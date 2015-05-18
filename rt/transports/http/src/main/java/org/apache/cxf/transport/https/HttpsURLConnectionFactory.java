@@ -170,9 +170,12 @@ public class HttpsURLConnectionFactory {
             ctx.init(keyManagers, tlsClientParameters.getTrustManagers(),
                      tlsClientParameters.getSecureRandom());
 
-            // The "false" argument means opposite of exclude.
-            String[] cipherSuites = SSLUtils.getCiphersuites(tlsClientParameters.getCipherSuites(), SSLUtils
-                .getSupportedCipherSuites(ctx), tlsClientParameters.getCipherSuitesFilter(), LOG, false);
+            String[] cipherSuites = 
+                SSLUtils.getCiphersuitesToInclude(tlsClientParameters.getCipherSuites(), 
+                                                  tlsClientParameters.getCipherSuitesFilter(), 
+                                                  ctx.getSocketFactory().getDefaultCipherSuites(),
+                                                  SSLUtils.getSupportedCipherSuites(ctx), 
+                                                  LOG);
             // The SSLSocketFactoryWrapper enables certain cipher suites
             // from the policy.
             socketFactory = new SSLSocketFactoryWrapper(ctx.getSocketFactory(), cipherSuites,

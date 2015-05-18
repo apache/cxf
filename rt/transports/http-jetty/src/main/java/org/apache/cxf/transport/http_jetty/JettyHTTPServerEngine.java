@@ -717,20 +717,22 @@ public class JettyHTTPServerEngine implements ServerEngine {
         final String[] supportedCipherSuites = 
             SSLUtils.getServerSupportedCipherSuites(context);
 
-        String[] excludedCipherSuites = 
-            SSLUtils.getCiphersuites(
-                    tlsServerParameters.getCipherSuites(),
-                    supportedCipherSuites,
-                    tlsServerParameters.getCipherSuitesFilter(),
-                    LOG, true);
-        scf.setExcludeCipherSuites(excludedCipherSuites);
+        if (tlsServerParameters.getCipherSuitesFilter() != null
+            && tlsServerParameters.getCipherSuitesFilter().isSetExclude()) {
+            String[] excludedCipherSuites = 
+                SSLUtils.getFilteredCiphersuites(tlsServerParameters.getCipherSuitesFilter(),
+                                                 supportedCipherSuites,
+                                                 LOG, 
+                                                 true);
+            scf.setExcludeCipherSuites(excludedCipherSuites);
+        }
         
         String[] includedCipherSuites = 
-            SSLUtils.getCiphersuites(
-                    tlsServerParameters.getCipherSuites(),
-                    supportedCipherSuites,
-                    tlsServerParameters.getCipherSuitesFilter(),
-                    LOG, false);
+            SSLUtils.getCiphersuitesToInclude(tlsServerParameters.getCipherSuites(), 
+                                              tlsServerParameters.getCipherSuitesFilter(), 
+                                              context.getServerSocketFactory().getDefaultCipherSuites(),
+                                              supportedCipherSuites, 
+                                              LOG);
         scf.setIncludeCipherSuites(includedCipherSuites);
         
         return context;

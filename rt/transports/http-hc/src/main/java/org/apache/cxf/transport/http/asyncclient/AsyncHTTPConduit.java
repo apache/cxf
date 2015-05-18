@@ -899,9 +899,13 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
         if (tlsClientParameters == null) {
             tlsClientParameters = new TLSClientParameters();
         }
-        String[] cipherSuites = SSLUtils.getCiphersuites(tlsClientParameters.getCipherSuites(),
-                                                         SSLUtils.getSupportedCipherSuites(sslcontext), 
-                                                         tlsClientParameters.getCipherSuitesFilter(), LOG, false);
+        
+        String[] cipherSuites = 
+            SSLUtils.getCiphersuitesToInclude(tlsClientParameters.getCipherSuites(), 
+                                              tlsClientParameters.getCipherSuitesFilter(), 
+                                              sslcontext.getSocketFactory().getDefaultCipherSuites(),
+                                              SSLUtils.getSupportedCipherSuites(sslcontext), 
+                                              LOG);
         sslengine.setEnabledCipherSuites(cipherSuites);
         
         String protocol = tlsClientParameters.getSecureSocketProtocol() != null ? tlsClientParameters

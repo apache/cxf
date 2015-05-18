@@ -426,31 +426,42 @@ public final class SSLUtils {
         return context.getServerSocketFactory().getSupportedCipherSuites();
     }
         
-    public static String[] getCiphersuites(List<String> cipherSuitesList,
-                                           String[] supportedCipherSuites,
+    public static String[] getCiphersuitesToInclude(List<String> cipherSuitesList,
                                            FiltersType filters,
-                                           Logger log, boolean exclude) {
-        
-        // First check the "include" case only. If we have defined explicit "cipherSuite"
-        // configuration, then just return these. Otherwise see if we have defined ciphersuites
-        // via a system property.
-        if (!exclude) {
-            if (!(cipherSuitesList == null || cipherSuitesList.isEmpty())) {
-                return getCiphersFromList(cipherSuitesList, log, exclude);
-            } else {
-                String[] cipherSuites = getSystemCiphersuites(log);
-                if (cipherSuites != null) {
-                    return cipherSuites;
-                }
-            }
+                                           String[] defaultCipherSuites,
+                                           String[] supportedCipherSuites,
+                                           Logger log) {
+        // CipherSuites are returned in the following priority:
+        // 1) If we have defined explicit "cipherSuite" configuration
+        // 2) If we have defined ciphersuites via a system property.
+        // 3) The default JVM CipherSuites, if no filters have been defined
+        // 4) Filter the supported cipher suites (*not* the default JVM CipherSuites)
+        if (!(cipherSuitesList == null || cipherSuitesList.isEmpty())) {
+            return getCiphersFromList(cipherSuitesList, log, false);
         }
-    
-        // Otherwise check the "include/exclude" cipherSuiteFilter configuration
+        
+        String[] cipherSuites = getSystemCiphersuites(log);
+        if (cipherSuites != null) {
+            return cipherSuites;
+        }
+
+        // If we have no explicit cipherSuites (for the include case as above), and no filters, 
+        // then just use the defaults
+        if ((defaultCipherSuites != null && defaultCipherSuites.length != 0)
+            && (filters == null || !(filters.isSetInclude() || filters.isSetExclude()))) {
+            LogUtils.log(log, Level.FINE, "CIPHERSUITES_SET", defaultCipherSuites.toString());          
+            return defaultCipherSuites;
+        }
         
         LogUtils.log(log, Level.FINE, "CIPHERSUITES_NOT_SET");
-        if (filters == null) {
-            LogUtils.log(log, Level.FINE, "CIPHERSUITE_FILTERS_NOT_SET");
-        }
+        
+        return getFilteredCiphersuites(filters, supportedCipherSuites, log, false);
+    }
+    
+    public static String[] getFilteredCiphersuites(FiltersType filters,
+                                           String[] supportedCipherSuites,
+                                           Logger log, boolean exclude) {
+        // We have explicit filters, so use the "include/exclude" cipherSuiteFilter configuration
         List<String> filteredCipherSuites = new ArrayList<String>();
         List<String> excludedCipherSuites = new ArrayList<String>();
         List<Pattern> includes =
