@@ -205,7 +205,7 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
             reportError("MISSING_RELAY_STATE");
             throw ExceptionUtils.toBadRequestException(null, null);
         }
-        if (relayState.getBytes().length < 0 || relayState.getBytes().length > 80) {
+        if (relayState.getBytes().length == 0 || relayState.getBytes().length > 80) {
             reportError("INVALID_RELAY_STATE");
             throw ExceptionUtils.toBadRequestException(null, null);
         }

@@ -19,105 +19,35 @@
 
 package org.apache.cxf.sts.cache;
 
-import java.util.Collections;
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.management.JMException;
-import javax.management.ObjectName;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.management.InstrumentationManager;
-import org.apache.cxf.management.ManagementConstants;
-import org.apache.cxf.management.annotation.ManagedOperation;
-import org.apache.cxf.management.annotation.ManagedResource;
+import org.apache.cxf.management.ManagedComponent;
 import org.apache.cxf.sts.IdentityMapper;
+import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 
-/**
- * A simple in-memory HashMap based cache to cache identities in different realms where
- * the relationship is of type FederateIdentity.
- */
-@ManagedResource()
-public class MemoryIdentityCache extends AbstractIdentityCache {
+public abstract class AbstractIdentityCache implements IdentityCache, IdentityMapper, ManagedComponent {
     
-    private static final Logger LOG = LogUtils.getL7dLogger(MemoryIdentityCache.class);
+    private static final Logger LOG = LogUtils.getL7dLogger(AbstractIdentityCache.class);
     
-    private final Map<String, Map<String, String>> cache =
-            Collections.synchronizedMap(new HashMap<String, Map<String, String>>());
+    private final IdentityMapper identityMapper;
+    private final Bus bus;
+    private MemoryIdentityCacheStatistics statistics;
     
-    private long maxCacheItems = 10000L;
-    
-    protected MemoryIdentityCache() {
-        super(null, null);
+    public AbstractIdentityCache(IdentityMapper identityMapper) {
+        this(null, identityMapper);
     }
     
-    public MemoryIdentityCache(IdentityMapper identityMapper) {
-        super(null, identityMapper);
+    public AbstractIdentityCache(Bus bus, IdentityMapper identityMapper) {
+        this.identityMapper = identityMapper;
+        this.bus = bus;
     }
     
-    public MemoryIdentityCache(Bus bus, IdentityMapper identityMapper) {
-        super(bus, identityMapper);
-        if (bus != null) {
-            InstrumentationManager im = bus.getExtension(InstrumentationManager.class);
-            if (im != null) {
-                try {
-                    im.register(this);
-                } catch (JMException e) {
-                    LOG.log(Level.WARNING, "Registering MemoryIdentityCache failed.", e);
-                }
-            }
-        }
-    }
-    
-    public long getMaxCacheItems() {
-        return maxCacheItems;
-    }
-
-    public void setMaxCacheItems(long maxCacheItems) {
-        this.maxCacheItems = maxCacheItems;
-    }
-
-    @Override
-    public void add(String user, String realm, Map<String, String> identities) {
-        if (cache.size() >= maxCacheItems) {
-            cache.clear();
-        }
-        cache.put(user + "@" + realm, identities);
-    }
-
-    @ManagedOperation()
-    @Override
-    public Map<String, String> get(String user, String realm) {
-        return cache.get(user + "@" + realm);
-    }
-
-    @Override
-    public void remove(String user, String realm) {
-        cache.remove(user + "@" + realm);       
-    }
-    
-    @ManagedOperation()
-    @Override
-    public void clear() {
-        cache.clear();  
-    }
-    
-    @ManagedOperation()
-    @Override
-    public int size() {
-        return cache.size();
-    }
-    
-    @ManagedOperation()
-    public String getContent() {
-        return this.cache.toString();
-    }
-
-<<<<<<< HEAD
-    @Override
     public Principal mapPrincipal(String sourceRealm,
             Principal sourcePrincipal, String targetRealm) {
         
@@ -147,7 +77,7 @@ public class MemoryIdentityCache extends AbstractIdentityCache {
                     if (LOG.isLoggable(Level.FINE)) {
                         LOG.fine("Merging mappings for '" + sourcePrincipal.getName() + "@" + sourceRealm + "'");
                     }
-                    //Identites already cached for targetUser@targetRealm key pair
+                    //Identities already cached for targetUser@targetRealm key pair
                     //Merge into identities object
                     this.mergeMap(identities, cachedItem);
                 }
@@ -171,7 +101,7 @@ public class MemoryIdentityCache extends AbstractIdentityCache {
             // Identities object NOT found for key sourceUser@sourceRealm
             targetPrincipal = this.identityMapper.mapPrincipal(
                     sourceRealm, sourcePrincipal, targetRealm);
-            identities = new HashMap<String, String>();
+            identities = new HashMap<>();
             identities.put(sourceRealm, sourcePrincipal.getName());
             identities.put(targetRealm, targetPrincipal.getName());
             this.add(targetPrincipal.getName(), targetRealm, identities);
@@ -180,30 +110,28 @@ public class MemoryIdentityCache extends AbstractIdentityCache {
         return targetPrincipal;
     }
     
-    
-    
-    private void mergeMap(Map<String, String> to, Map<String, String> from) {
-        for (String key : from.keySet()) {
-            to.put(key, from.get(key));
+    public MemoryIdentityCacheStatistics getStatistics() {
+        if (statistics == null) {
+            this.statistics = new MemoryIdentityCacheStatistics(bus, this);
         }
-        for (String key : to.keySet()) {
-            from.put(key, to.get(key));
+        return statistics;
+    }
+
+    public void setStatistics(MemoryIdentityCacheStatistics stats) {
+        this.statistics = stats;
+    }
+
+    private void mergeMap(Map<String, String> to, Map<String, String> from) {
+        for (Map.Entry<String, String> entry : from.entrySet()) {
+            to.put(entry.getKey(), entry.getValue());
+        }
+        for (Map.Entry<String, String> entry : to.entrySet()) {
+            from.put(entry.getKey(), entry.getValue());
         }
     }
     
-=======
->>>>>>> 591e5d9... Some code cleanup + fixes
-    public ObjectName getObjectName() throws JMException {
-        StringBuilder buffer = new StringBuilder();
-        buffer.append(ManagementConstants.DEFAULT_DOMAIN_NAME).append(':');
-        if (super.getBus() != null) {
-            buffer.append(
-                ManagementConstants.BUS_ID_PROP).append('=').append(super.getBus().getId()).append(',');
-        }
-        buffer.append(ManagementConstants.TYPE_PROP).append('=').append("MemoryIdentityCache").append(',');
-        buffer.append(ManagementConstants.NAME_PROP).append('=')
-            .append("MemoryIdentityCache-" + System.identityHashCode(this));
-        return new ObjectName(buffer.toString());
-    }    
+    protected Bus getBus() {
+        return bus;
+    }
 }
 
