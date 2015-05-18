@@ -58,9 +58,9 @@ public class CacheMap<K, V> implements Map<K, V> {
     private void updateMainDataMap() {
         //if the singleton in the mainDataMap has been garbage collected, 
         //we'll copy another version of it from the extraKeyMap
-        for (K o : extraKeyMap.keySet()) {
-            if (!mainDataMap.containsKey(o)) {
-                mainDataMap.put(o, extraKeyMap.get(o));
+        for (Map.Entry<K, V> entry : extraKeyMap.entrySet()) {
+            if (!mainDataMap.containsKey(entry.getKey())) {
+                mainDataMap.put(entry.getKey(), entry.getValue());
             }
         }
     }

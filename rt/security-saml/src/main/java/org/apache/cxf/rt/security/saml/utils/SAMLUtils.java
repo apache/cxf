@@ -114,7 +114,7 @@ public final class SAMLUtils {
         for (Claim claim : claims) {
             if (claim instanceof SAMLClaim && ((SAMLClaim)claim).getName().equals(name)
                 && (nameFormat == null 
-                    || claim instanceof SAMLClaim && nameFormat.equals(((SAMLClaim)claim).getNameFormat()))) {
+                    || nameFormat.equals(((SAMLClaim)claim).getNameFormat()))) {
                 for (Object claimValue : claim.getValues()) {
                     if (claimValue instanceof String) {
                         roles.add(new SimpleGroup((String)claimValue));

@@ -97,8 +97,8 @@ public final class VelocityGenerator {
 
         VelocityContext ctx = new VelocityContext();
 
-        for (String key : attributes.keySet()) {
-            ctx.put(key, attributes.get(key));
+        for (Map.Entry<String, Object> entry : attributes.entrySet()) {
+            ctx.put(entry.getKey(), entry.getValue());
         }
 
         VelocityWriter writer = new VelocityWriter(outputs);

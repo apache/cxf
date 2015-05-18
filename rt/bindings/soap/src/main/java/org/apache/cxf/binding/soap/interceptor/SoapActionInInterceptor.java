@@ -193,7 +193,7 @@ public class SoapActionInInterceptor extends AbstractSoapInterceptor {
                 boi.getOperationInfo().getInput().setProperty(CALCULATED_WSA_ACTION, o);
             }
         }
-        return o == null ? null : o.toString();
+        return o.toString();
     }
     private static String getActionBaseUri(final OperationInfo operation) {
         String interfaceName = operation.getInterface().getName().getLocalPart();

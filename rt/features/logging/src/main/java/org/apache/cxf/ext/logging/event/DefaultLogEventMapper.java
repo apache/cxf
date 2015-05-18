@@ -123,6 +123,9 @@ public class DefaultLogEventMapper implements LogEventMapper {
                 principals.append(",");
             }
         }
+        if (principals.length() == 0) {
+            return null;
+        }
         return principals.toString();
     }
 
@@ -135,13 +138,12 @@ public class DefaultLogEventMapper implements LogEventMapper {
     private Map<String, String> getHeaders(Message message) {
         Map<String, List<String>> headers = CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
         Map<String, String> result = new HashMap<>();
-        for (String key : headers.keySet()) {
-            List<String> value = headers.get(key);
-            if (value.size() == 1) {
-                result.put(key, value.iterator().next());
+        for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
+            if (entry.getValue().size() == 1) {
+                result.put(entry.getKey(), entry.getValue().get(0));
             } else {
-                String[] valueAr = value.toArray(new String[] {});
-                result.put(key, valueAr.toString());
+                String[] valueAr = entry.getValue().toArray(new String[] {});
+                result.put(entry.getKey(), valueAr.toString());
             }
         }
         return result;

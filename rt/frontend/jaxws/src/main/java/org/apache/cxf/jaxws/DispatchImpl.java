@@ -287,7 +287,7 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
                 return new WebServiceException(ex);
             }
             
-            SOAPFaultException  exception = new SOAPFaultException(soapFault);
+            SOAPFaultException exception = new SOAPFaultException(soapFault);
             exception.initCause(ex);
             return exception;                
         }

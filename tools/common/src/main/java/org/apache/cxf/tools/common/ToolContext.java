@@ -80,9 +80,9 @@ public class ToolContext {
     }
 
     public void addParameters(Map<String, Object> map) {
-        for (String key : map.keySet()) {
-            if (!optionSet(key)) {
-                put(key, map.get(key));
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            if (!optionSet(entry.getKey())) {
+                put(entry.getKey(), entry.getValue());
             }
         }
     }

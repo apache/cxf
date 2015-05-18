@@ -40,6 +40,9 @@ public class UserSubject {
     }
 
     public List<String> getRoles() {
+        if (roles == null) {
+            return Collections.emptyList();
+        }
         return Collections.unmodifiableList(roles);
     }
     

@@ -149,9 +149,9 @@ public class LdapCertificateRepo implements CertificateRepo {
         attribs.put(new BasicAttribute(ldapConfig.getAttrIssuerID(), cert.getIssuerX500Principal().getName()));
         attribs.put(new BasicAttribute(ldapConfig.getAttrSerialNumber(), cert.getSerialNumber().toString(16)));
         addConstantAttributes(ldapConfig.getConstAttrNamesCSV(), ldapConfig.getConstAttrValuesCSV(), attribs);
-        if ((appAttrs != null) && (!appAttrs.isEmpty())) {
-            for (String attrName : appAttrs.keySet()) {
-                attribs.put(new BasicAttribute(attrName, appAttrs.get(attrName)));
+        if (appAttrs != null && !appAttrs.isEmpty()) {
+            for (Map.Entry<String, String> entry : appAttrs.entrySet()) {
+                attribs.put(new BasicAttribute(entry.getKey(), entry.getValue()));
             }
         }
         try {
@@ -179,7 +179,7 @@ public class LdapCertificateRepo implements CertificateRepo {
         X509Certificate cert = null;
         try {
             String dn = id;
-            if ((rootDN != null) && !(rootDN.isEmpty())) {
+            if (rootDN != null && !rootDN.isEmpty()) {
                 dn = dn + "," + rootDN;
             }
             cert = getCertificateForDn(dn);
@@ -246,7 +246,7 @@ public class LdapCertificateRepo implements CertificateRepo {
 
     @Override
     public X509Certificate findByIssuerSerial(String issuer, String serial) {
-        if ((issuer == null) || (serial == null)) {
+        if (issuer == null || serial == null) {
             throw new IllegalArgumentException("Issuer and serial applications are expected in request");
         }
         String filter = String.format(filterIssuerSerialTemplate, issuer, serial);

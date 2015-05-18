@@ -64,8 +64,8 @@ public class DefaultSecurityContext implements LoginSecurityContext {
         }
         
         for (Principal principal : subject.getPrincipals()) {
-            if (!(principal instanceof Group) && (principalName == null 
-                || (principalName != null && principalName.equals(principal.getName())))) {
+            if (!(principal instanceof Group) 
+                && (principalName == null || principal.getName().equals(principalName))) {
                 return principal;
             }
         }

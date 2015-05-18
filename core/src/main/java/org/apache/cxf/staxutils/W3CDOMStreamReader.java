@@ -361,11 +361,7 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader<Node, Node> {
         String prefix = getPrefix();
         String ln = getLocalName();
 
-        if (prefix == null) {
-            return new QName(el.getNamespaceURI(), ln);
-        } else {
-            return new QName(el.getNamespaceURI(), ln, prefix);
-        }
+        return new QName(el.getNamespaceURI(), ln, prefix);
     }
 
     public String getLocalName() {

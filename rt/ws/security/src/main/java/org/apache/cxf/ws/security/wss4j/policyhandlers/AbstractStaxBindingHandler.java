@@ -770,8 +770,8 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
     
     protected void addSignatureParts(Map<AbstractToken, SecurePart> tokenMap) {
         if (tokenMap != null) {
-            for (AbstractToken token : tokenMap.keySet()) {
-                SecurePart part = tokenMap.get(token);
+            for (Map.Entry<AbstractToken, SecurePart> entry : tokenMap.entrySet()) {
+                SecurePart part = entry.getValue();
     
                 QName name = part.getName();
                 List<WSSConstants.Action> actionList = properties.getActions();

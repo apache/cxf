@@ -29,7 +29,6 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -343,8 +342,10 @@ public class Headers {
     private void transferProtocolHeadersToURLConnection(URLConnection connection) {
         boolean addHeaders = MessageUtils.isTrue(
                 message.getContextualProperty(ADD_HEADERS_PROPERTY));
-        for (String header : headers.keySet()) {
-            List<String> headerList = headers.get(header);
+        for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
+            String header = entry.getKey();
+            List<String> headerList = entry.getValue();
+            
             if (HttpHeaderHelper.CONTENT_TYPE.equalsIgnoreCase(header)) {
                 continue;
             }
@@ -448,9 +449,9 @@ public class Headers {
 
         boolean addHeaders = MessageUtils.isTrue(
                 message.getContextualProperty(ADD_HEADERS_PROPERTY));
-        for (Iterator<?> iter = headers.keySet().iterator(); iter.hasNext();) {
-            String header = (String)iter.next();
-            List<?> headerList = headers.get(header);
+        for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
+            String header = entry.getKey();
+            List<?> headerList = entry.getValue();
             
             if (addHeaders || HTTP_HEADERS_SINGLE_VALUE_ONLY.contains(header)) {
                 for (int i = 0; i < headerList.size(); i++) {

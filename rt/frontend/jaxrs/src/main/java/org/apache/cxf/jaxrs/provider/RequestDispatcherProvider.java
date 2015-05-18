@@ -247,9 +247,9 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
             return resourcePath;
         }
         String path = getRequestPath();
-        for (String requestPath : resourcePaths.keySet()) {
-            if (path.endsWith(requestPath)) {
-                return resourcePaths.get(requestPath);
+        for (Map.Entry<String, String> entry : resourcePaths.entrySet()) {
+            if (path.endsWith(entry.getKey())) {
+                return entry.getValue();
             }
         }
         

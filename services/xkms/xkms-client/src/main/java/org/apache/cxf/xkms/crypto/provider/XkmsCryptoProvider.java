@@ -164,9 +164,9 @@ public class XkmsCryptoProvider extends CryptoBase {
 
     private X509Certificate[] getX509(CryptoType cryptoType) {
         // Try to get X509 certificate from local keystore if it is configured
-        if (allowX509FromJKS && (fallbackCrypto != null)) {
+        if (allowX509FromJKS && fallbackCrypto != null) {
             X509Certificate[] localCerts = getCertificateLocaly(cryptoType);
-            if ((localCerts != null) && localCerts.length > 0) {
+            if (localCerts != null && localCerts.length > 0) {
                 return localCerts;
             }
         }

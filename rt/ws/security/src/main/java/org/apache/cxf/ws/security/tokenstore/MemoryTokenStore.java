@@ -86,10 +86,9 @@ public class MemoryTokenStore implements TokenStore {
     protected void processTokenExpiry() {
         Date current = new Date();
         synchronized (tokens) {
-            for (String id : tokens.keySet()) {
-                CacheEntry cacheEntry = tokens.get(id);
-                if (cacheEntry.getExpiry().before(current)) {
-                    tokens.remove(id);
+            for (Map.Entry<String, CacheEntry> entry : tokens.entrySet()) {
+                if (entry.getValue().getExpiry().before(current)) {
+                    tokens.remove(entry.getKey());
                 }
             }
         }

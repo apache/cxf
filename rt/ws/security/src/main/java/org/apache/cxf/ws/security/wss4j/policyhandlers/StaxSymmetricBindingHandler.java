@@ -620,7 +620,8 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                         == incomingEvent.getSecurityEventType()) {
                     org.apache.xml.security.stax.securityToken.SecurityToken token = 
                         ((AbstractSecuredElementSecurityEvent)incomingEvent).getSecurityToken();
-                    if (token.getKeyWrappingToken() != null && token.getKeyWrappingToken().getSecretKey() != null 
+                    if (token != null && token.getKeyWrappingToken() != null 
+                        && token.getKeyWrappingToken().getSecretKey() != null 
                         && token.getKeyWrappingToken().getSha1Identifier() != null) {
                         return token.getKeyWrappingToken();
                     } else if (token != null && token.getSecretKey() != null 
@@ -637,7 +638,8 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                         == incomingEvent.getSecurityEventType()) {
                     org.apache.xml.security.stax.securityToken.SecurityToken token = 
                         ((AbstractSecuredElementSecurityEvent)incomingEvent).getSecurityToken();
-                    if (token.getKeyWrappingToken() != null && token.getKeyWrappingToken().getSecretKey() != null 
+                    if (token != null && token.getKeyWrappingToken() != null 
+                        && token.getKeyWrappingToken().getSecretKey() != null 
                         && token.getKeyWrappingToken().getSha1Identifier() != null) {
                         return token.getKeyWrappingToken();
                     } else if (token != null && token.getSecretKey() != null 

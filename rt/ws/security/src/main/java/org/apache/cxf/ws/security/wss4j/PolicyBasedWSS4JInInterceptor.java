@@ -545,10 +545,10 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         
         // Validate security policies
         Map<QName, SecurityPolicyValidator> validators = PolicyUtils.getSecurityPolicyValidators(msg);
-        for (QName qName : aim.keySet()) {
+        for (Map.Entry<QName, Collection<AssertionInfo>> entry : aim.entrySet()) {
             // Check to see if we have a security policy + if we can validate it
-            if (validators.containsKey(qName)) {
-                validators.get(qName).validatePolicies(parameters, aim.get(qName));
+            if (validators.containsKey(entry.getKey())) {
+                validators.get(entry.getKey()).validatePolicies(parameters, entry.getValue());
             }
         }
         
