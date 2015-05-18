@@ -76,7 +76,7 @@ public class ProxyFactory {
             // 8080 is the default proxy port value as per some documentation
             String proxyPort = SystemPropertyAction.getProperty(HTTP_PROXY_PORT, "8080");
             if (StringUtils.isEmpty(proxyPort)) {
-                proxyPort = null;
+                proxyPort = "8080";
             }
             
             systemProxyConfiguration.setProxyServerPort(Integer.valueOf(proxyPort));

@@ -257,7 +257,7 @@ public class STSLoginModule implements LoginModule {
                 message.put(SecurityConstants.STS_CLIENT, stsClient);
                 data.setMsgContext(message);
             } else {
-                TokenStore tokenStore = configureTokenStore(message);
+                TokenStore tokenStore = configureTokenStore();
                 validator.setStsClient(stsClient);
                 validator.setTokenStore(tokenStore);
             }
@@ -325,11 +325,7 @@ public class STSLoginModule implements LoginModule {
         return c;
     }
     
-    private TokenStore configureTokenStore(Message msg) throws MalformedURLException {
-        if (msg != null) {
-            return STSTokenValidator.getTokenStore(msg);
-        }
-        
+    private TokenStore configureTokenStore() throws MalformedURLException {
         if (TokenStoreFactory.isEhCacheInstalled()) {
             String cfg = "cxf-ehcache.xml";
             URL url = null;

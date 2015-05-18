@@ -533,7 +533,7 @@ public class STSStaxTokenValidator
         private Element convertToDOM(
             BinarySecurityTokenType binarySecurityTokenType,
             byte[] securityTokenData
-        ) {
+        ) throws WSSecurityException {
             Document doc = DOMUtils.newDocument();
             BinarySecurity binarySecurity = null;
             if (WSSConstants.NS_X509_V3_TYPE.equals(binarySecurityTokenType.getValueType())) {
@@ -542,6 +542,8 @@ public class STSStaxTokenValidator
                 binarySecurity = new PKIPathSecurity(doc);
             } else if (WSSConstants.NS_GSS_Kerberos5_AP_REQ.equals(binarySecurityTokenType.getValueType())) {
                 binarySecurity = new KerberosSecurity(doc);
+            } else {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN);
             }
             
             binarySecurity.addWSSENamespace();

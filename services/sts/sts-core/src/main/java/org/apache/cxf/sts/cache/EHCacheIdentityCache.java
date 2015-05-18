@@ -22,8 +22,6 @@ package org.apache.cxf.sts.cache;
 import java.io.Closeable;
 import java.io.IOException;
 import java.net.URL;
-import java.security.Principal;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -43,7 +41,6 @@ import org.apache.cxf.buslifecycle.BusLifeCycleManager;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.management.InstrumentationManager;
-import org.apache.cxf.management.ManagedComponent;
 import org.apache.cxf.management.ManagementConstants;
 import org.apache.cxf.management.annotation.ManagedOperation;
 import org.apache.cxf.management.annotation.ManagedResource;
@@ -52,22 +49,18 @@ import org.apache.cxf.sts.IdentityMapper;
 import org.apache.cxf.ws.security.cache.EHCacheUtils;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreFactory;
 import org.apache.wss4j.common.cache.EHCacheManagerHolder;
-import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 
 /**
  * A EH-Cache based cache to cache identities in different realms where
  * the relationship is of type FederateIdentity.
  */
 @ManagedResource()
-public class EHCacheIdentityCache 
-    implements IdentityCache, IdentityMapper, Closeable, BusLifeCycleListener, ManagedComponent {
+public class EHCacheIdentityCache extends AbstractIdentityCache 
+    implements Closeable, BusLifeCycleListener {
     
     private static final Logger LOG = LogUtils.getL7dLogger(EHCacheIdentityCache.class);
     
-    private IdentityMapper identityMapper;
-    private MemoryIdentityCacheStatistics statistics;
     private Ehcache cache;
-    private Bus bus;
     private CacheManager cacheManager;
     
     
@@ -80,10 +73,8 @@ public class EHCacheIdentityCache
     public EHCacheIdentityCache(
         IdentityMapper identityMapper, String key, Bus b, URL configFileURL
     ) {
-        this.identityMapper = identityMapper;
-        
-        bus = b;
-        if (bus != null) {
+        super(b, identityMapper);
+        if (b != null) {
             b.getExtension(BusLifeCycleManager.class).registerLifeCycleListener(this);
             InstrumentationManager im = b.getExtension(InstrumentationManager.class);
             if (im != null) {
@@ -96,9 +87,9 @@ public class EHCacheIdentityCache
         }
 
         if (configFileURL != null) {
-            cacheManager = EHCacheUtils.getCacheManager(bus, configFileURL);
+            cacheManager = EHCacheUtils.getCacheManager(b, configFileURL);
         } else {
-            cacheManager = EHCacheUtils.getCacheManager(bus, getDefaultConfigFileURL());
+            cacheManager = EHCacheUtils.getCacheManager(b, getDefaultConfigFileURL());
         }
         CacheConfiguration cc = EHCacheManagerHolder.getCacheConfiguration(key, cacheManager);
         
@@ -106,17 +97,6 @@ public class EHCacheIdentityCache
         cache = cacheManager.addCacheIfAbsent(newCache);
     }
     
-    public MemoryIdentityCacheStatistics getStatistics() {
-        if (statistics == null) {
-            this.statistics = new MemoryIdentityCacheStatistics(bus, this);
-        }
-        return statistics;
-    }
-
-    public void setStatistics(MemoryIdentityCacheStatistics stats) {
-        this.statistics = stats;
-    }
-
     @Override
     public void add(String user, String realm, Map<String, String> identities) {
         cache.put(new Element(user + "@" + realm, identities));
@@ -155,80 +135,6 @@ public class EHCacheIdentityCache
         return this.cache.toString();
     }
 
-    @Override
-    public Principal mapPrincipal(String sourceRealm,
-            Principal sourcePrincipal, String targetRealm) {
-        
-        Principal targetPrincipal = null;
-        Map<String, String> identities = this.get(sourcePrincipal.getName(), sourceRealm);
-        if (identities != null) {
-            if (LOG.isLoggable(Level.FINE)) {
-                LOG.fine("Identities found for '" + sourcePrincipal.getName() + "@" + sourceRealm + "'");
-            }
-            // Identities object found for key sourceUser@sourceRealm
-            String targetUser = identities.get(targetRealm);
-            if (targetUser == null) {
-                getStatistics().increaseCacheMiss();
-                if (LOG.isLoggable(Level.FINE)) {
-                    LOG.fine("No mapping found for realm " + targetRealm + " of user '"
-                             + sourcePrincipal.getName() + "@" + sourceRealm + "'");
-                }
-                // User identity of target realm not cached yet
-                targetPrincipal = this.identityMapper.mapPrincipal(
-                        sourceRealm, sourcePrincipal, targetRealm);
-                // Add the identity for target realm to the cached entry 
-                identities.put(targetRealm, targetPrincipal.getName());
-                
-                // Verify whether target user has cached some identities already
-                Map<String, String> cachedItem = this.get(targetPrincipal.getName(), targetRealm);
-                if (cachedItem != null) {
-                    if (LOG.isLoggable(Level.FINE)) {
-                        LOG.fine("Merging mappings for '" + sourcePrincipal.getName() + "@" + sourceRealm + "'");
-                    }
-                    //Identites already cached for targetUser@targetRealm key pair
-                    //Merge into identities object
-                    this.mergeMap(identities, cachedItem);
-                }
-                this.add(targetPrincipal.getName(), targetRealm, identities);
-            } else {
-                getStatistics().increaseCacheHit();
-                if (LOG.isLoggable(Level.INFO)) {
-                    LOG.info("Mapping '" + sourcePrincipal.getName() + "@" + sourceRealm + "' to '"
-                             + targetUser + "@" + targetRealm + "' cached");
-                }
-                targetPrincipal = new CustomTokenPrincipal(targetUser);
-            }
-            
-        } else {
-            if (LOG.isLoggable(Level.FINE)) {
-                LOG.fine("No mapping found for realm " + targetRealm + " of user '"
-                        + sourcePrincipal.getName() + "@" + sourceRealm + "'");
-            }
-            getStatistics().increaseCacheMiss();
-            
-            // Identities object NOT found for key sourceUser@sourceRealm
-            targetPrincipal = this.identityMapper.mapPrincipal(
-                    sourceRealm, sourcePrincipal, targetRealm);
-            identities = new HashMap<>();
-            identities.put(sourceRealm, sourcePrincipal.getName());
-            identities.put(targetRealm, targetPrincipal.getName());
-            this.add(targetPrincipal.getName(), targetRealm, identities);
-            this.add(sourcePrincipal.getName(), sourceRealm, identities);
-        }
-        return targetPrincipal;
-    }
-    
-    
-    
-    private void mergeMap(Map<String, String> to, Map<String, String> from) {
-        for (String key : from.keySet()) {
-            to.put(key, from.get(key));
-        }
-        for (String key : to.keySet()) {
-            from.put(key, to.get(key));
-        }
-    }
-    
     public void close() {
         if (cacheManager != null) {
             // this step is especially important for global shared cache manager
@@ -239,8 +145,8 @@ public class EHCacheIdentityCache
             EHCacheManagerHolder.releaseCacheManger(cacheManager);
             cacheManager = null;
             cache = null;
-            if (bus != null) {
-                bus.getExtension(BusLifeCycleManager.class).unregisterLifeCycleListener(this);
+            if (super.getBus() != null) {
+                super.getBus().getExtension(BusLifeCycleManager.class).unregisterLifeCycleListener(this);
             }
         }
     }
@@ -258,8 +164,10 @@ public class EHCacheIdentityCache
     
     private URL getDefaultConfigFileURL() {
         URL url = null;
-        ResourceManager rm = bus.getExtension(ResourceManager.class);
-        url = rm.resolveResource("sts-ehcache.xml", URL.class);
+        if (super.getBus() != null) {
+            ResourceManager rm = super.getBus().getExtension(ResourceManager.class);
+            url = rm.resolveResource("sts-ehcache.xml", URL.class);
+        }
         try {
             if (url == null) {
                 url = ClassLoaderUtils.getResource("sts-ehcache.xml", TokenStoreFactory.class);
@@ -277,7 +185,10 @@ public class EHCacheIdentityCache
     public ObjectName getObjectName() throws JMException {
         StringBuilder buffer = new StringBuilder();
         buffer.append(ManagementConstants.DEFAULT_DOMAIN_NAME).append(':');
-        buffer.append(ManagementConstants.BUS_ID_PROP).append('=').append(bus.getId()).append(',');
+        if (super.getBus() != null) {
+            buffer.append(
+                ManagementConstants.BUS_ID_PROP).append('=').append(super.getBus().getId()).append(',');
+        }
         buffer.append(ManagementConstants.TYPE_PROP).append('=').append("EHCacheIdentityCache").append(',');
         buffer.append(ManagementConstants.NAME_PROP).append('=')
             .append("EHCacheIdentityCache-" + System.identityHashCode(this));
