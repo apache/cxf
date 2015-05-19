@@ -208,7 +208,7 @@ public abstract class HTTPConduit
      * This field holds the "default" URI for this particular conduit, which
      * is created on demand.
      */
-    protected Address defaultAddress;
+    protected volatile Address defaultAddress;
     
     protected boolean fromEndpointReferenceType;
     
@@ -298,11 +298,6 @@ public abstract class HTTPConduit
 
         if (t != null) {
             fromEndpointReferenceType = true;
-        }
-        try {
-            defaultAddress = createAddress();
-        } catch (URISyntaxException use) {
-            throw new IOException(use);
         }
         proxyFactory = new ProxyFactory();
         cookies = new Cookies();
@@ -679,6 +674,7 @@ public abstract class HTTPConduit
         String result = (String)message.get(Message.ENDPOINT_ADDRESS);
         String pathInfo = (String)message.get(Message.PATH_INFO);
         String queryString = (String)message.get(Message.QUERY_STRING);
+        setAndGetDefaultAddress();
         if (result == null) {
             if (pathInfo == null && queryString == null) {
                 message.put(Message.ENDPOINT_ADDRESS, defaultAddress.getString());
@@ -722,19 +718,26 @@ public abstract class HTTPConduit
      * @return the default target URL
      */
     protected URI getURI() throws URISyntaxException {
-        return defaultAddress.getURI();
+        return setAndGetDefaultAddress().getURI();
     }
 
-    private Address createAddress() throws URISyntaxException {
-        if (fromEndpointReferenceType && getTarget().getAddress().getValue() != null) {
-            return new Address(this.getTarget().getAddress().getValue());
+    private Address setAndGetDefaultAddress() throws URISyntaxException {
+        if (defaultAddress == null) {
+            synchronized (this) {
+                if (defaultAddress == null) {
+                    if (fromEndpointReferenceType && getTarget().getAddress().getValue() != null) {
+                        defaultAddress = new Address(this.getTarget().getAddress().getValue());
+                    }
+                    if (endpointInfo.getAddress() == null) {
+                        throw new URISyntaxException("<null>", 
+                                                     "Invalid address. Endpoint address cannot be null.",
+                                                     0);
+                    }
+                    defaultAddress = new Address(endpointInfo.getAddress());
+                }
+            }
         }
-        if (endpointInfo.getAddress() == null) {
-            throw new URISyntaxException("<null>", 
-                                         "Invalid address. Endpoint address cannot be null.",
-                                         0);
-        }
-        return new Address(endpointInfo.getAddress());
+        return defaultAddress;
     }
 
     /**
