@@ -50,6 +50,7 @@ public class CXFJettySslSocketConnector extends SslSelectChannelConnector {
     protected List<String>   cipherSuites;
     protected FiltersType    cipherSuitesFilter;
     protected List<String>   excludeProtocols;
+    protected List<String>   includeProtocols;
        
     /**
      * Set the cipherSuites
@@ -70,6 +71,13 @@ public class CXFJettySslSocketConnector extends SslSelectChannelConnector {
      */
     protected void setExcludeProtocols(List<String> ps) {
         excludeProtocols = ps;
+    }
+    
+    /**
+     * Set the protocols to include
+     */
+    protected void setIncludeProtocols(List<String> ps) {
+        includeProtocols = ps;
     }
     
     /**
@@ -118,15 +126,21 @@ public class CXFJettySslSocketConnector extends SslSelectChannelConnector {
     
     protected SSLContext createSSLContext() throws Exception  {
         String proto = getCxfSslContextFactory().getProtocol() == null
-            ? "TLS"
-                : getCxfSslContextFactory().getProtocol();
+            ? "TLS" : getCxfSslContextFactory().getProtocol();
  
-        // Exclude SSLv3 + SSLv2Hello by default unless the protocol is given as SSLv3
+        // Exclude SSLv3 + SSLv2Hello by default unless the protocol is given as SSLv3, or if
+        // they have been explicitly included
         if (!"SSLv3".equals(proto) 
             && (excludeProtocols == null || excludeProtocols.isEmpty())) {
-            getSslContextFactory().addExcludeProtocols("SSLv3");
-            getSslContextFactory().addExcludeProtocols("SSLv2Hello");
-        } else if (excludeProtocols != null) {
+            if (includeProtocols == null || !includeProtocols.contains("SSLv3")) {
+                getSslContextFactory().addExcludeProtocols("SSLv3");
+            }
+            if (includeProtocols == null || !includeProtocols.contains("SSLv2Hello")) {
+                getSslContextFactory().addExcludeProtocols("SSLv2Hello");
+            }
+        }
+        
+        if (excludeProtocols != null) {
             for (String p : excludeProtocols) {
                 getSslContextFactory().addExcludeProtocols(p);
             }
