@@ -26,6 +26,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import org.apache.aries.blueprint.NamespaceHandler;
+import org.apache.aries.blueprint.Namespaces;
 import org.apache.aries.blueprint.ParserContext;
 import org.apache.aries.blueprint.mutable.MutableBeanMetadata;
 import org.apache.cxf.bus.blueprint.BusDefinitionParser;
@@ -36,9 +37,13 @@ import org.apache.cxf.workqueue.AutomaticWorkQueueImpl;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.osgi.service.blueprint.reflect.Metadata;
 
-/**
- * 
- */
+@Namespaces({"http://cxf.apache.org/blueprint/core",
+             "http://cxf.apache.org/configuration/beans",
+             "http://cxf.apache.org/configuration/parameterized-types",
+             "http://cxf.apache.org/configuration/security",
+             "http://schemas.xmlsoap.org/wsdl/",
+             "http://www.w3.org/2005/08/addressing",
+             "http://schemas.xmlsoap.org/ws/2004/08/addressing"})
 public class CXFAPINamespaceHandler implements NamespaceHandler {    
     
     public URL getSchemaLocation(String namespace) {

@@ -20,6 +20,8 @@ package org.apache.cxf.systest.jaxrs;
 
 import java.net.URI;
 
+import javax.servlet.ServletContext;
+
 import org.apache.aries.blueprint.container.SimpleNamespaceHandlerSet;
 import org.apache.aries.blueprint.parser.NamespaceHandlerSet;
 import org.apache.aries.blueprint.web.BlueprintContextListener;
@@ -29,7 +31,7 @@ import org.apache.cxf.jaxws.blueprint.JAXWSBPNamespaceHandler;
 
 public class JAXRSBlueprintContextListener extends BlueprintContextListener {
     @Override
-    protected NamespaceHandlerSet getNamespaceHandlerSet(ClassLoader tccl) {
+    protected NamespaceHandlerSet getNamespaceHandlerSet(ServletContext sc, ClassLoader tccl) {
         SimpleNamespaceHandlerSet set = new SimpleNamespaceHandlerSet();
         
         set.addNamespace(URI.create("http://cxf.apache.org/blueprint/core"),
