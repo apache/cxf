@@ -1473,7 +1473,12 @@ public abstract class HTTPConduit
         protected boolean authorizationRetransmit() throws IOException {
             Message m = new MessageImpl();
             updateResponseHeaders(m);
-            HttpAuthHeader authHeader = new HttpAuthHeader(Headers.getSetProtocolHeaders(m).get("WWW-Authenticate"));
+            List<String> authHeaderValues = Headers.getSetProtocolHeaders(m).get("WWW-Authenticate");
+            if (authHeaderValues == null) {
+                LOG.warning("WWW-Authenticate response header is not set");
+                return false;
+            }
+            HttpAuthHeader authHeader = new HttpAuthHeader(authHeaderValues);
             URI currentURI = url;
             String realm = authHeader.getRealm();
             detectAuthorizationLoop(getConduitName(), outMessage, currentURI, realm);
