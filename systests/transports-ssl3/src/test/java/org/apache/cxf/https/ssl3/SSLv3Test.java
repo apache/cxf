@@ -47,6 +47,7 @@ public class SSLv3Test extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(SSLv3Server.class);
     static final String PORT2 = allocatePort(SSLv3Server.class, 2);
     static final String PORT3 = allocatePort(SSLv3Server.class, 3);
+    static final String PORT4 = allocatePort(SSLv3Server.class, 4);
     
     @BeforeClass
     public static void startServers() throws Exception {
@@ -239,6 +240,52 @@ public class SSLv3Test extends AbstractBusClientServerTestBase {
         updateAddressPort(port, PORT3);
         
         assertEquals(port.greetMe("Kitty"), "Hello Kitty");
+        
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+ 
+    @org.junit.Test
+    public void testTLSClientToEndpointWithSSL3Allowed() throws Exception {
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = SSLv3Test.class.getResource("sslv3-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        URL url = SOAPService.WSDL_LOCATION;
+        SOAPService service = new SOAPService(url, SOAPService.SERVICE);
+        assertNotNull("Service is null", service);   
+        final Greeter port = service.getHttpsPort();
+        assertNotNull("Port is null", port);
+        
+        updateAddressPort(port, PORT4);
+        
+        port.greetMe("Kitty");
+        
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testSSL3ClientToEndpointWithSSL3Allowed() throws Exception {
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = SSLv3Test.class.getResource("sslv3-client-allow.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        URL url = SOAPService.WSDL_LOCATION;
+        SOAPService service = new SOAPService(url, SOAPService.SERVICE);
+        assertNotNull("Service is null", service);   
+        final Greeter port = service.getHttpsPort();
+        assertNotNull("Port is null", port);
+        
+        updateAddressPort(port, PORT4);
+        
+        port.greetMe("Kitty");
         
         ((java.io.Closeable)port).close();
         bus.shutdown(true);

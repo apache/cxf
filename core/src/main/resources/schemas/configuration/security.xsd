@@ -353,6 +353,19 @@
         </xs:sequence>
     </xs:complexType>
     
+    <xs:complexType name="IncludeProtocols">
+      <xs:annotation>
+        <xs:documentation>
+        This structure holds a list of protocols that are to be included.
+        Sometimes we want to include more protocols than the secure socket protocol, for example
+        "SSLv2Hello".
+        </xs:documentation>
+      </xs:annotation>
+        <xs:sequence>
+           <xs:element name="includeProtocol" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    
     <xs:complexType name="SecureRandomParameters">
       <xs:annotation>
         <xs:documentation>
@@ -554,6 +567,13 @@
               <xs:annotation>
                 <xs:documentation>
                 This element contains the the Protocols that will be excluded
+                </xs:documentation>
+              </xs:annotation>
+           </xs:element>
+           <xs:element name="includeProtocols" type="tns:IncludeProtocols" minOccurs="0">
+              <xs:annotation>
+                <xs:documentation>
+                This element contains the the Protocols that will be included
                 </xs:documentation>
               </xs:annotation>
            </xs:element>

@@ -40,6 +40,7 @@ import org.apache.cxf.configuration.security.CipherSuites;
 import org.apache.cxf.configuration.security.ClientAuthentication;
 import org.apache.cxf.configuration.security.ExcludeProtocols;
 import org.apache.cxf.configuration.security.FiltersType;
+import org.apache.cxf.configuration.security.IncludeProtocols;
 import org.apache.cxf.configuration.security.KeyManagersType;
 import org.apache.cxf.configuration.security.SecureRandomParameters;
 import org.apache.cxf.configuration.security.TLSServerParametersType;
@@ -199,6 +200,9 @@ public class JettyHTTPServerEngineBeanDefinitionParser extends AbstractBeanDefin
             } else if ("excludeProtocols".equals(ename)) {
                 mapElementToJaxbProperty((Element)n, paramsbean, ename,
                                          ExcludeProtocols.class);
+            } else if ("includeProtocols".equals(ename)) {
+                mapElementToJaxbProperty((Element)n, paramsbean, ename,
+                                         IncludeProtocols.class);
             } else if ("secureRandomParameters".equals(ename)) {
                 mapElementToJaxbProperty((Element)n, paramsbean, ename,
                                          SecureRandomParameters.class);
