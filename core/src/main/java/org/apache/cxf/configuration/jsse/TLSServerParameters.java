@@ -32,6 +32,7 @@ public class TLSServerParameters extends TLSParameterBase {
 
     ClientAuthentication clientAuthentication;
     List<String> excludeProtocols = new ArrayList<String>();
+    List<String> includeProtocols = new ArrayList<String>();
     
     /**
      * This parameter configures the server side to request and/or
@@ -63,6 +64,23 @@ public class TLSServerParameters extends TLSParameterBase {
             excludeProtocols = new ArrayList<String>();
         }
         return excludeProtocols;
+    }
+    
+    /**
+     * This parameter sets the protocol list to include.
+     */
+    public final void setIncludeProtocols(List<String> protocols) {
+        includeProtocols = protocols;
+    }
+    
+    /**
+     * Returns the protocols to include that are associated with this endpoint.
+     */
+    public List<String> getIncludeProtocols() {
+        if (includeProtocols == null) {
+            includeProtocols = new ArrayList<String>();
+        }
+        return includeProtocols;
     }
 
 }

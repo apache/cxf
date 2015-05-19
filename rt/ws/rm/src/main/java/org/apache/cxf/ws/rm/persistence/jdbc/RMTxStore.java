@@ -949,6 +949,7 @@ public class RMTxStore implements RMStore {
                 }
             }
         } finally {
+            con.setAutoCommit(false);
             if (connection == null && con != null) {
                 con.close();
             }
