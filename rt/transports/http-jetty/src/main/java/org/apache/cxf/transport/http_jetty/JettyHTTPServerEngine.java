@@ -317,10 +317,13 @@ public class JettyHTTPServerEngine implements ServerEngine {
             checkRegistedContext(url);
         }
         if (contexts == null) {
-            if (server != null && server.getHandler() instanceof ContextHandlerCollection) {
-                contexts = (ContextHandlerCollection) server.getHandler();
-            } else {
-                contexts = new ContextHandlerCollection();    
+            contexts = new ContextHandlerCollection();
+            if (server != null) {
+                if (server.getHandler() instanceof ContextHandlerCollection) {
+                    contexts = (ContextHandlerCollection) server.getHandler();
+                } else {
+                    server.setHandler(contexts);
+                }
             }
         }
         
