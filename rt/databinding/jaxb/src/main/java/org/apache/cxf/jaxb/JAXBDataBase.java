@@ -20,6 +20,7 @@
 package org.apache.cxf.jaxb;
 
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -88,33 +89,39 @@ public abstract class JAXBDataBase {
     }
     
     protected Annotation[] getJAXBAnnotation(MessagePartInfo mpi) {
-        List<Annotation> annoList = new java.util.concurrent.CopyOnWriteArrayList<Annotation>();
-        
-        if (mpi != null && mpi.getProperty("parameter.annotations") != null) {
-            Annotation[] anns = (Annotation[])mpi.getProperty("parameter.annotations");
+        List<Annotation> annoList = null;
+        if (mpi != null) {
+            annoList = extractJAXBAnnotations((Annotation[])mpi.getProperty("parameter.annotations"));
+            if (annoList == null) {
+                annoList = extractJAXBAnnotations(getReturnMethodAnnotations(mpi));
+            }
+        }
+        return annoList == null ? new Annotation[0] : annoList.toArray(new Annotation[annoList.size()]);       
+    }
+    
+    private List<Annotation> extractJAXBAnnotations(Annotation[] anns) {
+        List<Annotation> annoList = null;
+        if (anns != null) {
             for (Annotation ann : anns) {
                 if (ann instanceof XmlList || ann instanceof XmlAttachmentRef
                     || ann instanceof XmlJavaTypeAdapter) {
+                    if (annoList == null) {
+                        annoList = new ArrayList<Annotation>();
+                    }
                     annoList.add(ann);
                 }
             }
         }
-        if (annoList.size() == 0 && mpi != null 
-            && mpi.getMessageInfo() != null
-            && isOutputMessage(mpi.getMessageInfo())
-            && mpi.getMessageInfo().getOperation() != null
-            && mpi.getMessageInfo().getOperation().getProperty("method.return.annotations") != null) {
-            OperationInfo op = mpi.getMessageInfo().getOperation();
-            Annotation[] anns = (Annotation[])op.getProperty("method.return.annotations");
-            for (Annotation ann : anns) {
-                if (ann instanceof XmlList || ann instanceof XmlAttachmentRef
-                    || ann instanceof XmlJavaTypeAdapter) {
-                    annoList.add(ann);
-                }
-            }
-            
+        return annoList;
+    }
+    
+    private Annotation[] getReturnMethodAnnotations(MessagePartInfo mpi) {
+        AbstractMessageContainer mi = mpi.getMessageInfo();
+        if (mi == null || !isOutputMessage(mi)) {
+            return null;
         }
-        return annoList.toArray(new Annotation[annoList.size()]);       
+        OperationInfo oi = mi != null ? mi.getOperation() : null;
+        return oi != null ? (Annotation[])oi.getProperty("method.return.annotations") : null;
     }
     
     protected boolean isOutputMessage(AbstractMessageContainer messageContainer) {

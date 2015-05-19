@@ -23,6 +23,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
@@ -88,7 +89,9 @@ public class RPCInInterceptor extends AbstractInDatabindingInterceptor {
     }
     public void handleMessage(Message message) {
         if (isGET(message)) {
-            LOG.fine("RPCInInterceptor skipped in HTTP GET method");
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.fine("RPCInInterceptor skipped in HTTP GET method");
+            }
             return;
         }
         DepthXMLStreamReader xmlReader = getXMLStreamReader(message);
