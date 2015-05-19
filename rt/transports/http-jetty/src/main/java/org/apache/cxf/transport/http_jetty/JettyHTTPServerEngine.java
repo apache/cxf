@@ -385,16 +385,7 @@ public class JettyHTTPServerEngine implements ServerEngine {
         if (shouldCheckUrl(handler.getBus())) {
             checkRegistedContext(url);
         }
-        if (contexts == null) {
-            contexts = new ContextHandlerCollection();
-            if (server != null) {
-                if (server.getHandler() instanceof ContextHandlerCollection) {
-                    contexts = (ContextHandlerCollection) server.getHandler();
-                } else {
-                    server.setHandler(contexts);
-                }
-            }
-        }
+        initializeContexts();
         
         SecurityHandler securityHandler = null;
         if (server == null) {
@@ -541,6 +532,19 @@ public class JettyHTTPServerEngine implements ServerEngine {
         ++servantCount;
     }
     
+    private void initializeContexts() {
+        if (contexts == null) {
+            contexts = new ContextHandlerCollection();
+            if (server != null) {
+                if (server.getHandler() instanceof ContextHandlerCollection) {
+                    contexts = (ContextHandlerCollection) server.getHandler();
+                } else {
+                    server.setHandler(contexts);
+                }
+            }
+        }
+    }
+
     private void addServerMBean() {
         if (mBeanContainer == null) {
             return;
