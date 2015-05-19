@@ -67,7 +67,7 @@ public class SampleWsApplicationTests {
 		StreamResult result = new StreamResult(System.out);
 
 		this.webServiceTemplate.sendSourceAndReceiveToResult(source, result);
-		assertThat(this.output.toString(), containsString("<?xml version=\"1.0\" encoding=\"UTF-8\"?><ns2:sayHelloResponse xmlns:ns2=\"http://service.ws.sample/\"><return>Welcome to CXF Spring boot Elan!!!</return></ns2:sayHelloResponse>"));
+		assertThat(this.output.toString(), containsString("<?xml version=\"1.0\" encoding=\"UTF-8\"?><ns2:sayHelloResponse xmlns:ns2=\"http://service.ws.sample/\"><return>Hello, Welcome to CXF Spring boot Elan!!!</return></ns2:sayHelloResponse>"));
 	}
 
 }
