@@ -727,13 +727,14 @@ public abstract class HTTPConduit
                 if (defaultAddress == null) {
                     if (fromEndpointReferenceType && getTarget().getAddress().getValue() != null) {
                         defaultAddress = new Address(this.getTarget().getAddress().getValue());
+                    } else {
+                        if (endpointInfo.getAddress() == null) {
+                            throw new URISyntaxException("<null>", 
+                                                         "Invalid address. Endpoint address cannot be null.",
+                                                         0);
+                        }
+                        defaultAddress = new Address(endpointInfo.getAddress());
                     }
-                    if (endpointInfo.getAddress() == null) {
-                        throw new URISyntaxException("<null>", 
-                                                     "Invalid address. Endpoint address cannot be null.",
-                                                     0);
-                    }
-                    defaultAddress = new Address(endpointInfo.getAddress());
                 }
             }
         }
