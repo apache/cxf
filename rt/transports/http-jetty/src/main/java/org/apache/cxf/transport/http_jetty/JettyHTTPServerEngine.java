@@ -692,20 +692,19 @@ public class JettyHTTPServerEngine implements ServerEngine {
         
         // Jetty 9 excludes SSLv3 by default. So if we want it then we need to 
         // remove it from the default excluded protocols
-        if ("SSLv3".equals(proto)) {
+        boolean allowSSLv3 = "SSLv3".equals(proto);
+        if (allowSSLv3 || !tlsServerParameters.getIncludeProtocols().isEmpty()) {
             List<String> excludedProtocols = new ArrayList<String>();
             for (String excludedProtocol : scf.getExcludeProtocols()) {
-                if (!("SSLv3".equals(excludedProtocol) || "SSLv2Hello".equals(excludedProtocol))) {
+                if (!(tlsServerParameters.getIncludeProtocols().contains(excludedProtocol)
+                    || (allowSSLv3 && ("SSLv3".equals(excludedProtocol) 
+                        || "SSLv2Hello".equals(excludedProtocol))))) {
                     excludedProtocols.add(excludedProtocol);
                 }
             }
             String[] revisedProtocols = new String[excludedProtocols.size()];
             excludedProtocols.toArray(revisedProtocols);
             scf.setExcludeProtocols(revisedProtocols);
-        } else if (tlsServerParameters.getExcludeProtocols().isEmpty()) {
-            // Exclude SSLv3 + SSLv2Hello by default unless the protocol is given as SSLv3
-            scf.addExcludeProtocols("SSLv3");
-            scf.addExcludeProtocols("SSLv2Hello");
         }
         
         for (String p : tlsServerParameters.getExcludeProtocols()) {

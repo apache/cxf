@@ -57,6 +57,9 @@ public class TLSServerParametersConfig
         if (params.isSetExcludeProtocols()) {
             this.setExcludeProtocols(params.getExcludeProtocols().getExcludeProtocol());
         }
+        if (params.isSetIncludeProtocols()) {
+            this.setIncludeProtocols(params.getIncludeProtocols().getIncludeProtocol());
+        }
         if (params.isSetJsseProvider()) {
             this.setJsseProvider(params.getJsseProvider());
         }

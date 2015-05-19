@@ -96,5 +96,32 @@
                      address="https://localhost:${testutil.ports.SSLv3Server.3}/SoapContext/HttpsPort" 
                      serviceName="s:SOAPService" 
                      endpointName="e:HttpsPort" depends-on="disallow-tls-via-configuration"/>
+                
+    <httpj:engine-factory id="tls-but-allow-ssl3">
+        <httpj:engine port="${testutil.ports.SSLv3Server.4}">
+            <httpj:tlsServerParameters>
+                <sec:keyManagers keyPassword="password">
+                    <sec:keyStore type="jks" password="password" resource="keys/Bethal.jks"/>
+                </sec:keyManagers>
+                <sec:trustManagers>
+                    <sec:keyStore type="jks" password="password" resource="keys/Truststore.jks"/>
+                </sec:trustManagers>
+                <sec:clientAuthentication want="true" required="false"/>
+                <sec:includeProtocols>
+                    <sec:includeProtocol>SSLv3</sec:includeProtocol>
+                    <sec:includeProtocol>SSLv2Hello</sec:includeProtocol>
+                </sec:includeProtocols>
+            </httpj:tlsServerParameters>
+        </httpj:engine>
+    </httpj:engine-factory>
+    
+    <jaxws:endpoint xmlns:e="http://apache.org/hello_world/services" 
+                     xmlns:s="http://apache.org/hello_world/services" 
+                     id="TLSAllowSSLv3Endpoint" 
+                     implementor="org.apache.cxf.https.ssl3.GreeterImpl" 
+                     address="https://localhost:${testutil.ports.SSLv3Server.4}/SoapContext/HttpsPort" 
+                     serviceName="s:SOAPService" 
+                     endpointName="e:HttpsPort" depends-on="tls-but-allow-ssl3"/>
+    
     
 </beans>
