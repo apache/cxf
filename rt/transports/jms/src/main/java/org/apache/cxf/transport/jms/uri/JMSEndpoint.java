@@ -155,11 +155,12 @@ public class JMSEndpoint {
      * @param params
      */
     private void configureProperties(Map<String, Object> params) {
-        for (String key : params.keySet()) {
-            Object value = params.get(key);
+        for (Map.Entry<String, Object> entry : params.entrySet()) {
+            Object value = entry.getValue();
             if (value == null || value.equals("")) {
                 continue;
             }
+            String key = entry.getKey();
             if (trySetProperty(key, value)) {
                 continue;
             }
@@ -190,13 +191,13 @@ public class JMSEndpoint {
         }
         requestUri.append(":" + destinationName);
         boolean first = true;
-        for (String key : parameters.keySet()) {
-            String value = parameters.get(key);
+        for (Map.Entry<String, String> entry : parameters.entrySet()) {
+            String value = entry.getValue();
             if (first) {
-                requestUri.append("?" + key + "=" + value);
+                requestUri.append("?" + entry.getKey() + "=" + value);
                 first = false;
             } else {
-                requestUri.append("&" + key + "=" + value);
+                requestUri.append("&" + entry.getKey() + "=" + value);
             }
         }
         return requestUri.toString();

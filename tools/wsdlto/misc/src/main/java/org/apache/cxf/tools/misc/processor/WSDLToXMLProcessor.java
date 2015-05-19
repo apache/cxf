@@ -90,10 +90,10 @@ public class WSDLToXMLProcessor extends AbstractWSDLToProcessor {
         if (services == null) {
             return false;
         }
-        for (QName serviceQName : services.keySet()) {
-            String serviceName = serviceQName.getLocalPart();
+        for (Map.Entry<QName, Service> entry : services.entrySet()) {
+            String serviceName = entry.getKey().getLocalPart();
             if (serviceName.equals(env.get(ToolConstants.CFG_SERVICE))) {
-                service = services.get(serviceQName);
+                service = entry.getValue();
                 break;
             }
         }
@@ -105,9 +105,9 @@ public class WSDLToXMLProcessor extends AbstractWSDLToProcessor {
         if (ports == null) {
             return false;
         }
-        for (String portName : ports.keySet()) {
-            if (portName.equals(env.get(ToolConstants.CFG_PORT))) {
-                port = ports.get(portName);
+        for (Map.Entry<String, Port> entry : ports.entrySet()) {
+            if (entry.getKey().equals(env.get(ToolConstants.CFG_PORT))) {
+                port = entry.getValue();
                 break;
             }
         }
@@ -119,10 +119,10 @@ public class WSDLToXMLProcessor extends AbstractWSDLToProcessor {
         if (portTypes == null) {
             return false;
         }
-        for (QName existPortQName : portTypes.keySet()) {
-            String existPortName = existPortQName.getLocalPart();
+        for (Map.Entry<QName, PortType> entry : portTypes.entrySet()) {
+            String existPortName = entry.getKey().getLocalPart();
             if (existPortName.equals(env.get(ToolConstants.CFG_PORTTYPE))) {
-                portType = portTypes.get(existPortQName);
+                portType = entry.getValue();
                 break;
             }
         }
@@ -134,11 +134,11 @@ public class WSDLToXMLProcessor extends AbstractWSDLToProcessor {
         if (bindings == null) {
             return false;
         }
-        for (QName existBindingQName : bindings.keySet()) {
-            String existBindingName = existBindingQName.getLocalPart();
+        for (Map.Entry<QName, Binding> entry : bindings.entrySet()) {
+            String existBindingName = entry.getKey().getLocalPart();
             String bindingName = (String)env.get(ToolConstants.CFG_BINDING);
             if (bindingName.equals(existBindingName)) {
-                binding = bindings.get(existBindingQName);
+                binding = entry.getValue();
             }
         }
         return (binding == null) ? false : true;
@@ -253,8 +253,8 @@ public class WSDLToXMLProcessor extends AbstractWSDLToProcessor {
     private void setAddrElement() throws ToolException {
         Address address = AddressFactory.getInstance().getAddresser("xml");
 
-        for (String key : address.getNamespaces(env).keySet()) {
-            wsdlDefinition.addNamespace(key, address.getNamespaces(env).get(key));
+        for (Map.Entry<String, String> entry : address.getNamespaces(env).entrySet()) {
+            wsdlDefinition.addNamespace(entry.getKey(), entry.getValue());
         }
 
         WSDLExtensibilityPlugin generator = getWSDLPlugin("xml", Port.class);

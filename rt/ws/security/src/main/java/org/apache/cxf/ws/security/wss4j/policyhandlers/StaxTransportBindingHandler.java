@@ -222,8 +222,10 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
                 addKerberosToken((KerberosToken)token, false, false, false);
             } else if (token instanceof SamlToken) {
                 addSamlToken((SamlToken)token, false, false);
-            } else {
+            } else if (token != null) {
                 throw new Exception(token.getName() + " is not supported in the streaming code");
+            } else {
+                throw new Exception("A null token was supplied to the streaming code");
             }
         }
     }

@@ -370,29 +370,32 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
     private void createClientJar(File tmpDirectory, JarOutputStream jarout) {
         try {
             URI parentFile = new File((String)context.get(ToolConstants.CFG_CLASSDIR)).toURI();
-            for (File file : tmpDirectory.listFiles()) {
-                URI relativePath = parentFile.relativize(file.toURI());
-                String name = relativePath.toString();
-                if (file.isDirectory()) {
-                    if (!StringUtils.isEmpty(name)) {
-                        if (!name.endsWith("/")) {
-                            name += "/";
+            File[] files = tmpDirectory.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    URI relativePath = parentFile.relativize(file.toURI());
+                    String name = relativePath.toString();
+                    if (file.isDirectory()) {
+                        if (!StringUtils.isEmpty(name)) {
+                            if (!name.endsWith("/")) {
+                                name += "/";
+                            }
+                            JarEntry entry = new JarEntry(name);
+                            entry.setTime(file.lastModified());
+                            jarout.putNextEntry(entry);
+                            jarout.closeEntry();
                         }
-                        JarEntry entry = new JarEntry(name);
-                        entry.setTime(file.lastModified());
-                        jarout.putNextEntry(entry);
-                        jarout.closeEntry();
+                        createClientJar(file, jarout);
+                        continue;
                     }
-                    createClientJar(file, jarout);
-                    continue;
+                    JarEntry entry = new JarEntry(name);
+                    entry.setTime(file.lastModified());
+                    jarout.putNextEntry(entry);
+                    InputStream input = new BufferedInputStream(new FileInputStream(file));
+                    IOUtils.copy(input, jarout);
+                    input.close();
+                    jarout.closeEntry();
                 }
-                JarEntry entry = new JarEntry(name);
-                entry.setTime(file.lastModified());
-                jarout.putNextEntry(entry);
-                InputStream input = new BufferedInputStream(new FileInputStream(file));
-                IOUtils.copy(input, jarout);
-                input.close();
-                jarout.closeEntry();
             }
         } catch (Exception e) {
             Message msg = new Message("FAILED_ADD_JARENTRY", LOG);
@@ -618,9 +621,8 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
     protected void setLibraryReferences(ToolContext env) {
         Properties props = loadProperties(getResourceAsStream("wsdltojavalib.properties"));
         if (props != null) {
-            for (Iterator<?> keys = props.keySet().iterator(); keys.hasNext();) {
-                String key = (String)keys.next();
-                env.put(key, props.get(key));
+            for (Map.Entry<Object, Object> entry : props.entrySet()) {
+                env.put((String)entry.getKey(), entry.getValue());
             }
         }
         env.put(ToolConstants.CFG_ANT_PROP, props);
@@ -677,7 +679,7 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
             file.delete();
             File tmpFile = file.getParentFile();
             while (tmpFile != null && !tmpFile.getCanonicalPath().equalsIgnoreCase(outPutDir)) {
-                if (tmpFile.isDirectory() && tmpFile.list().length == 0) {
+                if (tmpFile.isDirectory() && tmpFile.list() != null && tmpFile.list().length == 0) {
                     tmpFile.delete();
                 }
                 tmpFile = tmpFile.getParentFile();
@@ -691,7 +693,8 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
                 classFile.delete();
                 File tmpClzFile = classFile.getParentFile();
                 while (tmpClzFile != null && !tmpClzFile.getCanonicalPath().equalsIgnoreCase(outPutDir)) {
-                    if (tmpClzFile.isDirectory() && tmpClzFile.list().length == 0) {
+                    if (tmpClzFile.isDirectory() && tmpClzFile.list() != null 
+                        && tmpClzFile.list().length == 0) {
                         tmpClzFile.delete();
                     }
                     tmpClzFile = tmpClzFile.getParentFile();

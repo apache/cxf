@@ -229,23 +229,26 @@ public class WSDL11Validator extends AbstractDefinitionValidator {
                 } catch (URISyntaxException e) {
                     //
                 }
-                java.io.File file = new java.io.File(loc);
-                if (file.exists()) {
-                    File[] files = file.listFiles(new FileFilter() {
-                            public boolean accept(File pathname) {
-                                if (pathname.getAbsolutePath().endsWith(".xsd")) {
-                                    return true;
+                if (loc != null) {
+                    java.io.File file = new java.io.File(loc);
+                    if (file.exists()) {
+                        File[] files = file.listFiles(new FileFilter() {
+                                public boolean accept(File pathname) {
+                                    if (pathname.getAbsolutePath().endsWith(".xsd")) {
+                                        return true;
+                                    }
+                                    return false;
                                 }
-                                return false;
+                            });
+                        if (files != null) {
+                            for (int i = 0; i < files.length; i++) {
+                                InputSource is = new InputSource(files[i].toURI().toURL().openStream());
+                                is.setSystemId(files[i].toURI().toURL().toString());
+                                xsdList.add(is);
                             }
-                        });
-                    for (int i = 0; i < files.length; i++) {
-                        InputSource is = new InputSource(files[i].toURI().toURL().openStream());
-                        is.setSystemId(files[i].toURI().toURL().toString());
-                        xsdList.add(is);
+                        }
                     }
                 }
-                
             }
         }
         

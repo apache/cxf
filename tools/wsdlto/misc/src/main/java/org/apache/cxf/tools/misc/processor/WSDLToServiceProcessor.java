@@ -72,10 +72,10 @@ public class WSDLToServiceProcessor extends AbstractWSDLToProcessor {
         if (services == null) {
             return false;
         }
-        for (QName serviceQName : services.keySet()) {
-            String serviceName = serviceQName.getLocalPart();
+        for (Map.Entry<QName, Service> entry : services.entrySet()) {
+            String serviceName = entry.getKey().getLocalPart();
             if (serviceName.equals(env.get(ToolConstants.CFG_SERVICE))) {
-                service = services.get(serviceQName);
+                service = entry.getValue();
                 break;
             }
         }
@@ -87,9 +87,9 @@ public class WSDLToServiceProcessor extends AbstractWSDLToProcessor {
         if (ports == null) {
             return false;
         }
-        for (String portName : ports.keySet()) {
-            if (portName.equals(env.get(ToolConstants.CFG_PORT))) {
-                port = ports.get(portName);
+        for (Map.Entry<String, Port> entry : ports.entrySet()) {
+            if (entry.getKey().equals(env.get(ToolConstants.CFG_PORT))) {
+                port = entry.getValue();
                 break;
             }
         }
@@ -101,11 +101,11 @@ public class WSDLToServiceProcessor extends AbstractWSDLToProcessor {
         if (bindings == null) {
             return false;
         }
-        for (QName bindingQName : bindings.keySet()) {
-            String bindingName = bindingQName.getLocalPart();
+        for (Map.Entry<QName, Binding> entry : bindings.entrySet()) {
+            String bindingName = entry.getKey().getLocalPart();
             String attrBinding = (String)env.get(ToolConstants.CFG_BINDING_ATTR);
             if (attrBinding.equals(bindingName)) {
-                binding = bindings.get(bindingQName);
+                binding = entry.getValue();
             }
         }
         return (binding == null) ? false : true;
@@ -152,8 +152,8 @@ public class WSDLToServiceProcessor extends AbstractWSDLToProcessor {
         Address address = AddressFactory.getInstance().getAddresser(transport);
 
         Map<String, String> ns = address.getNamespaces(env);
-        for (String key : ns.keySet()) {
-            wsdlDefinition.addNamespace(key, ns.get(key));
+        for (Map.Entry<String, String> entry : ns.entrySet()) {
+            wsdlDefinition.addNamespace(entry.getKey(), entry.getValue());
         }
 
         WSDLExtensibilityPlugin plugin = getWSDLPlugin(transport, Port.class);

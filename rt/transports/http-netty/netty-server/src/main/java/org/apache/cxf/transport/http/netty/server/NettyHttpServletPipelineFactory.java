@@ -20,7 +20,6 @@
 package org.apache.cxf.transport.http.netty.server;
 
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -94,11 +93,10 @@ public class NettyHttpServletPipelineFactory extends ChannelInitializer<Channel>
     }
 
     public NettyHttpContextHandler getNettyHttpHandler(String url) {
-        Set<String> keySet = handlerMap.keySet();
-        for (String key : keySet) {
+        for (Map.Entry<String, NettyHttpContextHandler> entry : handlerMap.entrySet()) {
             // Here just check the context path first
-            if (url.startsWith(key)) {
-                return handlerMap.get(key);
+            if (url.startsWith(entry.getKey())) {
+                return entry.getValue();
             }
         }
         return null;

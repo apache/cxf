@@ -119,12 +119,12 @@ public final class CustomizationParser {
             }
         }
 
-        for (Element element : jaxwsBindingsMap.keySet()) {
-            nodeSelector.addNamespaces(element);
-            Element oldTargetNode = jaxwsBindingsMap.get(element);
+        for (Map.Entry<Element, Element> entry : jaxwsBindingsMap.entrySet()) {
+            nodeSelector.addNamespaces(entry.getKey());
+            Element oldTargetNode = entry.getValue();
             Element targetNode = oldTargetNode;
-            internalizeBinding(element, targetNode, "");
-            String uri = element.getAttribute("wsdlLocation");
+            internalizeBinding(entry.getKey(), targetNode, "");
+            String uri = entry.getKey().getAttribute("wsdlLocation");
             customizedElements.put(uri, targetNode);
             updateJaxwsBindingMapValue(targetNode);  
         }
@@ -185,13 +185,13 @@ public final class CustomizationParser {
     }
 
     private void updateJaxwsBindingMapValue(Element value) {
-        String baseURI = value.getBaseURI();        
-        for (Element ele : jaxwsBindingsMap.keySet()) {
-            String uri = jaxwsBindingsMap.get(ele).getBaseURI();
+        String baseURI = value.getBaseURI();
+        for (Map.Entry<Element, Element> entry : jaxwsBindingsMap.entrySet()) {
+            String uri = entry.getValue().getBaseURI();
             if (uri != null && uri.equals(baseURI)) {
-                jaxwsBindingsMap.put(ele, value);
+                jaxwsBindingsMap.put(entry.getKey(), value);
             }
-        }      
+        }
     }
     
     private void buildHandlerChains() {

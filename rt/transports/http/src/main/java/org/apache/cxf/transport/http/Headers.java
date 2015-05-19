@@ -277,10 +277,10 @@ public class Headers {
      */
     void logProtocolHeaders(Level level) {
         if (LOG.isLoggable(level)) {
-            for (String header : headers.keySet()) {
-                List<?> headerList = headers.get(header);
-                for (Object value : headerList) {
-                    LOG.log(level, header + ": " 
+            for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
+                List<String> headerList = entry.getValue();
+                for (String value : headerList) {
+                    LOG.log(level, entry.getKey() + ": " 
                         + (value == null ? "<null>" : value.toString()));
                 }
             }

@@ -78,13 +78,13 @@ public final class HttpAuthHeader {
     private String paramsToString() {
         StringBuilder builder = new StringBuilder();
         boolean first = true;
-        for (String key : params.keySet()) {
-            String param = params.get(key);
+        for (Map.Entry<String, String> entry : params.entrySet()) {
+            String param = entry.getValue();
             if (param != null) {
                 if (!first) {
                     builder.append(", ");
                 }
-                builder.append(key + "=\"" + param + "\"");
+                builder.append(entry.getKey() + "=\"" + param + "\"");
                 first = false;
             }
         }

@@ -136,10 +136,10 @@ public class WSDLServiceFactory extends AbstractServiceFactoryBean {
                         Map<QName, PortType> portTypes = CastUtils.cast(definition.getPortTypes());
                         String existPortName = null;
                         PortType portType = null;
-                        for (QName existPortQName : portTypes.keySet()) {
-                            existPortName = existPortQName.getLocalPart();
+                        for (Map.Entry<QName, PortType> entry : portTypes.entrySet()) {
+                            existPortName = entry.getKey().getLocalPart();
                             if (serviceName.getLocalPart().contains(existPortName)) {
-                                portType = portTypes.get(existPortQName);
+                                portType = entry.getValue();
                                 break;
                             }
                         }

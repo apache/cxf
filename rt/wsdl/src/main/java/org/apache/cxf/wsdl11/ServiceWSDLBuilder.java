@@ -274,9 +274,9 @@ public class ServiceWSDLBuilder {
         if (attributes == null) {
             return;
         }
-        for (QName qname : attributes.keySet()) {
-            addNamespace(qname.getNamespaceURI(), def);
-            attributeExtensible.setExtensionAttribute(qname, attributes.get(qname));
+        for (Map.Entry<QName, Object> entry : attributes.entrySet()) {
+            addNamespace(entry.getKey().getNamespaceURI(), def);
+            attributeExtensible.setExtensionAttribute(entry.getKey(), entry.getValue());
         }
     }
     

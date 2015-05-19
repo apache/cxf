@@ -247,19 +247,21 @@ public class SchemaValidator extends AbstractDefinitionValidator {
 
             File[] files = f.listFiles(filter);
 
-            List<String> xsdUrls = new ArrayList<String>(files.length);
-            for (File file : files) {
-                try {
-                    String s = file.toURI().toURL().toString();
-                    xsdUrls.add(s);
-                    if (s.contains("http-conf")) {
-                        xsdUrls.add(0, s);
+            if (files != null) {
+                List<String> xsdUrls = new ArrayList<String>(files.length);
+                for (File file : files) {
+                    try {
+                        String s = file.toURI().toURL().toString();
+                        xsdUrls.add(s);
+                        if (s.contains("http-conf")) {
+                            xsdUrls.add(0, s);
+                        }
+                    } catch (MalformedURLException e) {
+                        throw new ToolException(e);
                     }
-                } catch (MalformedURLException e) {
-                    throw new ToolException(e);
                 }
+                return xsdUrls.toArray(new String[xsdUrls.size()]);
             }
-            return xsdUrls.toArray(new String[xsdUrls.size()]);
         }
         return null;
     }

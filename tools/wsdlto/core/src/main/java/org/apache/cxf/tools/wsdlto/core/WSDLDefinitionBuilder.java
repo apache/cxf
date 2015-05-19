@@ -103,9 +103,8 @@ public class WSDLDefinitionBuilder implements WSDLBuilder<Definition> {
     public static Collection<Import> getImports(final Definition wsdlDef) {
         Collection<Import> importList = new ArrayList<Import>();
         Map<?, ?> imports = wsdlDef.getImports();
-        for (Iterator<?> iter = imports.keySet().iterator(); iter.hasNext();) {
-            String uri = (String)iter.next();
-            List<Import> lst = CastUtils.cast((List<?>)imports.get(uri));
+        for (Map.Entry<?, ?> entry : imports.entrySet()) {
+            List<Import> lst = CastUtils.cast((List<?>)entry.getValue());
             importList.addAll(lst);
         }
         return importList;
