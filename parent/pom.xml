@@ -193,6 +193,7 @@
         <cxf.htrace.version>3.1.0-incubating</cxf.htrace.version>
         <cxf.checkstyle.extension />
         <cxf.jaxb.context.class />
+        <cxf.jaxb.context.class.property>none</cxf.jaxb.context.class.property>
         <cxf.spring.validation.mode>VALIDATION_AUTO</cxf.spring.validation.mode>
         <cxf.downloadSources>true</cxf.downloadSources>
         <cxf.pmd.eclipse.ruleset.ext />
@@ -400,7 +401,7 @@
                         <useFile>${cxf.surefire.usefile}</useFile>
                         <forkMode>${cxf.surefire.fork.mode}</forkMode>
                         <childDelegation>false</childDelegation>
-                        <argLine>${cxf.surefire.fork.vmargs}</argLine>
+                        <argLine>${cxf.surefire.fork.vmargs} -D${cxf.jaxb.context.class.property}=${cxf.jaxb.context.class}</argLine>
                         <enableAssertions>${cxf.surefire.enable.assertions}</enableAssertions>
                         <parallel>${cxf.surefire.parallel.mode}</parallel>
                         <systemPropertyVariables>
@@ -416,8 +417,6 @@
                             <spring.validation.mode>${cxf.spring.validation.mode}</spring.validation.mode>
                             <server.launcher.vmargs>${cxf.server.launcher.vmargs}</server.launcher.vmargs>
                             <org.apache.cxf.transport.http.async.usePolicy>ASYNC_ONLY</org.apache.cxf.transport.http.async.usePolicy>
-                            <javax.xml.bind.JAXBContext>${cxf.jaxb.context.class}</javax.xml.bind.JAXBContext>
-                            <!--javax.xml.bind.JAXBContext>org.eclipse.persistence.jaxb.JAXBContextFactory</javax.xml.bind.JAXBContext-->
                         </systemPropertyVariables>
                     </configuration>
                 </plugin>
@@ -1869,6 +1868,7 @@
             <id>eclipse.moxy</id>
             <properties>
                 <cxf.jaxb.context.class>org.eclipse.persistence.jaxb.JAXBContextFactory</cxf.jaxb.context.class>
+                <cxf.jaxb.context.class.property>javax.xml.bind.JAXBContext</cxf.jaxb.context.class.property>
             </properties>
             <dependencies>
                 <dependency>
