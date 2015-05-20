@@ -30,7 +30,7 @@
         <property name="serviceName" value="bob@service.ws.apache.org"/>
     </bean>
     
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="doubleittransportkerberos" implementor="org.apache.cxf.systest.sts.kerberos.IntermediaryPortTypeImpl" endpointName="s:DoubleItTransportKerberosPort" serviceName="s:DoubleItService" depends-on="ClientAuthHttpsSettings" address="https://localhost:${testutil.ports.Intermediary}/doubleit/services/doubleittransportkerberos" wsdlLocation="org/apache/cxf/systest/sts/kerberos/DoubleItIntermediary.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="doubleittransportkerberos" implementor="org.apache.cxf.systest.sts.kerberos.IntermediaryPortTypeImpl" endpointName="s:DoubleItTransportKerberosPort" serviceName="s:DoubleItService" depends-on="ClientAuthHttpsSettings" address="https://localhost:${testutil.ports.kerberos.Intermediary}/doubleit/services/doubleittransportkerberos" wsdlLocation="org/apache/cxf/systest/sts/kerberos/DoubleItIntermediary.wsdl">
         <jaxws:properties>
             <entry key="ws-security.bst.validator" value-ref="kerberosValidator"/>
         </jaxws:properties>
@@ -40,7 +40,7 @@
        <property name="loginContextName" value="bob"/>
     </bean>
 
-    <jaxrs:server modelRef="classpath:org/apache/cxf/systest/sts/kerberos/jaxrs.xml" depends-on="ClientAuthHttpsSettings" address="https://localhost:${testutil.ports.Intermediary}/doubleit/services/doubleit-rs">
+    <jaxrs:server modelRef="classpath:org/apache/cxf/systest/sts/kerberos/jaxrs.xml" depends-on="ClientAuthHttpsSettings" address="https://localhost:${testutil.ports.kerberos.Intermediary}/doubleit/services/doubleit-rs">
         <jaxrs:providers>
             <ref bean="kerberosFilter" />
         </jaxrs:providers>
@@ -80,7 +80,7 @@
     </jaxws:client>
     
     <httpj:engine-factory id="ClientAuthHttpsSettings" bus="cxf">
-        <httpj:engine port="${testutil.ports.Intermediary}">
+        <httpj:engine port="${testutil.ports.kerberos.Intermediary}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="skpass">
                     <sec:keyStore type="jks" password="sspass" resource="servicestore.jks"/>

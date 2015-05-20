@@ -24,7 +24,7 @@
             <cxf:logging/>
         </cxf:features>
     </cxf:bus>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" implementor="org.apache.cxf.systest.sts.basic_auth.DoubleItPortTypeImpl" endpointName="s:DoubleItPort" serviceName="s:DoubleItService" depends-on="ClientAuthHttpsSettings" address="https://localhost:${testutil.ports.Server}/doubleit/services/doubleit" wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/basic_auth/DoubleIt.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" implementor="org.apache.cxf.systest.sts.basic_auth.DoubleItPortTypeImpl" endpointName="s:DoubleItPort" serviceName="s:DoubleItService" depends-on="ClientAuthHttpsSettings" address="https://localhost:${testutil.ports.basic_auth.Server}/doubleit/services/doubleit" wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/basic_auth/DoubleIt.wsdl">
         <jaxws:inInterceptors>
             <ref bean="basicAuthValidator"/>
         </jaxws:inInterceptors>
@@ -34,7 +34,7 @@
             </entry>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxrs:server modelRef="classpath:org/apache/cxf/systest/sts/basic_auth/jaxrs.xml" depends-on="ClientAuthHttpsSettings" address="https://localhost:${testutil.ports.Server}/doubleit/services/doubleit-rs">
+    <jaxrs:server modelRef="classpath:org/apache/cxf/systest/sts/basic_auth/jaxrs.xml" depends-on="ClientAuthHttpsSettings" address="https://localhost:${testutil.ports.basic_auth.Server}/doubleit/services/doubleit-rs">
         <jaxrs:inInterceptors>
             <ref bean="basicAuthValidator"/>
         </jaxrs:inInterceptors>
@@ -64,7 +64,7 @@
         </property>
     </bean>
     <httpj:engine-factory id="ClientAuthHttpsSettings" bus="cxf">
-        <httpj:engine port="${testutil.ports.Server}">
+        <httpj:engine port="${testutil.ports.basic_auth.Server}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="skpass">
                     <sec:keyStore type="jks" password="sspass" resource="servicestore.jks"/>

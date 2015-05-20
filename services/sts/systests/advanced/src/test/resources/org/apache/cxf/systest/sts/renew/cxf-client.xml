@@ -33,7 +33,7 @@
             <entry key="ws-security.sts.client">
                 <bean class="org.apache.cxf.ws.security.trust.STSClient">
                     <constructor-arg ref="cxf"/>
-                    <property name="wsdlLocation" value="https://localhost:${testutil.ports.STSServerPOP}/SecurityTokenService/Transport?wsdl"/>
+                    <property name="wsdlLocation" value="https://localhost:${testutil.ports.renew.STSServerPOP}/SecurityTokenService/Transport?wsdl"/>
                     <property name="serviceName" value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService"/>
                     <property name="endpointName" value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Port"/>
                     <property name="ttl" value="8"/>
@@ -57,7 +57,7 @@
             <entry key="ws-security.sts.client">
                 <bean class="org.apache.cxf.ws.security.trust.STSClient">
                     <constructor-arg ref="cxf"/>
-                    <property name="wsdlLocation" value="https://localhost:${testutil.ports.STSServerPOP}/SecurityTokenService/Transport?wsdl"/>
+                    <property name="wsdlLocation" value="https://localhost:${testutil.ports.renew.STSServerPOP}/SecurityTokenService/Transport?wsdl"/>
                     <property name="serviceName" value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService"/>
                     <property name="endpointName" value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Port"/>
                     <property name="ttl" value="8"/>
@@ -71,7 +71,7 @@
     
     <bean id="saml2STSClient" class="org.apache.cxf.ws.security.trust.STSClient">
         <constructor-arg ref="cxf"/>
-        <property name="wsdlLocation" value="https://localhost:${testutil.ports.STSServerPOP}/SecurityTokenService/Transport?wsdl"/>
+        <property name="wsdlLocation" value="https://localhost:${testutil.ports.renew.STSServerPOP}/SecurityTokenService/Transport?wsdl"/>
         <property name="serviceName" value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService"/>
         <property name="endpointName" value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Port"/>
         <property name="ttl" value="8"/>
@@ -98,7 +98,7 @@
     
      <bean id="saml2STSNoRenewClient" class="org.apache.cxf.ws.security.trust.STSClient">
         <constructor-arg ref="cxf"/>
-        <property name="wsdlLocation" value="https://localhost:${testutil.ports.STSServerPOP}/SecurityTokenService/TransportSoap12?wsdl"/>
+        <property name="wsdlLocation" value="https://localhost:${testutil.ports.renew.STSServerPOP}/SecurityTokenService/TransportSoap12?wsdl"/>
         <property name="serviceName" value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService"/>
         <property name="endpointName" value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Soap12_Port"/>
         <property name="ttl" value="8"/>

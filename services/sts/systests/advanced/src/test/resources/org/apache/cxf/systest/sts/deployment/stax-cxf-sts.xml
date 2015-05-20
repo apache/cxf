@@ -114,12 +114,12 @@
         <property name="issuer" value="DoubleItSTSIssuer"/>
         <property name="encryptionUsername" value="myservicekey"/>
     </bean>
-    <jaxws:endpoint xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/" id="localSTS" implementor="#transportSTSProviderBean" address="https://localhost:${testutil.ports.StaxSTSServer}/SecurityTokenService/Transport" wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/deployment/ws-trust-1.4-service.wsdl" depends-on="ClientAuthHttpsSettings" serviceName="ns1:SecurityTokenService" endpointName="ns1:Transport_Port">
+    <jaxws:endpoint xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/" id="localSTS" implementor="#transportSTSProviderBean" address="https://localhost:${testutil.ports.deployment.StaxSTSServer}/SecurityTokenService/Transport" wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/deployment/ws-trust-1.4-service.wsdl" depends-on="ClientAuthHttpsSettings" serviceName="ns1:SecurityTokenService" endpointName="ns1:Transport_Port">
         <jaxws:properties>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/" id="localSoap12STS" implementor="#transportSTSProviderBean" address="https://localhost:${testutil.ports.StaxSTSServer}/SecurityTokenService/TransportSoap12" wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/deployment/ws-trust-1.4-service.wsdl" depends-on="ClientAuthHttpsSettings" serviceName="ns1:SecurityTokenService" endpointName="ns1:Transport_Soap12_Port">
+    <jaxws:endpoint xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/" id="localSoap12STS" implementor="#transportSTSProviderBean" address="https://localhost:${testutil.ports.deployment.StaxSTSServer}/SecurityTokenService/TransportSoap12" wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/deployment/ws-trust-1.4-service.wsdl" depends-on="ClientAuthHttpsSettings" serviceName="ns1:SecurityTokenService" endpointName="ns1:Transport_Soap12_Port">
         <jaxws:properties>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
@@ -128,14 +128,14 @@
         <property name="contextName" value="bob"/>
         <property name="serviceName" value="bob@service.ws.apache.org"/>
     </bean>
-    <jaxws:endpoint xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/" id="localKerberosSTS" implementor="#transportSTSProviderBean" address="https://localhost:${testutil.ports.StaxSTSServer}/SecurityTokenService/Kerberos" wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/deployment/ws-trust-1.4-service.wsdl" depends-on="ClientAuthHttpsSettings" serviceName="ns1:SecurityTokenService" endpointName="ns1:Transport_Kerberos_Port">
+    <jaxws:endpoint xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/" id="localKerberosSTS" implementor="#transportSTSProviderBean" address="https://localhost:${testutil.ports.deployment.StaxSTSServer}/SecurityTokenService/Kerberos" wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/deployment/ws-trust-1.4-service.wsdl" depends-on="ClientAuthHttpsSettings" serviceName="ns1:SecurityTokenService" endpointName="ns1:Transport_Kerberos_Port">
         <jaxws:properties>
             <entry key="ws-security.bst.validator" value-ref="kerberosValidator"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <httpj:engine-factory id="ClientAuthHttpsSettings" bus="cxf">
-        <httpj:engine port="${testutil.ports.StaxSTSServer}">
+        <httpj:engine port="${testutil.ports.deployment.StaxSTSServer}">
             <httpj:tlsServerParameters>
                 <sec:trustManagers>
                     <sec:keyStore type="jks" password="stsspass" resource="stsstore.jks"/>

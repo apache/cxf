@@ -96,18 +96,18 @@
         <property name="issuer" value="DoubleItSTSIssuer"/>
         <property name="encryptionUsername" value="myservicekey"/>
     </bean>
-    <jaxws:endpoint xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/" id="localSTS" implementor="#transportSTSProviderBean" address="https://localhost:${testutil.ports.StaxSTSServer}/SecurityTokenService/Transport" wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/batch/ws-trust-1.4-service.wsdl" depends-on="ClientAuthHttpsSettings" serviceName="ns1:SecurityTokenService" endpointName="ns1:Transport_Port">
+    <jaxws:endpoint xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/" id="localSTS" implementor="#transportSTSProviderBean" address="https://localhost:${testutil.ports.batch.StaxSTSServer}/SecurityTokenService/Transport" wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/batch/ws-trust-1.4-service.wsdl" depends-on="ClientAuthHttpsSettings" serviceName="ns1:SecurityTokenService" endpointName="ns1:Transport_Port">
         <jaxws:properties>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/" id="localSTS2" implementor="#transportSTSProviderBean" address="https://localhost:${testutil.ports.StaxSTSServer}/SecurityTokenService/Transport2" wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/batch/ws-trust-1.4-service.wsdl" depends-on="ClientAuthHttpsSettings" serviceName="ns1:SecurityTokenService" endpointName="ns1:Transport_Port2">
+    <jaxws:endpoint xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/" id="localSTS2" implementor="#transportSTSProviderBean" address="https://localhost:${testutil.ports.batch.StaxSTSServer}/SecurityTokenService/Transport2" wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/batch/ws-trust-1.4-service.wsdl" depends-on="ClientAuthHttpsSettings" serviceName="ns1:SecurityTokenService" endpointName="ns1:Transport_Port2">
         <jaxws:properties>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <httpj:engine-factory id="ClientAuthHttpsSettings" bus="cxf">
-        <httpj:engine port="${testutil.ports.StaxSTSServer}">
+        <httpj:engine port="${testutil.ports.batch.StaxSTSServer}">
             <httpj:tlsServerParameters>
                 <sec:trustManagers>
                     <sec:keyStore type="jks" password="stsspass" resource="stsstore.jks"/>
