@@ -21,7 +21,6 @@
          http://cxf.apache.org/schemas/configuration/security.xsd">
 
      
-     <!-- Restaurant Reservations Application -->
      <!--
      <http:conduit name="*.http-conduit">
         <http:client ConnectionTimeout="3000000" ReceiveTimeout="3000000"/>
@@ -99,18 +98,27 @@
          <property name="key" value="${client_id}"/> 
          <property name="secret" value="${client_secret}"/>
      </bean>
-
-     <bean id="bigQueryService" class="demo.jaxrs.server.BigQueryService">
+     
+     <bean id="oidcRequestFilter" class="org.apache.cxf.rs.security.oidc.rp.OidcClientCodeRequestFilter">
+         <property name="scopes" value="openid email profile"/>
          <property name="accessTokenServiceClient" ref="atServiceClient"/>
          <property name="userInfoClient" ref="userInfoClient"/>
          <property name="consumer" ref="consumer"/>
          <property name="authorizationServiceUri" value="https://accounts.google.com/o/oauth2/auth"/>
-     </bean> 
+         <property name="startUri" value="service/bigquery"/>
+         <property name="completeUri" value="service/bigquery/complete"/>
+     </bean>
+     
+     <bean id="bigQueryService" class="demo.jaxrs.server.BigQueryService"/>
      
      <jaxrs:server id="bigQueryServer" address="/">
         <jaxrs:serviceBeans>
            <ref bean="bigQueryService"/>
         </jaxrs:serviceBeans>
+        <jaxrs:providers>
+           <ref bean="oidcRequestFilter"/>
+           <bean class="org.apache.cxf.rs.security.oauth2.client.ClientTokenContextProvider"/>
+        </jaxrs:providers>
         <jaxrs:features>
            <ref bean="loggingFeature"/>
         </jaxrs:features>
