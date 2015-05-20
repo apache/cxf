@@ -24,14 +24,6 @@
         <param-name>blueprintLocation</param-name>
         <param-value>jaxrs_soap_blueprint/WEB-INF/beans.xml</param-value>
     </context-param>
-    <context-param>
-        <param-name>blueprintNamespaceHandlers</param-name>
-        <param-value>
-            org.apache.cxf.internal.CXFAPINamespaceHandler,
-            org.apache.cxf.jaxrs.blueprint.JAXRSBPNamespaceHandler,
-            org.apache.cxf.jaxws.blueprint.JAXWSBPNamespaceHandler
-        </param-value>
-    </context-param>
     <listener>
         <listener-class>
             org.apache.aries.blueprint.web.BlueprintContextListener
