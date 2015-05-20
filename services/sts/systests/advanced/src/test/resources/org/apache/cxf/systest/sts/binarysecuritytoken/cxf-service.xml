@@ -24,7 +24,7 @@
             <cxf:logging/>
         </cxf:features>
     </cxf:bus>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="doubleitasymmetricbst" implementor="org.apache.cxf.systest.sts.common.DoubleItPortTypeImpl" endpointName="s:DoubleItAsymmetricBSTPort" serviceName="s:DoubleItService" address="http://localhost:${testutil.ports.Server}/doubleit/services/doubleitasymmetricbst" wsdlLocation="org/apache/cxf/systest/sts/binarysecuritytoken/DoubleIt.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="doubleitasymmetricbst" implementor="org.apache.cxf.systest.sts.common.DoubleItPortTypeImpl" endpointName="s:DoubleItAsymmetricBSTPort" serviceName="s:DoubleItService" address="http://localhost:${testutil.ports.binarysecuritytoken.Server}/doubleit/services/doubleitasymmetricbst" wsdlLocation="org/apache/cxf/systest/sts/binarysecuritytoken/DoubleIt.wsdl">
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="common.CommonCallbackHandler"/>
             <entry key="ws-security.bst.validator">

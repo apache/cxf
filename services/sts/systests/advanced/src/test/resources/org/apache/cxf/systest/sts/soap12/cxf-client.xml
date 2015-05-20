@@ -29,7 +29,7 @@
             <entry key="ws-security.sts.client">
                 <bean class="org.apache.cxf.ws.security.trust.STSClient">
                     <constructor-arg ref="cxf"/>
-                    <property name="wsdlLocation" value="https://localhost:${testutil.ports.STSServer}/SecurityTokenService/TransportSoap12?wsdl"/>
+                    <property name="wsdlLocation" value="https://localhost:${testutil.ports.deployment.STSServer}/SecurityTokenService/TransportSoap12?wsdl"/>
                     <property name="serviceName" value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService"/>
                     <property name="endpointName" value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Soap12_Port"/>
                     <property name="properties">

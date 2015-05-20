@@ -98,7 +98,7 @@
         <property name="issuer" value="DoubleItSTSIssuer"/>
         <property name="encryptionUsername" value="myservicekey"/>
     </bean>
-    <jaxws:endpoint xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/" id="localSCTSTS" implementor="#transportSTSProviderBean" address="https://localhost:${testutil.ports.STSServer}/SecurityTokenService/TransportSCT" wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/secure_conv/ws-trust-1.4-service.wsdl" depends-on="ClientAuthHttpsSettings" serviceName="ns1:SecurityTokenService" endpointName="ns1:Transport_Port">
+    <jaxws:endpoint xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/" id="localSCTSTS" implementor="#transportSTSProviderBean" address="https://localhost:${testutil.ports.secure_conv.STSServer}/SecurityTokenService/TransportSCT" wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/secure_conv/ws-trust-1.4-service.wsdl" depends-on="ClientAuthHttpsSettings" serviceName="ns1:SecurityTokenService" endpointName="ns1:Transport_Port">
         <jaxws:inInterceptors>
             <ref bean="sctInterceptor"/>
         </jaxws:inInterceptors>
@@ -109,7 +109,7 @@
             <ref bean="sctOutInterceptor"/>
         </jaxws:outFaultInterceptors>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/" id="localSCTEncryptedSTS" implementor="#transportSTSEncryptedProviderBean" address="https://localhost:${testutil.ports.STSServer}/SecurityTokenService/TransportSCTEncrypted" wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/secure_conv/ws-trust-1.4-service.wsdl" depends-on="ClientAuthHttpsSettings" serviceName="ns1:SecurityTokenService" endpointName="ns1:Transport_Port">
+    <jaxws:endpoint xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/" id="localSCTEncryptedSTS" implementor="#transportSTSEncryptedProviderBean" address="https://localhost:${testutil.ports.secure_conv.STSServer}/SecurityTokenService/TransportSCTEncrypted" wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/secure_conv/ws-trust-1.4-service.wsdl" depends-on="ClientAuthHttpsSettings" serviceName="ns1:SecurityTokenService" endpointName="ns1:Transport_Port">
         <jaxws:inInterceptors>
             <ref bean="sctInterceptor"/>
         </jaxws:inInterceptors>
@@ -120,7 +120,7 @@
             <ref bean="sctOutInterceptor"/>
         </jaxws:outFaultInterceptors>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/" id="localSCTEndorsingSTS" implementor="#transportSTSProviderBean" address="https://localhost:${testutil.ports.STSServer}/SecurityTokenService/TransportEndorsing" wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/secure_conv/ws-trust-1.4-service.wsdl" depends-on="ClientAuthHttpsSettings" serviceName="ns1:SecurityTokenService" endpointName="ns1:Transport_Endorsing_Port">
+    <jaxws:endpoint xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/" id="localSCTEndorsingSTS" implementor="#transportSTSProviderBean" address="https://localhost:${testutil.ports.secure_conv.STSServer}/SecurityTokenService/TransportEndorsing" wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/secure_conv/ws-trust-1.4-service.wsdl" depends-on="ClientAuthHttpsSettings" serviceName="ns1:SecurityTokenService" endpointName="ns1:Transport_Endorsing_Port">
         <jaxws:inInterceptors>
             <ref bean="sctInterceptor"/>
         </jaxws:inInterceptors>
@@ -139,7 +139,7 @@
     <bean id="sctInterceptor" class="org.apache.cxf.sts.interceptor.SCTInInterceptor"/>
     <bean id="sctOutInterceptor" class="org.apache.cxf.sts.interceptor.SCTOutInterceptor"/>
     <httpj:engine-factory id="ClientAuthHttpsSettings" bus="cxf">
-        <httpj:engine port="${testutil.ports.STSServer}">
+        <httpj:engine port="${testutil.ports.secure_conv.STSServer}">
             <httpj:tlsServerParameters>
                 <sec:trustManagers>
                     <sec:keyStore type="jks" password="stsspass" resource="stsstore.jks"/>
