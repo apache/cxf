@@ -100,7 +100,7 @@ public class AsymmetricBindingTest extends AbstractBusClientServerTestBase {
     
     @Parameters(name = "{0}")
     public static Collection<TestParam[]> data() {
-       
+        
         return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false, STSPORT2)},
                                                 {new TestParam(PORT, true, STSPORT2)},
                                                 {new TestParam(STAX_PORT, false, STSPORT2)},
