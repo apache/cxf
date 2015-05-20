@@ -142,13 +142,42 @@ public final class TestUtil {
     public static String getNewPortNumber(String name) {
         return getNewPortNumber(name, name);
     }
-    public static String getNewPortNumber(String fullName, String simpleName) {
+    
+    private static void applyNames(String fullName, String simpleName, String p) {
+        ports.setProperty("testutil.ports." + fullName, p);
+        ports.setProperty("testutil.ports." + simpleName, p);
+        System.setProperty("testutil.ports." + fullName, p);
+        System.setProperty("testutil.ports." + simpleName, p);
+        if (fullName.endsWith("." + simpleName)) {
+            int idx = fullName.lastIndexOf('.', fullName.lastIndexOf('.'));
+            while (idx != -1) {
+                String name = fullName.substring(idx + 1);
+                ports.setProperty("testutil.ports." + name, p);
+                System.setProperty("testutil.ports." + name, p);
+                idx = fullName.lastIndexOf('.', idx - 1);
+            }
+        }
+    }
+    private static void removeNames(String fullName, String simpleName) {
         ports.remove("testutil.ports." + fullName);
         ports.remove("testutil.ports." + simpleName);
         System.clearProperty("testutil.ports." + fullName);
         System.clearProperty("testutil.ports." + simpleName);        
+        if (fullName.endsWith("." + simpleName)) {
+            int idx = fullName.lastIndexOf('.', fullName.lastIndexOf('.'));
+            while (idx != -1) {
+                String name = fullName.substring(idx + 1);
+                ports.remove("testutil.ports." + name);
+                System.clearProperty("testutil.ports." + name);
+                idx = fullName.lastIndexOf('.', idx - 1);
+            }
+        }
+    }
+    
+    public static String getNewPortNumber(String fullName, String simpleName) {
+        removeNames(fullName, simpleName);
         return getPortNumber(fullName, simpleName);
-    }    
+    } 
     public static String getPortNumber(String fullName, String simpleName) {
         String p = ports.getProperty("testutil.ports." + fullName);
         if (p == null) {
@@ -170,10 +199,7 @@ public final class TestUtil {
                 //
             }
         }
-        ports.put("testutil.ports." + fullName, p);
-        ports.put("testutil.ports." + simpleName, p);
-        System.setProperty("testutil.ports." + fullName, p);
-        System.setProperty("testutil.ports." + simpleName, p);
+        applyNames(fullName, simpleName, p);
         return p;
     }
     
