@@ -18,6 +18,10 @@
  */
 package org.apache.cxf.rs.security.oidc.rp;
 
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.core.SecurityContext;
+
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.rs.security.oauth2.client.ClientCodeRequestFilter;
 import org.apache.cxf.rs.security.oauth2.client.ClientTokenContext;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
@@ -25,16 +29,32 @@ import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
 
     private UserInfoClient userInfoClient;
+    private boolean userInfoRequired = true; 
     @Override
-    protected ClientTokenContext createTokenContext(ClientAccessToken at) {
+    protected ClientTokenContext createTokenContext(ContainerRequestContext rc, ClientAccessToken at) {
         OidcClientTokenContextImpl ctx = new OidcClientTokenContextImpl();
         if (at != null) {
             ctx.setIdToken(userInfoClient.getIdToken(at, getConsumer().getKey()));
-            ctx.setUserInfo(userInfoClient.getUserInfo(at, ctx.getIdToken()));
+            if (userInfoRequired) {
+                ctx.setUserInfo(userInfoClient.getUserInfo(at, ctx.getIdToken()));
+            }
+            rc.setSecurityContext(new OidcSecurityContext(ctx));
         }
+        
         return ctx;
     }
     public void setUserInfoClient(UserInfoClient userInfoClient) {
         this.userInfoClient = userInfoClient;
+    }
+    public void setUserInfoRequired(boolean userInfoRequired) {
+        this.userInfoRequired = userInfoRequired;
+    }
+    @Override
+    protected void checkSecurityContextStart(SecurityContext sc) {
+        // The SSO is managed out of band and the act of validating IdToken
+        // finalizes the authentication flow
+        if (sc != null && sc.getUserPrincipal() != null) {
+            throw ExceptionUtils.toNotAuthorizedException(null, null);
+        }
     }
 }
