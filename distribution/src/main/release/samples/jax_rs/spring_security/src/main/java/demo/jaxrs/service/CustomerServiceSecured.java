@@ -19,7 +19,7 @@
 package demo.jaxrs.service;
 
 import javax.ws.rs.core.Response;
-import org.springframework.security.annotation.Secured;
+import org.springframework.security.access.annotation.Secured;
 
 
 public interface CustomerServiceSecured {

@@ -28,7 +28,7 @@ http://www.springframework.org/schema/beans/spring-beans.xsd
 http://www.springframework.org/schema/aop 
 http://www.springframework.org/schema/aop/spring-aop.xsd
 http://www.springframework.org/schema/security 
-http://www.springframework.org/schema/security/spring-security-2.0.4.xsd
+http://www.springframework.org/schema/security/spring-security.xsd
 http://cxf.apache.org/jaxrs
 http://cxf.apache.org/schemas/jaxrs.xsd">
 
@@ -53,7 +53,7 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
   <security:global-method-security secured-annotations="enabled">
       <security:protect-pointcut 
         expression="execution(* demo.jaxrs.service.CustomerService.getCustomer(*))" 
-        access="ROLE_CUSTOMER, ROLE_ADMIN"/>
+        access="ROLE_CUSTOMER,ROLE_ADMIN"/>
       <security:protect-pointcut 
         expression="execution(* demo.jaxrs.service.CustomerService.addCustomer(*))" 
         access="ROLE_ADMIN"/>
@@ -65,18 +65,19 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
         access="ROLE_ADMIN"/>    
       <security:protect-pointcut 
         expression="execution(* demo.jaxrs.service.CustomerService.getOrder(*))" 
-        access="ROLE_CUSTOMER, ROLE_ADMIN"/> 
+        access="ROLE_CUSTOMER,ROLE_ADMIN"/> 
   </security:global-method-security>
   
   <security:http auto-config='true'>
     <security:http-basic />
   </security:http>
-  
-  <security:authentication-provider>
-    <security:user-service>
-      <security:user name="bob" password="bobspassword" authorities="ROLE_CUSTOMER" />
-      <security:user name="fred" password="fredspassword" authorities="ROLE_CUSTOMER, ROLE_ADMIN" />
-    </security:user-service>
-  </security:authentication-provider> 
+  <security:authentication-manager>
+    <security:authentication-provider>
+      <security:user-service>
+        <security:user name="bob" password="bobspassword" authorities="ROLE_CUSTOMER" />
+        <security:user name="fred" password="fredspassword" authorities="ROLE_CUSTOMER,ROLE_ADMIN" />
+      </security:user-service>
+    </security:authentication-provider> 
+  </security:authentication-manager>
 </beans>
 
