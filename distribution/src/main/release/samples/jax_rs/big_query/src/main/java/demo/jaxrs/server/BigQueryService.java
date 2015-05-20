@@ -49,7 +49,7 @@ public class BigQueryService {
 
         ResponseBuilder rb = Response.ok().type("application/json");
         Response r = rb.entity(
-                "{\"email\":\"" + userInfo.getProperty("email") + "\"}")
+                "{\"email\":\"" + userInfo.getEmail() + "\"}")
                 .build();
         return r;
     }
