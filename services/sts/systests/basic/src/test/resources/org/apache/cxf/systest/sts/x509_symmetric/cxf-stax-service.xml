@@ -42,7 +42,7 @@
         </property>
     </bean>
     
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="doubleitsymmetricsaml1" implementor="org.apache.cxf.systest.sts.common.DoubleItPortTypeImpl" endpointName="s:DoubleItSymmetricSAML1Port" serviceName="s:DoubleItService" address="http://localhost:${testutil.ports.StaxServer}/doubleit/services/doubleitsymmetricsaml1" wsdlLocation="org/apache/cxf/systest/sts/x509_symmetric/DoubleIt.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="doubleitsymmetricsaml1" implementor="org.apache.cxf.systest.sts.common.DoubleItPortTypeImpl" endpointName="s:DoubleItSymmetricSAML1Port" serviceName="s:DoubleItService" address="http://localhost:${testutil.ports.x509_symmetric.StaxServer}/doubleit/services/doubleitsymmetricsaml1" wsdlLocation="org/apache/cxf/systest/sts/x509_symmetric/DoubleIt.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
             <entry key="security.signature.properties" value="serviceKeystore.properties"/>
@@ -58,7 +58,7 @@
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="doubleitsymmetricsaml2" implementor="org.apache.cxf.systest.sts.common.DoubleItPortTypeImpl" endpointName="s:DoubleItSymmetricSAML2Port" serviceName="s:DoubleItService" address="http://localhost:${testutil.ports.StaxServer}/doubleit/services/doubleitsymmetricsaml2" wsdlLocation="org/apache/cxf/systest/sts/x509_symmetric/DoubleIt.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="doubleitsymmetricsaml2" implementor="org.apache.cxf.systest.sts.common.DoubleItPortTypeImpl" endpointName="s:DoubleItSymmetricSAML2Port" serviceName="s:DoubleItService" address="http://localhost:${testutil.ports.x509_symmetric.StaxServer}/doubleit/services/doubleitsymmetricsaml2" wsdlLocation="org/apache/cxf/systest/sts/x509_symmetric/DoubleIt.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
             <entry key="security.signature.properties" value="serviceKeystore.properties"/>
@@ -69,7 +69,7 @@
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="doubleitsymmetricsaml2endorsing" implementor="org.apache.cxf.systest.sts.common.DoubleItPortTypeImpl" endpointName="s:DoubleItSymmetricSAML2EndorsingPort" serviceName="s:DoubleItService" address="http://localhost:${testutil.ports.StaxServer}/doubleit/services/doubleitsymmetricsaml2endorsing" wsdlLocation="org/apache/cxf/systest/sts/x509_symmetric/DoubleIt.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="doubleitsymmetricsaml2endorsing" implementor="org.apache.cxf.systest.sts.common.DoubleItPortTypeImpl" endpointName="s:DoubleItSymmetricSAML2EndorsingPort" serviceName="s:DoubleItService" address="http://localhost:${testutil.ports.x509_symmetric.StaxServer}/doubleit/services/doubleitsymmetricsaml2endorsing" wsdlLocation="org/apache/cxf/systest/sts/x509_symmetric/DoubleIt.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
             <entry key="security.signature.properties" value="serviceKeystore.properties"/>

@@ -24,7 +24,7 @@
             <cxf:logging/>
         </cxf:features>
     </cxf:bus>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="doubleittransportsaml2" implementor="org.apache.cxf.systest.sts.common.DoubleItPortTypeImpl" endpointName="s:DoubleItTransportSAML2Port" serviceName="s:DoubleItService" depends-on="ClientAuthHttpsSettings" address="https://localhost:${testutil.ports.Server.2}/doubleit/services/doubleittransportsaml2" wsdlLocation="org/apache/cxf/systest/sts/intermediary_transformation/DoubleIt.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="doubleittransportsaml2" implementor="org.apache.cxf.systest.sts.common.DoubleItPortTypeImpl" endpointName="s:DoubleItTransportSAML2Port" serviceName="s:DoubleItService" depends-on="ClientAuthHttpsSettings" address="https://localhost:${testutil.ports.intermediary_transformation.Server.2}/doubleit/services/doubleittransportsaml2" wsdlLocation="org/apache/cxf/systest/sts/intermediary_transformation/DoubleIt.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
             <entry key="security.signature.properties" value="serviceKeystore.properties"/>
@@ -35,7 +35,7 @@
         </jaxws:properties>
     </jaxws:endpoint>
     <httpj:engine-factory id="ClientAuthHttpsSettings" bus="cxf">
-        <httpj:engine port="${testutil.ports.Server.2}">
+        <httpj:engine port="${testutil.ports.intermediary_transformation.Server.2}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="skpass">
                     <sec:keyStore type="jks" password="sspass" resource="servicestore.jks"/>

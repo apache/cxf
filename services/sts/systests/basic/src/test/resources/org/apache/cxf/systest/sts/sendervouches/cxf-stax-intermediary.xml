@@ -25,16 +25,16 @@
         </cxf:features>
     </cxf:bus>
     <bean id="doubleItImpl" class="org.apache.cxf.systest.sts.sendervouches.DoubleItPortTypeImpl">
-        <property name="port" value="${testutil.ports.StaxServer.2}"/>
+        <property name="port" value="${testutil.ports.sendervouches.StaxServer.2}"/>
     </bean>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="doubleittransportut" implementor="#doubleItImpl" endpointName="s:DoubleItTransportUTPort" serviceName="s:DoubleItService" depends-on="ClientAuthHttpsSettings" address="https://localhost:${testutil.ports.StaxIntermediary}/doubleit/services/doubleittransportut" wsdlLocation="org/apache/cxf/systest/sts/sendervouches/DoubleIt.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="doubleittransportut" implementor="#doubleItImpl" endpointName="s:DoubleItTransportUTPort" serviceName="s:DoubleItService" depends-on="ClientAuthHttpsSettings" address="https://localhost:${testutil.ports.sendervouches.StaxIntermediary}/doubleit/services/doubleittransportut" wsdlLocation="org/apache/cxf/systest/sts/sendervouches/DoubleIt.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <httpj:engine-factory id="ClientAuthHttpsSettings" bus="cxf">
-        <httpj:engine port="${testutil.ports.StaxIntermediary}">
+        <httpj:engine port="${testutil.ports.sendervouches.StaxIntermediary}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="skpass">
                     <sec:keyStore type="jks" password="sspass" resource="servicestore.jks"/>
