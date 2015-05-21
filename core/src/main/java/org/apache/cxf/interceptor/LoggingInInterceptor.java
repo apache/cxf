@@ -148,6 +148,11 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
             log(logger, buffer.toString());
             return;
         }
+        if (!isShowMultipartContent() && isMultipartContent(ct)) {
+            buffer.getMessage().append(MULTIPART_CONTENT_MESSAGE).append('\n');
+            log(logger, buffer.toString());
+            return;
+        }
         
         InputStream is = message.getContent(InputStream.class);
         if (is != null) {
