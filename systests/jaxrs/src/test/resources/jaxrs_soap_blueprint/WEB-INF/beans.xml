@@ -26,8 +26,7 @@
              http://cxf.apache.org/blueprint/jaxws http://cxf.apache.org/schemas/blueprint/jaxws.xsd
              http://cxf.apache.org/blueprint/core http://cxf.apache.org/schemas/blueprint/core.xsd
              ">
-     <cxf:bus/>
-     
+          
      <bean id="resourceBean" class="org.apache.cxf.systest.jaxrs.jaxws.HelloWorldImpl"/>
      
      <jaxrs:server id="hello_rest" address="/hello-rest">
