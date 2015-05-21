@@ -30,16 +30,18 @@ import org.apache.cxf.systest.jaxrs.jaxws.User;
 import org.apache.cxf.systest.jaxrs.jaxws.UserImpl;
 import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
 
+import org.junit.BeforeClass;
 import org.junit.Ignore;
+import org.junit.Test;
 
 public class JAXRSSoapRestBlueprintTest extends AbstractClientServerTestBase {
     public static final int PORT = BlueprintServer.PORT;
-//    @BeforeClass
-//    public static void beforeClass() throws Exception {
-//        // must be 'in-process' to communicate with inner class in single JVM
-//        // and to spawn class SpringServer w/o using main() method
-//        launchServer(BlueprintServer.class, true);
-//    }
+    @BeforeClass
+    public static void beforeClass() throws Exception {
+        // must be 'in-process' to communicate with inner class in single JVM
+        // and to spawn class SpringServer w/o using main() method
+        launchServer(BlueprintServer.class, true);
+    }
 
     @Ignore
     public static class BlueprintServer extends AbstractSpringServer {
@@ -48,7 +50,7 @@ public class JAXRSSoapRestBlueprintTest extends AbstractClientServerTestBase {
             super("/jaxrs_soap_blueprint", "/bp", PORT);
         }
     }
-    //@Test
+    @Test
     public void testHelloRest() throws Exception {
         String address = "http://localhost:" + PORT + "/bp/services/hello-rest";
         
@@ -56,7 +58,7 @@ public class JAXRSSoapRestBlueprintTest extends AbstractClientServerTestBase {
         useHelloService(service);
     }
     
-    //@Test
+    @Test
     public void testHelloSoap() throws Exception {
         final QName serviceName = new QName("http://hello.com", "HelloWorld");
         final QName portName = new QName("http://hello.com", "HelloWorldPort");
