@@ -29,7 +29,7 @@
 
   <xsd:import namespace="http://www.osgi.org/xmlns/blueprint/v1.0.0" schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd"/>
   <xsd:import namespace="http://cxf.apache.org/configuration/beans" schemaLocation="http://cxf.apache.org/schemas/configuration/cxf-beans.xsd"/>
-  <xsd:include schemaLocation="http://cxf.apache.org/schemas/blueprint/jaxrs-common.xsd"/>
+  <xsd:include schemaLocation="jaxrs-common.xsd"/>
   
   <xsd:element name="server">
     <xsd:complexType>

@@ -31,7 +31,7 @@
            xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
            jaxb:version="2.0">
 
-    <xs:include schemaLocation="http://cxf.apache.org/schemas/wsdl/http-conf.xsd"/> 
+    <xs:include schemaLocation="../wsdl/http-conf.xsd"/> 
     <xs:import namespace="http://schemas.xmlsoap.org/wsdl/" 
                schemaLocation="http://schemas.xmlsoap.org/wsdl/2003-02-11.xsd"/>
     <xs:import namespace="http://cxf.apache.org/configuration/security" 
