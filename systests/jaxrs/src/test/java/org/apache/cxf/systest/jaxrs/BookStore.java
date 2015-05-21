@@ -96,7 +96,9 @@ import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 import org.apache.cxf.jaxrs.ext.search.SearchContext;
 import org.apache.cxf.jaxrs.ext.xml.XMLInstruction;
 import org.apache.cxf.jaxrs.ext.xml.XSISchemaLocation;
+import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.systest.jaxrs.BookServer20.CustomHeaderAdded;
 import org.apache.cxf.systest.jaxrs.BookServer20.CustomHeaderAddedAsync;
@@ -127,6 +129,8 @@ public class BookStore {
     private UriInfo uiFromConstructor;
     @Context 
     private ResourceContext resourceContext;
+    @Context 
+    private MessageContext messageContext;
     @Context 
     private Configuration configuration;
     
@@ -1187,6 +1191,13 @@ public class BookStore {
     }
     
     @GET
+    @Path("/books/statusFromStream")
+    @Produces("text/xml")
+    public StreamingOutput statusFromStream() {
+        return new ResponseStreamingOutputImpl();
+    }
+    
+    @GET
     @Path("/books/fail-late")
     @Produces("application/bar")
     public StreamingOutput writeToStreamAndFail() {
@@ -1655,6 +1666,18 @@ public class BookStore {
                 output.write("This is not supposed to go on the wire".getBytes());
                 throw new WebApplicationException(410);
             }
+        } 
+        
+    }
+    private class ResponseStreamingOutputImpl implements StreamingOutput {
+        public void write(OutputStream output) throws IOException, WebApplicationException {
+            BookStore.this.messageContext.put(Message.RESPONSE_CODE, 503);
+            MultivaluedMap<String, String> headers = new MetadataMap<String, String>();
+            headers.putSingle("Content-Type", "text/plain");
+            headers.putSingle("CustomHeader", "CustomValue");
+            BookStore.this.messageContext.put(Message.PROTOCOL_HEADERS, headers);
+            
+            output.write("Response is not available".getBytes());
         } 
         
     }
