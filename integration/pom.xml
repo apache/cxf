@@ -32,7 +32,6 @@
     <modules>
         <module>jca</module>
         <module>cdi</module>
-        <module>tracing/tracing-core</module>
         <module>tracing/tracing-htrace</module>
     </modules>
 </project>
