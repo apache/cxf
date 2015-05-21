@@ -69,7 +69,7 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
     protected PrintWriter writer;
     protected boolean prettyLogging;
     private boolean showBinaryContent;
-    private boolean showMultipartContent;
+    private boolean showMultipartContent = true;
     
     public AbstractLoggingInterceptor(String phase) {
         super(phase);
