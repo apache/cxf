@@ -30,7 +30,7 @@
     <!-- Transport Layer Security (TLS) settings -->
     <!-- -->
     <httpj:engine-factory id="tls-settings">
-        <httpj:engine port="${testutil.ports.StaxServer}">
+        <httpj:engine port="${testutil.ports.saml.subjectconf.StaxServer}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="password">
                     <sec:keyStore type="jks" password="password" resource="org/apache/cxf/systest/ws/security/Bethal.jks"/>
@@ -43,7 +43,7 @@
         </httpj:engine>
     </httpj:engine-factory>
     
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Saml2TokenOverTransport" address="https://localhost:${testutil.ports.StaxServer}/DoubleItSaml2Transport" serviceName="s:DoubleItService" endpointName="s:DoubleItSaml2TransportPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/saml/subjectconf//DoubleItSamlSubjectConf.wsdl" depends-on="tls-settings">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Saml2TokenOverTransport" address="https://localhost:${testutil.ports.saml.subjectconf.StaxServer}/DoubleItSaml2Transport" serviceName="s:DoubleItService" endpointName="s:DoubleItSaml2TransportPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/saml/subjectconf//DoubleItSamlSubjectConf.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="security.signature.properties" value="morpit.properties"/>
             <entry key="ws-security.enable.streaming" value="true"/>

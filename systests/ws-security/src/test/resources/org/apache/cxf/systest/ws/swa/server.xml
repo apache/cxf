@@ -27,7 +27,7 @@
     </cxf:bus>
 
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SignatureContentAction" 
-        address="http://localhost:${testutil.ports.Server}/DoubleItSWASignatureContentAction" 
+        address="http://localhost:${testutil.ports.swa.Server}/DoubleItSWASignatureContentAction" 
         serviceName="s:DoubleItService" endpointName="s:DoubleItSWASignatureContentActionPort" 
         implementor="org.apache.cxf.systest.ws.swa.DoubleIt3Impl" 
         wsdlLocation="org/apache/cxf/systest/ws/swa/DoubleItSwa.wsdl">
@@ -57,7 +57,7 @@
     </jaxws:endpoint>
     
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SignatureCompleteAction" 
-        address="http://localhost:${testutil.ports.Server}/DoubleItSWASignatureCompleteAction" 
+        address="http://localhost:${testutil.ports.swa.Server}/DoubleItSWASignatureCompleteAction" 
         serviceName="s:DoubleItService" endpointName="s:DoubleItSWASignatureCompleteActionPort" 
         implementor="org.apache.cxf.systest.ws.swa.DoubleIt3Impl" 
         wsdlLocation="org/apache/cxf/systest/ws/swa/DoubleItSwa.wsdl">
@@ -87,7 +87,7 @@
     </jaxws:endpoint>
     
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="EncryptionContentAction" 
-        address="http://localhost:${testutil.ports.Server}/DoubleItSWAEncryptionContentAction" 
+        address="http://localhost:${testutil.ports.swa.Server}/DoubleItSWAEncryptionContentAction" 
         serviceName="s:DoubleItService" endpointName="s:DoubleItSWAEncryptionContentActionPort" 
         implementor="org.apache.cxf.systest.ws.swa.DoubleIt3Impl" 
         wsdlLocation="org/apache/cxf/systest/ws/swa/DoubleItSwa.wsdl">
@@ -117,7 +117,7 @@
     </jaxws:endpoint>
     
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="EncryptionCompleteAction" 
-        address="http://localhost:${testutil.ports.Server}/DoubleItSWAEncryptionCompleteAction" 
+        address="http://localhost:${testutil.ports.swa.Server}/DoubleItSWAEncryptionCompleteAction" 
         serviceName="s:DoubleItService" endpointName="s:DoubleItSWAEncryptionCompleteActionPort" 
         implementor="org.apache.cxf.systest.ws.swa.DoubleIt3Impl" 
         wsdlLocation="org/apache/cxf/systest/ws/swa/DoubleItSwa.wsdl">

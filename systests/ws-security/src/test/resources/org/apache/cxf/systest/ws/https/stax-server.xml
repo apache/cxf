@@ -30,7 +30,7 @@
     <!-- Transport Layer Security (TLS) settings -->
     <!-- -->
     <httpj:engine-factory id="tls-settings">
-        <httpj:engine port="${testutil.ports.StaxServer}">
+        <httpj:engine port="${testutil.ports.https.StaxServer}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="password">
                     <sec:keyStore type="jks" password="password" resource="org/apache/cxf/systest/ws/security/Bethal.jks"/>
@@ -42,7 +42,7 @@
             </httpj:tlsServerParameters>
         </httpj:engine>
     </httpj:engine-factory>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="RequireClientCert" address="https://localhost:${testutil.ports.StaxServer}/DoubleItRequireClientCert" serviceName="s:DoubleItService" endpointName="s:DoubleItRequireClientCertPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/https/DoubleItHttps.wsdl" depends-on="tls-settings">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="RequireClientCert" address="https://localhost:${testutil.ports.https.StaxServer}/DoubleItRequireClientCert" serviceName="s:DoubleItService" endpointName="s:DoubleItRequireClientCertPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/https/DoubleItHttps.wsdl" depends-on="tls-settings">
         <jaxws:features>
             <p:policies>
                 <wsp:PolicyReference xmlns:wsp="http://www.w3.org/ns/ws-policy" URI="classpath:/org/apache/cxf/systest/ws/https/req-client-cert-policy.xml"/>
@@ -52,7 +52,7 @@
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="RequireClientCert2" address="https://localhost:${testutil.ports.StaxServer}/DoubleItRequireClientCert2" serviceName="s:DoubleItService" endpointName="s:DoubleItRequireClientCertPort2" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/https/DoubleItHttps.wsdl" depends-on="tls-settings">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="RequireClientCert2" address="https://localhost:${testutil.ports.https.StaxServer}/DoubleItRequireClientCert2" serviceName="s:DoubleItService" endpointName="s:DoubleItRequireClientCertPort2" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/https/DoubleItHttps.wsdl" depends-on="tls-settings">
         <jaxws:features>
             <p:policies>
                 <wsp:PolicyReference xmlns:wsp="http://www.w3.org/ns/ws-policy" URI="classpath:/org/apache/cxf/systest/ws/https/req-client-cert-policy.xml"/>
@@ -62,7 +62,7 @@
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="BasicAuth" address="https://localhost:${testutil.ports.StaxServer}/DoubleItBasicAuth" serviceName="s:DoubleItService" endpointName="s:DoubleItBasicAuthPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/https/DoubleItHttps.wsdl" depends-on="tls-settings">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="BasicAuth" address="https://localhost:${testutil.ports.https.StaxServer}/DoubleItBasicAuth" serviceName="s:DoubleItService" endpointName="s:DoubleItBasicAuthPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/https/DoubleItHttps.wsdl" depends-on="tls-settings">
         <jaxws:features>
             <p:policies>
                 <wsp:PolicyReference xmlns:wsp="http://www.w3.org/ns/ws-policy" URI="classpath:/org/apache/cxf/systest/ws/https/basic-auth-policy.xml"/>
@@ -72,7 +72,7 @@
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="BasicAuth2" address="https://localhost:${testutil.ports.StaxServer}/DoubleItBasicAuth2" serviceName="s:DoubleItService" endpointName="s:DoubleItBasicAuthPort2" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/https/DoubleItHttps.wsdl" depends-on="tls-settings">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="BasicAuth2" address="https://localhost:${testutil.ports.https.StaxServer}/DoubleItBasicAuth2" serviceName="s:DoubleItService" endpointName="s:DoubleItBasicAuthPort2" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/https/DoubleItHttps.wsdl" depends-on="tls-settings">
         <jaxws:features>
             <p:policies>
                 <wsp:PolicyReference xmlns:wsp="http://www.w3.org/ns/ws-policy" URI="classpath:/org/apache/cxf/systest/ws/https/basic-auth-policy.xml"/>

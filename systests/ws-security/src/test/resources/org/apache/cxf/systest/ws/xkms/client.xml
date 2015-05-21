@@ -33,7 +33,7 @@
     <jaxws:client id="xkmsClient"
         serviceClass="org.w3._2002._03.xkms_wsdl.XKMSPortType"
         name="{http://www.w3.org/2002/03/xkms#wsdl}XKMSPort" 
-        address="https://localhost:${testutil.ports.XKMSServer}/XKMS">
+        address="https://localhost:${testutil.ports.xkms.XKMSServer}/XKMS">
         <jaxws:properties>
             <entry key="jaxb.additionalContextClasses">
                  <bean factory-bean="additionalClasses" factory-method="create" />
@@ -43,7 +43,7 @@
     -->
     <bean id="xkmsClient" class="org.apache.cxf.xkms.client.XKMSClientFactory" factory-method="create">
         <constructor-arg>
-            <value>https://localhost:${testutil.ports.XKMSServer}/XKMS</value>
+            <value>https://localhost:${testutil.ports.xkms.XKMSServer}/XKMS</value>
         </constructor-arg>
         <constructor-arg ref="cxf"/>
     </bean>

@@ -24,7 +24,7 @@
     <!-- Transport Layer Security (TLS) settings -->
     <!-- -->
     <httpj:engine-factory id="tls-settings">
-        <httpj:engine port="${testutil.ports.AuthorizedServer.1}">
+        <httpj:engine port="${testutil.ports.wssec10.server.AuthorizedServer.1}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="password">
                     <sec:keyStore type="jks" password="password" resource="certs/restricted/bob.jks"/>
@@ -56,12 +56,12 @@
             </map>
         </property>
     </bean>
-    <jaxws:endpoint id="UserName" address="http://localhost:${testutil.ports.AuthorizedServer}/UserName" serviceName="interop:PingService" endpointName="interop:UserName_IPingService" wsdlLocation="target/test-classes/wsdl_systest_wssec/wssec10/WsSecurity10_12_restricted_hashed.wsdl" implementor="org.apache.cxf.systest.ws.wssec10.server.UserNameOverTransportRestricted">
+    <jaxws:endpoint id="UserName" address="http://localhost:${testutil.ports.wssec10.server.AuthorizedServer}/UserName" serviceName="interop:PingService" endpointName="interop:UserName_IPingService" wsdlLocation="target/test-classes/wsdl_systest_wssec/wssec10/WsSecurity10_12_restricted_hashed.wsdl" implementor="org.apache.cxf.systest.ws.wssec10.server.UserNameOverTransportRestricted">
         <jaxws:inInterceptors>
             <ref bean="authorizationInterceptor"/>
         </jaxws:inInterceptors>
     </jaxws:endpoint>
-    <jaxws:endpoint id="UserName2" address="http://localhost:${testutil.ports.AuthorizedServer}/HashedUserName" serviceName="interop:PingService" endpointName="interop:UserName_IPingService_hashed" wsdlLocation="target/test-classes/wsdl_systest_wssec/wssec10/WsSecurity10_12_restricted_hashed.wsdl" implementor="org.apache.cxf.systest.ws.wssec10.server.UserNameOverTransportRestricted">
+    <jaxws:endpoint id="UserName2" address="http://localhost:${testutil.ports.wssec10.server.AuthorizedServer}/HashedUserName" serviceName="interop:PingService" endpointName="interop:UserName_IPingService_hashed" wsdlLocation="target/test-classes/wsdl_systest_wssec/wssec10/WsSecurity10_12_restricted_hashed.wsdl" implementor="org.apache.cxf.systest.ws.wssec10.server.UserNameOverTransportRestricted">
         <jaxws:inInterceptors>
             <ref bean="authorizationInterceptor"/>
         </jaxws:inInterceptors>
@@ -69,7 +69,7 @@
     <!-- -->
     <!-- Scenario 3.1 -->
     <!-- -->
-    <jaxws:endpoint id="UserNameOverTransport" address="https://localhost:${testutil.ports.AuthorizedServer.1}/UserNameOverTransport" serviceName="interop:PingService" endpointName="interop:UserNameOverTransport_IPingService" implementor="org.apache.cxf.systest.ws.wssec10.server.UserNameOverTransportRestricted" depends-on="tls-settings">
+    <jaxws:endpoint id="UserNameOverTransport" address="https://localhost:${testutil.ports.wssec10.server.AuthorizedServer.1}/UserNameOverTransport" serviceName="interop:PingService" endpointName="interop:UserNameOverTransport_IPingService" implementor="org.apache.cxf.systest.ws.wssec10.server.UserNameOverTransportRestricted" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="security.username" value="Alice"/>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
