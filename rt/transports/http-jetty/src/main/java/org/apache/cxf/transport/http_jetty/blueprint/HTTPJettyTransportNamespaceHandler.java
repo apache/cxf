@@ -22,17 +22,17 @@ import java.net.URL;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import org.apache.aries.blueprint.NamespaceHandler;
-import org.apache.aries.blueprint.Namespaces;
 import org.apache.aries.blueprint.ParserContext;
 import org.apache.cxf.common.logging.LogUtils;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.osgi.service.blueprint.reflect.Metadata;
 
-@Namespaces("http://cxf.apache.org/transports/http-jetty/configuration")
+//@Namespaces("http://cxf.apache.org/transports/http-jetty/configuration")
 public class HTTPJettyTransportNamespaceHandler implements NamespaceHandler {
 
     public static final String JETTY_TRANSPORT = "http://cxf.apache.org/transports/http-jetty/configuration";

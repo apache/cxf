@@ -25,7 +25,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import org.apache.aries.blueprint.NamespaceHandler;
-import org.apache.aries.blueprint.Namespaces;
 import org.apache.aries.blueprint.ParserContext;
 import org.apache.cxf.clustering.FailoverFeature;
 import org.apache.cxf.clustering.LoadDistributorFeature;
@@ -33,7 +32,7 @@ import org.apache.cxf.configuration.blueprint.SimpleBPBeanDefinitionParser;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.osgi.service.blueprint.reflect.Metadata;
 
-@Namespaces("http://cxf.apache.org/clustering")
+//@Namespaces("http://cxf.apache.org/clustering")
 public class ClusteringBPNamespaceHandler implements NamespaceHandler {
     public ComponentMetadata decorate(Node node, ComponentMetadata component, ParserContext context) {
         return null;

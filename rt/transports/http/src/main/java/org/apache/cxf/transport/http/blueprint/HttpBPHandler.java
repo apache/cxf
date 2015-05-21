@@ -26,12 +26,11 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import org.apache.aries.blueprint.NamespaceHandler;
-import org.apache.aries.blueprint.Namespaces;
 import org.apache.aries.blueprint.ParserContext;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.osgi.service.blueprint.reflect.Metadata;
 
-@Namespaces("http://cxf.apache.org/transports/http/configuration")
+//@Namespaces("http://cxf.apache.org/transports/http/configuration")
 public class HttpBPHandler implements NamespaceHandler {
     
     public HttpBPHandler() {

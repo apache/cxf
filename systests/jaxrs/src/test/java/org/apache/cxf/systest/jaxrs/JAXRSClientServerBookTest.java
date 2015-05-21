@@ -1404,6 +1404,19 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testStatusAngHeadersFromStream() throws Exception {
+        String address = "http://localhost:" + PORT + "/bookstore/books/statusFromStream";
+        WebClient wc = WebClient.create(address);
+        wc.accept("text/xml");
+        Response r = wc.get();
+        assertEquals(503, r.getStatus());
+        assertEquals("text/plain", r.getMediaType().toString());
+        assertEquals("CustomValue", r.getHeaderString("CustomHeader"));
+        assertEquals("Response is not available", r.readEntity(String.class));
+        
+    }
+    
+    @Test
     public void testWriteAndFailEarly() throws Exception {
         getAndCompare("http://localhost:" + PORT + "/bookstore/books/fail-early",
                       "This is supposed to go on the wire",
