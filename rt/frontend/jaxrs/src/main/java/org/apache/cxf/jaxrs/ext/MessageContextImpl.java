@@ -180,6 +180,10 @@ public class MessageContextImpl implements MessageContext {
         m.put(key.toString(), value);
         if (!MessageUtils.isRequestor(m)) {
             m.getExchange().put(key.toString(), value);
+            Message outMessage = m.getExchange().getOutMessage();
+            if (outMessage != null && outMessage != m) {
+                outMessage.put(key.toString(), value);
+            }
         }
             
     }
