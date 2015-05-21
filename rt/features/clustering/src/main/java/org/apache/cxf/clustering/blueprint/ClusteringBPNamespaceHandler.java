@@ -32,6 +32,7 @@ import org.apache.cxf.configuration.blueprint.SimpleBPBeanDefinitionParser;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.osgi.service.blueprint.reflect.Metadata;
 
+//@Namespaces("http://cxf.apache.org/clustering")
 public class ClusteringBPNamespaceHandler implements NamespaceHandler {
     public ComponentMetadata decorate(Node node, ComponentMetadata component, ParserContext context) {
         return null;

@@ -26,7 +26,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import org.apache.aries.blueprint.NamespaceHandler;
-import org.apache.aries.blueprint.Namespaces;
 import org.apache.aries.blueprint.ParserContext;
 import org.apache.cxf.frontend.blueprint.ClientProxyFactoryBeanDefinitionParser;
 import org.apache.cxf.frontend.blueprint.ServerFactoryBeanDefinitionParser;
@@ -36,7 +35,7 @@ import org.osgi.service.blueprint.container.BlueprintContainer;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.osgi.service.blueprint.reflect.Metadata;
 
-@Namespaces("http://cxf.apache.org/blueprint/jaxws")
+//@Namespaces("http://cxf.apache.org/blueprint/jaxws")
 public class JAXWSBPNamespaceHandler implements NamespaceHandler {
     private BlueprintContainer blueprintContainer;
     

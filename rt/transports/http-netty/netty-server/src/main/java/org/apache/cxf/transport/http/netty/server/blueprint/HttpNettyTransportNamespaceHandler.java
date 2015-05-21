@@ -22,6 +22,7 @@ import java.net.URL;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -31,6 +32,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.osgi.service.blueprint.reflect.Metadata;
 
+//@Namespaces("http://cxf.apache.org/transports/http-netty-server/configuration")
 public class HttpNettyTransportNamespaceHandler implements NamespaceHandler {
 
     public static final String NETTY_SERVER_TRANSPORT = 

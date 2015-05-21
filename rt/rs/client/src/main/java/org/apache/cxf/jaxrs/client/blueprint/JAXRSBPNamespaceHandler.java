@@ -31,9 +31,7 @@ import org.osgi.service.blueprint.container.BlueprintContainer;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.osgi.service.blueprint.reflect.Metadata;
 
-/**
- * 
- */
+//@Namespaces("http://cxf.apache.org/blueprint/jaxrs-client")
 public class JAXRSBPNamespaceHandler implements NamespaceHandler {
     private BlueprintContainer blueprintContainer;
     
