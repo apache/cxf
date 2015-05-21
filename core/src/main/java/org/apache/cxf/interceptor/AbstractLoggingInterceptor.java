@@ -53,6 +53,8 @@ import org.apache.cxf.staxutils.StaxUtils;
 public abstract class AbstractLoggingInterceptor extends AbstractPhaseInterceptor<Message> {
     public static final int DEFAULT_LIMIT = 48 * 1024;
     protected static final String BINARY_CONTENT_MESSAGE = "--- Binary Content ---";
+    protected static final String MULTIPART_CONTENT_MESSAGE = "--- Multipart Content ---";
+    private static final String MULTIPART_CONTENT_MEDIA_TYPE = "multipart";
     private static final List<String> BINARY_CONTENT_MEDIA_TYPES;
     static {
         BINARY_CONTENT_MEDIA_TYPES = new ArrayList<String>();
@@ -67,6 +69,7 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
     protected PrintWriter writer;
     protected boolean prettyLogging;
     private boolean showBinaryContent;
+    private boolean showMultipartContent;
     
     public AbstractLoggingInterceptor(String phase) {
         super(phase);
@@ -256,7 +259,17 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
     public boolean isShowBinaryContent() {
         return showBinaryContent;
     }
-    public boolean isBinaryContent(String contentType) {
+    protected boolean isBinaryContent(String contentType) {
         return contentType != null && BINARY_CONTENT_MEDIA_TYPES.contains(contentType);
     }
+    public boolean isShowMultipartContent() {
+        return showMultipartContent;
+    }
+    public void setShowMultipartContent(boolean showMultipartContent) {
+        this.showMultipartContent = showMultipartContent;
+    }
+    protected boolean isMultipartContent(String contentType) {
+        return contentType != null && contentType.startsWith(MULTIPART_CONTENT_MEDIA_TYPE);
+    }
+    
 }

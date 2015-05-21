@@ -226,6 +226,11 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
                 log(logger, formatLoggingMessage(buffer));
                 return;
             }
+            if (!isShowMultipartContent() && isMultipartContent(ct)) {
+                buffer.getMessage().append(MULTIPART_CONTENT_MESSAGE).append('\n');
+                log(logger, buffer.toString());
+                return;
+            }
             
             if (cos.getTempFile() == null) {
                 //buffer.append("Outbound Message:\n");
