@@ -27,7 +27,7 @@
     </cxf:bus>
 
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SignedMTOM" 
-        address="http://localhost:${testutil.ports.Server}/DoubleItSignedMTOMInline" 
+        address="http://localhost:${testutil.ports.mtom.Server}/DoubleItSignedMTOMInline" 
         serviceName="s:DoubleItService" endpointName="s:DoubleItSignedMTOMInlinePort" 
         implementor="org.apache.cxf.systest.ws.mtom.DoubleIt4Impl" 
         wsdlLocation="org/apache/cxf/systest/ws/mtom/DoubleItMtom.wsdl">
@@ -60,7 +60,7 @@
     </jaxws:endpoint>
     
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SignedMTOMSwA" 
-        address="http://localhost:${testutil.ports.Server}/DoubleItSignedMTOMSwA" 
+        address="http://localhost:${testutil.ports.mtom.Server}/DoubleItSignedMTOMSwA" 
         serviceName="s:DoubleItService" endpointName="s:DoubleItSignedMTOMSwAPort" 
         implementor="org.apache.cxf.systest.ws.mtom.DoubleIt4Impl" 
         wsdlLocation="org/apache/cxf/systest/ws/mtom/DoubleItMtom.wsdl">

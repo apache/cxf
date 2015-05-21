@@ -32,7 +32,7 @@
          This endpoint is configured to read the username and password tokens    
          and validate them using a password callback handler.    
     -->
-    <jaxws:endpoint id="UsernameTokenEndpoint" implementor="org.apache.cxf.systest.ws.security.GreeterImpl" address="http://localhost:${testutil.ports.Server}/GreeterService/UsernameTokenPort" serviceName="test:GreeterService" endpointName="test:UsernameTokenPort">
+    <jaxws:endpoint id="UsernameTokenEndpoint" implementor="org.apache.cxf.systest.ws.security.GreeterImpl" address="http://localhost:${testutil.ports.security.Server}/GreeterService/UsernameTokenPort" serviceName="test:GreeterService" endpointName="test:UsernameTokenPort">
         <jaxws:features>
             <wsa:addressing/>
         </jaxws:features>
@@ -57,7 +57,7 @@
          This endpoint is configured to work with public key certificates    
          on both client (Alice) and service (Bob) side.    
     -->
-    <jaxws:endpoint id="TimestampSignEncryptEndpoint" implementor="org.apache.cxf.systest.ws.security.GreeterImpl" address="http://localhost:${testutil.ports.Server}/GreeterService/TimestampSignEncryptPort" serviceName="test:GreeterService" endpointName="test:TimestampSignEncryptPort">
+    <jaxws:endpoint id="TimestampSignEncryptEndpoint" implementor="org.apache.cxf.systest.ws.security.GreeterImpl" address="http://localhost:${testutil.ports.security.Server}/GreeterService/TimestampSignEncryptPort" serviceName="test:GreeterService" endpointName="test:TimestampSignEncryptPort">
         <jaxws:outInterceptors>
             <ref bean="TimestampSignEncrypt_Response"/>
         </jaxws:outInterceptors>

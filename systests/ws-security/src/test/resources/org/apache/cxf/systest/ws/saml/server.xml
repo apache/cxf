@@ -30,7 +30,7 @@
     <!-- Transport Layer Security (TLS) settings -->
     <!-- -->
     <httpj:engine-factory id="tls-settings">
-        <httpj:engine port="${testutil.ports.Server.2}">
+        <httpj:engine port="${testutil.ports.saml.Server.2}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="password">
                     <sec:keyStore type="jks" password="password" resource="org/apache/cxf/systest/ws/security/Bethal.jks"/>
@@ -42,11 +42,11 @@
             </httpj:tlsServerParameters>
         </httpj:engine>
     </httpj:engine-factory>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Saml1TokenOverTransport" address="https://localhost:${testutil.ports.Server.2}/DoubleItSaml1Transport" serviceName="s:DoubleItService" endpointName="s:DoubleItSaml1TransportPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl" depends-on="tls-settings">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Saml1TokenOverTransport" address="https://localhost:${testutil.ports.saml.Server.2}/DoubleItSaml1Transport" serviceName="s:DoubleItService" endpointName="s:DoubleItSaml1TransportPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl" depends-on="tls-settings">
         <jaxws:properties>
        </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Saml1TokenOverTransport2" address="https://localhost:${testutil.ports.Server.2}/DoubleItSaml1Transport2" serviceName="s:DoubleItService" endpointName="s:DoubleItSaml1TransportPort2" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl" depends-on="tls-settings">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Saml1TokenOverTransport2" address="https://localhost:${testutil.ports.saml.Server.2}/DoubleItSaml1Transport2" serviceName="s:DoubleItService" endpointName="s:DoubleItSaml1TransportPort2" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl" depends-on="tls-settings">
         <jaxws:properties>
        </jaxws:properties>
         <jaxws:features>
@@ -55,21 +55,21 @@
             </p:policies>
         </jaxws:features>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Saml1SupportingToken" address="https://localhost:${testutil.ports.Server.2}/DoubleItSaml1Supporting" serviceName="s:DoubleItService" endpointName="s:DoubleItSaml1SupportingPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl" depends-on="tls-settings">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Saml1SupportingToken" address="https://localhost:${testutil.ports.saml.Server.2}/DoubleItSaml1Supporting" serviceName="s:DoubleItService" endpointName="s:DoubleItSaml1SupportingPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Saml2TokenOverSymmetric" address="http://localhost:${testutil.ports.Server}/DoubleItSaml2Symmetric" serviceName="s:DoubleItService" endpointName="s:DoubleItSaml2SymmetricPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Saml2TokenOverSymmetric" address="http://localhost:${testutil.ports.saml.Server}/DoubleItSaml2Symmetric" serviceName="s:DoubleItService" endpointName="s:DoubleItSaml2SymmetricPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl">
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
             <entry key="ws-security.saml2.validator" value="org.apache.cxf.systest.ws.saml.CustomSaml2Validator"/>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Saml2TokenOverAsymmetric" address="http://localhost:${testutil.ports.Server}/DoubleItSaml2Asymmetric" serviceName="s:DoubleItService" endpointName="s:DoubleItSaml2AsymmetricPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Saml2TokenOverAsymmetric" address="http://localhost:${testutil.ports.saml.Server}/DoubleItSaml2Asymmetric" serviceName="s:DoubleItService" endpointName="s:DoubleItSaml2AsymmetricPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl">
         <jaxws:properties>
             <entry key="ws-security.username" value="bob"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
@@ -79,7 +79,7 @@
             <entry key="ws-security.saml2.validator" value="org.apache.cxf.systest.ws.saml.CustomSaml2Validator"/>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Saml2TokenOverAsymmetric2" address="http://localhost:${testutil.ports.Server}/DoubleItSaml2Asymmetric2" serviceName="s:DoubleItService" endpointName="s:DoubleItSaml2AsymmetricPort2" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Saml2TokenOverAsymmetric2" address="http://localhost:${testutil.ports.saml.Server}/DoubleItSaml2Asymmetric2" serviceName="s:DoubleItService" endpointName="s:DoubleItSaml2AsymmetricPort2" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl">
         <jaxws:properties>
             <entry key="ws-security.username" value="bob"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
@@ -94,52 +94,35 @@
             </p:policies>
         </jaxws:features>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Saml1SelfSignedTokenOverTransport" address="https://localhost:${testutil.ports.Server.2}/DoubleItSaml1SelfSignedTransport" serviceName="s:DoubleItService" endpointName="s:DoubleItSaml1SelfSignedTransportPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl" depends-on="tls-settings">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Saml1SelfSignedTokenOverTransport" address="https://localhost:${testutil.ports.saml.Server.2}/DoubleItSaml1SelfSignedTransport" serviceName="s:DoubleItService" endpointName="s:DoubleItSaml1SelfSignedTransportPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Saml1SelfSignedTokenOverTransportSP11" address="https://localhost:${testutil.ports.Server.2}/DoubleItSaml1SelfSignedTransportSP11" serviceName="s:DoubleItService" endpointName="s:DoubleItSaml1SelfSignedTransportSP11Port" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl" depends-on="tls-settings">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Saml1SelfSignedTokenOverTransportSP11" address="https://localhost:${testutil.ports.saml.Server.2}/DoubleItSaml1SelfSignedTransportSP11" serviceName="s:DoubleItService" endpointName="s:DoubleItSaml1SelfSignedTransportSP11Port" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Saml2EndorsingOverTransport" address="https://localhost:${testutil.ports.Server.2}/DoubleItSaml2EndorsingTransport" serviceName="s:DoubleItService" endpointName="s:DoubleItSaml2EndorsingTransportPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl" depends-on="tls-settings">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Saml2EndorsingOverTransport" address="https://localhost:${testutil.ports.saml.Server.2}/DoubleItSaml2EndorsingTransport" serviceName="s:DoubleItService" endpointName="s:DoubleItSaml2EndorsingTransportPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Saml2EndorsingOverTransportSP11" address="https://localhost:${testutil.ports.Server.2}/DoubleItSaml2EndorsingTransportSP11" serviceName="s:DoubleItService" endpointName="s:DoubleItSaml2EndorsingTransportSP11Port" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl" depends-on="tls-settings">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Saml2EndorsingOverTransportSP11" address="https://localhost:${testutil.ports.saml.Server.2}/DoubleItSaml2EndorsingTransportSP11" serviceName="s:DoubleItService" endpointName="s:DoubleItSaml2EndorsingTransportSP11Port" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="AsymmetricSamlInitiatorPort" address="http://localhost:${testutil.ports.Server}/DoubleItAsymmetricSamlInitiator" serviceName="s:DoubleItService" endpointName="s:DoubleItAsymmetricSamlInitiatorPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl">
-        <jaxws:properties>
-            <entry key="ws-security.username" value="bob"/>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-            <entry key="ws-security.signature.properties" value="bob.properties"/>
-            <entry key="ws-security.encryption.username" value="useReqSigCert"/>
-            <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
-            <entry key="ws-security.saml2.validator" value="org.apache.cxf.systest.ws.saml.CustomSaml2Validator"/>
-        </jaxws:properties>
-    </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Saml2TokenOverSymmetricSignedElements" address="http://localhost:${testutil.ports.Server}/DoubleItSaml2SymmetricSignedElements" serviceName="s:DoubleItService" endpointName="s:DoubleItSaml2SymmetricSignedElementsPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl">
-        <jaxws:properties>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-            <entry key="ws-security.signature.properties" value="bob.properties"/>
-            <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
-        </jaxws:properties>
-    </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Saml2TokenOverAsymmetricSignedEncrypted" address="http://localhost:${testutil.ports.Server}/DoubleItSaml2AsymmetricSignedEncrypted" serviceName="s:DoubleItService" endpointName="s:DoubleItSaml2AsymmetricSignedEncryptedPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="AsymmetricSamlInitiatorPort" address="http://localhost:${testutil.ports.saml.Server}/DoubleItAsymmetricSamlInitiator" serviceName="s:DoubleItService" endpointName="s:DoubleItAsymmetricSamlInitiatorPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl">
         <jaxws:properties>
             <entry key="ws-security.username" value="bob"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
@@ -149,7 +132,14 @@
             <entry key="ws-security.saml2.validator" value="org.apache.cxf.systest.ws.saml.CustomSaml2Validator"/>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Saml2TokenOverAsymmetricSignedEncryptedEncryptBeforeSigning" address="http://localhost:${testutil.ports.Server}/DoubleItSaml2AsymmetricSignedEncryptedEncryptBeforeSigning" serviceName="s:DoubleItService" endpointName="s:DoubleItSaml2AsymmetricSignedEncryptedEncryptBeforeSigningPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Saml2TokenOverSymmetricSignedElements" address="http://localhost:${testutil.ports.saml.Server}/DoubleItSaml2SymmetricSignedElements" serviceName="s:DoubleItService" endpointName="s:DoubleItSaml2SymmetricSignedElementsPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl">
+        <jaxws:properties>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+            <entry key="ws-security.signature.properties" value="bob.properties"/>
+            <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
+        </jaxws:properties>
+    </jaxws:endpoint>
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Saml2TokenOverAsymmetricSignedEncrypted" address="http://localhost:${testutil.ports.saml.Server}/DoubleItSaml2AsymmetricSignedEncrypted" serviceName="s:DoubleItService" endpointName="s:DoubleItSaml2AsymmetricSignedEncryptedPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl">
         <jaxws:properties>
             <entry key="ws-security.username" value="bob"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
@@ -159,7 +149,17 @@
             <entry key="ws-security.saml2.validator" value="org.apache.cxf.systest.ws.saml.CustomSaml2Validator"/>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Saml2TokenOverAsymmetricEncrypted" address="http://localhost:${testutil.ports.Server}/DoubleItSaml2AsymmetricEncrypted" serviceName="s:DoubleItService" endpointName="s:DoubleItSaml2AsymmetricEncryptedPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Saml2TokenOverAsymmetricSignedEncryptedEncryptBeforeSigning" address="http://localhost:${testutil.ports.saml.Server}/DoubleItSaml2AsymmetricSignedEncryptedEncryptBeforeSigning" serviceName="s:DoubleItService" endpointName="s:DoubleItSaml2AsymmetricSignedEncryptedEncryptBeforeSigningPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl">
+        <jaxws:properties>
+            <entry key="ws-security.username" value="bob"/>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+            <entry key="ws-security.signature.properties" value="bob.properties"/>
+            <entry key="ws-security.encryption.username" value="useReqSigCert"/>
+            <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
+            <entry key="ws-security.saml2.validator" value="org.apache.cxf.systest.ws.saml.CustomSaml2Validator"/>
+        </jaxws:properties>
+    </jaxws:endpoint>
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Saml2TokenOverAsymmetricEncrypted" address="http://localhost:${testutil.ports.saml.Server}/DoubleItSaml2AsymmetricEncrypted" serviceName="s:DoubleItService" endpointName="s:DoubleItSaml2AsymmetricEncryptedPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl">
         <jaxws:properties>
             <entry key="ws-security.username" value="bob"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
@@ -168,14 +168,14 @@
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Saml2EndorsingEncryptedOverTransport" address="https://localhost:${testutil.ports.Server.2}/DoubleItSaml2EndorsingEncryptedTransport" serviceName="s:DoubleItService" endpointName="s:DoubleItSaml2EndorsingEncryptedTransportPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl" depends-on="tls-settings">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Saml2EndorsingEncryptedOverTransport" address="https://localhost:${testutil.ports.saml.Server.2}/DoubleItSaml2EndorsingEncryptedTransport" serviceName="s:DoubleItService" endpointName="s:DoubleItSaml2EndorsingEncryptedTransportPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="InlinePolicy" address="https://localhost:${testutil.ports.Server.2}/DoubleItSamlInlinePolicy" serviceName="s:DoubleItService" endpointName="s:DoubleItInlinePolicyPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl" depends-on="tls-settings">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="InlinePolicy" address="https://localhost:${testutil.ports.saml.Server.2}/DoubleItSamlInlinePolicy" serviceName="s:DoubleItService" endpointName="s:DoubleItInlinePolicyPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
@@ -233,7 +233,7 @@
     <bean class="org.apache.cxf.rt.security.xacml.XACMLAuthorizingInterceptor" id="XACMLInterceptor">
         <constructor-arg ref="MockPDP"/>
     </bean>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Saml2TokenOverSymmetricPEP" address="http://localhost:${testutil.ports.Server}/DoubleItSaml2PEP" serviceName="s:DoubleItService" endpointName="s:DoubleItSaml2PEPPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Saml2TokenOverSymmetricPEP" address="http://localhost:${testutil.ports.saml.Server}/DoubleItSaml2PEP" serviceName="s:DoubleItService" endpointName="s:DoubleItSaml2PEPPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl">
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
@@ -243,7 +243,7 @@
             <ref bean="XACMLInterceptor"/>
         </jaxws:inInterceptors>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Saml2TransportToken" address="https://localhost:${testutil.ports.Server.2}/DoubleItSaml2Transport" serviceName="s:DoubleItService" endpointName="s:DoubleItSaml2TransportPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl" depends-on="tls-settings">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Saml2TransportToken" address="https://localhost:${testutil.ports.saml.Server.2}/DoubleItSaml2Transport" serviceName="s:DoubleItService" endpointName="s:DoubleItSaml2TransportPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
@@ -251,7 +251,7 @@
         </jaxws:properties>
     </jaxws:endpoint>
     
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Saml2TransportToken2" address="https://localhost:${testutil.ports.Server.2}/DoubleItSaml2Transport2" serviceName="s:DoubleItService" endpointName="s:DoubleItSaml2TransportPort2" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl" depends-on="tls-settings">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Saml2TransportToken2" address="https://localhost:${testutil.ports.saml.Server.2}/DoubleItSaml2Transport2" serviceName="s:DoubleItService" endpointName="s:DoubleItSaml2TransportPort2" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
@@ -259,7 +259,7 @@
         </jaxws:properties>
     </jaxws:endpoint>
     
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Saml2TransportToken3" address="https://localhost:${testutil.ports.Server.2}/DoubleItSaml2Transport3" serviceName="s:DoubleItService" endpointName="s:DoubleItSaml2TransportPort3" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl" depends-on="tls-settings">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Saml2TransportToken3" address="https://localhost:${testutil.ports.saml.Server.2}/DoubleItSaml2Transport3" serviceName="s:DoubleItService" endpointName="s:DoubleItSaml2TransportPort3" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>

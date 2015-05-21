@@ -42,7 +42,7 @@
             </map>
         </constructor-arg>
     </bean>
-    <jaxws:endpoint id="HelloWorldWS" address="http://localhost:${testutil.ports.Server}/wsse/HelloWorldWS" wsdlLocation="" implementor="org.apache.cxf.systest.ws.security.handler.HelloWorldImpl">
+    <jaxws:endpoint id="HelloWorldWS" address="http://localhost:${testutil.ports.handler.Server}/wsse/HelloWorldWS" wsdlLocation="" implementor="org.apache.cxf.systest.ws.security.handler.HelloWorldImpl">
         <jaxws:inInterceptors>
             <ref bean="UsernameTokenSign_Request"/>
         </jaxws:inInterceptors>

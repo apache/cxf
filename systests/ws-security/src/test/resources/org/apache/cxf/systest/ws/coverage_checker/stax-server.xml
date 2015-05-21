@@ -25,7 +25,7 @@
             <cxf:logging/>
         </cxf:features>
     </cxf:bus>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="BodyTimestamp" address="http://localhost:${testutil.ports.StaxServer}/DoubleItBodyTimestamp" serviceName="s:DoubleItService" endpointName="s:DoubleItBodyTimestampPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/coverage_checker/DoubleItCoverageChecker.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="BodyTimestamp" address="http://localhost:${testutil.ports.coverage_checker.StaxServer}/DoubleItBodyTimestamp" serviceName="s:DoubleItService" endpointName="s:DoubleItBodyTimestampPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/coverage_checker/DoubleItCoverageChecker.wsdl">
         <jaxws:inInterceptors>
             <bean class="org.apache.cxf.ws.security.wss4j.WSS4JStaxInInterceptor">
                 <constructor-arg>
@@ -40,7 +40,7 @@
             <bean class="org.apache.cxf.ws.security.wss4j.StaxCryptoCoverageChecker"/>
         </jaxws:inInterceptors>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="BodyTimestampSoap12" address="http://localhost:${testutil.ports.StaxServer}/DoubleItBodyTimestampSoap12" serviceName="s:DoubleItService" endpointName="s:DoubleItBodyTimestampSoap12Port" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/coverage_checker/DoubleItCoverageChecker.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="BodyTimestampSoap12" address="http://localhost:${testutil.ports.coverage_checker.StaxServer}/DoubleItBodyTimestampSoap12" serviceName="s:DoubleItService" endpointName="s:DoubleItBodyTimestampSoap12Port" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/coverage_checker/DoubleItCoverageChecker.wsdl">
         <jaxws:inInterceptors>
             <bean class="org.apache.cxf.ws.security.wss4j.WSS4JStaxInInterceptor">
                 <constructor-arg>
@@ -57,7 +57,7 @@
             </bean>
         </jaxws:inInterceptors>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SignedEncryptedBody" address="http://localhost:${testutil.ports.StaxServer}/DoubleItSignedEncrypted" serviceName="s:DoubleItService" endpointName="s:DoubleItSignedEncryptedBodyPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/coverage_checker/DoubleItCoverageChecker.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SignedEncryptedBody" address="http://localhost:${testutil.ports.coverage_checker.StaxServer}/DoubleItSignedEncrypted" serviceName="s:DoubleItService" endpointName="s:DoubleItSignedEncryptedBodyPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/coverage_checker/DoubleItCoverageChecker.wsdl">
         <jaxws:inInterceptors>
             <bean class="org.apache.cxf.ws.security.wss4j.WSS4JStaxInInterceptor">
                 <constructor-arg>
@@ -76,7 +76,7 @@
             </bean>
         </jaxws:inInterceptors>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="WSA" address="http://localhost:${testutil.ports.StaxServer}/DoubleItWSA" serviceName="s:DoubleItService" endpointName="s:DoubleItWSAPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/coverage_checker/DoubleItCoverageChecker.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="WSA" address="http://localhost:${testutil.ports.coverage_checker.StaxServer}/DoubleItWSA" serviceName="s:DoubleItService" endpointName="s:DoubleItWSAPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/coverage_checker/DoubleItCoverageChecker.wsdl">
         <jaxws:inInterceptors>
             <bean class="org.apache.cxf.ws.security.wss4j.WSS4JStaxInInterceptor">
                 <constructor-arg>
@@ -93,7 +93,7 @@
             <wsa:addressing xmlns:wsa="http://cxf.apache.org/ws/addressing"/>
         </jaxws:features>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="EncryptedUsernameToken" address="http://localhost:${testutil.ports.StaxServer}/DoubleItEncryptedUsernameToken" serviceName="s:DoubleItService" endpointName="s:DoubleItEncryptedUsernameTokenPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/coverage_checker/DoubleItCoverageChecker.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="EncryptedUsernameToken" address="http://localhost:${testutil.ports.coverage_checker.StaxServer}/DoubleItEncryptedUsernameToken" serviceName="s:DoubleItService" endpointName="s:DoubleItEncryptedUsernameTokenPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/coverage_checker/DoubleItCoverageChecker.wsdl">
         <jaxws:inInterceptors>
             <bean class="org.apache.cxf.ws.security.wss4j.WSS4JStaxInInterceptor">
                 <constructor-arg>

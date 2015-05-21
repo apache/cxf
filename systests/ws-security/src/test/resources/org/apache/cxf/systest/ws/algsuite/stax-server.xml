@@ -25,7 +25,7 @@
             <cxf:logging/>
         </cxf:features>
     </cxf:bus>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Symmetric128Endpoint" address="http://localhost:${testutil.ports.StaxServer}/DoubleItSymmetric128" serviceName="s:DoubleItService" endpointName="s:DoubleItSymmetric128Port" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/algsuite/DoubleItAlgSuite.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Symmetric128Endpoint" address="http://localhost:${testutil.ports.algsuite.StaxServer}/DoubleItSymmetric128" serviceName="s:DoubleItService" endpointName="s:DoubleItSymmetric128Port" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/algsuite/DoubleItAlgSuite.wsdl">
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
@@ -38,7 +38,7 @@
             </p:policies>
         </jaxws:features>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Symmetric128Endpoint2" address="http://localhost:${testutil.ports.StaxServer}/DoubleItSymmetric128no2" serviceName="s:DoubleItService" endpointName="s:DoubleItSymmetric128Port2" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/algsuite/DoubleItAlgSuite.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Symmetric128Endpoint2" address="http://localhost:${testutil.ports.algsuite.StaxServer}/DoubleItSymmetric128no2" serviceName="s:DoubleItService" endpointName="s:DoubleItSymmetric128Port2" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/algsuite/DoubleItAlgSuite.wsdl">
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
@@ -51,7 +51,7 @@
             </p:policies>
         </jaxws:features>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Symmetric128Endpoint3" address="http://localhost:${testutil.ports.StaxServer}/DoubleItSymmetric128no3" serviceName="s:DoubleItService" endpointName="s:DoubleItSymmetric128Port3" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/algsuite/DoubleItAlgSuite.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Symmetric128Endpoint3" address="http://localhost:${testutil.ports.algsuite.StaxServer}/DoubleItSymmetric128no3" serviceName="s:DoubleItService" endpointName="s:DoubleItSymmetric128Port3" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/algsuite/DoubleItAlgSuite.wsdl">
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
@@ -64,7 +64,7 @@
             </p:policies>
         </jaxws:features>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Symmetric128InclusiveEndpoint" address="http://localhost:${testutil.ports.StaxServer}/DoubleItSymmetric128Inclusive" serviceName="s:DoubleItService" endpointName="s:DoubleItSymmetric128InclusivePort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/algsuite/DoubleItAlgSuite.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Symmetric128InclusiveEndpoint" address="http://localhost:${testutil.ports.algsuite.StaxServer}/DoubleItSymmetric128Inclusive" serviceName="s:DoubleItService" endpointName="s:DoubleItSymmetric128InclusivePort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/algsuite/DoubleItAlgSuite.wsdl">
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
@@ -78,7 +78,7 @@
             </p:policies>
         </jaxws:features>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Symmetric128InclusiveEndpoint2" address="http://localhost:${testutil.ports.StaxServer}/DoubleItSymmetric128Inclusive2" serviceName="s:DoubleItService" endpointName="s:DoubleItSymmetric128InclusivePort2" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/algsuite/DoubleItAlgSuite.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Symmetric128InclusiveEndpoint2" address="http://localhost:${testutil.ports.algsuite.StaxServer}/DoubleItSymmetric128Inclusive2" serviceName="s:DoubleItService" endpointName="s:DoubleItSymmetric128InclusivePort2" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/algsuite/DoubleItAlgSuite.wsdl">
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>

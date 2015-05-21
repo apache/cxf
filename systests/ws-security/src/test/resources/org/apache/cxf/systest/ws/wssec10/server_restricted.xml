@@ -30,7 +30,7 @@
     <!-- Transport Layer Security (TLS) settings -->
     <!-- -->
     <httpj:engine-factory id="tls-settings">
-        <httpj:engine port="${testutil.ports.Server.1}">
+        <httpj:engine port="${testutil.ports.wssec10.server.Server.1}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="password">
                     <sec:keyStore type="jks" password="password" resource="certs/restricted/bob.jks"/>
@@ -47,13 +47,13 @@
     <!-- -->
     <!-- Scenario 3.1 -->
     <!-- -->
-    <jaxws:endpoint id="UserNameOverTransport" address="https://localhost:${testutil.ports.Server.1}/UserNameOverTransport" serviceName="interop:PingService" endpointName="interop:UserNameOverTransport_IPingService" implementor="org.apache.cxf.systest.ws.wssec10.server.UserNameOverTransportRestricted" depends-on="tls-settings">
+    <jaxws:endpoint id="UserNameOverTransport" address="https://localhost:${testutil.ports.wssec10.server.Server.1}/UserNameOverTransport" serviceName="interop:PingService" endpointName="interop:UserNameOverTransport_IPingService" implementor="org.apache.cxf.systest.ws.wssec10.server.UserNameOverTransportRestricted" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="ws-security.username" value="Alice"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint id="UserName" address="http://localhost:${testutil.ports.Server}/UserName" serviceName="interop:PingService" endpointName="interop:UserName_IPingService" implementor="org.apache.cxf.systest.ws.wssec10.server.UserNameOverTransportRestricted">
+    <jaxws:endpoint id="UserName" address="http://localhost:${testutil.ports.wssec10.server.Server}/UserName" serviceName="interop:PingService" endpointName="interop:UserName_IPingService" implementor="org.apache.cxf.systest.ws.wssec10.server.UserNameOverTransportRestricted">
         <jaxws:properties>
             <entry key="ws-security.username" value="Alice"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
@@ -62,7 +62,7 @@
     <!-- -->
     <!-- Scenario 3.3 -->
     <!-- -->
-    <jaxws:endpoint name="{http://WSSec/wssec10}MutualCertificate10SignEncrypt_IPingService" id="MutualCertificate10SignEncrypt" address="http://localhost:${testutil.ports.Server}/MutualCertificate10SignEncrypt" serviceName="interop:PingService" endpointName="interop:MutualCertificate10SignEncrypt_IPingService" implementor="org.apache.cxf.systest.ws.wssec10.server.MutualCertificate10SignEncryptRestricted">
+    <jaxws:endpoint name="{http://WSSec/wssec10}MutualCertificate10SignEncrypt_IPingService" id="MutualCertificate10SignEncrypt" address="http://localhost:${testutil.ports.wssec10.server.Server}/MutualCertificate10SignEncrypt" serviceName="interop:PingService" endpointName="interop:MutualCertificate10SignEncrypt_IPingService" implementor="org.apache.cxf.systest.ws.wssec10.server.MutualCertificate10SignEncryptRestricted">
         <jaxws:properties>
             <entry key="ws-security.username" value="Alice"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
@@ -74,7 +74,7 @@
     <!-- -->
     <!-- Scenario 3.4 -->
     <!-- -->
-    <jaxws:endpoint name="{http://WSSec/wssec10}MutualCertificate10SignEncryptRsa15TripleDes_IPingService" id="MutualCertificate10SignEncryptRsa15TripleDes" address="http://localhost:${testutil.ports.Server}/MutualCertificate10SignEncryptRsa15TripleDes" serviceName="interop:PingService" endpointName="interop:MutualCertificate10SignEncryptRsa15TripleDes_IPingService" implementor="org.apache.cxf.systest.ws.wssec10.server.MutualCertificate10SignEncryptRsa15TripleDesRestricted">
+    <jaxws:endpoint name="{http://WSSec/wssec10}MutualCertificate10SignEncryptRsa15TripleDes_IPingService" id="MutualCertificate10SignEncryptRsa15TripleDes" address="http://localhost:${testutil.ports.wssec10.server.Server}/MutualCertificate10SignEncryptRsa15TripleDes" serviceName="interop:PingService" endpointName="interop:MutualCertificate10SignEncryptRsa15TripleDes_IPingService" implementor="org.apache.cxf.systest.ws.wssec10.server.MutualCertificate10SignEncryptRsa15TripleDesRestricted">
         <jaxws:properties>
             <entry key="ws-security.username" value="Alice"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>

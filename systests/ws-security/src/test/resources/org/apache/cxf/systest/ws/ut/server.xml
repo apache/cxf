@@ -30,7 +30,7 @@
     <!-- Transport Layer Security (TLS) settings -->
     <!-- -->
     <httpj:engine-factory id="tls-settings">
-        <httpj:engine port="${testutil.ports.Server}">
+        <httpj:engine port="${testutil.ports.ut.Server}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="password">
                     <sec:keyStore type="jks" password="password" resource="org/apache/cxf/systest/ws/security/Bethal.jks"/>
@@ -42,51 +42,51 @@
             </httpj:tlsServerParameters>
         </httpj:engine>
     </httpj:engine-factory>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Plaintext" address="https://localhost:${testutil.ports.Server}/DoubleItUTPlaintext" serviceName="s:DoubleItService" endpointName="s:DoubleItPlaintextPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl" depends-on="tls-settings">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Plaintext" address="https://localhost:${testutil.ports.ut.Server}/DoubleItUTPlaintext" serviceName="s:DoubleItService" endpointName="s:DoubleItPlaintextPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="PlaintextCreated" address="https://localhost:${testutil.ports.Server}/DoubleItUTPlaintextCreated" serviceName="s:DoubleItService" endpointName="s:DoubleItPlaintextCreatedPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl" depends-on="tls-settings">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="PlaintextCreated" address="https://localhost:${testutil.ports.ut.Server}/DoubleItUTPlaintextCreated" serviceName="s:DoubleItService" endpointName="s:DoubleItPlaintextCreatedPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="PlaintextSupporting" address="https://localhost:${testutil.ports.Server}/DoubleItUTPlaintextSupporting" serviceName="s:DoubleItService" endpointName="s:DoubleItPlaintextSupportingPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl" depends-on="tls-settings">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="PlaintextSupporting" address="https://localhost:${testutil.ports.ut.Server}/DoubleItUTPlaintextSupporting" serviceName="s:DoubleItService" endpointName="s:DoubleItPlaintextSupportingPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Hashed" address="https://localhost:${testutil.ports.Server}/DoubleItUTHashed" serviceName="s:DoubleItService" endpointName="s:DoubleItHashedPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl" depends-on="tls-settings">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Hashed" address="https://localhost:${testutil.ports.ut.Server}/DoubleItUTHashed" serviceName="s:DoubleItService" endpointName="s:DoubleItHashedPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="NoPassword" address="https://localhost:${testutil.ports.Server}/DoubleItUTNoPassword" serviceName="s:DoubleItService" endpointName="s:DoubleItNoPasswordPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl" depends-on="tls-settings">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="NoPassword" address="https://localhost:${testutil.ports.ut.Server}/DoubleItUTNoPassword" serviceName="s:DoubleItService" endpointName="s:DoubleItNoPasswordPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SignedEndorsing" address="https://localhost:${testutil.ports.Server}/DoubleItUTSignedEndorsing" serviceName="s:DoubleItService" endpointName="s:DoubleItSignedEndorsingPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl" depends-on="tls-settings">
-        <jaxws:properties>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
-            <entry key="ws-security.signature.properties" value="bob.properties"/>
-            <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
-        </jaxws:properties>
-    </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SignedEncrypted" address="https://localhost:${testutil.ports.Server}/DoubleItUTSignedEncrypted" serviceName="s:DoubleItService" endpointName="s:DoubleItSignedEncryptedPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl" depends-on="tls-settings">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SignedEndorsing" address="https://localhost:${testutil.ports.ut.Server}/DoubleItUTSignedEndorsing" serviceName="s:DoubleItService" endpointName="s:DoubleItSignedEndorsingPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Encrypted" address="https://localhost:${testutil.ports.Server}/DoubleItUTEncrypted" serviceName="s:DoubleItService" endpointName="s:DoubleItEncryptedPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl" depends-on="tls-settings">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SignedEncrypted" address="https://localhost:${testutil.ports.ut.Server}/DoubleItUTSignedEncrypted" serviceName="s:DoubleItService" endpointName="s:DoubleItSignedEncryptedPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl" depends-on="tls-settings">
+        <jaxws:properties>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
+            <entry key="ws-security.signature.properties" value="bob.properties"/>
+            <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
+        </jaxws:properties>
+    </jaxws:endpoint>
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Encrypted" address="https://localhost:${testutil.ports.ut.Server}/DoubleItUTEncrypted" serviceName="s:DoubleItService" endpointName="s:DoubleItEncryptedPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="InlinePolicy" address="https://localhost:${testutil.ports.Server}/DoubleItUTInlinePolicy" serviceName="s:DoubleItService" endpointName="s:DoubleItInlinePolicyPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl" depends-on="tls-settings">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="InlinePolicy" address="https://localhost:${testutil.ports.ut.Server}/DoubleItUTInlinePolicy" serviceName="s:DoubleItService" endpointName="s:DoubleItInlinePolicyPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
         </jaxws:properties>
@@ -136,7 +136,7 @@
             </p:policies>
         </jaxws:features>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="HashedNoBinding" address="https://localhost:${testutil.ports.Server}/DoubleItUTDigestNoBinding" serviceName="s:DoubleItService" endpointName="s:DoubleItDigestNoBindingPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl" depends-on="tls-settings">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="HashedNoBinding" address="https://localhost:${testutil.ports.ut.Server}/DoubleItUTDigestNoBinding" serviceName="s:DoubleItService" endpointName="s:DoubleItDigestNoBindingPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
         </jaxws:properties>
@@ -170,7 +170,7 @@
             </map>
         </property>
     </bean>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="PlaintextPrincipal" address="https://localhost:${testutil.ports.Server}/DoubleItUTPlaintextPrincipal" serviceName="s:DoubleItService" endpointName="s:DoubleItPlaintextPrincipalPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl" depends-on="tls-settings">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="PlaintextPrincipal" address="https://localhost:${testutil.ports.ut.Server}/DoubleItUTPlaintextPrincipal" serviceName="s:DoubleItService" endpointName="s:DoubleItPlaintextPrincipalPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="ws-security.ut.validator" value-ref="subjectValidator"/>
