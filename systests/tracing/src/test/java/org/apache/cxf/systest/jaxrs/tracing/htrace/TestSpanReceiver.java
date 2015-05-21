@@ -21,7 +21,6 @@ package org.apache.cxf.systest.jaxrs.tracing.htrace;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 
 import org.apache.htrace.HTraceConfiguration;
@@ -32,7 +31,7 @@ import org.apache.htrace.SpanReceiver;
  * Test HTrace Span receiver
  */
 public class TestSpanReceiver implements SpanReceiver {
-    private static Collection<Span> spans = new HashSet<Span>();
+    private static List<Span> spans = new ArrayList<Span>();
 
     public TestSpanReceiver(final HTraceConfiguration conf) {
     }
@@ -55,7 +54,7 @@ public class TestSpanReceiver implements SpanReceiver {
     }
     
     public static List<Span> getAllSpans() {
-        return new ArrayList< Span >(spans);
+        return spans;
     }
 
 }

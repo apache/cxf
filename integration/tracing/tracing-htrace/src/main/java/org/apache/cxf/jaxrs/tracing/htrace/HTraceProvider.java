@@ -34,17 +34,28 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.htrace.Sampler;
 import org.apache.htrace.Trace;
 import org.apache.htrace.TraceInfo;
+import org.apache.htrace.TraceScope;
 import org.apache.htrace.Tracer;
 import org.apache.htrace.impl.NeverSampler;
+
+import static org.apache.cxf.tracing.TracerHeaders.HEADER_SPAN_ID;
+import static org.apache.cxf.tracing.TracerHeaders.HEADER_TRACE_ID;
 
 @Provider
 public class HTraceProvider implements ContainerRequestFilter, ContainerResponseFilter { 
     private static final Logger LOG = LogUtils.getL7dLogger(HTraceProvider.class);
-    
-    private static final String HEADER_TRACE_ID = "X-Trace-Id";
-    private static final String HEADER_SPAN_ID = "X-Span-Id";
-    
+        
     private final Sampler< ? > sampler;
+    
+    // Keep the parent spans in the thread-local storage. The span created during request
+    // phase should be closed during the response phase in order to mark the start/end 
+    // bounds 
+    private final ThreadLocal<TraceScope> parent = new ThreadLocal<TraceScope>() {
+        @Override
+        protected TraceScope initialValue() {
+            return null;
+        }
+    };
     
     public HTraceProvider() {
         this(NeverSampler.INSTANCE);
@@ -68,8 +79,8 @@ public class HTraceProvider implements ContainerRequestFilter, ContainerResponse
             Tracer.DONT_TRACE.spanId); 
         
         if (traceId != Tracer.DONT_TRACE.traceId && spanId != Tracer.DONT_TRACE.spanId) {
-            Trace.startSpan(requestContext.getUriInfo().getPath(), (Sampler< TraceInfo >)sampler,
-                new TraceInfo(traceId, spanId));
+            parent.set(Trace.startSpan(requestContext.getUriInfo().getPath(), (Sampler< TraceInfo >)sampler,
+                new TraceInfo(traceId, spanId)));
         }
     }
     
@@ -82,6 +93,12 @@ public class HTraceProvider implements ContainerRequestFilter, ContainerResponse
         if (headers.containsKey(HEADER_TRACE_ID) && headers.containsKey(HEADER_SPAN_ID)) {
             responseContext.getHeaders().add(HEADER_TRACE_ID, headers.getFirst(HEADER_TRACE_ID));
             responseContext.getHeaders().add(HEADER_SPAN_ID, headers.getFirst(HEADER_SPAN_ID));
+        }
+        
+        try (final TraceScope span = parent.get()) {
+            if (span != null) {
+                parent.remove();
+            }
         }
     }
     

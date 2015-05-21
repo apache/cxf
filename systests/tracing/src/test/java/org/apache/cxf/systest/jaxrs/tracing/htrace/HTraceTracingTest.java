@@ -36,6 +36,7 @@ import org.apache.cxf.jaxrs.tracing.htrace.HTraceFeature;
 import org.apache.cxf.systest.jaxrs.tracing.BookStore;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.tracing.TracerHeaders;
 import org.apache.htrace.HTraceConfiguration;
 import org.apache.htrace.impl.AlwaysSampler;
 import org.junit.Before;
@@ -79,12 +80,31 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
-    public void testThatPatternValidationFails() {
+    public void testThatNewSpanIsCreatedWhenNotProvided() {
         final Response r = createWebClient("/bookstore/books").get();
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
         
         assertThat(TestSpanReceiver.getAllSpans().size(), equalTo(1));
         assertThat(TestSpanReceiver.getAllSpans().get(0).getDescription(), equalTo("Get Books"));
+        
+        assertFalse(r.getHeaders().containsKey(TracerHeaders.HEADER_TRACE_ID));
+        assertFalse(r.getHeaders().containsKey(TracerHeaders.HEADER_SPAN_ID));
+    }
+    
+    @Test
+    public void testThatNewInnerSpanIsCreated() {
+        final Response r = createWebClient("/bookstore/books")
+            .header(TracerHeaders.HEADER_TRACE_ID, 10L)
+            .header(TracerHeaders.HEADER_SPAN_ID, 20L)
+            .get();
+        assertEquals(Status.OK.getStatusCode(), r.getStatus());
+        
+        assertThat(TestSpanReceiver.getAllSpans().size(), equalTo(2));
+        assertThat(TestSpanReceiver.getAllSpans().get(0).getDescription(), equalTo("Get Books"));
+        assertThat(TestSpanReceiver.getAllSpans().get(1).getDescription(), equalTo("bookstore/books"));
+        
+        assertThat((String)r.getHeaders().getFirst(TracerHeaders.HEADER_TRACE_ID), equalTo("10"));
+        assertThat((String)r.getHeaders().getFirst(TracerHeaders.HEADER_SPAN_ID), equalTo("20"));
     }
     
     protected WebClient createWebClient(final String url) {
