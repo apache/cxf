@@ -89,13 +89,14 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.Nullable;
 import org.apache.cxf.jaxrs.ext.Oneway;
+import org.apache.cxf.jaxrs.ext.StreamingResponse;
 import org.apache.cxf.jaxrs.ext.search.QueryContext;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 import org.apache.cxf.jaxrs.ext.search.SearchContext;
 import org.apache.cxf.jaxrs.ext.xml.XMLInstruction;
 import org.apache.cxf.jaxrs.ext.xml.XSISchemaLocation;
-import org.apache.cxf.jaxrs.impl.ResourceContextImpl;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
+import org.apache.cxf.jaxrs.impl.ResourceContextImpl;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
@@ -1121,6 +1122,22 @@ public class BookStore {
     @Produces("text/xml")
     public StreamingOutput statusFromStream() {
         return new ResponseStreamingOutputImpl();
+    }
+    
+    @SuppressWarnings("rawtypes")
+    @GET
+    @Path("/books/streamingresponse")
+    @Produces("text/xml")
+    public Response getBookStreamingResponse() {
+        return Response.ok(new StreamingResponse() {
+
+            @SuppressWarnings("unchecked")
+            @Override
+            public void writeTo(Writer writer) throws IOException {
+                writer.write(new Book("stream", 124L));
+            }
+            
+        }).build();
     }
     
     @GET

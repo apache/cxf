@@ -109,6 +109,15 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         assertEquals("root", book.getName());
     }
     @Test
+    public void testGetBookUntypedStreamingResponse() throws Exception {
+        String address = "http://localhost:" + PORT + "/bookstore/books/streamingresponse";
+        WebClient wc = WebClient.create(address);
+        wc.accept("text/xml");
+        Book book = wc.get(Book.class);
+        assertEquals(124L, book.getId());
+        assertEquals("stream", book.getName());
+    }
+    @Test
     public void testGetBookQueryGZIP() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/";
         WebClient wc = WebClient.create(address);
@@ -293,7 +302,6 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     public void testUseMapperOnBus() {
         String address = "http://localhost:" + PORT + "/bookstore/mapperonbus";
         WebClient wc = WebClient.create(address);
-        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000L);
         Response r = wc.post(null);
         assertEquals(500, r.getStatus());
         MediaType mt = r.getMediaType();
@@ -343,9 +351,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     
     private void doTestGetChapterFromSelectedBook(String address) {
         
-        WebClient wc = 
-            WebClient.create(address);
-        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(1000000);
+        WebClient wc = WebClient.create(address);
         wc.accept("application/xml");
         Chapter chapter = wc.get(Chapter.class);
         assertEquals("chapter 1", chapter.getTitle());    
@@ -446,7 +452,6 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         String base = "http://localhost:" + PORT;
         String endpointAddress = base + "/bookstore/name-in-query"; 
         WebClient wc = WebClient.create(endpointAddress);
-        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(1000000);
         String name = "Many        spaces";
         wc.query("name", name);
         String content = wc.get(String.class);
@@ -503,7 +508,6 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         String endpointAddress =
             "http://localhost:" + PORT + "/bookstore/outfault"; 
         WebClient wc = WebClient.create(endpointAddress);
-        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(1000000L);
         Response r = wc.get();
         assertEquals(403, r.getStatus());
     }
@@ -1856,7 +1860,6 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     public void testGetBookByHeaderPerRequestContextFault() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore2/bookheaders";
         WebClient wc = WebClient.create(address);
-        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(1000000);
         wc.accept("application/xml");
         wc.header("BOOK", "1", "3", "4");
         Response r = wc.get();
@@ -1932,7 +1935,6 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         provider.setOutTransformElements(outMap);
         WebClient wc = WebClient.create("http://localhost:" + PORT + "/bookstore/books/adapter-list",
                                         Collections.singletonList(provider));
-        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000);
         Response r = wc.type("application/xml").accept("application/json")
             .post(new Books(new Book("CXF", 123L)));
         assertEquals("{\"Book\":[{\"id\":123,\"name\":\"CXF\"}]}",
@@ -1958,7 +1960,6 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     @Test
     public void testGetBookAdapterInterfaceProxy() throws Exception {
         BookStore store = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class);
-        WebClient.getConfig(store).getHttpConduit().getClient().setReceiveTimeout(10000000L);
         BookInfoInterface info = store.getBookAdapterInterface();
         assertEquals(123L, info.getId());
     }
@@ -2032,7 +2033,6 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     
     private void doTestGetBookWithResourceContext(String address) throws Exception {
         WebClient wc = WebClient.create(address);
-        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(1000000);
         wc.accept("application/xml");
         wc.query("bookid", "12345");
         wc.query("bookname", "bookcontext");
