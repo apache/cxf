@@ -19,7 +19,6 @@
 package org.apache.cxf.jaxrs.tracing.htrace;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -95,20 +94,14 @@ public class HTraceProvider implements ContainerRequestFilter, ContainerResponse
     
     private static Long getFirstValueOrDefault(final MultivaluedMap<String, String> headers, 
             final String header, final long defaultValue) {
-        
-        if (!headers.containsKey(header)) {
-            return defaultValue;
-        }
-        
-        try {
-            final List< String > values = headers.get(header);
-            if (values != null && !values.isEmpty()) {
-                return Long.parseLong(values.get(0));
+        String value = headers.getFirst(header);
+        if (value != null) {
+            try {
+                return Long.parseLong(value);
+            } catch (NumberFormatException ex) {
+                LOG.log(Level.FINE, String.format("Unable to parse '%s' header value to long number", header), ex);
             }
-        } catch (NumberFormatException ex) {
-            LOG.log(Level.FINE, String.format("Unable to parse '%s' header value to long number", header), ex);
         }
-        
         return defaultValue;
     }
 }
