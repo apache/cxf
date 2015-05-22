@@ -94,7 +94,7 @@ public class CorbaStreamInInterceptor extends AbstractPhaseInterceptor<Message> 
             message.setContent(Exception.class, 
                                message.getExchange().getOutMessage().getContent(Exception.class));
 
-            Endpoint ep = message.getExchange().get(Endpoint.class);
+            Endpoint ep = message.getExchange().getEndpoint();
             message.getInterceptorChain().abort();
             if (ep.getInFaultObserver() != null) {
                 ep.getInFaultObserver().onMessage(message);
@@ -108,7 +108,7 @@ public class CorbaStreamInInterceptor extends AbstractPhaseInterceptor<Message> 
 
         CorbaTypeEventProducer eventProducer = null;
         Exchange exchange = message.getExchange();
-        BindingOperationInfo bindingOpInfo = exchange.get(BindingOperationInfo.class);  
+        BindingOperationInfo bindingOpInfo = exchange.getBindingOperationInfo();  
         BindingMessageInfo msgInfo = bindingOpInfo.getOutput();
 
         boolean wrap = false;

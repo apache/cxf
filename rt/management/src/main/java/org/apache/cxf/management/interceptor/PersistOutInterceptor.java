@@ -164,10 +164,10 @@ public class PersistOutInterceptor extends AbstractPhaseInterceptor<Message> {
 
             try {
 
-                Service service = message.getExchange().get(Service.class);
+                Service service = message.getExchange().getService();
 
                 String serviceName = String.valueOf(service.getName());
-                OperationInfo opInfo = message.getExchange().get(OperationInfo.class);
+                OperationInfo opInfo = message.getExchange().getBindingOperationInfo().getOperationInfo();
                 String operationName = opInfo == null ? null : opInfo.getName().getLocalPart();
 
                 if (operationName == null) {

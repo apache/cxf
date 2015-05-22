@@ -38,7 +38,7 @@ public class LoadDistributorSequentialStrategy extends SequentialStrategy {
         // This is only required if the client wants to always try one endpoint first,
         // which is not typically desired for a load distributed configuration
         // (but is required by one of the unit tests)        
-        Endpoint endpoint = exchange.get(Endpoint.class);
+        Endpoint endpoint = exchange.getEndpoint();
         String defaultAddress = endpoint.getEndpointInfo().getAddress();
         for (Endpoint alternate : alternateEndpoints) {            
             if (defaultAddress.equals(alternate.getEndpointInfo().getAddress())) {

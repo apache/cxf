@@ -84,7 +84,7 @@ public class AbstractRMInterceptorTest extends Assert {
         Exchange ex = control.createMock(Exchange.class);
         EasyMock.expect(message.getExchange()).andReturn(ex).anyTimes();
         Endpoint e = control.createMock(Endpoint.class);
-        EasyMock.expect(ex.get(Endpoint.class)).andReturn(e);
+        EasyMock.expect(ex.getEndpoint()).andReturn(e);
         EasyMock.expect(e.getBinding()).andReturn(null);
         control.replay();
         try {
@@ -104,7 +104,7 @@ public class AbstractRMInterceptorTest extends Assert {
         Exchange ex = control.createMock(Exchange.class);
         EasyMock.expect(message.getExchange()).andReturn(ex).anyTimes();
         Endpoint e = control.createMock(Endpoint.class);
-        EasyMock.expect(ex.get(Endpoint.class)).andReturn(e);
+        EasyMock.expect(ex.getEndpoint()).andReturn(e);
         Binding b = control.createMock(Binding.class);
         EasyMock.expect(e.getBinding()).andReturn(b);        
         RMManager mgr = control.createMock(RMManager.class);

@@ -108,7 +108,7 @@ public class ClientFaultConverter extends AbstractInDatabindingInterceptor {
         QName qname = new QName(exDetail.getNamespaceURI(), exDetail.getLocalName());
         FaultInfo faultWanted = null;
         MessagePartInfo part = null;
-        BindingOperationInfo boi = msg.getExchange().get(BindingOperationInfo.class);
+        BindingOperationInfo boi = msg.getExchange().getBindingOperationInfo();
         if (boi == null) {
             return;
         }
@@ -145,7 +145,7 @@ public class ClientFaultConverter extends AbstractInDatabindingInterceptor {
         if (faultWanted == null) {
             return;
         }
-        Service s = msg.getExchange().get(Service.class);
+        Service s = msg.getExchange().getService();
         DataBinding dataBinding = s.getDataBinding();
 
         Object e = null;

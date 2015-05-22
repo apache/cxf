@@ -177,7 +177,7 @@ public class CorbaConduitTest extends Assert {
         Exchange exg = control.createMock(Exchange.class);
         EasyMock.expect(msg.getExchange()).andReturn(exg);
         BindingOperationInfo bopInfo = control.createMock(BindingOperationInfo.class);
-        EasyMock.expect(exg.get(BindingOperationInfo.class)).andReturn(bopInfo);
+        EasyMock.expect(exg.getBindingOperationInfo()).andReturn(bopInfo);
         OperationType opType = control.createMock(OperationType.class);
         bopInfo.getExtensor(OperationType.class);
         EasyMock.expectLastCall().andReturn(opType);

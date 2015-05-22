@@ -83,7 +83,7 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
         
         InvocationKey key = new InvocationKey(exchange);
         if (getInvocationContext(key) == null) {
-            Endpoint endpoint = exchange.get(Endpoint.class);
+            Endpoint endpoint = exchange.getEndpoint();
             BindingOperationInfo bindingOperationInfo =
                 exchange.getBindingOperationInfo();
             Object[] params = message.getContent(List.class).toArray();

@@ -80,7 +80,7 @@ public class WebServiceContextImpl implements WebServiceContext {
     public EndpointReference getEndpointReference(Element... referenceParameters) {
         WrappedMessageContext ctx = (WrappedMessageContext)getMessageContext();
         org.apache.cxf.message.Message msg = ctx.getWrappedMessage();
-        Endpoint ep = msg.getExchange().get(Endpoint.class);
+        Endpoint ep = msg.getExchange().getEndpoint();
 
         W3CEndpointReferenceBuilder builder = new W3CEndpointReferenceBuilder();
         builder.address(ep.getEndpointInfo().getAddress());

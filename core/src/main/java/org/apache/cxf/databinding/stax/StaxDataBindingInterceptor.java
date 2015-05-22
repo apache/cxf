@@ -54,7 +54,7 @@ public class StaxDataBindingInterceptor extends AbstractInDatabindingInterceptor
         MessageContentsList parameters = new MessageContentsList();
 
         Exchange exchange = message.getExchange();
-        BindingOperationInfo bop = exchange.get(BindingOperationInfo.class);
+        BindingOperationInfo bop = exchange.getBindingOperationInfo();
 
         //if body is empty and we have BindingOperationInfo, we do not need to match 
         //operation anymore, just return
@@ -64,7 +64,7 @@ public class StaxDataBindingInterceptor extends AbstractInDatabindingInterceptor
         }
         
         if (bop == null) {
-            Endpoint ep = exchange.get(Endpoint.class);
+            Endpoint ep = exchange.getEndpoint();
             bop = ep.getBinding().getBindingInfo().getOperations().iterator().next();
         }
         

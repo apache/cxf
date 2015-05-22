@@ -37,7 +37,6 @@ import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.headers.Header;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
@@ -206,7 +205,7 @@ public abstract class AbstractTokenInterceptor extends AbstractSoapInterceptor {
     }
 
     protected TokenStore getTokenStore(SoapMessage message) {
-        EndpointInfo info = message.getExchange().get(Endpoint.class).getEndpointInfo();
+        EndpointInfo info = message.getExchange().getEndpoint().getEndpointInfo();
         synchronized (info) {
             TokenStore tokenStore = 
                 (TokenStore)message.getContextualProperty(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE);

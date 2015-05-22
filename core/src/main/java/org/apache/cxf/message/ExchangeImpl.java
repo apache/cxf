@@ -103,10 +103,7 @@ public class ExchangeImpl extends ConcurrentHashMap<String, Object>  implements 
     public <T> void put(Class<T> key, T value) {
         if (value == null) {
             super.remove(key);
-        } else {
-            super.put(key.getName(), value);
-        }
-        if (key == Bus.class) {
+        } else if (key == Bus.class) {
             resetContextCaches();
             bus = (Bus)value;
         } else if (key == Endpoint.class) {
@@ -119,6 +116,8 @@ public class ExchangeImpl extends ConcurrentHashMap<String, Object>  implements 
             bindingOp = (BindingOperationInfo)value;
         } else if (key == Binding.class) {
             binding = (Binding)value;
+        } else {
+            super.put(key.getName(), value);
         }
     }
     
@@ -200,7 +199,7 @@ public class ExchangeImpl extends ConcurrentHashMap<String, Object>  implements 
 
     public void setConduit(Conduit c) {
         put(ConduitSelector.class,
-            new PreexistingConduitSelector(c, get(Endpoint.class)));
+            new PreexistingConduitSelector(c, getEndpoint()));
     }
 
     public void setOutMessage(Message m) {

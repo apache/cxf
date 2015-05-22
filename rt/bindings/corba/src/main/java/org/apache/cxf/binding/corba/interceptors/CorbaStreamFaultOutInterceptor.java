@@ -171,10 +171,10 @@ public class CorbaStreamFaultOutInterceptor extends AbstractPhaseInterceptor<Mes
                     setUserExceptionFromFaultDetail(message, 
                             faultEx.getDetail(), 
                             exType, opInfo, writer,
-                            exchange.get(ServiceInfo.class));
+                            exchange.getEndpoint().getEndpointInfo().getService());
                 } else {
                     setUserException(message, ex, exType, opInfo, writer,
-                                    exchange.get(ServiceInfo.class));
+                                    exchange.getEndpoint().getEndpointInfo().getService());
                 }
             } else {
                 throw new CorbaBindingException(ex);

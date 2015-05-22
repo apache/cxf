@@ -52,7 +52,7 @@ public class XMLMessageOutInterceptor extends AbstractOutDatabindingInterceptor 
     }
 
     public void handleMessage(Message message) throws Fault {
-        BindingOperationInfo boi = message.getExchange().get(BindingOperationInfo.class);
+        BindingOperationInfo boi = message.getExchange().getBindingOperationInfo();
         MessageInfo mi;
         BindingMessageInfo bmi;
         if (isRequestor(message)) {

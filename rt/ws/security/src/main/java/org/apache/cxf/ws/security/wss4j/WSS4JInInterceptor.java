@@ -758,7 +758,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             try {
                 cbHandler = getPasswordCallbackHandler(reqData);
             } catch (WSSecurityException sec) {
-                Endpoint ep = ((SoapMessage)reqData.getMsgContext()).getExchange().get(Endpoint.class);
+                Endpoint ep = ((SoapMessage)reqData.getMsgContext()).getExchange().getEndpoint();
                 if (ep != null && ep.getEndpointInfo() != null) {
                     TokenStore store = 
                         WSS4JUtils.getTokenStore((SoapMessage)reqData.getMsgContext(), false);
@@ -770,7 +770,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             }
         }
             
-        Endpoint ep = ((SoapMessage)reqData.getMsgContext()).getExchange().get(Endpoint.class);
+        Endpoint ep = ((SoapMessage)reqData.getMsgContext()).getExchange().getEndpoint();
         if (ep != null && ep.getEndpointInfo() != null) {
             TokenStore store = WSS4JUtils.getTokenStore((SoapMessage)reqData.getMsgContext(), false);
             if (store != null) {

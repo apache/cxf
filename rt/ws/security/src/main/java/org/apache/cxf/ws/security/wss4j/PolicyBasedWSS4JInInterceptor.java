@@ -44,7 +44,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.MapNamespaceContext;
@@ -225,17 +224,20 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             signCrypto = getSignatureCrypto(s, message, data);
         }
         
+        final String signCryptoRefId = signCrypto != null ? "RefId-" + signCrypto.hashCode() : null;
+        
         if (signCrypto != null) {
-            message.put(WSHandlerConstants.DEC_PROP_REF_ID, "RefId-" + signCrypto.hashCode());
-            message.put("RefId-" + signCrypto.hashCode(), signCrypto);
+            message.put(WSHandlerConstants.DEC_PROP_REF_ID, signCryptoRefId);
+            message.put(signCryptoRefId, signCrypto);
         }
         
         if (encrCrypto != null) {
-            message.put(WSHandlerConstants.SIG_VER_PROP_REF_ID, "RefId-" + encrCrypto.hashCode());
-            message.put("RefId-" + encrCrypto.hashCode(), (Crypto)encrCrypto);
+            final String encCryptoRefId = "RefId-" + encrCrypto.hashCode();
+            message.put(WSHandlerConstants.SIG_VER_PROP_REF_ID, encCryptoRefId);
+            message.put(encCryptoRefId, (Crypto)encrCrypto);
         } else if (signCrypto != null) {
-            message.put(WSHandlerConstants.SIG_VER_PROP_REF_ID, "RefId-" + signCrypto.hashCode());
-            message.put("RefId-" + signCrypto.hashCode(), (Crypto)signCrypto);
+            message.put(WSHandlerConstants.SIG_VER_PROP_REF_ID, signCryptoRefId);
+            message.put(signCryptoRefId, (Crypto)signCrypto);
         }
      
         return action;
@@ -263,17 +265,19 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             signCrypto = getSignatureCrypto(s, message, data);
         }
         
+        final String signCryptoRefId = signCrypto != null ? "RefId-" + signCrypto.hashCode() : null;
         if (signCrypto != null) {
-            message.put(WSHandlerConstants.DEC_PROP_REF_ID, "RefId-" + signCrypto.hashCode());
-            message.put("RefId-" + signCrypto.hashCode(), signCrypto);
+            message.put(WSHandlerConstants.DEC_PROP_REF_ID, signCryptoRefId);
+            message.put(signCryptoRefId, signCrypto);
         }
         
         if (encrCrypto != null) {
-            message.put(WSHandlerConstants.SIG_VER_PROP_REF_ID, "RefId-" + encrCrypto.hashCode());
-            message.put("RefId-" + encrCrypto.hashCode(), (Crypto)encrCrypto);
+            final String encCryptoRefId = "RefId-" + encrCrypto.hashCode();
+            message.put(WSHandlerConstants.SIG_VER_PROP_REF_ID, encCryptoRefId);
+            message.put(encCryptoRefId, (Crypto)encrCrypto);
         } else if (signCrypto != null) {
-            message.put(WSHandlerConstants.SIG_VER_PROP_REF_ID, "RefId-" + signCrypto.hashCode());
-            message.put("RefId-" + signCrypto.hashCode(), (Crypto)signCrypto);
+            message.put(WSHandlerConstants.SIG_VER_PROP_REF_ID, signCryptoRefId);
+            message.put(signCryptoRefId, (Crypto)signCrypto);
         }
 
         return action;
@@ -383,8 +387,9 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                 crypto = signCrypto;
             }
             if (crypto != null) {
-                message.put(WSHandlerConstants.SIG_VER_PROP_REF_ID, "RefId-" + crypto.hashCode());
-                message.put("RefId-" + crypto.hashCode(), crypto);
+                final String refId = "RefId-" + crypto.hashCode();
+                message.put(WSHandlerConstants.SIG_VER_PROP_REF_ID, refId);
+                message.put(refId, crypto);
             }
             
             crypto = signCrypto;
@@ -392,8 +397,9 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                 crypto = encrCrypto;
             }
             if (crypto != null) {
-                message.put(WSHandlerConstants.DEC_PROP_REF_ID, "RefId-" + crypto.hashCode());
-                message.put("RefId-" + crypto.hashCode(), crypto);
+                final String refId = "RefId-" + crypto.hashCode();
+                message.put(WSHandlerConstants.DEC_PROP_REF_ID, refId);
+                message.put(refId, crypto);
             }
         } else {
             Crypto crypto = signCrypto;
@@ -401,8 +407,9 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                 crypto = encrCrypto;
             }
             if (crypto != null) {
-                message.put(WSHandlerConstants.SIG_VER_PROP_REF_ID, "RefId-" + crypto.hashCode());
-                message.put("RefId-" + crypto.hashCode(), crypto);
+                final String refId = "RefId-" + crypto.hashCode();
+                message.put(WSHandlerConstants.SIG_VER_PROP_REF_ID, refId);
+                message.put(refId, crypto);
             }
             
             crypto = encrCrypto;
@@ -410,8 +417,9 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                 crypto = signCrypto;
             }
             if (crypto != null) {
-                message.put(WSHandlerConstants.DEC_PROP_REF_ID, "RefId-" + crypto.hashCode());
-                message.put("RefId-" + crypto.hashCode(), crypto);
+                final String refId = "RefId-" + crypto.hashCode();
+                message.put(WSHandlerConstants.DEC_PROP_REF_ID, refId);
+                message.put(refId, crypto);
             }
         }
         
@@ -439,7 +447,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             encrCrypto = CryptoFactory.getInstance(props, Loader.getClassLoader(CryptoFactory.class),
                                                    passwordEncryptor);
 
-            EndpointInfo info = message.getExchange().get(Endpoint.class).getEndpointInfo();
+            EndpointInfo info = message.getExchange().getEndpoint().getEndpointInfo();
             synchronized (info) {
                 info.setProperty(SecurityConstants.ENCRYPT_CRYPTO, encrCrypto);
             }
@@ -488,7 +496,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             signCrypto = CryptoFactory.getInstance(props, Loader.getClassLoader(CryptoFactory.class),
                                                    passwordEncryptor);
 
-            EndpointInfo info = message.getExchange().get(Endpoint.class).getEndpointInfo();
+            EndpointInfo info = message.getExchange().getEndpoint().getEndpointInfo();
             synchronized (info) {
                 info.setProperty(SecurityConstants.SIGNATURE_CRYPTO, signCrypto);
             }

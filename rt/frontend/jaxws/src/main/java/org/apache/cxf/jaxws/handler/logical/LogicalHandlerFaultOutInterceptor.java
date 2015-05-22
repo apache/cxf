@@ -30,7 +30,6 @@ import javax.xml.ws.Binding;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
-import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.InterceptorChain;
@@ -130,7 +129,7 @@ public class LogicalHandlerFaultOutInterceptor
                 if (null == faultMessage) {
                     faultMessage = new MessageImpl();
                     faultMessage.setExchange(message.getExchange());
-                    faultMessage = exchange.get(Endpoint.class).getBinding().createMessage(faultMessage);
+                    faultMessage = exchange.getEndpoint().getBinding().createMessage(faultMessage);
                 }
                 faultMessage.setContent(Exception.class, ex);
                 if (null != mode) {

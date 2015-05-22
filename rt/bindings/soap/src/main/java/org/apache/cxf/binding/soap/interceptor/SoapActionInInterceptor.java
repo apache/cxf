@@ -119,7 +119,7 @@ public class SoapActionInInterceptor extends AbstractSoapInterceptor {
         }
         
         Exchange ex = message.getExchange();
-        Endpoint ep = ex.get(Endpoint.class);
+        Endpoint ep = ex.getEndpoint();
         if (ep == null) {
             return;
         }
@@ -159,7 +159,6 @@ public class SoapActionInInterceptor extends AbstractSoapInterceptor {
         }
         
         ex.put(BindingOperationInfo.class, bindingOp);
-        ex.put(OperationInfo.class, bindingOp.getOperationInfo());
     }
     private static boolean matchWSAAction(BindingOperationInfo boi, String action) {
         Object o = getWSAAction(boi);

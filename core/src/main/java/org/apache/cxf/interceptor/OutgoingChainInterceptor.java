@@ -56,7 +56,7 @@ public class OutgoingChainInterceptor extends AbstractPhaseInterceptor<Message> 
 
     public void handleMessage(Message message) {
         Exchange ex = message.getExchange();
-        BindingOperationInfo binding = ex.get(BindingOperationInfo.class);
+        BindingOperationInfo binding = ex.getBindingOperationInfo();
         //if we get this far, we're going to be outputting some valid content, but we COULD
         //also be "echoing" some of the content from the input.   Thus, we need to 
         //mark it as requiring the input to be cached.   
@@ -104,7 +104,7 @@ public class OutgoingChainInterceptor extends AbstractPhaseInterceptor<Message> 
             try {
                 conduit = ex.getDestination().getBackChannel(ex.getInMessage());
                 ex.put(ConduitSelector.class, 
-                       new PreexistingConduitSelector(conduit, ex.get(Endpoint.class)));
+                       new PreexistingConduitSelector(conduit, ex.getEndpoint()));
             } catch (IOException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -114,12 +114,12 @@ public class OutgoingChainInterceptor extends AbstractPhaseInterceptor<Message> 
     }
     
     public static InterceptorChain getOutInterceptorChain(Exchange ex) {
-        Bus bus = ex.get(Bus.class);
-        Binding binding = ex.get(Binding.class);
+        Bus bus = ex.getBus();
+        Binding binding = ex.getBinding();
         PhaseManager pm = bus.getExtension(PhaseManager.class);
         PhaseInterceptorChain chain = new PhaseInterceptorChain(pm.getOutPhases());
         
-        Endpoint ep = ex.get(Endpoint.class);
+        Endpoint ep = ex.getEndpoint();
         List<Interceptor<? extends Message>> il = ep.getOutInterceptors();
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Interceptors contributed by endpoint: " + il);
@@ -172,10 +172,10 @@ public class OutgoingChainInterceptor extends AbstractPhaseInterceptor<Message> 
     }
     
     private static PhaseInterceptorChain getChain(Exchange ex, PhaseChainCache chainCache) {
-        Bus bus = ex.get(Bus.class);
-        Binding binding = ex.get(Binding.class);
+        Bus bus = ex.getBus();
+        Binding binding = ex.getBinding();
         
-        Endpoint ep = ex.get(Endpoint.class);
+        Endpoint ep = ex.getEndpoint();
         
         List<Interceptor<? extends Message>> i1 = bus.getOutInterceptors();
         if (LOG.isLoggable(Level.FINE)) {

@@ -53,9 +53,6 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.service.Service;
-import org.apache.cxf.service.model.BindingInfo;
-import org.apache.cxf.service.model.InterfaceInfo;
-import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.ContextUtils;
@@ -312,7 +309,7 @@ public class RMManager {
     // The real stuff ...
 
     public RMEndpoint getReliableEndpoint(Message message) throws RMException {
-        Endpoint endpoint = message.getExchange().get(Endpoint.class);
+        Endpoint endpoint = message.getExchange().getEndpoint();
         QName name = endpoint.getEndpointInfo().getName();
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Getting RMEndpoint for endpoint with info: " + name);
@@ -380,7 +377,7 @@ public class RMManager {
                     AddressingProperties maps = RMContextUtils.retrieveMAPs(message, false, false);
                     replyTo = maps.getReplyTo();
                 }
-                Endpoint ei = message.getExchange().get(Endpoint.class);
+                Endpoint ei = message.getExchange().getEndpoint();
                 org.apache.cxf.transport.Destination dest 
                     = ei == null ? null : ei.getEndpointInfo()
                         .getProperty(MAPAggregator.DECOUPLED_DESTINATION, 
@@ -437,7 +434,7 @@ public class RMManager {
                 to = RMUtils.createReference(maps.getTo().getValue());
                 acksTo = maps.getReplyTo();
                 if (RMUtils.getAddressingConstants().getNoneURI().equals(acksTo.getAddress().getValue())) {
-                    Endpoint ei = message.getExchange().get(Endpoint.class);
+                    Endpoint ei = message.getExchange().getEndpoint();
                     org.apache.cxf.transport.Destination dest 
                         = ei == null ? null : ei.getEndpointInfo()
                                 .getProperty(MAPAggregator.DECOUPLED_DESTINATION, 
@@ -590,12 +587,7 @@ public class RMManager {
             }
             exchange.put(Endpoint.class, endpoint);
             exchange.put(Service.class, endpoint.getService());
-            if (endpoint.getEndpointInfo().getService() != null) {
-                exchange.put(ServiceInfo.class, endpoint.getEndpointInfo().getService());
-                exchange.put(InterfaceInfo.class, endpoint.getEndpointInfo().getService().getInterface());
-            }
             exchange.put(Binding.class, endpoint.getBinding());
-            exchange.put(BindingInfo.class, endpoint.getEndpointInfo().getBinding());
             exchange.put(Bus.class, bus);
             
             SequenceType st = new SequenceType();

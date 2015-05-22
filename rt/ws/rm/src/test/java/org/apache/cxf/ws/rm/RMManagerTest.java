@@ -221,7 +221,7 @@ public class RMManagerTest extends Assert {
         Exchange exchange = control.createMock(Exchange.class);
         EasyMock.expect(message.getExchange()).andReturn(exchange).anyTimes();
         WrappedEndpoint wre = control.createMock(WrappedEndpoint.class);
-        EasyMock.expect(exchange.get(Endpoint.class)).andReturn(wre).anyTimes();
+        EasyMock.expect(exchange.getEndpoint()).andReturn(wre).anyTimes();
         EndpointInfo ei = control.createMock(EndpointInfo.class);
         EasyMock.expect(wre.getEndpointInfo()).andReturn(ei).anyTimes();
         QName name = RM10Constants.PORT_NAME;
@@ -250,7 +250,7 @@ public class RMManagerTest extends Assert {
 
         control.reset();
         EasyMock.expect(message.getExchange()).andReturn(exchange);
-        EasyMock.expect(exchange.get(Endpoint.class)).andReturn(wre);
+        EasyMock.expect(exchange.getEndpoint()).andReturn(wre);
         EasyMock.expect(wre.getEndpointInfo()).andReturn(ei);
         EasyMock.expect(ei.getName()).andReturn(name);
         EasyMock.expect(wre.getWrappedEndpoint()).andReturn(e); 
@@ -270,7 +270,7 @@ public class RMManagerTest extends Assert {
         Exchange exchange = control.createMock(Exchange.class);
         EasyMock.expect(message.getExchange()).andReturn(exchange).anyTimes();
         Endpoint endpoint = control.createMock(Endpoint.class);
-        EasyMock.expect(exchange.get(Endpoint.class)).andReturn(endpoint);
+        EasyMock.expect(exchange.getEndpoint()).andReturn(endpoint);
         EndpointInfo ei = control.createMock(EndpointInfo.class);
         EasyMock.expect(endpoint.getEndpointInfo()).andReturn(ei);
         QName name = new QName("http://x.y.z/a", "GreeterPort");
@@ -290,7 +290,7 @@ public class RMManagerTest extends Assert {
 
         control.reset();
         EasyMock.expect(message.getExchange()).andReturn(exchange);
-        EasyMock.expect(exchange.get(Endpoint.class)).andReturn(endpoint);
+        EasyMock.expect(exchange.getEndpoint()).andReturn(endpoint);
         EasyMock.expect(endpoint.getEndpointInfo()).andReturn(ei);
         EasyMock.expect(ei.getName()).andReturn(name);
     
@@ -313,7 +313,7 @@ public class RMManagerTest extends Assert {
         Exchange exchange = control.createMock(Exchange.class);
         EasyMock.expect(message.getExchange()).andReturn(exchange);
         Endpoint endpoint = control.createMock(Endpoint.class);
-        EasyMock.expect(exchange.get(Endpoint.class)).andReturn(endpoint);
+        EasyMock.expect(exchange.getEndpoint()).andReturn(endpoint);
         EndpointInfo ei = control.createMock(EndpointInfo.class);
         EasyMock.expect(endpoint.getEndpointInfo()).andReturn(ei);
         QName name = new QName("http://x.y.z/a", "GreeterPort");

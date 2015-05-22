@@ -53,8 +53,7 @@ public class RPCOutInterceptor extends AbstractOutDatabindingInterceptor {
             NSStack nsStack = new NSStack();
             nsStack.push();
 
-            BindingOperationInfo operation = (BindingOperationInfo) message.getExchange().get(
-                            BindingOperationInfo.class.getName());
+            BindingOperationInfo operation = (BindingOperationInfo) message.getExchange().getBindingOperationInfo();
 
             assert operation.getName() != null;
 
@@ -138,7 +137,6 @@ public class RPCOutInterceptor extends AbstractOutDatabindingInterceptor {
                                       boolean output,
                                       BindingOperationInfo boi) 
         throws XMLStreamException {
-        String responseSuffix = output ? "Response" : "";
         String ns = boi.getName().getNamespaceURI();
         SoapBody body = null;
         if (output) {
@@ -155,7 +153,8 @@ public class RPCOutInterceptor extends AbstractOutDatabindingInterceptor {
 
         nsStack.add(ns);
         String prefix = nsStack.getPrefix(ns);
-        StaxUtils.writeStartElement(xmlWriter, prefix, boi.getName().getLocalPart() + responseSuffix, ns);
+        String name = output ? boi.getName().getLocalPart() + "Response" : boi.getName().getLocalPart();
+        StaxUtils.writeStartElement(xmlWriter, prefix, name, ns);
         return ns;
     }
 

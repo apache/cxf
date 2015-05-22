@@ -586,7 +586,7 @@ public final class ContextUtils {
      * @return the Method from the BindingOperationInfo
      */
     public static Message createMessage(Exchange exchange) {
-        Endpoint ep = exchange.get(Endpoint.class);
+        Endpoint ep = exchange.getEndpoint();
         Message msg = null;
         if (ep != null) {
             msg = new MessageImpl();
@@ -600,13 +600,13 @@ public final class ContextUtils {
     
     public static Destination createDecoupledDestination(Exchange exchange, 
                                                          final EndpointReferenceType reference) {
-        final EndpointInfo ei = exchange.get(Endpoint.class).getEndpointInfo();
+        final EndpointInfo ei = exchange.getEndpoint().getEndpointInfo();
         return new Destination() {
             public EndpointReferenceType getAddress() {
                 return reference;
             }
             public Conduit getBackChannel(Message inMessage) throws IOException {
-                Bus bus = inMessage.getExchange().get(Bus.class);
+                Bus bus = inMessage.getExchange().getBus();
                 //this is a response targeting a decoupled endpoint.   Treat it as a oneway so
                 //we don't wait for a response.
                 inMessage.getExchange().setOneWay(true);

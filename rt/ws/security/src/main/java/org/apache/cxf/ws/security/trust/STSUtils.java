@@ -99,7 +99,7 @@ public final class STSUtils {
             .getContextualProperty(SecurityConstants.STS_CLIENT);
         if (client == null) {
             client = createSTSClient(message, type);
-            Bus bus = message.getExchange().get(Bus.class);
+            Bus bus = message.getExchange().getBus();
             
             // Check for the "default" case first
             bus.getExtension(Configurer.class).configureBean("default.sts-client", client);
@@ -161,8 +161,8 @@ public final class STSUtils {
         } else {
             type = "." + type + "-client";
         }
-        STSClient client = new STSClient(message.getExchange().get(Bus.class));
-        Endpoint ep = message.getExchange().get(Endpoint.class);
+        STSClient client = new STSClient(message.getExchange().getBus());
+        Endpoint ep = message.getExchange().getEndpoint();
         client.setEndpointName(ep.getEndpointInfo().getName().toString() + type);
         client.setBeanName(ep.getEndpointInfo().getName().toString() + type);
         if (MessageUtils.getContextualBoolean(message, SecurityConstants.STS_CLIENT_SOAP12_BINDING, false)) {

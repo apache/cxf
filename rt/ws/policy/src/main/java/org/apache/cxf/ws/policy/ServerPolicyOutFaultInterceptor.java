@@ -61,20 +61,20 @@ public class ServerPolicyOutFaultInterceptor extends AbstractPolicyInterceptor {
         Exchange exchange = msg.getExchange();
         assert null != exchange;
         
-        BindingOperationInfo boi = exchange.get(BindingOperationInfo.class);
+        BindingOperationInfo boi = exchange.getBindingOperationInfo();
         if (null == boi) {
             LOG.fine("No binding operation info.");
             return;
         }
         
-        Endpoint e = exchange.get(Endpoint.class);
+        Endpoint e = exchange.getEndpoint();
         if (null == e) {
             LOG.fine("No endpoint.");
             return;
         }
         EndpointInfo ei = e.getEndpointInfo();
 
-        Bus bus = exchange.get(Bus.class);
+        Bus bus = exchange.getBus();
         PolicyEngine pe = bus.getExtension(PolicyEngine.class);
         if (null == pe) {
             return;

@@ -63,7 +63,7 @@ public class CheckFaultInterceptor extends AbstractSoapInterceptor {
                                 message.getVersion().getSender());
         }
         if (message.getVersion().getFault().equals(xmlReader.getName()) && isRequestor(message)) {
-            Endpoint ep = message.getExchange().get(Endpoint.class);
+            Endpoint ep = message.getExchange().getEndpoint();
             message.getInterceptorChain().abort();
             if (ep.getInFaultObserver() != null) {
                 ep.getInFaultObserver().onMessage(message);

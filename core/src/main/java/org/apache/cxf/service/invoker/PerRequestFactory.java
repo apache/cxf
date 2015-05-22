@@ -53,7 +53,7 @@ public class PerRequestFactory implements Factory {
                 throw new Fault(new Message("SVC_CLASS_IS_ABSTRACT", BUNDLE, svcClass.getName()));
             }
             Object o = svcClass.newInstance();
-            Bus b = ex.get(Bus.class);
+            Bus b = ex.getBus();
             ResourceManager resourceManager = b.getExtension(ResourceManager.class);
             if (resourceManager != null) {
                 ResourceInjector injector = new ResourceInjector(resourceManager);

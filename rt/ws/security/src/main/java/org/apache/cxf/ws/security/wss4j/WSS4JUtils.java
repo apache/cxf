@@ -89,7 +89,7 @@ public final class WSS4JUtils {
         if (!specified && MessageUtils.isRequestor(message)) {
             return null;
         }
-        Endpoint ep = message.getExchange().get(Endpoint.class);
+        Endpoint ep = message.getExchange().getEndpoint();
         if (ep != null && ep.getEndpointInfo() != null) {
             EndpointInfo info = ep.getEndpointInfo();
             synchronized (info) {
@@ -134,7 +134,7 @@ public final class WSS4JUtils {
         
         if (o instanceof String) {
             URL url = null;
-            ResourceManager rm = message.getExchange().get(Bus.class).getExtension(ResourceManager.class);
+            ResourceManager rm = message.getExchange().getBus().getExtension(ResourceManager.class);
             url = rm.resolveResource((String)o, URL.class);
             try {
                 if (url == null) {
@@ -158,7 +158,7 @@ public final class WSS4JUtils {
     }
     
     public static TokenStore getTokenStore(Message message, boolean create) {
-        EndpointInfo info = message.getExchange().get(Endpoint.class).getEndpointInfo();
+        EndpointInfo info = message.getExchange().getEndpoint().getEndpointInfo();
         synchronized (info) {
             TokenStore tokenStore = 
                 (TokenStore)message.getContextualProperty(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE);
