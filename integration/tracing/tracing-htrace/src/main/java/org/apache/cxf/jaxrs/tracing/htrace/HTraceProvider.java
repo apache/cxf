@@ -44,18 +44,9 @@ import static org.apache.cxf.tracing.TracerHeaders.HEADER_TRACE_ID;
 @Provider
 public class HTraceProvider implements ContainerRequestFilter, ContainerResponseFilter { 
     private static final Logger LOG = LogUtils.getL7dLogger(HTraceProvider.class);
+    private static final String TRACE_SPAN = "org.apache.cxf.jaxrs.tracing.htrace.span";
         
     private final Sampler< ? > sampler;
-    
-    // Keep the parent spans in the thread-local storage. The span created during request
-    // phase should be closed during the response phase in order to mark the start/end 
-    // bounds 
-    private final ThreadLocal<TraceScope> parent = new ThreadLocal<TraceScope>() {
-        @Override
-        protected TraceScope initialValue() {
-            return null;
-        }
-    };
     
     public HTraceProvider() {
         this(NeverSampler.INSTANCE);
@@ -79,8 +70,8 @@ public class HTraceProvider implements ContainerRequestFilter, ContainerResponse
             Tracer.DONT_TRACE.spanId); 
         
         if (traceId != Tracer.DONT_TRACE.traceId && spanId != Tracer.DONT_TRACE.spanId) {
-            parent.set(Trace.startSpan(requestContext.getUriInfo().getPath(), (Sampler< TraceInfo >)sampler,
-                new TraceInfo(traceId, spanId)));
+            requestContext.setProperty(TRACE_SPAN, Trace.startSpan(requestContext.getUriInfo().getPath(), 
+                (Sampler< TraceInfo >)sampler, new TraceInfo(traceId, spanId)));
         }
     }
     
@@ -95,10 +86,10 @@ public class HTraceProvider implements ContainerRequestFilter, ContainerResponse
             responseContext.getHeaders().add(HEADER_SPAN_ID, headers.getFirst(HEADER_SPAN_ID));
         }
         
-        try (final TraceScope span = parent.get()) {
-            if (span != null) {
-                parent.remove();
-            }
+        final Object value = requestContext.getProperty(TRACE_SPAN);
+        if (value instanceof TraceScope) {
+            final TraceScope span = (TraceScope)value;
+            span.close();
         }
     }
     
