@@ -100,6 +100,7 @@ public class DefaultProtocolInterceptor extends AtmosphereInterceptorAdapter {
         this.excludedheaders = excludedheaders;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public Action inspect(final AtmosphereResource r) {
         LOG.log(Level.FINE, "inspect");
@@ -245,6 +246,7 @@ public class DefaultProtocolInterceptor extends AtmosphereInterceptorAdapter {
     private final class Interceptor extends AsyncIOInterceptorAdapter {
 
         @Override
+        @SuppressWarnings("deprecation")
         public byte[] transformPayload(AtmosphereResponse response, byte[] responseDraft, byte[] data) 
             throws IOException {
             if (LOG.isLoggable(Level.INFO)) {
