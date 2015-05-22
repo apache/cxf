@@ -53,6 +53,8 @@
         <module>jax_rs/websocket</module>
         <module>jax_rs/search</module>
         <module>jax_rs/description_swagger</module>
+        <module>jax_rs/jaxrs_spring_boot</module>
+        <module>jax_rs/big_query</module>
         <module>callback</module>
         <module>wsdl_first_pure_xml</module>
         <module>jaxws_dispatch_provider</module>
@@ -103,6 +105,7 @@
         <module>ws_discovery</module>
         <module>ws_eventing</module>
         <module>throttling</module>
+        <module>jaxws_spring_boot</module>
     </modules>
     <dependencyManagement>
         <dependencies>
