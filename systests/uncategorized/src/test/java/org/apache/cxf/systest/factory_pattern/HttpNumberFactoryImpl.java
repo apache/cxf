@@ -64,6 +64,7 @@ public class HttpNumberFactoryImpl extends NumberFactoryImpl {
             new EndpointImpl(bus, servant, bindingId, wsdlLocation);
         ep.setEndpointName(new QName(NUMBER_SERVICE_QNAME.getNamespaceURI(), "NumberPort"));
         ep.publish(getServantAddressRoot());
+        endpoints.add(ep);
         templateEpr = ep.getServer().getDestination().getAddress();        
     }
 }

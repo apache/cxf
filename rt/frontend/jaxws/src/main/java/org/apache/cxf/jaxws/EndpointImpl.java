@@ -79,7 +79,7 @@ import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl11.WSDLServiceBuilder;
 
 public class EndpointImpl extends javax.xml.ws.Endpoint 
-    implements InterceptorProvider, Configurable {
+    implements InterceptorProvider, Configurable, AutoCloseable {
     /**
      * This property controls whether the 'publishEndpoint' permission is checked 
      * using only the AccessController (i.e. when SecurityManager is not installed).
@@ -855,6 +855,11 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
             sf.setDestinationFactory(new JAXWSHttpSpiTransportFactory(context));
         }
         publish(context.getPath());
+    }
+
+    @Override
+    public void close() throws Exception {
+        stop();
     }    
 
 }

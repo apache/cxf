@@ -168,115 +168,118 @@ public class CodeFirstTest extends AbstractJaxWsTest {
     public void testEndpoint() throws Exception {
         Hello service = new Hello();
 
-        EndpointImpl ep = new EndpointImpl(getBus(), service, (String) null);
-        ep.setExecutor(new Executor() {
-            public void execute(Runnable r) {
-                new Thread(r).start();
-            }
-        });
-        ep.publish("local://localhost:9090/hello");
-
-        Node res = invoke("local://localhost:9090/hello", 
-                          LocalTransportFactory.TRANSPORT_ID,
-                          "sayHi.xml");
-        
-        assertNotNull(res);
-       
-        addNamespace("h", "http://service.jaxws.cxf.apache.org/");
-        assertValid("//s:Body/h:sayHiResponse/return", res);
-        
-        res = invoke("local://localhost:9090/hello", 
-                     LocalTransportFactory.TRANSPORT_ID,
-                     "getGreetings.xml");
-
-        assertNotNull(res);
-        
-        addNamespace("h", "http://service.jaxws.cxf.apache.org/");
-        assertValid("//s:Body/h:getGreetingsResponse/return[1]", res);
-        assertValid("//s:Body/h:getGreetingsResponse/return[2]", res);
+        try (EndpointImpl ep = new EndpointImpl(getBus(), service, (String) null)) {
+            ep.setExecutor(new Executor() {
+                public void execute(Runnable r) {
+                    new Thread(r).start();
+                }
+            });
+            ep.publish("local://localhost:9090/hello");
+    
+            Node res = invoke("local://localhost:9090/hello", 
+                              LocalTransportFactory.TRANSPORT_ID,
+                              "sayHi.xml");
+            
+            assertNotNull(res);
+           
+            addNamespace("h", "http://service.jaxws.cxf.apache.org/");
+            assertValid("//s:Body/h:sayHiResponse/return", res);
+            
+            res = invoke("local://localhost:9090/hello", 
+                         LocalTransportFactory.TRANSPORT_ID,
+                         "getGreetings.xml");
+    
+            assertNotNull(res);
+            
+            addNamespace("h", "http://service.jaxws.cxf.apache.org/");
+            assertValid("//s:Body/h:getGreetingsResponse/return[1]", res);
+            assertValid("//s:Body/h:getGreetingsResponse/return[2]", res);
+        }
     }
     
     @Test
     public void testClient() throws Exception {
         Hello serviceImpl = new Hello();
-        EndpointImpl ep = new EndpointImpl(getBus(), serviceImpl, (String) null);
-        ep.publish("local://localhost:9090/hello");
-        QName serviceName = new QName("http://service.jaxws.cxf.apache.org/", "HelloService");
-        QName portName = new QName("http://service.jaxws.cxf.apache.org/", "HelloPort");
-        
-        // need to set the same bus with service , so use the ServiceImpl
-        ServiceImpl service = new ServiceImpl(getBus(), (URL)null, serviceName, null);
-        service.addPort(portName, "http://schemas.xmlsoap.org/soap/", "local://localhost:9090/hello"); 
-        
-        HelloInterface proxy = service.getPort(portName, HelloInterface.class, new LoggingFeature());
-        Client client = ClientProxy.getClient(proxy);
-        boolean found = false;
-        for (Interceptor<? extends Message> i : client.getOutInterceptors()) {
-            if (i instanceof LoggingOutInterceptor) {
-                found = true;
+        try (EndpointImpl ep = new EndpointImpl(getBus(), serviceImpl, (String) null)) {
+            ep.publish("local://localhost:9090/hello");
+            QName serviceName = new QName("http://service.jaxws.cxf.apache.org/", "HelloService");
+            QName portName = new QName("http://service.jaxws.cxf.apache.org/", "HelloPort");
+            
+            // need to set the same bus with service , so use the ServiceImpl
+            ServiceImpl service = new ServiceImpl(getBus(), (URL)null, serviceName, null);
+            service.addPort(portName, "http://schemas.xmlsoap.org/soap/", "local://localhost:9090/hello"); 
+            
+            HelloInterface proxy = service.getPort(portName, HelloInterface.class, new LoggingFeature());
+            Client client = ClientProxy.getClient(proxy);
+            boolean found = false;
+            for (Interceptor<? extends Message> i : client.getOutInterceptors()) {
+                if (i instanceof LoggingOutInterceptor) {
+                    found = true;
+                }
             }
+            assertTrue(found);
+            assertEquals("Get the wrong result", "hello", proxy.sayHi("hello"));
+            String[] strInput = new String[2];
+            strInput[0] = "Hello";
+            strInput[1] = "Bonjour";
+            String[] strings = proxy.getStringArray(strInput);
+            assertEquals(strings.length, 2);
+            assertEquals(strings[0], "HelloHello");
+            assertEquals(strings[1], "BonjourBonjour");
+            List<String> listInput = new ArrayList<String>();
+            listInput.add("Hello");
+            listInput.add("Bonjour");
+            List<String> list = proxy.getStringList(listInput);
+            assertEquals(list.size(), 2);
+            assertEquals(list.get(0), "HelloHello");
+            assertEquals(list.get(1), "BonjourBonjour");
+            //now the client side can't unmarshal the complex type without binding types annoutation 
+            List<String> result = proxy.getGreetings();
+            assertEquals(2, result.size());
         }
-        assertTrue(found);
-        assertEquals("Get the wrong result", "hello", proxy.sayHi("hello"));
-        String[] strInput = new String[2];
-        strInput[0] = "Hello";
-        strInput[1] = "Bonjour";
-        String[] strings = proxy.getStringArray(strInput);
-        assertEquals(strings.length, 2);
-        assertEquals(strings[0], "HelloHello");
-        assertEquals(strings[1], "BonjourBonjour");
-        List<String> listInput = new ArrayList<String>();
-        listInput.add("Hello");
-        listInput.add("Bonjour");
-        List<String> list = proxy.getStringList(listInput);
-        assertEquals(list.size(), 2);
-        assertEquals(list.get(0), "HelloHello");
-        assertEquals(list.get(1), "BonjourBonjour");
-        //now the client side can't unmarshal the complex type without binding types annoutation 
-        List<String> result = proxy.getGreetings();
-        assertEquals(2, result.size());
     }
     
     @Test
     public void testException() throws Exception {
         Hello serviceImpl = new Hello();
-        EndpointImpl ep = new EndpointImpl(getBus(), serviceImpl, (String) null);
-        ep.publish("local://localhost:9090/hello");
-        ep.getServer().getEndpoint().getInInterceptors().add(new LoggingInInterceptor());
-        ep.getServer().getEndpoint().getOutInterceptors().add(new LoggingOutInterceptor());
-        QName serviceName = new QName("http://service.jaxws.cxf.apache.org/", "HelloService");
-        QName portName = new QName("http://service.jaxws.cxf.apache.org/", "HelloPort");
-
-        // need to set the same bus with service , so use the ServiceImpl
-        ServiceImpl service = new ServiceImpl(getBus(), (URL)null, serviceName, null);
-        service.addPort(portName, "http://schemas.xmlsoap.org/soap/", "local://localhost:9090/hello");
-
-        HelloInterface proxy = service.getPort(portName, HelloInterface.class);
-        ClientProxy.getClient(proxy).getInFaultInterceptors().add(new LoggingInInterceptor());
-        ClientProxy.getClient(proxy).getInInterceptors().add(new LoggingInInterceptor());
-        try {   
-            proxy.addNumbers(1, -2);
-            fail("should throw AddNumbersException");
-        } catch (AddNumbersException e) {
-            assertEquals(e.getInfo(), "Sum is less than 0.");
-        }
-        
-        try {   
-            proxy.addNumbers(1, 99);
-            fail("should throw AddNumbersSubException");
-        } catch (AddNumbersSubException e) {
-            assertEquals(e.getSubInfo(), "Sum is 100");
-        } catch (AddNumbersException e) {
-            fail("should throw AddNumbersSubException");
-        }
-        try (AutoCloseable c = (AutoCloseable)proxy) {
-            assertEquals("Result = 2", proxy.addNumbers(1, 1));
-        }
-        try {
-            proxy.addNumbers(1, 1);
-            fail("Proxy should be closed");
-        } catch (IllegalStateException t) {
-            //this is expected as the client is closed.
+        try (EndpointImpl ep = new EndpointImpl(getBus(), serviceImpl, (String) null)) {
+            ep.publish("local://localhost:9090/hello");
+            ep.getServer().getEndpoint().getInInterceptors().add(new LoggingInInterceptor());
+            ep.getServer().getEndpoint().getOutInterceptors().add(new LoggingOutInterceptor());
+            QName serviceName = new QName("http://service.jaxws.cxf.apache.org/", "HelloService");
+            QName portName = new QName("http://service.jaxws.cxf.apache.org/", "HelloPort");
+    
+            // need to set the same bus with service , so use the ServiceImpl
+            ServiceImpl service = new ServiceImpl(getBus(), (URL)null, serviceName, null);
+            service.addPort(portName, "http://schemas.xmlsoap.org/soap/", "local://localhost:9090/hello");
+    
+            HelloInterface proxy = service.getPort(portName, HelloInterface.class);
+            ClientProxy.getClient(proxy).getInFaultInterceptors().add(new LoggingInInterceptor());
+            ClientProxy.getClient(proxy).getInInterceptors().add(new LoggingInInterceptor());
+            try {   
+                proxy.addNumbers(1, -2);
+                fail("should throw AddNumbersException");
+            } catch (AddNumbersException e) {
+                assertEquals(e.getInfo(), "Sum is less than 0.");
+            }
+            
+            try {   
+                proxy.addNumbers(1, 99);
+                fail("should throw AddNumbersSubException");
+            } catch (AddNumbersSubException e) {
+                assertEquals(e.getSubInfo(), "Sum is 100");
+            } catch (AddNumbersException e) {
+                fail("should throw AddNumbersSubException");
+            }
+            try (AutoCloseable c = (AutoCloseable)proxy) {
+                assertEquals("Result = 2", proxy.addNumbers(1, 1));
+            }
+            try {
+                proxy.addNumbers(1, 1);
+                fail("Proxy should be closed");
+            } catch (IllegalStateException t) {
+                //this is expected as the client is closed.
+            }
         }
     }
 
@@ -284,70 +287,72 @@ public class CodeFirstTest extends AbstractJaxWsTest {
     @Test
     public void testRpcClient() throws Exception {
         SayHiImpl serviceImpl = new SayHiImpl();
-        EndpointImpl ep = new EndpointImpl(getBus(), serviceImpl, (String) null);
-        ep.publish("local://localhost:9090/hello");
-        
-        QName serviceName = new QName("http://mynamespace.com/", "SayHiService");
-        QName portName = new QName("http://mynamespace.com/", "HelloPort");
-        
-        // need to set the same bus with service , so use the ServiceImpl
-        ServiceImpl service = new ServiceImpl(getBus(), (URL)null, serviceName, null);
-        service.addPort(portName, "http://schemas.xmlsoap.org/soap/", "local://localhost:9090/hello"); 
-        
-        SayHi proxy = service.getPort(portName, SayHi.class);
-        long res = proxy.sayHi(3);
-        assertEquals(3, res);
-        String[] strInput = new String[2];
-        strInput[0] = "Hello";
-        strInput[1] = "Bonjour";
-        String[] strings = proxy.getStringArray(strInput);
-        assertEquals(strings.length, 2);
-        assertEquals(strings[0], "HelloHello");
-        assertEquals(strings[1], "BonjourBonjour");
-        
+        try (EndpointImpl ep = new EndpointImpl(getBus(), serviceImpl, (String) null)) {
+            ep.publish("local://localhost:9090/hello");
+            
+            QName serviceName = new QName("http://mynamespace.com/", "SayHiService");
+            QName portName = new QName("http://mynamespace.com/", "HelloPort");
+            
+            // need to set the same bus with service , so use the ServiceImpl
+            ServiceImpl service = new ServiceImpl(getBus(), (URL)null, serviceName, null);
+            service.addPort(portName, "http://schemas.xmlsoap.org/soap/", "local://localhost:9090/hello"); 
+            
+            SayHi proxy = service.getPort(portName, SayHi.class);
+            long res = proxy.sayHi(3);
+            assertEquals(3, res);
+            String[] strInput = new String[2];
+            strInput[0] = "Hello";
+            strInput[1] = "Bonjour";
+            String[] strings = proxy.getStringArray(strInput);
+            assertEquals(strings.length, 2);
+            assertEquals(strings[0], "HelloHello");
+            assertEquals(strings[1], "BonjourBonjour");
+        }
     }
+        
     
     @Test
     public void testArrayAndList() throws Exception {
         ArrayServiceImpl serviceImpl = new ArrayServiceImpl();
-        EndpointImpl ep = new EndpointImpl(getBus(), serviceImpl, (String) null);
-        ep.publish("local://localhost:9090/array");
-        ep.getServer().getEndpoint().getInInterceptors().add(new LoggingInInterceptor());
-        ep.getServer().getEndpoint().getOutInterceptors().add(new LoggingOutInterceptor());
-        QName serviceName = new QName("http://service.jaxws.cxf.apache.org/", "ArrayService");
-        QName portName = new QName("http://service.jaxws.cxf.apache.org/", "ArrayPort");
-        
-        // need to set the same bus with service , so use the ServiceImpl
-        ServiceImpl service = new ServiceImpl(getBus(), (URL)null, serviceName, null);
-        service.addPort(portName, "http://schemas.xmlsoap.org/soap/", "local://localhost:9090/array"); 
-        
-        ArrayService proxy = service.getPort(portName, ArrayService.class);
-        String[] arrayOut = proxy.arrayOutput();
-        assertEquals(arrayOut.length, 3);
-        assertEquals(arrayOut[0], "string1");
-        assertEquals(arrayOut[1], "string2");
-        assertEquals(arrayOut[2], "string3");
-        String[] arrayIn = new String[3];
-        arrayIn[0] = "string1";
-        arrayIn[1] = "string2";
-        arrayIn[2] = "string3";
-        assertEquals(proxy.arrayInput(arrayIn), "string1string2string3");
-        arrayOut = proxy.arrayInputAndOutput(arrayIn);
-        assertEquals(arrayOut.length, 3);
-        assertEquals(arrayOut[0], "string11");
-        assertEquals(arrayOut[1], "string22");
-        assertEquals(arrayOut[2], "string33");
-        
-        List<String> listOut = proxy.listOutput();
-        assertEquals(listOut.size(), 3);
-        assertEquals(listOut.get(0), "string1");
-        assertEquals(listOut.get(1), "string2");
-        assertEquals(listOut.get(2), "string3");
-        List<String> listIn = new ArrayList<String>();
-        listIn.add("list1");
-        listIn.add("list2");
-        listIn.add("list3");
-        assertEquals(proxy.listInput(listIn), "list1list2list3");
+        try (EndpointImpl ep = new EndpointImpl(getBus(), serviceImpl, (String) null)) {
+            ep.publish("local://localhost:9090/array");
+            ep.getServer().getEndpoint().getInInterceptors().add(new LoggingInInterceptor());
+            ep.getServer().getEndpoint().getOutInterceptors().add(new LoggingOutInterceptor());
+            QName serviceName = new QName("http://service.jaxws.cxf.apache.org/", "ArrayService");
+            QName portName = new QName("http://service.jaxws.cxf.apache.org/", "ArrayPort");
+            
+            // need to set the same bus with service , so use the ServiceImpl
+            ServiceImpl service = new ServiceImpl(getBus(), (URL)null, serviceName, null);
+            service.addPort(portName, "http://schemas.xmlsoap.org/soap/", "local://localhost:9090/array"); 
+            
+            ArrayService proxy = service.getPort(portName, ArrayService.class);
+            String[] arrayOut = proxy.arrayOutput();
+            assertEquals(arrayOut.length, 3);
+            assertEquals(arrayOut[0], "string1");
+            assertEquals(arrayOut[1], "string2");
+            assertEquals(arrayOut[2], "string3");
+            String[] arrayIn = new String[3];
+            arrayIn[0] = "string1";
+            arrayIn[1] = "string2";
+            arrayIn[2] = "string3";
+            assertEquals(proxy.arrayInput(arrayIn), "string1string2string3");
+            arrayOut = proxy.arrayInputAndOutput(arrayIn);
+            assertEquals(arrayOut.length, 3);
+            assertEquals(arrayOut[0], "string11");
+            assertEquals(arrayOut[1], "string22");
+            assertEquals(arrayOut[2], "string33");
+            
+            List<String> listOut = proxy.listOutput();
+            assertEquals(listOut.size(), 3);
+            assertEquals(listOut.get(0), "string1");
+            assertEquals(listOut.get(1), "string2");
+            assertEquals(listOut.get(2), "string3");
+            List<String> listIn = new ArrayList<String>();
+            listIn.add("list1");
+            listIn.add("list2");
+            listIn.add("list3");
+            assertEquals(proxy.listInput(listIn), "list1list2list3");
+        }
     }
 
     @Test

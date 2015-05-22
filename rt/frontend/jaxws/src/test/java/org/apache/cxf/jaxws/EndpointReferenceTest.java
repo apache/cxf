@@ -121,65 +121,67 @@ public class EndpointReferenceTest extends AbstractJaxWsTest {
     public void testServiceGetPortUsingEndpointReference() throws Exception {
         BusFactory.setDefaultBus(getBus());
         GreeterImpl greeter1 = new GreeterImpl();
-        EndpointImpl endpoint = new EndpointImpl(getBus(), greeter1, (String)null);
-        endpoint.publish("http://localhost:8080/test");
-        
-        javax.xml.ws.Service s = javax.xml.ws.Service
-            .create(new QName("http://apache.org/hello_world_soap_http", "SoapPort"));
-
-        InputStream is = getClass().getResourceAsStream("resources/hello_world_soap_http_infoset.xml");
-        Document doc = StaxUtils.read(is);
-        DOMSource erXML = new DOMSource(doc);
-        EndpointReference endpointReference = EndpointReference.readFrom(erXML);
-
-        WebServiceFeature[] wfs = new WebServiceFeature[] {};
-
-        Greeter greeter = s.getPort(endpointReference, Greeter.class, wfs);
-
-        String response = greeter.greetMe("John");
-        
-        assertEquals("Hello John", response);
+        try (EndpointImpl endpoint = new EndpointImpl(getBus(), greeter1, (String)null)) {
+            endpoint.publish("http://localhost:8080/test");
+            
+            javax.xml.ws.Service s = javax.xml.ws.Service
+                .create(new QName("http://apache.org/hello_world_soap_http", "SoapPort"));
+    
+            InputStream is = getClass().getResourceAsStream("resources/hello_world_soap_http_infoset.xml");
+            Document doc = StaxUtils.read(is);
+            DOMSource erXML = new DOMSource(doc);
+            EndpointReference endpointReference = EndpointReference.readFrom(erXML);
+    
+            WebServiceFeature[] wfs = new WebServiceFeature[] {};
+    
+            Greeter greeter = s.getPort(endpointReference, Greeter.class, wfs);
+    
+            String response = greeter.greetMe("John");
+            
+            assertEquals("Hello John", response);
+        }
     }
 
     @Test
     public void testEndpointReferenceGetPort() throws Exception {
         BusFactory.setDefaultBus(getBus());
         GreeterImpl greeter1 = new GreeterImpl();
-        EndpointImpl endpoint = new EndpointImpl(getBus(), greeter1, (String)null);
-        endpoint.publish("http://localhost:8080/test");
-        
-        InputStream is = getClass().getResourceAsStream("resources/hello_world_soap_http_infoset.xml");
-        Document doc = StaxUtils.read(is);
-        DOMSource erXML = new DOMSource(doc);
-        EndpointReference endpointReference = EndpointReference.readFrom(erXML);
-
-        WebServiceFeature[] wfs = new WebServiceFeature[] {};
-
-        Greeter greeter = endpointReference.getPort(Greeter.class, wfs);
-
-        String response = greeter.greetMe("John");
-        assertEquals("Hello John", response);
+        try (EndpointImpl endpoint = new EndpointImpl(getBus(), greeter1, (String)null)) {
+            endpoint.publish("http://localhost:8080/test");
+            
+            InputStream is = getClass().getResourceAsStream("resources/hello_world_soap_http_infoset.xml");
+            Document doc = StaxUtils.read(is);
+            DOMSource erXML = new DOMSource(doc);
+            EndpointReference endpointReference = EndpointReference.readFrom(erXML);
+    
+            WebServiceFeature[] wfs = new WebServiceFeature[] {};
+    
+            Greeter greeter = endpointReference.getPort(Greeter.class, wfs);
+    
+            String response = greeter.greetMe("John");
+            assertEquals("Hello John", response);
+        }
     }    
     
     @Test
     public void testEndpointGetEndpointReferenceSOAPBinding() throws Exception {
         GreeterImpl greeter = new GreeterImpl();
-        EndpointImpl endpoint = new EndpointImpl(getBus(), greeter, (String)null);
-        endpoint.publish("http://localhost:8080/test");
-
-        InputStream is = getClass().getResourceAsStream("resources/hello_world_soap_http_infoset.xml");
-        Document doc = StaxUtils.read(is);
-        Element referenceParameters = fetchElementByNameAttribute(doc.getDocumentElement(),
-                                                                  "wsa:ReferenceParameters",
-                                                                  "");
-        EndpointReference endpointReference = endpoint.getEndpointReference(referenceParameters);
-        assertNotNull(endpointReference);
-        assertTrue(endpointReference instanceof W3CEndpointReference);
-
-        //A returned W3CEndpointReferenceMUST also contain the specified referenceParameters.
-        //W3CEndpointReference wer = (W3CEndpointReference)endpointReference;
-
-        endpoint.stop();        
+        try (EndpointImpl endpoint = new EndpointImpl(getBus(), greeter, (String)null)) {
+            endpoint.publish("http://localhost:8080/test");
+    
+            InputStream is = getClass().getResourceAsStream("resources/hello_world_soap_http_infoset.xml");
+            Document doc = StaxUtils.read(is);
+            Element referenceParameters = fetchElementByNameAttribute(doc.getDocumentElement(),
+                                                                      "wsa:ReferenceParameters",
+                                                                      "");
+            EndpointReference endpointReference = endpoint.getEndpointReference(referenceParameters);
+            assertNotNull(endpointReference);
+            assertTrue(endpointReference instanceof W3CEndpointReference);
+    
+            //A returned W3CEndpointReferenceMUST also contain the specified referenceParameters.
+            //W3CEndpointReference wer = (W3CEndpointReference)endpointReference;
+            endpoint.stop();        
+        }
     }
     
     @Test
@@ -187,72 +189,75 @@ public class EndpointReferenceTest extends AbstractJaxWsTest {
     public void testEndpointGetEndpointReferenceXMLBinding() throws Exception {
         org.apache.hello_world_xml_http.bare.Greeter greeter = 
             new org.apache.hello_world_xml_http.bare.GreeterImpl();
-        EndpointImpl endpoint = new EndpointImpl(getBus(), greeter, (String)null);
+        try (EndpointImpl endpoint = new EndpointImpl(getBus(), greeter, (String)null)) {
 
-        endpoint.publish("http://localhost:8080/test");
-
-        try {
-            InputStream is = getClass().getResourceAsStream("resources/hello_world_soap_http_infoset.xml");
-            Document doc = StaxUtils.read(is);
-            Element referenceParameters = fetchElementByNameAttribute(doc.getDocumentElement(),
-                                                                      "wsa:ReferenceParameters",
-                                                                      "");
-            endpoint.getEndpointReference(referenceParameters);
-
-            fail("Did not get expected UnsupportedOperationException");
-        } catch (UnsupportedOperationException e) {
-            //do nothing
+            endpoint.publish("http://localhost:8080/test");
+    
+            try {
+                InputStream is = getClass().getResourceAsStream("resources/hello_world_soap_http_infoset.xml");
+                Document doc = StaxUtils.read(is);
+                Element referenceParameters = fetchElementByNameAttribute(doc.getDocumentElement(),
+                                                                          "wsa:ReferenceParameters",
+                                                                          "");
+                endpoint.getEndpointReference(referenceParameters);
+    
+                fail("Did not get expected UnsupportedOperationException");
+            } catch (UnsupportedOperationException e) {
+                //do nothing
+            }
+    
+            endpoint.stop();
         }
-
-        endpoint.stop();        
     }
     
     @Test
     public void testEndpointGetEndpointReferenceW3C() throws Exception {
         GreeterImpl greeter = new GreeterImpl();
-        EndpointImpl endpoint = new EndpointImpl(getBus(), greeter, (String)null);
+        try (EndpointImpl endpoint = new EndpointImpl(getBus(), greeter, (String)null)) {
 
-        endpoint.publish("http://localhost:8080/test");
-
-        InputStream is = getClass().getResourceAsStream("resources/hello_world_soap_http_infoset.xml");
-        Document doc = StaxUtils.read(is);
-        Element referenceParameters = fetchElementByNameAttribute(doc.getDocumentElement(),
-                                                                  "wsa:ReferenceParameters",
-                                                                  "");
-        EndpointReference endpointReference = endpoint.getEndpointReference(W3CEndpointReference.class,
-                                                                            referenceParameters);
-        assertNotNull(endpointReference);
-
-        assertTrue(endpointReference instanceof W3CEndpointReference);
-
-        //A returned W3CEndpointReferenceMUST also contain the specified referenceParameters.
-        //W3CEndpointReference wer = (W3CEndpointReference)endpointReference;
-
-        endpoint.stop();        
+            endpoint.publish("http://localhost:8080/test");
+    
+            InputStream is = getClass().getResourceAsStream("resources/hello_world_soap_http_infoset.xml");
+            Document doc = StaxUtils.read(is);
+            Element referenceParameters = fetchElementByNameAttribute(doc.getDocumentElement(),
+                                                                      "wsa:ReferenceParameters",
+                                                                      "");
+            EndpointReference endpointReference = endpoint.getEndpointReference(W3CEndpointReference.class,
+                                                                                referenceParameters);
+            assertNotNull(endpointReference);
+    
+            assertTrue(endpointReference instanceof W3CEndpointReference);
+    
+            //A returned W3CEndpointReferenceMUST also contain the specified referenceParameters.
+            //W3CEndpointReference wer = (W3CEndpointReference)endpointReference;
+    
+            endpoint.stop();
+        }
     }
     
     
     @Test
     public void testEndpointGetEndpointReferenceInvalid() throws Exception {
         GreeterImpl greeter = new GreeterImpl();
-        EndpointImpl endpoint = new EndpointImpl(getBus(), greeter, (String)null);
-
-        endpoint.publish("http://localhost:8080/test");
-
-        try {
-            InputStream is = getClass().getResourceAsStream("resources/hello_world_soap_http_infoset.xml");
-            Document doc = StaxUtils.read(is);
-            Element referenceParameters = fetchElementByNameAttribute(doc.getDocumentElement(),
-                                                                      "wsa:ReferenceParameters",
-                                                                      "");
-            endpoint.getEndpointReference(MyEndpointReference.class, referenceParameters);
-
-            fail("Did not get expected WebServiceException");
-        } catch (WebServiceException e) {
-            // do nothing
+        try (EndpointImpl endpoint = new EndpointImpl(getBus(), greeter, (String)null)) {
+    
+            endpoint.publish("http://localhost:8080/test");
+    
+            try {
+                InputStream is = getClass().getResourceAsStream("resources/hello_world_soap_http_infoset.xml");
+                Document doc = StaxUtils.read(is);
+                Element referenceParameters = fetchElementByNameAttribute(doc.getDocumentElement(),
+                                                                          "wsa:ReferenceParameters",
+                                                                          "");
+                endpoint.getEndpointReference(MyEndpointReference.class, referenceParameters);
+    
+                fail("Did not get expected WebServiceException");
+            } catch (WebServiceException e) {
+                // do nothing
+            }
+    
+            endpoint.stop();
         }
-
-        endpoint.stop();        
     }
     
     @Test
@@ -298,22 +303,23 @@ public class EndpointReferenceTest extends AbstractJaxWsTest {
     public void testProviderGetPort() throws Exception {
         BusFactory.setDefaultBus(getBus());
         GreeterImpl greeter1 = new GreeterImpl();
-        EndpointImpl endpoint = new EndpointImpl(getBus(), greeter1, (String)null);
-        endpoint.publish("http://localhost:8080/test");
-        
-        ProviderImpl provider = new ProviderImpl();
-        
-        InputStream is = getClass().getResourceAsStream("resources/hello_world_soap_http_infoset.xml");
-        Document doc = StaxUtils.read(is);
-        DOMSource erXML = new DOMSource(doc);
-        EndpointReference endpointReference = EndpointReference.readFrom(erXML);        
-
-        WebServiceFeature[] wfs = new WebServiceFeature[] {};
-        
-        Greeter greeter = provider.getPort(endpointReference, Greeter.class, wfs);        
-
-        String response = greeter.greetMe("John");
-        assertEquals("Hello John", response);
+        try (EndpointImpl endpoint = new EndpointImpl(getBus(), greeter1, (String)null)) {
+            endpoint.publish("http://localhost:8080/test");
+            
+            ProviderImpl provider = new ProviderImpl();
+            
+            InputStream is = getClass().getResourceAsStream("resources/hello_world_soap_http_infoset.xml");
+            Document doc = StaxUtils.read(is);
+            DOMSource erXML = new DOMSource(doc);
+            EndpointReference endpointReference = EndpointReference.readFrom(erXML);        
+    
+            WebServiceFeature[] wfs = new WebServiceFeature[] {};
+            
+            Greeter greeter = provider.getPort(endpointReference, Greeter.class, wfs);        
+    
+            String response = greeter.greetMe("John");
+            assertEquals("Hello John", response);
+        }
     }
     
     final class MyEndpointReference extends EndpointReference {

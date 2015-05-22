@@ -59,14 +59,17 @@ public class MultiplexHttpAddressClientServerTest extends AbstractBusClientServe
     
     public static class Server extends AbstractBusTestServerBase {        
         Endpoint ep;
+        HttpNumberFactoryImpl implementor;
         protected void run() {
             setBus(new SpringBusFactory().createBus("org/apache/cxf/systest/factory_pattern/cxf.xml"));
-            Object implementor = new HttpNumberFactoryImpl(getBus(), PORT);
+            implementor = new HttpNumberFactoryImpl(getBus(), PORT);
             ep = Endpoint.publish(FACTORY_ADDRESS, implementor);
         }
-        public void tearDown() {
+        public void tearDown() throws Exception {
             ep.stop();
             ep = null;
+            implementor.stop();
+            implementor = null;
         }
 
         public static void main(String[] args) {

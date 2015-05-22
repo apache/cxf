@@ -220,6 +220,7 @@ public class MDBActivationWork implements Work {
      */
     private Server createServerFromJaxwsEndpoint(JaxWsServerFactoryBean factory) {
         
+        @SuppressWarnings("resource")
         EndpointImpl endpoint = new EndpointImpl(factory.getBus(), null, factory);
         
         endpoint.setWsdlLocation(factory.getWsdlURL());

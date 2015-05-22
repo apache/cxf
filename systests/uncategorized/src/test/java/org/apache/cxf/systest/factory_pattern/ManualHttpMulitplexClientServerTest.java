@@ -44,6 +44,7 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -55,14 +56,17 @@ public class ManualHttpMulitplexClientServerTest extends AbstractBusClientServer
 
     public static class Server extends AbstractBusTestServerBase {        
         Endpoint ep;
+        ManualNumberFactoryImpl implementor;
         protected void run() {
             setBus(BusFactory.getDefaultBus());
-            Object implementor = new ManualNumberFactoryImpl(getBus(), PORT);
+            implementor = new ManualNumberFactoryImpl(getBus(), PORT);
             ep = Endpoint.publish(FACTORY_ADDRESS, implementor);            
         }
-        public void tearDown() {
+        public void tearDown() throws Exception {
             ep.stop();
             ep = null;
+            implementor.stop();
+            implementor = null;
         }
 
         public static void main(String[] args) {

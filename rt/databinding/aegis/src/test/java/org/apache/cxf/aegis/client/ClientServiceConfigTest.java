@@ -24,7 +24,6 @@ import javax.xml.ws.Holder;
 
 import org.apache.cxf.aegis.AbstractAegisTest;
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
-
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.jaxws.EndpointImpl;
@@ -32,11 +31,13 @@ import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.service.invoker.BeanInvoker;
 import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 public class ClientServiceConfigTest extends AbstractAegisTest {
-
+    EndpointImpl impl;
+    
     @Before
     public void before() throws Exception {
         super.setUp();
@@ -53,9 +54,14 @@ public class ClientServiceConfigTest extends AbstractAegisTest {
         svrFac.create();
 
         Endpoint endpoint = Endpoint.create(new EchoImpl());
-        EndpointImpl impl = (EndpointImpl) endpoint;
+        impl = (EndpointImpl) endpoint;
         impl.setDataBinding(new AegisDatabinding());
         endpoint.publish("local://JaxWsEcho");
+    }
+    @After
+    public void after() throws Exception {
+        impl.close();
+        impl = null;
     }
 
     @Test

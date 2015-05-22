@@ -19,6 +19,9 @@
 
 package org.apache.cxf.systest.factory_pattern;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import javax.jws.WebService;
 import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
@@ -49,10 +52,17 @@ public class NumberFactoryImpl implements NumberFactory {
     protected NumberImpl servant;
     protected Bus bus;
     protected String port;
+    protected List<AutoCloseable> endpoints = new LinkedList<AutoCloseable>();
 
     public NumberFactoryImpl(Bus b, String p) {
         bus = b;
         port = p;
+    }
+    
+    public void stop() throws Exception {
+        for (AutoCloseable ep: endpoints) {
+            ep.close();
+        }
     }
 
     public W3CEndpointReference create(String id) {
@@ -92,6 +102,8 @@ public class NumberFactoryImpl implements NumberFactory {
                                            servant, bindingId, wsdlLocation);
         ep.setEndpointName(new QName(NUMBER_SERVICE_QNAME.getNamespaceURI(), "NumberPort"));
         ep.publish(getServantAddressRoot());
+        endpoints.add(ep);
+        
         templateEpr = ep.getServer().getDestination().getAddress();
 
         // jms port
@@ -102,6 +114,7 @@ public class NumberFactoryImpl implements NumberFactory {
         ep.publish();
         ep.getServer().getEndpoint().getInInterceptors().add(new LoggingInInterceptor());
         ep.getServer().getEndpoint().getOutInterceptors().add(new LoggingOutInterceptor());
+        endpoints.add(ep);
     }
     
 }

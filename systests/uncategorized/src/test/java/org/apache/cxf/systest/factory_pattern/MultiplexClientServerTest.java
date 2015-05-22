@@ -54,13 +54,20 @@ public class MultiplexClientServerTest extends AbstractBusClientServerTestBase {
     
     public static class Server extends AbstractBusTestServerBase {        
         Endpoint ep;
+        NumberFactoryImpl implementor;
         protected void run() {
-            Object implementor = new NumberFactoryImpl(BusFactory.getDefaultBus(), PORT);
+            implementor = new NumberFactoryImpl(BusFactory.getDefaultBus(), PORT);
             ep = Endpoint.publish(FACTORY_ADDRESS, implementor);
         }
         public void tearDown() {
             ep.stop();
             ep = null;
+            try {
+                implementor.stop();
+            } catch (Exception e) {
+                //ignore
+            }
+            implementor = null;
         }
 
         public static void main(String[] args) {
