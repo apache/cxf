@@ -47,6 +47,7 @@ import org.apache.cxf.jaxrs.ext.search.sql.SQLPrinterVisitor;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.provider.BinaryDataProvider;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
+import org.apache.cxf.jaxrs.provider.StreamingResponseProvider;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
     
@@ -86,6 +87,7 @@ public class BookServer extends AbstractBusTestServerBase {
         providers.add(new BookStore.PrimitiveDoubleArrayReaderWriter());
         providers.add(new BookStore.StringArrayBodyReaderWriter());
         providers.add(new BookStore.StringListBodyReaderWriter());
+        providers.add(new StreamingResponseProvider<Object>());
         providers.add(new ContentTypeModifyingMBW());
         JAXBElementProvider<?> jaxbProvider = new JAXBElementProvider<Object>();
         Map<String, String> jaxbElementClassMap = new HashMap<String, String>(); 

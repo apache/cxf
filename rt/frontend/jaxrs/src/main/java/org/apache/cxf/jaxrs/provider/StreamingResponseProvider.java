@@ -50,15 +50,11 @@ public class StreamingResponseProvider<T> implements
                         MediaType mt, MultivaluedMap<String, Object> headers, OutputStream os)
         throws IOException, WebApplicationException {
         Class<?> actualCls = InjectionUtils.getActualType(t);
-        @SuppressWarnings("unchecked")
-        MessageBodyWriter<T> writer = 
-            (MessageBodyWriter<T>)providers.getMessageBodyWriter(actualCls, actualCls, anns, mt);
-        if (writer == null) {
-            throw new InternalServerErrorException();
+        if (cls == actualCls) {
+            actualCls = Object.class;
         }
         //TODO: review the possibility of caching the providers
-        StreamingResponseWriter thewriter = 
-            new StreamingResponseWriter(writer, actualCls, anns, mt, headers, os);
+        StreamingResponseWriter thewriter = new StreamingResponseWriter(actualCls, anns, mt, headers, os);
         p.writeTo(thewriter);
     }
 
@@ -68,31 +64,36 @@ public class StreamingResponseProvider<T> implements
     }
     
     private class StreamingResponseWriter implements StreamingResponse.Writer<T> {
-        private MessageBodyWriter<T> writer;
-        private Class<?> cls;
+        private volatile MessageBodyWriter<T> writer;
+        private Class<?> entityCls;
         private MediaType mt;
         private Annotation[] anns;
         private MultivaluedMap<String, Object> headers; 
         private OutputStream os;
                 
-        public StreamingResponseWriter(MessageBodyWriter<T> writer, 
-                                       Class<?> cls,
+        public StreamingResponseWriter(Class<?> entityCls,
                                        Annotation[] anns,
                                        MediaType mt,
                                        MultivaluedMap<String, Object> headers, 
                                        OutputStream os) {
-            this.writer = writer;
-            this.cls = cls;
+            this.entityCls = entityCls;
             this.anns = anns;
             this.mt = mt;
             this.headers = headers;
             this.os = os;
         }
         
+        @SuppressWarnings("unchecked")
         @Override
         public void write(T data) throws IOException {
-            writer.writeTo(data, cls, cls, anns, mt, headers, os);
-            
+            Class<?> actualCls = entityCls != Object.class ? entityCls : data.getClass(); 
+            if (writer == null) {
+                writer = (MessageBodyWriter<T>)providers.getMessageBodyWriter(actualCls, actualCls, anns, mt);
+                if (writer == null) {
+                    throw new InternalServerErrorException();
+                }
+            }
+            writer.writeTo(data, actualCls, actualCls, anns, mt, headers, os);
         }
 
         @Override
