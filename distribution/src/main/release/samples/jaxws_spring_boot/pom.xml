@@ -57,9 +57,19 @@
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
+			   <groupId>org.springframework.boot</groupId>
+			   <artifactId>spring-boot-maven-plugin</artifactId>
+                           <configuration>
+	 	               <mainClass>sample.ws.SampleWsApplication</mainClass>
+        		   </configuration>  
 			</plugin>
+                        <plugin>
+		    <groupId>org.codehaus.mojo</groupId>
+		    <artifactId>exec-maven-plugin</artifactId>
+		    <configuration>
+		      <mainClass>sample.ws.service.client.HelloClient</mainClass>
+		    </configuration>
+		   </plugin>
 		</plugins>
 	</build>
 </project>
