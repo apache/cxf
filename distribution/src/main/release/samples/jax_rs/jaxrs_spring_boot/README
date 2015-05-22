@@ -9,5 +9,12 @@ The sample uses Maven. It can be built and run from the command line:
 $ mvn spring-boot:run
 ----
 
-http://localhost:8080/services/helloservice/sayHello/Elan  will now display the output in the browser
+http://localhost:8080/services/helloservice/sayHello/ApacheCxfUser will now display the output in the browser
 like "Hello Elan, Welcome to CXF RS Spring Boot World!!!"
+
+To run the client from a command line open a new terminal window and run:
+
+----
+$ mvn exec:java
+----
+

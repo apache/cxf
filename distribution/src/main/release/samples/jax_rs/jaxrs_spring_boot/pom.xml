@@ -35,6 +35,11 @@
 		</dependency>
 		<dependency>
 			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-rt-rs-client</artifactId>
+			<version>${cxf.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.cxf</groupId>
 			<artifactId>cxf-rt-transports-http</artifactId>
 			<version>${cxf.version}</version>
 		</dependency>
@@ -92,12 +97,21 @@
 
 	</dependencies>
 	<build>
-		<plugins>
-
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
+           <plugins>
+		<plugin>
+			   <groupId>org.springframework.boot</groupId>
+			   <artifactId>spring-boot-maven-plugin</artifactId>
+                           <configuration>
+	 	               <mainClass>sample.rs.service.SampleRestWsApplication</mainClass>
+        		   </configuration>  
 			</plugin>
-		</plugins>
+                        <plugin>
+		    <groupId>org.codehaus.mojo</groupId>
+		    <artifactId>exec-maven-plugin</artifactId>
+		    <configuration>
+		      <mainClass>sample.rs.client.SampleRestClientApplication</mainClass>
+		    </configuration>
+		</plugin>
+            </plugins>
 	</build>
 </project>

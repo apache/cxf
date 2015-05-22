@@ -12,7 +12,7 @@ public class HelloService {
     @Path("/{a}")
     @Produces(MediaType.TEXT_PLAIN)
     public String sayHello(@PathParam("a") String a) {
-        return "Hello "+a+", Welcome to CXF RS Spring Boot World!!!";
+        return "Hello " + a + ", Welcome to CXF RS Spring Boot World!!!";
     }
     
 }
