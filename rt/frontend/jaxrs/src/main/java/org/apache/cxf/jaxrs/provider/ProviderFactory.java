@@ -945,7 +945,7 @@ public abstract class ProviderFactory {
     }
     
     public static ProviderFactory getInstance(Message m) {
-        Endpoint e = m.getExchange().get(Endpoint.class);
+        Endpoint e = m.getExchange().getEndpoint();
         
         Message outM = m.getExchange().getOutMessage();
         boolean isClient = outM != null && MessageUtils.isRequestor(outM);

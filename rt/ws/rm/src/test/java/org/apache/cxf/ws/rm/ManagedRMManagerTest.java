@@ -458,7 +458,7 @@ public class ManagedRMManagerTest extends Assert {
         Exchange exchange = control.createMock(Exchange.class);
         
         EasyMock.expect(message.getExchange()).andReturn(exchange).anyTimes();
-        EasyMock.expect(exchange.get(Endpoint.class)).andReturn(endpoint);
+        EasyMock.expect(exchange.getEndpoint()).andReturn(endpoint);
         
         control.replay();
         return manager.getReliableEndpoint(message);

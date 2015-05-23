@@ -159,7 +159,7 @@ public abstract class AbstractInDatabindingInterceptor extends AbstractPhaseInte
     protected MessagePartInfo findMessagePart(Exchange exchange, Collection<OperationInfo> operations,
                                               QName name, boolean client, int index,
                                               Message message) {
-        Endpoint ep = exchange.get(Endpoint.class);
+        Endpoint ep = exchange.getEndpoint();
         MessagePartInfo lastChoice = null;
         BindingOperationInfo lastBoi = null;
         BindingMessageInfo lastMsgInfo = null;
@@ -196,7 +196,6 @@ public abstract class AbstractInDatabindingInterceptor extends AbstractPhaseInte
             }
             if (name.equals(p.getConcreteName())) {
                 exchange.put(BindingOperationInfo.class, boi);
-                exchange.put(OperationInfo.class, boi.getOperationInfo());
                 exchange.setOneWay(op.isOneWay());
                 return p;
             }
@@ -224,7 +223,6 @@ public abstract class AbstractInDatabindingInterceptor extends AbstractPhaseInte
         Exchange ex = message.getExchange();
         
         ex.put(BindingOperationInfo.class, operation);
-        ex.put(OperationInfo.class, operation.getOperationInfo());
         ex.setOneWay(operation.getOperationInfo().isOneWay());
 
         //Set standard MessageContext properties required by JAX_WS, but not specific to JAX_WS.
@@ -285,7 +283,6 @@ public abstract class AbstractInDatabindingInterceptor extends AbstractPhaseInte
         
         if (bop != null) {
             exchange.put(BindingOperationInfo.class, bop);
-            exchange.put(OperationInfo.class, bop.getOperationInfo());
         }
         return bop;
     }

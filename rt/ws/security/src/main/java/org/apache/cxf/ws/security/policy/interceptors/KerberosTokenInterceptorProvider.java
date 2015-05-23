@@ -30,7 +30,6 @@ import java.util.logging.Logger;
 import javax.crypto.SecretKey;
 
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
@@ -134,7 +133,7 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
                         for (AssertionInfo ai : ais) {
                             ai.setAsserted(true);
                         }
-                        message.getExchange().get(Endpoint.class).put(SecurityConstants.TOKEN_ID, 
+                        message.getExchange().getEndpoint().put(SecurityConstants.TOKEN_ID, 
                                                                       tok.getId());
                         message.getExchange().put(SecurityConstants.TOKEN_ID, 
                                                   tok.getId());

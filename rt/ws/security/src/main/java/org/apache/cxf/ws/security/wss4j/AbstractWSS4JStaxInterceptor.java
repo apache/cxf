@@ -43,7 +43,6 @@ import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.SoapInterceptor;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
@@ -209,11 +208,11 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
             }
             
             if (o instanceof CallbackHandler) {
-                EndpointInfo info = soapMessage.getExchange().get(Endpoint.class).getEndpointInfo();
+                EndpointInfo info = soapMessage.getExchange().getEndpoint().getEndpointInfo();
                 synchronized (info) {
                     info.setProperty(SecurityConstants.CALLBACK_HANDLER, o);
                 }
-                soapMessage.getExchange().get(Endpoint.class).put(SecurityConstants.CALLBACK_HANDLER, o);
+                soapMessage.getExchange().getEndpoint().put(SecurityConstants.CALLBACK_HANDLER, o);
                 soapMessage.getExchange().put(SecurityConstants.CALLBACK_HANDLER, o);
             }
         }            
@@ -452,7 +451,7 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
                     Loader.getClassLoader(CryptoFactory.class),
                     getPasswordEncryptor(message, securityProperties));
 
-            EndpointInfo info = message.getExchange().get(Endpoint.class).getEndpointInfo();
+            EndpointInfo info = message.getExchange().getEndpoint().getEndpointInfo();
             synchronized (info) {
                 info.setProperty(SecurityConstants.ENCRYPT_CRYPTO, encrCrypto);
             }
@@ -482,7 +481,7 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
                     Loader.getClassLoader(CryptoFactory.class),
                     getPasswordEncryptor(message, securityProperties));
 
-            EndpointInfo info = message.getExchange().get(Endpoint.class).getEndpointInfo();
+            EndpointInfo info = message.getExchange().getEndpoint().getEndpointInfo();
             synchronized (info) {
                 info.setProperty(SecurityConstants.SIGNATURE_CRYPTO, signCrypto);
             }

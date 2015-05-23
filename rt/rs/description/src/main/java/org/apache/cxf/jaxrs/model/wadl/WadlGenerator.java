@@ -121,7 +121,6 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.jaxrs.utils.schemas.SchemaHandler;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.staxutils.DelegatingXMLStreamWriter;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -340,7 +339,7 @@ public class WadlGenerator implements ContainerRequestFilter {
     }
 
     private String getBaseURI(Message m, UriInfo ui) {
-        EndpointInfo ei = m.getExchange().get(Endpoint.class).getEndpointInfo();
+        EndpointInfo ei = m.getExchange().getEndpoint().getEndpointInfo();
         String publishedEndpointUrl = (String)ei.getProperty("publishedEndpointUrl");
         if (publishedEndpointUrl == null) {
             return ui.getBaseUri().toString();
@@ -1116,7 +1115,7 @@ public class WadlGenerator implements ContainerRequestFilter {
         if (!path.startsWith(slash)) {
             path = slash + path;
         }
-        List<ClassResourceInfo> all = ((JAXRSServiceImpl)m.getExchange().get(Service.class))
+        List<ClassResourceInfo> all = ((JAXRSServiceImpl)m.getExchange().getService())
             .getClassResourceInfos();
         boolean absolutePathSlashOn = checkAbsolutePathSlash && ui.getAbsolutePath().getPath().endsWith(slash);
         if (slash.equals(path) && !absolutePathSlashOn) {
@@ -1135,7 +1134,7 @@ public class WadlGenerator implements ContainerRequestFilter {
 
     // TODO: deal with caching later on
     public Response getExistingWadl(Message m, UriInfo ui, MediaType mt) {
-        Endpoint ep = m.getExchange().get(Endpoint.class);
+        Endpoint ep = m.getExchange().getEndpoint();
         if (ep != null) {
             String loc = (String)ep.get(JAXRSUtils.DOC_LOCATION);
             if (loc != null) {

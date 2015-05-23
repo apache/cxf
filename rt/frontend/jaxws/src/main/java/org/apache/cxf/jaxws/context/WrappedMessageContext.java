@@ -306,15 +306,15 @@ public class WrappedMessageContext implements MessageContext {
     }
     
     private static BindingOperationInfo getBindingOperationInfo(Exchange exchange) {
-        if (exchange != null && exchange.get(BindingOperationInfo.class) != null) {
-            return exchange.get(BindingOperationInfo.class);
+        if (exchange != null && exchange.getBindingOperationInfo() != null) {
+            return exchange.getBindingOperationInfo();
         }
         return null;
     }
 
     private static EndpointInfo getEndpointInfo(Exchange exchange) {
         if (exchange != null) {
-            Endpoint endpoint = exchange.get(Endpoint.class);
+            Endpoint endpoint = exchange.getEndpoint();
             if (endpoint != null) {
                 return endpoint.getEndpointInfo();
             }
@@ -336,7 +336,7 @@ public class WrappedMessageContext implements MessageContext {
                 m = exchange.getInMessage();
             }
             if (m == null) {
-                Endpoint ep = exchange.get(Endpoint.class);
+                Endpoint ep = exchange.getEndpoint();
                 m = new org.apache.cxf.message.MessageImpl();
                 m.setExchange(exchange);
                 m = ep.getBinding().createMessage(m);
@@ -348,7 +348,7 @@ public class WrappedMessageContext implements MessageContext {
                 m = exchange.getOutFaultMessage();
             }
             if (m == null) {
-                Endpoint ep = exchange.get(Endpoint.class);
+                Endpoint ep = exchange.getEndpoint();
                 m = new org.apache.cxf.message.MessageImpl();
                 m.setExchange(exchange);
                 m = ep.getBinding().createMessage(m);

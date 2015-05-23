@@ -50,7 +50,7 @@ public class ObjectDispatchInInterceptor extends AbstractPhaseInterceptor<Messag
             throw new Fault(new org.apache.cxf.common.i18n.Message("NO_OPERATION", BUNDLE));
         }
 
-        Endpoint ep = message.getExchange().get(Endpoint.class);
+        Endpoint ep = message.getExchange().getEndpoint();
         
         BindingInfo binding = null;
         

@@ -26,7 +26,6 @@ import java.util.Properties;
 
 import javax.security.auth.callback.CallbackHandler;
 
-import org.apache.cxf.Bus;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.resource.ResourceManager;
@@ -50,7 +49,7 @@ final class CryptoProviderUtils {
         if (o instanceof Properties) {
             properties = (Properties)o;
         } else if (o instanceof String) {
-            ResourceManager rm = message.getExchange().get(Bus.class)
+            ResourceManager rm = message.getExchange().getBus()
                 .getExtension(ResourceManager.class);
             URL url = rm.resolveResource((String)o, URL.class);
             try {

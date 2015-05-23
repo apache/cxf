@@ -223,7 +223,7 @@ public class Destination extends AbstractEndpoint {
     }
     
     private static Message createMessage(Exchange exchange) {
-        Endpoint ep = exchange.get(Endpoint.class);
+        Endpoint ep = exchange.getEndpoint();
         Message msg = null;
         if (ep != null) {
             msg = new MessageImpl();

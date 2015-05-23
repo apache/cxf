@@ -24,7 +24,6 @@ import java.util.Collection;
 import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.cxf.binding.soap.SoapMessage;
-import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
@@ -63,7 +62,7 @@ class SpnegoContextTokenOutInterceptor extends AbstractPhaseInterceptor<SoapMess
                     tok = NegotiationUtils.getTokenStore(message).getToken(tokId);
                     
                     if (tok != null && tok.isExpired()) {
-                        message.getExchange().get(Endpoint.class).remove(SecurityConstants.TOKEN_ID);
+                        message.getExchange().getEndpoint().remove(SecurityConstants.TOKEN_ID);
                         message.getExchange().remove(SecurityConstants.TOKEN_ID);
                         NegotiationUtils.getTokenStore(message).remove(tokId);
                         tok = null;
@@ -77,7 +76,7 @@ class SpnegoContextTokenOutInterceptor extends AbstractPhaseInterceptor<SoapMess
                     for (AssertionInfo ai : ais) {
                         ai.setAsserted(true);
                     }
-                    message.getExchange().get(Endpoint.class).put(SecurityConstants.TOKEN_ID, tok.getId());
+                    message.getExchange().getEndpoint().put(SecurityConstants.TOKEN_ID, tok.getId());
                     message.getExchange().put(SecurityConstants.TOKEN_ID, tok.getId());
                     NegotiationUtils.getTokenStore(message).add(tok);
                 }

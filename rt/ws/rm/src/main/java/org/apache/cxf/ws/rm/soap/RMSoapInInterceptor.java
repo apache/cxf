@@ -53,7 +53,6 @@ import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
-import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.ContextUtils;
@@ -303,7 +302,6 @@ public class RMSoapInInterceptor extends AbstractSoapInterceptor {
             LOG.fine("No BindingInfo for action " + action);
         } else {
             exchange.put(BindingOperationInfo.class, boi);
-            exchange.put(OperationInfo.class, boi.getOperationInfo());
             exchange.setOneWay(isOneway); 
         }
         

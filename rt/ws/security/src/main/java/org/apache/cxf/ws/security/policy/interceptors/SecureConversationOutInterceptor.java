@@ -26,7 +26,6 @@ import java.util.logging.Logger;
 
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
@@ -86,8 +85,8 @@ class SecureConversationOutInterceptor extends AbstractPhaseInterceptor<SoapMess
                     for (AssertionInfo ai : ais) {
                         ai.setAsserted(true);
                     }
-                    message.getExchange().get(Endpoint.class).put(SecurityConstants.TOKEN, tok);
-                    message.getExchange().get(Endpoint.class).put(SecurityConstants.TOKEN_ID, tok.getId());
+                    message.getExchange().getEndpoint().put(SecurityConstants.TOKEN, tok);
+                    message.getExchange().getEndpoint().put(SecurityConstants.TOKEN_ID, tok.getId());
                     message.getExchange().put(SecurityConstants.TOKEN_ID, tok.getId());
                     message.getExchange().put(SecurityConstants.TOKEN, tok);
                     NegotiationUtils.getTokenStore(message).add(tok);
@@ -114,8 +113,8 @@ class SecureConversationOutInterceptor extends AbstractPhaseInterceptor<SoapMess
         
         
         // Remove the old token
-        message.getExchange().get(Endpoint.class).remove(SecurityConstants.TOKEN);
-        message.getExchange().get(Endpoint.class).remove(SecurityConstants.TOKEN_ID);
+        message.getExchange().getEndpoint().remove(SecurityConstants.TOKEN);
+        message.getExchange().getEndpoint().remove(SecurityConstants.TOKEN_ID);
         message.getExchange().remove(SecurityConstants.TOKEN_ID);
         message.getExchange().remove(SecurityConstants.TOKEN);
         NegotiationUtils.getTokenStore(message).remove(tok.getId());

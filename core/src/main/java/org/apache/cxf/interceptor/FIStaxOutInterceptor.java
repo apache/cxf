@@ -140,7 +140,7 @@ public class FIStaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
     
     private StAXDocumentSerializer getOutput(Message m, OutputStream out) {
         /*
-        StAXDocumentSerializer serializer = (StAXDocumentSerializer)m.getExchange().get(Endpoint.class)
+        StAXDocumentSerializer serializer = (StAXDocumentSerializer)m.getExchange().getEndpoint()
             .remove(StAXDocumentSerializer.class.getName());
         if (serializer != null) {
             serializer.setOutputStream(out);

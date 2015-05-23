@@ -56,15 +56,15 @@ public class PolicyOutInterceptor extends AbstractPolicyInterceptor {
     
     protected void handle(Message msg) {        
         Exchange exchange = msg.getExchange();
-        Bus bus = exchange.get(Bus.class);
+        Bus bus = exchange.getBus();
         
-        BindingOperationInfo boi = exchange.get(BindingOperationInfo.class);
+        BindingOperationInfo boi = exchange.getBindingOperationInfo();
         if (null == boi) {
             LOG.fine("No binding operation info.");
             return;
         }
         
-        Endpoint e = exchange.get(Endpoint.class);
+        Endpoint e = exchange.getEndpoint();
         if (null == e) {
             LOG.fine("No endpoint.");
             return;

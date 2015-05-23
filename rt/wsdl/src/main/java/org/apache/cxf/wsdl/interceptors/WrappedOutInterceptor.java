@@ -67,7 +67,7 @@ public class WrappedOutInterceptor extends AbstractOutDatabindingInterceptor {
 
             try {
                 String pfx = null;
-                Service service = message.getExchange().get(Service.class);
+                Service service = message.getExchange().getService();
                 if (service.getDataBinding().getDeclaredNamespaceMappings() != null) {
                     pfx = service.getDataBinding().getDeclaredNamespaceMappings().get(name.getNamespaceURI());
                 }

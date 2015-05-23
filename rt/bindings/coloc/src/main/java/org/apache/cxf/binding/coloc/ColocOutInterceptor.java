@@ -70,7 +70,7 @@ public class ColocOutInterceptor extends AbstractPhaseInterceptor<Message> {
     
     public void handleMessage(Message message) throws Fault {
         if (bus == null) {
-            bus = message.getExchange().get(Bus.class);
+            bus = message.getExchange().getBus();
             if (bus == null) {
                 bus = BusFactory.getDefaultBus(false);
             }
@@ -86,14 +86,14 @@ public class ColocOutInterceptor extends AbstractPhaseInterceptor<Message> {
         }
         
         Exchange exchange = message.getExchange();
-        Endpoint senderEndpoint = exchange.get(Endpoint.class);
+        Endpoint senderEndpoint = exchange.getEndpoint();
 
         if (senderEndpoint == null) {
             throw new Fault(new org.apache.cxf.common.i18n.Message("ENDPOINT_NOT_FOUND", 
                                                                    BUNDLE));
         }
 
-        BindingOperationInfo boi = exchange.get(BindingOperationInfo.class);
+        BindingOperationInfo boi = exchange.getBindingOperationInfo();
         
         if (boi == null) {
             throw new Fault(new org.apache.cxf.common.i18n.Message("OPERATIONINFO_NOT_FOUND", 

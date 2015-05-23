@@ -28,7 +28,6 @@ import javax.ws.rs.core.HttpHeaders;
 
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
-import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.rs.security.jose.JoseException;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
@@ -48,7 +47,7 @@ public class JwtAuthenticationClientFilter extends AbstractJoseJwtProducer
         boolean jweRequired = false;
         if (jwt == null) {
             AuthorizationPolicy ap = JAXRSUtils.getCurrentMessage().getExchange()
-                .get(Endpoint.class).getEndpointInfo().getExtensor(AuthorizationPolicy.class);
+                .getEndpoint().getEndpointInfo().getExtensor(AuthorizationPolicy.class);
             if (ap != null && ap.getUserName() != null) {
                 JwtClaims claims = new JwtClaims();
                 claims.setSubject(ap.getUserName());

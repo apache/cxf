@@ -68,7 +68,7 @@ public class FaultOutInterceptor extends AbstractPhaseInterceptor<Message> {
             return;
         }
         
-        BindingOperationInfo bop = message.getExchange().get(BindingOperationInfo.class);
+        BindingOperationInfo bop = message.getExchange().getBindingOperationInfo();
         if (bop == null) {
             return;
         }
@@ -77,7 +77,7 @@ public class FaultOutInterceptor extends AbstractPhaseInterceptor<Message> {
         if (cause instanceof Exception && fi != null) {
             Exception ex = (Exception)cause;
             Object bean = getFaultBean(cause, fi, message);
-            Service service = message.getExchange().get(Service.class);
+            Service service = message.getExchange().getService();
 
             MessagePartInfo part = fi.getFirstMessagePart();
             DataBinding db = service.getDataBinding();

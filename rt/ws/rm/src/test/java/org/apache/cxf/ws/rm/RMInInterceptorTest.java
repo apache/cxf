@@ -403,7 +403,7 @@ public class RMInInterceptorTest extends Assert {
         Endpoint ep = control.createMock(Endpoint.class);
         EndpointInfo epi = control.createMock(EndpointInfo.class);
         EasyMock.expect(ep.getEndpointInfo()).andReturn(epi).anyTimes();
-        EasyMock.expect(exchange.get(Endpoint.class)).andReturn(ep).anyTimes();
+        EasyMock.expect(exchange.getEndpoint()).andReturn(ep).anyTimes();
         EasyMock.expect(maps.getFaultTo())
             .andReturn(RMUtils.createReference("http://localhost:9999/decoupled")).anyTimes();
         EasyMock.expect(message.get(JAXWSAConstants.ADDRESSING_PROPERTIES_INBOUND)).andReturn(maps);

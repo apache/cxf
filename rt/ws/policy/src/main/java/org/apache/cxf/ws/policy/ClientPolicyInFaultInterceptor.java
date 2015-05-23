@@ -59,14 +59,14 @@ public class ClientPolicyInFaultInterceptor extends AbstractPolicyInterceptor {
         Exchange exchange = msg.getExchange();
         assert null != exchange;
         
-        Endpoint e = exchange.get(Endpoint.class);
+        Endpoint e = exchange.getEndpoint();
         if (null == e) {
             LOG.fine("No endpoint.");
             return;
         }
         EndpointInfo ei = e.getEndpointInfo();
         
-        Bus bus = exchange.get(Bus.class);
+        Bus bus = exchange.getBus();
         PolicyEngine pe = bus.getExtension(PolicyEngine.class);
         if (null == pe) {
             return;

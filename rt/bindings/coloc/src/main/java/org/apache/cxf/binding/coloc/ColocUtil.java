@@ -80,10 +80,10 @@ public final class ColocUtil {
     }
     
     public static InterceptorChain getOutInterceptorChain(Exchange ex, SortedSet<Phase> phases) {
-        Bus bus = ex.get(Bus.class);
+        Bus bus = ex.getBus();
         PhaseInterceptorChain chain = new PhaseInterceptorChain(phases);
         
-        Endpoint ep = ex.get(Endpoint.class);
+        Endpoint ep = ex.getEndpoint();
         List<Interceptor<? extends Message>> il = ep.getOutInterceptors();
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Interceptors contributed by endpoint: " + il);
@@ -113,10 +113,10 @@ public final class ColocUtil {
     }
     
     public static InterceptorChain getInInterceptorChain(Exchange ex, SortedSet<Phase> phases) {
-        Bus bus = ex.get(Bus.class);
+        Bus bus = ex.getBus();
         PhaseInterceptorChain chain = new PhaseInterceptorChain(phases);
         
-        Endpoint ep = ex.get(Endpoint.class);
+        Endpoint ep = ex.getEndpoint();
         List<Interceptor<? extends Message>> il = ep.getInInterceptors();
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Interceptors contributed by endpoint: " + il);
@@ -296,7 +296,7 @@ public final class ColocUtil {
     }
     
     private static MessageInfo getMessageInfo(Message message) {
-        OperationInfo oi = message.getExchange().get(OperationInfo.class);
+        OperationInfo oi = message.getExchange().getBindingOperationInfo().getOperationInfo();
         if (MessageUtils.isOutbound(message)) {
             return oi.getOutput();
         } else {

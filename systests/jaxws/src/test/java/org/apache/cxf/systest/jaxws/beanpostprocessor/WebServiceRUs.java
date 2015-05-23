@@ -44,7 +44,7 @@ public class WebServiceRUs implements IWebServiceRUs {
         MessageContext ctx = injectedContext.getMessageContext();
         WrappedMessageContext wmc = (WrappedMessageContext) ctx;
         org.apache.cxf.message.Message msg = wmc.getWrappedMessage();
-        service = msg.getExchange().get(Service.class);
+        service = msg.getExchange().getService();
     }
     
     @WebMethod(exclude = true)

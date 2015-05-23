@@ -120,7 +120,7 @@ public final class ServerProviderFactory extends ProviderFactory {
     }
     
     public static ServerProviderFactory getInstance(Message m) {
-        Endpoint e = m.getExchange().get(Endpoint.class);
+        Endpoint e = m.getExchange().getEndpoint();
         return (ServerProviderFactory)e.get(SERVER_FACTORY_NAME);
     }
     

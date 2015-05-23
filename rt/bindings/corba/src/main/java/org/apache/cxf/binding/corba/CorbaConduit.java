@@ -136,7 +136,7 @@ public class CorbaConduit implements Conduit {
 
     public void close(Message message) throws IOException {
         if (message.get(CorbaConstants.CORBA_ENDPOINT_OBJECT) != null) {
-            BindingOperationInfo boi = message.getExchange().get(BindingOperationInfo.class);
+            BindingOperationInfo boi = message.getExchange().getBindingOperationInfo();
             OperationType opType = boi.getExtensor(OperationType.class);
             try {
                 if (message instanceof CorbaMessage) {
@@ -180,7 +180,7 @@ public class CorbaConduit implements Conduit {
     }
         
     public void buildRequest(CorbaMessage message, OperationType opType) throws Exception {        
-        ServiceInfo service = message.getExchange().get(ServiceInfo.class);
+        ServiceInfo service = message.getExchange().getEndpoint().getEndpointInfo().getService();
         NVList nvlist = getArguments(message);
         NamedValue ret = getReturn(message);
         Map<TypeCode, RaisesType> exceptions = getOperationExceptions(opType, typeMap);

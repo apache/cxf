@@ -39,7 +39,6 @@ import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingMessageInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
-import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.staxutils.DepthXMLStreamReader;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.wsdl.interceptors.DocLiteralInInterceptor;
@@ -60,7 +59,7 @@ public class XMLMessageInInterceptor extends AbstractInDatabindingInterceptor {
             LOG.fine("XMLMessageInInterceptor skipped in HTTP GET method");
             return;
         }
-        Endpoint ep = message.getExchange().get(Endpoint.class);
+        Endpoint ep = message.getExchange().getEndpoint();
 
         XMLStreamReader xsr = message.getContent(XMLStreamReader.class);
         if (xsr == null) {
@@ -83,14 +82,13 @@ public class XMLMessageInInterceptor extends AbstractInDatabindingInterceptor {
             }
         }
         // handling xml normal inbound message
-        BindingOperationInfo boi = ex.get(BindingOperationInfo.class);
+        BindingOperationInfo boi = ex.getBindingOperationInfo();
         boolean isRequestor = isRequestor(message);
         if (boi == null) {
             BindingInfo service = ep.getEndpointInfo().getBinding();
             boi = getBindingOperationInfo(isRequestor, startQName, service, xsr);
             if (boi != null) {
                 ex.put(BindingOperationInfo.class, boi);
-                ex.put(OperationInfo.class, boi.getOperationInfo());
                 ex.setOneWay(boi.getOperationInfo().isOneWay());
             }
         } else {
