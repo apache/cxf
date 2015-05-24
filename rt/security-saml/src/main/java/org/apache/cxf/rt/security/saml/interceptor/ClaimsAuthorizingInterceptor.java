@@ -43,7 +43,6 @@ import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.security.claims.authorization.Claim;
 import org.apache.cxf.security.claims.authorization.ClaimMode;
 import org.apache.cxf.security.claims.authorization.Claims;
-import org.apache.cxf.service.Service;
 import org.apache.cxf.service.invoker.MethodDispatcher;
 import org.apache.cxf.service.model.BindingOperationInfo;
 
@@ -88,10 +87,10 @@ public class ClaimsAuthorizingInterceptor extends AbstractPhaseInterceptor<Messa
     }
     
     protected Method getTargetMethod(Message m) {
-        BindingOperationInfo bop = m.getExchange().get(BindingOperationInfo.class);
+        BindingOperationInfo bop = m.getExchange().getBindingOperationInfo();
         if (bop != null) {
             MethodDispatcher md = (MethodDispatcher) 
-                m.getExchange().get(Service.class).get(MethodDispatcher.class.getName());
+                m.getExchange().getService().get(MethodDispatcher.class.getName());
             return md.getMethod(bop);
         } 
         Method method = (Method)m.get("org.apache.cxf.resource.method");

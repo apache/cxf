@@ -30,7 +30,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Exchange;
@@ -168,7 +167,7 @@ abstract class STSInvoker implements Invoker {
         }
         writer.writeStartElement(prefix, "RequestSecurityTokenResponse", namespace);
         
-        TokenStore store = (TokenStore)exchange.get(Endpoint.class).getEndpointInfo()
+        TokenStore store = (TokenStore)exchange.getEndpoint().getEndpointInfo()
                 .getProperty(TokenStore.class.getName());
         store.remove(cancelToken.getId());
         // Put the token on the out message so that we can sign the response
@@ -192,7 +191,7 @@ abstract class STSInvoker implements Invoker {
                 new SecurityTokenReference(childElement, new BSPEnforcer());
             uri = ref.getReference().getURI();
         }
-        TokenStore store = (TokenStore)exchange.get(Endpoint.class).getEndpointInfo()
+        TokenStore store = (TokenStore)exchange.getEndpoint().getEndpointInfo()
                 .getProperty(TokenStore.class.getName());
         return store.getToken(uri);
     }

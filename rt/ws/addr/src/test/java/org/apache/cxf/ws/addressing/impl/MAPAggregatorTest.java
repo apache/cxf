@@ -637,7 +637,7 @@ public class MAPAggregatorTest extends Assert {
             EasyMock.expectLastCall().andReturn(serv).anyTimes();
             serv.getOutInterceptors();
             EasyMock.expectLastCall().andReturn(new ArrayList<Interceptor<? extends Message>>()).anyTimes();
-            exchange.get(Endpoint.class);
+            exchange.getEndpoint();
             EasyMock.expectLastCall().andReturn(endpoint).anyTimes();
         }
         control.replay();
@@ -820,7 +820,7 @@ public class MAPAggregatorTest extends Assert {
                              "org.apache.cxf.ws.addressing.partial.response.sent",
                              Boolean.FALSE);
         Endpoint endpoint = control.createMock(Endpoint.class);
-        exchange.get(Endpoint.class);
+        exchange.getEndpoint();
         EasyMock.expectLastCall().andReturn(endpoint);
         Binding binding = control.createMock(Binding.class);
         endpoint.getBinding();        
@@ -865,6 +865,7 @@ public class MAPAggregatorTest extends Assert {
                                                                        "opResponse",
                                                                        "opFault", method);
         setUpExchangeGet(exchange, BindingOperationInfo.class, bindingOpInfo);
+        EasyMock.expect(exchange.getBindingOperationInfo()).andReturn(bindingOpInfo).anyTimes();
         // Usual fun with EasyMock not always working as expected
         //BindingOperationInfo bindingOpInfo =
         //    EasyMock.createMock(BindingOperationInfo.class); 
@@ -905,7 +906,7 @@ public class MAPAggregatorTest extends Assert {
         EasyMock.expectLastCall().andReturn(new PhaseManagerImpl()).anyTimes();
         
         Exchange exchange = control.createMock(Exchange.class);
-        exchange.get(Bus.class);
+        exchange.getBus();
         EasyMock.expectLastCall().andReturn(bus).anyTimes();
         EasyMock.expect(exchange.isEmpty()).andReturn(true).anyTimes();
         return exchange;

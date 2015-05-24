@@ -458,7 +458,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
         protected void initiate(boolean requestAcknowledge) {
             includeAckRequested = requestAcknowledge;
             pending = true;
-            Endpoint ep = message.getExchange().get(Endpoint.class);
+            Endpoint ep = message.getExchange().getEndpoint();
             Executor executor = ep.getExecutor();
             if (null == executor) {
                 executor = ep.getService().getExecutor();

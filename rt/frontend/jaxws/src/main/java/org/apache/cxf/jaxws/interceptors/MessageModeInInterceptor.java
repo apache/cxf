@@ -68,7 +68,7 @@ public class MessageModeInInterceptor extends AbstractPhaseInterceptor<Message> 
     }
 
     public void handleMessage(Message message) throws Fault {
-        BindingOperationInfo bop = message.getExchange().get(BindingOperationInfo.class); 
+        BindingOperationInfo bop = message.getExchange().getBindingOperationInfo(); 
         if (bop == null || !bindingName.equals(bop.getBinding().getName())) {
             return;
         }

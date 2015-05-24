@@ -26,7 +26,6 @@ import java.util.List;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.MediaType;
 
-import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.jaxrs.ext.DefaultMethod;
 import org.apache.cxf.jaxrs.ext.ResourceComparator;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
@@ -44,7 +43,7 @@ public class OperationResourceInfoComparator implements Comparator<OperationReso
     public OperationResourceInfoComparator(Message m, String method) {
         this.message = m;
         if (message != null) {
-            Object o = m.getExchange().get(Endpoint.class).get("org.apache.cxf.jaxrs.comparator");
+            Object o = m.getExchange().getEndpoint().get("org.apache.cxf.jaxrs.comparator");
             if (o != null) {
                 rc = (ResourceComparator)o;
             }

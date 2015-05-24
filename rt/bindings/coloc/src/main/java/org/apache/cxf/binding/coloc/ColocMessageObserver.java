@@ -82,7 +82,8 @@ public class ColocMessageObserver extends ChainInitiationObserver {
             inMsg.put(COLOCATED, Boolean.TRUE);
             inMsg.put(Message.REQUESTOR_ROLE, Boolean.FALSE);
             inMsg.put(Message.INBOUND_MESSAGE, Boolean.TRUE);
-            OperationInfo oi = ex.get(OperationInfo.class);
+            BindingOperationInfo boi = ex.getBindingOperationInfo();
+            OperationInfo oi = boi != null ? boi.getOperationInfo() : null;
             if (oi != null) {
                 inMsg.put(MessageInfo.class, oi.getInput());
             }
@@ -101,7 +102,8 @@ public class ColocMessageObserver extends ChainInitiationObserver {
             inMsg.setInterceptorChain(chain);
     
             //Convert the coloc object type if necessary
-            OperationInfo soi = m.getExchange().get(OperationInfo.class);
+            BindingOperationInfo bop = m.getExchange().getBindingOperationInfo();
+            OperationInfo soi = bop != null ? bop.getOperationInfo() : null;
             if (soi != null && oi != null) {
                 if (ColocUtil.isAssignableOperationInfo(soi, Source.class) 
                     && !ColocUtil.isAssignableOperationInfo(oi, Source.class)) {
@@ -161,11 +163,7 @@ public class ColocMessageObserver extends ChainInitiationObserver {
             boi = boi.getWrappedOperation();
         }
         
-        exchange.put(BindingInfo.class, bi);
         exchange.put(BindingOperationInfo.class, boi);
-        if (boi != null) {
-            exchange.put(OperationInfo.class, boi.getOperationInfo());
-        }
     }
     
     protected List<Interceptor<? extends Message>> addColocInterceptors() {

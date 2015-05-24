@@ -278,7 +278,7 @@ public class SAAJInInterceptor extends AbstractSoapInterceptor {
         }
         Element elem = DOMUtils.getFirstElement(header);
         while (elem != null) {
-            Bus b = message.getExchange() == null ? null : message.getExchange().get(Bus.class);
+            Bus b = message.getExchange() == null ? null : message.getExchange().getBus();
             HeaderProcessor p =  null;
             if (b != null && b.getExtension(HeaderManager.class) != null) {
                 p = b.getExtension(HeaderManager.class).getHeaderProcessor(elem.getNamespaceURI());

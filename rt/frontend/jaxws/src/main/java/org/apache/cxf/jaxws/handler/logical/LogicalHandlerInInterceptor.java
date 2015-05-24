@@ -83,7 +83,7 @@ public class LogicalHandlerInInterceptor
 
         if (!message.getExchange().isOneWay()) {
             //server side inbound
-            Endpoint e = message.getExchange().get(Endpoint.class);
+            Endpoint e = message.getExchange().getEndpoint();
             Message responseMsg = new MessageImpl();
             responseMsg.setExchange(message.getExchange());
             responseMsg = e.getBinding().createMessage(responseMsg);            

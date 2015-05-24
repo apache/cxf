@@ -94,7 +94,7 @@ public class CryptoLoader {
     }
     
     public final Map<Object, Crypto> getCryptoCache(Message message) {
-        Endpoint endpoint = message.getExchange().get(Endpoint.class);
+        Endpoint endpoint = message.getExchange().getEndpoint();
         if (endpoint != null) {
             EndpointInfo info  = endpoint.getEndpointInfo();
             synchronized (info) {

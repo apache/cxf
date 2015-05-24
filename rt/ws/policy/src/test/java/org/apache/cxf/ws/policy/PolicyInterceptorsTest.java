@@ -410,12 +410,12 @@ public class PolicyInterceptorsTest extends Assert {
 
         EasyMock.expect(message.getExchange()).andReturn(exchange);
         
-        EasyMock.expect(exchange.get(Bus.class)).andReturn(bus).anyTimes();
+        EasyMock.expect(exchange.getBus()).andReturn(bus).anyTimes();
         if (usesOperationInfo) {
             if (null == boi && setupOperation) {
                 boi = control.createMock(BindingOperationInfo.class);
             }
-            EasyMock.expect(exchange.get(BindingOperationInfo.class)).andReturn(setupOperation ? boi : null)
+            EasyMock.expect(exchange.getBindingOperationInfo()).andReturn(setupOperation ? boi : null)
                 .anyTimes();
             if (!setupOperation) {
                 return;
@@ -425,7 +425,7 @@ public class PolicyInterceptorsTest extends Assert {
         if (null == endpoint && setupEndpoint) {
             endpoint = control.createMock(Endpoint.class);
         }
-        EasyMock.expect(exchange.get(Endpoint.class)).andReturn(setupEndpoint ? endpoint : null);
+        EasyMock.expect(exchange.getEndpoint()).andReturn(setupEndpoint ? endpoint : null);
         if (!setupEndpoint) {
             return;
         }

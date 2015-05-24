@@ -28,7 +28,6 @@ import java.util.logging.Logger;
 
 import javax.security.auth.callback.CallbackHandler;
 
-import org.apache.cxf.Bus;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 import org.apache.cxf.common.logging.LogUtils;
@@ -78,8 +77,8 @@ public final class SecurityUtils {
             msg = PhaseInterceptorChain.getCurrentMessage();
         }
         ResourceManager manager = null;
-        if (msg != null && msg.getExchange() != null && msg.getExchange().get(Bus.class) != null) {
-            manager = msg.getExchange().get(Bus.class).getExtension(ResourceManager.class);
+        if (msg != null && msg.getExchange() != null && msg.getExchange().getBus() != null) {
+            manager = msg.getExchange().getBus().getExtension(ResourceManager.class);
         }
         return loadResource(manager, o);
     }

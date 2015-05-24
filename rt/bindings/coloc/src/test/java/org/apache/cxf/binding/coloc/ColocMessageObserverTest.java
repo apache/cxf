@@ -38,11 +38,8 @@ import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
-import org.apache.cxf.service.model.MessageInfo;
-import org.apache.cxf.service.model.OperationInfo;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -56,14 +53,12 @@ public class ColocMessageObserverTest extends Assert {
     private Service srv;
     private Endpoint ep;
     private Bus bus;
-    private OperationInfo oi;
 
     @Before
     public void setUp() throws Exception {
         ep = control.createMock(Endpoint.class);
         bus = control.createMock(Bus.class);
         srv = control.createMock(Service.class);
-        oi = control.createMock(OperationInfo.class);
         BusFactory.setDefaultBus(bus);        
         msg = new MessageImpl();
         ex = new ExchangeImpl();
@@ -88,7 +83,6 @@ public class ColocMessageObserverTest extends Assert {
         EasyMock.expect(ei.getBinding()).andReturn(bi);
         BindingOperationInfo boi = control.createMock(BindingOperationInfo.class);
         EasyMock.expect(bi.getOperation(opName)).andReturn(boi);
-        EasyMock.expect(boi.getOperationInfo()).andReturn(oi);        
         EasyMock.expect(bus.getExtension(ClassLoader.class)).andReturn(this.getClass().getClassLoader());
         control.replay();
         observer = new ColocMessageObserver(ep, bus);
@@ -96,17 +90,15 @@ public class ColocMessageObserverTest extends Assert {
         control.verify();
 
         assertNotNull("Bus should be set",
-                      ex.get(Bus.class));
+                      ex.getBus());
         assertNotNull("Endpoint should be set",
-                      ex.get(Endpoint.class));
+                      ex.getEndpoint());
         assertNotNull("Binding should be set",
-                      ex.get(Binding.class));
+                      ex.getBinding());
         assertNotNull("Service should be set",
-                      ex.get(Service.class));
+                      ex.getService());
         assertNotNull("BindingOperationInfo should be set",
-                      ex.get(BindingOperationInfo.class));
-        assertNotNull("OperationInfo should be set",
-                      ex.get(OperationInfo.class));
+                      ex.getBindingOperationInfo());
     }
 
     @Test
@@ -118,9 +110,6 @@ public class ColocMessageObserverTest extends Assert {
         
         Message inMsg = new MessageImpl();
         EasyMock.expect(binding.createMessage()).andReturn(inMsg);
-
-        MessageInfo mi = control.createMock(MessageInfo.class);
-        EasyMock.expect(oi.getInput()).andReturn(mi);
 
         EasyMock.expect(ep.getService()).andReturn(srv).anyTimes();
         EasyMock.expect(
@@ -143,8 +132,6 @@ public class ColocMessageObserverTest extends Assert {
         assertEquals("Message.INBOUND_MESSAGE should be true",
                      Boolean.TRUE,
                      inMsg.get(Message.INBOUND_MESSAGE));
-        assertNotNull("MessageInfo should be present in the Message instance",                     
-                     inMsg.get(MessageInfo.class));
         assertNotNull("Chain should be set", inMsg.getInterceptorChain());
         Exchange ex1 = msg.getExchange();
         assertNotNull("Exchange should be set", ex1);
@@ -159,7 +146,6 @@ public class ColocMessageObserverTest extends Assert {
             exchange.put(Bus.class, bus);
             exchange.put(Endpoint.class, ep);
             exchange.put(Service.class, srv);
-            exchange.put(OperationInfo.class, oi);
         }
         
         protected List<Interceptor<? extends Message>> addColocInterceptors() {

@@ -67,7 +67,7 @@ public class Servant implements Invoker {
     public Object invoke(Exchange exchange, Object o) {
         LOG.fine("Invoking on RM Endpoint");
         final ProtocolVariation protocol = RMContextUtils.getProtocolVariation(exchange.getInMessage());
-        OperationInfo oi = exchange.get(OperationInfo.class);
+        OperationInfo oi = exchange.getBindingOperationInfo().getOperationInfo();
         if (null == oi) {
             LOG.fine("No operation info."); 
             return null;
@@ -83,7 +83,7 @@ public class Servant implements Invoker {
                 LOG.log(Level.WARNING, "Sequence creation rejected", ex);
                 SequenceFault sf = 
                     new SequenceFaultFactory(protocol.getConstants()).createCreateSequenceRefusedFault();
-                Endpoint e = exchange.get(Endpoint.class);
+                Endpoint e = exchange.getEndpoint();
                 Binding b = null == e ? null : e.getBinding();
                 if (null != b) {
                     RMManager m = reliableEndpoint.getManager();

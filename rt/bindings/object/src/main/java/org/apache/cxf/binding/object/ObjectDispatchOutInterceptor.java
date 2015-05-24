@@ -44,7 +44,7 @@ public class ObjectDispatchOutInterceptor extends AbstractPhaseInterceptor<Messa
         message.put(LocalConduit.DIRECT_DISPATCH, Boolean.TRUE);
         message.put(LocalTransportFactory.MESSAGE_INCLUDE_PROPERTIES,
                     includes);
-        BindingOperationInfo bop = ex.get(BindingOperationInfo.class);
+        BindingOperationInfo bop = ex.getBindingOperationInfo();
         
         message.put(ObjectBinding.OPERATION, bop.getName());
         message.put(ObjectBinding.BINDING, bop.getBinding().getName());

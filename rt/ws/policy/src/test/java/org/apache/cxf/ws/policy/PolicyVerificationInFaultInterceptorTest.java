@@ -149,14 +149,14 @@ public class PolicyVerificationInFaultInterceptorTest extends Assert {
         if (setupOperationInfo && null == boi) {
             boi = control.createMock(BindingOperationInfo.class);
         }
-        EasyMock.expect(exchange.get(BindingOperationInfo.class)).andReturn(boi);
+        EasyMock.expect(exchange.getBindingOperationInfo()).andReturn(boi);
         if (!setupOperationInfo) {
             return;
         }
         if (setupEndpoint && null == endpoint) {
             endpoint = control.createMock(Endpoint.class);
         }
-        EasyMock.expect(exchange.get(Endpoint.class)).andReturn(endpoint);
+        EasyMock.expect(exchange.getEndpoint()).andReturn(endpoint);
         if (!setupEndpoint) {
             return;
         }
@@ -165,7 +165,7 @@ public class PolicyVerificationInFaultInterceptorTest extends Assert {
         }
         EasyMock.expect(endpoint.getEndpointInfo()).andReturn(ei);
         
-        EasyMock.expect(exchange.get(Bus.class)).andReturn(bus);
+        EasyMock.expect(exchange.getBus()).andReturn(bus);
         if (setupPolicyEngine && null == engine) {
             engine = control.createMock(PolicyEngine.class);
         }

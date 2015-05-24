@@ -178,7 +178,7 @@ public class PushBack401 extends AbstractPhaseInterceptor<Message> {
         Exchange exchange = message.getExchange();
         Message outMessage = exchange.getOutMessage();
         if (outMessage == null) {
-            Endpoint endpoint = exchange.get(Endpoint.class);
+            Endpoint endpoint = exchange.getEndpoint();
             outMessage = new MessageImpl();
             outMessage.putAll(message);
             outMessage.remove(Message.PROTOCOL_HEADERS);

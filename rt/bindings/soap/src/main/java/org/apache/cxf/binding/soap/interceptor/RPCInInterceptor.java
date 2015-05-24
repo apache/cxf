@@ -44,7 +44,6 @@ import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.MessageInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
-import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.service.model.ServiceModelUtil;
 import org.apache.cxf.staxutils.DepthXMLStreamReader;
@@ -63,7 +62,7 @@ public class RPCInInterceptor extends AbstractInDatabindingInterceptor {
     private BindingOperationInfo getOperation(Message message, QName opName) {
         BindingOperationInfo bop = ServiceModelUtil.getOperation(message.getExchange(), opName);
         if (bop == null) {
-            Endpoint ep = message.getExchange().get(Endpoint.class);
+            Endpoint ep = message.getExchange().getEndpoint();
             if (ep == null) {
                 return null;
             }
@@ -102,7 +101,7 @@ public class RPCInInterceptor extends AbstractInDatabindingInterceptor {
             opName = opName.substring(0, opName.length() - 8);
         }
 
-        if (message.getExchange().get(BindingOperationInfo.class) == null) {
+        if (message.getExchange().getBindingOperationInfo() == null) {
             operation = getOperation(message, new QName(xmlReader.getNamespaceURI(), opName));
             if (operation == null) {
                 // it's doc-lit-bare
@@ -112,7 +111,7 @@ public class RPCInInterceptor extends AbstractInDatabindingInterceptor {
                 setMessage(message, operation);
             }
         } else {
-            operation = message.getExchange().get(BindingOperationInfo.class);
+            operation = message.getExchange().getBindingOperationInfo();
         }
         MessageInfo msg;
         DataReader<XMLStreamReader> dr = getDataReader(message, XMLStreamReader.class);
@@ -193,7 +192,6 @@ public class RPCInInterceptor extends AbstractInDatabindingInterceptor {
                              BindingOperationInfo operation) {
         Exchange ex = message.getExchange();
         ex.put(BindingOperationInfo.class, operation);
-        ex.put(OperationInfo.class, operation.getOperationInfo());
         ex.setOneWay(operation.getOperationInfo().isOneWay());
 
         //Set standard MessageContext properties required by JAX_WS, but not specific to JAX_WS.
@@ -206,7 +204,7 @@ public class RPCInInterceptor extends AbstractInDatabindingInterceptor {
         QName interfaceQName = si.getInterface().getName();
         message.put(Message.WSDL_INTERFACE, interfaceQName);
 
-        EndpointInfo endpointInfo = ex.get(Endpoint.class).getEndpointInfo();
+        EndpointInfo endpointInfo = ex.getEndpoint().getEndpointInfo();
         QName portQName = endpointInfo.getName();
         message.put(Message.WSDL_PORT, portQName);
 

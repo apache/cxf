@@ -54,8 +54,8 @@ public class PolicyInInterceptor extends AbstractPolicyInterceptor {
     
     protected void handle(Message msg) {
         Exchange exchange = msg.getExchange();
-        Bus bus = exchange.get(Bus.class);
-        Endpoint e = exchange.get(Endpoint.class);
+        Bus bus = exchange.getBus();
+        Endpoint e = exchange.getEndpoint();
         if (null == e) {
             LOG.fine("No endpoint.");
             return;
@@ -84,7 +84,7 @@ public class PolicyInInterceptor extends AbstractPolicyInterceptor {
             assertions.addAll(effectivePolicy.getChosenAlternative());
         } else if (MessageUtils.isRequestor(msg)) {
             // 2. Process client policy
-            BindingOperationInfo boi = exchange.get(BindingOperationInfo.class);
+            BindingOperationInfo boi = exchange.getBindingOperationInfo();
             if (boi == null) {
                 Conduit conduit = exchange.getConduit(msg);
                 EndpointPolicy ep = pe.getClientEndpointPolicy(ei, conduit, msg);

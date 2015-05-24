@@ -35,7 +35,6 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.FaultMode;
 import org.apache.cxf.message.MessageContentsList;
-import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingOperationInfo;
 
 /**
@@ -50,9 +49,9 @@ public abstract class AbstractInvoker implements Invoker {
         final Object serviceObject = getServiceObject(exchange);
         try {
 
-            BindingOperationInfo bop = exchange.get(BindingOperationInfo.class);
+            BindingOperationInfo bop = exchange.getBindingOperationInfo();
             MethodDispatcher md = (MethodDispatcher) 
-                exchange.get(Service.class).get(MethodDispatcher.class.getName());
+                exchange.getService().get(MethodDispatcher.class.getName());
             Method m = bop == null ? null : md.getMethod(bop);
             if (m == null && bop == null) {
                 LOG.severe(new Message("MISSING_BINDING_OPERATION", LOG).toString());

@@ -30,7 +30,6 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
-import org.apache.cxf.service.Service;
 import org.apache.cxf.service.invoker.FactoryInvoker;
 import org.apache.cxf.service.invoker.Invoker;
 import org.apache.cxf.service.invoker.MethodDispatcher;
@@ -82,7 +81,7 @@ public abstract class AbstractValidationInterceptor extends AbstractPhaseInterce
         if (current != null) {
             return current;
         }
-        Endpoint e = message.getExchange().get(Endpoint.class);
+        Endpoint e = message.getExchange().getEndpoint();
         if (e != null && e.getService() != null) {
             Invoker invoker = e.getService().getInvoker();
             if (invoker instanceof FactoryInvoker) {
@@ -99,10 +98,10 @@ public abstract class AbstractValidationInterceptor extends AbstractPhaseInterce
         Message inMessage = message.getExchange().getInMessage();
         Method method = (Method)inMessage.get("org.apache.cxf.resource.method");
         if (method == null) {
-            BindingOperationInfo bop = inMessage.getExchange().get(BindingOperationInfo.class);
+            BindingOperationInfo bop = inMessage.getExchange().getBindingOperationInfo();
             if (bop != null) {
                 MethodDispatcher md = (MethodDispatcher) 
-                    inMessage.getExchange().get(Service.class).get(MethodDispatcher.class.getName());
+                    inMessage.getExchange().getService().get(MethodDispatcher.class.getName());
                 method = md.getMethod(bop);
             }
         }

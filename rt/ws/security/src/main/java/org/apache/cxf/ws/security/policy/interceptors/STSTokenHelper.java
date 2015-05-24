@@ -26,7 +26,6 @@ import java.util.logging.Logger;
 
 import org.w3c.dom.Element;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
@@ -83,10 +82,10 @@ public final class STSTokenHelper {
                                               true)
                 && !isOneTimeUse(tok);
         if (cacheIssuedToken) {
-            message.getExchange().get(Endpoint.class).put(SecurityConstants.TOKEN, tok);
+            message.getExchange().getEndpoint().put(SecurityConstants.TOKEN, tok);
             message.getExchange().put(SecurityConstants.TOKEN, tok);
             message.getExchange().put(SecurityConstants.TOKEN_ID, tok.getId());
-            message.getExchange().get(Endpoint.class).put(SecurityConstants.TOKEN_ID,
+            message.getExchange().getEndpoint().put(SecurityConstants.TOKEN_ID,
                                                           tok.getId());
         } else {
             message.put(SecurityConstants.TOKEN, tok);
@@ -204,8 +203,8 @@ public final class STSTokenHelper {
         }
 
         // Remove token from cache
-        message.getExchange().get(Endpoint.class).remove(SecurityConstants.TOKEN);
-        message.getExchange().get(Endpoint.class).remove(SecurityConstants.TOKEN_ID);
+        message.getExchange().getEndpoint().remove(SecurityConstants.TOKEN);
+        message.getExchange().getEndpoint().remove(SecurityConstants.TOKEN_ID);
         message.getExchange().remove(SecurityConstants.TOKEN_ID);
         message.getExchange().remove(SecurityConstants.TOKEN);
         TokenStoreUtils.getTokenStore(message).remove(tok.getId());

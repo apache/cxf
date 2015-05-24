@@ -70,14 +70,13 @@ public class PolicyVerificationInInterceptor extends AbstractPolicyInterceptor {
             return;
         }
         
-        Endpoint e = exchange.get(Endpoint.class);
+        Endpoint e = exchange.getEndpoint();
         if (null == e) {
             LOG.fine("No endpoint.");
             return;
         } 
-        EndpointInfo ei = e.getEndpointInfo();
 
-        Bus bus = exchange.get(Bus.class);
+        Bus bus = exchange.getBus();
         PolicyEngine pe = bus.getExtension(PolicyEngine.class);
         if (null == pe) {
             return;
@@ -92,6 +91,7 @@ public class PolicyVerificationInInterceptor extends AbstractPolicyInterceptor {
         
         EffectivePolicy effectivePolicy = message.get(EffectivePolicy.class);
         if (effectivePolicy == null) {
+            EndpointInfo ei = e.getEndpointInfo();
             if (MessageUtils.isRequestor(message)) {
                 effectivePolicy = pe.getEffectiveClientResponsePolicy(ei, boi, message);
             } else {

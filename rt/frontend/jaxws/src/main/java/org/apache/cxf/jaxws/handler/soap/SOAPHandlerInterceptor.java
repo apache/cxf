@@ -134,7 +134,7 @@ public class SOAPHandlerInterceptor extends
                 }
             }
             if (isFault) {
-                Endpoint ep = message.getExchange().get(Endpoint.class);
+                Endpoint ep = message.getExchange().getEndpoint();
                 message.getInterceptorChain().abort();
                 if (ep.getInFaultObserver() != null) {
                     ep.getInFaultObserver().onMessage(message);
@@ -189,7 +189,7 @@ public class SOAPHandlerInterceptor extends
                 MessageObserver observer = message.getExchange().get(MessageObserver.class);
                 if (!message.getExchange().isOneWay()
                     && observer != null) {
-                    Endpoint e = message.getExchange().get(Endpoint.class);
+                    Endpoint e = message.getExchange().getEndpoint();
                     Message responseMsg = new MessageImpl();
                     responseMsg.setExchange(message.getExchange());
                     responseMsg = e.getBinding().createMessage(responseMsg);
@@ -219,7 +219,7 @@ public class SOAPHandlerInterceptor extends
             if (!getInvoker(message).isOutbound()) {
                 // server side inbound
                 message.getInterceptorChain().abort();
-                Endpoint e = message.getExchange().get(Endpoint.class);
+                Endpoint e = message.getExchange().getEndpoint();
                 if (!message.getExchange().isOneWay()) {
                     Message responseMsg = new MessageImpl();
                     responseMsg.setExchange(message.getExchange());
