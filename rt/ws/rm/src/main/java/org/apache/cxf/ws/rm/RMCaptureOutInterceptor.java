@@ -341,7 +341,6 @@ public class RMCaptureOutInterceptor extends AbstractRMInterceptor<Message>  {
         
         newex.put(BindingInfo.class, bi);
         newex.put(BindingOperationInfo.class, boi);
-        newex.put(OperationInfo.class, boi.getOperationInfo());
         
         msg.setExchange(newex);
         newex.setOutMessage(msg);

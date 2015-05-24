@@ -19,7 +19,6 @@
 
 package org.apache.cxf.management.interceptor;
 
-import org.apache.cxf.Bus;
 import org.apache.cxf.interceptor.InterceptorChain;
 import org.apache.cxf.management.counters.MessageHandlingTimeRecorder;
 import org.apache.cxf.message.FaultMode;
@@ -140,7 +139,7 @@ public class ResponseTimeMessageOutInterceptorTest extends AbstractMessageRespon
     public void testClientMessageOut() {
         EasyMock.expect(message.get(Message.PARTIAL_RESPONSE_MESSAGE)).andReturn(Boolean.FALSE).anyTimes();
         EasyMock.expect(message.getExchange()).andReturn(exchange);
-        EasyMock.expect(exchange.get(Bus.class)).andReturn(bus);
+        EasyMock.expect(exchange.getBus()).andReturn(bus);
         EasyMock.expect(exchange.get("org.apache.cxf.management.counter.enabled")).andReturn(null);
         EasyMock.replay(exchange);
         EasyMock.replay(message);

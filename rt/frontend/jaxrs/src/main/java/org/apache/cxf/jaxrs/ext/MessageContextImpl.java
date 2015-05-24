@@ -233,7 +233,7 @@ public class MessageContextImpl implements MessageContext {
         
         Message message = m.getExchange().getOutMessage();
         if (message == null) {
-            Endpoint ep = m.getExchange().get(Endpoint.class);
+            Endpoint ep = m.getExchange().getEndpoint();
             message = new org.apache.cxf.message.MessageImpl();
             message.setExchange(m.getExchange());
             message = ep.getBinding().createMessage(message);

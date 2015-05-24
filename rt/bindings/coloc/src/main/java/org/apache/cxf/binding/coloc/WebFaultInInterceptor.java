@@ -57,7 +57,7 @@ public class WebFaultInInterceptor extends AbstractPhaseInterceptor<Message> {
             return;
         }
 
-        BindingOperationInfo boi = message.getExchange().get(BindingOperationInfo.class);
+        BindingOperationInfo boi = message.getExchange().getBindingOperationInfo();
         MessagePartInfo part = getFaultMessagePart(faultName, boi.getOperationInfo());
 
         if (part != null) {

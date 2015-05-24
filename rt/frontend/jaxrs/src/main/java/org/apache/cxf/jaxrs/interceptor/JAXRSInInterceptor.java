@@ -264,7 +264,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
     }
     
     private Message createOutMessage(Message inMessage, Response r) {
-        Endpoint e = inMessage.getExchange().get(Endpoint.class);
+        Endpoint e = inMessage.getExchange().getEndpoint();
         Message mout = e.getBinding().createMessage();
         mout.setContent(List.class, new MessageContentsList(r));
         mout.setExchange(inMessage.getExchange());

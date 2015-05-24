@@ -92,7 +92,7 @@ public final class WSS4JUtils {
         if (!specified && MessageUtils.isRequestor(message)) {
             return null;
         }
-        Endpoint ep = message.getExchange().get(Endpoint.class);
+        Endpoint ep = message.getExchange().getEndpoint();
         if (ep != null && ep.getEndpointInfo() != null) {
             EndpointInfo info = ep.getEndpointInfo();
             synchronized (info) {
@@ -277,7 +277,7 @@ public final class WSS4JUtils {
             encrCrypto = CryptoFactory.getInstance(props, Loader.getClassLoader(CryptoFactory.class),
                                                    passwordEncryptor);
 
-            EndpointInfo info = message.getExchange().get(Endpoint.class).getEndpointInfo();
+            EndpointInfo info = message.getExchange().getEndpoint().getEndpointInfo();
             synchronized (info) {
                 info.setProperty(SecurityConstants.ENCRYPT_CRYPTO, encrCrypto);
             }
@@ -305,7 +305,7 @@ public final class WSS4JUtils {
             signCrypto = CryptoFactory.getInstance(props, Loader.getClassLoader(CryptoFactory.class),
                                                    passwordEncryptor);
 
-            EndpointInfo info = message.getExchange().get(Endpoint.class).getEndpointInfo();
+            EndpointInfo info = message.getExchange().getEndpoint().getEndpointInfo();
             synchronized (info) {
                 info.setProperty(SecurityConstants.SIGNATURE_CRYPTO, signCrypto);
             }

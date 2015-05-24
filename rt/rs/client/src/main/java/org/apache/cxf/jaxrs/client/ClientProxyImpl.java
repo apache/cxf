@@ -316,7 +316,7 @@ public class ClientProxyImpl extends AbstractClient implements
                 throw t;
             }
             
-            Endpoint ep = inMessage.getExchange().get(Endpoint.class);
+            Endpoint ep = inMessage.getExchange().getEndpoint();
             inMessage.getExchange().put(InterceptorProvider.class, getConfiguration());
             inMessage.setContent(Exception.class, new Fault(t));
             inMessage.getInterceptorChain().abort();

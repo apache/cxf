@@ -206,7 +206,7 @@ public class MAPAggregatorImpl extends MAPAggregator {
     */
     private boolean hasUsingAddressing(Message message) {
         boolean ret = false;
-        Endpoint endpoint = message.getExchange().get(Endpoint.class);
+        Endpoint endpoint = message.getExchange().getEndpoint();
         if (null != endpoint) {
             Boolean b = (Boolean)endpoint.get(USING_ADDRESSING);
             if (null == b) {
@@ -716,7 +716,7 @@ public class MAPAggregatorImpl extends MAPAggregator {
     }
 
     protected String getActionUri(Message message, boolean checkMessage) {
-        BindingOperationInfo bop = message.getExchange().get(BindingOperationInfo.class);
+        BindingOperationInfo bop = message.getExchange().getBindingOperationInfo();
         if (bop == null || Boolean.TRUE.equals(bop.getProperty("operation.is.synthetic"))) {
             return null;
         }
@@ -910,7 +910,7 @@ public class MAPAggregatorImpl extends MAPAggregator {
     private EndpointReferenceType getReplyTo(Message message, 
                                              EndpointReferenceType originalReplyTo) {
         Exchange exchange = message.getExchange();
-        Endpoint info = exchange.get(Endpoint.class);
+        Endpoint info = exchange.getEndpoint();
         if (info == null) {
             return originalReplyTo;
         }
@@ -942,7 +942,7 @@ public class MAPAggregatorImpl extends MAPAggregator {
     private Destination createDecoupledDestination(Message message) {
         String replyToAddress = (String)message.getContextualProperty(WSAContextUtils.REPLYTO_PROPERTY);
         if (replyToAddress != null) {
-            return setUpDecoupledDestination(message.getExchange().get(Bus.class),
+            return setUpDecoupledDestination(message.getExchange().getBus(),
                                              replyToAddress, 
                                              message);
         }
@@ -981,7 +981,7 @@ public class MAPAggregatorImpl extends MAPAggregator {
         DestinationFactory factory =
             factoryManager.getDestinationFactoryForUri(address);
         if (factory != null) {
-            Endpoint ep = message.getExchange().get(Endpoint.class);
+            Endpoint ep = message.getExchange().getEndpoint();
             
             EndpointInfo ei = new EndpointInfo();
             ei.setName(new QName(ep.getEndpointInfo().getName().getNamespaceURI(),

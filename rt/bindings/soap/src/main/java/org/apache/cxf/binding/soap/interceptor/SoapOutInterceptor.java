@@ -194,8 +194,7 @@ public class SoapOutInterceptor extends AbstractSoapInterceptor {
         //add MessagePart to soapHeader if necessary
         boolean endedHeader = false;
         Exchange exchange = message.getExchange();
-        BindingOperationInfo bop = (BindingOperationInfo)exchange.get(BindingOperationInfo.class
-                                                                            .getName());
+        BindingOperationInfo bop = exchange.getBindingOperationInfo();
         if (bop == null) {
             return endedHeader;
         }

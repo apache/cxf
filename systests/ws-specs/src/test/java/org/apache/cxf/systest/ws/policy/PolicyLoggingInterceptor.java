@@ -26,7 +26,6 @@ import java.util.logging.Logger;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
@@ -55,8 +54,8 @@ public class PolicyLoggingInterceptor extends AbstractPhaseInterceptor<Message> 
     }
     
     public void handleMessage(Message message) throws Fault {
-        EndpointInfo ei = message.getExchange().get(Endpoint.class).getEndpointInfo();
-        BindingOperationInfo boi = message.getExchange().get(BindingOperationInfo.class);
+        EndpointInfo ei = message.getExchange().getEndpoint().getEndpointInfo();
+        BindingOperationInfo boi = message.getExchange().getBindingOperationInfo();
         LOG.fine("Getting effective server request policy for endpoint " + ei
                  + " and binding operation " + boi);
         EffectivePolicy ep = 

@@ -76,7 +76,7 @@ public class WSDLGetInterceptor extends AbstractPhaseInterceptor<Message> {
         if (isRecognizedQuery(map)) {
             Document doc = getDocument(utils, message, baseUri, map, ctx);
             
-            Endpoint e = message.getExchange().get(Endpoint.class);
+            Endpoint e = message.getExchange().getEndpoint();
             Message mout = new MessageImpl();
             mout.setExchange(message.getExchange());
             mout = e.getBinding().createMessage(mout);

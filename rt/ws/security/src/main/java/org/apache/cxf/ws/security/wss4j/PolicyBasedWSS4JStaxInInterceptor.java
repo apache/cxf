@@ -329,7 +329,7 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
         final List<SecurityEventListener> securityEventListeners = new ArrayList<>(2);
         securityEventListeners.addAll(super.configureSecurityEventListeners(msg, securityProperties));
         
-        Endpoint endoint = msg.getExchange().get(Endpoint.class);
+        Endpoint endoint = msg.getExchange().getEndpoint();
         
         PolicyEnforcer policyEnforcer = createPolicyEnforcer(endoint.getEndpointInfo(), msg);
         securityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, securityProperties));

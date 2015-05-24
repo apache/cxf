@@ -32,7 +32,6 @@ import org.w3c.dom.Element;
 import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.SoapActionInInterceptor;
-import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Exchange;
@@ -359,7 +358,7 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             writer.writeStartElement(prefix, "RequestedSecurityToken", namespace);
             SecurityContextToken sct;
             if (tokenIdToRenew != null) {
-                ((TokenStore)exchange.get(Endpoint.class).getEndpointInfo()
+                ((TokenStore)exchange.getEndpoint().getEndpointInfo()
                     .getProperty(TokenStore.class.getName())).remove(tokenIdToRenew);
                 sct = new SecurityContextToken(
                         NegotiationUtils.getWSCVersion(tokenType), writer.getDocument(),
@@ -415,7 +414,7 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                 token.setProperties(properties);
             }
 
-            ((TokenStore)exchange.get(Endpoint.class).getEndpointInfo()
+            ((TokenStore)exchange.getEndpoint().getEndpointInfo()
                     .getProperty(TokenStore.class.getName())).add(token);
 
 

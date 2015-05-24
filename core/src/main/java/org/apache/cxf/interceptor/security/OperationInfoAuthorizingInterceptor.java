@@ -71,7 +71,7 @@ public class OperationInfoAuthorizingInterceptor extends SimpleAuthorizingInterc
     }
 
     protected OperationInfo getTargetOperationInfo(Message message) {
-        BindingOperationInfo bop = message.getExchange().get(BindingOperationInfo.class);
+        BindingOperationInfo bop = message.getExchange().getBindingOperationInfo();
         if (bop != null) {
             return bop.getOperationInfo();
         }

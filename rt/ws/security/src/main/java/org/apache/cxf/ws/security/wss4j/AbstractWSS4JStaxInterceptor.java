@@ -41,7 +41,6 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.SoapInterceptor;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
@@ -203,11 +202,11 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
         }
             
         if (callbackHandler != null) {
-            EndpointInfo info = soapMessage.getExchange().get(Endpoint.class).getEndpointInfo();
+            EndpointInfo info = soapMessage.getExchange().getEndpoint().getEndpointInfo();
             synchronized (info) {
                 info.setProperty(SecurityConstants.CALLBACK_HANDLER, callbackHandler);
             }
-            soapMessage.getExchange().get(Endpoint.class).put(SecurityConstants.CALLBACK_HANDLER, 
+            soapMessage.getExchange().getEndpoint().put(SecurityConstants.CALLBACK_HANDLER, 
                                                               callbackHandler);
             soapMessage.getExchange().put(SecurityConstants.CALLBACK_HANDLER, callbackHandler);
         }

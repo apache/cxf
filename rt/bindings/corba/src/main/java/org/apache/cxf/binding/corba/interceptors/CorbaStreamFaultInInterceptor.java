@@ -83,10 +83,10 @@ public class CorbaStreamFaultInInterceptor extends AbstractPhaseInterceptor<Mess
             if (exStreamable != null) {
                 DataReader<XMLStreamReader> reader = getDataReader(message);
 
-                BindingOperationInfo bopInfo = message.getExchange().get(BindingOperationInfo.class);
+                BindingOperationInfo bopInfo = message.getExchange().getBindingOperationInfo();
                 OperationInfo opInfo = bopInfo.getOperationInfo();
                 
-                ServiceInfo service = message.getExchange().get(ServiceInfo.class);
+                ServiceInfo service = message.getExchange().getEndpoint().getEndpointInfo().getService();
                 
                 org.omg.CORBA.ORB orb = (org.omg.CORBA.ORB) message.get(CorbaConstants.ORB);
                 if (orb == null) {

@@ -65,9 +65,7 @@ import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingMessageInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
-import org.apache.cxf.service.model.InterfaceInfo;
 import org.apache.cxf.service.model.MessageInfo;
-import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.MessageObserver;
@@ -685,11 +683,9 @@ public class ClientImpl
             }
             if (!Boolean.TRUE.equals(exchange.get(FINISHED))) {
                 LogUtils.log(LOG, Level.WARNING, "RESPONSE_TIMEOUT",
-                    exchange.get(OperationInfo.class).getName().toString());
-                String msg = new org.apache.cxf.common.i18n.Message("RESPONSE_TIMEOUT", LOG, 
-                                                                    exchange.get(OperationInfo.class)
-                                                                        .getName().toString())
-                    .toString();
+                    exchange.getBindingOperationInfo().getOperationInfo().getName().toString());
+                String msg = new org.apache.cxf.common.i18n.Message("RESPONSE_TIMEOUT", LOG, exchange
+                    .getBindingOperationInfo().getOperationInfo().getName().toString()).toString();
                 throw new IOException(msg);
             }
         }
@@ -869,16 +865,10 @@ public class ClientImpl
         if (endpoint != null) {
             exchange.put(Endpoint.class, endpoint);
             exchange.put(Service.class, endpoint.getService());
-            if (endpoint.getEndpointInfo().getService() != null) {
-                exchange.put(ServiceInfo.class, endpoint.getEndpointInfo().getService());
-                exchange.put(InterfaceInfo.class, endpoint.getEndpointInfo().getService().getInterface());
-            }
             exchange.put(Binding.class, endpoint.getBinding());
-            exchange.put(BindingInfo.class, endpoint.getEndpointInfo().getBinding());
         }
         if (boi != null) {
             exchange.put(BindingOperationInfo.class, boi);
-            exchange.put(OperationInfo.class, boi.getOperationInfo());
         }
 
         if (exchange.isSynchronous() || executor == null) {

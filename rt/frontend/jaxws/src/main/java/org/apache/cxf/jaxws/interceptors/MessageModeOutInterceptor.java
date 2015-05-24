@@ -91,7 +91,7 @@ public class MessageModeOutInterceptor extends AbstractPhaseInterceptor<Message>
         this.bindingName = bname;
     }
     public void handleMessage(Message message) throws Fault {
-        BindingOperationInfo bop = message.getExchange().get(BindingOperationInfo.class);
+        BindingOperationInfo bop = message.getExchange().getBindingOperationInfo();
         if (bop != null && !bindingName.equals(bop.getBinding().getName())) {
             return;
         }
@@ -316,7 +316,7 @@ public class MessageModeOutInterceptor extends AbstractPhaseInterceptor<Message>
                 }
             }
 
-            BindingOperationInfo bop = message.getExchange().get(BindingOperationInfo.class);
+            BindingOperationInfo bop = message.getExchange().getBindingOperationInfo();
             DocumentFragment frag = soapMessage.getSOAPPart().createDocumentFragment();
             try {
                 Node body = SAAJUtils.getBody(soapMessage);

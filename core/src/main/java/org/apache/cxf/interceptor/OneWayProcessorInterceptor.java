@@ -25,7 +25,6 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.logging.Logger;
 
-import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.io.DelegatingInputStream;
@@ -129,7 +128,7 @@ public class OneWayProcessorInterceptor extends AbstractPhaseInterceptor<Message
                 try {
                     final Object lock = new Object();
                     synchronized (lock) {
-                        message.getExchange().get(Bus.class).getExtension(WorkQueueManager.class)
+                        message.getExchange().getBus().getExtension(WorkQueueManager.class)
                             .getAutomaticWorkQueue().execute(new Runnable() {
                                 public void run() {
                                     synchronized (lock) {
@@ -163,7 +162,7 @@ public class OneWayProcessorInterceptor extends AbstractPhaseInterceptor<Message
     }
     
     private static Message createMessage(Exchange exchange) {
-        Endpoint ep = exchange.get(Endpoint.class);
+        Endpoint ep = exchange.getEndpoint();
         Message msg = null;
         if (ep != null) {
             msg = new MessageImpl();

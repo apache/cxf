@@ -41,7 +41,6 @@ import org.apache.cxf.service.model.BindingMessageInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.MessageInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
-import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceModelUtil;
 import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
 
@@ -110,7 +109,6 @@ public class WrapperClassOutInterceptor extends AbstractPhaseInterceptor<Message
             
             // we've now wrapped the object, so use the wrapped binding op
             ex.put(BindingOperationInfo.class, newbop);
-            ex.put(OperationInfo.class, newbop.getOperationInfo());
             
             if (messageInfo == bop.getOperationInfo().getInput()) {
                 message.put(MessageInfo.class, newbop.getOperationInfo().getInput());

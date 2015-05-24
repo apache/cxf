@@ -62,8 +62,8 @@ public class CorbaStreamOutEndingInterceptor extends AbstractPhaseInterceptor<Me
         CorbaMessage message = (CorbaMessage) msg;
         orb = (org.omg.CORBA.ORB) message.get(CorbaConstants.ORB);
         Exchange exchange = message.getExchange();
-        BindingOperationInfo boi = exchange.get(BindingOperationInfo.class);
-        service = exchange.get(ServiceInfo.class);
+        BindingOperationInfo boi = exchange.getBindingOperationInfo();
+        service = exchange.getEndpoint().getEndpointInfo().getService();
         typeMap = message.getCorbaTypeMap();
 
         if (ContextUtils.isRequestor(message)) {

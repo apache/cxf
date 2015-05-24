@@ -568,7 +568,7 @@ public final class JAXRSUtils {
     }
     
     public static List<ClassResourceInfo> getRootResources(Message message) {
-        Service service = message.getExchange().get(Service.class);
+        Service service = message.getExchange().getService();
         return ((JAXRSServiceImpl)service).getClassResourceInfos();
     }
     

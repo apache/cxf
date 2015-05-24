@@ -351,12 +351,12 @@ public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
         cryptoType.setAlias(alias);
         issuedToken.setX509Certificate(crypto.getX509Certificates(cryptoType)[0], crypto);
         
-        msg.getExchange().get(Endpoint.class).put(SecurityConstants.TOKEN_ID, 
+        msg.getExchange().getEndpoint().put(SecurityConstants.TOKEN_ID, 
                 issuedToken.getId());
         msg.getExchange().put(SecurityConstants.TOKEN_ID, issuedToken.getId());
         
         TokenStore tokenStore = new MemoryTokenStore();
-        msg.getExchange().get(Endpoint.class).getEndpointInfo()
+        msg.getExchange().getEndpoint().getEndpointInfo()
             .setProperty(TokenStore.class.getName(), tokenStore);
         tokenStore.add(issuedToken);
         

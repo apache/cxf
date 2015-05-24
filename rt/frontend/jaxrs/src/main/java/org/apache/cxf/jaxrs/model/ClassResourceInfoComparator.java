@@ -21,7 +21,6 @@ package org.apache.cxf.jaxrs.model;
 
 import java.util.Comparator;
 
-import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.jaxrs.ext.ResourceComparator;
 import org.apache.cxf.message.Message;
 
@@ -33,7 +32,7 @@ public class ClassResourceInfoComparator implements Comparator<ClassResourceInfo
     public ClassResourceInfoComparator(Message m) {
         this.message = m;
         if (message != null) {
-            Object o = m.getExchange().get(Endpoint.class).get("org.apache.cxf.jaxrs.comparator");
+            Object o = m.getExchange().getEndpoint().get("org.apache.cxf.jaxrs.comparator");
             if (o != null) {
                 rc = (ResourceComparator)o;
             }

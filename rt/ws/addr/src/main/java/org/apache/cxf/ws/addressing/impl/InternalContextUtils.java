@@ -92,7 +92,7 @@ final class InternalContextUtils {
             if (ContextUtils.isNoneAddress(reference)) {
                 return null;
             }
-            Bus bus = inMessage.getExchange().get(Bus.class);
+            Bus bus = inMessage.getExchange().getBus();
             //this is a response targeting a decoupled endpoint.   Treat it as a oneway so
             //we don't wait for a response.
             inMessage.getExchange().setOneWay(true);
@@ -219,7 +219,7 @@ final class InternalContextUtils {
                     exchange.setDestination(target);
                     exchange.setOneWay(false);
                     exchange.put(ConduitSelector.class,
-                                 new PreexistingConduitSelector(backChannel, exchange.get(Endpoint.class)));
+                                 new PreexistingConduitSelector(backChannel, exchange.getEndpoint()));
                     if (newChian != null && !newChian.doIntercept(partialResponse)
                         && partialResponse.getContent(Exception.class) != null) {
                         if (partialResponse.getContent(Exception.class) instanceof Fault) {
@@ -238,7 +238,7 @@ final class InternalContextUtils {
                         MessageUtils.isTrue(inMessage.getContextualProperty(Message.ROBUST_ONEWAY));
                     
                     if (robust) {
-                        BindingOperationInfo boi = exchange.get(BindingOperationInfo.class);
+                        BindingOperationInfo boi = exchange.getBindingOperationInfo();
                         // insert the executor in the exchange to fool the OneWayProcessorInterceptor
                         exchange.put(Executor.class, getExecutor(inMessage));
                         // pause dispatch on current thread and resume...
@@ -265,7 +265,7 @@ final class InternalContextUtils {
                     partialResponse.setInterceptorChain(chain);
                     exchange.put(ConduitSelector.class,
                                  new PreexistingConduitSelector(backChannel,
-                                                                exchange.get(Endpoint.class)));
+                                                                exchange.getEndpoint()));
 
                     if (chain != null && !chain.doIntercept(partialResponse) 
                         && partialResponse.getContent(Exception.class) != null) {
@@ -341,7 +341,7 @@ final class InternalContextUtils {
 
     public static Destination createDecoupledDestination(
         Exchange exchange, final EndpointReferenceType reference) {
-        final EndpointInfo ei = exchange.get(Endpoint.class).getEndpointInfo();
+        final EndpointInfo ei = exchange.getEndpoint().getEndpointInfo();
         return new DecoupledDestination(ei, reference);
     }
     
@@ -394,7 +394,9 @@ final class InternalContextUtils {
                 action = getActionFromServiceModel(message, fault);
             }
         }
-        LOG.fine("action: " + action);
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("action: " + action);
+        }
         return action != null ? ContextUtils.getAttributedURI(action) : null;
     }
 
@@ -408,7 +410,7 @@ final class InternalContextUtils {
                                                     Exception fault) {
         String action = null;
         BindingOperationInfo bindingOpInfo =
-            message.getExchange().get(BindingOperationInfo.class);
+            message.getExchange().getBindingOperationInfo();
         if (bindingOpInfo != null) {
             if (bindingOpInfo.isUnwrappedCapable()) {
                 bindingOpInfo = bindingOpInfo.getUnwrappedOperation();
@@ -468,7 +470,9 @@ final class InternalContextUtils {
                 }
             }
         }
-        LOG.fine("action determined from service model: " + action);
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("action determined from service model: " + action);
+        }
         return action;
     }
 
@@ -526,12 +530,12 @@ final class InternalContextUtils {
      * @return
      */
     private static Executor getExecutor(final Message message) {
-        Endpoint endpoint = message.getExchange().get(Endpoint.class);
+        Endpoint endpoint = message.getExchange().getEndpoint();
         Executor executor = endpoint.getService().getExecutor();
         
         if (executor == null || SynchronousExecutor.isA(executor)) {
             // need true asynchrony
-            Bus bus = message.getExchange().get(Bus.class);
+            Bus bus = message.getExchange().getBus();
             if (bus != null) {
                 WorkQueueManager workQueueManager =
                     bus.getExtension(WorkQueueManager.class);

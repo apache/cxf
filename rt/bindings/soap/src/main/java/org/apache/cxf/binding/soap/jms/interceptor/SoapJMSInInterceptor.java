@@ -216,7 +216,7 @@ public class SoapJMSInInterceptor extends AbstractSoapInterceptor {
 
     private Fault createFault(SoapMessage message, JMSFault jmsFault) {
         Fault f = null;
-        Endpoint e = message.getExchange().get(Endpoint.class);
+        Endpoint e = message.getExchange().getEndpoint();
         Binding b = null;
         if (null != e) {
             b = e.getBinding();

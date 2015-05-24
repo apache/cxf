@@ -28,7 +28,6 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.FaultMode;
 import org.apache.cxf.message.Message;
@@ -81,7 +80,7 @@ public abstract class AbstractFaultChainInitiatorObserver implements MessageObse
                 if (null == faultMessage) {
                     faultMessage = new MessageImpl();
                     faultMessage.setExchange(exchange);
-                    faultMessage = exchange.get(Endpoint.class).getBinding().createMessage(faultMessage);
+                    faultMessage = exchange.getEndpoint().getBinding().createMessage(faultMessage);
                 }
                 faultMessage.setContent(Exception.class, ex);
                 if (null != mode) {

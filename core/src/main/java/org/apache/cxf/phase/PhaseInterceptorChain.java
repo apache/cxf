@@ -44,6 +44,7 @@ import org.apache.cxf.message.FaultMode;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.Service;
+import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.transport.MessageObserver;
 
@@ -370,11 +371,12 @@ public class PhaseInterceptorChain implements InterceptorChain {
         StringBuilder description = new StringBuilder();
         if (message.getExchange() != null) {
             Exchange exchange = message.getExchange();
-            Service service = exchange.get(Service.class);
+            Service service = exchange.getService();
             if (service != null) {
                 description.append('\'');
                 description.append(service.getName());
-                OperationInfo opInfo = exchange.get(OperationInfo.class);
+                BindingOperationInfo boi = exchange.getBindingOperationInfo();
+                OperationInfo opInfo = boi != null ? boi.getOperationInfo() : null;
                 if (opInfo != null) {
                     description.append("#").append(opInfo.getName());
                 }

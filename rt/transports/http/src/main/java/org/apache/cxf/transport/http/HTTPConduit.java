@@ -1177,7 +1177,7 @@ public abstract class HTTPConduit
                         };
                     }
                     if (ex == null || forceWQ) {
-                        WorkQueueManager mgr = outMessage.getExchange().get(Bus.class)
+                        WorkQueueManager mgr = outMessage.getExchange().getBus()
                             .getExtension(WorkQueueManager.class);
                         AutomaticWorkQueue qu = mgr.getNamedWorkQueue("http-conduit");
                         if (qu == null) {

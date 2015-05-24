@@ -29,7 +29,6 @@ import org.w3c.dom.Element;
 import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.SoapActionInInterceptor;
-import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Exchange;
@@ -253,7 +252,7 @@ class SpnegoContextTokenInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             spnegoToken.clear();
             
             token.setSecret(secret);
-            ((TokenStore)exchange.get(Endpoint.class).getEndpointInfo()
+            ((TokenStore)exchange.getEndpoint().getEndpointInfo()
                     .getProperty(TokenStore.class.getName())).add(token);
         }
 

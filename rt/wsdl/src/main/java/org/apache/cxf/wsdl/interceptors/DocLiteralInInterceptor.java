@@ -132,7 +132,7 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
                 BindingMessageInfo msgInfo = null;
 
     
-                Endpoint ep = exchange.get(Endpoint.class);
+                Endpoint ep = exchange.getEndpoint();
                 ServiceInfo si = ep.getEndpointInfo().getService();
                 if (bop != null) { //for xml binding or client side
                     if (client) {
@@ -226,7 +226,6 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
                     && Constants.XSD_ANYTYPE.equals(bmsg.getFirstMessagePart().getTypeQName()))) {
                 BindingOperationInfo boi = ep.getEndpointInfo().getBinding().getOperation(op);
                 exchange.put(BindingOperationInfo.class, boi);
-                exchange.put(OperationInfo.class, op);
                 exchange.setOneWay(op.isOneWay());
             }
         }
@@ -347,7 +346,6 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
             
         if (bop != null) {
             exchange.put(BindingOperationInfo.class, bop);
-            exchange.put(OperationInfo.class, bop.getOperationInfo());
         }
         return bop;
     }

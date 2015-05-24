@@ -26,7 +26,6 @@ import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.service.model.BindingOperationInfo;
-import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceModelUtil;
 
 public abstract class AbstractJAXWSHandlerInterceptor<T extends Message> extends AbstractPhaseInterceptor<T> {
@@ -106,7 +105,7 @@ public abstract class AbstractJAXWSHandlerInterceptor<T extends Message> extends
     }
     
     protected void setupBindingOperationInfo(Exchange exch, Object data) {
-        if (exch.get(BindingOperationInfo.class) == null) {
+        if (exch.getBindingOperationInfo() == null) {
             //need to know the operation to determine if oneway
             QName opName = getOpQName(exch, data);
             if (opName == null) {
@@ -119,7 +118,6 @@ public abstract class AbstractJAXWSHandlerInterceptor<T extends Message> extends
             }
             if (bop != null) {
                 exch.put(BindingOperationInfo.class, bop);
-                exch.put(OperationInfo.class, bop.getOperationInfo());
                 if (bop.getOutput() == null) {
                     exch.setOneWay(true);
                 }

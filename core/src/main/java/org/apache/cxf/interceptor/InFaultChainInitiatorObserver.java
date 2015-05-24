@@ -38,7 +38,7 @@ public class InFaultChainInitiatorObserver extends AbstractFaultChainInitiatorOb
     }
 
     protected void initializeInterceptors(Exchange ex, PhaseInterceptorChain chain) {
-        Endpoint e = ex.get(Endpoint.class);
+        Endpoint e = ex.getEndpoint();
         Client c = ex.get(Client.class);
         InterceptorProvider ip = ex.get(InterceptorProvider.class);
         
