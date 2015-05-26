@@ -46,8 +46,7 @@ public class XkmsCryptoProviderFactory implements CryptoProviderFactory {
 
     @Override
     public Crypto create(Message message) {
-        Object crypto = 
-            SecurityUtils.getSecurityPropertyValue(SecurityConstants.SIGNATURE_CRYPTO, message);
+        Object crypto = message.getContextualProperty(SecurityConstants.SIGNATURE_CRYPTO);
         if (crypto instanceof Crypto) {
             new XkmsCryptoProvider(xkmsConsumer, (Crypto)crypto);
         }
