@@ -64,11 +64,11 @@ public final class EncryptionUtils {
             }
         } catch (InvalidKeyException e) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILED_ENCRYPTION, null, null, e
+                WSSecurityException.ErrorCode.FAILED_ENCRYPTION, e
             );
         } catch (InvalidAlgorithmParameterException e) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILED_ENCRYPTION, null, null, e
+                WSSecurityException.ErrorCode.FAILED_ENCRYPTION, e
             );
         }
         return cipher;
@@ -94,11 +94,11 @@ public final class EncryptionUtils {
             }
         } catch (InvalidKeyException e) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILED_ENCRYPTION, null, null, e
+                WSSecurityException.ErrorCode.FAILED_ENCRYPTION, e
             );
         } catch (InvalidAlgorithmParameterException e) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILED_ENCRYPTION, null, null, e
+                WSSecurityException.ErrorCode.FAILED_ENCRYPTION, e
             );
         }
         return cipher;
