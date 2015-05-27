@@ -18,14 +18,12 @@
  */
 package org.apache.cxf.ext.logging.event;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.StringReader;
 import java.io.StringWriter;
 
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
-import javax.xml.transform.stream.StreamSource;
 
 import org.apache.cxf.staxutils.PrettyPrintXMLStreamWriter;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -45,7 +43,7 @@ public class PrettyLoggingFilter implements LogEventSender {
     @Override
     public void send(LogEvent event) {
         if (shouldPrettyPrint(event)) {
-            event.setPayload(getPrettyMessage(event.getPayload(), event.getEncoding()));
+            event.setPayload(getPrettyMessage(event));
         }
         next.send(event);
     }
@@ -59,31 +57,67 @@ public class PrettyLoggingFilter implements LogEventSender {
             && event.getPayload().length() > 0;
     }
 
-    public String getPrettyMessage(String message, String encoding) {
-        StringWriter swriter = new StringWriter();
+    /**
+     * Pretty-print {@linkplain LogEvent} XML payload.
+     * 
+     * @param event the log event containing an XML payload which is to be pretty-printed.
+     * @return pretty-printed XML or original payload in case of an unexpected exception.
+     */
+    
+    private String getPrettyMessage(LogEvent event) {
+        /*
+        * Do not call close() on the {@linkplain XMLStreamWriter} before getting the underlying content,
+        * as some writers will close start tags and end scopes, see {@linkplain com.ctc.wstx.sw.BaseStreamWriter#close}
+        * and note test cases.
+        */
+        
+        String payload = event.getPayload(); // potentially truncated XML string
+        
+        // roughly estimate pretty-printed message to twice the raw XML size
+        StringWriter swriter = new StringWriter(payload.length() * 2);
+        
+        XMLStreamWriter xwriter = new PrettyPrintXMLStreamWriter(StaxUtils.createXMLStreamWriter(swriter), 2);
+        XMLStreamReader xreader = StaxUtils.createXMLStreamReader(new StringReader(payload));
         try {
-            // Using XMLStreamWriter instead of Transformer as it works with non well formed xml
-            // that can occur when we set a limit and cur the rest off
-            XMLStreamWriter xwriter = StaxUtils.createXMLStreamWriter(swriter);
-            xwriter = new PrettyPrintXMLStreamWriter(xwriter, 2);
-            InputStream in = new ByteArrayInputStream(message.getBytes(encoding));
+            StaxUtils.copy(xreader, xwriter);
+            
+            xwriter.flush();
+            
+            return swriter.toString();
+        } catch (XMLStreamException xse) {
+            if (!event.isTruncated()) {
+                // log with debug level, assume additional warn or error logging elsewhere
+                
+                LOG.debug("Error while pretty printing cxf message, returning raw message.", xse);
+            
+                return payload;
+            } 
+            
+            // Expected behavior for truncated payloads - keep what is already written.
+            // This might effectively result in additional truncation, 
+            // as the truncated XML document might result in partially parsed XML nodes, 
+            // for example an open start tag. As long as a truncated payload is not 
+            // mistaken for a non-truncated payload, we're good.
+
             try {
-                StaxUtils.copy(new StreamSource(in), xwriter);
-            } catch (XMLStreamException xse) {
+                xwriter.flush();
+            } catch (XMLStreamException xse2) {
                 //ignore
-            } finally {
-                try {
-                    xwriter.flush();
-                    xwriter.close();
-                } catch (XMLStreamException xse2) {
-                    //ignore
-                }
-                in.close();
             }
-        } catch (IOException e) {
-            LOG.debug("Error while pretty printing cxf message, returning what we got till now.", e);
-        }
-        return swriter.toString();
+            return swriter.toString();
+        } finally {
+            // free up resources
+            try {
+                xwriter.close();
+            } catch (XMLStreamException xse2) {
+                //ignore
+            }
+            try {
+                xreader.close();
+            } catch (XMLStreamException xse2) {
+                //ignore
+            }
+        } 
     }
 
     public void setNext(LogEventSender next) {
