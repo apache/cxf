@@ -20,10 +20,12 @@ package org.apache.cxf.interceptor;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
-import java.io.StringReader;
+import java.io.Reader;
 import java.io.StringWriter;
+import java.io.Writer;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,8 +34,8 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
-import javax.xml.transform.stream.StreamSource;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
@@ -51,6 +53,77 @@ import org.apache.cxf.staxutils.StaxUtils;
  * Logger.
  */
 public abstract class AbstractLoggingInterceptor extends AbstractPhaseInterceptor<Message> {
+    
+    /**
+    *   
+    * {@linkplain StringBuilder} writer for use with {@linkplain XMLStreamWriter}.
+    * 
+    */
+    
+    static class ClosableStringBuilderWriter extends Writer {
+        private boolean ignoreWrites;
+        private final StringBuilder buffer;
+
+        public ClosableStringBuilderWriter(StringBuilder buffer) {
+            this.buffer = buffer;
+        }
+
+        public void write(char[] chars, int off, int len) throws IOException {
+            if (!ignoreWrites) {
+                this.buffer.append(chars, off, len);
+            }
+        }
+
+        public void flush() {
+
+        }
+        
+        public void ignoreWrites() {
+            ignoreWrites = true;
+        }
+
+        public void close()  {
+            // XMLStreamWrite.close() specifies that underlying resource not be closed, 
+            // so this should never be called
+        }
+    }
+    
+    /**
+     * {@linkplain StringBuffer} reader for use with {@linkplain XMLStreamReader}.
+     *
+     */
+    
+    static class StringBufferReader extends Reader {
+
+        private final StringBuffer buffer;
+        private final int contentLength;
+        private int count;
+        
+        public StringBufferReader(StringBuffer buffer) {
+            this.buffer = buffer;
+            this.contentLength = buffer.length();
+        }
+        
+        @Override
+        public int read(char[] cbuf, int offset, int length) throws IOException {
+            if (count >= contentLength) {
+                return -1;
+            }
+            
+            int n = Math.min(contentLength - count, length);
+            buffer.getChars(count, count + n, cbuf, offset);
+            count += n;
+            return n;
+        }
+
+        @Override
+        public void close() throws IOException {
+            // XMLStreamReader.close() specifies that underlying resource not be closed, 
+            // so this should never be called
+        }
+    }
+    
+    
     public static final int DEFAULT_LIMIT = 48 * 1024;
     protected static final String BINARY_CONTENT_MESSAGE = "--- Binary Content ---";
     protected static final String MULTIPART_CONTENT_MESSAGE = "--- Multipart Content ---";
@@ -152,39 +225,92 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
     public long getInMemThreshold() {
         return threshold;
     }
+    
+    /**
+     * Write payload as characters. 
+     * 
+     * @param builder output 
+     * @param cos cached content as bytes
+     * @param encoding character encoding
+     * @param contentType content type 
+     * @throws Exception the default implementation will only throw {@linkplain IOException}}
+     */
 
     protected void writePayload(StringBuilder builder, CachedOutputStream cos,
-                                String encoding, String contentType) 
-        throws Exception {
-        // Just transform the XML message when the cos has content
+                                String encoding, String contentType) throws Exception  {
+        // Pretty-print the XML message when the CachedOutputStream has content
         if (isPrettyLogging() && (contentType != null && contentType.indexOf("xml") >= 0 
             && contentType.toLowerCase().indexOf("multipart/related") < 0) && cos.size() > 0) {
 
-            StringWriter swriter = new StringWriter();
-            XMLStreamWriter xwriter = StaxUtils.createXMLStreamWriter(swriter);
-            xwriter = new PrettyPrintXMLStreamWriter(xwriter, 2);
+            // This implementation does not enforce the limit directly in the pretty-printing operation,
+            // so somewhat more work than necessary might be carried out. However in return the distinction 
+            // between valid and invalid XML can always be made.
+
+            // Save input size so we can clear or limit the output
+            int inputBuilderLength = builder.length();
+
+            // Roughly estimate pretty-printed message to twice the size of raw XML size
+            builder.ensureCapacity(inputBuilderLength + (int)(cos.size() * 2));
+            
+            // Write directly to the output builder
+            ClosableStringBuilderWriter swriter = new ClosableStringBuilderWriter(builder);
+
+            XMLStreamWriter xwriter = new PrettyPrintXMLStreamWriter(StaxUtils.createXMLStreamWriter(swriter), 2);
+            
             InputStream in = cos.getInputStream();
+            
+            // Passing the InputStream to the readers is optimal performance-wise as some readers
+            // work on the byte stream directly and so will be slowed down if a InputStreamReader
+            // was used as a wrapper.
+
+            XMLStreamReader xreader;
+            if (StringUtils.isEmpty(encoding)) {
+                xreader = StaxUtils.createXMLStreamReader(in);
+            } else {
+                xreader = StaxUtils.createXMLStreamReader(in, encoding);
+            }
+                        
             try {
-                StaxUtils.copy(new StreamSource(in), xwriter);
+                StaxUtils.copy(xreader, xwriter);
+                
+                xwriter.flush();
+                
+                // Check number of characters added compared to input size
+                if (limit != -1 && builder.length() - inputBuilderLength > limit) {
+                    // truncate content
+                    builder.setLength(inputBuilderLength + limit);
+                }
             } catch (XMLStreamException xse) {
-                //ignore
+                // Reset builder to original size, discarding whatever was written
+                builder.setLength(inputBuilderLength);
+                
+                // Fall back to capture as raw XML
+                if (StringUtils.isEmpty(encoding)) {
+                    cos.writeCacheTo(builder, limit);
+                } else {
+                    cos.writeCacheTo(builder, encoding, limit);
+                }
             } finally {
+                // Ensure nothing more is written to the builder
+                swriter.ignoreWrites();
+                
+                // Free up resources
                 try {
-                    xwriter.flush();
                     xwriter.close();
                 } catch (XMLStreamException xse2) {
                     //ignore
                 }
-                in.close();
+                try {
+                    xreader.close();
+                } catch (XMLStreamException xse2) {
+                    //ignore
+                }
+                try {
+                    in.close();
+                } catch (IOException e) {
+                    //ignore
+                }
             }
-            
-            String result = swriter.toString();
-            if (result.length() < limit || limit == -1) {
-                builder.append(swriter.toString());
-            } else {
-                builder.append(swriter.toString().substring(0, limit));
-            }
-
         } else {
             if (StringUtils.isEmpty(encoding)) {
                 cos.writeCacheTo(builder, limit);
@@ -203,25 +329,68 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
             && contentType.indexOf("xml") >= 0 
             && stringWriter.getBuffer().length() > 0) {
 
-            StringWriter swriter = new StringWriter();
-            XMLStreamWriter xwriter = StaxUtils.createXMLStreamWriter(swriter);
-            xwriter = new PrettyPrintXMLStreamWriter(xwriter, 2);
-            StaxUtils.copy(new StreamSource(new StringReader(stringWriter.getBuffer().toString())), xwriter);
-            xwriter.close();
+            // save input size so we can clear or limit the output
+            int inputBuilderLength = builder.length();
+
+            // Write directly to the output builder
+            ClosableStringBuilderWriter swriter = new ClosableStringBuilderWriter(builder);
             
-            String result = swriter.toString();
-            if (result.length() < limit || limit == -1) {
-                builder.append(swriter.toString());
-            } else {
-                builder.append(swriter.toString().substring(0, limit));
+            XMLStreamWriter xwriter = new PrettyPrintXMLStreamWriter(StaxUtils.createXMLStreamWriter(swriter), 2);
+            
+            // read directly from the StringWriter buffer
+            XMLStreamReader xreader = StaxUtils.createXMLStreamReader(new StringBufferReader(stringWriter.getBuffer()));
+            
+            try {
+                StaxUtils.copy(xreader, xwriter);
+                
+                xwriter.flush();
+                
+                // Check number of characters added compared to input size
+                if (limit != -1 && builder.length() - inputBuilderLength > limit) {
+                    // truncate content
+                    builder.setLength(inputBuilderLength + limit);
+                }
+            } catch (XMLStreamException xse) {
+                // Reset builder to original size, discarding whatever was written
+                builder.setLength(inputBuilderLength);
+                
+                // Fall back to capture as raw XML
+                StringBuffer buffer = stringWriter.getBuffer();
+                if (limit == -1 || buffer.length() < limit) {
+                    builder.append(buffer);
+                } else {
+                    // subsequence so that the underlying implementation uses System.arrayCopy(..)
+                    // rather than a for loop - appending with offset + length is not really supported
+                    // for StringBuffer on the StringBuilder
+                    builder.append(buffer.subSequence(0, limit));
+                }
+            } finally {
+                // Ensure nothing more is written to the builder
+                swriter.ignoreWrites();
+                
+                // Free up resources
+                try {
+                    xwriter.close();
+                } catch (XMLStreamException xse2) {
+                    //ignore
+                }
+                try {
+                    xreader.close();
+                } catch (XMLStreamException xse2) {
+                    //ignore
+                }
+
             }
 
         } else {
             StringBuffer buffer = stringWriter.getBuffer();
-            if (buffer.length() > limit) {
-                builder.append(buffer.subSequence(0, limit));
-            } else {
+            if (limit == -1 || buffer.length() < limit) {
                 builder.append(buffer);
+            } else {
+                // subsequence so that the underlying implementation uses System.arrayCopy(..)
+                // rather than a for loop - appending with offset + length is not really supported
+                // for StringBuffer on the StringBuilder
+                builder.append(buffer.subSequence(0, limit));
             }
         }
     }
