@@ -20,6 +20,7 @@
 package org.apache.cxf.interceptor;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.logging.Logger;
@@ -40,6 +41,10 @@ import org.junit.Test;
 
 public class LoggingOutInterceptorTest extends Assert {
 
+    private static final String XML_UNFORMATTED = "<Envelope><Body>Text</Body></Envelope>";
+    private static final String XML_UNFORMATTED_INVALID = "<Envelope><Body>Text</Body>";
+    private static final String XML_FORMATTED = "<Envelope>\n  <Body>Text</Body>\n</Envelope>";
+    
     protected IMocksControl control;
 
     @Before
@@ -51,32 +56,44 @@ public class LoggingOutInterceptorTest extends Assert {
     public void tearDown() throws Exception {
         control.verify();
     }
+    
+    @Test
+    public void testValidXML() throws Exception {
+        validateLogging(XML_UNFORMATTED, false, XML_UNFORMATTED);
+    }
 
     @Test
-    public void testFormatting() throws Exception {
+    public void testPrettyPrintValidXML() throws Exception {
+        validateLogging(XML_UNFORMATTED, true, XML_FORMATTED);
+    }
+
+    @Test
+    public void testPrettyPrintInvalidXML() throws Exception {
+        validateLogging(XML_UNFORMATTED_INVALID, true, XML_UNFORMATTED_INVALID);
+    }
+
+    private void validateLogging(String payload, boolean prettyPrint, String loggedPayload) throws IOException {
         control.replay();
+        
+        // short-circuit the logging by providing a writer
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         PrintWriter pw = new PrintWriter(baos);
         
         LoggingOutInterceptor p = new LoggingOutInterceptor(pw);
-        //p.setPrettyLogging(true);
+        p.setPrettyLogging(prettyPrint);
         CachedOutputStream cos = new CachedOutputStream();
-        String s = "<today><is><the><twenty> <second> <of> <january> <two> <thousand> <and> <nine></nine> "
-            + "</and></thousand></two></january></of></second></twenty></the></is></today>";
-        cos.write(s.getBytes());
+        cos.write(payload.getBytes());
         Message message = new MessageImpl();
         message.setExchange(new ExchangeImpl());
         message.put(Message.CONTENT_TYPE, "application/xml");
         Logger logger = LogUtils.getL7dLogger(this.getClass());
         LoggingOutInterceptor.LoggingCallback l = p.new LoggingCallback(logger, message, cos);
         l.onClose(cos);
+        
         String str = baos.toString();
-        //format has changed
-        assertFalse(str.matches(s));
-        assertTrue(str.contains("<today>"));
-
+        assertTrue(str.contains(loggedPayload));
     }
-
+    
     @Test
     public void testCachedOutputStreamThreshold() throws Exception {
         byte[] mex = "<test><threshold/></test>".getBytes();
