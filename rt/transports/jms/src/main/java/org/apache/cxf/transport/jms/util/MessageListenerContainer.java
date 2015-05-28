@@ -106,7 +106,9 @@ public class MessageListenerContainer extends AbstractMessageListenerContainer {
         private void safeRollback(Throwable t) {
             LOG.log(Level.WARNING, "Exception while processing jms message in cxf. Rolling back" , t);
             try {
-                session.rollback();
+                if (session.getTransacted()) {
+                    session.rollback();
+                }
             } catch (Exception e) {
                 LOG.log(Level.WARNING, "Rollback of Local transaction failed", e);
             }
