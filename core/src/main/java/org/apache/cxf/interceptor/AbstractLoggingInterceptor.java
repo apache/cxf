@@ -60,11 +60,11 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
     * 
     */
     
-    static class ClosableStringBuilderWriter extends Writer {
+    static class IgnorableStringBuilderWriter extends Writer {
         private boolean ignoreWrites;
         private final StringBuilder buffer;
 
-        public ClosableStringBuilderWriter(StringBuilder buffer) {
+        public IgnorableStringBuilderWriter(StringBuilder buffer) {
             this.buffer = buffer;
         }
 
@@ -253,7 +253,7 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
             builder.ensureCapacity(inputBuilderLength + (int)(cos.size() * 2));
             
             // Write directly to the output builder
-            ClosableStringBuilderWriter swriter = new ClosableStringBuilderWriter(builder);
+            IgnorableStringBuilderWriter swriter = new IgnorableStringBuilderWriter(builder);
 
             XMLStreamWriter xwriter = new PrettyPrintXMLStreamWriter(StaxUtils.createXMLStreamWriter(swriter), 2);
             
@@ -333,7 +333,7 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
             int inputBuilderLength = builder.length();
 
             // Write directly to the output builder
-            ClosableStringBuilderWriter swriter = new ClosableStringBuilderWriter(builder);
+            IgnorableStringBuilderWriter swriter = new IgnorableStringBuilderWriter(builder);
             
             XMLStreamWriter xwriter = new PrettyPrintXMLStreamWriter(StaxUtils.createXMLStreamWriter(swriter), 2);
             
