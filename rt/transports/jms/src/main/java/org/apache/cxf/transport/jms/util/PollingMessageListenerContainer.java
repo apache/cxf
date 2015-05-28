@@ -32,6 +32,8 @@ import javax.jms.MessageConsumer;
 import javax.jms.MessageListener;
 import javax.jms.Session;
 import javax.jms.Topic;
+import javax.transaction.Status;
+import javax.transaction.Transaction;
 
 import org.apache.cxf.common.logging.LogUtils;
 
@@ -104,10 +106,12 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
                 MessageConsumer consumer = null;
                 Session session = null;
                 try {
-                    boolean isExternalTransaction = transactionManager.getTransaction() != null;
-                    if (!isExternalTransaction) {
-                        transactionManager.begin();
+                    final Transaction externalTransaction = transactionManager.getTransaction();
+                    if ((externalTransaction != null) && (externalTransaction.getStatus() == Status.STATUS_ACTIVE)) {
+                        LOG.log(Level.SEVERE, "External transactions are not supported in XAPoller");
+                        throw new IllegalStateException("External transactions are not supported in XAPoller");
                     }
+                    transactionManager.begin();
                     /*
                      * Create session inside transaction to give it the 
                      * chance to enlist itself as a resource
@@ -119,12 +123,10 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
                         if (message != null) {
                             listenerHandler.onMessage(message);
                         }
-                        if (!isExternalTransaction) {
-                            transactionManager.commit();
-                        }
-                    } catch (Exception e) {
+                        transactionManager.commit();
+                    } catch (Throwable e) {
                         LOG.log(Level.WARNING, "Exception while processing jms message in cxf. Rolling back", e);
-                        safeRollBack(session, isExternalTransaction);
+                        safeRollBack(session);
                     } finally {
                         ResourceCloser.close(consumer);
                         ResourceCloser.close(session);
@@ -137,13 +139,9 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
 
         }
         
-        private void safeRollBack(Session session, boolean isExternalTransaction) {
+        private void safeRollBack(Session session) {
             try {
-                if (isExternalTransaction) {
-                    transactionManager.setRollbackOnly();
-                } else {
-                    transactionManager.rollback();
-                }
+                transactionManager.rollback();
             } catch (Exception e) {
                 LOG.log(Level.WARNING, "Rollback of XA transaction failed", e);
             }
