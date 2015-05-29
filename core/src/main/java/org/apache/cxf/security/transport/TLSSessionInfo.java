@@ -71,7 +71,16 @@ public class TLSSessionInfo {
      * @return      the negotiated cipher suite.  This attribute is
      *              guaranteed to be non-null.
      */
+    @Deprecated
     public final String getChipherSuite() {
+        return cipherSuite;
+    }
+    
+    /**
+     * @return      the negotiated cipher suite.  This attribute is
+     *              guaranteed to be non-null.
+     */
+    public final String getCipherSuite() {
         return cipherSuite;
     }
 
