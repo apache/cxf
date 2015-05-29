@@ -45,7 +45,13 @@
                      implementor="org.apache.cxf.systest.http.GreeterImpl" 
                      address="https://localhost:${testutil.ports.CipherSuitesServer}/SoapContext/HttpsPort" 
                      serviceName="s:SOAPService" 
-                     endpointName="e:HttpsPort" depends-on="aes-tls-settings"/>
+                     endpointName="e:HttpsPort" depends-on="aes-tls-settings">
+        <jaxws:inInterceptors>
+            <bean class="org.apache.cxf.systest.https.ciphersuites.CipherSuiteChecker">
+                <property name="requiredAlgorithm" value="AES"/>
+            </bean>
+        </jaxws:inInterceptors>
+    </jaxws:endpoint>
     
     
     <httpj:engine-factory id="rc4-tls-settings">
