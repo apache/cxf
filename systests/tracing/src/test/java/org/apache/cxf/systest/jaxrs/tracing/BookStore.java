@@ -21,19 +21,26 @@ package org.apache.cxf.systest.jaxrs.tracing;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
+import org.apache.cxf.tracing.Traceable;
 import org.apache.cxf.tracing.TracerContext;
 import org.apache.htrace.TraceScope;
 
 @Path("/bookstore/")
 public class BookStore {
     @Context private TracerContext tracer;
+    private ExecutorService executor = Executors.newSingleThreadExecutor();
         
     @GET
     @Path("/books")
@@ -45,5 +52,30 @@ public class BookStore {
                 new Book("Mastering Apache CXF", UUID.randomUUID().toString())
             );
         }
+    }
+    
+    @GET
+    @Path("/book/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Book getBook(@PathParam("id") final String id) {
+        tracer.annotate("book-id", id);
+        return new Book("Apache CXF in Action", id);
+    }
+    
+    @PUT
+    @Path("/process")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response processBooks() {
+        executor.submit(
+            tracer.wrap("Processing books", new Traceable<Void>() {
+                @Override
+                public Void call(final TracerContext context) throws Exception {
+                    context.timeline("Processing started");
+                    return null;
+                }
+            })
+        );
+        
+        return Response.ok().build();
     }
 }

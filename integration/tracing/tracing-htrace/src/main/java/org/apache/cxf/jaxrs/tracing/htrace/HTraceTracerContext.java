@@ -18,10 +18,15 @@
  */
 package org.apache.cxf.jaxrs.tracing.htrace;
 
+import java.nio.charset.StandardCharsets;
+import java.util.concurrent.Callable;
+
+import org.apache.cxf.tracing.Traceable;
 import org.apache.cxf.tracing.TracerContext;
 import org.apache.htrace.Sampler;
 import org.apache.htrace.Trace;
 import org.apache.htrace.TraceScope;
+import org.apache.htrace.wrappers.TraceCallable;
 
 public class HTraceTracerContext implements TracerContext {
     private final Sampler< ? > sampler;
@@ -34,5 +39,39 @@ public class HTraceTracerContext implements TracerContext {
     @SuppressWarnings("unchecked")
     public TraceScope startSpan(final String description) {
         return Trace.startSpan(description, sampler);
+    }
+    
+    @Override
+    public <T> Callable<T> wrap(final String desription, final Traceable<T> traceable) {
+        final Callable<T> callable = new Callable<T>() {
+            @Override
+            public T call() throws Exception {
+                return traceable.call(new HTraceTracerContext(sampler));
+            }
+        };
+        
+        // TODO: Replace with HTrace's wrap() method once the version with
+        // callable and description becomes available.
+        if (Trace.isTracing()) {
+            return new TraceCallable<T>(Trace.currentSpan(), callable, desription);
+        } else {
+            return callable;
+        }
+    }
+
+    @Override
+    public void annotate(byte[] key, byte[] value) {
+        Trace.addKVAnnotation(key, value);
+    }
+    
+    @Override
+    public void annotate(String key, String value) {
+        annotate(key.getBytes(StandardCharsets.UTF_8), 
+            value.getBytes(StandardCharsets.UTF_8));
+    }
+    
+    @Override
+    public void timeline(String message) {
+        Trace.addTimelineAnnotation(message);
     }
 }

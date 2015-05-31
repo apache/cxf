@@ -18,14 +18,6 @@
  */
 package org.apache.cxf.tracing;
 
-import java.util.concurrent.Callable;
-
-public interface TracerContext {
-    <T> T startSpan(final String desription);
-    <T> Callable<T> wrap(final String desription, final Traceable<T> traceable);
-    
-    void annotate(byte[] key, byte[] value);
-    void annotate(String key, String value);
-    
-    void timeline(String message);
+public interface Traceable<T> {
+    T call(final TracerContext context) throws Exception;
 }

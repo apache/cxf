@@ -107,6 +107,40 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
         assertThat((String)r.getHeaders().getFirst(TracerHeaders.HEADER_SPAN_ID), equalTo("20"));
     }
     
+    @Test
+    public void testThatCurrentSpanIsAnnotatedWithKeyValue() {
+        final Response r = createWebClient("/bookstore/book/1")
+            .header(TracerHeaders.HEADER_TRACE_ID, 10L)
+            .header(TracerHeaders.HEADER_SPAN_ID, 20L)
+            .get();
+        assertEquals(Status.OK.getStatusCode(), r.getStatus());
+        
+        assertThat(TestSpanReceiver.getAllSpans().size(), equalTo(1));
+        assertThat(TestSpanReceiver.getAllSpans().get(0).getDescription(), equalTo("bookstore/book/1"));
+        assertThat(TestSpanReceiver.getAllSpans().get(0).getKVAnnotations().size(), equalTo(1));
+        
+        assertThat((String)r.getHeaders().getFirst(TracerHeaders.HEADER_TRACE_ID), equalTo("10"));
+        assertThat((String)r.getHeaders().getFirst(TracerHeaders.HEADER_SPAN_ID), equalTo("20"));
+    }
+    
+    @Test
+    public void testThatParallelSpanIsAnnotatedWithTimeline() {
+        final Response r = createWebClient("/bookstore/process")
+            .header(TracerHeaders.HEADER_TRACE_ID, 10L)
+            .header(TracerHeaders.HEADER_SPAN_ID, 20L)
+            .put("");
+        assertEquals(Status.OK.getStatusCode(), r.getStatus());
+        
+        assertThat(TestSpanReceiver.getAllSpans().size(), equalTo(2));
+        assertThat(TestSpanReceiver.getAllSpans().get(0).getDescription(), equalTo("bookstore/process"));
+        assertThat(TestSpanReceiver.getAllSpans().get(0).getTimelineAnnotations().size(), equalTo(0));
+        assertThat(TestSpanReceiver.getAllSpans().get(1).getDescription(), equalTo("Processing books"));
+        assertThat(TestSpanReceiver.getAllSpans().get(1).getTimelineAnnotations().size(), equalTo(1));
+        
+        assertThat((String)r.getHeaders().getFirst(TracerHeaders.HEADER_TRACE_ID), equalTo("10"));
+        assertThat((String)r.getHeaders().getFirst(TracerHeaders.HEADER_SPAN_ID), equalTo("20"));
+    }
+    
     protected WebClient createWebClient(final String url) {
         return WebClient
             .create("http://localhost:" + PORT + url)
