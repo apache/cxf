@@ -49,6 +49,10 @@ This code was written by Tyler Akins and has been placed in the
 public domain.  It would be nice if you left this header intact.
 Base64 code from Tyler Akins -- http://rumkin.com
 
+This project includes Public Suffix List copied from
+https://publicsuffix.org/list/effective_tld_names.dat
+licensed under the terms of the Mozilla Public License, v. 2.0
+Full license text: <http://mozilla.org/MPL/2.0/>
 
 Additional copyright notices and license terms applicable are
 present in the licenses directory of this distribution.
