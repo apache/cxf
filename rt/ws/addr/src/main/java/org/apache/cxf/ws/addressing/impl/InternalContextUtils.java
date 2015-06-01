@@ -394,7 +394,9 @@ final class InternalContextUtils {
                 action = getActionFromServiceModel(message, fault);
             }
         }
-        LOG.fine("action: " + action);
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("action: " + action);
+        }
         return action != null ? ContextUtils.getAttributedURI(action) : null;
     }
 
@@ -468,7 +470,9 @@ final class InternalContextUtils {
                 }
             }
         }
-        LOG.fine("action determined from service model: " + action);
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("action determined from service model: " + action);
+        }
         return action;
     }
 
