@@ -44,16 +44,26 @@ import org.junit.Test;
 public class AttachmentSerializerTest extends Assert {
     
     @Test
-    public void testMessageWriteXopOn() throws Exception {
-        doTestMessageWrite(true);
+    public void testMessageWriteXopOn1() throws Exception {
+        doTestMessageWrite(true, "text/xml");
     }
     
     @Test
-    public void testMessageWriteXopOff() throws Exception {
-        doTestMessageWrite(false);
+    public void testMessageWriteXopOn2() throws Exception {
+        doTestMessageWrite(true, "application/soap+xml; action=\"urn:foo\"");
     }
     
-    private void doTestMessageWrite(boolean xop) throws Exception {
+    @Test
+    public void testMessageWriteXopOff1() throws Exception {
+        doTestMessageWrite(false, "text/xml");
+    }
+    
+    @Test
+    public void testMessageWriteXopOff2() throws Exception {
+        doTestMessageWrite(false, "application/soap+xml; action=\"urn:foo\"");
+    }
+    
+    private void doTestMessageWrite(boolean xop, String soapContentType) throws Exception {
         MessageImpl msg = new MessageImpl();
         
         Collection<Attachment> atts = new ArrayList<Attachment>();
@@ -68,8 +78,17 @@ public class AttachmentSerializerTest extends Assert {
         msg.setAttachments(atts);
         
         // Set the SOAP content type
-        msg.put(Message.CONTENT_TYPE, "application/soap+xml");
-        
+        msg.put(Message.CONTENT_TYPE, soapContentType);
+        String soapCtType = null;
+        String soapCtParams = null;
+        int p = soapContentType.indexOf(';');
+        if (p != -1) {
+            soapCtParams = soapContentType.substring(p);
+            soapCtType = soapContentType.substring(0, p);
+        } else {
+            soapCtParams = "";
+            soapCtType = soapContentType;
+        }
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         msg.setContent(OutputStream.class, out);
         
@@ -81,10 +100,22 @@ public class AttachmentSerializerTest extends Assert {
         
         serializer.writeProlog();
 
+        // we expect
+        // - the package header must have type multipart/related
+        // - the start-info property must be present for mtom but otherwise optional
+        // - the action property should not appear directly
+        // - the type property must be application/xop+xml for mtom but otherwise text/xml or application/soap+xml
         String ct = (String) msg.get(Message.CONTENT_TYPE);
+        System.out.println("##teset ct=" + ct);
         assertTrue(ct.indexOf("multipart/related;") == 0);
         assertTrue(ct.indexOf("start=\"<root.message@cxf.apache.org>\"") > -1);
-        assertTrue(ct.indexOf("start-info=\"application/soap+xml\"") > -1);
+        assertTrue(ct.indexOf("start-info=\"" + escapeQuotes(soapContentType) + "\"") > -1);
+        assertTrue(ct.indexOf("action=\"") == -1);
+        if (xop) {
+            assertTrue(ct.indexOf("type=\"application/xop+xml\"") > -1);
+        } else {
+            assertTrue(ct.indexOf("type=\"" + soapCtType + "\"") > -1);
+        }
         out.write("<soap:Body/>".getBytes());
         
         serializer.writeAttachments();
@@ -101,11 +132,15 @@ public class AttachmentSerializerTest extends Assert {
         MimeMultipart multipart = (MimeMultipart) inMsg.getContent();
         
         MimeBodyPart part = (MimeBodyPart) multipart.getBodyPart(0);
+        // we expect
+        // - the envelope header must have type application/xop+xml for mtom but otherwise t
+        // - the start-info property must be present for mtom but otherwise text/xml or application/soap+xml
+        // - the action must appear if it was present in the original message
         if (xop) {
-            assertEquals("application/xop+xml; charset=UTF-8; type=\"application/soap+xml\"", 
+            assertEquals("application/xop+xml; charset=UTF-8; type=\"" + soapCtType + "\"" + soapCtParams, 
                          part.getHeader("Content-Type")[0]);
         } else {
-            assertEquals("text/xml; charset=UTF-8; type=\"application/soap+xml\"", 
+            assertEquals(soapCtType + "; charset=UTF-8" + soapCtParams,  
                          part.getHeader("Content-Type")[0]);
         }
         
@@ -191,5 +226,9 @@ public class AttachmentSerializerTest extends Assert {
         assertEquals("binary", part2.getHeader("Content-Transfer-Encoding")[0]);
         assertEquals("<test.xml>", part2.getHeader("Content-ID")[0]);
         
+    }
+
+    private static String escapeQuotes(String s) {
+        return s.indexOf('"') != 0 ? s.replace("\"", "\\\"") : s;    
     }
 }

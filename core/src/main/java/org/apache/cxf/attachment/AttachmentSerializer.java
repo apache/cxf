@@ -72,26 +72,19 @@ public class AttachmentSerializer {
         bodyBoundary = AttachmentUtil.getUniqueBoundaryValue();
 
         String bodyCt = (String) message.get(Message.CONTENT_TYPE);
-        
-        // The bodyCt string is used enclosed within "", so if it contains the character ", it
-        // should be adjusted, like in the following case:
-        //   application/soap+xml; action="urn:ihe:iti:2007:RetrieveDocumentSet"
-        // The attribute action is added in SoapActionOutInterceptor, when SOAP 1.2 is used
-        // The string has to be changed in:
-        //   application/soap+xml"; action="urn:ihe:iti:2007:RetrieveDocumentSet
-        // so when it is enclosed within "", the result must be:
-        //   "application/soap+xml"; action="urn:ihe:iti:2007:RetrieveDocumentSet"
-        // instead of 
-        //   "application/soap+xml; action="urn:ihe:iti:2007:RetrieveDocumentSet""
-        // that is wrong because when used it produces:
-        //   type="application/soap+xml; action="urn:ihe:iti:2007:RetrieveDocumentSet""
-        if ((bodyCt.indexOf('"') != -1) && (bodyCt.indexOf(';') != -1)) {
+        String bodyCtParams = null;
+        // split the bodyCt to its head that is the type and its properties so that we
+        // can insert the values at the right places based on the soap version and the mtom option
+        // bodyCt will be of the form
+        // soap11 -> text/xml
+        // soap12 -> application/soap+xml; action="urn:ihe:iti:2007:RetrieveDocumentSet"
+        if (bodyCt.indexOf(';') != -1) {
             int pos = bodyCt.indexOf(';');
-            StringBuilder st = new StringBuilder(bodyCt.substring(0 , pos));
-            st.append("\"").append(bodyCt.substring(pos, bodyCt.length() - 1));
-            bodyCt = st.toString();
-        }        
-        
+            // get everything from the semi-colon
+            bodyCtParams = bodyCt.substring(pos);
+            // keep the type/subtype part in bodyCt
+            bodyCt = bodyCt.substring(0, pos);
+        }
         // Set transport mime type
         String requestMimeType = multipartType == null ? DEFAULT_MULTIPART_TYPE : multipartType;
         
@@ -131,10 +124,14 @@ public class AttachmentSerializer {
         
         // start-info is a required parameter for XOP/MTOM, may be needed for
         // other WS cases but is redundant in simpler multipart/related cases
+        // the parameters need to be included within the start-info's value in the escaped form
         if (writeOptionalTypeParameters || xop) {
             ct.append("; start-info=\"")
-                .append(bodyCt)
-                .append("\"");
+                .append(bodyCt);
+            if (bodyCtParams != null) {
+                ct.append(escapeQuotes(bodyCtParams));                
+            }
+            ct.append("\"");
         }
         
         
@@ -154,17 +151,24 @@ public class AttachmentSerializer {
         StringBuilder mimeBodyCt = new StringBuilder();
         String bodyType = getHeaderValue("Content-Type", null);
         if (bodyType == null) {
-            mimeBodyCt.append(xop ? "application/xop+xml; charset=" : "text/xml; charset=")
-                .append(encoding)
-                .append("; type=\"")
-                .append(bodyCt)
-                .append("\"");
+            mimeBodyCt.append(xop ? "application/xop+xml" : bodyCt)
+                .append("; charset=").append(encoding);
+            if (xop) {
+                mimeBodyCt.append("; type=\"").append(bodyCt).append("\"");
+            }
+            if (bodyCtParams != null) {
+                mimeBodyCt.append(bodyCtParams);
+            }
         } else {
             mimeBodyCt.append(bodyType);
         }
         
         writeHeaders(mimeBodyCt.toString(), rootContentId, rootHeaders, writer);
         out.write(writer.getBuffer().toString().getBytes(encoding));
+    }
+
+    private static String escapeQuotes(String s) {
+        return s.indexOf('"') != 0 ? s.replace("\"", "\\\"") : s;    
     }
 
     private String getHeaderValue(String name, String defaultValue) {
