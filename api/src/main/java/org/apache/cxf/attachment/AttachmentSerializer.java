@@ -73,6 +73,7 @@ public class AttachmentSerializer {
 
         String bodyCt = (String) message.get(Message.CONTENT_TYPE);
         String bodyCtParams = null;
+        String bodyCtParamsEscaped = null;
         // split the bodyCt to its head that is the type and its properties so that we
         // can insert the values at the right places based on the soap version and the mtom option
         // bodyCt will be of the form
@@ -82,6 +83,7 @@ public class AttachmentSerializer {
             int pos = bodyCt.indexOf(';');
             // get everything from the semi-colon
             bodyCtParams = bodyCt.substring(pos);
+            bodyCtParamsEscaped = escapeQuotes(bodyCtParams); 
             // keep the type/subtype part in bodyCt
             bodyCt = bodyCt.substring(0, pos);
         }
@@ -128,8 +130,8 @@ public class AttachmentSerializer {
         if (writeOptionalTypeParameters || xop) {
             ct.append("; start-info=\"")
                 .append(bodyCt);
-            if (bodyCtParams != null) {
-                ct.append(escapeQuotes(bodyCtParams));                
+            if (bodyCtParamsEscaped != null) {
+                ct.append(bodyCtParamsEscaped);
             }
             ct.append("\"");
         }
@@ -154,9 +156,12 @@ public class AttachmentSerializer {
             mimeBodyCt.append(xop ? "application/xop+xml" : bodyCt)
                 .append("; charset=").append(encoding);
             if (xop) {
-                mimeBodyCt.append("; type=\"").append(bodyCt).append("\"");
-            }
-            if (bodyCtParams != null) {
+                mimeBodyCt.append("; type=\"").append(bodyCt);
+                if (bodyCtParamsEscaped != null) {
+                    mimeBodyCt.append(bodyCtParamsEscaped);
+                }
+                mimeBodyCt.append("\"");
+            } else if (bodyCtParams != null) {
                 mimeBodyCt.append(bodyCtParams);
             }
         } else {
