@@ -434,11 +434,23 @@ public class Java2WSMojo extends AbstractMojo {
             File wsdlFile = new File(outputFile);
             if (wsdlFile.exists()) {
                 if (classifier != null) {
-                    projectHelper.attachArtifact(project, "wsdl", classifier, wsdlFile);
+                    projectHelper.attachArtifact(project, wsdlFile.getName(), classifier, wsdlFile);
                 } else {
-                    projectHelper.attachArtifact(project, "wsdl", wsdlFile);
+                    projectHelper.attachArtifact(project, wsdlFile.getName(), wsdlFile);
                 }
-                
+                boolean hasWsdlAttached = false;
+                for (Artifact a : project.getAttachedArtifacts()) {
+                    if ("wsdl".equals(a.getType())) {
+                        hasWsdlAttached = true;
+                    }
+                }
+                if (!hasWsdlAttached) {
+                    if (classifier != null) {
+                        projectHelper.attachArtifact(project, "wsdl", classifier, wsdlFile);
+                    } else {
+                        projectHelper.attachArtifact(project, "wsdl", wsdlFile);
+                    }
+                }
             }
         }
     }
