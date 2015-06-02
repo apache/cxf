@@ -34,6 +34,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -47,6 +48,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapters;
 
 import org.apache.cxf.common.classloader.JAXBClassLoaderUtils;
 import org.apache.cxf.common.jaxb.JAXBUtils;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ASMHelper;
 import org.apache.cxf.common.util.ASMHelper.ClassWriter;
 import org.apache.cxf.common.util.ASMHelper.MethodVisitor;
@@ -64,7 +66,7 @@ import org.apache.cxf.service.model.UnwrappedOperationInfo;
  * Walks the service model and sets up the classes for the context.
  */
 class JAXBContextInitializer extends ServiceModelVisitor {
-
+    private static final Logger LOG = LogUtils.getL7dLogger(JAXBContextInitializer.class);
     private Set<Class<?>> classes;
     private Collection<Object> typeReferences;
     private Set<Class<?>> globalAdapters = new HashSet<Class<?>>();
@@ -303,7 +305,10 @@ class JAXBContextInitializer extends ServiceModelVisitor {
             return;
         } else {
             Class<?> cls = JAXBUtils.getValidClass(claz);
-            if (cls == null && ReflectionUtil.getDeclaredConstructors(claz).length > 0) {
+            if (cls == null 
+                && ReflectionUtil.getDeclaredConstructors(claz).length > 0 
+                && !Modifier.isAbstract(claz.getModifiers())) {
+                LOG.info("Class " + claz.getName() + " does not have a default constructor which JAXB requires.");
                 //there is no init(), but other constructors
                 Object factory = createFactory(claz, ReflectionUtil.getDeclaredConstructors(claz)[0]);
                 unmarshallerProperties.put("com.sun.xml.bind.ObjectFactory", factory);
