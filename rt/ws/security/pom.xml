@@ -33,7 +33,7 @@
     <properties>
         <cxf.osgi.import>
             net.sf.ehcache*;resolution:=optional;version="[2.5, 3.0.0)",
-            org.opensaml*;resolution:=optional;version="${cxf.opensaml.osgi.version.range}",
+            org.opensaml*;version="${cxf.opensaml.osgi.version.range}",
         </cxf.osgi.import>
     </properties>
     <dependencies>
