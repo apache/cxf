@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import org.apache.cxf.attachment.AttachmentDeserializer;
 import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.binding.soap.Soap12;
 import org.apache.cxf.binding.soap.SoapBindingConstants;
@@ -80,11 +81,25 @@ public class SoapActionInInterceptor extends AbstractSoapInterceptor {
             }
             
             int start = ct.indexOf("action=");
+            if (start == -1 && ct.indexOf("multipart/related") == 0) {
+                // the action property may not be found at the package's content-type for non-mtom multipart message
+                List<String> cts = CastUtils.cast((List<?>)(CastUtils.cast(
+                    (Map<?, ?>)message.get(AttachmentDeserializer.ATTACHMENT_PART_HEADERS)).get(Message.CONTENT_TYPE)));
+                if (cts != null && cts.size() > 0) {
+                    ct = cts.get(0);
+                    start = ct.indexOf("action=");
+                }
+            }
             if (start != -1) {
                 int end;
-                if (ct.charAt(start + 7) == '\"') {
+                char c = ct.charAt(start + 7);
+                // handle the extraction robustly
+                if (c == '\"') {
                     start += 8;
                     end = ct.indexOf('\"', start);
+                } else if (c == '\\' && ct.charAt(start + 8) == '\"') {
+                    start += 9;
+                    end = ct.indexOf('\\', start);
                 } else {
                     start += 7;
                     end = ct.indexOf(';', start);
