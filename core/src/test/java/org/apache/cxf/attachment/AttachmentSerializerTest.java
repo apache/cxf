@@ -81,12 +81,15 @@ public class AttachmentSerializerTest extends Assert {
         msg.put(Message.CONTENT_TYPE, soapContentType);
         String soapCtType = null;
         String soapCtParams = null;
+        String soapCtParamsEscaped = null;
         int p = soapContentType.indexOf(';');
         if (p != -1) {
             soapCtParams = soapContentType.substring(p);
+            soapCtParamsEscaped = escapeQuotes(soapCtParams);
             soapCtType = soapContentType.substring(0, p);
         } else {
             soapCtParams = "";
+            soapCtParamsEscaped = "";
             soapCtType = soapContentType;
         }
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -100,16 +103,19 @@ public class AttachmentSerializerTest extends Assert {
         
         serializer.writeProlog();
 
-        // we expect
-        // - the package header must have type multipart/related
-        // - the start-info property must be present for mtom but otherwise optional
-        // - the action property should not appear directly
-        // - the type property must be application/xop+xml for mtom but otherwise text/xml or application/soap+xml
+        // we expect the following rules at the package header level
+        // - the package header must have media type multipart/related.
+        // - the start-info property must be present for mtom but otherwise optional. its
+        //   value must contain the content type associated with the root content's xml serialization,
+        //   including its parameters as appropriate.
+        // - the action property should not appear directly in the package header level
+        // - the type property must contain the media type type/subtype of the root content part. 
+        //   namely application/xop+xml for mtom but otherwise text/xml or application/soap+xml
+        //   depending on the soap version 1.1 or 1.2, respectively.
         String ct = (String) msg.get(Message.CONTENT_TYPE);
-        System.out.println("##teset ct=" + ct);
         assertTrue(ct.indexOf("multipart/related;") == 0);
         assertTrue(ct.indexOf("start=\"<root.message@cxf.apache.org>\"") > -1);
-        assertTrue(ct.indexOf("start-info=\"" + escapeQuotes(soapContentType) + "\"") > -1);
+        assertTrue(ct.indexOf("start-info=\"" + soapCtType + soapCtParamsEscaped + "\"") > -1);
         assertTrue(ct.indexOf("action=\"") == -1);
         if (xop) {
             assertTrue(ct.indexOf("type=\"application/xop+xml\"") > -1);
@@ -132,13 +138,15 @@ public class AttachmentSerializerTest extends Assert {
         MimeMultipart multipart = (MimeMultipart) inMsg.getContent();
         
         MimeBodyPart part = (MimeBodyPart) multipart.getBodyPart(0);
-        // we expect
-        // - the envelope header must have type application/xop+xml for mtom but otherwise t
-        // - the start-info property must be present for mtom but otherwise text/xml or application/soap+xml
-        // - the action must appear if it was present in the original message
+        // we expect the following rules at the root content level
+        // - the envelope header must have type application/xop+xml for mtom but otherwise the content's 
+        //   serialization type.
+        // - the type property must be present for mtom and it must contain the content's serialization type
+        //   including its parameters if appropriate. 
+        // - the action must appear if it was present in the original message (i.e., for soap 1.2)
         if (xop) {
-            assertEquals("application/xop+xml; charset=UTF-8; type=\"" + soapCtType + "\"" + soapCtParams, 
-                         part.getHeader("Content-Type")[0]);
+            assertEquals("application/xop+xml; charset=UTF-8; type=\"" + soapCtType + soapCtParamsEscaped + "\"",
+                part.getHeader("Content-Type")[0]);
         } else {
             assertEquals(soapCtType + "; charset=UTF-8" + soapCtParams,  
                          part.getHeader("Content-Type")[0]);
