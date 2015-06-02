@@ -298,9 +298,6 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
             if (StringUtils.isEmpty(password)) {
                 password = getPassword(user, token, WSPasswordCallback.SIGNATURE, message);
             }
-            if (password == null) {
-                password = "";
-            }
 
             // TODO configure using a KeyValue here
             assertion.signAssertion(user, password, crypto, false);
