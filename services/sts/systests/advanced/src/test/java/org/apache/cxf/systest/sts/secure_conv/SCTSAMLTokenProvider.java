@@ -26,7 +26,6 @@ import java.util.logging.Logger;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.sts.STSConstants;
@@ -40,6 +39,7 @@ import org.apache.cxf.sts.token.provider.DefaultConditionsProvider;
 import org.apache.cxf.sts.token.provider.DefaultSubjectProvider;
 import org.apache.cxf.sts.token.provider.SamlCallbackHandler;
 import org.apache.cxf.sts.token.provider.SubjectProvider;
+import org.apache.cxf.sts.token.provider.SubjectProviderParameters;
 import org.apache.cxf.sts.token.provider.TokenProvider;
 import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.cxf.sts.token.provider.TokenProviderResponse;
@@ -53,7 +53,6 @@ import org.apache.wss4j.common.saml.bean.AttributeStatementBean;
 import org.apache.wss4j.common.saml.bean.ConditionsBean;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
 import org.apache.wss4j.dom.WSConstants;
-
 import org.joda.time.DateTime;
 import org.opensaml.saml.common.SAMLVersion;
 
@@ -250,7 +249,13 @@ public class SCTSAMLTokenProvider implements TokenProvider {
         }
 
         // Get the Subject and Conditions
-        SubjectBean subjectBean = subjectProvider.getSubject(tokenParameters, doc, secret);
+        SubjectProviderParameters subjectProviderParameters = new SubjectProviderParameters();
+        subjectProviderParameters.setProviderParameters(tokenParameters);
+        subjectProviderParameters.setDoc(doc);
+        subjectProviderParameters.setSecret(secret);
+        subjectProviderParameters.setAttrBeanList(attrBeanList);
+        SubjectBean subjectBean = subjectProvider.getSubject(subjectProviderParameters);
+        
         ConditionsBean conditionsBean = conditionsProvider.getConditions(tokenParameters);
 
         // Set all of the beans on the SamlCallbackHandler

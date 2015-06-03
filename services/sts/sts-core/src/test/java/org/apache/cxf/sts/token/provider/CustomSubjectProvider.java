@@ -20,8 +20,6 @@ package org.apache.cxf.sts.token.provider;
 
 import java.security.Principal;
 
-import org.w3c.dom.Document;
-
 import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.TokenRequirements;
@@ -40,7 +38,8 @@ public class CustomSubjectProvider implements SubjectProvider {
     /**
      * Get a SubjectBean object.
      */
-    public SubjectBean getSubject(TokenProviderParameters providerParameters, Document doc, byte[] secret) {
+    public SubjectBean getSubject(SubjectProviderParameters subjectProviderParameters) {
+        TokenProviderParameters providerParameters = subjectProviderParameters.getProviderParameters();
         TokenRequirements tokenRequirements = providerParameters.getTokenRequirements();
         KeyRequirements keyRequirements = providerParameters.getKeyRequirements();
 

@@ -383,7 +383,15 @@ public class SAMLTokenProvider extends AbstractSAMLTokenProvider implements Toke
         }
         
         // Get the Subject and Conditions
-        SubjectBean subjectBean = subjectProvider.getSubject(tokenParameters, doc, secret);
+        SubjectProviderParameters subjectProviderParameters = new SubjectProviderParameters();
+        subjectProviderParameters.setProviderParameters(tokenParameters);
+        subjectProviderParameters.setDoc(doc);
+        subjectProviderParameters.setSecret(secret);
+        subjectProviderParameters.setAttrBeanList(attrBeanList);
+        subjectProviderParameters.setAuthBeanList(authBeanList);
+        subjectProviderParameters.setAuthDecisionBeanList(authDecisionBeanList);
+        SubjectBean subjectBean = subjectProvider.getSubject(subjectProviderParameters);
+        
         ConditionsBean conditionsBean = conditionsProvider.getConditions(tokenParameters);
         
         // Set all of the beans on the SamlCallbackHandler

@@ -84,21 +84,20 @@ public class DefaultSubjectProvider implements SubjectProvider {
     /**
      * Get a SubjectBean object.
      */
-    public SubjectBean getSubject(
-        TokenProviderParameters providerParameters, Document doc, byte[] secret
-    ) {
+    public SubjectBean getSubject(SubjectProviderParameters subjectProviderParameters) {
+        
         // 1. Get the principal
-        Principal principal = getPrincipal(providerParameters);
+        Principal principal = getPrincipal(subjectProviderParameters);
         if (principal == null) {
             LOG.fine("Error in getting principal");
             throw new STSException("Error in getting principal", STSException.REQUEST_FAILED);
         }
         
         // 2. Create the SubjectBean using the principal
-        SubjectBean subjectBean = createSubjectBean(principal, providerParameters);
+        SubjectBean subjectBean = createSubjectBean(principal, subjectProviderParameters);
         
         // 3. Create the KeyInfoBean and set it on the SubjectBean
-        KeyInfoBean keyInfo = createKeyInfo(providerParameters, doc, secret);
+        KeyInfoBean keyInfo = createKeyInfo(subjectProviderParameters);
         subjectBean.setKeyInfo(keyInfo);
         
         return subjectBean;
@@ -112,7 +111,9 @@ public class DefaultSubjectProvider implements SubjectProvider {
      *  - The principal associated with the request. We don't need to check to see if it is "valid" here, as it
      *    is not parsed by the STS (but rather the WS-Security layer).
      */
-    protected Principal getPrincipal(TokenProviderParameters providerParameters) {
+    protected Principal getPrincipal(SubjectProviderParameters subjectProviderParameters) {
+        TokenProviderParameters providerParameters = subjectProviderParameters.getProviderParameters();
+        
         Principal principal = null;
         //TokenValidator in IssueOperation has validated the ReceivedToken
         //if validation was successful, the principal was set in ReceivedToken 
@@ -141,7 +142,10 @@ public class DefaultSubjectProvider implements SubjectProvider {
     /**
      * Create the SubjectBean using the specified principal.
      */
-    protected SubjectBean createSubjectBean(Principal principal, TokenProviderParameters providerParameters) {
+    protected SubjectBean createSubjectBean(
+        Principal principal, SubjectProviderParameters subjectProviderParameters
+    ) {
+        TokenProviderParameters providerParameters = subjectProviderParameters.getProviderParameters();
         TokenRequirements tokenRequirements = providerParameters.getTokenRequirements();
         KeyRequirements keyRequirements = providerParameters.getKeyRequirements();
 
@@ -199,9 +203,8 @@ public class DefaultSubjectProvider implements SubjectProvider {
     /**
      * Create and return the KeyInfoBean to be inserted into the SubjectBean
      */
-    protected KeyInfoBean createKeyInfo(
-        TokenProviderParameters providerParameters, Document doc, byte[] secret
-    ) {
+    protected KeyInfoBean createKeyInfo(SubjectProviderParameters subjectProviderParameters) {
+        TokenProviderParameters providerParameters = subjectProviderParameters.getProviderParameters();
         KeyRequirements keyRequirements = providerParameters.getKeyRequirements();
         STSPropertiesMBean stsProperties = providerParameters.getStsProperties();
 
@@ -241,6 +244,8 @@ public class DefaultSubjectProvider implements SubjectProvider {
                 if ((certs == null) || (certs.length == 0)) {
                     throw new STSException("Encryption certificate is not found for alias: " + encryptionName);
                 }
+                Document doc = subjectProviderParameters.getDoc();
+                byte[] secret = subjectProviderParameters.getSecret();
                 KeyInfoBean keyInfo = 
                     createEncryptedKeyKeyInfo(certs[0], secret, doc, encryptionProperties, crypto);
                 return keyInfo;

@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.sts.token.provider;
 
-import org.w3c.dom.Document;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
 
 /**
@@ -30,6 +29,6 @@ public interface SubjectProvider {
     /**
      * Get a SubjectBean object.
      */
-    SubjectBean getSubject(TokenProviderParameters providerParameters, Document doc, byte[] secret);
+    SubjectBean getSubject(SubjectProviderParameters subjectProviderParameters);
         
 }
