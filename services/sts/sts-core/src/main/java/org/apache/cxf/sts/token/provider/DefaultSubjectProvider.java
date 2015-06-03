@@ -175,28 +175,6 @@ public class DefaultSubjectProvider implements SubjectProvider {
     }
         
     /**
-     * Get the SubjectConfirmation method given a tokenType and keyType
-     */
-    protected String getSubjectConfirmationMethod(String tokenType, String keyType) {
-        if (WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)
-            || WSConstants.SAML_NS.equals(tokenType)) {
-            if (STSConstants.SYMMETRIC_KEY_KEYTYPE.equals(keyType) 
-                || STSConstants.PUBLIC_KEY_KEYTYPE.equals(keyType)) {
-                return SAML1Constants.CONF_HOLDER_KEY;
-            } else {
-                return SAML1Constants.CONF_BEARER;
-            }
-        } else {
-            if (STSConstants.SYMMETRIC_KEY_KEYTYPE.equals(keyType) 
-                || STSConstants.PUBLIC_KEY_KEYTYPE.equals(keyType)) {
-                return SAML2Constants.CONF_HOLDER_KEY;
-            } else {
-                return SAML2Constants.CONF_BEARER;
-            }
-        }
-    }
-    
-    /**
      * Create and return the KeyInfoBean to be inserted into the SubjectBean
      */
     protected KeyInfoBean createKeyInfo(
@@ -276,8 +254,7 @@ public class DefaultSubjectProvider implements SubjectProvider {
             return createPublicKeyKeyInfo(receivedKey.getX509Cert(), receivedKey.getPublicKey());
         }
         
-<<<<<<< HEAD
-        return subjectBean;
+        return null;
     }
         
     /**
@@ -300,9 +277,6 @@ public class DefaultSubjectProvider implements SubjectProvider {
                 return SAML1Constants.CONF_BEARER;
             }
         }
-=======
-        return null;
->>>>>>> 3348a29... Refactor DefaultSubjectProvider to make it easier to subclass bits of functionality
     }
 
     /**
