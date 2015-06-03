@@ -87,30 +87,47 @@ public class DefaultSubjectProvider implements SubjectProvider {
     public SubjectBean getSubject(
         TokenProviderParameters providerParameters, Document doc, byte[] secret
     ) {
-        TokenRequirements tokenRequirements = providerParameters.getTokenRequirements();
-        KeyRequirements keyRequirements = providerParameters.getKeyRequirements();
-        STSPropertiesMBean stsProperties = providerParameters.getStsProperties();
-
-        String tokenType = tokenRequirements.getTokenType();
-        String keyType = keyRequirements.getKeyType();
-        String confirmationMethod = getSubjectConfirmationMethod(tokenType, keyType);
+        // 1. Get the principal
+        Principal principal = getPrincipal(providerParameters);
+        if (principal == null) {
+            LOG.fine("Error in getting principal");
+            throw new STSException("Error in getting principal", STSException.REQUEST_FAILED);
+        }
         
+        // 2. Create the SubjectBean using the principal
+        SubjectBean subjectBean = createSubjectBean(principal, providerParameters);
+        
+        // 3. Create the KeyInfoBean and set it on the SubjectBean
+        KeyInfoBean keyInfo = createKeyInfo(providerParameters, doc, secret);
+        subjectBean.setKeyInfo(keyInfo);
+        
+        return subjectBean;
+    }
+    
+    /**
+     * Get the Principal (which is used as the Subject). By default, we check the following (in order):
+     *  - A valid OnBehalfOf principal
+     *  - A valid ActAs principal
+     *  - A valid principal associated with a token received as ValidateTarget
+     *  - The principal associated with the request. We don't need to check to see if it is "valid" here, as it
+     *    is not parsed by the STS (but rather the WS-Security layer).
+     */
+    protected Principal getPrincipal(TokenProviderParameters providerParameters) {
         Principal principal = null;
-        ReceivedToken receivedToken = null;
         //TokenValidator in IssueOperation has validated the ReceivedToken
         //if validation was successful, the principal was set in ReceivedToken 
         if (providerParameters.getTokenRequirements().getOnBehalfOf() != null) {
-            receivedToken = providerParameters.getTokenRequirements().getOnBehalfOf();    
+            ReceivedToken receivedToken = providerParameters.getTokenRequirements().getOnBehalfOf();    
             if (receivedToken.getState().equals(STATE.VALID)) {
                 principal = receivedToken.getPrincipal();
             }
         } else if (providerParameters.getTokenRequirements().getActAs() != null) {
-            receivedToken = providerParameters.getTokenRequirements().getActAs();
+            ReceivedToken receivedToken = providerParameters.getTokenRequirements().getActAs();
             if (receivedToken.getState().equals(STATE.VALID)) {
                 principal = receivedToken.getPrincipal();
             }
         } else if (providerParameters.getTokenRequirements().getValidateTarget() != null) {
-            receivedToken = providerParameters.getTokenRequirements().getValidateTarget();
+            ReceivedToken receivedToken = providerParameters.getTokenRequirements().getValidateTarget();
             if (receivedToken.getState().equals(STATE.VALID)) {
                 principal = receivedToken.getPrincipal();
             }
@@ -118,10 +135,19 @@ public class DefaultSubjectProvider implements SubjectProvider {
             principal = providerParameters.getPrincipal();
         }
         
-        if (principal == null) {
-            LOG.fine("Error in getting principal");
-            throw new STSException("Error in getting principal", STSException.REQUEST_FAILED);
-        }
+        return principal;
+    }
+    
+    /**
+     * Create the SubjectBean using the specified principal.
+     */
+    protected SubjectBean createSubjectBean(Principal principal, TokenProviderParameters providerParameters) {
+        TokenRequirements tokenRequirements = providerParameters.getTokenRequirements();
+        KeyRequirements keyRequirements = providerParameters.getKeyRequirements();
+
+        String tokenType = tokenRequirements.getTokenType();
+        String keyType = keyRequirements.getKeyType();
+        String confirmationMethod = getSubjectConfirmationMethod(tokenType, keyType);
         
         String subjectName = principal.getName();
         if (SAML2Constants.NAMEID_FORMAT_UNSPECIFIED.equals(subjectNameIDFormat)
@@ -144,6 +170,42 @@ public class DefaultSubjectProvider implements SubjectProvider {
         if (subjectNameIDFormat != null && subjectNameIDFormat.length() > 0) {
             subjectBean.setSubjectNameIDFormat(subjectNameIDFormat);
         }
+        
+        return subjectBean;
+    }
+        
+    /**
+     * Get the SubjectConfirmation method given a tokenType and keyType
+     */
+    protected String getSubjectConfirmationMethod(String tokenType, String keyType) {
+        if (WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)
+            || WSConstants.SAML_NS.equals(tokenType)) {
+            if (STSConstants.SYMMETRIC_KEY_KEYTYPE.equals(keyType) 
+                || STSConstants.PUBLIC_KEY_KEYTYPE.equals(keyType)) {
+                return SAML1Constants.CONF_HOLDER_KEY;
+            } else {
+                return SAML1Constants.CONF_BEARER;
+            }
+        } else {
+            if (STSConstants.SYMMETRIC_KEY_KEYTYPE.equals(keyType) 
+                || STSConstants.PUBLIC_KEY_KEYTYPE.equals(keyType)) {
+                return SAML2Constants.CONF_HOLDER_KEY;
+            } else {
+                return SAML2Constants.CONF_BEARER;
+            }
+        }
+    }
+    
+    /**
+     * Create and return the KeyInfoBean to be inserted into the SubjectBean
+     */
+    protected KeyInfoBean createKeyInfo(
+        TokenProviderParameters providerParameters, Document doc, byte[] secret
+    ) {
+        KeyRequirements keyRequirements = providerParameters.getKeyRequirements();
+        STSPropertiesMBean stsProperties = providerParameters.getStsProperties();
+
+        String keyType = keyRequirements.getKeyType();
         
         if (STSConstants.SYMMETRIC_KEY_KEYTYPE.equals(keyType)) {
             Crypto crypto = stsProperties.getEncryptionCrypto();
@@ -180,8 +242,8 @@ public class DefaultSubjectProvider implements SubjectProvider {
                     throw new STSException("Encryption certificate is not found for alias: " + encryptionName);
                 }
                 KeyInfoBean keyInfo = 
-                    createKeyInfo(certs[0], secret, doc, encryptionProperties, crypto);
-                subjectBean.setKeyInfo(keyInfo);
+                    createEncryptedKeyKeyInfo(certs[0], secret, doc, encryptionProperties, crypto);
+                return keyInfo;
             } catch (WSSecurityException ex) {
                 LOG.log(Level.WARNING, "", ex);
                 throw new STSException(ex.getMessage(), ex);
@@ -211,39 +273,16 @@ public class DefaultSubjectProvider implements SubjectProvider {
                 }
             }
             
-            KeyInfoBean keyInfo = createKeyInfo(receivedKey.getX509Cert(), receivedKey.getPublicKey());
-            subjectBean.setKeyInfo(keyInfo);
+            return createPublicKeyKeyInfo(receivedKey.getX509Cert(), receivedKey.getPublicKey());
         }
         
-        return subjectBean;
-    }
-        
-    /**
-     * Get the SubjectConfirmation method given a tokenType and keyType
-     */
-    protected String getSubjectConfirmationMethod(String tokenType, String keyType) {
-        if (WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)
-            || WSConstants.SAML_NS.equals(tokenType)) {
-            if (STSConstants.SYMMETRIC_KEY_KEYTYPE.equals(keyType) 
-                || STSConstants.PUBLIC_KEY_KEYTYPE.equals(keyType)) {
-                return SAML1Constants.CONF_HOLDER_KEY;
-            } else {
-                return SAML1Constants.CONF_BEARER;
-            }
-        } else {
-            if (STSConstants.SYMMETRIC_KEY_KEYTYPE.equals(keyType) 
-                || STSConstants.PUBLIC_KEY_KEYTYPE.equals(keyType)) {
-                return SAML2Constants.CONF_HOLDER_KEY;
-            } else {
-                return SAML2Constants.CONF_BEARER;
-            }
-        }
+        return null;
     }
 
     /**
      * Create a KeyInfoBean that contains an X.509 certificate or Public Key
      */
-    protected static KeyInfoBean createKeyInfo(X509Certificate certificate, PublicKey publicKey) {
+    protected static KeyInfoBean createPublicKeyKeyInfo(X509Certificate certificate, PublicKey publicKey) {
         KeyInfoBean keyInfo = new KeyInfoBean();
 
         if (certificate != null) {
@@ -260,7 +299,7 @@ public class DefaultSubjectProvider implements SubjectProvider {
     /**
      * Create an EncryptedKey KeyInfo.
      */
-    protected static KeyInfoBean createKeyInfo(
+    protected static KeyInfoBean createEncryptedKeyKeyInfo(
         X509Certificate certificate, 
         byte[] secret,
         Document doc,
