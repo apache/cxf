@@ -34,6 +34,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -308,7 +309,9 @@ class JAXBContextInitializer extends ServiceModelVisitor {
             if (cls == null 
                 && ReflectionUtil.getDeclaredConstructors(claz).length > 0 
                 && !Modifier.isAbstract(claz.getModifiers())) {
-                LOG.info("Class " + claz.getName() + " does not have a default constructor which JAXB requires.");
+                if (LOG.isLoggable(Level.INFO)) {
+                    LOG.info("Class " + claz.getName() + " does not have a default constructor which JAXB requires.");
+                }
                 //there is no init(), but other constructors
                 Object factory = createFactory(claz, ReflectionUtil.getDeclaredConstructors(claz)[0]);
                 unmarshallerProperties.put("com.sun.xml.bind.ObjectFactory", factory);
