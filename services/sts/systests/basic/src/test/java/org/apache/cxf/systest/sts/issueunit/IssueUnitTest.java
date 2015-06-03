@@ -25,13 +25,15 @@ import java.util.Map;
 import java.util.Properties;
 
 import javax.security.auth.callback.CallbackHandler;
+import javax.wsdl.Definition;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
-
 import org.apache.cxf.Bus;
+import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.context.WebServiceContextImpl;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
@@ -48,9 +50,13 @@ import org.apache.cxf.systest.sts.common.CommonCallbackHandler;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.systest.sts.deployment.STSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.ws.mex.MetadataExchange;
+import org.apache.cxf.ws.mex.model._2004_09.Metadata;
+import org.apache.cxf.ws.mex.model._2004_09.MetadataSection;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.trust.STSClient;
+import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -101,6 +107,35 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
         stopAllServers();
+    }
+    
+    @org.junit.Test
+    public void testRetrieveWSMEX() throws Exception {
+        
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = IssueUnitTest.class.getResource("cxf-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+  
+        // Get Metadata
+        JaxWsProxyFactoryBean proxyFac = new JaxWsProxyFactoryBean();
+        proxyFac.setBindingId(SoapBindingConstants.SOAP11_BINDING_ID);
+        proxyFac.setAddress("https://localhost:" + STSPORT + "/SecurityTokenService/Transport/mex");
+        MetadataExchange exc = proxyFac.create(MetadataExchange.class);
+        Metadata metadata = exc.get2004();
+        
+        // Parse response (as per the STSClient)
+        Definition definition = null;
+        // Parse the MetadataSections into WSDL definition + associated schemas
+        for (MetadataSection s : metadata.getMetadataSection()) {
+            if ("http://schemas.xmlsoap.org/wsdl/".equals(s.getDialect())) {
+                definition = 
+                    bus.getExtension(WSDLManager.class).getDefinition((Element)s.getAny());
+            }
+        }
+        assertNotNull(definition);
     }
 
     /**
