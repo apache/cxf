@@ -19,8 +19,11 @@
 package org.apache.cxf.tracing;
 
 public final class TracerHeaders {
-    public static final String HEADER_TRACE_ID = "X-Trace-Id";
-    public static final String HEADER_SPAN_ID = "X-Span-Id";
+    public static final String HEADER_TRACE_ID = "org.apache.cxf.jaxrs.tracing.header.trace_id";
+    public static final String HEADER_SPAN_ID = "org.apache.cxf.jaxrs.tracing.header.span_id";
+    
+    public static final String DEFAULT_HEADER_TRACE_ID = "X-Trace-Id";
+    public static final String DEFAULT_HEADER_SPAN_ID = "X-Span-Id";
     
     private TracerHeaders() {
     }

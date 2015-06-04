@@ -56,7 +56,7 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
             properties.put("span.receiver", TestSpanReceiver.class.getName());
             properties.put("sampler", AlwaysSampler.class.getName());
             
-            JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
+            final JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
             sf.setResourceClasses(BookStore.class);
             sf.setResourceProvider(BookStore.class, new SingletonResourceProvider(new BookStore()));
             sf.setAddress("http://localhost:" + PORT);
@@ -87,15 +87,15 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
         assertThat(TestSpanReceiver.getAllSpans().size(), equalTo(1));
         assertThat(TestSpanReceiver.getAllSpans().get(0).getDescription(), equalTo("Get Books"));
         
-        assertFalse(r.getHeaders().containsKey(TracerHeaders.HEADER_TRACE_ID));
-        assertFalse(r.getHeaders().containsKey(TracerHeaders.HEADER_SPAN_ID));
+        assertFalse(r.getHeaders().containsKey(TracerHeaders.DEFAULT_HEADER_TRACE_ID));
+        assertFalse(r.getHeaders().containsKey(TracerHeaders.DEFAULT_HEADER_SPAN_ID));
     }
     
     @Test
     public void testThatNewInnerSpanIsCreated() {
         final Response r = createWebClient("/bookstore/books")
-            .header(TracerHeaders.HEADER_TRACE_ID, 10L)
-            .header(TracerHeaders.HEADER_SPAN_ID, 20L)
+            .header(TracerHeaders.DEFAULT_HEADER_TRACE_ID, 10L)
+            .header(TracerHeaders.DEFAULT_HEADER_SPAN_ID, 20L)
             .get();
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
         
@@ -103,15 +103,15 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
         assertThat(TestSpanReceiver.getAllSpans().get(0).getDescription(), equalTo("Get Books"));
         assertThat(TestSpanReceiver.getAllSpans().get(1).getDescription(), equalTo("bookstore/books"));
         
-        assertThat((String)r.getHeaders().getFirst(TracerHeaders.HEADER_TRACE_ID), equalTo("10"));
-        assertThat((String)r.getHeaders().getFirst(TracerHeaders.HEADER_SPAN_ID), equalTo("20"));
+        assertThat((String)r.getHeaders().getFirst(TracerHeaders.DEFAULT_HEADER_TRACE_ID), equalTo("10"));
+        assertThat((String)r.getHeaders().getFirst(TracerHeaders.DEFAULT_HEADER_SPAN_ID), equalTo("20"));
     }
     
     @Test
     public void testThatCurrentSpanIsAnnotatedWithKeyValue() {
         final Response r = createWebClient("/bookstore/book/1")
-            .header(TracerHeaders.HEADER_TRACE_ID, 10L)
-            .header(TracerHeaders.HEADER_SPAN_ID, 20L)
+            .header(TracerHeaders.DEFAULT_HEADER_TRACE_ID, 10L)
+            .header(TracerHeaders.DEFAULT_HEADER_SPAN_ID, 20L)
             .get();
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
         
@@ -119,15 +119,15 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
         assertThat(TestSpanReceiver.getAllSpans().get(0).getDescription(), equalTo("bookstore/book/1"));
         assertThat(TestSpanReceiver.getAllSpans().get(0).getKVAnnotations().size(), equalTo(1));
         
-        assertThat((String)r.getHeaders().getFirst(TracerHeaders.HEADER_TRACE_ID), equalTo("10"));
-        assertThat((String)r.getHeaders().getFirst(TracerHeaders.HEADER_SPAN_ID), equalTo("20"));
+        assertThat((String)r.getHeaders().getFirst(TracerHeaders.DEFAULT_HEADER_TRACE_ID), equalTo("10"));
+        assertThat((String)r.getHeaders().getFirst(TracerHeaders.DEFAULT_HEADER_SPAN_ID), equalTo("20"));
     }
     
     @Test
     public void testThatParallelSpanIsAnnotatedWithTimeline() {
         final Response r = createWebClient("/bookstore/process")
-            .header(TracerHeaders.HEADER_TRACE_ID, 10L)
-            .header(TracerHeaders.HEADER_SPAN_ID, 20L)
+            .header(TracerHeaders.DEFAULT_HEADER_TRACE_ID, 10L)
+            .header(TracerHeaders.DEFAULT_HEADER_SPAN_ID, 20L)
             .put("");
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
         
@@ -137,8 +137,8 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
         assertThat(TestSpanReceiver.getAllSpans().get(1).getDescription(), equalTo("Processing books"));
         assertThat(TestSpanReceiver.getAllSpans().get(1).getTimelineAnnotations().size(), equalTo(1));
         
-        assertThat((String)r.getHeaders().getFirst(TracerHeaders.HEADER_TRACE_ID), equalTo("10"));
-        assertThat((String)r.getHeaders().getFirst(TracerHeaders.HEADER_SPAN_ID), equalTo("20"));
+        assertThat((String)r.getHeaders().getFirst(TracerHeaders.DEFAULT_HEADER_TRACE_ID), equalTo("10"));
+        assertThat((String)r.getHeaders().getFirst(TracerHeaders.DEFAULT_HEADER_SPAN_ID), equalTo("20"));
     }
     
     protected WebClient createWebClient(final String url) {

@@ -30,6 +30,10 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.tracing.TracerHeaders;
 import org.apache.htrace.Sampler;
 import org.apache.htrace.Trace;
 import org.apache.htrace.TraceInfo;
@@ -37,8 +41,8 @@ import org.apache.htrace.TraceScope;
 import org.apache.htrace.Tracer;
 import org.apache.htrace.impl.NeverSampler;
 
-import static org.apache.cxf.tracing.TracerHeaders.HEADER_SPAN_ID;
-import static org.apache.cxf.tracing.TracerHeaders.HEADER_TRACE_ID;
+import static org.apache.cxf.tracing.TracerHeaders.DEFAULT_HEADER_SPAN_ID;
+import static org.apache.cxf.tracing.TracerHeaders.DEFAULT_HEADER_TRACE_ID;
 
 @Provider
 public class HTraceProvider implements ContainerRequestFilter, ContainerResponseFilter { 
@@ -61,11 +65,11 @@ public class HTraceProvider implements ContainerRequestFilter, ContainerResponse
         final MultivaluedMap<String, String> headers = requestContext.getHeaders();
         
         // Try to extract the Trace Id value from the request header
-        final long traceId = getFirstValueOrDefault(headers, HEADER_TRACE_ID, 
+        final long traceId = getFirstValueOrDefault(headers, getTraceIdHeader(), 
             Tracer.DONT_TRACE.traceId);
         
         // Try to extract the Span Id value from the request header
-        final long spanId = getFirstValueOrDefault(headers, HEADER_SPAN_ID, 
+        final long spanId = getFirstValueOrDefault(headers, getSpanIdHeader(), 
             Tracer.DONT_TRACE.spanId); 
         
         if (traceId != Tracer.DONT_TRACE.traceId && spanId != Tracer.DONT_TRACE.spanId) {
@@ -79,10 +83,13 @@ public class HTraceProvider implements ContainerRequestFilter, ContainerResponse
             final ContainerResponseContext responseContext) throws IOException {
         final MultivaluedMap<String, String> headers = requestContext.getHeaders();
         
+        final String traceIdHeader = getTraceIdHeader();
+        final String spanIdHeader = getSpanIdHeader();
+
         // Transfer tracing headers into the response headers
-        if (headers.containsKey(HEADER_TRACE_ID) && headers.containsKey(HEADER_SPAN_ID)) {
-            responseContext.getHeaders().add(HEADER_TRACE_ID, headers.getFirst(HEADER_TRACE_ID));
-            responseContext.getHeaders().add(HEADER_SPAN_ID, headers.getFirst(HEADER_SPAN_ID));
+        if (headers.containsKey(traceIdHeader) && headers.containsKey(spanIdHeader)) {
+            responseContext.getHeaders().add(traceIdHeader, headers.getFirst(traceIdHeader));
+            responseContext.getHeaders().add(spanIdHeader, headers.getFirst(spanIdHeader));
         }
         
         final Object value = requestContext.getProperty(TRACE_SPAN);
@@ -103,5 +110,30 @@ public class HTraceProvider implements ContainerRequestFilter, ContainerResponse
             }
         }
         return defaultValue;
+    }
+    
+    private static String getSpanIdHeader() {
+        return getHeaderOrDefault(TracerHeaders.HEADER_SPAN_ID, DEFAULT_HEADER_SPAN_ID);
+    }
+    
+    private static String getTraceIdHeader() {
+        return getHeaderOrDefault(TracerHeaders.HEADER_TRACE_ID, DEFAULT_HEADER_TRACE_ID);
+    }
+
+    private static String getHeaderOrDefault(final String property, final String fallback) {
+        final Message message = JAXRSUtils.getCurrentMessage();
+        
+        if (message != null) {
+            final Object header = message.getContextualProperty(property);
+            
+            if (header instanceof String) {
+                final String name = (String)header;
+                if (!StringUtils.isEmpty(name)) {
+                    return name;
+                }
+            }
+        }
+        
+        return fallback;
     }
 }
