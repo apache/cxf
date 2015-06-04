@@ -33,7 +33,7 @@ public class ExtensionInvocationHandler implements InvocationHandler {
         if (method.getDeclaringClass().isAssignableFrom(obj.getClass())) {
             return method.invoke(obj, args);
         } else {
-            //in case obj has the required method with exact signature despite it's class
+            //in case obj has the required method with exact signature despite its class
             //not being assignable from the class declaring the specified method
             Method m = obj.getClass().getMethod(method.getName(), method.getParameterTypes());
             return m.invoke(obj, args);
