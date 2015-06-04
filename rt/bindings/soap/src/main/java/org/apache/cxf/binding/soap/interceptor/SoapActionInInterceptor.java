@@ -80,10 +80,11 @@ public class SoapActionInInterceptor extends AbstractSoapInterceptor {
             }
             
             int start = ct.indexOf("action=");
-            if (start == -1 && ct.indexOf("multipart/related") == 0) {
+            if (start == -1 && ct.indexOf("multipart/related") == 0 && ct.indexOf("start-info") == -1) {
                 // the action property may not be found at the package's content-type for non-mtom multipart message
-                List<String> cts = CastUtils.cast((List<?>)(CastUtils.cast(
-                    (Map<?, ?>)message.get("javax.mail.internet.InternetHeaders")).get(Message.CONTENT_TYPE)));
+                // but skip searching if the start-info property is set
+                List<String> cts = CastUtils.cast((List<?>)(((Map<?, ?>)
+                    message.get("javax.mail.internet.InternetHeaders")).get(Message.CONTENT_TYPE)));
                 if (cts != null && cts.size() > 0) {
                     ct = cts.get(0);
                     start = ct.indexOf("action=");
