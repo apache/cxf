@@ -32,4 +32,5 @@ public interface MetricsProvider {
 
     MetricsContext createOperationContext(Endpoint endpoint, BindingOperationInfo boi, boolean asClient, String cid);
 
+    MetricsContext createResourceContext(Endpoint endpoint, String resourceName, boolean asClient, String cid);
 }

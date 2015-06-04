@@ -133,4 +133,13 @@ public class CodahaleMetricsProvider implements MetricsProvider {
         return new CodahaleMetricsContext(buffer.toString(), registry);
     }
 
+    /** {@inheritDoc}*/
+    @Override
+    public MetricsContext createResourceContext(Endpoint endpoint, String resourceName, 
+                                                boolean asClient, String clientId) {
+        StringBuilder buffer = getBaseServiceName(endpoint, asClient, clientId);
+        buffer.append("Operation=").append(resourceName).append(',');
+        return new CodahaleMetricsContext(buffer.toString(), registry);
+    }
+
 }

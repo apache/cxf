@@ -44,6 +44,9 @@ public class MetricsFeature extends AbstractFeature {
     public MetricsFeature() {
         this.providers = null;
     }
+    public MetricsFeature(MetricsProvider provider) {
+        this.providers = new MetricsProvider[] {provider};
+    }
     public MetricsFeature(MetricsProvider ... providers) {
         this.providers = providers.length > 0 ? providers : null;
     }

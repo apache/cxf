@@ -37,6 +37,7 @@ import org.apache.cxf.message.FaultMode;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.service.Service;
+import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.OperationInfo;
 
 public abstract class AbstractMessageResponseTimeInterceptor extends AbstractPhaseInterceptor<Message> {
@@ -158,7 +159,8 @@ public abstract class AbstractMessageResponseTimeInterceptor extends AbstractPha
     }
     
     protected ObjectName getOperationCounterName(Exchange ex, ObjectName sericeCounterName) {
-        OperationInfo opInfo = ex.getBindingOperationInfo().getOperationInfo();
+        BindingOperationInfo bop = ex.getBindingOperationInfo();
+        OperationInfo opInfo = bop == null ? null : bop.getOperationInfo();
         String operationName = opInfo == null ? null : "\"" + opInfo.getName().getLocalPart() + "\"";
 
         if (operationName == null) {

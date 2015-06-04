@@ -41,10 +41,7 @@ public class MetricsMessageClientOutInterceptor extends AbstractMetricsIntercept
                 message.setContent(InputStream.class, newIn);
                 message.getExchange().put(CountingInputStream.class, newIn);
             }
-            if (message.getExchange().getBindingOperationInfo() != null) {
-                //we now know the operation, start metrics for it
-                addOperationMetrics(ctx, message, message.getExchange().getBindingOperationInfo());
-            }
+            addOperationMetrics(ctx, message, message.getExchange().getBindingOperationInfo());
             ctx.start();
         }
     }

@@ -25,6 +25,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
@@ -41,6 +43,7 @@ import org.apache.cxf.service.model.BindingOperationInfo;
 
 
 public abstract class AbstractMetricsInterceptor extends AbstractPhaseInterceptor<Message> {
+    private static final String REST_METRICS_MAP = AbstractMetricsInterceptor.class.getName() + ".METRICS_MAP";
     MetricsProvider providers[];
     public AbstractMetricsInterceptor(String phase, MetricsProvider p[]) {
         super(phase);
@@ -112,26 +115,75 @@ public abstract class AbstractMetricsInterceptor extends AbstractPhaseIntercepto
         return o;
     }
 
-    protected void addOperationMetrics(ExchangeMetrics ctx, Message m, BindingOperationInfo boi) {
-        if (boi.isUnwrapped()) {
-            boi = boi.getWrappedOperation();
+    private Map<String, Object> getRestMetricsMap(Endpoint e) {
+        synchronized (e) {
+            Object mmo = e.get(REST_METRICS_MAP);
+            if (mmo == null) {
+                e.put(REST_METRICS_MAP, new ConcurrentHashMap<String, Object>());
+                mmo = e.get(REST_METRICS_MAP);
+            }
+            return CastUtils.cast((Map<?, ?>)mmo);
         }
-        Object o = boi.getProperty(MetricsContext.class.getName());
-        if (o == null) {
-            synchronized (boi) {
-                o = createMetricsContextForOperation(m, boi);
+    }
+    protected void addOperationMetrics(ExchangeMetrics ctx, Message m, BindingOperationInfo boi) {
+        Object metrics = null;
+        if (boi == null) {
+            //likely a REST service, let's see if we have a resource name
+            Object nameProperty = m.getExchange().get("org.apache.cxf.resource.operation.name");
+            if (nameProperty != null) {
+                Map<String, Object> restMap = getRestMetricsMap(m.getExchange().getEndpoint());
+                metrics = restMap.get(nameProperty.toString());
+                if (metrics == null) {
+                    metrics = createMetricsContextForRestResource(m, nameProperty.toString());
+                }
+            }
+        } else {
+            if (boi.isUnwrapped()) {
+                boi = boi.getWrappedOperation();
+            }
+            metrics = boi.getProperty(MetricsContext.class.getName());
+            if (metrics == null) {
+                synchronized (boi) {
+                    metrics = createMetricsContextForOperation(m, boi);
+                }
             }
         }
-        if (o instanceof List) {
-            List<MetricsContext> list = CastUtils.cast((List<?>)o);
+        if (metrics instanceof List) {
+            List<MetricsContext> list = CastUtils.cast((List<?>)metrics);
             for (MetricsContext c : list) {
                 ctx.addContext(c);
             }
-        } else if (o instanceof MetricsContext) {
-            ctx.addContext((MetricsContext)o);
+        } else if (metrics instanceof MetricsContext) {
+            ctx.addContext((MetricsContext)metrics);
         }
     }
     
+    private synchronized Object createMetricsContextForRestResource(Message message, String resource) {
+        Map<String, Object> restMap = getRestMetricsMap(message.getExchange().getEndpoint());
+        Object o = restMap.get(resource);
+        if (o != null) {
+            return o;
+        }
+        List<MetricsContext> contexts = new ArrayList<MetricsContext>();
+        for (MetricsProvider p : getMetricProviders(message.getExchange().getBus())) {
+            MetricsContext c = p.createResourceContext(message.getExchange().getEndpoint(),
+                                     resource, MessageUtils.isRequestor(message),
+                                     (String)message.getContextualProperty(MetricsProvider.CLIENT_ID));
+            if (c != null) {
+                contexts.add(c);
+            }
+            if (c instanceof Closeable) {
+                message.getExchange().getEndpoint().addCleanupHook((Closeable)c);
+            }
+        }
+        if (contexts.size() == 1) {
+            o = contexts.get(0);
+        } else {
+            o = contexts;
+        }
+        restMap.put(resource, o);
+        return o;
+    }
     private Object createMetricsContextForOperation(Message message, BindingOperationInfo boi) {
         Object o = boi.getProperty(MetricsContext.class.getName());
         if (o == null) {
