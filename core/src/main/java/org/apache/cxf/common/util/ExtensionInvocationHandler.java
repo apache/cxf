@@ -30,15 +30,13 @@ public class ExtensionInvocationHandler implements InvocationHandler {
     }
 
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        Class<?>[] clzs = null;
-        if (args != null) {
-            clzs = new Class[args.length];
-            for (int i = 0; i < args.length; i++) {
-                clzs[i] = args[i].getClass();
-            }
+        if (method.getDeclaringClass().isAssignableFrom(obj.getClass())) {
+            return method.invoke(obj, args);
+        } else {
+            //in case obj has the required method with exact signature despite it's class
+            //not being assignable from the class declaring the specified method
+            Method m = obj.getClass().getMethod(method.getName(), method.getParameterTypes());
+            return m.invoke(obj, args);
         }
-        
-        Method m = obj.getClass().getMethod(method.getName(), method.getParameterTypes());
-        return m.invoke(obj, args);
     }
 }
