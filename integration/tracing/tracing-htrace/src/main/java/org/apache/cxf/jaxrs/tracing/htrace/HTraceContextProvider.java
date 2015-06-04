@@ -23,6 +23,7 @@ import javax.ws.rs.ext.Provider;
 import org.apache.cxf.jaxrs.ext.ContextProvider;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.tracing.TracerContext;
+import org.apache.cxf.tracing.htrace.HTraceTracerContext;
 import org.apache.htrace.Sampler;
 import org.apache.htrace.impl.NeverSampler;
 
