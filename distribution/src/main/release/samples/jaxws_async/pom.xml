@@ -26,7 +26,7 @@
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
-        <version>3.1.1-SNAPSHOT</version>
+        <version>3.1.1</version>
     </parent>
     <properties>
         <cxf.version>${project.version}</cxf.version>
@@ -127,17 +127,17 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxws</artifactId>
-            <version>3.1.1-SNAPSHOT</version>
+            <version>3.1.1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http</artifactId>
-            <version>3.1.1-SNAPSHOT</version>
+            <version>3.1.1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http-hc</artifactId>
-            <version>3.1.1-SNAPSHOT</version>
+            <version>3.1.1</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -149,7 +149,7 @@
             <!-- Not needed if deploying to a Servlet 3 based container or non-jetty container -->
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http-jetty</artifactId>
-            <version>3.1.1-SNAPSHOT</version>
+            <version>3.1.1</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.eclipse.jetty</groupId>
