@@ -132,9 +132,16 @@
         <feature version="${cxf.wss4j.version}">wss4j</feature>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-security-saml/${project.version}</bundle>
     </feature>
-    <feature name="cxf-http" version="${project.version}" resolver="(obr)">
+    <feature name="cxf-http-client" version="${project.version}" resolver="(obr)">
+        <!-- Can be used instead cxf-http for a smaller footprint -->
         <feature version="${project.version}">cxf-core</feature>
         <bundle start-level="40">mvn:${cxf.servlet-api.group}/${cxf.servlet-api.artifact}/${cxf.servlet-api.version}</bundle>
+        <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-transports-http/${project.version}</bundle>
+    </feature>
+
+    <feature name="cxf-http" version="${project.version}" resolver="(obr)">
+        <feature version="${project.version}">cxf-core</feature>
+        <feature>http</feature>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-transports-http/${project.version}</bundle>
     </feature>
     <feature name="cxf-http-jetty" version="${project.version}" resolver="(obr)">

@@ -15,5 +15,8 @@ xkms-war - Web spring configuration for Web depoyment
 Installation
 ------------
 
-features:addurl mvn:org.apache.cxf.services.xkms/cxf-services-xkms-features/3.0.0-SNAPSHOT/xml
+features:addurl mvn:org.apache.cxf.services.xkms/cxf-services-xkms-features/3.1.1-SNAPSHOT/xml
 features:install cxf-xkms-service cxf-xkms-client
+
+feature:repo-add mvn:org.apache.cxf.services.xkms/cxf-services-xkms-features/3.1.1-SNAPSHOT/xml
+feature:install cxf-xkms-service cxf-xkms-client
