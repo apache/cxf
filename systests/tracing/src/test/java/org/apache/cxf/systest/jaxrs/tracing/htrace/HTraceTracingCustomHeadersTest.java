@@ -32,14 +32,15 @@ import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
-import org.apache.cxf.jaxrs.tracing.htrace.HTraceFeature;
 import org.apache.cxf.systest.jaxrs.tracing.BookStore;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.tracing.TracerHeaders;
+import org.apache.cxf.tracing.htrace.jaxrs.HTraceFeature;
 import org.apache.htrace.HTraceConfiguration;
 import org.apache.htrace.impl.AlwaysSampler;
 import org.apache.htrace.impl.StandardOutSpanReceiver;
+
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;

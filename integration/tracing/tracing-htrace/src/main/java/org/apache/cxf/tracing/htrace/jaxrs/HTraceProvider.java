@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.tracing.htrace;
+package org.apache.cxf.tracing.htrace.jaxrs;
 
 import java.io.IOException;
 import java.util.logging.Level;
