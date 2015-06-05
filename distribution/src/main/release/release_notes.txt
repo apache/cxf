@@ -1,8 +1,8 @@
-Apache CXF 3.1.0 Release Notes
+Apache CXF 3.1.1 Release Notes
 
 1. Overview
 
-The 3.1.0 version of Apache CXF is a significant new version of CXF 
+The 3.1.1 version of Apache CXF is a significant new version of CXF 
 that provides several new features and enhancements.  
 
 New features include: 
@@ -24,6 +24,9 @@ Users are encourage to review the migration guide at:
 http://cxf.apache.org/docs/31-migration-guide.html
 for further information and requirements for upgrading from earlier
 versions of CXF.
+
+3.1.1 fixes over 34 JIRA issues reported by users and the community.
+
 
 
 2. Installation Prerequisites 
@@ -63,6 +66,47 @@ See the migration guide at:
 http://cxf.apache.org/docs/31-migration-guide.html
 for caveats when upgrading from CXF 2.7.x and 3.0.x
 to 3.1.
+
+
+
+7. Specific issues, features, and improvements fixed in this version
+
+** Bug
+    * [CXF-6388] - NPE has been swallowed in org.apache.cxf.jaxrs.impl.AsyncResponseImpl
+    * [CXF-6389] - set initialSuspend=true incorrectly when resume the asyncresponse
+    * [CXF-6390] - JAXRS Async Client does not always wrap the client side exceptions into ProcessingException
+    * [CXF-6392] - Schema imports are not handled correctly in generated WSDL and XSD files
+    * [CXF-6393] - JAXRS Async Client unwraps a parameterized type given to InvocationCallback
+    * [CXF-6395] - Call setTimeout() in a second request cause illegalStateException from web container.
+    * [CXF-6398] - AlgorithmSuitePolicyValidator rejects enveloped-signature Transform
+    * [CXF-6402] - JettyHTTPServerEngine cannot set a provided Jetty Server
+    * [CXF-6403] - Potential memory leak in PolicyBasedWSS4JInInterceptor and AbstractWSS4JStaxInterceptor
+    * [CXF-6408] - HTTP Conduit throws NPE exception for "invalid" 401 HTTP response
+    * [CXF-6409] - CXF web service cannot process MTOM/XOP-optimized content within a CipherValue element
+    * [CXF-6412] - MessageBodyReader and MessageBodyWritter should follow different sorting rule
+    * [CXF-6415] - WS-RM client persistent tests are failing
+    * [CXF-6416] - Cannot resolve the name 'tns:model' to a(n) 'type definition' component error
+    * [CXF-6428] - JAX-WS of XCF 3.1.0 does not work with Spring 4.1 on Tomcat (UnsupportedOperationException)
+    * [CXF-6430] - SwA: Wrong Content-Type of root part
+    * [CXF-6431] - Attachment serialization does not conform to the relevant specs
+    * [CXF-6433] - SOAPAction value may not be extracted correctly for SOAP 1.2 with Attachments
+    * [CXF-6442] - Possible uses contraint violation because of different servlet API versions
+
+
+** Improvement
+    * [CXF-6196] - Investigate how CXFBlueprintServlet can work with blueprint-no-osgi and blueprint.web 
+    * [CXF-6394] - Add an option to add the namespace map of the container element in the message
+    * [CXF-6399] - Add attributes transform handling in transform feature
+    * [CXF-6400] - Make ws-security.callback-handler optional for generating a WS-Security signature
+    * [CXF-6401] - Change the order that the set of security results are searched to create a security context
+    * [CXF-6404] - HTTPConduit performance improvements
+    * [CXF-6407] - Use default JVM cipher suites if no filters are specified
+    * [CXF-6414] - Add a way of including TLS protocols in the Jetty server
+    * [CXF-6419] - Update JMSEndpoint properties using EndpointInfo
+    * [CXF-6420] - Maven cxf-java2ws-plugin copies to the maven repository only the last wsdl of multiple services/executions - overwrites the others
+    * [CXF-6421] - Slim Exchange map down
+    * [CXF-6438] - Optimize ExtensionInvocationHandler
+    * [CXF-6440] - New metrics component doesn't record metrics for Rest resources
 
 
 
