@@ -7,12 +7,12 @@
 		<version>1.2.3.RELEASE</version>
   	   </parent> 
 	<artifactId>spring-boot-sample-rs-cxf</artifactId>
-  <version>3.1.1</version>
+  <version>1.2.3.RELEASE</version>
 	<name>Spring Boot Web Services Sample</name>
 	<description>Spring Boot CXF Restful Web Services Sample</description>
 	<url>http://projects.spring.io/spring-boot/</url>
 	<properties>
-		<cxf.version>3.1.1</cxf.version>
+		<cxf.version>3.1.2-SNAPSHOT</cxf.version>
 		<jackson.version>2.3.0</jackson.version>
 		<jetty.version>8.1.5.v20120716</jetty.version>
 	</properties>
@@ -114,8 +114,4 @@
 		</plugin>
             </plugins>
 	</build>
-
-  <scm>
-    <tag>cxf-3.1.1</tag>
-  </scm>
 </project>
