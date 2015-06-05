@@ -92,7 +92,6 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
     private String locationPrefix;
     private String resourceExtension;
     private boolean includeResource; 
-    private boolean ignoreContextPath;
     
     private MessageContext mc; 
 
@@ -195,7 +194,7 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
             }
             
             HttpServletRequestFilter requestFilter = new HttpServletRequestFilter(
-                servletRequest, path, theServletPath, saveParametersAsAttributes, ignoreContextPath);
+                servletRequest, path, theServletPath, saveParametersAsAttributes);
             String attributeName = getBeanName(o);
             if (REQUEST_SCOPE.equals(scope)) {
                 requestFilter.setAttribute(attributeName, o);
@@ -412,38 +411,22 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
         this.resourceExtension = resourceExtension;
     }
 
-    public void setIgnoreContextPath(boolean ignoreContextPath) {
-        this.ignoreContextPath = ignoreContextPath;
-    }
-
     protected static class HttpServletRequestFilter extends HttpServletRequestWrapper {
         
         private Map<String, String[]> params;
         private String path;
         private String servletPath;
         private boolean saveParamsAsAttributes;
-        private boolean ignoreContextPath;
         
         public HttpServletRequestFilter(HttpServletRequest request, 
                                         String path, 
                                         String servletPath,
-                                        boolean saveParamsAsAttributes,
-                                        boolean ignoreContextPath) {
+                                        boolean saveParamsAsAttributes) {
             super(request);
             this.path = path;
             this.servletPath = servletPath;
             this.saveParamsAsAttributes = saveParamsAsAttributes;
-            this.ignoreContextPath = ignoreContextPath;
             params = new HashMap<String, String[]>(request.getParameterMap());
-        }
-        
-        @Override
-        public String getContextPath() {
-            if (ignoreContextPath) {
-                return "/";
-            } else {
-                return super.getContextPath();
-            }
         }
         
         @Override

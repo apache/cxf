@@ -78,7 +78,6 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
     private static final String REDIRECT_SERVLET_PATH_PARAMETER = "redirect-servlet-path";
     private static final String REDIRECT_ATTRIBUTES_PARAMETER = "redirect-attributes";
     private static final String REDIRECT_QUERY_CHECK_PARAMETER = "redirect-query-check";
-    private static final String REDIRECT_IGNORE_CONTEXT_PARAMETER = "redirect-ignore-context";
     private static final String REDIRECT_WITH_INCLUDE_PARAMETER = "redirect-with-include";
     private static final String USE_X_FORWARDED_HEADERS_PARAMETER = "use-x-forwarded-headers";
     private static final String X_FORWARDED_PROTO_HEADER = "X-Forwarded-Proto";
@@ -105,9 +104,8 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
     private Map<String, String> staticContentTypes = 
         new HashMap<String, String>(DEFAULT_STATIC_CONTENT_TYPES);
     private boolean redirectQueryCheck;
-    private boolean redirectIgnoreContextPath;
-    private boolean useXForwardedHeaders;
-        
+    private boolean useXForwardedHeaders; 
+    
     public void init(ServletConfig servletConfig) throws ServletException {
         super.init(servletConfig);
 
@@ -115,7 +113,6 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
         staticWelcomeFile = servletConfig.getInitParameter(STATIC_WELCOME_FILE_PARAMETER);
         redirectList = parseListSequence(servletConfig.getInitParameter(REDIRECTS_PARAMETER));
         redirectQueryCheck = Boolean.valueOf(servletConfig.getInitParameter(REDIRECT_QUERY_CHECK_PARAMETER));
-        redirectIgnoreContextPath = Boolean.valueOf(servletConfig.getInitParameter(REDIRECT_IGNORE_CONTEXT_PARAMETER));
         dispatcherServletName = servletConfig.getInitParameter(REDIRECT_SERVLET_NAME_PARAMETER);
         dispatcherServletPath = servletConfig.getInitParameter(REDIRECT_SERVLET_PATH_PARAMETER);
         redirectAttributes = parseMapSequence(servletConfig.getInitParameter(REDIRECT_ATTRIBUTES_PARAMETER));
@@ -385,8 +382,7 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
                 request.setAttribute(entry.getKey(), entry.getValue());
             }
             HttpServletRequest servletRequest = 
-                new HttpServletRequestRedirectFilter(request, pathInfo, theServletPath, customServletPath, 
-                                                     redirectIgnoreContextPath);
+                new HttpServletRequestRedirectFilter(request, pathInfo, theServletPath, customServletPath);
             if (PropertyUtils.isTrue(getServletConfig().getInitParameter(REDIRECT_WITH_INCLUDE_PARAMETER))) {
                 rd.include(servletRequest, response);
             } else {
@@ -405,17 +401,14 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
         
         private String pathInfo;
         private String servletPath;
-        private boolean ignoreContextPath;
         
         public HttpServletRequestRedirectFilter(HttpServletRequest request, 
                                         String pathInfo,
                                         String servletPath,
-                                        boolean customServletPath,
-                                        boolean ignoreContextPath) {
+                                        boolean customServletPath) {
             super(request);
             this.pathInfo = pathInfo;
             this.servletPath = servletPath;
-            this.ignoreContextPath = ignoreContextPath;
             if ("/".equals(this.servletPath) && !customServletPath) {
                 if (this.pathInfo == null) {
                     this.pathInfo = "/";
@@ -423,15 +416,6 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
                 } else {
                     this.servletPath = "";
                 }
-            }
-        }
-        
-        @Override
-        public String getContextPath() {
-            if (ignoreContextPath) {
-                return "/";
-            } else {
-                return super.getContextPath();
             }
         }
         
