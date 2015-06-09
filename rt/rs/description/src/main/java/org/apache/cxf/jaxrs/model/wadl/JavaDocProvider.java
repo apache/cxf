@@ -40,6 +40,8 @@ import org.apache.cxf.jaxrs.utils.ResourceUtils;
 public class JavaDocProvider implements DocumentationProvider {
     public static final double JAVA_VERSION = getVersion();
     public static final double JAVA_VERSION_16 = 1.6D;
+    public static final double JAVA_VERSION_17 = 1.7D;
+    public static final double JAVA_VERSION_18 = 1.8D;
 
     private ClassLoader javaDocLoader;
     private ConcurrentHashMap<String, ClassDocs> docs = new ConcurrentHashMap<String, ClassDocs>();
@@ -176,12 +178,13 @@ public class JavaDocProvider implements DocumentationProvider {
         MethodDocs mDocs = classDoc.getMethodDocs(method);
         if (mDocs == null) {
             String operLink = getOperLink();
-            String operMarker = operLink + method.getName() + "(";
+            String operMarker = operLink + method.getName() + getOperationMarkerOpen();
             
             int operMarkerIndex = classDoc.getClassDoc().indexOf(operMarker);
             while (operMarkerIndex != -1) { 
                 int startOfOpSigIndex = operMarkerIndex + operMarker.length();
-                int endOfOpSigIndex = classDoc.getClassDoc().indexOf(")", startOfOpSigIndex);
+                int endOfOpSigIndex = classDoc.getClassDoc().indexOf(getOperationMarkerClose(), 
+                                                                     startOfOpSigIndex);
                 int paramLen = method.getParameterTypes().length;
                 if (endOfOpSigIndex == startOfOpSigIndex && paramLen == 0) {
                     break;
@@ -290,6 +293,13 @@ public class JavaDocProvider implements DocumentationProvider {
     protected String getCodeTag() {
         String tag = "</CODE>";
         return javaDocsBuiltByVersion == JAVA_VERSION_16 ? tag : tag.toLowerCase();
+    }
+    
+    protected String getOperationMarkerOpen() {
+        return javaDocsBuiltByVersion == JAVA_VERSION_18 ? "--" : "(";
+    }
+    protected String getOperationMarkerClose() {
+        return javaDocsBuiltByVersion == JAVA_VERSION_18 ? "--" : ")";
     }
     
     public void setJavaDocsBuiltByVersion(String version) {
