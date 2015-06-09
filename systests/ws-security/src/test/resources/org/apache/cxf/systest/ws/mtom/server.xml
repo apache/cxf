@@ -92,4 +92,14 @@
         </jaxws:properties>
     </jaxws:endpoint>
     
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Asymmetric" address="http://localhost:${testutil.ports.mtom.Server}/DoubleItX509Asymmetric" serviceName="s:DoubleItService" endpointName="s:DoubleItAsymmetricPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/mtom/DoubleItMtom.wsdl">
+        <jaxws:properties>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+            <entry key="security.signature.properties" value="bob.properties"/>
+            <entry key="security.encryption.properties" value="alice.properties"/>
+            <entry key="security.encryption.username" value="alice"/>
+            <entry key="mtom-enabled" value="true"/>
+        </jaxws:properties>
+    </jaxws:endpoint>
+    
 </beans>
