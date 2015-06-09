@@ -163,6 +163,16 @@ public class BookStore {
     public Book getBookRoot() {
         return new Book("root", 124L);
     }
+    @PUT
+    @Path("/updatebook/{id}")
+    @Consumes("application/xml")
+    @Produces("application/xml")
+    public Book updateEchoBook(Book book) {
+        if (book.getId() != Long.parseLong(ui.getPathParameters().getFirst("id"))) {
+            throw new WebApplicationException(404);
+        }
+        return new Book("root", book.getId());
+    }
     @GET
     @Path("/books/wildcard")
     @Produces("text/*")

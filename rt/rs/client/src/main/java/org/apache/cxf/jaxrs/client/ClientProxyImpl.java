@@ -166,10 +166,9 @@ public class ClientProxyImpl extends AbstractClient implements
         MultivaluedMap<ParameterType, Parameter> types = getParametersInfo(m, params, ori);
         List<Parameter> beanParamsList =  getParameters(types, ParameterType.BEAN);
         
-        
-        List<Object> pathParams = getPathParamValues(m, params, types, beanParamsList, ori);
-        
         int bodyIndex = getBodyIndex(types, ori);
+        
+        List<Object> pathParams = getPathParamValues(m, params, types, beanParamsList, ori, bodyIndex);
         
         UriBuilder builder = getCurrentBuilder().clone(); 
         if (isRoot) {
@@ -388,7 +387,8 @@ public class ClientProxyImpl extends AbstractClient implements
                                             Object[] params,
                                             MultivaluedMap<ParameterType, Parameter> map,
                                             List<Parameter> beanParams,
-                                            OperationResourceInfo ori) {
+                                            OperationResourceInfo ori,
+                                            int bodyIndex) {
         List<Object> list = new LinkedList<Object>();
         if (isRoot) {
             list.addAll(valuesMap.values());
@@ -413,7 +413,7 @@ public class ClientProxyImpl extends AbstractClient implements
         for (Parameter p : beanParams) {
             beanParamValues.putAll(getValuesFromBeanParam(params[p.getIndex()], PathParam.class));
         }
-        
+        Object requestBody = bodyIndex == -1 ? null : params[bodyIndex];
         for (String varName : methodVars) {
             Parameter p = paramsMap.remove(varName);
             if (p != null) {
@@ -421,6 +421,14 @@ public class ClientProxyImpl extends AbstractClient implements
             } else if (beanParamValues.containsKey(varName)) {
                 BeanPair pair = beanParamValues.get(varName);
                 list.add(convertParamValue(pair.getValue(), pair.getAnns()));
+            } else if (requestBody != null) {
+                try {
+                    Method getter = requestBody.getClass().getMethod("get" + StringUtils.capitalize(varName), 
+                                                                     new Class<?>[]{});
+                    list.add(getter.invoke(requestBody, new Object[]{}));
+                } catch (Exception ex) {
+                    // continue
+                }
             }
         }
         

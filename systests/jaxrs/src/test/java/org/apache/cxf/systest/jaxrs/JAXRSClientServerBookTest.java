@@ -107,6 +107,13 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         assertEquals(500, r.getStatus());
     }
     @Test
+    public void testUpdateBookWithProxy() throws Exception {
+        String address = "http://localhost:" + PORT;
+        BookStore store = JAXRSClientFactory.create(address, BookStore.class);
+        Book b = store.updateEchoBook(new Book("CXF", 125L));
+        assertEquals(125L, b.getId());
+    }
+    @Test
     public void testGetBookRoot() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/;JSESSIONID=xxx";
         WebClient wc = WebClient.create(address);
