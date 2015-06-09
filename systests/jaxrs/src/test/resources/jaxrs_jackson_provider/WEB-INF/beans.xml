@@ -49,8 +49,16 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
             <ref bean="jackson"/>
         </jaxrs:providers>
     </jaxrs:server>
-    
-    <core:bus name="cxf1" id="cxf1"/>
+    <core:bus>
+       <core:properties>
+           <entry key="skip.default.json.provider.registration" value="true"/>
+       </core:properties>
+    </core:bus>
+    <core:bus name="cxf1" id="cxf1">
+       <core:properties>
+           <entry key="skip.default.json.provider.registration" value="true"/>
+       </core:properties>
+    </core:bus>
     
     <jaxrs:server id="genericBookStore"
                   bus="cxf1"

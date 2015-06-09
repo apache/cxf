@@ -33,6 +33,7 @@ import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
@@ -41,6 +42,7 @@ import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -53,6 +55,11 @@ public class JAXRSClientServerResourceJacksonSpringProviderTest extends Abstract
         assertTrue("server did not launch correctly",
                    launchServer(BookServerResourceJacksonSpringProviders.class, true));
         createStaticBus();
+        BusFactory.getDefaultBus().setProperty("skip.default.json.provider.registration", true);
+    }
+    @AfterClass
+    public static void afterClass() throws Exception {
+        BusFactory.getDefaultBus().getProperties().remove("skip.default.json.provider.registration");
     }
     
     @Test

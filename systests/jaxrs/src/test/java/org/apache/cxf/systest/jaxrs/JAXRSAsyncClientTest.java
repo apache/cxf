@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.WebApplicationException;
@@ -279,7 +280,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         }
         
     }
-    
+    @Consumes("application/xml")
     private static class FaultyBookReader implements MessageBodyReader<Book> {
 
         @Override

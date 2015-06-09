@@ -35,7 +35,7 @@ public class ApplicationInfo extends ProviderInfo<Application> {
     public ApplicationInfo(Application provider, 
                         Map<Class<?>, ThreadLocalProxy<?>> constructorProxies, 
                         Bus bus) {
-        super(provider, constructorProxies, bus);
+        super(provider, constructorProxies, bus, true);
     }
     
     public Map<String, Object> getProperties() {

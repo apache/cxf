@@ -65,7 +65,6 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 
 public final class ServerProviderFactory extends ProviderFactory {
-    private static final String SHARED_SERVER_FACTORY = "jaxrs.shared.server.factory";
     private static final Set<Class<?>> SERVER_FILTER_INTERCEPTOR_CLASSES = 
         new HashSet<Class<?>>(Arrays.<Class<?>>asList(ContainerRequestFilter.class,
                                                       ContainerResponseFilter.class,
@@ -89,11 +88,9 @@ public final class ServerProviderFactory extends ProviderFactory {
     private Map<Class<?>, BeanParamInfo> beanParams = new HashMap<Class<?>, BeanParamInfo>();
     private ProviderInfo<ContainerRequestFilter> wadlGenerator;
         
-    private ServerProviderFactory(ProviderFactory baseFactory, Bus bus) {
-        super(baseFactory, bus);
-        if (baseFactory == null) {
-            wadlGenerator = createWadlGenerator(bus);
-        }
+    private ServerProviderFactory(Bus bus) {
+        super(bus);
+        wadlGenerator = createWadlGenerator(bus);
     }
     
     private static ProviderInfo<ContainerRequestFilter> createWadlGenerator(Bus bus) {
@@ -101,7 +98,7 @@ public final class ServerProviderFactory extends ProviderFactory {
         if (provider == null) {
             return null;
         } else {
-            return new ProviderInfo<ContainerRequestFilter>((ContainerRequestFilter)provider, bus);
+            return new ProviderInfo<ContainerRequestFilter>((ContainerRequestFilter)provider, bus, true);
         }
     }
     
@@ -113,8 +110,9 @@ public final class ServerProviderFactory extends ProviderFactory {
         if (bus == null) {
             bus = BusFactory.getThreadDefaultBus();
         }
-        ServerProviderFactory baseFactory = initBaseFactory(bus);
-        ServerProviderFactory factory = new ServerProviderFactory(baseFactory, bus);
+        ServerProviderFactory factory = new ServerProviderFactory(bus);
+        ProviderFactory.initFactory(factory);
+        factory.setProviders(false, new WebApplicationExceptionMapper());
         factory.setBusProviders();
         return factory;
     }
@@ -122,21 +120,6 @@ public final class ServerProviderFactory extends ProviderFactory {
     public static ServerProviderFactory getInstance(Message m) {
         Endpoint e = m.getExchange().get(Endpoint.class);
         return (ServerProviderFactory)e.get(SERVER_FACTORY_NAME);
-    }
-    
-    private static synchronized ServerProviderFactory initBaseFactory(Bus bus) {
-        ServerProviderFactory factory = (ServerProviderFactory)bus.getProperty(SHARED_SERVER_FACTORY);
-        if (factory != null) {
-            return factory;
-        }
-        factory = new ServerProviderFactory(null, bus);
-        ProviderFactory.initBaseFactory(factory);
-        factory.setProviders(new WebApplicationExceptionMapper());
-        
-        bus.setProperty(SHARED_SERVER_FACTORY, factory);
-
-
-        return factory;
     }
     
     public List<ProviderInfo<ContainerRequestFilter>> getPreMatchContainerRequestFilters() {
@@ -150,20 +133,19 @@ public final class ServerProviderFactory extends ProviderFactory {
     
     private List<ProviderInfo<ContainerRequestFilter>> getContainerRequestFilters(
         List<ProviderInfo<ContainerRequestFilter>> filters, boolean syncNeeded) {
-        ProviderInfo<ContainerRequestFilter> generator = wadlGenerator != null ? wadlGenerator 
-            : ((ServerProviderFactory)getBaseFactory()).wadlGenerator;
-        if (generator == null) { 
+        
+        if (wadlGenerator == null) { 
             return filters;
         }
         if (filters.size() == 0) {
-            return Collections.singletonList(generator);
+            return Collections.singletonList(wadlGenerator);
         } else if (!syncNeeded) {
-            filters.add(0, generator);
+            filters.add(0, wadlGenerator);
             return filters;
         } else {
             synchronized (filters) {
-                if (filters.get(0) != generator) {
-                    filters.add(0, generator);
+                if (filters.get(0) != wadlGenerator) {
+                    filters.add(0, wadlGenerator);
                 }
             }
             return filters;
@@ -181,43 +163,34 @@ public final class ServerProviderFactory extends ProviderFactory {
     public BeanParamInfo getBeanParamInfo(Class<?> beanClass) {
         return beanParams.get(beanClass);
     }
-   
+
+    @SuppressWarnings("unchecked")
     public <T extends Throwable> ExceptionMapper<T> createExceptionMapper(Class<?> exceptionType,
                                                                           Message m) {
-        ExceptionMapper<T> mapper = doCreateExceptionMapper(exceptionType, m);
-        if (mapper != null || isBaseFactory()) {
-            return mapper;
-        }
-        
-        return ((ServerProviderFactory)getBaseFactory()).createExceptionMapper(exceptionType, m);
-    }
-    
-    @SuppressWarnings("unchecked")
-    private <T extends Throwable> ExceptionMapper<T> doCreateExceptionMapper(
-        Class<?> exceptionType, Message m) {
-        
-        List<ExceptionMapper<?>> candidates = new LinkedList<ExceptionMapper<?>>();
+        List<ProviderInfo<ExceptionMapper<?>>> candidates = new LinkedList<ProviderInfo<ExceptionMapper<?>>>();
         for (ProviderInfo<ExceptionMapper<?>> em : exceptionMappers) {
-            handleMapper(candidates, em, exceptionType, m, ExceptionMapper.class, true);
+            if (handleMapper(em, exceptionType, m, ExceptionMapper.class, true)) {
+                candidates.add(em);
+            }
         }
         if (candidates.size() == 0) {
             return null;
         }
-        Collections.sort(candidates, new ClassComparator(exceptionType));
-        return (ExceptionMapper<T>) candidates.get(0);
+        Collections.sort(candidates, new ProviderInfoClassComparator(exceptionType));
+        return (ExceptionMapper<T>) candidates.get(0).getProvider();
     }
     
     
     @SuppressWarnings("unchecked")
     @Override
-    protected void setProviders(Object... providers) {
+    protected void setProviders(boolean custom, Object... providers) {
         List<ProviderInfo<ContainerRequestFilter>> postMatchRequestFilters = 
             new LinkedList<ProviderInfo<ContainerRequestFilter>>();
         List<ProviderInfo<ContainerResponseFilter>> postMatchResponseFilters = 
             new LinkedList<ProviderInfo<ContainerResponseFilter>>();
         
         List<ProviderInfo<? extends Object>> theProviders = 
-            prepareProviders((Object[])providers, application);
+            prepareProviders(custom, (Object[])providers, application);
         super.setCommonProviders(theProviders);
         for (ProviderInfo<? extends Object> provider : theProviders) {
             Class<?> providerCls = ClassHelper.getRealClass(getBus(), provider.getProvider());
