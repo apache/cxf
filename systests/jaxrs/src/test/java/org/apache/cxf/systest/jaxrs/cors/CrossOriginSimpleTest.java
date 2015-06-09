@@ -437,6 +437,35 @@ public class CrossOriginSimpleTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testAnnotatedMethodPreflight2() throws Exception {
+        configureAllowOrigins(true, null);
+        String r = configClient.replacePath("/setAllowCredentials/false")
+            .accept("text/plain").post(null, String.class);
+        assertEquals("ok", r);
+        HttpClient httpclient = HttpClientBuilder.create().build();
+        HttpOptions http = new HttpOptions("http://localhost:" + PORT + "/untest/annotatedPut2");
+        // this is the origin we expect to get.
+        http.addHeader("Origin", "http://area51.mil:31415");
+        http.addHeader(CorsHeaderConstants.HEADER_AC_REQUEST_METHOD, "PUT");
+        http.addHeader(CorsHeaderConstants.HEADER_AC_REQUEST_HEADERS, "X-custom-1, x-custom-2");
+        HttpResponse response = httpclient.execute(http);
+        assertEquals(200, response.getStatusLine().getStatusCode());
+        assertOriginResponse(false, new String[]{"http://area51.mil:31415"}, true, response);
+        assertAllowCredentials(response, true);
+        List<String> exposeHeadersValues 
+            = headerValues(response.getHeaders(CorsHeaderConstants.HEADER_AC_EXPOSE_HEADERS));
+        // preflight never returns Expose-Headers
+        assertEquals(Collections.emptyList(), exposeHeadersValues);
+        List<String> allowHeadersValues 
+            = headerValues(response.getHeaders(CorsHeaderConstants.HEADER_AC_ALLOW_HEADERS));
+        assertEquals(Arrays.asList(new String[] {"X-custom-1", "x-custom-2" }), allowHeadersValues);
+        if (httpclient instanceof Closeable) {
+            ((Closeable)httpclient).close();
+        }
+
+    }
+    
+    @Test
     public void testAnnotatedClassCorrectOrigin() throws Exception {
         HttpClient httpclient = HttpClientBuilder.create().build();
         HttpGet httpget = new HttpGet("http://localhost:" + PORT + "/antest/simpleGet/HelloThere");
