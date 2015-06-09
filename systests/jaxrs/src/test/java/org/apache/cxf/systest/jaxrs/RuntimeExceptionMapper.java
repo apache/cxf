@@ -18,17 +18,18 @@
  */
 package org.apache.cxf.systest.jaxrs;
 
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.ExceptionMapper;
 
-public class RuntimeExceptionMapper implements ExceptionMapper<RuntimeException> {
+public class RuntimeExceptionMapper implements ExceptionMapper<WebApplicationException> {
 
     @Context 
     private UriInfo ui;
     
-    public Response toResponse(RuntimeException exception) {
+    public Response toResponse(WebApplicationException exception) {
         String path = ui.getPath();
         if (path.endsWith("nonexistent")) {
             return Response.status(405).type("text/plain").entity("Nonexistent method").build();

@@ -429,13 +429,13 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
                 if (isApplication) {
                     provider = new ApplicationInfo((Application)c.newInstance(), getBus());
                 } else {
-                    provider = new ProviderInfo<Object>(c.newInstance(), getBus(), false);    
+                    provider = new ProviderInfo<Object>(c.newInstance(), getBus(), false, true);    
                 }
             } else {
                 Map<Class<?>, Object> values = new HashMap<Class<?>, Object>();
                 values.put(ServletContext.class, sc.getServletContext());
                 values.put(ServletConfig.class, sc);
-                provider = ProviderFactory.createProviderFromConstructor(c, values, getBus(), isApplication);
+                provider = ProviderFactory.createProviderFromConstructor(c, values, getBus(), isApplication, true);
             }
             Object instance = provider.getProvider();
             injectProperties(instance, props);

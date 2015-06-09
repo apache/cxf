@@ -18,13 +18,11 @@
   under the License.
 -->
 <!-- START SNIPPET: beans -->
-<!--beans xmlns="http://www.springframework.org/schema/beans"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:simple="http://cxf.apache.org/simple"
-  xsi:schemaLocation="
-  http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-  http://cxf.apache.org/simple http://cxf.apache.org/schemas/simple.xsd"-->
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util" xmlns:jaxrs="http://cxf.apache.org/jaxrs" xmlns:cxf="http://cxf.apache.org/core" xsi:schemaLocation=" http://www.springframework.org/schema/beans  http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util  http://www.springframework.org/schema/util/spring-util.xsd http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:util="http://www.springframework.org/schema/util" 
+    xmlns:jaxrs="http://cxf.apache.org/jaxrs" 
+    xmlns:cxf="http://cxf.apache.org/core" 
+    xsi:schemaLocation=" http://www.springframework.org/schema/beans  http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util  http://www.springframework.org/schema/util/spring-util.xsd http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
     <import resource="classpath:META-INF/cxf/cxf.xml"/>
     <import resource="classpath:META-INF/cxf/cxf-servlet.xml"/>
     <bean class="org.apache.cxf.systest.jaxrs.BookStoreSpring" id="serviceBean"/>
@@ -133,7 +131,12 @@
             <bean class="org.apache.cxf.jaxrs.provider.jsonp.JsonpPostStreamInterceptor"/>
         </jaxrs:outInterceptors>
     </jaxrs:server>
-    <jaxrs:server id="bookJsonp2" address="/jsonp2">
+    <cxf:bus name="cxf2" id="cxf2">
+       <cxf:properties>
+           <entry key="skip.default.json.provider.registration" value="true"/>
+       </cxf:properties>
+    </cxf:bus>
+    <jaxrs:server id="bookJsonp2" address="/jsonp2" bus="cxf2">
         <jaxrs:serviceBeans>
             <ref bean="serviceBean"/>
         </jaxrs:serviceBeans>

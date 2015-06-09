@@ -482,7 +482,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     
     @Test
     public void testGetBookJsonpJackson() throws Exception {
-        String url = "http://localhost:" + PORT + "/the/jsonp2/books/123";
+        String url = "http://localhost:" + PORT + "/bus/jsonp2/books/123";
         WebClient client = WebClient.create(url);
         WebClient.getConfig(client).getHttpConduit().getClient().setReceiveTimeout(10000000);
         client.accept("application/json, application/x-javascript");

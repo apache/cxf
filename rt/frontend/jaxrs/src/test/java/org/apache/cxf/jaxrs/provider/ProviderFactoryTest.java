@@ -93,9 +93,9 @@ public class ProviderFactoryTest extends Assert {
         WildcardReader2 reader2 = new WildcardReader2();
         pf.registerUserProvider(reader2);
         List<ProviderInfo<MessageBodyReader<?>>> readers = pf.getMessageReaders();
-        assertEquals(2, readers.size());
-        assertSame(reader1, readers.get(0).getProvider());
-        assertSame(reader2, readers.get(1).getProvider());
+        assertEquals(10, readers.size());
+        assertSame(reader1, readers.get(6).getProvider());
+        assertSame(reader2, readers.get(7).getProvider());
     }
     
     @Test
@@ -150,9 +150,7 @@ public class ProviderFactoryTest extends Assert {
         MessageBodyReader<Book> customJaxbReader = pf.createMessageBodyReader(
             Book.class, null, null, MediaType.TEXT_XML_TYPE, new MessageImpl());
         assertTrue(jaxbReader instanceof JAXBElementProvider);
-        assertNotSame(jaxbReader, customJaxbReader);
-        
-        assertNull(((JAXBElementProvider<Book>)jaxbReader).getSchema());
+        assertSame(jaxbReader, customJaxbReader);
         assertNotNull(((JAXBElementProvider<Book>)customJaxbReader).getSchema());
     }
     
@@ -203,7 +201,9 @@ public class ProviderFactoryTest extends Assert {
         
         TestRuntimeExceptionMapper rm = new TestRuntimeExceptionMapper(); 
         pf.registerUserProvider(rm);
-        assertSame(rm, pf.createExceptionMapper(WebApplicationException.class, new MessageImpl()));
+        ExceptionMapper<WebApplicationException> em = 
+            pf.createExceptionMapper(WebApplicationException.class, new MessageImpl());
+        assertTrue(em instanceof WebApplicationExceptionMapper);
         assertSame(rm, pf.createExceptionMapper(RuntimeException.class, new MessageImpl()));
         
         WebApplicationExceptionMapper wm = new WebApplicationExceptionMapper(); 
@@ -230,6 +230,22 @@ public class ProviderFactoryTest extends Assert {
         MessageBodyReader<String> mbr = pf.createMessageBodyReader(String.class, String.class, new Annotation[]{}, 
                                    MediaType.APPLICATION_XML_TYPE, new MessageImpl());
         assertTrue(mbr instanceof StringTextProvider);
+    }
+    @Test
+    public void testMessageBodyReaderBoolean() throws Exception {
+        ProviderFactory pf = ServerProviderFactory.getInstance();
+        pf.registerUserProvider(new CustomBooleanReader());
+        MessageBodyReader<Boolean> mbr = pf.createMessageBodyReader(Boolean.class, Boolean.class, new Annotation[]{}, 
+                                   MediaType.TEXT_PLAIN_TYPE, new MessageImpl());
+        assertTrue(mbr instanceof PrimitiveTextProvider);
+    }
+    @Test
+    public void testMessageBodyReaderBoolean2() throws Exception {
+        ProviderFactory pf = ServerProviderFactory.getInstance();
+        pf.registerUserProvider(new CustomBooleanReader2());
+        MessageBodyReader<Boolean> mbr = pf.createMessageBodyReader(Boolean.class, Boolean.class, new Annotation[]{}, 
+                                   MediaType.TEXT_PLAIN_TYPE, new MessageImpl());
+        assertTrue(mbr instanceof CustomBooleanReader2);
     }
     @Test
     public void testMessageBodyWriterString() throws Exception {
@@ -908,4 +924,23 @@ public class ProviderFactoryTest extends Assert {
             return null;
         }
     }
+    @Consumes("text/plain")
+    public static class CustomBooleanReader2 extends CustomBooleanReader {
+        
+    }
+    public static class CustomBooleanReader implements MessageBodyReader<Boolean> {
+        @Override
+        public boolean isReadable(Class<?> type, Type type1, Annotation[] antns, MediaType mt) {
+            return type == Boolean.class;
+        }
+        @Override
+        public Boolean readFrom(Class<Boolean> type,
+                                 Type type1,
+                                 Annotation[] antns,
+                                 MediaType mt, MultivaluedMap<String, String> mm,
+                                 InputStream in) throws IOException, WebApplicationException {
+            return Boolean.TRUE;        
+        }
+    }
+    
 }

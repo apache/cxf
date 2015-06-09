@@ -36,8 +36,6 @@ import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.message.Message;
 
 public final class ClientProviderFactory extends ProviderFactory {
-    private static final String SHARED_CLIENT_FACTORY = "jaxrs.shared.client.factory";
-    
     private List<ProviderInfo<ClientRequestFilter>> clientRequestFilters = 
         new ArrayList<ProviderInfo<ClientRequestFilter>>(1);
     private List<ProviderInfo<ClientResponseFilter>> clientResponseFilters = 
@@ -45,16 +43,16 @@ public final class ClientProviderFactory extends ProviderFactory {
     private List<ProviderInfo<ResponseExceptionMapper<?>>> responseExceptionMappers = 
         new ArrayList<ProviderInfo<ResponseExceptionMapper<?>>>(1);
     
-    private ClientProviderFactory(ProviderFactory baseFactory, Bus bus) {
-        super(baseFactory, bus);
+    private ClientProviderFactory(Bus bus) {
+        super(bus);
     }
     
     public static ClientProviderFactory createInstance(Bus bus) {
         if (bus == null) {
             bus = BusFactory.getThreadDefaultBus();
         }
-        ClientProviderFactory baseFactory = initBaseFactory(bus);
-        ClientProviderFactory factory = new ClientProviderFactory(baseFactory, bus);
+        ClientProviderFactory factory = new ClientProviderFactory(bus);
+        ProviderFactory.initFactory(factory);
         factory.setBusProviders();
         return factory;
     }
@@ -68,20 +66,11 @@ public final class ClientProviderFactory extends ProviderFactory {
         return (ClientProviderFactory)e.get(CLIENT_FACTORY_NAME);
     }
        
-    private static synchronized ClientProviderFactory initBaseFactory(Bus bus) {
-        ClientProviderFactory factory = (ClientProviderFactory)bus.getProperty(SHARED_CLIENT_FACTORY);
-        if (factory != null) {
-            return factory;
-        }
-        factory = new ClientProviderFactory(null, bus);
-        ProviderFactory.initBaseFactory(factory);
-        bus.setProperty(SHARED_CLIENT_FACTORY, factory);
-        return factory;
-    }
+    
     @Override
-    protected void setProviders(Object... providers) {
+    protected void setProviders(boolean custom, Object... providers) {
         List<ProviderInfo<? extends Object>> theProviders = 
-            prepareProviders((Object[])providers, null);
+            prepareProviders(custom, (Object[])providers, null);
         super.setCommonProviders(theProviders);
         for (ProviderInfo<? extends Object> provider : theProviders) {
             Class<?> providerCls = ClassHelper.getRealClass(getBus(), provider.getProvider());
@@ -112,7 +101,9 @@ public final class ClientProviderFactory extends ProviderFactory {
         List<ResponseExceptionMapper<?>> candidates = new LinkedList<ResponseExceptionMapper<?>>();
         
         for (ProviderInfo<ResponseExceptionMapper<?>> em : responseExceptionMappers) {
-            handleMapper(candidates, em, paramType, m, ResponseExceptionMapper.class, true);
+            if (handleMapper(em, paramType, m, ResponseExceptionMapper.class, true)) {
+                candidates.add(em.getProvider());
+            }
         }
         if (candidates.size() == 0) {
             return null;

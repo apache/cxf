@@ -43,7 +43,7 @@ public class FilterProviderInfo<T> extends ProviderInfo<T> {
                               String nameBinding,
                               boolean dynamic,
                               Map<Class<?>, Integer> supportedContracts) {
-        super(provider, bus);
+        super(provider, bus, true);
         this.nameBinding = Collections.singleton(nameBinding);
         this.supportedContracts = supportedContracts;
         this.dynamic = dynamic;
