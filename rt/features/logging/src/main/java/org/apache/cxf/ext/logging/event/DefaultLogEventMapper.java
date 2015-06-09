@@ -29,7 +29,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import javax.security.auth.Subject;
-import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.cxf.binding.Binding;
@@ -70,19 +69,10 @@ public class DefaultLogEventMapper implements LogEventMapper {
             }
         }
 
-        String encoding = (String)message.get(Message.ENCODING);
+        event.setEncoding(safeGet(message, Message.ENCODING));
+        event.setHttpMethod(safeGet(message, Message.HTTP_REQUEST_METHOD));
+        event.setContentType(safeGet(message, Message.CONTENT_TYPE));
 
-        if (encoding != null) {
-            event.setEncoding(encoding);
-        }
-        String httpMethod = (String)message.get(Message.HTTP_REQUEST_METHOD);
-        if (httpMethod != null) {
-            event.setHttpMethod(httpMethod);
-        }
-        String ct = (String)message.get(Message.CONTENT_TYPE);
-        if (ct != null) {
-            event.setContentType(ct);
-        }
         Map<String, String> headerMap = getHeaders(message);
         event.setHeaders(headerMap);
 
@@ -138,6 +128,9 @@ public class DefaultLogEventMapper implements LogEventMapper {
     private Map<String, String> getHeaders(Message message) {
         Map<String, List<String>> headers = CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
         Map<String, String> result = new HashMap<>();
+        if (headers == null) {
+            return result;
+        }
         for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
             if (entry.getValue().size() == 1) {
                 result.put(entry.getKey(), entry.getValue().get(0));
@@ -150,10 +143,10 @@ public class DefaultLogEventMapper implements LogEventMapper {
     }
 
     private String getUri(Message message) {
-        String uri = (String)message.get(Message.REQUEST_URL);
+        String uri = safeGet(message, Message.REQUEST_URL);
         if (uri == null) {
-            String address = (String)message.get(Message.ENDPOINT_ADDRESS);
-            uri = (String)message.get(Message.REQUEST_URI);
+            String address = safeGet(message, Message.ENDPOINT_ADDRESS);
+            uri = safeGet(message, Message.REQUEST_URI);
             if (uri != null && uri.startsWith("/")) {
                 if (address != null && !address.startsWith(uri)) {
                     if (address.endsWith("/") && address.length() > 1) {
@@ -165,7 +158,7 @@ public class DefaultLogEventMapper implements LogEventMapper {
                 uri = address;
             }
         }
-        String query = (String)message.get(Message.QUERY_STRING);
+        String query = safeGet(message, Message.QUERY_STRING);
         if (query != null) {
             return uri + "?" + query;
         } else {
@@ -174,7 +167,7 @@ public class DefaultLogEventMapper implements LogEventMapper {
     }
 
     private boolean isBinaryContent(Message message) {
-        String contentType = (String)message.get(Message.CONTENT_TYPE);
+        String contentType = safeGet(message, Message.CONTENT_TYPE);
         return contentType != null && BINARY_CONTENT_MEDIA_TYPES.contains(contentType);
     }
 
@@ -228,13 +221,12 @@ public class DefaultLogEventMapper implements LogEventMapper {
     }
 
     private BindingOperationInfo getOperationFromContent(Message message) {
-        BindingOperationInfo boi = null;
         XMLStreamReader xmlReader = message.getContent(XMLStreamReader.class);
-        if (null != xmlReader) {
-            QName qName = xmlReader.getName();
-            boi = ServiceModelUtil.getOperation(message.getExchange(), qName);
+        if (xmlReader != null) {
+            return ServiceModelUtil.getOperation(message.getExchange(), xmlReader.getName());
+        } else {
+            return null;
         }
-        return boi;
     }
 
     private Message getEffectiveMessage(Message message) {
@@ -249,23 +241,30 @@ public class DefaultLogEventMapper implements LogEventMapper {
 
     private String getRestOperationName(Message curMessage) {
         Message message = getEffectiveMessage(curMessage);
-        if (message.containsKey(Message.HTTP_REQUEST_METHOD)) {
-            String httpMethod = message.get(Message.HTTP_REQUEST_METHOD).toString();
-
-            String path = "";
-            if (message.containsKey(Message.REQUEST_URI)) {
-                String requestUri = message.get(Message.REQUEST_URI).toString();
-                int baseUriLength = (message.containsKey(Message.BASE_PATH)) ? message.get(Message.BASE_PATH)
-                    .toString().length() : 0;
-                path = requestUri.substring(baseUriLength);
-                if (path.isEmpty()) {
-                    path = "/";
-                }
-            }
-
-            return new StringBuffer().append(httpMethod).append('[').append(path).append(']').toString();
+        String httpMethod = safeGet(message, Message.HTTP_REQUEST_METHOD);
+        if (httpMethod == null) {
+            return "";
         }
-        return "";
+
+        String path = "";
+        String requestUri = safeGet(message, Message.REQUEST_URI);
+        if (requestUri != null) {
+            String basePath = safeGet(message, Message.BASE_PATH);
+            int baseUriLength = (basePath != null) ? basePath.length() : 0;
+            path = requestUri.substring(baseUriLength);
+            if (path.isEmpty()) {
+                path = "/";
+            }
+        }
+        return new StringBuffer().append(httpMethod).append('[').append(path).append(']').toString();
+    }
+    
+    private String safeGet(Message message, String key) {
+        if (!message.containsKey(key)) {
+            return null;
+        }
+        Object value = message.get(key);
+        return (value instanceof String) ? value.toString() : null;
     }
 
     /**
@@ -317,7 +316,6 @@ public class DefaultLogEventMapper implements LogEventMapper {
         EndpointInfo endpoint = getEPInfo(message);
         event.setPortName(endpoint.getName());
         event.setPortTypeName(endpoint.getName());
-        event.setOperationName(getRestOperationName(message));
         String opName = isSOAPMessage(message) ? getOperationName(message) : getRestOperationName(message);
         event.setOperationName(opName);
         if (endpoint.getService() != null) {
@@ -333,7 +331,7 @@ public class DefaultLogEventMapper implements LogEventMapper {
 
     private EndpointInfo getEPInfo(Message message) {
         Endpoint ep = message.getExchange().getEndpoint();
-        return (ep == null) ? null : ep.getEndpointInfo();
+        return (ep == null) ? new EndpointInfo() : ep.getEndpointInfo();
     }
 
 }
