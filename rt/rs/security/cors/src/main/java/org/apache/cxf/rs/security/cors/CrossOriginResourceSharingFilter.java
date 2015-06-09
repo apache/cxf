@@ -113,28 +113,19 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
     }
 
     private Response simpleRequest(Message m, CrossOriginResourceSharing ann) {
-        List<String> values = getHeaderValues(CorsHeaderConstants.HEADER_ORIGIN, true);
+        List<String> headerOriginValues = getHeaderValues(CorsHeaderConstants.HEADER_ORIGIN, true);
         // 5.1.1 there has to be an origin
-        if (values == null || values.size() == 0) {
+        if (headerOriginValues == null || headerOriginValues.size() == 0) {
             return null;
         }
         
         // 5.1.2 check all the origins
-        if (!effectiveAllowOrigins(ann, values)) {
+        if (!effectiveAllowOrigins(ann, headerOriginValues)) {
             return null;
         }
         
-        String originResponse;
-        // 5.1.3 credentials lives in the output filter
-        // in any case
-        if (effectiveAllowAllOrigins(ann)) {
-            originResponse = "*";
-        } else {
-            originResponse = concatValues(values, true);
-        }
-
         // handle 5.1.3
-        commonRequestProcessing(m, ann, originResponse);
+        setAllowOriginAndCredentials(m, ann, headerOriginValues);
         
         // 5.1.4
         List<String> effectiveExposeHeaders = effectiveExposeHeaders(ann);
@@ -230,13 +221,6 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
             return createPreflightResponse(m, false);
         }
 
-        // 5.2.7: add allow credentials and allow-origin as required: this lives in the Output filter
-        String originResponse;
-        if (effectiveAllowAllOrigins(ann)) {
-            originResponse = "*";
-        } else {
-            originResponse = origin;
-        }
         // 5.2.9 add allow-methods; we pass them from here to the output filter which actually adds them.
         m.getExchange().put(CorsHeaderConstants.HEADER_AC_ALLOW_METHODS, Arrays.asList(requestMethod));
         
@@ -249,7 +233,7 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
         }
 
         // 5.2.7 is in here.
-        commonRequestProcessing(m, ann, originResponse);
+        setAllowOriginAndCredentials(m, ann, headerOriginValues);
 
         return createPreflightResponse(m, true);
     }
@@ -314,10 +298,22 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
         }
     }
     
-    private void commonRequestProcessing(Message m, CrossOriginResourceSharing ann, String origin) {
+    private void setAllowOriginAndCredentials(Message m, 
+                                              CrossOriginResourceSharing ann,
+                                              List<String> headerOriginValues) {
+     
+        boolean allowCreds = effectiveAllowCredentials(ann);
+        m.getExchange().put(CorsHeaderConstants.HEADER_AC_ALLOW_CREDENTIALS, allowCreds);
         
-        m.getExchange().put(CorsHeaderConstants.HEADER_ORIGIN, origin);
-        m.getExchange().put(CorsHeaderConstants.HEADER_AC_ALLOW_CREDENTIALS, effectiveAllowCredentials(ann));
+        String originResponse;
+        if (!allowCreds && effectiveAllowAllOrigins(ann)) {
+            originResponse = "*";
+        } else {
+            originResponse = concatValues(headerOriginValues, true);
+        }
+        
+        m.getExchange().put(CorsHeaderConstants.HEADER_ORIGIN, originResponse);
+        
     }
 
     public Response handleResponse(Message m, OperationResourceInfo ori, Response response) {

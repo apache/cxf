@@ -77,4 +77,19 @@ public class UnannotatedCorsServer {
     public String annotatedPut(String input) {
         return input;
     }
+    
+    @PUT
+    @Consumes("text/plain")
+    @Produces("text/plain")
+    @Path("/annotatedPut2")
+    @CrossOriginResourceSharing(
+        allowAllOrigins = true, 
+        allowCredentials = true, 
+        maxAge = 1, 
+        allowHeaders = { "X-custom-1", "X-custom-2" },
+        exposeHeaders = {"X-custom-3", "X-custom-4" }
+    )
+    public String annotatedPut2(String input) {
+        return input;
+    }
 }
