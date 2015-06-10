@@ -60,7 +60,7 @@ public class JsonWebKeys extends JsonMapObject {
         }
         Map<String, JsonWebKey> map = new LinkedHashMap<String, JsonWebKey>();
         for (JsonWebKey key : keys) {
-            String kid = key.getKid();
+            String kid = key.getKeyId();
             if (kid != null) {
                 map.put(kid, key);
             }

@@ -137,20 +137,20 @@ public class JwkJoseCookBookTest extends Assert {
     }
     private void validateSecretSignKey(JsonWebKey key) {
         assertEquals(SIGN_SECRET_VALUE, key.getProperty(JsonWebKey.OCTET_KEY_VALUE));
-        assertEquals(SIGN_KID_VALUE, key.getKid());
+        assertEquals(SIGN_KID_VALUE, key.getKeyId());
         assertEquals(JsonWebKey.KEY_TYPE_OCTET, key.getKeyType());
         assertEquals(AlgorithmUtils.HMAC_SHA_256_ALGO, key.getAlgorithm());
     }
     private void validateSecretEncKey(JsonWebKey key) {
         assertEquals(ENCRYPTION_SECRET_VALUE, key.getProperty(JsonWebKey.OCTET_KEY_VALUE));
-        assertEquals(ENCRYPTION_KID_VALUE, key.getKid());
+        assertEquals(ENCRYPTION_KID_VALUE, key.getKeyId());
         assertEquals(JsonWebKey.KEY_TYPE_OCTET, key.getKeyType());
         assertEquals(AlgorithmUtils.A256GCM_ALGO, key.getAlgorithm());
     }
     private void validatePublicRsaKey(JsonWebKey key) {
         assertEquals(RSA_MODULUS_VALUE, key.getProperty(JsonWebKey.RSA_MODULUS));
         assertEquals(RSA_PUBLIC_EXP_VALUE, key.getProperty(JsonWebKey.RSA_PUBLIC_EXP));
-        assertEquals(RSA_KID_VALUE, key.getKid());
+        assertEquals(RSA_KID_VALUE, key.getKeyId());
         assertEquals(JsonWebKey.KEY_TYPE_RSA, key.getKeyType());
     }
     private void validatePrivateRsaKey(JsonWebKey key) {
@@ -165,7 +165,7 @@ public class JwkJoseCookBookTest extends Assert {
     private void validatePublicEcKey(JsonWebKey key) {
         assertEquals(EC_X_COORDINATE_VALUE, key.getProperty(JsonWebKey.EC_X_COORDINATE));
         assertEquals(EC_Y_COORDINATE_VALUE, key.getProperty(JsonWebKey.EC_Y_COORDINATE));
-        assertEquals(EC_KID_VALUE, key.getKid());
+        assertEquals(EC_KID_VALUE, key.getKeyId());
         assertEquals(JsonWebKey.KEY_TYPE_ELLIPTIC, key.getKeyType());
         assertEquals(EC_CURVE_VALUE, key.getProperty(JsonWebKey.EC_CURVE));
         assertEquals(JsonWebKey.PUBLIC_KEY_USE_SIGN, key.getPublicKeyUse());

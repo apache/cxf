@@ -70,6 +70,8 @@ public final class KeyManagementUtils {
     public static final String RSSEC_DECRYPT_KEY_PSWD_PROVIDER = "rs.security.decryption.key.password.provider";
     public static final String RSSEC_DEFAULT_ALGORITHMS = "rs.security.default.algorithms";
     public static final String RSSEC_REPORT_KEY_PROP = "rs.security.report.public.key";
+    public static final String RSSEC_REPORT_KEY_ID_PROP = "rs.security.report.public.key.id";
+    public static final String RSSEC_ACCEPT_PUBLIC_KEY_PROP = "rs.security.accept.public.key.properties";
     private static final Logger LOG = LogUtils.getL7dLogger(KeyManagementUtils.class);
     
     private KeyManagementUtils() {
@@ -272,6 +274,7 @@ public final class KeyManagementUtils {
             return null;
         }
     }
+    //TODO: enhance the certificate validation code
     public static void validateCertificateChain(Properties storeProperties, List<X509Certificate> inCerts) {
         KeyStore ks = loadPersistKeyStore(JAXRSUtils.getCurrentMessage(), storeProperties);
         validateCertificateChain(ks, inCerts);

@@ -59,6 +59,7 @@ public final class JweUtils {
     private static final String RSSEC_ENCRYPTION_IN_PROPS = "rs.security.encryption.in.properties";
     private static final String RSSEC_ENCRYPTION_PROPS = "rs.security.encryption.properties";
     private static final String RSSEC_ENCRYPTION_REPORT_KEY_PROP = "rs.security.jwe.report.public.key";
+    private static final String RSSEC_ENCRYPTION_REPORT_KEY_ID_PROP = "rs.security.jwe.report.public.key.id";
     
     private JweUtils() {
         
@@ -265,6 +266,10 @@ public final class JweUtils {
             headers != null && MessageUtils.isTrue(
                 MessageUtils.getContextualProperty(m, RSSEC_ENCRYPTION_REPORT_KEY_PROP, 
                                                    KeyManagementUtils.RSSEC_REPORT_KEY_PROP));
+        boolean reportPublicKeyId = 
+            headers != null && MessageUtils.isTrue(
+                MessageUtils.getContextualProperty(m, RSSEC_ENCRYPTION_REPORT_KEY_ID_PROP, 
+                                                   KeyManagementUtils.RSSEC_REPORT_KEY_ID_PROP));
         
         KeyEncryptionProvider keyEncryptionProvider = null;
         String keyEncryptionAlgo = getKeyEncryptionAlgo(m, props, null, null);
@@ -279,8 +284,9 @@ public final class JweUtils {
                 ctEncryptionProvider = getContentEncryptionAlgorithm(jwk, contentEncryptionAlgo);
             } else {
                 keyEncryptionProvider = getKeyEncryptionProvider(jwk, keyEncryptionAlgo);
-                if (reportPublicKey) {
-                    JwkUtils.setPublicKeyInfo(jwk, headers, keyEncryptionAlgo);
+                if (reportPublicKey || reportPublicKeyId) {
+                    JwkUtils.setPublicKeyInfo(jwk, headers, keyEncryptionAlgo, 
+                                              reportPublicKey, reportPublicKeyId);
                 }
             }
         } else {

@@ -108,11 +108,11 @@ public class JsonWebKey extends JsonMapObject {
         return (String)getProperty(KEY_ALGO);
     }
     
-    public void setKid(String kid) {
+    public void setKeyId(String kid) {
         setProperty(KEY_ID, kid);
     }
 
-    public String getKid() {
+    public String getKeyId() {
         return (String)getProperty(KEY_ID);
     }
     
