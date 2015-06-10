@@ -21,6 +21,7 @@ package org.apache.cxf.rs.security.jose.jws;
 import java.util.Map;
 
 import org.apache.cxf.rs.security.jose.JoseHeaders;
+import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 
 public class JwsHeaders extends JoseHeaders {
     public JwsHeaders() {
@@ -40,4 +41,18 @@ public class JwsHeaders extends JoseHeaders {
         setAlgorithm(sigAlgo);
     }
 
+    public void setSignatureAlgorithm(String type) {
+        setAlgorithm(type);
+    }
+    
+    public void setSignatureAlgorithm(SignatureAlgorithm algo) {
+        this.setSignatureAlgorithm(algo.getJwaName());
+    }
+    
+    public String getSignatureAlgorithm() {
+        return super.getAlgorithm();
+    }
+    public SignatureAlgorithm getSignatureAlgorithmEnum() {
+        return SignatureAlgorithm.getAlgorithm(getSignatureAlgorithm());
+    }
 }

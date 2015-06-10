@@ -69,6 +69,9 @@ public enum SignatureAlgorithm {
     }
     
     public static SignatureAlgorithm getAlgorithm(String algo) {
+        if (algo == null) {
+            return null;
+        }
         return SignatureAlgorithm.valueOf(algo.replace('-', '_')
                                         .replace('+', '_'));
         

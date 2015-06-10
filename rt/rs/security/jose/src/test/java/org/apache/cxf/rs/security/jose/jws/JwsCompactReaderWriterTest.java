@@ -33,11 +33,14 @@ import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
+import org.apache.cxf.rs.security.jose.jwk.KeyOperation;
+import org.apache.cxf.rs.security.jose.jwk.KeyType;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rs.security.jose.jwt.JwtTokenReaderWriter;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -142,9 +145,9 @@ public class JwsCompactReaderWriterTest extends Assert {
     @Test
     public void testWriteJwsWithJwkSignedByMac() throws Exception {
         JsonWebKey key = new JsonWebKey();
-        key.setKeyType(JsonWebKey.KEY_TYPE_OCTET);
+        key.setKeyType(KeyType.OCTET);
         key.setKeyOperation(Arrays.asList(
-            new String[]{JsonWebKey.KEY_OPER_SIGN, JsonWebKey.KEY_OPER_VERIFY}));
+            new KeyOperation[]{KeyOperation.SIGN, KeyOperation.VERIFY}));
         doTestWriteJwsWithJwkSignedByMac(key);
     }
     
@@ -153,7 +156,7 @@ public class JwsCompactReaderWriterTest extends Assert {
         Map<String, Object> map = new LinkedHashMap<String, Object>();
         map.put(JsonWebKey.KEY_TYPE, JsonWebKey.KEY_TYPE_OCTET);
         map.put(JsonWebKey.KEY_OPERATIONS,
-                new String[]{JsonWebKey.KEY_OPER_SIGN, JsonWebKey.KEY_OPER_VERIFY});
+                new KeyOperation[]{KeyOperation.SIGN, KeyOperation.VERIFY});
         doTestWriteJwsWithJwkSignedByMac(map);
     }
     
@@ -186,11 +189,11 @@ public class JwsCompactReaderWriterTest extends Assert {
         assertEquals(SignatureAlgorithm.HS256.getJwaName(), headers.getAlgorithm());
         
         JsonWebKey key = headers.getJsonWebKey();
-        assertEquals(JsonWebKey.KEY_TYPE_OCTET, key.getKeyType());
-        List<String> keyOps = key.getKeyOperation();
+        assertEquals(KeyType.OCTET, key.getKeyType());
+        List<KeyOperation> keyOps = key.getKeyOperation();
         assertEquals(2, keyOps.size());
-        assertEquals(JsonWebKey.KEY_OPER_SIGN, keyOps.get(0));
-        assertEquals(JsonWebKey.KEY_OPER_VERIFY, keyOps.get(1));
+        assertEquals(KeyOperation.SIGN, keyOps.get(0));
+        assertEquals(KeyOperation.VERIFY, keyOps.get(1));
         
         validateSpecClaim(token.getClaims());
     }

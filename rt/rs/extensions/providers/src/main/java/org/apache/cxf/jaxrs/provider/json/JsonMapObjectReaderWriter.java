@@ -102,11 +102,12 @@ public class JsonMapObjectReaderWriter {
         } else if (Map.class.isAssignableFrom(value.getClass())) {
             toJsonInternal(out, (Map<String, Object>)value);
         } else {
-            if (value.getClass() == String.class) {
+            boolean stringOrEnum = value.getClass() == String.class || value.getClass().isEnum();
+            if (stringOrEnum) {
                 out.append("\"");
             }
             out.append(value.toString());
-            if (value.getClass() == String.class) {
+            if (stringOrEnum) {
                 out.append("\"");
             }
         }

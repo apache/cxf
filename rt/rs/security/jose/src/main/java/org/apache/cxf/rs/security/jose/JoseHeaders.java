@@ -59,7 +59,8 @@ public class JoseHeaders extends JsonMapObject {
     }
     
     public String getAlgorithm() {
-        return (String)getHeader(JoseConstants.HEADER_ALGORITHM);
+        Object prop = getHeader(JoseConstants.HEADER_ALGORITHM);
+        return prop == null ? null : prop.toString();
     }
     
     public void setKeyId(String kid) {

@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.rs.security.jose.jwk;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -67,6 +68,10 @@ public class JsonWebKey extends JsonMapObject {
     public static final String KEY_OPER_VERIFY = "verify";
     public static final String KEY_OPER_ENCRYPT = "encrypt";
     public static final String KEY_OPER_DECRYPT = "decrypt";
+    public static final String KEY_OPER_WRAP_KEY = "wrapKey";
+    public static final String KEY_OPER_UNWRAP_KEY = "unwrapKey";
+    public static final String KEY_OPER_DERIVE_KEY = "deriveKey";
+    public static final String KEY_OPER_DERIVE_BITS = "deriveBits";
     
     public JsonWebKey() {
         
@@ -76,28 +81,42 @@ public class JsonWebKey extends JsonMapObject {
         super(values);
     }
     
-    public void setKeyType(String keyType) {
-        setProperty(KEY_TYPE, keyType);
-    }
-
-    public String getKeyType() {
-        return (String)getProperty(KEY_TYPE);
-    }
-
-    public void setPublicKeyUse(String use) {
-        setProperty(PUBLIC_KEY_USE, use);
+    public void setKeyType(KeyType keyType) {
+        setProperty(KEY_TYPE, keyType.toString());
     }
     
-    public String getPublicKeyUse() {
-        return (String)getProperty(PUBLIC_KEY_USE);
+    public KeyType getKeyType() {
+        Object prop = getProperty(KEY_TYPE);
+        return prop == null ? null : KeyType.getKeyType(prop.toString());
     }
 
-    public void setKeyOperation(List<String> keyOperation) {
-        setProperty(KEY_OPERATIONS, keyOperation);
+    public void setPublicKeyUse(PublicKeyUse use) {
+        setProperty(PUBLIC_KEY_USE, use.toString());
+    }
+    
+    public PublicKeyUse getPublicKeyUse() {
+        Object prop = getProperty(PUBLIC_KEY_USE);
+        return prop == null ? null : PublicKeyUse.getPublicKeyUse(prop.toString());
     }
 
-    public List<String> getKeyOperation() {
-        return CastUtils.cast((List<?>)getProperty(KEY_OPERATIONS));
+    public void setKeyOperation(List<KeyOperation> keyOperation) {
+        List<String> ops = new ArrayList<String>(keyOperation.size());
+        for (KeyOperation op : keyOperation) {
+            ops.add(op.toString());
+        }
+        setProperty(KEY_OPERATIONS, ops);
+    }
+
+    public List<KeyOperation> getKeyOperation() {
+        List<Object> ops = CastUtils.cast((List<?>)getProperty(KEY_OPERATIONS));
+        if (ops == null) {
+            return null;
+        }
+        List<KeyOperation> keyOps = new ArrayList<KeyOperation>(ops.size());
+        for (Object op : ops) {
+            keyOps.add(KeyOperation.getKeyOperation(op.toString()));
+        }
+        return keyOps;
     }
     
     public void setAlgorithm(String algorithm) {

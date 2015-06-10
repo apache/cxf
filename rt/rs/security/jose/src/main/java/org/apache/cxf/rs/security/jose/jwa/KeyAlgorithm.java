@@ -65,6 +65,9 @@ public enum KeyAlgorithm {
         return keySizeBits;
     }
     public static KeyAlgorithm getAlgorithm(String algo) {
+        if (algo == null) {
+            return null;
+        }
         return KeyAlgorithm.valueOf(algo.replace('-', '_')
                                     .replace('+', '_'));
         

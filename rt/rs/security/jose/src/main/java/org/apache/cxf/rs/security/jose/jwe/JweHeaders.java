@@ -77,8 +77,7 @@ public class JweHeaders extends JoseHeaders {
         return super.getAlgorithm();
     }
     public KeyAlgorithm getKeyEncryptionAlgorithmEnum() {
-        String algo = getKeyEncryptionAlgorithm();
-        return algo == null ? null : KeyAlgorithm.getAlgorithm(algo);
+        return KeyAlgorithm.getAlgorithm(getKeyEncryptionAlgorithm());
     }
     
     public void setContentEncryptionAlgorithm(String type) {
@@ -90,11 +89,11 @@ public class JweHeaders extends JoseHeaders {
     }
     
     public String getContentEncryptionAlgorithm() {
-        return (String)getHeader(JoseConstants.JWE_HEADER_CONTENT_ENC_ALGORITHM);
+        Object prop = getHeader(JoseConstants.JWE_HEADER_CONTENT_ENC_ALGORITHM);
+        return prop == null ? null : prop.toString();
     }
     public ContentAlgorithm getContentEncryptionAlgorithmEnum() {
-        String algo = getContentEncryptionAlgorithm();
-        return algo == null ? null : ContentAlgorithm.getAlgorithm(algo);
+        return ContentAlgorithm.getAlgorithm(getContentEncryptionAlgorithm());
     }
     public void setZipAlgorithm(String type) {
         setHeader(JoseConstants.JWE_HEADER_ZIP_ALGORITHM, type);
