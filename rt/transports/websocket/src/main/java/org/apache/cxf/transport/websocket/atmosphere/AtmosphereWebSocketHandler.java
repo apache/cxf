@@ -27,7 +27,6 @@ import java.security.Principal;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.RejectedExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -101,49 +100,29 @@ public class AtmosphereWebSocketHandler implements WebSocketProtocol {
     
     protected List<AtmosphereRequest> invokeService(final WebSocket webSocket,  final InputStream stream) {
         LOG.fine("invokeService(WebSocket, InputStream)");
-        // invoke the service asynchronously as onMessage is synchronously blocked (in jetty)
-        // make sure the byte array passed to this method is immutable, as the websocket framework
-        // may corrupt the byte array after this method is returned (i.e., before the data is returned in
-        // the executor's thread.
-        executeServiceTask(new Runnable() {
-            @Override
-            public void run() {
-                HttpServletRequest request = null;
-                HttpServletResponse response = null;
-                try {
-                    WebSocketServletHolder webSocketHolder = new AtmosphereWebSocketServletHolder(webSocket);
-                    response = createServletResponse(webSocketHolder);
-                    request = createServletRequest(webSocketHolder, stream);
-                    if (destination != null) {
-                        String reqid = request.getHeader(requestIdKey);
-                        if (reqid != null) {
-                            response.setHeader(responseIdKey, reqid);
-                        }
-                        ((WebSocketDestinationService)destination).invokeInternal(null,
-                            webSocket.resource().getRequest().getServletContext(),
-                            request, response);
-                    }
-                } catch (InvalidPathException ex) {
-                    reportErrorStatus(response, 400);
-                } catch (Exception e) {
-                    LOG.log(Level.WARNING, "Failed to invoke service", e);
+        HttpServletRequest request = null;
+        HttpServletResponse response = null;
+        try {
+            WebSocketServletHolder webSocketHolder = new AtmosphereWebSocketServletHolder(webSocket);
+            response = createServletResponse(webSocketHolder);
+            request = createServletRequest(webSocketHolder, stream);
+            if (destination != null) {
+                String reqid = request.getHeader(requestIdKey);
+                if (reqid != null) {
+                    response.setHeader(responseIdKey, reqid);
                 }
+                ((WebSocketDestinationService)destination).invokeInternal(null,
+                    webSocket.resource().getRequest().getServletContext(),
+                    request, response);
             }
-        });
+        } catch (InvalidPathException ex) {
+            reportErrorStatus(response, 400);
+        } catch (Exception e) {
+            LOG.log(Level.WARNING, "Failed to invoke service", e);
+        }
         return null;
     }
 
-    private void executeServiceTask(Runnable r) {
-        try {
-            destination.getExecutor().execute(r);
-        } catch (RejectedExecutionException e) {
-            LOG.warning(
-                "Executor queue is full, run the service invocation task in caller thread." 
-                + "  Users can specify a larger executor queue to avoid this.");
-            r.run();
-        }
-    }
-    
     // may want to move this error reporting code to WebSocketServletHolder
     protected void reportErrorStatus(HttpServletResponse response, int status) {
         if (response != null) {

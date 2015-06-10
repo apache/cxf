@@ -21,8 +21,6 @@ package org.apache.cxf.transport.websocket.atmosphere;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.concurrent.Executor;
-import java.util.concurrent.RejectedExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -41,7 +39,6 @@ import org.apache.cxf.transport.http_jetty.JettyHTTPDestination;
 import org.apache.cxf.transport.http_jetty.JettyHTTPHandler;
 import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngineFactory;
 import org.apache.cxf.transport.websocket.WebSocketDestinationService;
-import org.apache.cxf.workqueue.WorkQueueManager;
 import org.atmosphere.cpr.ApplicationConfig;
 import org.atmosphere.cpr.AtmosphereFramework;
 import org.atmosphere.cpr.AtmosphereRequest;
@@ -59,7 +56,6 @@ public class AtmosphereWebSocketJettyDestination extends JettyHTTPDestination im
     WebSocketDestinationService {
     private static final Logger LOG = LogUtils.getL7dLogger(AtmosphereWebSocketJettyDestination.class);
     private AtmosphereFramework framework;
-    private Executor executor;
     
     public AtmosphereWebSocketJettyDestination(Bus bus, DestinationRegistry registry, EndpointInfo ei,
                                      JettyHTTPServerEngineFactory serverEngineFactory) throws IOException {
@@ -69,13 +65,10 @@ public class AtmosphereWebSocketJettyDestination extends JettyHTTPDestination im
         framework.addInitParameter(ApplicationConfig.PROPERTY_NATIVE_COMETSUPPORT, "true");
         framework.addInitParameter(ApplicationConfig.PROPERTY_SESSION_SUPPORT, "true");
         framework.addInitParameter(ApplicationConfig.WEBSOCKET_SUPPORT, "true");
+        framework.addInitParameter(ApplicationConfig.WEBSOCKET_PROTOCOL_EXECUTION, "true");
         AtmosphereUtils.addInterceptors(framework, bus);
         framework.addAtmosphereHandler("/", new DestinationHandler());
         framework.init();
-
-        // the executor for decoupling the service invocation from websocket's onMessage call which is
-        // synchronously blocked
-        executor = bus.getExtension(WorkQueueManager.class).getAutomaticWorkQueue();
     }
     
     @Override
@@ -146,31 +139,15 @@ public class AtmosphereWebSocketJettyDestination extends JettyHTTPDestination im
         @Override
         public void onRequest(final AtmosphereResource resource) throws IOException {
             LOG.fine("onRequest");
-            executeHandlerTask(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        invokeInternal(null, 
-                            resource.getRequest().getServletContext(), resource.getRequest(), resource.getResponse());
-                    } catch (Exception e) {
-                        LOG.log(Level.WARNING, "Failed to invoke service", e);
-                    }
-                }
-            });
+            try {
+                invokeInternal(null, 
+                    resource.getRequest().getServletContext(), resource.getRequest(), resource.getResponse());
+            } catch (Exception e) {
+                LOG.log(Level.WARNING, "Failed to invoke service", e);
+            }
         }
     }
     
-    private void executeHandlerTask(Runnable r) {
-        try {
-            executor.execute(r);
-        } catch (RejectedExecutionException e) {
-            LOG.warning(
-                "Executor queue is full, run the service invocation task in caller thread." 
-                + "  Users can specify a larger executor queue to avoid this.");
-            r.run();
-        }
-    }
-
     // used for internal tests
     AtmosphereFramework getAtmosphereFramework() {
         return framework;

@@ -20,8 +20,6 @@
 package org.apache.cxf.transport.websocket.atmosphere;
 
 import java.io.IOException;
-import java.util.concurrent.Executor;
-import java.util.concurrent.RejectedExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,7 +35,6 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transport.servlet.ServletDestination;
 import org.apache.cxf.transport.websocket.WebSocketDestinationService;
-import org.apache.cxf.workqueue.WorkQueueManager;
 import org.atmosphere.cpr.ApplicationConfig;
 import org.atmosphere.cpr.AtmosphereFramework;
 import org.atmosphere.cpr.AtmosphereRequest;
@@ -54,7 +51,6 @@ public class AtmosphereWebSocketServletDestination extends ServletDestination im
     private static final Logger LOG = LogUtils.getL7dLogger(AtmosphereWebSocketServletDestination.class);
 
     private AtmosphereFramework framework;
-    private Executor executor;
 
     public AtmosphereWebSocketServletDestination(Bus bus, DestinationRegistry registry, EndpointInfo ei, 
                                                  String path) throws IOException {
@@ -64,13 +60,10 @@ public class AtmosphereWebSocketServletDestination extends ServletDestination im
         framework.addInitParameter(ApplicationConfig.PROPERTY_NATIVE_COMETSUPPORT, "true");
         framework.addInitParameter(ApplicationConfig.PROPERTY_SESSION_SUPPORT, "true");
         framework.addInitParameter(ApplicationConfig.WEBSOCKET_SUPPORT, "true");
+        framework.addInitParameter(ApplicationConfig.WEBSOCKET_PROTOCOL_EXECUTION, "true");
         AtmosphereUtils.addInterceptors(framework, bus);
         framework.addAtmosphereHandler("/", new DestinationHandler());
         framework.init();
-
-        // the executor for decoupling the service invocation from websocket's onMessage call which is
-        // synchronously blocked
-        executor = bus.getExtension(WorkQueueManager.class).getAutomaticWorkQueue();
     }
 
     @Override
@@ -94,10 +87,6 @@ public class AtmosphereWebSocketServletDestination extends ServletDestination im
         super.invoke(config, context, req, resp);
     }
 
-    Executor getExecutor() {
-        return executor;
-    }
-
     @Override
     public void shutdown() {
         try {
@@ -114,31 +103,15 @@ public class AtmosphereWebSocketServletDestination extends ServletDestination im
         @Override
         public void onRequest(final AtmosphereResource resource) throws IOException {
             LOG.fine("onRequest");
-            executeHandlerTask(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        invokeInternal(null, 
-                            resource.getRequest().getServletContext(), resource.getRequest(), resource.getResponse());
-                    } catch (Exception e) {
-                        LOG.log(Level.WARNING, "Failed to invoke service", e);
-                    }
-                }
-            });
+            try {
+                invokeInternal(null, 
+                    resource.getRequest().getServletContext(), resource.getRequest(), resource.getResponse());
+            } catch (Exception e) {
+                LOG.log(Level.WARNING, "Failed to invoke service", e);
+            }
         }
     }
     
-    private void executeHandlerTask(Runnable r) {
-        try {
-            executor.execute(r);
-        } catch (RejectedExecutionException e) {
-            LOG.warning(
-                "Executor queue is full, run the service invocation task in caller thread." 
-                + "  Users can specify a larger executor queue to avoid this.");
-            r.run();
-        }
-    }
-
     // used for internal tests
     AtmosphereFramework getAtmosphereFramework() {
         return framework;
