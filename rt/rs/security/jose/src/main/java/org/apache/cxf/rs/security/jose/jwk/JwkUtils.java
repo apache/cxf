@@ -262,13 +262,13 @@ public final class JwkUtils {
             return keys;
         }
     }
-    public static JsonWebKey loadJsonWebKey(Message m, Properties props, String keyOper) {
+    public static JsonWebKey loadJsonWebKey(Message m, Properties props, KeyOperation keyOper) {
         return loadJsonWebKey(m, props, keyOper, null);
     }
-    public static JsonWebKey loadJsonWebKey(Message m, Properties props, String keyOper, String inHeaderKid) {
+    public static JsonWebKey loadJsonWebKey(Message m, Properties props, KeyOperation keyOper, String inHeaderKid) {
         return loadJsonWebKey(m, props, keyOper, inHeaderKid, new DefaultJwkReaderWriter());
     }
-    public static JsonWebKey loadJsonWebKey(Message m, Properties props, String keyOper, String inHeaderKid, 
+    public static JsonWebKey loadJsonWebKey(Message m, Properties props, KeyOperation keyOper, String inHeaderKid, 
                                             JwkReaderWriter reader) {
         PrivateKeyPasswordProvider cb = KeyManagementUtils.loadPasswordProvider(m, props, keyOper);
         JsonWebKeys jwkSet = loadJwkSet(m, props, cb, reader);
@@ -282,18 +282,19 @@ public final class JwkUtils {
         if (kid != null) {
             return jwkSet.getKey(kid);
         } else if (keyOper != null) {
-            List<JsonWebKey> keys = jwkSet.getKeyUseMap().get(keyOper);
+            List<JsonWebKey> keys = jwkSet.getKeyOperationMap().get(keyOper);
             if (keys != null && keys.size() == 1) {
                 return keys.get(0);
             }
         }
         return null;
     }
-    public static List<JsonWebKey> loadJsonWebKeys(Message m, Properties props, String keyOper) {
+    public static List<JsonWebKey> loadJsonWebKeys(Message m, Properties props, KeyOperation keyOper) {
         return loadJsonWebKeys(m, props, keyOper, new DefaultJwkReaderWriter());
     }
 
-    public static List<JsonWebKey> loadJsonWebKeys(Message m, Properties props, String keyOper, 
+    public static List<JsonWebKey> loadJsonWebKeys(Message m, Properties props, 
+                                                   KeyOperation keyOper, 
                                                    JwkReaderWriter reader) {
         PrivateKeyPasswordProvider cb = KeyManagementUtils.loadPasswordProvider(m, props, keyOper);
         JsonWebKeys jwkSet = loadJwkSet(m, props, cb, reader);
@@ -311,7 +312,7 @@ public final class JwkUtils {
             return keys;
         }
         if (keyOper != null) {
-            List<JsonWebKey> keys = jwkSet.getKeyUseMap().get(keyOper);
+            List<JsonWebKey> keys = jwkSet.getKeyOperationMap().get(keyOper);
             if (keys != null && keys.size() == 1) {
                 return Collections.singletonList(keys.get(0));
             }
@@ -338,7 +339,7 @@ public final class JwkUtils {
     }
     public static JsonWebKey fromECPublicKey(ECPublicKey pk, String curve) {
         JsonWebKey jwk = new JsonWebKey();
-        jwk.setKeyType(JsonWebKey.KEY_TYPE_ELLIPTIC);
+        jwk.setKeyType(KeyType.EC);
         jwk.setProperty(JsonWebKey.EC_CURVE, curve);
         jwk.setProperty(JsonWebKey.EC_X_COORDINATE, 
                         Base64UrlUtility.encode(pk.getW().getAffineX().toByteArray()));
@@ -348,7 +349,7 @@ public final class JwkUtils {
     }
     public static JsonWebKey fromECPrivateKey(ECPrivateKey pk, String curve) {
         JsonWebKey jwk = new JsonWebKey();
-        jwk.setKeyType(JsonWebKey.KEY_TYPE_ELLIPTIC);
+        jwk.setKeyType(KeyType.EC);
         jwk.setProperty(JsonWebKey.EC_CURVE, curve);
         jwk.setProperty(JsonWebKey.EC_PRIVATE_KEY, 
                         Base64UrlUtility.encode(pk.getS().toByteArray()));
@@ -431,7 +432,7 @@ public final class JwkUtils {
             throw new SecurityException("Invalid algorithm");
         }
         JsonWebKey jwk = new JsonWebKey();
-        jwk.setKeyType(JsonWebKey.KEY_TYPE_OCTET);
+        jwk.setKeyType(KeyType.OCTET);
         jwk.setAlgorithm(algo);
         String encodedSecretKey = Base64UrlUtility.encode(secretKey.getEncoded());
         jwk.setProperty(JsonWebKey.OCTET_KEY_VALUE, encodedSecretKey);
@@ -453,7 +454,7 @@ public final class JwkUtils {
             throw new SecurityException("Invalid algorithm");
         }
         JsonWebKey jwk = new JsonWebKey();
-        jwk.setKeyType(JsonWebKey.KEY_TYPE_RSA);
+        jwk.setKeyType(KeyType.RSA);
         jwk.setAlgorithm(algo);
         String encodedModulus = Base64UrlUtility.encode(modulus.toByteArray());
         jwk.setProperty(JsonWebKey.RSA_MODULUS, encodedModulus);

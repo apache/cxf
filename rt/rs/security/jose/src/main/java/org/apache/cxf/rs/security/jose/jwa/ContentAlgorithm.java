@@ -59,6 +59,9 @@ public enum ContentAlgorithm {
     }
     
     public static ContentAlgorithm getAlgorithm(String algo) {
+        if (algo == null) {
+            return null;
+        }
         return ContentAlgorithm.valueOf(algo.replace('-', '_')
                                         .replace('+', '_'));
         

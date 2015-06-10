@@ -27,6 +27,8 @@ import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKeys;
 import org.apache.cxf.rs.security.jose.jwk.JwkUtils;
+import org.apache.cxf.rs.security.jose.jwk.KeyType;
+import org.apache.cxf.rs.security.jose.jwk.PublicKeyUse;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -97,13 +99,13 @@ public class JwkJoseCookBookTest extends Assert {
     @Test
     public void testPublicSetAsMap() throws Exception {
         JsonWebKeys jwks = readKeySet("cookbookPublicSet.txt");
-        Map<String, List<JsonWebKey>> keysMap = jwks.getKeyTypeMap();
+        Map<KeyType, List<JsonWebKey>> keysMap = jwks.getKeyTypeMap();
         assertEquals(2, keysMap.size());
-        List<JsonWebKey> rsaKeys = keysMap.get("RSA");
+        List<JsonWebKey> rsaKeys = keysMap.get(KeyType.RSA);
         assertEquals(1, rsaKeys.size());
         assertEquals(5, rsaKeys.get(0).asMap().size());
         validatePublicRsaKey(rsaKeys.get(0));
-        List<JsonWebKey> ecKeys = keysMap.get("EC");
+        List<JsonWebKey> ecKeys = keysMap.get(KeyType.EC);
         assertEquals(1, ecKeys.size());
         assertEquals(6, ecKeys.get(0).asMap().size());
         validatePublicEcKey(ecKeys.get(0));
@@ -138,20 +140,20 @@ public class JwkJoseCookBookTest extends Assert {
     private void validateSecretSignKey(JsonWebKey key) {
         assertEquals(SIGN_SECRET_VALUE, key.getProperty(JsonWebKey.OCTET_KEY_VALUE));
         assertEquals(SIGN_KID_VALUE, key.getKeyId());
-        assertEquals(JsonWebKey.KEY_TYPE_OCTET, key.getKeyType());
+        assertEquals(KeyType.OCTET, key.getKeyType());
         assertEquals(AlgorithmUtils.HMAC_SHA_256_ALGO, key.getAlgorithm());
     }
     private void validateSecretEncKey(JsonWebKey key) {
         assertEquals(ENCRYPTION_SECRET_VALUE, key.getProperty(JsonWebKey.OCTET_KEY_VALUE));
         assertEquals(ENCRYPTION_KID_VALUE, key.getKeyId());
-        assertEquals(JsonWebKey.KEY_TYPE_OCTET, key.getKeyType());
+        assertEquals(KeyType.OCTET, key.getKeyType());
         assertEquals(AlgorithmUtils.A256GCM_ALGO, key.getAlgorithm());
     }
     private void validatePublicRsaKey(JsonWebKey key) {
         assertEquals(RSA_MODULUS_VALUE, key.getProperty(JsonWebKey.RSA_MODULUS));
         assertEquals(RSA_PUBLIC_EXP_VALUE, key.getProperty(JsonWebKey.RSA_PUBLIC_EXP));
         assertEquals(RSA_KID_VALUE, key.getKeyId());
-        assertEquals(JsonWebKey.KEY_TYPE_RSA, key.getKeyType());
+        assertEquals(KeyType.RSA, key.getKeyType());
     }
     private void validatePrivateRsaKey(JsonWebKey key) {
         validatePublicRsaKey(key);
@@ -166,9 +168,9 @@ public class JwkJoseCookBookTest extends Assert {
         assertEquals(EC_X_COORDINATE_VALUE, key.getProperty(JsonWebKey.EC_X_COORDINATE));
         assertEquals(EC_Y_COORDINATE_VALUE, key.getProperty(JsonWebKey.EC_Y_COORDINATE));
         assertEquals(EC_KID_VALUE, key.getKeyId());
-        assertEquals(JsonWebKey.KEY_TYPE_ELLIPTIC, key.getKeyType());
+        assertEquals(KeyType.EC, key.getKeyType());
         assertEquals(EC_CURVE_VALUE, key.getProperty(JsonWebKey.EC_CURVE));
-        assertEquals(JsonWebKey.PUBLIC_KEY_USE_SIGN, key.getPublicKeyUse());
+        assertEquals(PublicKeyUse.SIGN, key.getPublicKeyUse());
     }
     private void validatePrivateEcKey(JsonWebKey key) {
         validatePublicEcKey(key);

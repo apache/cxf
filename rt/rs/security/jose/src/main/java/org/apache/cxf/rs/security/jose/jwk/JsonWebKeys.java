@@ -70,41 +70,36 @@ public class JsonWebKeys extends JsonMapObject {
     public JsonWebKey getKey(String kid) {
         return getKeyIdMap().get(kid);
     }
-    public Map<String, List<JsonWebKey>> getKeyTypeMap() {
-        return getKeyPropertyMap(JsonWebKey.KEY_TYPE);
-    }
-    public Map<String, List<JsonWebKey>> getKeyUseMap() {
-        return getKeyPropertyMap(JsonWebKey.PUBLIC_KEY_USE);
-    }
-    private Map<String, List<JsonWebKey>> getKeyPropertyMap(String propertyName) {
+    public Map<KeyType, List<JsonWebKey>> getKeyTypeMap() {
         List<JsonWebKey> keys = getKeys();
         if (keys == null) {
             return Collections.emptyMap();
         }
-        Map<String, List<JsonWebKey>> map = new LinkedHashMap<String, List<JsonWebKey>>();
+        Map<KeyType, List<JsonWebKey>> map = new LinkedHashMap<KeyType, List<JsonWebKey>>();
         for (JsonWebKey key : keys) {
-            String propValue = (String)key.getProperty(propertyName);
-            if (propValue != null) {
-                List<JsonWebKey> list = map.get(propValue);
+            KeyType type = key.getKeyType();
+            if (type != null) {
+                List<JsonWebKey> list = map.get(type);
                 if (list == null) {
                     list = new LinkedList<JsonWebKey>();
-                    map.put(propValue, list);
+                    map.put(type, list);
                 }
                 list.add(key);
             }
         }
         return map;
     }
-    public Map<String, List<JsonWebKey>> getKeyOperationMap() {
+    
+    public Map<KeyOperation, List<JsonWebKey>> getKeyOperationMap() {
         List<JsonWebKey> keys = getKeys();
         if (keys == null) {
             return Collections.emptyMap();
         }
-        Map<String, List<JsonWebKey>> map = new LinkedHashMap<String, List<JsonWebKey>>();
+        Map<KeyOperation, List<JsonWebKey>> map = new LinkedHashMap<KeyOperation, List<JsonWebKey>>();
         for (JsonWebKey key : keys) {
-            List<String> ops = key.getKeyOperation();
+            List<KeyOperation> ops = key.getKeyOperation();
             if (ops != null) {
-                for (String op : ops) {
+                for (KeyOperation op : ops) {
                     List<JsonWebKey> list = map.get(op);
                     if (list == null) {
                         list = new LinkedList<JsonWebKey>();

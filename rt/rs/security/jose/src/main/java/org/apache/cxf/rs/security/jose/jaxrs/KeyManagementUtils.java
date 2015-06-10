@@ -49,7 +49,7 @@ import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.rs.security.jose.JoseException;
-import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
+import org.apache.cxf.rs.security.jose.jwk.KeyOperation;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
 import org.apache.cxf.security.SecurityContext;
 
@@ -132,7 +132,7 @@ public final class KeyManagementUtils {
                                             Properties props, 
                                             Bus bus, 
                                             PrivateKeyPasswordProvider provider,
-                                            String keyOper,
+                                            KeyOperation keyOper,
                                             String alias) {
         
         String keyPswd = props.getProperty(RSSEC_KEY_PSWD);
@@ -142,11 +142,11 @@ public final class KeyManagementUtils {
         return CryptoUtils.loadPrivateKey(keyStore, keyPswdChars, theAlias);
     }
     
-    public static PrivateKey loadPrivateKey(Message m, String keyStoreLocProp, String keyOper) {
+    public static PrivateKey loadPrivateKey(Message m, String keyStoreLocProp, KeyOperation keyOper) {
         return loadPrivateKey(m, keyStoreLocProp, null, keyOper);
     }
     public static PrivateKey loadPrivateKey(Message m, String keyStoreLocPropPreferred,
-                                            String keyStoreLocPropDefault, String keyOper) {
+                                            String keyStoreLocPropDefault, KeyOperation keyOper) {
         String keyStoreLoc = getMessageProperty(m, keyStoreLocPropPreferred, keyStoreLocPropDefault);
         Bus bus = m.getExchange().getBus();
         try {
@@ -157,13 +157,15 @@ public final class KeyManagementUtils {
         }
     }
     
-    public static String getKeyId(Message m, Properties props, String preferredPropertyName, String keyOper) {
+    public static String getKeyId(Message m, Properties props, 
+                                  String preferredPropertyName, 
+                                  KeyOperation keyOper) {
         String kid = null;
         String altPropertyName = null;
         if (keyOper != null) {
-            if (keyOper.equals(JsonWebKey.KEY_OPER_ENCRYPT) || keyOper.equals(JsonWebKey.KEY_OPER_DECRYPT)) {
+            if (keyOper == KeyOperation.ENCRYPT || keyOper == KeyOperation.DECRYPT) {
                 altPropertyName = preferredPropertyName + ".jwe";
-            } else if (keyOper.equals(JsonWebKey.KEY_OPER_SIGN) || keyOper.equals(JsonWebKey.KEY_OPER_VERIFY)) {
+            } else if (keyOper == KeyOperation.SIGN || keyOper == KeyOperation.VERIFY) {
                 altPropertyName = preferredPropertyName + ".jws";
             }
             String direction = m.getExchange().getOutMessage() == m ? ".out" : ".in";
@@ -182,12 +184,12 @@ public final class KeyManagementUtils {
         }
         return kid;
     }
-    public static PrivateKeyPasswordProvider loadPasswordProvider(Message m, Properties props, String keyOper) {
+    public static PrivateKeyPasswordProvider loadPasswordProvider(Message m, Properties props, KeyOperation keyOper) {
         PrivateKeyPasswordProvider cb = 
             (PrivateKeyPasswordProvider)m.getContextualProperty(RSSEC_KEY_PSWD_PROVIDER);
         if (cb == null && keyOper != null) {
-            String propName = keyOper.equals(JsonWebKey.KEY_OPER_SIGN) ? RSSEC_SIG_KEY_PSWD_PROVIDER
-                : keyOper.equals(JsonWebKey.KEY_OPER_DECRYPT) 
+            String propName = keyOper == KeyOperation.SIGN ? RSSEC_SIG_KEY_PSWD_PROVIDER
+                : keyOper == KeyOperation.DECRYPT 
                 ? RSSEC_DECRYPT_KEY_PSWD_PROVIDER : null;
             if (propName != null) {
                 cb = (PrivateKeyPasswordProvider)m.getContextualProperty(propName);
@@ -196,11 +198,11 @@ public final class KeyManagementUtils {
         return cb;
     }
     
-    public static PrivateKey loadPrivateKey(Message m, Properties props, String keyOper) {
+    public static PrivateKey loadPrivateKey(Message m, Properties props, KeyOperation keyOper) {
         KeyStore keyStore = loadPersistKeyStore(m, props);
         return loadPrivateKey(keyStore, m, props, keyOper, null);
     }
-    private static PrivateKey loadPrivateKey(KeyStore keyStore, Message m, Properties props, String keyOper, 
+    private static PrivateKey loadPrivateKey(KeyStore keyStore, Message m, Properties props, KeyOperation keyOper, 
                                                 String alias) {
         Bus bus = m.getExchange().getBus();
         PrivateKeyPasswordProvider cb = loadPasswordProvider(m, props, keyOper);
@@ -361,7 +363,8 @@ public final class KeyManagementUtils {
         return props; 
     }
     public static PrivateKey loadPrivateKey(Message m, Properties props, 
-                                               List<X509Certificate> inCerts, String keyOper) {
+                                            List<X509Certificate> inCerts, 
+                                            KeyOperation keyOper) {
         KeyStore ks = loadPersistKeyStore(m, props);
         
         try {
