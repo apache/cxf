@@ -308,7 +308,19 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
     }
     @Test
     public void testJwsJwkRSA() throws Exception {
-        String address = "https://localhost:" + PORT + "/jwsjwkrsa";
+        doTestJwsJwkRSA("https://localhost:" + PORT + "/jwsjwkrsa", false, false);
+    }
+    @Test
+    public void testJwsJwkInHeadersRSA() throws Exception {
+        doTestJwsJwkRSA("https://localhost:" + PORT + "/jwsjwkrsa", true, true);
+    }
+    @Test
+    public void testJwsJwkKidOnlyInHeadersRSA() throws Exception {
+        doTestJwsJwkRSA("https://localhost:" + PORT + "/jwsjwkrsa", false, true);
+    }
+    private void doTestJwsJwkRSA(String address, 
+                                 boolean reportPublicKey,
+                                 boolean reportPublicKeyId) throws Exception {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = JAXRSJweJwsTest.class.getResource("client.xml");
@@ -326,6 +338,12 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
             "org/apache/cxf/systest/jaxrs/security/alice.jwk.properties");
         bean.getProperties(true).put("rs.security.signature.in.properties",
             "org/apache/cxf/systest/jaxrs/security/bob.jwk.properties");
+        if (reportPublicKey) {
+            bean.getProperties(true).put("rs.security.report.public.key", true);
+        }
+        if (reportPublicKeyId) {
+            bean.getProperties(true).put("rs.security.report.public.key.id", true);
+        }
         BookStore bs = bean.create(BookStore.class);
         String text = bs.echoText("book");
         assertEquals("book", text);

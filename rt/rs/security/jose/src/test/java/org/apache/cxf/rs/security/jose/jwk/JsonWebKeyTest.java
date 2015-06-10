@@ -182,13 +182,13 @@ public class JsonWebKeyTest extends Assert {
     
     private void validateSecretAesKey(JsonWebKey key) {
         assertEquals(AES_SECRET_VALUE, key.getProperty(JsonWebKey.OCTET_KEY_VALUE));
-        assertEquals(AES_KID_VALUE, key.getKid());
+        assertEquals(AES_KID_VALUE, key.getKeyId());
         assertEquals(JsonWebKey.KEY_TYPE_OCTET, key.getKeyType());
         assertEquals(AlgorithmUtils.A128KW_ALGO, key.getAlgorithm());
     }
     private void validateSecretHmacKey(JsonWebKey key) {
         assertEquals(HMAC_SECRET_VALUE, key.getProperty(JsonWebKey.OCTET_KEY_VALUE));
-        assertEquals(HMAC_KID_VALUE, key.getKid());
+        assertEquals(HMAC_KID_VALUE, key.getKeyId());
         assertEquals(JsonWebKey.KEY_TYPE_OCTET, key.getKeyType());
         assertEquals(AlgorithmUtils.HMAC_SHA_256_ALGO, key.getAlgorithm());
     }
@@ -196,7 +196,7 @@ public class JsonWebKeyTest extends Assert {
     private void validatePublicRsaKey(JsonWebKey key) {
         assertEquals(RSA_MODULUS_VALUE, key.getProperty(JsonWebKey.RSA_MODULUS));
         assertEquals(RSA_PUBLIC_EXP_VALUE, key.getProperty(JsonWebKey.RSA_PUBLIC_EXP));
-        assertEquals(RSA_KID_VALUE, key.getKid());
+        assertEquals(RSA_KID_VALUE, key.getKeyId());
         assertEquals(JsonWebKey.KEY_TYPE_RSA, key.getKeyType());
         assertEquals(AlgorithmUtils.RS_SHA_256_ALGO, key.getAlgorithm());
     }
@@ -212,7 +212,7 @@ public class JsonWebKeyTest extends Assert {
     private void validatePublicEcKey(JsonWebKey key) {
         assertEquals(EC_X_COORDINATE_VALUE, key.getProperty(JsonWebKey.EC_X_COORDINATE));
         assertEquals(EC_Y_COORDINATE_VALUE, key.getProperty(JsonWebKey.EC_Y_COORDINATE));
-        assertEquals(EC_KID_VALUE, key.getKid());
+        assertEquals(EC_KID_VALUE, key.getKeyId());
         assertEquals(JsonWebKey.KEY_TYPE_ELLIPTIC, key.getKeyType());
         assertEquals(EC_CURVE_VALUE, key.getProperty(JsonWebKey.EC_CURVE));
         assertEquals(JsonWebKey.PUBLIC_KEY_USE_ENCRYPT, key.getPublicKeyUse());

@@ -42,6 +42,7 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.rs.security.jose.JoseConstants;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.JoseUtils;
@@ -262,14 +263,22 @@ public final class JwkUtils {
         }
     }
     public static JsonWebKey loadJsonWebKey(Message m, Properties props, String keyOper) {
-        return loadJsonWebKey(m, props, keyOper, new DefaultJwkReaderWriter());
+        return loadJsonWebKey(m, props, keyOper, null);
     }
-
-    public static JsonWebKey loadJsonWebKey(Message m, Properties props, String keyOper, JwkReaderWriter reader) {
+    public static JsonWebKey loadJsonWebKey(Message m, Properties props, String keyOper, String inHeaderKid) {
+        return loadJsonWebKey(m, props, keyOper, inHeaderKid, new DefaultJwkReaderWriter());
+    }
+    public static JsonWebKey loadJsonWebKey(Message m, Properties props, String keyOper, String inHeaderKid, 
+                                            JwkReaderWriter reader) {
         PrivateKeyPasswordProvider cb = KeyManagementUtils.loadPasswordProvider(m, props, keyOper);
         JsonWebKeys jwkSet = loadJwkSet(m, props, cb, reader);
-        String kid = 
-            KeyManagementUtils.getKeyId(m, props, KeyManagementUtils.RSSEC_KEY_STORE_ALIAS, keyOper);
+        String kid = null;
+        if (inHeaderKid != null 
+            && MessageUtils.getContextualBoolean(m, KeyManagementUtils.RSSEC_ACCEPT_PUBLIC_KEY_PROP, true)) {
+            kid = inHeaderKid;
+        } else {
+            kid = KeyManagementUtils.getKeyId(m, props, KeyManagementUtils.RSSEC_KEY_STORE_ALIAS, keyOper);
+        }
         if (kid != null) {
             return jwkSet.getKey(kid);
         } else if (keyOper != null) {
@@ -460,15 +469,24 @@ public final class JwkUtils {
     private static JweHeaders toJweHeaders(String ct) {
         return new JweHeaders(Collections.<String, Object>singletonMap(JoseConstants.HEADER_CONTENT_TYPE, ct));
     }
-    public static void setPublicKeyInfo(JsonWebKey jwk, JoseHeaders headers, String algo) {
-        if (JsonWebKey.KEY_TYPE_RSA.equals(jwk.getKeyType())) {
+    public static void setPublicKeyInfo(JsonWebKey jwk, JoseHeaders headers, String algo,
+                                        boolean reportPublicKey, boolean reportPublicKeyId) {
+        if (reportPublicKey && JsonWebKey.KEY_TYPE_RSA.equals(jwk.getKeyType())) {
             List<String> chain = CastUtils.cast((List<?>)jwk.getProperty("x5c"));
+            //TODO: if needed the chain can be reported as part of a 'jwk' property
             if (chain != null) {
                 headers.setX509Chain(chain);
             } else {
-                headers.setJsonWebKey(
-                    JwkUtils.fromRSAPublicKey(JwkUtils.toRSAPublicKey(jwk), algo));
+                JsonWebKey jwkPublic = JwkUtils.fromRSAPublicKey(JwkUtils.toRSAPublicKey(jwk), algo);
+                if (reportPublicKeyId && jwk.getKeyId() != null) {
+                    jwkPublic.setKeyId(jwk.getKeyId());
+                }
+                headers.setJsonWebKey(jwkPublic);
             }
         }
+        if (reportPublicKeyId && jwk.getKeyId() != null) {
+            headers.setKeyId(jwk.getKeyId());
+        }
+        
     }
 }
