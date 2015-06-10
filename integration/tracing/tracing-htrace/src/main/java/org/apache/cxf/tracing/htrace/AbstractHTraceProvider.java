@@ -34,6 +34,7 @@ import org.apache.htrace.Trace;
 import org.apache.htrace.TraceInfo;
 import org.apache.htrace.TraceScope;
 import org.apache.htrace.Tracer;
+import org.apache.htrace.impl.MilliSpan;
 
 import static org.apache.cxf.tracing.TracerHeaders.DEFAULT_HEADER_SPAN_ID;
 import static org.apache.cxf.tracing.TracerHeaders.DEFAULT_HEADER_TRACE_ID;
@@ -59,11 +60,16 @@ public abstract class AbstractHTraceProvider  {
         final long spanId = getFirstValueOrDefault(requestHeaders, getSpanIdHeader(), 
             Tracer.DONT_TRACE.spanId); 
         
-        if (traceId != Tracer.DONT_TRACE.traceId && spanId != Tracer.DONT_TRACE.spanId) {
-            return Trace.startSpan(path, 
-                                   (Sampler< TraceInfo >)sampler, new TraceInfo(traceId, spanId));
-        }
-        return null;
+        if (traceId == Tracer.DONT_TRACE.traceId || spanId == Tracer.DONT_TRACE.spanId) {
+            return Trace.startSpan(path, (Sampler< TraceInfo >)sampler, 
+                new TraceInfo(traceId, spanId));
+        } 
+        
+        return Trace.startSpan(path, new MilliSpan
+            .Builder()
+            .spanId(spanId)
+            .traceId(traceId)
+            .build());
     }
     
     protected void stopTraceSpan(final Map<String, List<String>> requestHeaders,

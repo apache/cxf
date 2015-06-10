@@ -36,10 +36,10 @@ import org.apache.cxf.systest.jaxrs.tracing.BookStore;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.tracing.TracerHeaders;
+import org.apache.cxf.tracing.htrace.jaxrs.HTraceClientProvider;
 import org.apache.cxf.tracing.htrace.jaxrs.HTraceFeature;
 import org.apache.htrace.HTraceConfiguration;
 import org.apache.htrace.impl.AlwaysSampler;
-
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -49,6 +49,8 @@ import static org.hamcrest.CoreMatchers.equalTo;
 
 public class HTraceTracingTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(HTraceTracingTest.class);
+    
+    private HTraceClientProvider htraceClientProvider;
 
     @Ignore
     public static class Server extends AbstractBusTestServerBase {
@@ -78,6 +80,9 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
     @Before
     public void setUp() {
         TestSpanReceiver.clear();
+        
+        htraceClientProvider = new HTraceClientProvider(
+            new AlwaysSampler(HTraceConfiguration.EMPTY));
     }
     
     @Test
@@ -85,7 +90,7 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
         final Response r = createWebClient("/bookstore/books").get();
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
         
-        assertThat(TestSpanReceiver.getAllSpans().size(), equalTo(1));
+        assertThat(TestSpanReceiver.getAllSpans().size(), equalTo(2));
         assertThat(TestSpanReceiver.getAllSpans().get(0).getDescription(), equalTo("Get Books"));
         
         assertFalse(r.getHeaders().containsKey(TracerHeaders.DEFAULT_HEADER_TRACE_ID));
@@ -142,9 +147,22 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
         assertThat((String)r.getHeaders().getFirst(TracerHeaders.DEFAULT_HEADER_SPAN_ID), equalTo("20"));
     }
     
-    protected WebClient createWebClient(final String url) {
+    @Test
+    public void testThatNewChildSpanIsCreatedWhenParentIsProvided() {
+        final Response r = createWebClient("/bookstore/books", htraceClientProvider).get();
+        assertEquals(Status.OK.getStatusCode(), r.getStatus());
+        
+        assertThat(TestSpanReceiver.getAllSpans().size(), equalTo(3));
+        assertThat(TestSpanReceiver.getAllSpans().get(0).getDescription(), equalTo("Get Books"));
+        assertThat(TestSpanReceiver.getAllSpans().get(0).getParents().length, equalTo(1));
+        
+        assertTrue(r.getHeaders().containsKey(TracerHeaders.DEFAULT_HEADER_TRACE_ID));
+        assertTrue(r.getHeaders().containsKey(TracerHeaders.DEFAULT_HEADER_SPAN_ID));
+    }
+    
+    protected WebClient createWebClient(final String url, final Object ... providers) {
         return WebClient
-            .create("http://localhost:" + PORT + url)
+            .create("http://localhost:" + PORT + url, Arrays.asList(providers))
             .accept(MediaType.APPLICATION_JSON);
     }
 }
