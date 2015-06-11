@@ -189,8 +189,10 @@ public class JavaDocProvider implements DocumentationProvider {
                 if (endOfOpSigIndex == startOfOpSigIndex && paramLen == 0) {
                     break;
                 } else if (endOfOpSigIndex > startOfOpSigIndex + 1) {
+                    
                     String[] opBits = 
-                        classDoc.getClassDoc().substring(operMarkerIndex, endOfOpSigIndex).split(",");
+                        classDoc.getClassDoc().substring(operMarkerIndex, endOfOpSigIndex)
+                            .split(getOperationParamSeparator());
                     if (opBits.length == paramLen) {
                         break;
                     }
@@ -296,12 +298,14 @@ public class JavaDocProvider implements DocumentationProvider {
     }
     
     protected String getOperationMarkerOpen() {
-        return javaDocsBuiltByVersion == JAVA_VERSION_18 ? "--" : "(";
+        return javaDocsBuiltByVersion == JAVA_VERSION_18 ? "-" : "(";
     }
     protected String getOperationMarkerClose() {
-        return javaDocsBuiltByVersion == JAVA_VERSION_18 ? "--" : ")";
+        return javaDocsBuiltByVersion == JAVA_VERSION_18 ? "-" : ")";
     }
-    
+    protected String getOperationParamSeparator() {
+        return javaDocsBuiltByVersion == JAVA_VERSION_18 ? "-" : ",";
+    }
     public void setJavaDocsBuiltByVersion(String version) {
         javaDocsBuiltByVersion = Double.valueOf(version);
     }

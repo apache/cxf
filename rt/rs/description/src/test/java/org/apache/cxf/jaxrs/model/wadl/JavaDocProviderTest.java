@@ -31,20 +31,21 @@ public class JavaDocProviderTest extends Assert {
 
     @Test
     public void testJava6Docs() throws Exception {
-        if (JavaDocProvider.JAVA_VERSION == JavaDocProvider.JAVA_VERSION_16) {
-            doTestJavaDocs("classpath:/javadocs/pet-store-javadoc16.jar");
-        }
+        doTestJavaDocs("classpath:/javadocs/pet-store-javadoc16.jar", "1.6");
     }
     
     @Test
     public void testJava7Docs() throws Exception {
-        if (JavaDocProvider.JAVA_VERSION != JavaDocProvider.JAVA_VERSION_16) {
-            doTestJavaDocs("classpath:/javadocs/pet-store-javadoc17.jar");
-        }
+        doTestJavaDocs("classpath:/javadocs/pet-store-javadoc17.jar", "1.7");
+    }
+    @Test
+    public void testJava8Docs() throws Exception {
+        doTestJavaDocs("classpath:/javadocs/pet-store-javadoc18.jar", "1.8");
     }
     
-    private void doTestJavaDocs(String path) throws Exception {
+    private void doTestJavaDocs(String path, String version) throws Exception {
         JavaDocProvider p = new JavaDocProvider(path);
+        p.setJavaDocsBuiltByVersion(version);
         ClassResourceInfo cri = 
             ResourceUtils.createClassResourceInfo(PetStore.class, PetStore.class, true, true);
         String classDoc = p.getClassDoc(cri);
