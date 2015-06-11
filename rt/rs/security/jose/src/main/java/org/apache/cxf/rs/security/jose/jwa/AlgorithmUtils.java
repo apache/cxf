@@ -35,7 +35,7 @@ public final class AlgorithmUtils {
     // JWA
     public static final String RSA_OAEP_ALGO = "RSA-OAEP";
     public static final String RSA_OAEP_256_ALGO = "RSA-OAEP-256";
-    public static final String RSA_1_5_ALGO = "RSA1_5";
+    public static final String RSA1_5_ALGO = "RSA1_5";
     public static final String A128KW_ALGO = "A128KW";
     public static final String A192KW_ALGO = "A192KW";
     public static final String A256KW_ALGO = "A256KW";
@@ -108,7 +108,7 @@ public final class AlgorithmUtils {
                                                                        ES_SHA_512_ALGO));
     public static final Set<String> RSA_CEK_SET = new HashSet<String>(Arrays.asList(RSA_OAEP_ALGO,
                                                                                   RSA_OAEP_256_ALGO,
-                                                                                  RSA_1_5_ALGO));
+                                                                                  RSA1_5_ALGO));
     public static final Set<String> AES_GCM_CEK_SET = new HashSet<String>(Arrays.asList(A128GCM_ALGO,
                                                                                       A192GCM_ALGO,
                                                                                       A256GCM_ALGO));
@@ -146,7 +146,7 @@ public final class AlgorithmUtils {
         JAVA_TO_JWA_NAMES.put(ES_SHA_512_JAVA, ES_SHA_512_ALGO);
         JAVA_TO_JWA_NAMES.put(RSA_OAEP_ALGO_JAVA, RSA_OAEP_ALGO);
         JAVA_TO_JWA_NAMES.put(RSA_OAEP_256_ALGO_JAVA, RSA_OAEP_256_ALGO);
-        JAVA_TO_JWA_NAMES.put(RSA_1_5_ALGO_JAVA, RSA_1_5_ALGO);
+        JAVA_TO_JWA_NAMES.put(RSA_1_5_ALGO_JAVA, RSA1_5_ALGO);
         JAVA_TO_JWA_NAMES.put(AES_GCM_ALGO_JAVA, A256GCM_ALGO);
         JAVA_TO_JWA_NAMES.put(AES_GCM_ALGO_JAVA, A192GCM_ALGO);
         JAVA_TO_JWA_NAMES.put(AES_GCM_ALGO_JAVA, A128GCM_ALGO);
@@ -171,7 +171,7 @@ public final class AlgorithmUtils {
         JWA_TO_JAVA_NAMES.put(ES_SHA_512_ALGO, ES_SHA_512_JAVA);
         JWA_TO_JAVA_NAMES.put(RSA_OAEP_ALGO, RSA_OAEP_ALGO_JAVA);
         JWA_TO_JAVA_NAMES.put(RSA_OAEP_256_ALGO, RSA_OAEP_256_ALGO_JAVA);
-        JWA_TO_JAVA_NAMES.put(RSA_1_5_ALGO, RSA_1_5_ALGO_JAVA);
+        JWA_TO_JAVA_NAMES.put(RSA1_5_ALGO, RSA_1_5_ALGO_JAVA);
         JWA_TO_JAVA_NAMES.put(A128KW_ALGO, AES_WRAP_ALGO_JAVA);
         JWA_TO_JAVA_NAMES.put(A192KW_ALGO, AES_WRAP_ALGO_JAVA);
         JWA_TO_JAVA_NAMES.put(A256KW_ALGO, AES_WRAP_ALGO_JAVA);

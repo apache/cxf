@@ -66,7 +66,7 @@ public class WrappedKeyDecryptionAlgorithm implements KeyDecryptionAlgorithm {
         return -1;
     }
     protected String getKeyEncryptionAlgorithm(JweDecryptionInput jweDecryptionInput) {
-        String keyAlgo = jweDecryptionInput.getJweHeaders().getKeyEncryptionAlgorithm();
+        String keyAlgo = jweDecryptionInput.getJweHeaders().getKeyEncryptionAlgorithm().getJwaName();
         validateKeyEncryptionAlgorithm(keyAlgo);
         return AlgorithmUtils.toJavaName(keyAlgo);
     }
@@ -81,7 +81,8 @@ public class WrappedKeyDecryptionAlgorithm implements KeyDecryptionAlgorithm {
         throw new JweException(JweException.Error.INVALID_KEY_ALGORITHM);
     }
     protected String getContentEncryptionAlgorithm(JweDecryptionInput jweDecryptionInput) {
-        return AlgorithmUtils.toJavaName(jweDecryptionInput.getJweHeaders().getContentEncryptionAlgorithm());
+        return AlgorithmUtils.toJavaName(
+            jweDecryptionInput.getJweHeaders().getContentEncryptionAlgorithm().getJwaName());
     }
     protected AlgorithmParameterSpec getAlgorithmParameterSpec(JweDecryptionInput jweDecryptionInput) {
         return null;

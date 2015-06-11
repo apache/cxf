@@ -31,7 +31,7 @@ public class AesGcmContentDecryptionAlgorithm extends AbstractContentEncryptionC
 
     @Override
     public byte[] getEncryptedSequence(JweHeaders headers, byte[] cipher, byte[] authTag) {
-        String algo = headers.getContentEncryptionAlgorithm();
+        String algo = headers.getContentEncryptionAlgorithm().getJwaName();
         if (!AlgorithmUtils.isAesGcm(algo) || !getAlgorithm().getJwaName().equals(algo)) {
             LOG.warning("Invalid content encryption algorithm");
             throw new JweException(JweException.Error.INVALID_CONTENT_ALGORITHM);

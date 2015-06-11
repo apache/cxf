@@ -41,18 +41,12 @@ public class JwsHeaders extends JoseHeaders {
         setAlgorithm(sigAlgo);
     }
 
-    public void setSignatureAlgorithm(String type) {
-        setAlgorithm(type);
-    }
-    
     public void setSignatureAlgorithm(SignatureAlgorithm algo) {
-        this.setSignatureAlgorithm(algo.getJwaName());
+        super.setAlgorithm(algo.getJwaName());
     }
     
-    public String getSignatureAlgorithm() {
-        return super.getAlgorithm();
-    }
-    public SignatureAlgorithm getSignatureAlgorithmEnum() {
-        return SignatureAlgorithm.getAlgorithm(getSignatureAlgorithm());
+    public SignatureAlgorithm getSignatureAlgorithm() {
+        String algo = super.getAlgorithm();
+        return algo == null ? null : SignatureAlgorithm.getAlgorithm(algo);
     }
 }

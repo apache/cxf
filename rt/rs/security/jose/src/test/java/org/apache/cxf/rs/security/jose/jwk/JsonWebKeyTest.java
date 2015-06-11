@@ -130,9 +130,8 @@ public class JsonWebKeyTest extends Assert {
             String encryptedKeySet = JwkUtils.encryptJwkSet(jwks, password.toCharArray());
             JweCompactConsumer c = new JweCompactConsumer(encryptedKeySet);
             assertEquals("jwk-set+json", c.getJweHeaders().getContentType());
-            assertEquals(KeyAlgorithm.PBES2_HS256_A128KW.getJwaName(), c.getJweHeaders().getKeyEncryptionAlgorithm());
-            assertEquals(ContentAlgorithm.A128CBC_HS256.getJwaName(), 
-                         c.getJweHeaders().getContentEncryptionAlgorithm());
+            assertEquals(KeyAlgorithm.PBES2_HS256_A128KW, c.getJweHeaders().getKeyEncryptionAlgorithm());
+            assertEquals(ContentAlgorithm.A128CBC_HS256, c.getJweHeaders().getContentEncryptionAlgorithm());
             assertNotNull(c.getJweHeaders().getHeader("p2s"));
             assertNotNull(c.getJweHeaders().getHeader("p2c"));
             jwks = JwkUtils.decryptJwkSet(encryptedKeySet, password.toCharArray());
@@ -155,9 +154,8 @@ public class JsonWebKeyTest extends Assert {
             String encryptedKey = JwkUtils.encryptJwkKey(jwk, password.toCharArray());
             JweCompactConsumer c = new JweCompactConsumer(encryptedKey);
             assertEquals("jwk+json", c.getJweHeaders().getContentType());
-            assertEquals(KeyAlgorithm.PBES2_HS256_A128KW.getJwaName(), c.getJweHeaders().getKeyEncryptionAlgorithm());
-            assertEquals(ContentAlgorithm.A128CBC_HS256.getJwaName(), 
-                         c.getJweHeaders().getContentEncryptionAlgorithm());
+            assertEquals(KeyAlgorithm.PBES2_HS256_A128KW, c.getJweHeaders().getKeyEncryptionAlgorithm());
+            assertEquals(ContentAlgorithm.A128CBC_HS256, c.getJweHeaders().getContentEncryptionAlgorithm());
             assertNotNull(c.getJweHeaders().getHeader("p2s"));
             assertNotNull(c.getJweHeaders().getHeader("p2c"));
             jwk = JwkUtils.decryptJwkKey(encryptedKey, password.toCharArray());

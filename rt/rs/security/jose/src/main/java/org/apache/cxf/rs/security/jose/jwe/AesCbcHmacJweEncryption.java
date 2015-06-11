@@ -104,7 +104,7 @@ public class AesCbcHmacJweEncryption extends JweEncryption {
                                                      byte[] extraAad,
                                                      JweHeaders theHeaders,
                                                      String protectedHeadersJson) {
-        String algoJwt = theHeaders.getContentEncryptionAlgorithm();
+        String algoJwt = theHeaders.getContentEncryptionAlgorithm().getJwaName();
         int size = getFullCekKeySize(algoJwt) / 2;
         byte[] macKey = new byte[size];
         System.arraycopy(secretKey, 0, macKey, 0, size);

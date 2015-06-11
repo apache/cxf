@@ -69,7 +69,7 @@ public class JwePbeHmacAesWrapTest extends Assert {
         final String specPlainText = "Live long and prosper.";
         JweHeaders headers = new JweHeaders();
         headers.setAlgorithm(AlgorithmUtils.PBES2_HS256_A128KW_ALGO);
-        headers.setContentEncryptionAlgorithm(ContentAlgorithm.A128GCM.getJwaName());
+        headers.setContentEncryptionAlgorithm(ContentAlgorithm.A128GCM);
         final String password = "Thus from my lips, by yours, my sin is purged."; 
         KeyEncryptionProvider keyEncryption = 
             new PbesHmacAesWrapKeyEncryptionAlgorithm(password, KeyAlgorithm.PBES2_HS256_A128KW);

@@ -25,7 +25,7 @@ package org.apache.cxf.rs.security.jose.jwa;
 public enum KeyAlgorithm {
     RSA_OAEP(AlgorithmUtils.RSA_OAEP_ALGO, "RSA/ECB/OAEPWithSHA-1AndMGF1Padding", -1),
     RSA_OAEP_256(AlgorithmUtils.RSA_OAEP_256_ALGO, "RSA/ECB/OAEPWithSHA-256AndMGF1Padding", -1),
-    RSA_1_5(AlgorithmUtils.RSA_1_5_ALGO, "RSA/ECB/PKCS1Padding", -1),
+    RSA1_5(AlgorithmUtils.RSA1_5_ALGO, "RSA/ECB/PKCS1Padding", -1),
     A128KW(AlgorithmUtils.A128KW_ALGO, "AESWrap", 128),
     A192KW(AlgorithmUtils.A192KW_ALGO, "AESWrap", 192),
     A256KW(AlgorithmUtils.A256KW_ALGO, "AESWrap", 256),
@@ -37,7 +37,8 @@ public enum KeyAlgorithm {
     PBES2_HS512_A256KW(AlgorithmUtils.PBES2_HS512_A256KW_ALGO, "AESWrap", 256),
     ECDH_ES_A128KW(AlgorithmUtils.ECDH_ES_A128KW_ALGO, "AESWrap", 128),
     ECDH_ES_A192KW(AlgorithmUtils.ECDH_ES_A192KW_ALGO, "AESWrap", 192),
-    ECDH_ES_A256KW(AlgorithmUtils.ECDH_ES_A256KW_ALGO, "AESWrap", 256);
+    ECDH_ES_A256KW(AlgorithmUtils.ECDH_ES_A256KW_ALGO, "AESWrap", 256),
+    ECDH_ES_DIRECT(AlgorithmUtils.ECDH_ES_DIRECT_ALGO, null, -1);
         
     private final String jwaName;
     private final String javaName;
