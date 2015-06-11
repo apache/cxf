@@ -108,8 +108,14 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
         if (value.getPath() != null) {
             sb.append(';').append(PATH).append('=').append(value.getPath());
         }
+        if (value.getExpiry() != null) {
+            sb.append(';').append(EXPIRES).append('=').append(HttpUtils.toHttpDate(value.getExpiry()));
+        }
         if (value.isSecure()) {
             sb.append(';').append(SECURE);
+        }
+        if (value.isHttpOnly()) {
+            sb.append(';').append(HTTP_ONLY);
         }
         sb.append(';').append(VERSION).append('=').append(value.getVersion());
         return sb.toString();
