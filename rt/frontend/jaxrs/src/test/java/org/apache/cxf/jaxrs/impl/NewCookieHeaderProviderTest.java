@@ -19,7 +19,11 @@
 
 package org.apache.cxf.jaxrs.impl;
 
+import java.util.Date;
+
 import javax.ws.rs.core.NewCookie;
+
+import org.apache.cxf.jaxrs.utils.HttpUtils;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -57,6 +61,25 @@ public class NewCookieHeaderProviderTest extends Assert {
                    && "domain".equals(c.getDomain())
                    && "comment".equals(c.getComment())
                    && 10 == c.getMaxAge());
+    }
+    
+    @Test
+    public void testFromComplexStringWithExpiresAndHttpOnly() {
+        NewCookie c = NewCookie.valueOf(
+                      "foo=bar;Comment=comment;Path=path;Max-Age=10;Domain=domain;Secure;"
+                      + "Expires=Wed, 09 Jun 2021 10:18:14 GMT;HttpOnly;Version=1");
+        assertTrue("bar".equals(c.getValue())
+                   && "foo".equals(c.getName()));
+        assertTrue(1 == c.getVersion()
+                   && "path".equals(c.getPath())
+                   && "domain".equals(c.getDomain())
+                   && "comment".equals(c.getComment())
+                   && c.isSecure()
+                   && c.isHttpOnly()
+                   && 10 == c.getMaxAge());
+        Date d = c.getExpiry();
+        assertNotNull(d);
+        assertEquals("Wed, 09 Jun 2021 10:18:14 GMT", HttpUtils.toHttpDate(d));
     }
     
     @Test

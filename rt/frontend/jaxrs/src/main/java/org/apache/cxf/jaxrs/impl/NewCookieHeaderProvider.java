@@ -19,10 +19,13 @@
 
 package org.apache.cxf.jaxrs.impl;
 
+import java.util.Date;
+
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.jaxrs.utils.HttpUtils;
 
 public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
 
@@ -33,6 +36,7 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
     private static final String COMMENT = "Comment";
     private static final String SECURE = "Secure";
     private static final String EXPIRES = "Expires";
+    private static final String HTTP_ONLY = "HttpOnly";
         
     public NewCookie fromString(String c) {
         
@@ -45,8 +49,11 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
         String path = null;
         String domain = null;
         String comment = null;
-        int maxAge = -1;
+        int maxAge = NewCookie.DEFAULT_MAX_AGE;
         boolean isSecure = false;
+        Date expires = null;
+        boolean httpOnly = false;
+        int version = NewCookie.DEFAULT_VERSION;
         
         String[] tokens = StringUtils.split(c, ";");
         for (String token : tokens) {
@@ -54,7 +61,8 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
             
             int sepIndex = theToken.indexOf('=');
             String paramName = sepIndex != -1 ? theToken.substring(0, sepIndex) : theToken;
-            String paramValue = sepIndex == theToken.length() + 1 ? null : theToken.substring(sepIndex + 1);
+            String paramValue = sepIndex == -1 || sepIndex == theToken.length() - 1 
+                ? null : theToken.substring(sepIndex + 1);
             
             if (paramName.equalsIgnoreCase(MAX_AGE)) {
                 maxAge = Integer.parseInt(paramValue);
@@ -66,10 +74,13 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
                 comment = paramValue;
             } else if (paramName.equalsIgnoreCase(SECURE)) {
                 isSecure = true;
-            } else if (paramName.equalsIgnoreCase(EXPIRES) || paramName.equalsIgnoreCase(VERSION)) {
-                // ignore
-                continue;
-            } else {
+            } else if (paramName.equalsIgnoreCase(EXPIRES)) {
+                expires = HttpUtils.getHttpDate(paramValue);
+            } else if (paramName.equalsIgnoreCase(HTTP_ONLY)) {
+                httpOnly = true;
+            } else if (paramName.equalsIgnoreCase(VERSION)) {
+                version = Integer.parseInt(paramValue);
+            } else if (paramValue != null) {
                 name = paramName;
                 value = paramValue;
             }
@@ -79,7 +90,7 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
             throw new IllegalArgumentException("Set-Cookie is malformed : " + c);
         }
         
-        return new NewCookie(name, value, path, domain, comment, maxAge, isSecure);
+        return new NewCookie(name, value, path, domain, version, comment, maxAge, expires, isSecure, httpOnly);
     }
 
     public String toString(NewCookie value) {
