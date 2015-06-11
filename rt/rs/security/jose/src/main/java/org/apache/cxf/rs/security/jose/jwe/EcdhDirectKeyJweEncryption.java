@@ -24,8 +24,8 @@ import java.security.interfaces.ECPublicKey;
 
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
+import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 import org.apache.cxf.rs.security.jose.jwk.JwkUtils;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
 
@@ -50,7 +50,7 @@ public class EcdhDirectKeyJweEncryption extends JweEncryption {
     }
     protected static class EcdhDirectKeyEncryptionAlgorithm extends DirectKeyEncryptionAlgorithm {
         protected void checkKeyEncryptionAlgorithm(JweHeaders headers) {
-            headers.setKeyEncryptionAlgorithm(AlgorithmUtils.ECDH_ES_DIRECT_ALGO);
+            headers.setKeyEncryptionAlgorithm(KeyAlgorithm.ECDH_ES_DIRECT);
         }
     }
     protected static class EcdhAesGcmContentEncryptionAlgorithm extends AesGcmContentEncryptionAlgorithm {

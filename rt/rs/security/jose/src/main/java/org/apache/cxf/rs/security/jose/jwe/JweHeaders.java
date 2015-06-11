@@ -58,43 +58,32 @@ public class JweHeaders extends JoseHeaders {
     }
     private void init(String keyEncAlgo, String ctEncAlgo, boolean deflate) {
         if (keyEncAlgo != null) {
-            setKeyEncryptionAlgorithm(keyEncAlgo);    
+            setKeyEncryptionAlgorithm(KeyAlgorithm.getAlgorithm(keyEncAlgo));    
         }
-        setContentEncryptionAlgorithm(ctEncAlgo);
+        setContentEncryptionAlgorithm(ContentAlgorithm.getAlgorithm(ctEncAlgo));
         if (deflate) {
             setZipAlgorithm(JoseConstants.DEFLATE_ZIP_ALGORITHM);
         }
     }
     
-    public void setKeyEncryptionAlgorithm(String type) {
-        super.setAlgorithm(type);
-    }
     public void setKeyEncryptionAlgorithm(KeyAlgorithm algo) {
-        this.setKeyEncryptionAlgorithm(algo.getJwaName());
+        super.setAlgorithm(algo.getJwaName());
     }
     
-    public String getKeyEncryptionAlgorithm() {
-        return super.getAlgorithm();
-    }
-    public KeyAlgorithm getKeyEncryptionAlgorithmEnum() {
-        return KeyAlgorithm.getAlgorithm(getKeyEncryptionAlgorithm());
-    }
-    
-    public void setContentEncryptionAlgorithm(String type) {
-        setHeader(JoseConstants.JWE_HEADER_CONTENT_ENC_ALGORITHM, type);
+    public KeyAlgorithm getKeyEncryptionAlgorithm() {
+        String algo = super.getAlgorithm();
+        return algo == null ? null : KeyAlgorithm.getAlgorithm(algo);
     }
     
     public void setContentEncryptionAlgorithm(ContentAlgorithm algo) {
-        this.setContentEncryptionAlgorithm(algo.getJwaName());
+        setHeader(JoseConstants.JWE_HEADER_CONTENT_ENC_ALGORITHM, algo.getJwaName());
     }
     
-    public String getContentEncryptionAlgorithm() {
+    public ContentAlgorithm getContentEncryptionAlgorithm() {
         Object prop = getHeader(JoseConstants.JWE_HEADER_CONTENT_ENC_ALGORITHM);
-        return prop == null ? null : prop.toString();
+        return prop == null ? null : ContentAlgorithm.getAlgorithm(prop.toString());
     }
-    public ContentAlgorithm getContentEncryptionAlgorithmEnum() {
-        return ContentAlgorithm.getAlgorithm(getContentEncryptionAlgorithm());
-    }
+    
     public void setZipAlgorithm(String type) {
         setHeader(JoseConstants.JWE_HEADER_ZIP_ALGORITHM, type);
     }

@@ -31,6 +31,7 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.provider.json.JsonMapObjectReaderWriter;
 import org.apache.cxf.rs.security.jose.JoseException;
 import org.apache.cxf.rs.security.jose.JoseUtils;
+import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 
 public class JweJsonConsumer {
     protected static final Logger LOG = LogUtils.getL7dLogger(JweJsonConsumer.class);
@@ -83,8 +84,8 @@ public class JweJsonConsumer {
 
     private JweJsonEncryptionEntry getJweDecryptionEntry(JweDecryptionProvider jwe) {
         for (Map.Entry<JweJsonEncryptionEntry, JweHeaders> entry : recipientsMap.entrySet()) {
-            String keyAlgo = entry.getValue().getKeyEncryptionAlgorithm();
-            if (keyAlgo != null && keyAlgo.equals(jwe.getKeyAlgorithm().getJwaName())
+            KeyAlgorithm keyAlgo = entry.getValue().getKeyEncryptionAlgorithm();
+            if (keyAlgo != null && keyAlgo.equals(jwe.getKeyAlgorithm())
                 || keyAlgo == null && jwe.getKeyAlgorithm() == null) {
                 return entry.getKey();        
             }    

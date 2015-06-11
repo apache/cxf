@@ -63,7 +63,8 @@ public abstract class AbstractJweDecryption implements JweDecryptionProvider {
         boolean compressionSupported = 
             JoseConstants.DEFLATE_ZIP_ALGORITHM.equals(jweDecryptionInput.getJweHeaders().getZipAlgorithm());
         keyProperties.setCompressionSupported(compressionSupported);
-        byte[] actualCek = getActualCek(cek, jweDecryptionInput.getJweHeaders().getContentEncryptionAlgorithm());
+        byte[] actualCek = getActualCek(cek, 
+                               jweDecryptionInput.getJweHeaders().getContentEncryptionAlgorithm().getJwaName());
         Key secretKey = CryptoUtils.createSecretKeySpec(actualCek, keyProperties.getKeyAlgo());
         byte[] bytes = 
             CryptoUtils.decryptBytes(getEncryptedContentWithAuthTag(jweDecryptionInput), secretKey, keyProperties);
@@ -77,7 +78,8 @@ public abstract class AbstractJweDecryption implements JweDecryptionProvider {
             getContentEncryptionCipherInitVector(jweDecryptionInput));
     }
     protected String getContentEncryptionAlgorithm(JweDecryptionInput jweDecryptionInput) {
-        return AlgorithmUtils.toJavaName(jweDecryptionInput.getJweHeaders().getContentEncryptionAlgorithm());
+        return AlgorithmUtils.toJavaName(jweDecryptionInput.getJweHeaders()
+                                         .getContentEncryptionAlgorithm().getJwaName());
     }
     protected byte[] getContentEncryptionCipherAAD(JweDecryptionInput jweDecryptionInput) {
         return contentDecryptionAlgo.getAdditionalAuthenticationData(

@@ -73,10 +73,10 @@ public abstract class AbstractWrapKeyEncryptionAlgorithm implements KeyEncryptio
         }
     }
     protected String getKeyEncryptionAlgoJava(JweHeaders headers) {
-        return AlgorithmUtils.toJavaName(headers.getKeyEncryptionAlgorithm());
+        return AlgorithmUtils.toJavaName(headers.getKeyEncryptionAlgorithm().getJwaName());
     }
     protected String getContentEncryptionAlgoJava(JweHeaders headers) {
-        return AlgorithmUtils.toJavaName(headers.getContentEncryptionAlgorithm());
+        return AlgorithmUtils.toJavaName(headers.getContentEncryptionAlgorithm().getJwaName());
     }
     protected AlgorithmParameterSpec getAlgorithmParameterSpec(JweHeaders headers) {
         return null;
@@ -89,16 +89,16 @@ public abstract class AbstractWrapKeyEncryptionAlgorithm implements KeyEncryptio
         return algo;
     }
     protected void checkAlgorithms(JweHeaders headers) {
-        String providedAlgo = headers.getKeyEncryptionAlgorithm();
-        if (providedAlgo != null && !providedAlgo.equals(algorithm.getJwaName())) {
+        KeyAlgorithm providedAlgo = headers.getKeyEncryptionAlgorithm();
+        if (providedAlgo != null && !providedAlgo.equals(algorithm)) {
             LOG.warning("Invalid key encryption algorithm: " + providedAlgo);
             throw new JweException(JweException.Error.INVALID_KEY_ALGORITHM);
         }
         if (providedAlgo != null) {
-            checkAlgorithm(providedAlgo);
+            checkAlgorithm(providedAlgo.getJwaName());
         } else {
             checkAlgorithm(algorithm.getJwaName());
-            headers.setKeyEncryptionAlgorithm(algorithm.getJwaName());
+            headers.setKeyEncryptionAlgorithm(algorithm);
         }
     }
     

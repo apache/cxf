@@ -160,20 +160,20 @@ public abstract class AbstractJweEncryption implements JweEncryptionProvider {
     private JweEncryptionInternal getInternalState(JweHeaders jweInHeaders, JweEncryptionInput jweInput) {
         JweHeaders theHeaders = new JweHeaders();
         if (getKeyAlgorithm() != null) {
-            theHeaders.setKeyEncryptionAlgorithm(getKeyAlgorithm().getJwaName());
+            theHeaders.setKeyEncryptionAlgorithm(getKeyAlgorithm());
         }
-        theHeaders.setContentEncryptionAlgorithm(getContentEncryptionAlgoJwt());
+        theHeaders.setContentEncryptionAlgorithm(getContentEncryptionAlgorithm().getAlgorithm());
         
         JweHeaders protectedHeaders = null;
         if (jweInHeaders != null) {
             if (jweInHeaders.getKeyEncryptionAlgorithm() != null 
                 && (getKeyAlgorithm() == null 
-                    || !getKeyAlgorithm().getJwaName().equals(jweInHeaders.getKeyEncryptionAlgorithm()))) {
+                    || !getKeyAlgorithm().equals(jweInHeaders.getKeyEncryptionAlgorithm()))) {
                 LOG.warning("Invalid key encryption algorithm");
                 throw new JweException(JweException.Error.INVALID_KEY_ALGORITHM);
             }
             if (jweInHeaders.getContentEncryptionAlgorithm() != null 
-                && !getContentEncryptionAlgoJwt().equals(jweInHeaders.getContentEncryptionAlgorithm())) {
+                && !getContentEncryptionAlgoJwt().equals(jweInHeaders.getContentEncryptionAlgorithm().getJwaName())) {
                 LOG.warning("Invalid content encryption algorithm");
                 throw new JweException(JweException.Error.INVALID_CONTENT_ALGORITHM);
             }

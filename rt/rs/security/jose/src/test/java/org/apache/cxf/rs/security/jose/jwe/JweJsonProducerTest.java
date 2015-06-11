@@ -28,6 +28,7 @@ import javax.crypto.SecretKey;
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
+import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.AfterClass;
@@ -259,7 +260,7 @@ public class JweJsonProducerTest extends Assert {
             }
         };
         JweHeaders recepientUnprotectedHeaders = new JweHeaders();
-        recepientUnprotectedHeaders.setKeyEncryptionAlgorithm(AlgorithmUtils.A128KW_ALGO);
+        recepientUnprotectedHeaders.setKeyEncryptionAlgorithm(KeyAlgorithm.A128KW);
         String jweJson = p.encryptWith(jwe, recepientUnprotectedHeaders);
         assertEquals(SINGLE_RECIPIENT_ALL_HEADERS_AAD_OUTPUT, jweJson);
     }
@@ -272,7 +273,7 @@ public class JweJsonProducerTest extends Assert {
         JweHeaders protectedHeaders = new JweHeaders(AlgorithmUtils.A128GCM_ALGO);
         JweHeaders sharedUnprotectedHeaders = new JweHeaders();
         sharedUnprotectedHeaders.setJsonWebKeysUrl("https://server.example.com/keys.jwks");
-        sharedUnprotectedHeaders.setKeyEncryptionAlgorithm(AlgorithmUtils.A128KW_ALGO);
+        sharedUnprotectedHeaders.setKeyEncryptionAlgorithm(KeyAlgorithm.A128KW);
         
         List<JweEncryptionProvider> jweList = new LinkedList<JweEncryptionProvider>();
         
