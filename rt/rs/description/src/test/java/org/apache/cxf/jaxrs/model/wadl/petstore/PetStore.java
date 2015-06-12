@@ -19,17 +19,12 @@
 
 package org.apache.cxf.jaxrs.model.wadl.petstore;
 
-import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-import javax.xml.bind.annotation.XmlType;
 
 /**
  * The Pet Store
@@ -44,13 +39,19 @@ public class PetStore {
 
     @GET
     @Produces("text/plain")
+    /**
+     * Return Pet Status with no params
+     * 
+     * @return status 
+     * @throws Exception
+     */
     public Response getBaseStatus() throws Exception {
 
         return Response.ok(CLOSED).build();
     }
     
     /**
-     * Return Pet Status
+     * Return Pet Status with 2 params
      * @param petId the pet id
      * @param query the query
      * @return status 
@@ -59,42 +60,43 @@ public class PetStore {
     @GET
     @Path("/petstore/pets/{petId}/")
     @Produces("text/xml")
-    public Response getStatus(@PathParam("petId") String petId,
+    public Response getStatus2Params(@PathParam("petId") String petId,
                               @QueryParam("query") String query) throws Exception {
 
         return Response.ok(CLOSED).build();
     }
     
-    
+    /**
+     * Return Pet Status With 1 Param
+     * @param petId the pet id
+     * @return status 
+     * @throws Exception
+     */
     @GET
-    @Path("/petstore/jaxb/status/")
+    @Path("/petstore/pets/id/{petId}/")
     @Produces("text/xml")
-    public PetStoreStatus getJaxbStatus() {
+    public Response getStatus1Param(@PathParam("petId") String petId) throws Exception {
 
-        return new PetStoreStatus();
+        return Response.ok(CLOSED).build();
     }
     
     
+    /**
+     * Return Pet Status With 3 Params
+     * @param petId the pet id
+     * @param query the query
+     * @param query2 the query2
+     * @return status 
+     * @throws Exception
+     */
     @GET
-    @POST
-    @Path("/petstore/pets/")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Path("/petstore/pets/{petId}/")
     @Produces("text/xml")
-    public Response updateStatus(MultivaluedMap<String, String> params) throws Exception {
-        return Response.ok(params.getFirst("status")).build();
+    public Response getStatus3Params(@PathParam("petId") String petId,
+                              @QueryParam("query") String query,
+                              @QueryParam("query2") String query2) throws Exception {
+
+        return Response.ok(CLOSED).build();
     }
     
-    @XmlType(name = "status", namespace = "http://pets")
-    public static class PetStoreStatus {
-        private String status = PetStore.CLOSED;
-
-        public String getStatus() {
-            return status;
-        }
-
-        public void setStatus(String status) {
-            this.status = status;
-        }
-        
-    }
 }
