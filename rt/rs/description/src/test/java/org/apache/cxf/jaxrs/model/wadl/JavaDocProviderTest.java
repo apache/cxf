@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.jaxrs.model.wadl;
 
-import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.wadl.petstore.PetStore;
@@ -51,32 +50,58 @@ public class JavaDocProviderTest extends Assert {
         String classDoc = p.getClassDoc(cri);
         assertEquals("The Pet Store", classDoc);
         
-        boolean getStatusTested = false;
+        boolean getStatus1Tested = false;
+        boolean getStatus2Tested = false;
+        boolean getStatus3Tested = false;
         boolean noDocsTested = false;
         for (OperationResourceInfo ori : cri.getMethodDispatcher().getOperationResourceInfos()) {
-            if ("getStatus".equals(ori.getMethodToInvoke().getName())) {
-                testGetStatusJavaDocs(p, ori);
-                getStatusTested = true;
-            } else {
+            if ("getStatus1Param".equals(ori.getMethodToInvoke().getName())) {
+                testGetStatus1JavaDocs(p, ori);
+                getStatus1Tested = true;
+            } else if ("getStatus2Params".equals(ori.getMethodToInvoke().getName())) {
+                testGetStatus2JavaDocs(p, ori);
+                getStatus2Tested = true;
+            } else if ("getStatus3Params".equals(ori.getMethodToInvoke().getName())) {
+                testGetStatus3JavaDocs(p, ori);
+                getStatus3Tested = true;
+            } else if ("getBaseStatus".equals(ori.getMethodToInvoke().getName())) {
                 testOperWithNoJavaDocs(p, ori);
                 noDocsTested = true;
             }
         }
-        assertTrue(getStatusTested);
+        assertTrue(getStatus1Tested);
+        assertTrue(getStatus2Tested);
+        assertTrue(getStatus3Tested);
         assertTrue(noDocsTested);
         assertTrue(true);
     }
 
     private void testOperWithNoJavaDocs(JavaDocProvider p, OperationResourceInfo ori) {
-        assertTrue(StringUtils.isEmpty(p.getMethodDoc(ori)));
-        assertTrue(StringUtils.isEmpty(p.getMethodResponseDoc(ori)));
+        assertEquals(0, ori.getParameters().size());
+        assertEquals("Return Pet Status with no params", p.getMethodDoc(ori));
+        assertEquals("status", p.getMethodResponseDoc(ori));
     }
     
-    private void testGetStatusJavaDocs(JavaDocProvider p, OperationResourceInfo ori) {
-        assertEquals("Return Pet Status", p.getMethodDoc(ori));
+    private void testGetStatus1JavaDocs(JavaDocProvider p, OperationResourceInfo ori) {
+        assertEquals("Return Pet Status With 1 Param", p.getMethodDoc(ori));
+        assertEquals(1, ori.getParameters().size());
+        assertEquals("status", p.getMethodResponseDoc(ori));
+        assertEquals("the pet id", p.getMethodParameterDoc(ori, 0));
+    }
+    private void testGetStatus2JavaDocs(JavaDocProvider p, OperationResourceInfo ori) {
+        assertEquals("Return Pet Status with 2 params", p.getMethodDoc(ori));
+        assertEquals(2, ori.getParameters().size());
         assertEquals("status", p.getMethodResponseDoc(ori));
         assertEquals("the pet id", p.getMethodParameterDoc(ori, 0));
         assertEquals("the query", p.getMethodParameterDoc(ori, 1));
+    }
+    private void testGetStatus3JavaDocs(JavaDocProvider p, OperationResourceInfo ori) {
+        assertEquals("Return Pet Status With 3 Params", p.getMethodDoc(ori));
+        assertEquals(3, ori.getParameters().size());
+        assertEquals("status", p.getMethodResponseDoc(ori));
+        assertEquals("the pet id", p.getMethodParameterDoc(ori, 0));
+        assertEquals("the query", p.getMethodParameterDoc(ori, 1));
+        assertEquals("the query2", p.getMethodParameterDoc(ori, 2));
     }
     
 }
