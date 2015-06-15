@@ -24,11 +24,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
-import org.apache.cxf.message.Message;
-import org.apache.cxf.phase.PhaseInterceptorChain;
-import org.apache.cxf.tracing.TracerHeaders;
+import org.apache.cxf.tracing.AbstractTracingProvider;
 import org.apache.htrace.Sampler;
 import org.apache.htrace.Trace;
 import org.apache.htrace.TraceInfo;
@@ -36,10 +33,7 @@ import org.apache.htrace.TraceScope;
 import org.apache.htrace.Tracer;
 import org.apache.htrace.impl.MilliSpan;
 
-import static org.apache.cxf.tracing.TracerHeaders.DEFAULT_HEADER_SPAN_ID;
-import static org.apache.cxf.tracing.TracerHeaders.DEFAULT_HEADER_TRACE_ID;
-
-public abstract class AbstractHTraceProvider  { 
+public abstract class AbstractHTraceProvider extends AbstractTracingProvider { 
     protected static final Logger LOG = LogUtils.getL7dLogger(AbstractHTraceProvider.class);
     protected static final String TRACE_SPAN = "org.apache.cxf.tracing.htrace.span";
         
@@ -100,30 +94,5 @@ public abstract class AbstractHTraceProvider  {
             }
         }
         return defaultValue;
-    }
-    
-    private static String getSpanIdHeader() {
-        return getHeaderOrDefault(TracerHeaders.HEADER_SPAN_ID, DEFAULT_HEADER_SPAN_ID);
-    }
-    
-    private static String getTraceIdHeader() {
-        return getHeaderOrDefault(TracerHeaders.HEADER_TRACE_ID, DEFAULT_HEADER_TRACE_ID);
-    }
-
-    private static String getHeaderOrDefault(final String property, final String fallback) {
-        final Message message = PhaseInterceptorChain.getCurrentMessage();
-        
-        if (message != null) {
-            final Object header = message.getContextualProperty(property);
-            
-            if (header instanceof String) {
-                final String name = (String)header;
-                if (!StringUtils.isEmpty(name)) {
-                    return name;
-                }
-            }
-        }
-        
-        return fallback;
     }
 }

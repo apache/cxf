@@ -27,18 +27,16 @@ import javax.ws.rs.client.ClientResponseFilter;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
 
-import org.apache.cxf.tracing.TracerHeaders;
+import org.apache.cxf.tracing.AbstractTracingProvider;
 import org.apache.htrace.Sampler;
 import org.apache.htrace.Span;
 import org.apache.htrace.Trace;
 import org.apache.htrace.TraceScope;
 import org.apache.htrace.impl.NeverSampler;
 
-import static org.apache.cxf.tracing.TracerHeaders.DEFAULT_HEADER_SPAN_ID;
-import static org.apache.cxf.tracing.TracerHeaders.DEFAULT_HEADER_TRACE_ID;
-
 @Provider
-public class HTraceClientProvider implements ClientRequestFilter, ClientResponseFilter {
+public class HTraceClientProvider extends AbstractTracingProvider 
+        implements ClientRequestFilter, ClientResponseFilter {
     private static final String TRACE_SPAN = "org.apache.cxf.tracing.client.htrace.span";
     
     private final Sampler< ? > sampler;
@@ -84,17 +82,5 @@ public class HTraceClientProvider implements ClientRequestFilter, ClientResponse
         if (scope != null) {
             scope.close();
         }
-    }
-    
-    private static String getSpanIdHeader() {
-        return getHeaderOrDefault(TracerHeaders.HEADER_SPAN_ID, DEFAULT_HEADER_SPAN_ID);
-    }
-    
-    private static String getTraceIdHeader() {
-        return getHeaderOrDefault(TracerHeaders.HEADER_TRACE_ID, DEFAULT_HEADER_TRACE_ID);
-    }
-
-    private static String getHeaderOrDefault(final String property, final String fallback) {
-        return fallback;
     }
 }

@@ -29,6 +29,7 @@ import javax.ws.rs.core.Response.Status;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
+import org.apache.cxf.jaxrs.client.ClientConfiguration;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
@@ -36,22 +37,26 @@ import org.apache.cxf.systest.jaxrs.tracing.BookStore;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.tracing.TracerHeaders;
+import org.apache.cxf.tracing.htrace.jaxrs.HTraceClientProvider;
 import org.apache.cxf.tracing.htrace.jaxrs.HTraceFeature;
 import org.apache.htrace.HTraceConfiguration;
 import org.apache.htrace.impl.AlwaysSampler;
 import org.apache.htrace.impl.StandardOutSpanReceiver;
-
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.notNullValue;
 
 public class HTraceTracingCustomHeadersTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(HTraceTracingCustomHeadersTest.class);
     
     private static final String CUSTOM_HEADER_SPAN_ID = "My-Span-Id";
     private static final String CUSTOM_HEADER_TRACE_ID = "My-Trace-Id";
+    
+    private HTraceClientProvider htraceClientProvider;
     
     @Ignore
     public static class Server extends AbstractBusTestServerBase {
@@ -83,8 +88,14 @@ public class HTraceTracingCustomHeadersTest extends AbstractBusClientServerTestB
         createStaticBus();
     }
     
+    @Before
+    public void setUp() {
+        htraceClientProvider = new HTraceClientProvider(
+            new AlwaysSampler(HTraceConfiguration.EMPTY));
+    }
+    
     @Test
-    public void testThatNewInnerSpanIsCreated() {
+    public void testThatNewSpanIsCreated() {
         final Response r = createWebClient("/bookstore/books")
             .header(CUSTOM_HEADER_TRACE_ID, 10L)
             .header(CUSTOM_HEADER_SPAN_ID, 20L)
@@ -94,10 +105,27 @@ public class HTraceTracingCustomHeadersTest extends AbstractBusClientServerTestB
         assertThat((String)r.getHeaders().getFirst(CUSTOM_HEADER_TRACE_ID), equalTo("10"));
         assertThat((String)r.getHeaders().getFirst(CUSTOM_HEADER_SPAN_ID), equalTo("20"));
     }
+    
+    @Test
+    public void testThatNewChildSpanIsCreated() {
+        final Response r = createWebClient("/bookstore/books", htraceClientProvider).get();
+        assertEquals(Status.OK.getStatusCode(), r.getStatus());
+        
+        assertThat((String)r.getHeaders().getFirst(CUSTOM_HEADER_TRACE_ID), notNullValue());
+        assertThat((String)r.getHeaders().getFirst(CUSTOM_HEADER_SPAN_ID), notNullValue());
+    }
 
-    protected WebClient createWebClient(final String url) {
-        return WebClient
-            .create("http://localhost:" + PORT + url)
+    protected WebClient createWebClient(final String url, final Object ... providers) {
+        final WebClient client = WebClient
+            .create("http://localhost:" + PORT + url, Arrays.asList(providers))
             .accept(MediaType.APPLICATION_JSON);
+
+        if (providers.length > 0) {
+            final ClientConfiguration config = WebClient.getConfig(client);
+            config.getRequestContext().put(TracerHeaders.HEADER_SPAN_ID, CUSTOM_HEADER_SPAN_ID);
+            config.getRequestContext().put(TracerHeaders.HEADER_TRACE_ID, CUSTOM_HEADER_TRACE_ID);
+        }
+
+        return client;
     }
 }
