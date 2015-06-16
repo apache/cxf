@@ -30,6 +30,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import org.apache.aries.blueprint.NamespaceHandler;
+import org.apache.aries.blueprint.Namespaces;
 import org.apache.aries.blueprint.ParserContext;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
@@ -38,7 +39,7 @@ import org.osgi.service.blueprint.container.BlueprintContainer;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.osgi.service.blueprint.reflect.Metadata;
 
-//@Namespaces("http://cxf.apache.org/blueprint/jaxrs")
+@Namespaces("http://cxf.apache.org/blueprint/jaxrs")
 public class JAXRSBPNamespaceHandler implements NamespaceHandler {
     private BlueprintContainer blueprintContainer;
     
