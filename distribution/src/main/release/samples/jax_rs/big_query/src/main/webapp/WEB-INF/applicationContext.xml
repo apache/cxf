@@ -92,6 +92,7 @@
          <property name="jwkSetClient" ref="jwkSetClient"/> 
          <property name="issuerId" value="accounts.google.com"/>
          <property name="userInfoServiceClient" ref="userInfoServiceClient"/>
+         <property name="clockOffset" value="10"/>
      </bean>
 
      <bean id="consumer" class="org.apache.cxf.rs.security.oauth2.client.Consumer">

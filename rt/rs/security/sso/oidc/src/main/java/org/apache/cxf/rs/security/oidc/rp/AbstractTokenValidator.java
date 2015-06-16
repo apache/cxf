@@ -38,6 +38,7 @@ public abstract class AbstractTokenValidator {
     private JwsSignatureVerifier jwsVerifier;
     private String issuerId;
     private int issuedAtRange;
+    private int clockOffset;
     private WebClient jwkSetClient;
     private ConcurrentHashMap<String, JsonWebKey> keyMap = new ConcurrentHashMap<String, JsonWebKey>(); 
     
@@ -79,7 +80,7 @@ public abstract class AbstractTokenValidator {
         if (issuer == null && validateClaimsAlways || issuer != null && !issuer.equals(issuerId)) {
             throw new SecurityException("Invalid provider");
         }
-        JwtUtils.validateJwtTimeClaims(claims, issuedAtRange, validateClaimsAlways);
+        JwtUtils.validateJwtTimeClaims(claims, clockOffset, issuedAtRange, validateClaimsAlways);
     }
     
     
@@ -145,5 +146,9 @@ public abstract class AbstractTokenValidator {
             throw new SecurityException();
         }
         return theJwsVerifier;
+    }
+
+    public void setClockOffset(int clockOffset) {
+        this.clockOffset = clockOffset;
     }
 }
