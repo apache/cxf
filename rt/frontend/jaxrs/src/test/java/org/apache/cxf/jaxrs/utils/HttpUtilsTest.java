@@ -40,22 +40,6 @@ import org.junit.Test;
 public class HttpUtilsTest extends Assert {
 
     @Test
-    public void testResolveJarUrl() throws Exception {
-        String str = "jar:file:/home/sberyozkin/.m2/repository/org/apache/cxf/cxf-rt-transports-http/3.1.2-SNAPSHOT/cxf-rt-transports-http-3.1.2-SNAPSHOT.jar!/schemas/configuration/http-conf.xsd";
-        URI uri = URI.create(str); 
-        String systemIdUri = "common.xsd";
-        if ("jar".equals(uri.toURL().getProtocol())) {
-            int jarFragmentIndex = str.lastIndexOf('!');
-            if (jarFragmentIndex > 0 && jarFragmentIndex < str.length() - 1) {
-                String jarUri = str.substring(0, jarFragmentIndex);
-                String oldFragment = str.substring(jarFragmentIndex + 1);
-                String newFragment = URI.create(oldFragment).resolve(systemIdUri).toString();
-                System.out.println(jarUri + "!" + newFragment);
-            }
-        }
-    }
-    
-    @Test
     public void testUrlDecode() {
         assertEquals("+ ", HttpUtils.urlDecode("%2B+"));
     }
