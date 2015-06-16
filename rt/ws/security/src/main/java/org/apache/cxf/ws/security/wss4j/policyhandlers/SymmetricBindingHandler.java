@@ -403,6 +403,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             WSSecDKEncrypt dkEncr = new WSSecDKEncrypt();
             dkEncr.setIdAllocator(wssConfig.getIdAllocator());
             dkEncr.setCallbackLookup(callbackLookup);
+            dkEncr.setAttachmentCallbackHandler(new AttachmentCallbackHandler(message));
             if (recToken.getToken().getVersion() == SPConstants.SPVersion.SP11) {
                 dkEncr.setWscVersion(ConversationConstants.VERSION_05_02);
             }
@@ -486,10 +487,21 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             encrDKTokenElem = dkEncr.getdktElement();
             addDerivedKeyElement(encrDKTokenElem);
             Element refList = dkEncr.encryptForExternalRef(null, encrParts);
+            List<Element> attachments = dkEncr.getAttachmentEncryptedDataElements();
             if (atEnd) {
                 this.insertBeforeBottomUp(refList);
+                if (attachments != null) {
+                    for (Element attachment : attachments) {
+                        this.insertBeforeBottomUp(attachment);
+                    }
+                }
             } else {
-                this.addDerivedKeyElement(refList);                        
+                this.addDerivedKeyElement(refList);
+                if (attachments != null) {
+                    for (Element attachment : attachments) {
+                        this.addDerivedKeyElement(attachment);
+                    }
+                }
             }
             return dkEncr;
         } catch (Exception e) {
@@ -631,6 +643,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
         WSSecDKSign dkSign = new WSSecDKSign();
         dkSign.setIdAllocator(wssConfig.getIdAllocator());
         dkSign.setCallbackLookup(callbackLookup);
+        dkSign.setAttachmentCallbackHandler(new AttachmentCallbackHandler(message));
         if (policyAbstractTokenWrapper.getToken().getVersion() == SPConstants.SPVersion.SP11) {
             dkSign.setWscVersion(ConversationConstants.VERSION_05_02);
         }
