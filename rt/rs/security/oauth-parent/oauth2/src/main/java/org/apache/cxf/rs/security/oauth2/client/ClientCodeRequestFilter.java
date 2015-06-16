@@ -107,7 +107,7 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
 
     private Response createCodeResponse(ContainerRequestContext rc, UriInfo ui) {
         MultivaluedMap<String, String> redirectState = createRedirectState(rc, ui);
-        String theState = redirectState != null ? redirectState.getFirst(OAuthConstants.SCOPE) : null;
+        String theState = redirectState != null ? redirectState.getFirst(OAuthConstants.STATE) : null;
         String redirectScope = redirectState != null ? redirectState.getFirst(OAuthConstants.SCOPE) : null;
         String theScope = redirectScope != null ? redirectScope : scopes;
         URI uri = OAuthClientUtils.getAuthorizationURI(authorizationServiceUri, 

@@ -24,6 +24,8 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
+import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
+import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 
 public class MemoryClientCodeStateManager implements ClientCodeStateManager {
     private ConcurrentHashMap<String, MultivaluedMap<String, String>> map = 
@@ -32,17 +34,18 @@ public class MemoryClientCodeStateManager implements ClientCodeStateManager {
     @Override
     public MultivaluedMap<String, String> toRedirectState(MessageContext mc, 
                                                           MultivaluedMap<String, String> requestState) {
-        String name = mc.getSecurityContext().getUserPrincipal().getName();
-        String hashCode = Integer.toString(name.hashCode());
-        map.put(hashCode, requestState);
-        return new MetadataMap<String, String>();
+        String stateParam = OAuthUtils.generateRandomTokenKey();
+        map.put(stateParam, requestState);
+        
+        MultivaluedMap<String, String> redirectMap = new MetadataMap<String, String>();
+        redirectMap.putSingle(OAuthConstants.STATE, stateParam);
+        return redirectMap;
     }
 
     @Override
     public MultivaluedMap<String, String> fromRedirectState(MessageContext mc, 
                                                             MultivaluedMap<String, String> redirectState) {
-        String name = mc.getSecurityContext().getUserPrincipal().getName();
-        String hashCode = Integer.toString(name.hashCode());
-        return map.remove(hashCode);
+        String stateParam = redirectState.getFirst(OAuthConstants.STATE);
+        return map.remove(stateParam);
     }
 }
