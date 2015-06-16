@@ -64,11 +64,13 @@ public class BigQueryService {
                                                                  searchWord);
         
         List<Map<String, Object>> rows = CastUtils.cast((List<?>)jsonMap.getProperty("rows"));
-        for (Map<String, Object> row : rows) {
-            List<Map<String, Object>> fields = CastUtils.cast((List<?>)row.get("f"));
-            ShakespeareText text = new ShakespeareText((String)fields.get(0).get("v"),
-                                                       (String)fields.get(1).get("v"));
-            bigQueryResponse.getTexts().add(text);
+        if (rows != null) {
+            for (Map<String, Object> row : rows) {
+                List<Map<String, Object>> fields = CastUtils.cast((List<?>)row.get("f"));
+                ShakespeareText text = new ShakespeareText((String)fields.get(0).get("v"),
+                                                           (String)fields.get(1).get("v"));
+                bigQueryResponse.getTexts().add(text);
+            }
         }
         return bigQueryResponse;
     }
