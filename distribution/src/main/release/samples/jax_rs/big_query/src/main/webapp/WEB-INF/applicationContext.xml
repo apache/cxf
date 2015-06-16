@@ -98,8 +98,9 @@
          <property name="key" value="${client_id}"/> 
          <property name="secret" value="${client_secret}"/>
      </bean>
-     
+     <bean id="clientCodeStateManager" class="org.apache.cxf.rs.security.oauth2.client.MemoryClientCodeStateManager"/>
      <bean id="oidcRequestFilter" class="org.apache.cxf.rs.security.oidc.rp.OidcClientCodeRequestFilter">
+         <property name="clientCodeStateManager" ref="clientCodeStateManager"/>
          <property name="scopes" value="openid email profile https://www.googleapis.com/auth/bigquery.readonly"/>
          <property name="accessTokenServiceClient" ref="atServiceClient"/>
          <property name="userInfoClient" ref="userInfoClient"/>

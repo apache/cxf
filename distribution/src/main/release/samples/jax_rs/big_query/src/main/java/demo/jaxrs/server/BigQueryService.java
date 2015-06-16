@@ -25,6 +25,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
@@ -45,8 +46,10 @@ public class BigQueryService {
         ClientAccessToken accessToken = context.getToken();
         bigQueryClient.authorization(accessToken);
         
-        String searchWord = "brave";
-        String maxResults = "10";
+        MultivaluedMap<String, String> state = context.getState();
+        
+        String searchWord = state.getFirst("word");
+        String maxResults = state.getFirst("maxResults");
         String bigQuerySelect = "SELECT corpus,corpus_date FROM publicdata:samples.shakespeare WHERE word=\\\"" 
             + searchWord + "\\\"";
         String bigQueryRequest = "{" +
