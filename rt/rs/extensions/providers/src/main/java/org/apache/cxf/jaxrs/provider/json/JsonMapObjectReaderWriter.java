@@ -210,7 +210,7 @@ public class JsonMapObjectReaderWriter {
         String valueStr = value.toString().trim(); 
         if (valueStr.startsWith("\"")) {
             value = valueStr.substring(1, valueStr.length() - 1);
-        } else if ("true".equals(value) || "false".equals(value)) {
+        } else if ("true".equals(valueStr) || "false".equals(valueStr)) {
             value = Boolean.valueOf(valueStr);
         } else {
             try {
