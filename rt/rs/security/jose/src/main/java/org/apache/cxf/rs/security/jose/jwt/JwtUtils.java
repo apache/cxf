@@ -36,7 +36,8 @@ public final class JwtUtils {
         return new JwtTokenReaderWriter().fromJsonClaims(json);
     }
     
-    public static void validateJwtTimeClaims(JwtClaims claims, int issuedAtRange, boolean claimsRequired) {
+    public static void validateJwtTimeClaims(JwtClaims claims, int clockOffset, 
+                                             int issuedAtRange, boolean claimsRequired) {
         Long currentTimeInSecs = System.currentTimeMillis() / 1000;
         Long expiryTimeInSecs = claims.getExpiryTime();
         if (expiryTimeInSecs == null && claimsRequired 
@@ -44,15 +45,18 @@ public final class JwtUtils {
             throw new SecurityException("The token expired");
         }
         Long issuedAtInSecs = claims.getIssuedAt();
+        if (clockOffset <= 0) {
+            clockOffset = 0;
+        }
         if (issuedAtInSecs == null && claimsRequired 
-            || issuedAtInSecs != null && (issuedAtInSecs > currentTimeInSecs || issuedAtRange > 0
+            || issuedAtInSecs != null && (issuedAtInSecs - clockOffset > currentTimeInSecs || issuedAtRange > 0
             && issuedAtInSecs < currentTimeInSecs - issuedAtRange)) {
             throw new SecurityException("Invalid issuedAt");
         }
     }
     
     public static void validateJwtTimeClaims(JwtClaims claims) {
-        validateJwtTimeClaims(claims, 0, false);
+        validateJwtTimeClaims(claims, 0, 0, false);
     }
     
 }
