@@ -26,12 +26,13 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import org.apache.aries.blueprint.NamespaceHandler;
+import org.apache.aries.blueprint.Namespaces;
 import org.apache.aries.blueprint.ParserContext;
 import org.osgi.service.blueprint.container.BlueprintContainer;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.osgi.service.blueprint.reflect.Metadata;
 
-//@Namespaces("http://cxf.apache.org/blueprint/simple")
+@Namespaces("http://cxf.apache.org/blueprint/simple")
 public class SimpleBPNamespaceHandler implements NamespaceHandler {
     private BlueprintContainer blueprintContainer;
     
