@@ -18,39 +18,59 @@
  */
 package demo.jaxrs.server;
 
+import java.util.List;
+import java.util.Map;
+
 import javax.ws.rs.GET;
-import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
 
-import org.apache.cxf.rs.security.oidc.common.IdToken;
-import org.apache.cxf.rs.security.oidc.common.UserInfo;
+import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.jaxrs.client.WebClient;
+import org.apache.cxf.jaxrs.provider.json.JsonMapObject;
+import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oidc.rp.OidcClientTokenContext;
 
-@Path("/service")
+@Path("/search")
 public class BigQueryService {
 
+    private WebClient bigQueryClient;
+    
     @GET
-    @Path("/bigquery/complete")
-    @Produces("application/xml,application/json,text/html")
-    public Response completeBigQuery(@Context OidcClientTokenContext context) {
-        // This IdToken check can be skipped and UserInfo checked for null instead
-        // given that UserInfo can only be obtained if IdToken is valid; shown here
-        // to demonstrate the properties of OidcClientTokenContext
-        IdToken idToken = context.getIdToken();
-        if (idToken == null) {
-            throw new NotAuthorizedException(Response.Status.UNAUTHORIZED);
-        }
+    @Path("/complete")
+    @Produces("text/html")
+    public BigQueryResponse completeBigQuery(@Context OidcClientTokenContext context) {
         
-        UserInfo userInfo = context.getUserInfo();
+        ClientAccessToken accessToken = context.getToken();
+        bigQueryClient.authorization(accessToken);
+        
+        String searchWord = "brave";
+        String maxResults = "10";
+        String bigQuerySelect = "SELECT corpus,corpus_date FROM publicdata:samples.shakespeare WHERE word=\\\"" 
+            + searchWord + "\\\"";
+        String bigQueryRequest = "{" +
+            "\"kind\": \"bigquery#queryRequest\"," 
+            + "\"query\": \"" + bigQuerySelect + "\","
+            + "\"maxResults\": " + Integer.parseInt(maxResults)
+            + "}";
+        
+        
+        JsonMapObject jsonMap = bigQueryClient.post(bigQueryRequest, JsonMapObject.class);
+        BigQueryResponse bigQueryResponse = new BigQueryResponse(context.getUserInfo().getName(),
+                                                                 searchWord);
+        
+        List<Map<String, Object>> rows = CastUtils.cast((List<?>)jsonMap.getProperty("rows"));
+        for (Map<String, Object> row : rows) {
+            List<Map<String, Object>> fields = CastUtils.cast((List<?>)row.get("f"));
+            ShakespeareText text = new ShakespeareText((String)fields.get(0).get("v"),
+                                                       (String)fields.get(1).get("v"));
+            bigQueryResponse.getTexts().add(text);
+        }
+        return bigQueryResponse;
+    }
 
-        ResponseBuilder rb = Response.ok().type("application/json");
-        Response r = rb.entity(
-                "{\"email\":\"" + userInfo.getEmail() + "\"}")
-                .build();
-        return r;
+    public void setBigQueryClient(WebClient bigQueryClient) {
+        this.bigQueryClient = bigQueryClient;
     }
 }

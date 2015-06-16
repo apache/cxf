@@ -74,7 +74,7 @@
     </dependencies>
     <build>
         <!-- Name of the generated WAR file -->
-        <finalName>rest</finalName>
+        <finalName>bigquery</finalName>
         <plugins>
             <plugin>
                 <groupId>org.mortbay.jetty</groupId>
@@ -85,7 +85,7 @@
                     <connectors>
                       <connector implementation="org.mortbay.jetty.security.SslSocketConnector">
                          <port>8080</port>
-                         <keystore>${project.build.directory}/rest/WEB-INF/servicestore.jks</keystore>
+                         <keystore>${project.build.directory}/bigquery/WEB-INF/servicestore.jks</keystore>
                          <password>sspass</password>
                          <keyPassword>skpass</keyPassword>
                       </connector>

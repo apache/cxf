@@ -100,16 +100,36 @@
      </bean>
      
      <bean id="oidcRequestFilter" class="org.apache.cxf.rs.security.oidc.rp.OidcClientCodeRequestFilter">
-         <property name="scopes" value="openid email profile"/>
+         <property name="scopes" value="openid email profile https://www.googleapis.com/auth/bigquery.readonly"/>
          <property name="accessTokenServiceClient" ref="atServiceClient"/>
          <property name="userInfoClient" ref="userInfoClient"/>
          <property name="consumer" ref="consumer"/>
          <property name="authorizationServiceUri" value="https://accounts.google.com/o/oauth2/auth"/>
-         <property name="startUri" value="service/bigquery"/>
-         <property name="completeUri" value="service/bigquery/complete"/>
+         <property name="startUri" value="search"/>
+         <property name="completeUri" value="search/complete"/>
      </bean>
      
-     <bean id="bigQueryService" class="demo.jaxrs.server.BigQueryService"/>
+     <bean id="bigQueryService" class="demo.jaxrs.server.BigQueryService">
+         <property name="bigQueryClient" ref="bigQueryClient"/>
+     </bean>
+     
+     <!-- BigQuery WebClient -->
+     <jaxrsclient:client id="bigQueryClient" threadSafe="true" 
+        address="https://www.googleapis.com/bigquery/v2/projects/${project_id}/queries"
+        serviceClass="org.apache.cxf.jaxrs.client.WebClient">
+        <jaxrsclient:headers>
+            <entry key="Accept" value="application/json"/>
+            <entry key="Content-Type" value="application/json"/>
+        </jaxrsclient:headers>
+        <jaxrsclient:providers>
+           <bean class="org.apache.cxf.jaxrs.provider.json.JsonMapObjectProvider"/>
+        </jaxrsclient:providers>
+     </jaxrsclient:client>
+     
+     <bean id="searchView" class="org.apache.cxf.jaxrs.provider.RequestDispatcherProvider">
+         <property name="useClassNames" value="true"/>
+         <property name="locationPrefix" value="/forms/"/>
+     </bean>
      
      <jaxrs:server id="bigQueryServer" address="/">
         <jaxrs:serviceBeans>
@@ -117,6 +137,7 @@
         </jaxrs:serviceBeans>
         <jaxrs:providers>
            <ref bean="oidcRequestFilter"/>
+           <ref bean="searchView"/>
            <bean class="org.apache.cxf.rs.security.oauth2.client.ClientTokenContextProvider"/>
         </jaxrs:providers>
         <jaxrs:features>
