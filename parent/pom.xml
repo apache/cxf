@@ -125,7 +125,7 @@
         <cxf.netty.version.range>[4,5)</cxf.netty.version.range>
         <cxf.oauth.bundle.version>20100527_1</cxf.oauth.bundle.version>
         <cxf.oauth.version>20100527</cxf.oauth.version>
-        <cxf.opensaml.version>3.1.0</cxf.opensaml.version>
+        <cxf.opensaml.version>3.1.1</cxf.opensaml.version>
         <cxf.opensaml.osgi.version>3.1.0_1</cxf.opensaml.osgi.version>
         <cxf.opensaml.osgi.version.range>[3.1,4)</cxf.opensaml.osgi.version.range>
         <cxf.rhino.version>1.7R2</cxf.rhino.version>
