@@ -33,6 +33,9 @@ public class AesGcmContentEncryptionAlgorithm extends AbstractContentEncryptionA
     public AesGcmContentEncryptionAlgorithm(String encodedCek, String encodedIv, ContentAlgorithm algo) {
         this((byte[])CryptoUtils.decodeSequence(encodedCek), CryptoUtils.decodeSequence(encodedIv), algo);
     }
+    public AesGcmContentEncryptionAlgorithm(String encodedCek, ContentAlgorithm algo) {
+        this((byte[])CryptoUtils.decodeSequence(encodedCek), null, algo);
+    }
     public AesGcmContentEncryptionAlgorithm(SecretKey key, byte[] iv, ContentAlgorithm algo) { 
         this(key.getEncoded(), iv, algo);    
     }
