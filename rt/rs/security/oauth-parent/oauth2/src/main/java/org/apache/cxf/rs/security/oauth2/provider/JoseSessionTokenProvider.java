@@ -165,7 +165,7 @@ public class JoseSessionTokenProvider implements SessionAuthenticityTokenProvide
         state.append(ModelEncryptionSupport.SEP);
         // 5: redirect uri
         state.append(ModelEncryptionSupport.tokenizeString(secData.getRedirectUri()));
-        return null;
+        return state.toString();
     }
 
     public void setMaxDefaultSessionInterval(int maxDefaultSessionInterval) {

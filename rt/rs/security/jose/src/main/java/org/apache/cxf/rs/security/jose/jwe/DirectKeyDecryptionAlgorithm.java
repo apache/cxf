@@ -23,12 +23,16 @@ import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
+import org.apache.cxf.rt.security.crypto.CryptoUtils;
 
 public class DirectKeyDecryptionAlgorithm implements KeyDecryptionAlgorithm {
     private static final Logger LOG = LogUtils.getL7dLogger(DirectKeyDecryptionAlgorithm.class);
     private byte[] contentDecryptionKey;
     public DirectKeyDecryptionAlgorithm(Key contentDecryptionKey) {    
         this(contentDecryptionKey.getEncoded());
+    }
+    public DirectKeyDecryptionAlgorithm(String encodedContentDecryptionKey) {    
+        this(CryptoUtils.decodeSequence(encodedContentDecryptionKey));
     }
     public DirectKeyDecryptionAlgorithm(byte[] contentDecryptionKey) {    
         this.contentDecryptionKey = contentDecryptionKey;
