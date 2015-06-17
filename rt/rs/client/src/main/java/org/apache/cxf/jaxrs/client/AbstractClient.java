@@ -892,10 +892,7 @@ public abstract class AbstractClient implements Client {
             throw new IllegalStateException("Client is closed");
         }
     }
-    protected void finalize() throws Throwable {
-        super.finalize();
-        close();
-    }
+    
     protected Message createMessage(Object body,
                                     String httpMethod, 
                                     MultivaluedMap<String, String> headers,
