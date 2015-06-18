@@ -44,23 +44,23 @@ public class JweHeaders extends JoseHeaders {
     public JweHeaders(Map<String, Object> values) {
         super(values);
     }
-    public JweHeaders(String keyEncAlgo, String ctEncAlgo) {
+    public JweHeaders(KeyAlgorithm keyEncAlgo, ContentAlgorithm ctEncAlgo) {
         this(keyEncAlgo, ctEncAlgo, false);
     }
-    public JweHeaders(String ctEncAlgo) {
+    public JweHeaders(ContentAlgorithm ctEncAlgo) {
         this(null, ctEncAlgo, false);
     }
-    public JweHeaders(String ctEncAlgo, boolean deflate) {
+    public JweHeaders(ContentAlgorithm ctEncAlgo, boolean deflate) {
         this(null, ctEncAlgo, deflate);
     }
-    public JweHeaders(String keyEncAlgo, String ctEncAlgo, boolean deflate) {
+    public JweHeaders(KeyAlgorithm keyEncAlgo, ContentAlgorithm ctEncAlgo, boolean deflate) {
         init(keyEncAlgo, ctEncAlgo, deflate);
     }
-    private void init(String keyEncAlgo, String ctEncAlgo, boolean deflate) {
+    private void init(KeyAlgorithm keyEncAlgo, ContentAlgorithm ctEncAlgo, boolean deflate) {
         if (keyEncAlgo != null) {
-            setKeyEncryptionAlgorithm(KeyAlgorithm.getAlgorithm(keyEncAlgo));    
+            setKeyEncryptionAlgorithm(keyEncAlgo);    
         }
-        setContentEncryptionAlgorithm(ContentAlgorithm.getAlgorithm(ctEncAlgo));
+        setContentEncryptionAlgorithm(ctEncAlgo);
         if (deflate) {
             setZipAlgorithm(JoseConstants.DEFLATE_ZIP_ALGORITHM);
         }

@@ -34,11 +34,11 @@ public class JwsHeaders extends JoseHeaders {
     public JwsHeaders(Map<String, Object> values) {
         super(values);
     }
-    public JwsHeaders(String sigAlgo) {
+    public JwsHeaders(SignatureAlgorithm sigAlgo) {
         init(sigAlgo);
     }
-    private void init(String sigAlgo) {
-        setAlgorithm(sigAlgo);
+    private void init(SignatureAlgorithm sigAlgo) {
+        setSignatureAlgorithm(sigAlgo);
     }
 
     public void setSignatureAlgorithm(SignatureAlgorithm algo) {
