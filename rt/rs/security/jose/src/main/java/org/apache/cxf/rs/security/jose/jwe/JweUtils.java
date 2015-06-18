@@ -226,7 +226,7 @@ public final class JweUtils {
     public static SecretKey getContentDecryptionSecretKey(JsonWebKey jwk, String defaultAlgorithm) {
         String ctEncryptionAlgo = jwk.getAlgorithm() == null ? defaultAlgorithm : jwk.getAlgorithm();
         KeyType keyType = jwk.getKeyType();
-        if (KeyType.RSA == keyType && AlgorithmUtils.isAesGcm(ctEncryptionAlgo)) {
+        if (KeyType.OCTET == keyType && AlgorithmUtils.isAesGcm(ctEncryptionAlgo)) {
             return JwkUtils.toSecretKey(jwk);
         }
         return null;
@@ -283,12 +283,12 @@ public final class JweUtils {
         ContentEncryptionProvider ctEncryptionProvider = null;
         if (JwkUtils.JWK_KEY_STORE_TYPE.equals(props.get(KeyManagementUtils.RSSEC_KEY_STORE_TYPE))) {
             JsonWebKey jwk = JwkUtils.loadJsonWebKey(m, props, KeyOperation.ENCRYPT);
-            keyEncryptionAlgo = getKeyEncryptionAlgo(m, props, jwk.getAlgorithm(), 
-                                                     getDefaultKeyAlgo(jwk));
             if ("direct".equals(keyEncryptionAlgo)) {
                 contentEncryptionAlgo = getContentEncryptionAlgo(m, props, jwk.getAlgorithm());
                 ctEncryptionProvider = getContentEncryptionAlgorithm(jwk, contentEncryptionAlgo);
             } else {
+                keyEncryptionAlgo = getKeyEncryptionAlgo(m, props, jwk.getAlgorithm(), 
+                                                         getDefaultKeyAlgo(jwk));
                 keyEncryptionProvider = getKeyEncryptionProvider(jwk, keyEncryptionAlgo);
                 if (reportPublicKey || reportPublicKeyId) {
                     JwkUtils.setPublicKeyInfo(jwk, headers, keyEncryptionAlgo, 
@@ -338,12 +338,12 @@ public final class JweUtils {
         } else {
             if (JwkUtils.JWK_KEY_STORE_TYPE.equals(props.get(KeyManagementUtils.RSSEC_KEY_STORE_TYPE))) {
                 JsonWebKey jwk = JwkUtils.loadJsonWebKey(m, props, KeyOperation.DECRYPT);
-                keyEncryptionAlgo = getKeyEncryptionAlgo(m, props, jwk.getAlgorithm(),
-                                                         getDefaultKeyAlgo(jwk));
                 if ("direct".equals(keyEncryptionAlgo)) {
-                    contentEncryptionAlgo = getContentEncryptionAlgo(m, props, contentEncryptionAlgo);
+                    contentEncryptionAlgo = getContentEncryptionAlgo(m, props, jwk.getAlgorithm());
                     ctDecryptionKey = getContentDecryptionSecretKey(jwk, contentEncryptionAlgo);
                 } else {
+                    keyEncryptionAlgo = getKeyEncryptionAlgo(m, props, jwk.getAlgorithm(),
+                                                             getDefaultKeyAlgo(jwk));
                     keyDecryptionProvider = getKeyDecryptionAlgorithm(jwk, keyEncryptionAlgo);
                 }
             } else {
