@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.rs.security.jose.jwe;
 
+import java.security.NoSuchAlgorithmException;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.Arrays;
 import java.util.logging.Logger;
@@ -124,7 +125,15 @@ public abstract class AbstractJweEncryption implements JweEncryptionProvider {
                                       authTag);
     }
     protected byte[] encryptInternal(JweEncryptionInternal state, byte[] content) {
-        return CryptoUtils.encryptBytes(content, createCekSecretKey(state), state.keyProps);
+        try {
+            return CryptoUtils.encryptBytes(content, createCekSecretKey(state), state.keyProps);
+        } catch (SecurityException ex) {
+            if (ex.getCause() instanceof NoSuchAlgorithmException) {
+                LOG.warning("Unsupported algorithm: " + state.keyProps.getKeyAlgo());
+                throw new JweException(JweException.Error.INVALID_CONTENT_ALGORITHM);
+            }
+            throw new JweException(JweException.Error.CONTENT_ENCRYPTION_FAILURE);
+        }
     }
     protected byte[] getActualCipher(byte[] cipher) {
         return Arrays.copyOf(cipher, cipher.length - DEFAULT_AUTH_TAG_LENGTH / 8);
