@@ -480,12 +480,19 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             Element encrDKTokenElem = null;
             encrDKTokenElem = dkEncr.getdktElement();
             addDerivedKeyElement(encrDKTokenElem);
+            
             Element refList = dkEncr.encryptForExternalRef(null, encrParts);
+<<<<<<< HEAD
             if (atEnd) {
                 this.insertBeforeBottomUp(refList);
             } else {
                 this.addDerivedKeyElement(refList);                        
             }
+=======
+            List<Element> attachments = dkEncr.getAttachmentEncryptedDataElements();
+            addAttachmentsForEncryption(atEnd, refList, attachments);
+
+>>>>>>> e9e4d0b... [CXF-6464] - Minor refactor of applied patch. This closes #77
             return dkEncr;
         } catch (Exception e) {
             LOG.log(Level.FINE, e.getMessage(), e);
@@ -589,21 +596,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                    
                     Element refList = encr.encryptForRef(null, encrParts);
                     List<Element> attachments = encr.getAttachmentEncryptedDataElements();
-                    if (atEnd) {
-                        this.insertBeforeBottomUp(refList);
-                        if (attachments != null) {
-                            for (Element attachment : attachments) {
-                                this.insertBeforeBottomUp(attachment);
-                            }
-                        }
-                    } else {
-                        this.addDerivedKeyElement(refList);
-                        if (attachments != null) {
-                            for (Element attachment : attachments) {
-                                this.addDerivedKeyElement(attachment);
-                            }
-                        }
-                    }
+                    addAttachmentsForEncryption(atEnd, refList, attachments);
                     
                     return encr;
                 } catch (WSSecurityException e) {
@@ -613,7 +606,25 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             }
         }
         return null;
-    }    
+    }
+    
+    private void addAttachmentsForEncryption(boolean atEnd, Element refList, List<Element> attachments) {
+        if (atEnd) {
+            this.insertBeforeBottomUp(refList);
+            if (attachments != null) {
+                for (Element attachment : attachments) {
+                    this.insertBeforeBottomUp(attachment);
+                }
+            }
+        } else {
+            this.addDerivedKeyElement(refList);
+            if (attachments != null) {
+                for (Element attachment : attachments) {
+                    this.addDerivedKeyElement(attachment);
+                }
+            }
+        }
+    }
     
     private byte[] doSignatureDK(List<WSEncryptionPart> sigs,
                                AbstractTokenWrapper policyAbstractTokenWrapper, 
