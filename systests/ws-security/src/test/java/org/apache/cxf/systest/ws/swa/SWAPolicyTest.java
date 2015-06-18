@@ -205,6 +205,35 @@ public class SWAPolicyTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.Test
+    public void testSWACombinedDerivedPolicy() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = SWAPolicyTest.class.getResource("policy-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        URL wsdl = SWAPolicyTest.class.getResource("DoubleItSwa.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSWACombinedDerivedPolicyPort");
+        DoubleItSwaPortType port = 
+                service.getPort(portQName, DoubleItSwaPortType.class);
+        updateAddressPort(port, test.getPort());
+        
+        if (test.isStreaming()) {
+            enableStreaming(port);
+        }
+        
+        DoubleIt3 doubleIt = new DoubleIt3();
+        doubleIt.setNumberToDouble(25);
+        port.doubleIt3(doubleIt, "12345".getBytes());
+        
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
     public void testSWACombinedAsymmetricPolicy() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
@@ -217,6 +246,36 @@ public class SWAPolicyTest extends AbstractBusClientServerTestBase {
         URL wsdl = SWAPolicyTest.class.getResource("DoubleItSwa.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSWACombinedAsymmetricPolicyPort");
+        DoubleItSwaPortType port = 
+                service.getPort(portQName, DoubleItSwaPortType.class);
+        updateAddressPort(port, test.getPort());
+        
+        if (test.isStreaming()) {
+            enableStreaming(port);
+        }
+        
+        DoubleIt3 doubleIt = new DoubleIt3();
+        doubleIt.setNumberToDouble(25);
+        port.doubleIt3(doubleIt, "12345".getBytes());
+        
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    @org.junit.Ignore
+    public void testSWACombinedAsymmetricDerivedPolicy() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = SWAPolicyTest.class.getResource("policy-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        URL wsdl = SWAPolicyTest.class.getResource("DoubleItSwa.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSWACombinedAsymmetricDerivedPolicyPort");
         DoubleItSwaPortType port = 
                 service.getPort(portQName, DoubleItSwaPortType.class);
         updateAddressPort(port, test.getPort());

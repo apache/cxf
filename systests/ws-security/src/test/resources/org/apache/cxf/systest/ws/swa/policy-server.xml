@@ -70,6 +70,17 @@
         </jaxws:properties>
     </jaxws:endpoint>
     
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="CombinedDerivedPolicy" 
+        address="http://localhost:${testutil.ports.swa.PolicyServer}/DoubleItSWACombinedDerivedPolicy" 
+        serviceName="s:DoubleItService" endpointName="s:DoubleItSWACombinedDerivedPolicyPort" 
+        implementor="org.apache.cxf.systest.ws.swa.DoubleIt3Impl" 
+        wsdlLocation="org/apache/cxf/systest/ws/swa/DoubleItSwa.wsdl">
+        <jaxws:properties>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+            <entry key="security.signature.properties" value="bob.properties"/>
+        </jaxws:properties>
+    </jaxws:endpoint>
+    
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="CombinedAsymmetricPolicy" 
         address="http://localhost:${testutil.ports.swa.PolicyServer}/DoubleItSWACombinedAsymmetricPolicy" 
         serviceName="s:DoubleItService" endpointName="s:DoubleItSWACombinedAsymmetricPolicyPort" 
@@ -80,6 +91,19 @@
             <entry key="ws-security.signature.properties" value="bob.properties"/>
             <entry key="ws-security.encryption.properties" value="alice.properties"/>
             <entry key="ws-security.encryption.username" value="alice"/>
+        </jaxws:properties>
+    </jaxws:endpoint>
+    
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="CombinedAsymmetricDerivedPolicy" 
+        address="http://localhost:${testutil.ports.swa.PolicyServer}/DoubleItSWACombinedAsymmetricDerivedPolicy" 
+        serviceName="s:DoubleItService" endpointName="s:DoubleItSWACombinedAsymmetricDerivedPolicyPort" 
+        implementor="org.apache.cxf.systest.ws.swa.DoubleIt3Impl" 
+        wsdlLocation="org/apache/cxf/systest/ws/swa/DoubleItSwa.wsdl">
+        <jaxws:properties>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+            <entry key="security.signature.properties" value="bob.properties"/>
+            <entry key="security.encryption.properties" value="alice.properties"/>
+            <entry key="security.encryption.username" value="alice"/>
         </jaxws:properties>
     </jaxws:endpoint>
     
