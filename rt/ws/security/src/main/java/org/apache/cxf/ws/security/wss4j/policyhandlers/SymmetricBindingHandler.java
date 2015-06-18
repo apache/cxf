@@ -398,6 +398,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                                           boolean atEnd) {
         try {
             WSSecDKEncrypt dkEncr = new WSSecDKEncrypt(wssConfig);
+            dkEncr.setAttachmentCallbackHandler(new AttachmentCallbackHandler(message));
             if (recToken.getToken().getVersion() == SPConstants.SPVersion.SP11) {
                 dkEncr.setWscVersion(ConversationConstants.VERSION_05_02);
             }
@@ -625,6 +626,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                                boolean included) throws WSSecurityException {
         Document doc = saaj.getSOAPPart();
         WSSecDKSign dkSign = new WSSecDKSign(wssConfig);
+        dkSign.setAttachmentCallbackHandler(new AttachmentCallbackHandler(message));
         if (policyAbstractTokenWrapper.getToken().getVersion() == SPConstants.SPVersion.SP11) {
             dkSign.setWscVersion(ConversationConstants.VERSION_05_02);
         }
