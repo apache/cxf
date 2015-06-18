@@ -482,17 +482,9 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             addDerivedKeyElement(encrDKTokenElem);
             
             Element refList = dkEncr.encryptForExternalRef(null, encrParts);
-<<<<<<< HEAD
-            if (atEnd) {
-                this.insertBeforeBottomUp(refList);
-            } else {
-                this.addDerivedKeyElement(refList);                        
-            }
-=======
             List<Element> attachments = dkEncr.getAttachmentEncryptedDataElements();
             addAttachmentsForEncryption(atEnd, refList, attachments);
 
->>>>>>> e9e4d0b... [CXF-6464] - Minor refactor of applied patch. This closes #77
             return dkEncr;
         } catch (Exception e) {
             LOG.log(Level.FINE, e.getMessage(), e);
