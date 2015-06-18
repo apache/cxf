@@ -29,7 +29,7 @@ function signInCallback(authResult) {
     // Send the code to the server
     $.ajax({
       type: 'POST',
-      url: 'service/oidc/rp/complete',
+      url: 'service/search',
       contentType: 'application/octet-stream; charset=utf-8',
       success: function(result) {
         // Handle or verify the server response if necessary.

@@ -36,6 +36,14 @@ import org.apache.cxf.rs.security.oidc.rp.OidcClientTokenContext;
 @Path("/search")
 public class BigQueryService {
 
+    private static final String BQ_SELECT = 
+        "SELECT corpus,corpus_date FROM publicdata:samples.shakespeare WHERE word=\\\"%s\\\"";
+    private static final String BQ_REQUEST = "{" +
+        "\"kind\": \"bigquery#queryRequest\"," 
+        + "\"query\": \"%s\","
+        + "\"maxResults\": %d" 
+        + "}";
+    
     private WebClient bigQueryClient;
     
     @GET
@@ -50,14 +58,9 @@ public class BigQueryService {
         
         String searchWord = state.getFirst("word");
         String maxResults = state.getFirst("maxResults");
-        String bigQuerySelect = "SELECT corpus,corpus_date FROM publicdata:samples.shakespeare WHERE word=\\\"" 
-            + searchWord + "\\\"";
-        String bigQueryRequest = "{" +
-            "\"kind\": \"bigquery#queryRequest\"," 
-            + "\"query\": \"" + bigQuerySelect + "\","
-            + "\"maxResults\": " + Integer.parseInt(maxResults)
-            + "}";
         
+        String bigQuerySelect = String.format(BQ_SELECT, searchWord);
+        String bigQueryRequest = String.format(BQ_REQUEST, bigQuerySelect, Integer.parseInt(maxResults));
         
         JsonMapObject jsonMap = bigQueryClient.post(bigQueryRequest, JsonMapObject.class);
         BigQueryResponse bigQueryResponse = new BigQueryResponse(context.getUserInfo().getName(),
