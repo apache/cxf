@@ -70,6 +70,7 @@
         </jaxws:properties>
     </jaxws:client>
     
+<<<<<<< HEAD
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSWACombinedAsymmetricDerivedPolicyPort" createdFromAPI="true">
          <jaxws:properties>
             <entry key="ws-security.encryption.properties" value="bob.properties"/>
@@ -80,4 +81,6 @@
         </jaxws:properties>
     </jaxws:client>
     
+=======
+>>>>>>> 25d02a2... Removing test
 </beans>

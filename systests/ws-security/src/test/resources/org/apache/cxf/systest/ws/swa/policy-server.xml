@@ -94,6 +94,7 @@
         </jaxws:properties>
     </jaxws:endpoint>
     
+<<<<<<< HEAD
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="CombinedAsymmetricDerivedPolicy" 
         address="http://localhost:${testutil.ports.swa.PolicyServer}/DoubleItSWACombinedAsymmetricDerivedPolicy" 
         serviceName="s:DoubleItService" endpointName="s:DoubleItSWACombinedAsymmetricDerivedPolicyPort" 
@@ -107,4 +108,6 @@
         </jaxws:properties>
     </jaxws:endpoint>
     
+=======
+>>>>>>> 25d02a2... Removing test
 </beans>
