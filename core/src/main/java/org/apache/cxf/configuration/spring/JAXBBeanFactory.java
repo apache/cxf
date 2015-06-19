@@ -28,6 +28,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 
 /**
@@ -44,7 +45,7 @@ public final class JAXBBeanFactory {
         
         StringReader reader = new StringReader(s);
         XMLStreamReader data = StaxUtils.createXMLStreamReader(reader);
-        Unmarshaller u;
+        Unmarshaller u = null;
         try {
             Object obj;
             u = context.createUnmarshaller();
@@ -67,6 +68,7 @@ public final class JAXBBeanFactory {
             } catch (XMLStreamException ex) {
                 throw new RuntimeException(ex);
             }
+            JAXBUtils.closeUnmarshaller(u);
         }
     }
 

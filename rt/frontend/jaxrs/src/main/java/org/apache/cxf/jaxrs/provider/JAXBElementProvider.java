@@ -168,13 +168,14 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
         }
         
         XMLStreamReader reader = null;
+        Unmarshaller unmarshaller = null;
         try {
             
             boolean isCollection = InjectionUtils.isSupportedCollectionOrArray(type);
             Class<?> theGenericType = isCollection ? InjectionUtils.getActualType(genericType) : type;
             Class<?> theType = getActualType(theGenericType, genericType, anns);
 
-            Unmarshaller unmarshaller = createUnmarshaller(theType, genericType, isCollection);
+            unmarshaller = createUnmarshaller(theType, genericType, isCollection);
             addAttachmentUnmarshaller(unmarshaller);
             Object response = null;
             if (JAXBElement.class.isAssignableFrom(type) 
@@ -217,6 +218,7 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
             } catch (XMLStreamException e) {
                 // Ignore
             }
+            JAXBUtils.closeUnmarshaller(unmarshaller);
         }
         // unreachable
         return null;

@@ -217,6 +217,7 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         
         XMLStreamReader reader = null;
         String enc = HttpUtils.getEncoding(mt, "UTF-8");
+        Unmarshaller unmarshaller = null;
         try {
             InputStream realStream = getInputStream(type, genericType, is);
             if (Document.class.isAssignableFrom(type)) {
@@ -229,7 +230,7 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
             Class<?> theGenericType = isCollection ? InjectionUtils.getActualType(genericType) : type;
             Class<?> theType = getActualType(theGenericType, genericType, anns);
             
-            Unmarshaller unmarshaller = createUnmarshaller(theType, genericType, isCollection);
+            unmarshaller = createUnmarshaller(theType, genericType, isCollection);
             XMLStreamReader xsr = createReader(type, realStream, isCollection, enc);
             
             Object response = null;
@@ -270,6 +271,7 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
             } catch (XMLStreamException e) {
                 throw ExceptionUtils.toBadRequestException(e, null);
             }
+            JAXBUtils.closeUnmarshaller(unmarshaller);
         }
         // unreachable
         return null;

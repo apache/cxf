@@ -346,8 +346,9 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
                                            QName qname, Element element, Definition wsdl,
                                            ExtensionRegistry registry) throws WSDLException {
         XMLStreamReader reader = null;
+        Unmarshaller u = null;
         try {
-            Unmarshaller u = createUnmarshaller();
+            u = createUnmarshaller();
         
             Object o = null;
             if (namespace == null) {
@@ -376,6 +377,7 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
             } catch (XMLStreamException ex) {
                 throw new WSDLException(WSDLException.PARSER_ERROR, ex.getMessage(), ex);
             }
+            JAXBUtils.closeUnmarshaller(u);
         }
     }
     

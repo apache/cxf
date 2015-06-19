@@ -47,6 +47,7 @@ import org.w3c.dom.NodeList;
 
 import org.xml.sax.InputSource;
 
+import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
@@ -358,10 +359,14 @@ public class XMLSource {
                 c = provider.getClassContext(cls);
             }
             Unmarshaller u = c.createUnmarshaller();
-            if (cls.getAnnotation(XmlRootElement.class) != null) {
-                return cls.cast(u.unmarshal(s));
-            } else {
-                return u.unmarshal(s, cls).getValue();
+            try {
+                if (cls.getAnnotation(XmlRootElement.class) != null) {
+                    return cls.cast(u.unmarshal(s));
+                } else {
+                    return u.unmarshal(s, cls).getValue();
+                }
+            } finally {
+                JAXBUtils.closeUnmarshaller(u);
             }
         } catch (Exception ex) {
             throw new RuntimeException(ex);

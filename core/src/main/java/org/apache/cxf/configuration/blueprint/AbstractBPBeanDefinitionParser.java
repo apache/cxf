@@ -48,6 +48,7 @@ import org.apache.aries.blueprint.mutable.MutableValueMetadata;
 import org.apache.cxf.bus.blueprint.BlueprintBus;
 import org.apache.cxf.common.jaxb.JAXBContextCache;
 import org.apache.cxf.common.jaxb.JAXBContextCache.CachedContextAndSchemas;
+import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.DOMUtils;
@@ -335,7 +336,7 @@ public abstract class AbstractBPBeanDefinitionParser {
         public Object createJAXBBean(String v) {
             XMLStreamReader reader = StaxUtils.createXMLStreamReader(new StringReader(v));
             try {
-                Object o = ctx.createUnmarshaller().unmarshal(reader, cls);
+                Object o = JAXBUtils.unmarshall(ctx, reader, cls);
                 if (o instanceof JAXBElement<?>) {
                     JAXBElement<?> el = (JAXBElement<?>)o;
                     o = el.getValue();
@@ -360,6 +361,7 @@ public abstract class AbstractBPBeanDefinitionParser {
                                             Class<?> c) {   
         try {
             XMLStreamWriter xmlWriter = null;
+            Unmarshaller u = null;
             try {
                 StringWriter writer = new StringWriter();
                 xmlWriter = StaxUtils.createXMLStreamWriter(writer);
@@ -375,7 +377,7 @@ public abstract class AbstractBPBeanDefinitionParser {
                 bean.addProperty(propertyName, factory);
 
             } catch (Exception ex) {                
-                Unmarshaller u = getContext(c).createUnmarshaller();
+                u = getContext(c).createUnmarshaller();
                 Object obj;
                 if (c != null) {
                     obj = u.unmarshal(data, c);
@@ -393,6 +395,7 @@ public abstract class AbstractBPBeanDefinitionParser {
                 }
             } finally {
                 StaxUtils.close(xmlWriter);
+                JAXBUtils.closeUnmarshaller(u);
             }
         } catch (JAXBException e) {
             throw new RuntimeException("Could not parse configuration.", e);

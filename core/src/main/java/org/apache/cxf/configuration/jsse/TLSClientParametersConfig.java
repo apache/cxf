@@ -36,6 +36,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.jaxb.JAXBContextCache;
 import org.apache.cxf.common.jaxb.JAXBContextCache.CachedContextAndSchemas;
+import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.configuration.security.TLSClientParametersType;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -140,7 +141,7 @@ public final class TLSClientParametersConfig {
         
         StringReader reader = new StringReader(s);
         XMLStreamReader data = StaxUtils.createXMLStreamReader(reader);
-        Unmarshaller u;
+        Unmarshaller u = null;
         try {
             u = getContext().createUnmarshaller();
             JAXBElement<TLSClientParametersType> type = u.unmarshal(data, TLSClientParametersType.class);
@@ -156,6 +157,7 @@ public final class TLSClientParametersConfig {
             } catch (XMLStreamException ex) {
                 throw new RuntimeException(ex);
             }
+            JAXBUtils.closeUnmarshaller(u);
         }
     }
     

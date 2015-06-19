@@ -51,6 +51,7 @@ import org.w3c.dom.Element;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.i18n.Message;
+import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.helpers.DOMUtils;
@@ -190,7 +191,7 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
     public static EndpointReferenceType convertToInternal(EndpointReference external) {
         if (external instanceof W3CEndpointReference) {
             
-            
+            Unmarshaller um = null;
             try {
                 Document doc = DOMUtils.newDocument();
                 DOMResult result = new DOMResult(doc);
@@ -202,13 +203,16 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
                 //jaxContext = ContextUtils.getJAXBContext();
                 JAXBContext context = JAXBContext
                     .newInstance(new Class[] {org.apache.cxf.ws.addressing.ObjectFactory.class});
-                EndpointReferenceType internal = context.createUnmarshaller()
+                um = context.createUnmarshaller();
+                EndpointReferenceType internal = um
                     .unmarshal(reader, EndpointReferenceType.class)
                     .getValue();
                 return internal;
             } catch (JAXBException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
+            } finally {
+                JAXBUtils.closeUnmarshaller(um);
             }
             return null;
         } else {
@@ -370,7 +374,11 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
                 return AccessController.doPrivileged(new PrivilegedExceptionAction<W3CEndpointReference>() {
                     public W3CEndpointReference run() throws Exception {
                         Unmarshaller unmarshaller = getJAXBContext().createUnmarshaller();
-                        return (W3CEndpointReference)unmarshaller.unmarshal(writer.getDocument());
+                        try {
+                            return (W3CEndpointReference)unmarshaller.unmarshal(writer.getDocument());
+                        } finally {
+                            JAXBUtils.closeUnmarshaller(unmarshaller);
+                        }
                     }
                 });
             } catch (PrivilegedActionException pae) {
@@ -399,8 +407,9 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
             final XMLStreamReader reader = StaxUtils.createXMLStreamReader(eprInfoset);
             return AccessController.doPrivileged(new PrivilegedExceptionAction<EndpointReference>() {
                 public EndpointReference run() throws Exception {
+                    Unmarshaller unmarshaller = null;
                     try {
-                        Unmarshaller unmarshaller = getJAXBContext().createUnmarshaller();
+                        unmarshaller = getJAXBContext().createUnmarshaller();
                         return (EndpointReference)unmarshaller.unmarshal(reader);
                     } finally {
                         try {
@@ -408,6 +417,7 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
                         } catch (XMLStreamException e) {
                             // Ignore
                         }
+                        JAXBUtils.closeUnmarshaller(unmarshaller);
                     }
                 }
             });
