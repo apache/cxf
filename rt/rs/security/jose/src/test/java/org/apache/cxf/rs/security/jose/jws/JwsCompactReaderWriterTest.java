@@ -30,6 +30,7 @@ import java.util.Map;
 
 import org.apache.cxf.rs.security.jose.JoseConstants;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
+import org.apache.cxf.rs.security.jose.JoseType;
 import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
@@ -97,7 +98,7 @@ public class JwsCompactReaderWriterTest extends Assert {
     @Test
     public void testWriteJwsSignedByMacSpecExample() throws Exception {
         JoseHeaders headers = new JoseHeaders();
-        headers.setType(JoseConstants.TYPE_JWT);
+        headers.setType(JoseType.JWT);
         headers.setAlgorithm(SignatureAlgorithm.HS256.getJwaName());
         JwsCompactProducer jws = initSpecJwtTokenWriter(headers);
         jws.signWith(new HmacJwsSignatureProvider(ENCODED_MAC_KEY, SignatureAlgorithm.HS256));
@@ -108,8 +109,7 @@ public class JwsCompactReaderWriterTest extends Assert {
     
     @Test
     public void testWriteReadJwsUnsigned() throws Exception {
-        JoseHeaders headers = new JoseHeaders();
-        headers.setType(JoseConstants.TYPE_JWT);
+        JoseHeaders headers = new JoseHeaders(JoseType.JWT);
         headers.setAlgorithm(AlgorithmUtils.PLAIN_TEXT_ALGO);
         
         JwtClaims claims = new JwtClaims();
@@ -137,7 +137,7 @@ public class JwsCompactReaderWriterTest extends Assert {
                                                                         SignatureAlgorithm.HS256)));
         JwtToken token = jws.getJwtToken();
         JoseHeaders headers = token.getHeaders();
-        assertEquals(JoseConstants.TYPE_JWT, headers.getType());
+        assertEquals(JoseType.JWT, headers.getType());
         assertEquals(SignatureAlgorithm.HS256.getJwaName(), headers.getAlgorithm());
         validateSpecClaim(token.getClaims());
     }
@@ -161,9 +161,9 @@ public class JwsCompactReaderWriterTest extends Assert {
     }
     
     private void doTestWriteJwsWithJwkSignedByMac(Object jsonWebKey) throws Exception {
-        JoseHeaders headers = new JoseHeaders();
-        headers.setType(JoseConstants.TYPE_JWT);
-        headers.setAlgorithm(SignatureAlgorithm.HS256.getJwaName());
+        JwsHeaders headers = new JwsHeaders();
+        headers.setType(JoseType.JWT);
+        headers.setSignatureAlgorithm(SignatureAlgorithm.HS256);
         headers.setHeader(JoseConstants.HEADER_JSON_WEB_KEY, jsonWebKey);
         
         JwtClaims claims = new JwtClaims();
@@ -185,7 +185,7 @@ public class JwsCompactReaderWriterTest extends Assert {
                                                                         SignatureAlgorithm.HS256)));
         JwtToken token = jws.getJwtToken();
         JoseHeaders headers = token.getHeaders();
-        assertEquals(JoseConstants.TYPE_JWT, headers.getType());
+        assertEquals(JoseType.JWT, headers.getType());
         assertEquals(SignatureAlgorithm.HS256.getJwaName(), headers.getAlgorithm());
         
         JsonWebKey key = headers.getJsonWebKey();

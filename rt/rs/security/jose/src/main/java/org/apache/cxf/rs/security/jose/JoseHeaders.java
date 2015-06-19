@@ -30,6 +30,10 @@ public class JoseHeaders extends JsonMapObject {
     public JoseHeaders() {
     }
     
+    public JoseHeaders(JoseType type) {
+        init(type);
+    }
+    
     public JoseHeaders(JoseHeaders headers) {
         this(headers.asMap());
     }
@@ -37,13 +41,16 @@ public class JoseHeaders extends JsonMapObject {
     public JoseHeaders(Map<String, Object> values) {
         super(values);
     }
-    
-    public void setType(String type) {
-        setHeader(JoseConstants.HEADER_TYPE, type);
+    private void init(JoseType type) {
+        setType(type);
+    }
+    public void setType(JoseType type) {
+        setHeader(JoseConstants.HEADER_TYPE, type.toString());
     }
     
-    public String getType() {
-        return (String)getHeader(JoseConstants.HEADER_TYPE);
+    public JoseType getType() {
+        Object prop = getHeader(JoseConstants.HEADER_TYPE);
+        return prop == null ? null : JoseType.getType(prop.toString());
     }
     
     public void setContentType(String type) {
