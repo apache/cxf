@@ -248,12 +248,6 @@ public final class PolicyUtils {
     
     public static AbstractBinding getSecurityBinding(AssertionInfoMap aim) {
         
-        AssertionInfo transAis = PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.TRANSPORT_BINDING);
-        if (transAis != null) {
-            transAis.setAsserted(true);
-            return (AbstractBinding)transAis.getAssertion();
-        }
-        
         AssertionInfo asymAis = PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.ASYMMETRIC_BINDING);
         if (asymAis != null) {
             asymAis.setAsserted(true);
@@ -264,6 +258,12 @@ public final class PolicyUtils {
         if (symAis != null) {
             symAis.setAsserted(true);
             return (AbstractBinding)symAis.getAssertion();
+        }
+        
+        AssertionInfo transAis = PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.TRANSPORT_BINDING);
+        if (transAis != null) {
+            transAis.setAsserted(true);
+            return (AbstractBinding)transAis.getAssertion();
         }
         
         return null;
