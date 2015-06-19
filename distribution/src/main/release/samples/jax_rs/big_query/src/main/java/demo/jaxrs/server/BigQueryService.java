@@ -18,6 +18,7 @@
  */
 package demo.jaxrs.server;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -52,33 +53,40 @@ public class BigQueryService {
     public BigQueryResponse completeBigQuery(@Context OidcClientTokenContext context) {
         
         ClientAccessToken accessToken = context.getToken();
-        bigQueryClient.authorization(accessToken);
         
         MultivaluedMap<String, String> state = context.getState();
         
         String searchWord = state.getFirst("word");
         String maxResults = state.getFirst("maxResults");
         
+        BigQueryResponse bigQueryResponse = new BigQueryResponse(context.getUserInfo().getName(),
+                                                                 searchWord);
+        bigQueryResponse.setTexts(getMatchingTexts(bigQueryClient, accessToken, searchWord, maxResults));
+        return bigQueryResponse;
+    }
+
+    public void setBigQueryClient(WebClient bigQueryClient) {
+        this.bigQueryClient = bigQueryClient;
+    }
+    
+    static List<ShakespeareText> getMatchingTexts(WebClient bqClient, ClientAccessToken accessToken, 
+                                                  String searchWord, String maxResults) {
+        bqClient.authorization(accessToken);
         String bigQuerySelect = String.format(BQ_SELECT, searchWord);
         String bigQueryRequest = String.format(BQ_REQUEST, bigQuerySelect, Integer.parseInt(maxResults));
         
-        JsonMapObject jsonMap = bigQueryClient.post(bigQueryRequest, JsonMapObject.class);
-        BigQueryResponse bigQueryResponse = new BigQueryResponse(context.getUserInfo().getName(),
-                                                                 searchWord);
+        JsonMapObject jsonMap = bqClient.post(bigQueryRequest, JsonMapObject.class);
         
+        List<ShakespeareText> texts = new LinkedList<ShakespeareText>(); 
         List<Map<String, Object>> rows = CastUtils.cast((List<?>)jsonMap.getProperty("rows"));
         if (rows != null) {
             for (Map<String, Object> row : rows) {
                 List<Map<String, Object>> fields = CastUtils.cast((List<?>)row.get("f"));
                 ShakespeareText text = new ShakespeareText((String)fields.get(0).get("v"),
                                                            (String)fields.get(1).get("v"));
-                bigQueryResponse.getTexts().add(text);
+                texts.add(text);
             }
         }
-        return bigQueryResponse;
-    }
-
-    public void setBigQueryClient(WebClient bigQueryClient) {
-        this.bigQueryClient = bigQueryClient;
+        return texts;
     }
 }

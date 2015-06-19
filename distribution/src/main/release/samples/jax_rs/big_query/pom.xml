@@ -109,6 +109,22 @@
                     </webResources>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <executable>java</executable>
+                    <mainClass>demo.jaxrs.server.BigQueryServer</mainClass>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
+    
 </project>
