@@ -24,15 +24,15 @@ public class JwtBearerGrant extends AbstractJwtBearerGrant {
     private static final long serialVersionUID = -7296527609343431294L;
 
     public JwtBearerGrant(String assertion) {
-        this(assertion, false);
+        this(assertion, true);
     }
     
     public JwtBearerGrant(String assertion, boolean encoded) {
-        this(assertion, false, null);
+        this(assertion, encoded, null);
     }
     
     public JwtBearerGrant(String assertion, String scope) {
-        this(assertion, false, scope);
+        this(assertion, true, scope);
     }
     
     public JwtBearerGrant(String assertion, boolean encoded, String scope) {
