@@ -21,12 +21,15 @@ package org.apache.cxf.rs.security.jose.jws;
 import java.util.Map;
 
 import org.apache.cxf.rs.security.jose.JoseHeaders;
+import org.apache.cxf.rs.security.jose.JoseType;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 
 public class JwsHeaders extends JoseHeaders {
     public JwsHeaders() {
     }
-    
+    public JwsHeaders(JoseType type) {
+        super(type);
+    }
     public JwsHeaders(JoseHeaders headers) {
         super(headers.asMap());
     }
@@ -35,6 +38,10 @@ public class JwsHeaders extends JoseHeaders {
         super(values);
     }
     public JwsHeaders(SignatureAlgorithm sigAlgo) {
+        init(sigAlgo);
+    }
+    public JwsHeaders(JoseType type, SignatureAlgorithm sigAlgo) {
+        super(type);
         init(sigAlgo);
     }
     private void init(SignatureAlgorithm sigAlgo) {

@@ -26,6 +26,7 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.rs.security.jose.JoseConstants;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
+import org.apache.cxf.rs.security.jose.JoseType;
 import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
 import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 
@@ -36,7 +37,9 @@ public class JweHeaders extends JoseHeaders {
     private JweHeaders protectedHeaders;
     public JweHeaders() {
     }
-    
+    public JweHeaders(JoseType type) {
+        super(type);
+    }
     public JweHeaders(JoseHeaders headers) {
         super(headers.asMap());
     }
