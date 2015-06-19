@@ -19,6 +19,7 @@
 package org.apache.cxf.jaxrs.provider.json;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Collection;
@@ -29,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.helpers.IOUtils;
 
 
 
@@ -123,6 +125,9 @@ public class JsonMapObjectReaderWriter {
             out.append("\r\n ");
         }
     }
+    public JsonMapObject fromJsonToJsonObject(InputStream is) throws IOException {
+        return fromJsonToJsonObject(IOUtils.toString(is));
+    }
     public JsonMapObject fromJsonToJsonObject(String json) {
         JsonMapObject obj = new JsonMapObject();
         fromJson(obj, json);
@@ -133,7 +138,9 @@ public class JsonMapObjectReaderWriter {
         JsonObjectSettable settable = new JsonObjectSettable(obj);
         readJsonObjectAsSettable(settable, theJson.substring(1, theJson.length() - 1));
     }
-    
+    public Map<String, Object> fromJson(InputStream is) throws IOException {
+        return fromJson(IOUtils.toString(is));
+    }
     public Map<String, Object> fromJson(String json) {
         String theJson = json.trim();
         MapSettable nextMap = new MapSettable();

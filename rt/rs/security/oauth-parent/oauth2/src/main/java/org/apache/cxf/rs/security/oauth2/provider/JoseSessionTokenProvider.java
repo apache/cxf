@@ -139,11 +139,21 @@ public class JoseSessionTokenProvider implements SessionAuthenticityTokenProvide
         String[] parts = ModelEncryptionSupport.getParts(stateString);
         OAuthRedirectionState state = new OAuthRedirectionState();
         state.setClientId(parts[0]);
-        state.setAudience(parts[1]);
-        state.setClientCodeChallenge(parts[2]);
-        state.setState(parts[3]);
-        state.setProposedScope(parts[4]);
-        state.setRedirectUri(parts[5]);
+        if (!StringUtils.isEmpty(parts[1])) {
+            state.setAudience(parts[1]);
+        }
+        if (!StringUtils.isEmpty(parts[2])) {
+            state.setClientCodeChallenge(parts[2]);
+        }
+        if (!StringUtils.isEmpty(parts[3])) {
+            state.setState(parts[3]);
+        }
+        if (!StringUtils.isEmpty(parts[4])) {
+            state.setProposedScope(parts[4]);
+        }
+        if (!StringUtils.isEmpty(parts[5])) {
+            state.setRedirectUri(parts[5]);
+        }
         return state;
     }
     protected String convertStateToString(OAuthRedirectionState secData) {
