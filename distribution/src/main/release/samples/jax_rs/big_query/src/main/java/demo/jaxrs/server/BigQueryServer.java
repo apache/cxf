@@ -22,8 +22,11 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.PrivateKey;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import javax.ws.rs.core.MediaType;
 
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.provider.json.JsonMapObjectProvider;
@@ -33,9 +36,10 @@ import org.apache.cxf.rs.security.jose.jws.JwsHeaders;
 import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactProducer;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
-import org.apache.cxf.rs.security.oauth2.client.OAuthClientUtils;
+import org.apache.cxf.rs.security.oauth2.client.AccessTokenGrantWriter;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.grants.jwt.JwtBearerGrant;
+import org.apache.cxf.rs.security.oauth2.provider.OAuthJSONProvider;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 
 
@@ -54,8 +58,8 @@ public class BigQueryServer {
         WebClient bigQueryClient = WebClient.create("https://www.googleapis.com/bigquery/v2/projects/" 
                                                     + projectId + "/queries",
                                                     Collections.singletonList(new JsonMapObjectProvider()));
-        bigQueryClient.accept("application/json");
-        bigQueryClient.type("application/json");
+        bigQueryClient.accept(MediaType.APPLICATION_JSON);
+        bigQueryClient.type(MediaType.APPLICATION_JSON);
         
         List<ShakespeareText> texts = BigQueryService.getMatchingTexts(bigQueryClient, accessToken, "brave", "10");
         
@@ -82,8 +86,11 @@ public class BigQueryServer {
         
         JwtBearerGrant grant = new JwtBearerGrant(base64UrlAssertion);
         
-        WebClient accessTokenService = WebClient.create("https://www.googleapis.com/oauth2/v3/token");
-        return OAuthClientUtils.getAccessToken(accessTokenService, grant);
+        WebClient accessTokenService = WebClient.create("https://www.googleapis.com/oauth2/v3/token",
+                                                        Arrays.asList(new OAuthJSONProvider(), new AccessTokenGrantWriter()));
+        accessTokenService.type(MediaType.APPLICATION_FORM_URLENCODED);
+        accessTokenService.accept(MediaType.APPLICATION_JSON);
+        return accessTokenService.post(grant, ClientAccessToken.class);
     }
 
     private static PrivateKey loadPrivateKey(String p12File, String password) throws Exception {
