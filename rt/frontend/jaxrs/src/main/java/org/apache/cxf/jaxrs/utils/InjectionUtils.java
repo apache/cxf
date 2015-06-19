@@ -1159,7 +1159,7 @@ public final class InjectionUtils {
                 } else if (isSupportedCollectionOrArray(value.getClass())) {
                     List<Object> theValues = null;
                     if (value.getClass().isArray()) {
-                        theValues = Arrays.asList(value);
+                        theValues = Arrays.asList((Object[])value);
                     } else if (value instanceof Set) {
                         theValues = new ArrayList<Object>((Set<?>)value);
                     } else {
