@@ -137,10 +137,10 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
             }
 
             if (binding != null) {
-                WSSecHeader secHeader = new WSSecHeader(actor, mustUnderstand);
+                WSSecHeader secHeader = new WSSecHeader(actor, mustUnderstand, saaj.getSOAPPart());
                 Element el = null;
                 try {
-                    el = secHeader.insertSecurityHeader(saaj.getSOAPPart());
+                    el = secHeader.insertSecurityHeader();
                 } catch (WSSecurityException e) {
                     throw new SoapFault(
                         new Message("SECURITY_FAILED", LOG), e, message.getVersion().getSender()

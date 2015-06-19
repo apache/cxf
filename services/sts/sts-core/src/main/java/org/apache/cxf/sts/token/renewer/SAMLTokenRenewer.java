@@ -189,7 +189,7 @@ public class SAMLTokenRenewer extends AbstractSAMLTokenProvider implements Token
             // Validate the Assertion
             validateAssertion(assertion, tokenToRenew, cachedToken, tokenParameters);
             
-            SamlAssertionWrapper renewedAssertion = new SamlAssertionWrapper(assertion.getXmlObject());
+            SamlAssertionWrapper renewedAssertion = new SamlAssertionWrapper(assertion.getSamlObject());
             String oldId = createNewId(renewedAssertion);
             // Remove the previous token (now expired) from the cache
             tokenStore.remove(oldId);
