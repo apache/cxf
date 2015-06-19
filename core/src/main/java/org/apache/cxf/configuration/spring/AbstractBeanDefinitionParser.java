@@ -38,8 +38,10 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+
 import org.apache.cxf.common.jaxb.JAXBContextCache;
 import org.apache.cxf.common.jaxb.JAXBContextCache.CachedContextAndSchemas;
+import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.DOMUtils;
@@ -334,6 +336,7 @@ public abstract class AbstractBeanDefinitionParser
                                             Class<?> c) {
         try {
             XMLStreamWriter xmlWriter = null;
+            Unmarshaller u = null;
             try {
                 StringWriter writer = new StringWriter();
                 xmlWriter = StaxUtils.createXMLStreamWriter(writer);
@@ -348,7 +351,7 @@ public abstract class AbstractBeanDefinitionParser
                 jaxbbean.addConstructorArgValue(c);
                 bean.addPropertyValue(propertyName, jaxbbean.getBeanDefinition());
             } catch (Exception ex) {
-                Unmarshaller u = getContext(c).createUnmarshaller();
+                u = getContext(c).createUnmarshaller();
                 Object obj;
                 if (c != null) {
                     obj = u.unmarshal(data, c);
@@ -364,6 +367,7 @@ public abstract class AbstractBeanDefinitionParser
                 }
             } finally {
                 StaxUtils.close(xmlWriter);
+                JAXBUtils.closeUnmarshaller(u);
             }
         } catch (JAXBException e) {
             throw new RuntimeException("Could not parse configuration.", e);
@@ -426,8 +430,9 @@ public abstract class AbstractBeanDefinitionParser
     protected static <T> T unmarshalFactoryString(String s, JAXBContext ctx, Class<T> cls) {
         StringReader reader = new StringReader(s);
         XMLStreamReader data = StaxUtils.createXMLStreamReader(reader);
+        Unmarshaller u = null;
         try {
-            Unmarshaller u = ctx.createUnmarshaller();
+            u = ctx.createUnmarshaller();
             JAXBElement<?> obj = u.unmarshal(data, cls);
             return cls.cast(obj.getValue());
         } catch (RuntimeException e) {
@@ -440,6 +445,7 @@ public abstract class AbstractBeanDefinitionParser
             } catch (XMLStreamException ex) {
                 throw new RuntimeException(ex);
             }
+            JAXBUtils.closeUnmarshaller(u);
         }
     }
     

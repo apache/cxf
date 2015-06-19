@@ -138,10 +138,13 @@ public class JaxbAssertionBuilder<T> implements AssertionBuilder<Element> {
     @SuppressWarnings("unchecked")
     protected T getData(Element element) {
         Object obj = null;
+        Unmarshaller um = getUnmarshaller();
         try {
-            obj = getUnmarshaller().unmarshal(element);
+            obj = um.unmarshal(element);
         } catch (JAXBException ex) {
             LogUtils.log(LOG, Level.SEVERE, "UNMARSHAL_ELEMENT_EXC", ex);
+        } finally {
+            JAXBUtils.closeUnmarshaller(um);
         }
         if (obj instanceof JAXBElement<?>) {
             JAXBElement<?> el = (JAXBElement<?>)obj;

@@ -21,6 +21,7 @@ package org.apache.cxf.common.jaxb;
 
 
 import java.io.BufferedReader;
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,10 +49,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.PropertyException;
 import javax.xml.bind.SchemaOutputResolver;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.attachment.AttachmentMarshaller;
 import javax.xml.bind.attachment.AttachmentUnmarshaller;
@@ -59,6 +62,7 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Result;
+import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.stream.StreamResult;
 
@@ -162,6 +166,52 @@ public final class JAXBUtils {
      *
      */
     private JAXBUtils() {
+    }
+    
+    public static void closeUnmarshaller(Unmarshaller u) {
+        if (u instanceof Closeable) {
+            //need to do this to clear the ThreadLocal cache
+            //see https://java.net/jira/browse/JAXB-1000
+
+            try {
+                ((Closeable)u).close();
+            } catch (IOException e) {
+                //ignore
+            }
+        }
+    }
+    public static Object unmarshall(JAXBContext c, Element e) throws JAXBException {
+        Unmarshaller u = c.createUnmarshaller();
+        try {
+            return u.unmarshal(e);
+        } finally {
+            closeUnmarshaller(u);
+        }
+    }
+    public static <T> JAXBElement<T> unmarshall(JAXBContext c, Element e, Class<T> cls) throws JAXBException {
+        Unmarshaller u = c.createUnmarshaller();
+        try {
+            return u.unmarshal(e, cls);
+        } finally {
+            closeUnmarshaller(u);
+        }
+    }
+    public static Object unmarshall(JAXBContext c, Source s) throws JAXBException {
+        Unmarshaller u = c.createUnmarshaller();
+        try {
+            return u.unmarshal(s);
+        } finally {
+            closeUnmarshaller(u);
+        }
+    }
+    public static <T> JAXBElement<T> unmarshall(JAXBContext c, XMLStreamReader reader,
+                                                Class<T> cls) throws JAXBException {
+        Unmarshaller u = c.createUnmarshaller();
+        try {
+            return u.unmarshal(reader, cls);
+        } finally {
+            closeUnmarshaller(u);
+        }
     }
     
     public static String builtInTypeToJavaType(String type) {
