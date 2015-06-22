@@ -52,7 +52,7 @@ public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
     @Override
     protected void checkSecurityContextStart(ContainerRequestContext rc) {
         SecurityContext sc = rc.getSecurityContext();
-        if (sc != null && sc.getUserPrincipal() != null) {
+        if (sc != null && !(sc instanceof OidcSecurityContext)) {
             throw ExceptionUtils.toNotAuthorizedException(null, null);
         }
     }
