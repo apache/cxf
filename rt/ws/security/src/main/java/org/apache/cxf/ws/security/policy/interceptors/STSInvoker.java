@@ -44,6 +44,11 @@ import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.trust.STSUtils;
+<<<<<<< HEAD
+=======
+import org.apache.wss4j.common.bsp.BSPEnforcer;
+import org.apache.wss4j.common.derivedKey.ConversationConstants;
+>>>>>>> 05383ff... [CXF-6468] - Secure Conversation Renew is missing Instance creation. Thanks to Freddy Exposito for the patch.
 import org.apache.wss4j.common.derivedKey.P_SHA1;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
@@ -246,6 +251,39 @@ abstract class STSInvoker implements Invoker {
         SecurityTokenReference str = new SecurityTokenReference(writer.getDocument());
         str.addWSSENamespace();
         str.setReference(ref);
+
+        writer.getCurrentNode().appendChild(str.getElement());
+        return str.getElement();
+    }
+    
+    Element writeSecurityTokenReference(
+        W3CDOMStreamWriter writer,
+        String id,
+        String instance,
+        String refValueType
+    ) {
+        Reference ref = new Reference(writer.getDocument());
+        ref.setURI(id);
+        if (refValueType != null) {
+            ref.setValueType(refValueType);
+        }
+        SecurityTokenReference str = new SecurityTokenReference(writer.getDocument());
+        str.addWSSENamespace();
+        str.setReference(ref);
+        
+        if (instance != null) {
+            try {
+                Element firstChildElement = str.getFirstElement();
+                if (firstChildElement != null) {
+                    int version = NegotiationUtils.getWSCVersion(refValueType);
+                    String ns = ConversationConstants.getWSCNs(version);
+                    firstChildElement.setAttributeNS(ns, "wsc:" + ConversationConstants.INSTANCE_LN,
+                                                     instance);
+                }
+            } catch (WSSecurityException e) {
+                //just return without wsc:Instance
+            }
+        }
 
         writer.getCurrentNode().appendChild(str.getElement());
         return str.getElement();
