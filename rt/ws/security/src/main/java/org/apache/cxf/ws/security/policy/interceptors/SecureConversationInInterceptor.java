@@ -74,6 +74,7 @@ import org.apache.wss4j.policy.model.SecureConversationToken;
 import org.apache.wss4j.policy.model.SignedParts;
 import org.apache.wss4j.policy.model.Trust10;
 import org.apache.wss4j.policy.model.Trust13;
+import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.utils.Base64;
 
 class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
@@ -360,9 +361,10 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             if (tokenIdToRenew != null) {
                 ((TokenStore)exchange.getEndpoint().getEndpointInfo()
                     .getProperty(TokenStore.class.getName())).remove(tokenIdToRenew);
+                String instance = IDGenerator.generateID(null);
                 sct = new SecurityContextToken(
                         NegotiationUtils.getWSCVersion(tokenType), writer.getDocument(),
-                        tokenIdToRenew);
+                        tokenIdToRenew, instance);
                 sct.setID(WSSConfig.getNewInstance().getIdAllocator()
                         .createSecureId("sctId-", sct.getElement()));
             } else {
@@ -391,7 +393,7 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
 
             writer.writeStartElement(prefix, "RequestedUnattachedReference", namespace);
             token.setUnattachedReference(
-                writeSecurityTokenReference(writer, sct.getIdentifier(), tokenType)
+                writeSecurityTokenReference(writer, sct.getIdentifier(), sct.getInstance(), tokenType)
             );
             writer.writeEndElement();
 
