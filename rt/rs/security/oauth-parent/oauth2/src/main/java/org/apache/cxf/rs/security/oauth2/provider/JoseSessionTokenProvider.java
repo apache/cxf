@@ -96,7 +96,7 @@ public class JoseSessionTokenProvider implements SessionAuthenticityTokenProvide
         if (jweEncryptor != null) {
             return jweEncryptor;    
         }
-        return JweUtils.loadEncryptionProvider(true);
+        return JweUtils.loadEncryptionProvider(jweRequired);
     }
 
     public void setJwsRequired(boolean jwsRequired) {
