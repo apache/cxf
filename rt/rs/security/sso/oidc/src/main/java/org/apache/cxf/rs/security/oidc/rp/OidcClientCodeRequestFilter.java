@@ -50,9 +50,8 @@ public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
         this.userInfoRequired = userInfoRequired;
     }
     @Override
-    protected void checkSecurityContextStart(SecurityContext sc) {
-        // The SSO is managed out of band and the act of validating IdToken
-        // finalizes the authentication flow
+    protected void checkSecurityContextStart(ContainerRequestContext rc) {
+        SecurityContext sc = rc.getSecurityContext();
         if (sc != null && sc.getUserPrincipal() != null) {
             throw ExceptionUtils.toNotAuthorizedException(null, null);
         }
