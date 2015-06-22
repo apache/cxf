@@ -66,7 +66,7 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
     
     @Override
     public void filter(ContainerRequestContext rc) throws IOException {
-        checkSecurityContextStart(rc.getSecurityContext());
+        checkSecurityContextStart(rc);
         UriInfo ui = rc.getUriInfo();
         String absoluteRequestUri = ui.getAbsolutePath().toString();
         
@@ -92,14 +92,15 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
             rc.abortWith(codeResponse);
         } else if (absoluteRequestUri.endsWith(completeUri)) {
             processCodeResponse(rc, ui);
-            checkSecurityContextEnd(rc.getSecurityContext());
+            checkSecurityContextEnd(rc);
         }
     }
 
-    protected void checkSecurityContextStart(SecurityContext sc) {
-        checkSecurityContextEnd(sc);
+    protected void checkSecurityContextStart(ContainerRequestContext rc) {
+        checkSecurityContextEnd(rc);
     }
-    private void checkSecurityContextEnd(SecurityContext sc) {
+    private void checkSecurityContextEnd(ContainerRequestContext rc) {
+        SecurityContext sc = rc.getSecurityContext();
         if (sc == null || sc.getUserPrincipal() == null) {
             throw ExceptionUtils.toNotAuthorizedException(null, null);
         }
