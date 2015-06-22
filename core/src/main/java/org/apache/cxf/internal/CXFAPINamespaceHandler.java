@@ -43,7 +43,7 @@ import org.osgi.service.blueprint.reflect.Metadata;
              "http://cxf.apache.org/configuration/security",
              "http://schemas.xmlsoap.org/wsdl/",
              "http://www.w3.org/2005/08/addressing",
-             "http://schemas.xmlsoap.org/ws/2004/08/addressing"})
+             "http://schemas.xmlsoap.org/ws/2004/08/addressing" })
 public class CXFAPINamespaceHandler implements NamespaceHandler {    
     
     public URL getSchemaLocation(String namespace) {
