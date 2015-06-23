@@ -38,6 +38,8 @@ import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
+import org.apache.cxf.ws.security.trust.STSTokenRetriever;
+import org.apache.cxf.ws.security.trust.STSTokenRetriever.TokenRequestParams;
 import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JOutInterceptor;
 import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JStaxInInterceptor;
@@ -117,7 +119,17 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                 if (isRequestor(message)) {
                     IssuedToken itok = (IssuedToken)ais.iterator().next().getAssertion();
                     
-                    SecurityToken tok = STSTokenHelper.getTokenByWSPolicy(message, itok, aim);
+                    TokenRequestParams params = new TokenRequestParams();
+                    params.setIssuer(itok.getIssuer());
+                    params.setClaims(itok.getClaims());
+                    if (itok.getPolicy() != null) {
+                        params.setWspNamespace(itok.getPolicy().getNamespace());
+                    }
+                    params.setTrust10(NegotiationUtils.getTrust10(aim));
+                    params.setTrust13(NegotiationUtils.getTrust13(aim));
+                    params.setTokenTemplate(itok.getRequestSecurityTokenTemplate());
+
+                    SecurityToken tok = STSTokenRetriever.getToken(message, params);
                     
                     if (tok != null) {
                         assertIssuedToken(itok, aim);

@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.ws.security.policy.interceptors;
+package org.apache.cxf.ws.security.trust;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,46 +25,31 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.w3c.dom.Element;
+
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.ws.addressing.AddressingProperties;
-import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreUtils;
-import org.apache.cxf.ws.security.trust.STSClient;
-import org.apache.cxf.ws.security.trust.STSUtils;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.policy.model.IssuedToken;
 import org.apache.wss4j.policy.model.Trust10;
 import org.apache.wss4j.policy.model.Trust13;
 
-public final class STSTokenHelper {
-    private static final Logger LOG = LogUtils.getL7dLogger(STSTokenHelper.class);
+/**
+ * A Helper utility class to cache STS token and issue or renew the token from STS.
+ */
+public final class STSTokenRetriever {
+    private static final Logger LOG = LogUtils.getL7dLogger(STSTokenRetriever.class);
     private static final String ASSOCIATED_TOKEN =
-        STSTokenHelper.class.getName() + "-" + "Associated_Token";
+        STSTokenRetriever.class.getName() + "-" + "Associated_Token";
     
-    private STSTokenHelper() {
-    }
-
-    public static SecurityToken getTokenByWSPolicy(Message message, IssuedToken issuedToken,
-                                            AssertionInfoMap aim) {
-        TokenRequestParams params = new TokenRequestParams();
-        params.setIssuer(issuedToken.getIssuer());
-        params.setClaims(issuedToken.getClaims());
-        if (issuedToken.getPolicy() != null) {
-            params.setWspNamespace(issuedToken.getPolicy().getNamespace());
-        }
-        params.setTrust10(NegotiationUtils.getTrust10(aim));
-        params.setTrust13(NegotiationUtils.getTrust13(aim));
-        params.setTokenTemplate(issuedToken.getRequestSecurityTokenTemplate());
-
-        return getToken(message, params);
+    private STSTokenRetriever() {
     }
 
     public static SecurityToken getToken(Message message, TokenRequestParams params) {
@@ -493,22 +478,3 @@ public final class STSTokenHelper {
         }
     }
 }
-
-/*
- * STSClient stsClient = new STSClient(bus); stsClient.setServiceQName(new QName(stsProps.get(STS_NAMESPACE),
- * stsProps.get(STS_SERVICE_NAME))); Map<String, Object> props = new HashMap<String, Object>(); for
- * (Map.Entry<String, String> entry : stsProps.entrySet()) { if
- * (SecurityConstants.ALL_PROPERTIES.contains(entry.getKey())) { props.put(entry.getKey(),
- * processFileURI(entry.getValue())); } } stsClient.setProperties(props);
- * stsClient.setWsdlLocation(stsProps.get(STS_WSDL_LOCATION)); stsClient.setEndpointQName(new
- * QName(stsProps.get(STS_NAMESPACE), stsProps.get(STS_ENDPOINT_NAME)));
- * stsClient.setAllowRenewingAfterExpiry(true); stsClient.setEnableLifetime(true);
- * stsClient.setTokenType(SAML2_TOKEN_TYPE); stsClient.setKeyType(BEARER_KEYTYPE); if (token != null) {
- * stsClient.setActAs(token); } token =
- * message.getContextualProperty(SecurityConstants.STS_TOKEN_ON_BEHALF_OF); if (token != null) {
- * stsClient.setOnBehalfOf(token); } Object o =
- * message.getContextualProperty(SecurityConstants.STS_APPLIES_TO); String appliesTo = null == o ? null :
- * o.toString(); appliesTo = null == appliesTo ?
- * message.getContextualProperty(Message.ENDPOINT_ADDRESS).toString() : appliesTo;
- * stsClient.setMessage(message);
- */

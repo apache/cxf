@@ -59,9 +59,9 @@ import org.apache.cxf.systest.sts.deployment.STSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.cxf.ws.security.policy.interceptors.STSTokenHelper;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.trust.STSClient;
+import org.apache.cxf.ws.security.trust.STSTokenRetriever;
 
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -71,7 +71,7 @@ import org.junit.Test;
 /**
  * Some tests for STSClient configuration.
  */
-public class STSTokenHelperTest extends AbstractBusClientServerTestBase {    
+public class STSTokenRetrieverTest extends AbstractBusClientServerTestBase {    
     static final String STSPORT = allocatePort(STSServer.class);
     static final String STSPORT2 = allocatePort(STSServer.class, 2);
    
@@ -118,9 +118,9 @@ public class STSTokenHelperTest extends AbstractBusClientServerTestBase {
         STSClient stsClient = initStsClientAsymmeticBinding(bus);
         
         MessageImpl message = prepareMessage(bus, stsClient, SERVICE_ENDPOINT_ASSYMETRIC);
-        STSTokenHelper.TokenRequestParams params = new STSTokenHelper.TokenRequestParams();
+        STSTokenRetriever.TokenRequestParams params = new STSTokenRetriever.TokenRequestParams();
         
-        SecurityToken token = STSTokenHelper.getToken(message, params);
+        SecurityToken token = STSTokenRetriever.getToken(message, params);
         validateSecurityToken(token);
     }
 
@@ -136,9 +136,9 @@ public class STSTokenHelperTest extends AbstractBusClientServerTestBase {
         ((HTTPConduit)stsClient.getClient().getConduit()).setTlsClientParameters(tlsParams);
         
         MessageImpl message = prepareMessage(bus, stsClient, SERVICE_ENDPOINT_TRANSPORT);       
-        STSTokenHelper.TokenRequestParams params = new STSTokenHelper.TokenRequestParams();
+        STSTokenRetriever.TokenRequestParams params = new STSTokenRetriever.TokenRequestParams();
         
-        SecurityToken token = STSTokenHelper.getToken(message, params);
+        SecurityToken token = STSTokenRetriever.getToken(message, params);
         validateSecurityToken(token);
     }
 
@@ -253,7 +253,7 @@ public class STSTokenHelperTest extends AbstractBusClientServerTestBase {
     private KeyStore loadClientKeystore() throws KeyStoreException, IOException, NoSuchAlgorithmException,
         CertificateException {
         KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
-        InputStream keystoreStream = STSTokenHelperTest.class.getResourceAsStream(CLIENTSTORE);
+        InputStream keystoreStream = STSTokenRetrieverTest.class.getResourceAsStream(CLIENTSTORE);
         try {
             keystore.load(keystoreStream, KEYSTORE_PASS.toCharArray());
         } finally {
