@@ -211,27 +211,23 @@ public class JSONProviderTest extends Assert {
         assertEquals(expected, bos.toString());
     }
     
-    @Test
     public void testWriteCollectionAsPureArray() throws Exception {
         JSONProvider<ReportDefinition> provider 
             = new JSONProvider<ReportDefinition>();
-        //provider.setSerializeAsArray(true);
-        provider.setArrayKeys(Arrays.asList("parameterList"));
+        provider.setSerializeAsArray(true);
         provider.setDropRootElement(true);
         provider.setOutDropElements(Arrays.asList("parameterList"));
         provider.setDropElementsInXmlStream(false);
         ReportDefinition r = new ReportDefinition();
-        //r.setReportName("report");
+        r.setReportName("report");
         r.addParameterDefinition(new ParameterDefinition("param"));
-        r.addParameterDefinition(new ParameterDefinition("param2"));
         
         Method m = ReportService.class.getMethod("findReport", new Class<?>[]{});
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         provider.writeTo(r, m.getReturnType(), m.getGenericReturnType(),
                          new Annotation[0], MediaType.APPLICATION_JSON_TYPE, 
                          new MetadataMap<String, Object>(), bos);
-        System.out.println(bos.toString());
-        //assertTrue(bos.toString().startsWith("[{\"parameterList\":"));
+        assertTrue(bos.toString().startsWith("[{\"parameterList\":"));
     }
     
     @Test
@@ -242,7 +238,7 @@ public class JSONProviderTest extends Assert {
         provider.setOutDropElements(Collections.singletonList("reportDefinition"));
         provider.setDropElementsInXmlStream(false);
         ReportDefinition r = new ReportDefinition();
-        //r.setReportName("report");
+        r.setReportName("report");
         r.addParameterDefinition(new ParameterDefinition("param"));
         
         Method m = ReportService.class.getMethod("findReport", new Class<?>[]{});
@@ -264,7 +260,7 @@ public class JSONProviderTest extends Assert {
         provider.setDropRootElement(true);
         provider.setDropElementsInXmlStream(false);
         ReportDefinition r = new ReportDefinition();
-        //r.setReportName("report");
+        r.setReportName("report");
         ParameterDefinition paramDef = new ParameterDefinition("param");
         r.addParameterDefinition(paramDef);
         
@@ -1820,7 +1816,7 @@ public class JSONProviderTest extends Assert {
 
     @XmlRootElement
     public static class ReportDefinition {
-        //private String reportName;
+        private String reportName;
        
         private List<ParameterDefinition> parameterList;
        
@@ -1829,16 +1825,16 @@ public class JSONProviderTest extends Assert {
         }
        
         public ReportDefinition(String reportName) {
-        //    this.reportName = reportName;
+            this.reportName = reportName;
         }
-//       
-//        public String getReportName() {
-//            return reportName;
-//        }
-//
-//        public void setReportName(String reportName) {
-//            this.reportName = reportName;
-//        }
+       
+        public String getReportName() {
+            return reportName;
+        }
+
+        public void setReportName(String reportName) {
+            this.reportName = reportName;
+        }
        
         public List<ParameterDefinition> getParameterList() {
             return parameterList;
