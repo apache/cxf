@@ -20,8 +20,11 @@ package org.apache.cxf.rs.security.oidc.rp;
 
 import java.util.Map;
 
+import javax.annotation.Priority;
+import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -34,6 +37,8 @@ import org.apache.cxf.jaxrs.utils.FormUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 
+@PreMatching
+@Priority(Priorities.AUTHENTICATION)
 public class OidcRpAuthenticationFilter implements ContainerRequestFilter {
     
     private OidcRpStateManager stateManager;
@@ -46,7 +51,7 @@ public class OidcRpAuthenticationFilter implements ContainerRequestFilter {
             String token = OAuthUtils.generateRandomTokenKey();
             MultivaluedMap<String, String> state = toRequestState(rc);
             stateManager.setRequestState(token, state);
-            UriBuilder ub = UriBuilder.fromUri(rpServiceAddress);
+            UriBuilder ub = rc.getUriInfo().getBaseUriBuilder().path(rpServiceAddress);
             ub.queryParam("state", token);
             rc.abortWith(Response.seeOther(ub.build())
                            .header(HttpHeaders.CACHE_CONTROL, "no-cache, no-store")
@@ -79,9 +84,13 @@ public class OidcRpAuthenticationFilter implements ContainerRequestFilter {
             FormUtils.populateMapFromString(requestState, JAXRSUtils.getCurrentMessage(), body, 
                                             "UTF-8", true);
         }
+        requestState.putSingle("location", rc.getUriInfo().getRequestUri().toString());
         return requestState;
     }
     public void setRpServiceAddress(String rpServiceAddress) {
         this.rpServiceAddress = rpServiceAddress;
+    }
+    public void setStateManager(OidcRpStateManager stateManager) {
+        this.stateManager = stateManager;
     }
 }

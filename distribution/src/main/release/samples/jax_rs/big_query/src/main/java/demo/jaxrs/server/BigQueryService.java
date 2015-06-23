@@ -34,7 +34,7 @@ import org.apache.cxf.jaxrs.provider.json.JsonMapObject;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oidc.rp.OidcClientTokenContext;
 
-@Path("/search")
+@Path("/")
 public class BigQueryService {
 
     private static final String BQ_SELECT = 

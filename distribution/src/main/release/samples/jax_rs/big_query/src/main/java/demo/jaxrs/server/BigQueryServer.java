@@ -58,8 +58,7 @@ public class BigQueryServer {
         WebClient bigQueryClient = WebClient.create("https://www.googleapis.com/bigquery/v2/projects/" 
                                                     + projectId + "/queries",
                                                     Collections.singletonList(new JsonMapObjectProvider()));
-        bigQueryClient.accept(MediaType.APPLICATION_JSON);
-        bigQueryClient.type(MediaType.APPLICATION_JSON);
+        bigQueryClient.type(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON);
         
         List<ShakespeareText> texts = BigQueryService.getMatchingTexts(bigQueryClient, accessToken, "brave", "10");
         
@@ -88,8 +87,8 @@ public class BigQueryServer {
         
         WebClient accessTokenService = WebClient.create("https://www.googleapis.com/oauth2/v3/token",
                                                         Arrays.asList(new OAuthJSONProvider(), new AccessTokenGrantWriter()));
-        accessTokenService.type(MediaType.APPLICATION_FORM_URLENCODED);
-        accessTokenService.accept(MediaType.APPLICATION_JSON);
+        accessTokenService.type(MediaType.APPLICATION_FORM_URLENCODED).accept(MediaType.APPLICATION_JSON);
+        
         return accessTokenService.post(grant, ClientAccessToken.class);
     }
 

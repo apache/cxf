@@ -21,13 +21,7 @@
     <servlet>
         <servlet-name>RESTServlet</servlet-name>
         <servlet-class>org.apache.cxf.transport.servlet.CXFServlet</servlet-class>
-	<load-on-startup>1</load-on-startup>
-        <init-param>
-            <param-name>static-resources-list</param-name>
-            <param-value>
-                 /index.html
-            </param-value>
-        </init-param> 
+        <load-on-startup>1</load-on-startup>
     </servlet>
     <servlet-mapping>
         <servlet-name>RESTServlet</servlet-name>
