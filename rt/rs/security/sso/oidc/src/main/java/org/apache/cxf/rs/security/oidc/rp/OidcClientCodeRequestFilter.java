@@ -32,6 +32,9 @@ public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
     private boolean userInfoRequired = true; 
     @Override
     protected ClientTokenContext createTokenContext(ContainerRequestContext rc, ClientAccessToken at) {
+        if (rc.getSecurityContext() instanceof OidcSecurityContext) {
+            return ((OidcSecurityContext)rc.getSecurityContext()).getOidcContext();
+        }
         OidcClientTokenContextImpl ctx = new OidcClientTokenContextImpl();
         if (at != null) {
             ctx.setIdToken(userInfoClient.getIdToken(at, getConsumer().getKey()));
@@ -52,7 +55,7 @@ public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
     @Override
     protected void checkSecurityContextStart(ContainerRequestContext rc) {
         SecurityContext sc = rc.getSecurityContext();
-        if (sc != null && !(sc instanceof OidcSecurityContext)) {
+        if (!(sc instanceof OidcSecurityContext) && sc.getUserPrincipal() != null) {
             throw ExceptionUtils.toNotAuthorizedException(null, null);
         }
     }
