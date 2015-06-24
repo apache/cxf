@@ -1147,17 +1147,14 @@ public final class JAXRSUtils {
     public static <T> T createServletResourceValue(Message m, Class<T> clazz) {
         
         Object value = null; 
-        if (HttpServletRequest.class.isAssignableFrom(clazz)) {
+        if (clazz == HttpServletRequest.class) {
             value = m.get(AbstractHTTPDestination.HTTP_REQUEST);
-        }
-        if (HttpServletResponse.class.isAssignableFrom(clazz)) {
+        } else if (clazz == HttpServletResponse.class) {
             HttpServletResponse response = (HttpServletResponse)m.get(AbstractHTTPDestination.HTTP_RESPONSE);
             value = response != null ? new HttpServletResponseFilter(response, m) : null;
-        }
-        if (ServletContext.class.isAssignableFrom(clazz)) {
+        } else if (clazz == ServletContext.class) {
             value = m.get(AbstractHTTPDestination.HTTP_CONTEXT);
-        }
-        if (ServletConfig.class.isAssignableFrom(clazz)) {
+        } else if (clazz == ServletConfig.class) {
             value = m.get(AbstractHTTPDestination.HTTP_CONFIG);
         }
         
