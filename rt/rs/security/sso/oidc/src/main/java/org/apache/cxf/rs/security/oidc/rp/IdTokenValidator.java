@@ -28,20 +28,27 @@ public class IdTokenValidator extends AbstractTokenValidator {
     
     public IdToken getIdToken(ClientAccessToken at, String clientId) {
         JwtToken jwt = getIdJwtToken(at, clientId);
-        return getIdTokenFromJwt(jwt, clientId);
+        return getIdTokenFromJwt(jwt);
     }
-    public IdToken getIdTokenFromJwt(JwtToken jwt, String clientId) {
-        //TODO: do the extra validation if needed
-        return new IdToken(jwt.getClaims().asMap());
+    public IdToken getIdToken(String idJwtToken, String clientId) {
+        JwtToken jwt = getIdJwtToken(idJwtToken, clientId);
+        return getIdTokenFromJwt(jwt);
     }
     public JwtToken getIdJwtToken(ClientAccessToken at, String clientId) {
         String idJwtToken = at.getParameters().get(OidcUtils.ID_TOKEN);
-        JwtToken jwt = getJwtToken(idJwtToken, clientId, null, false);
-        validateJwtClaims(jwt.getClaims(), clientId, true);
+        JwtToken jwt = getIdJwtToken(idJwtToken, clientId); 
         OidcUtils.validateAccessTokenHash(at, jwt, requireAtHash);
         return jwt;
     }
-
+    public JwtToken getIdJwtToken(String idJwtToken, String clientId) {
+        JwtToken jwt = getJwtToken(idJwtToken, null, false);
+        validateJwtClaims(jwt.getClaims(), clientId, true);
+        return jwt;
+    }
+    public IdToken getIdTokenFromJwt(JwtToken jwt) {
+        //TODO: do the extra validation if needed
+        return new IdToken(jwt.getClaims().asMap());
+    }
     public void setRequireAtHash(boolean requireAtHash) {
         this.requireAtHash = requireAtHash;
     }
