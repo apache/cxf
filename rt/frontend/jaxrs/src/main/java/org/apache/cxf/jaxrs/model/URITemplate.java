@@ -188,7 +188,8 @@ public final class URITemplate {
         for (String name : variables) {
             while (i <= groupCount) {
                 String value = m.group(i++);
-                if (value == null || value.length() == 0 && i < groupCount) {
+                if ((value == null || value.length() == 0 && i < groupCount) 
+                    && variables.size() + 1 < groupCount) {
                     continue;
                 }
                 templateVariableToValue.add(name, value);
