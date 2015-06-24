@@ -33,8 +33,7 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 public class OidcRpAuthenticationService {
     private OidcRpStateManager stateManager;
     private String defaultLocation;
-    
-    
+        
     @GET
     @Path("complete")
     public Response completeAuthentication(@Context OidcClientTokenContext context,
@@ -42,7 +41,7 @@ public class OidcRpAuthenticationService {
         String key = OAuthUtils.generateRandomTokenKey();
         stateManager.setTokenContext(key, context);
         URI redirectUri = null;
-        String location = context.getState().getFirst("location");
+        String location = context.getState().getFirst("state");
         if (location == null) {
             String basePath = (String)mc.get("http.base.path");
             redirectUri = UriBuilder.fromUri(basePath).path(defaultLocation).build();
