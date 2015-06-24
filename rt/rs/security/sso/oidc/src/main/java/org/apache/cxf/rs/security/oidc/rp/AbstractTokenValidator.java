@@ -43,7 +43,6 @@ public abstract class AbstractTokenValidator {
     private ConcurrentHashMap<String, JsonWebKey> keyMap = new ConcurrentHashMap<String, JsonWebKey>(); 
     
     protected JwtToken getJwtToken(String wrappedJwtToken, 
-                                   String clientId,
                                    String idTokenKid, 
                                    boolean jweOnly) {
         if (wrappedJwtToken == null) {
