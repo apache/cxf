@@ -65,7 +65,7 @@ public class URITemplateTest extends Assert {
         String value = values.getFirst("id");
         assertEquals("123", value);
     }
-
+    
     @Test
     public void testMatchWithMatrixAndTemplate() throws Exception {
         URITemplate uriTemplate = new URITemplate("/customers/{id}");
@@ -439,6 +439,39 @@ public class URITemplateTest extends Assert {
         assertEquals("/", finalPath);
     }
     
+    @Test
+    public void testExpressionWithTwoVars() throws Exception {
+        URITemplate uriTemplate = new URITemplate("/{tenant : [^/]*}/resource/{id}");
+        MultivaluedMap<String, String> values = new MetadataMap<String, String>();
+        boolean match = uriTemplate.match("/t1/resource/1", values);
+        assertTrue(match);
+        String tenant = values.getFirst("tenant");
+        assertEquals("t1", tenant);
+        String id = values.getFirst("id");
+        assertEquals("1", id);
+        String finalPath = values.getFirst(URITemplate.FINAL_MATCH_GROUP);
+        assertEquals("/", finalPath);
+        
+        values.clear();
+        match = uriTemplate.match("//resource/1", values);
+        assertTrue(match);
+        tenant = values.getFirst("tenant");
+        assertEquals("", tenant);
+        id = values.getFirst("id");
+        assertEquals("1", id);
+        finalPath = values.getFirst(URITemplate.FINAL_MATCH_GROUP);
+        assertEquals("/", finalPath);
+        
+        values.clear();
+        match = uriTemplate.match("/t1/resource/1/sub", values);
+        assertTrue(match);
+        tenant = values.getFirst("tenant");
+        assertEquals("t1", tenant);
+        id = values.getFirst("id");
+        assertEquals("1", id);
+        finalPath = values.getFirst(URITemplate.FINAL_MATCH_GROUP);
+        assertEquals("/sub", finalPath);
+    }
     
     @Test
     public void testExpressionWithNestedGroupAndManySegments() throws Exception {
