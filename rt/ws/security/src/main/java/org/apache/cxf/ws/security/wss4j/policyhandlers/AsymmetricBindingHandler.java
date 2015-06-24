@@ -172,6 +172,8 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             }
             addSupportingTokens(sigs);
             
+            sigs.addAll(this.getSignedParts(null));
+            
             if (isRequestor() && initiatorWrapper != null) {
                 doSignature(initiatorWrapper, sigs, attached);
                 doEndorse();
@@ -326,7 +328,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
         List<WSEncryptionPart> encrParts = null;
         try {
             encrParts = getEncryptedParts();
-            //Signed parts are determined before encryption because encrypted signed  headers
+            //Signed parts are determined before encryption because encrypted signed headers
             //will not be included otherwise
             sigParts.addAll(this.getSignedParts(null));
         } catch (SOAPException ex) {
@@ -605,7 +607,6 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
         }
         
         AbstractToken sigToken = wrapper.getToken();
-        sigParts.addAll(this.getSignedParts(null));
         if (sigParts.isEmpty()) {
             // Add the BST to the security header if required
             if (!attached && isTokenRequired(sigToken.getIncludeTokenType())) {
