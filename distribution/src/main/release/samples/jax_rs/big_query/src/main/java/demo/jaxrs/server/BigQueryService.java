@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
@@ -47,10 +48,17 @@ public class BigQueryService {
     
     private WebClient bigQueryClient;
     
+    @POST
+    @Path("/complete")
+    @Produces("text/html")
+    public BigQueryResponse completeBigQueryPost(@Context OidcClientTokenContext context) {
+        return completeBigQueryGet(context);
+    }
+    
     @GET
     @Path("/complete")
     @Produces("text/html")
-    public BigQueryResponse completeBigQuery(@Context OidcClientTokenContext context) {
+    public BigQueryResponse completeBigQueryGet(@Context OidcClientTokenContext context) {
         
         ClientAccessToken accessToken = context.getToken();
         

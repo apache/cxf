@@ -21,28 +21,14 @@ package org.apache.cxf.rs.security.oidc.rp;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.ws.rs.core.MultivaluedMap;
-
 
 public class MemoryOidcRpStateManager implements OidcRpStateManager {
-    private ConcurrentHashMap<String, MultivaluedMap<String, String>> map = 
-        new ConcurrentHashMap<String, MultivaluedMap<String, String>>();
     private ConcurrentHashMap<String, OidcClientTokenContext> map2 = 
         new ConcurrentHashMap<String, OidcClientTokenContext>();
     @Override
     public void close() throws IOException {
         // TODO Auto-generated method stub
         
-    }
-
-    @Override
-    public void setRequestState(String token, MultivaluedMap<String, String> state) {
-        map.put(token, state);
-    }
-
-    @Override
-    public MultivaluedMap<String, String> removeRequestState(String token) {
-        return map.remove(token);
     }
 
     @Override

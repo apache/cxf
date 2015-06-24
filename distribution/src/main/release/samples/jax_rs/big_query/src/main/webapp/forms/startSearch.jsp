@@ -16,7 +16,7 @@
 <em></em>
 <p>
  <table>
-     <form action="https://localhost:8080/bigquery/service/search" method="POST">
+     <form action="https://localhost:8080/bigquery/service/search/complete" method="POST">
         <tr>
             <td><big><big><big>Text Word:</big></big></big></td>
             <td>

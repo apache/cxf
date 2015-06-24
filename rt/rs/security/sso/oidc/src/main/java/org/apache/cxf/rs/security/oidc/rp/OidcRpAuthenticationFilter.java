@@ -35,7 +35,7 @@ import javax.ws.rs.core.UriBuilder;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.utils.FormUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
-import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
+import org.apache.cxf.rs.security.oauth2.client.ClientTokenContext;
 
 @PreMatching
 @Priority(Priorities.AUTHENTICATION)
@@ -48,11 +48,7 @@ public class OidcRpAuthenticationFilter implements ContainerRequestFilter {
         if (checkSecurityContext(rc)) {
             return;
         } else {
-            String token = OAuthUtils.generateRandomTokenKey();
-            MultivaluedMap<String, String> state = toRequestState(rc);
-            stateManager.setRequestState(token, state);
             UriBuilder ub = rc.getUriInfo().getBaseUriBuilder().path(rpServiceAddress);
-            ub.queryParam("state", token);
             rc.abortWith(Response.seeOther(ub.build())
                            .header(HttpHeaders.CACHE_CONTROL, "no-cache, no-store")
                            .header("Pragma", "no-cache") 
@@ -69,11 +65,16 @@ public class OidcRpAuthenticationFilter implements ContainerRequestFilter {
         String contextKey = securityContextCookie.getValue();
         
         OidcClientTokenContext tokenContext = stateManager.getTokenContext(contextKey);
-        
         if (tokenContext == null) {
             return false;
         }
-        rc.setSecurityContext(new OidcSecurityContext(tokenContext));
+        OidcClientTokenContextImpl newTokenContext = new OidcClientTokenContextImpl();
+        newTokenContext.setToken(tokenContext.getToken());
+        newTokenContext.setIdToken(tokenContext.getIdToken());
+        newTokenContext.setUserInfo(tokenContext.getUserInfo());
+        newTokenContext.setState(toRequestState(rc));
+        JAXRSUtils.getCurrentMessage().setContent(ClientTokenContext.class, newTokenContext);
+        rc.setSecurityContext(new OidcSecurityContext(newTokenContext));
         return true;
     }
     private MultivaluedMap<String, String> toRequestState(ContainerRequestContext rc) {
@@ -84,7 +85,6 @@ public class OidcRpAuthenticationFilter implements ContainerRequestFilter {
             FormUtils.populateMapFromString(requestState, JAXRSUtils.getCurrentMessage(), body, 
                                             "UTF-8", true);
         }
-        requestState.putSingle("location", rc.getUriInfo().getRequestUri().toString());
         return requestState;
     }
     public void setRpServiceAddress(String rpServiceAddress) {

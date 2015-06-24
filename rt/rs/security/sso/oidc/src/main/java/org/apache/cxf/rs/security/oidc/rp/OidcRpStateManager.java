@@ -20,12 +20,7 @@ package org.apache.cxf.rs.security.oidc.rp;
 
 import java.io.Closeable;
 
-import javax.ws.rs.core.MultivaluedMap;
-
 public interface OidcRpStateManager extends Closeable {
-    void setRequestState(String token, MultivaluedMap<String, String> state);
-    MultivaluedMap<String, String> removeRequestState(String token);
-    
     void setTokenContext(String contextKey, OidcClientTokenContext state);
     OidcClientTokenContext getTokenContext(String contextKey);
     OidcClientTokenContext removeTokenContext(String contextKey);

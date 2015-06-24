@@ -84,20 +84,6 @@
          <property name="secret" value="${client_secret}"/>
      </bean>
      <bean id="clientCodeStateManager" class="org.apache.cxf.rs.security.oauth2.client.MemoryClientCodeStateManager"/>
-     <bean id="oidcRequestFilter" class="org.apache.cxf.rs.security.oidc.rp.OidcClientCodeRequestFilter">
-         <property name="clientCodeStateManager" ref="clientCodeStateManager"/>
-         <!-- Use it if no incremental authorization if enabled --> 
-         <property name="scopes" value="openid email profile https://www.googleapis.com/auth/bigquery.readonly"/>
-         <!--
-         <property name="scopes" value="https://www.googleapis.com/auth/bigquery.readonly"/>
-         -->
-         <property name="accessTokenServiceClient" ref="atServiceClient"/>
-         <property name="userInfoClient" ref="userInfoClient"/>
-         <property name="consumer" ref="consumer"/>
-         <property name="authorizationServiceUri" value="https://accounts.google.com/o/oauth2/auth"/>
-         <property name="startUri" value="search"/>
-         <property name="completeUri" value="complete"/>
-     </bean>
      
      <bean id="bigQueryService" class="demo.jaxrs.server.BigQueryService">
          <property name="bigQueryClient" ref="bigQueryClient"/>
@@ -125,11 +111,7 @@
            <ref bean="bigQueryService"/>
         </jaxrs:serviceBeans>
         <jaxrs:providers>
-           <!-- disable "oidcRpFilter" if the RP endpoint is not available 
            <ref bean="oidcRpFilter"/>
-           -->
-           
-           <ref bean="oidcRequestFilter"/>
            <ref bean="searchView"/>
            <bean class="org.apache.cxf.rs.security.oauth2.client.ClientTokenContextProvider"/>
         </jaxrs:providers>
@@ -137,7 +119,7 @@
            <ref bean="loggingFeature"/>
         </jaxrs:features>
      </jaxrs:server>
-     <!--
+     
      <bean id="stateManager" class="org.apache.cxf.rs.security.oidc.rp.MemoryOidcRpStateManager"/>
      
      <bean id="oidcRpFilter" class="org.apache.cxf.rs.security.oidc.rp.OidcRpAuthenticationFilter">
@@ -166,7 +148,7 @@
      <bean id="rpClientCodeStateManager" class="org.apache.cxf.rs.security.oauth2.client.MemoryClientCodeStateManager"/>
      <bean id="rpOidcRequestFilter" class="org.apache.cxf.rs.security.oidc.rp.OidcClientCodeRequestFilter">
          <property name="clientCodeStateManager" ref="rpClientCodeStateManager"/>
-         <property name="scopes" value="openid email profile"/>
+         <property name="scopes" value="openid email profile https://www.googleapis.com/auth/bigquery.readonly"/>
          <property name="accessTokenServiceClient" ref="atServiceClient"/>
          <property name="userInfoClient" ref="userInfoClient"/>
          <property name="consumer" ref="consumer"/>
@@ -174,6 +156,6 @@
          <property name="startUri" value="rp"/>
          <property name="completeUri" value="rp/complete"/>
      </bean>
-     -->     
+          
 </beans>
 
