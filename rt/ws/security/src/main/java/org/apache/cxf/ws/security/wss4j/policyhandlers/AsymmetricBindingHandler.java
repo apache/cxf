@@ -143,7 +143,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             }
             addSupportingTokens(sigs);
             
-            sigs.addAll(this.getSignedParts(null));
+            sigs.addAll(this.getSignedParts());
             
             if (isRequestor() && initiatorWrapper != null) {
                 doSignature(initiatorWrapper, sigs, attached);
@@ -504,12 +504,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             assertUnusedTokens(abinding.getRecipientSignatureToken());
         }
         
-<<<<<<< HEAD
         Token sigToken = wrapper.getToken();
-        sigParts.addAll(this.getSignedParts());
-=======
-        AbstractToken sigToken = wrapper.getToken();
->>>>>>> 273351c... [CXF-6473] - Double signatures while using AsymmetricBindingHandle
         if (sigParts.isEmpty()) {
             // Add the BST to the security header if required
             if (!attached && includeToken(sigToken.getInclusion())) {
