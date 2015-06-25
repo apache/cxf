@@ -625,8 +625,8 @@ public class WSDLGetUtils {
 
         if (imp.getReferencedSchema() != null) {
             for (Map.Entry<String, SchemaReference> e : doneSchemas.entrySet()) {
-                if (e.getValue().getReferencedSchema().getElement()
-                    == imp.getReferencedSchema().getElement()) {
+                if ((e.getValue().getReferencedSchema().getElement() == imp.getReferencedSchema().getElement())
+                    && schemaLocationURI.equals(e.getKey())) {
                     doneSchemas.put(schemaLocationURI, imp);
                     imp.setSchemaLocationURI(e.getKey());
                     return e.getKey();
