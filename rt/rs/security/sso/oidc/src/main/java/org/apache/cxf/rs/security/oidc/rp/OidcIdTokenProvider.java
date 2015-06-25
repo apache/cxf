@@ -18,32 +18,14 @@
  */
 package org.apache.cxf.rs.security.oidc.rp;
 
-import java.io.IOException;
-import java.util.concurrent.ConcurrentHashMap;
+import org.apache.cxf.jaxrs.ext.ContextProvider;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.rs.security.oauth2.client.ClientTokenContext;
+import org.apache.cxf.rs.security.oidc.common.IdToken;
 
-
-public class MemoryOidcRpStateManager implements OidcRpStateManager {
-    private ConcurrentHashMap<String, OidcClientTokenContext> map2 = 
-        new ConcurrentHashMap<String, OidcClientTokenContext>();
+public class OidcIdTokenProvider implements ContextProvider<IdToken> {
     @Override
-    public void close() throws IOException {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public void setTokenContext(String contextKey, OidcClientTokenContext state) {
-        map2.put(contextKey, state);
-        
-    }
-
-    @Override
-    public OidcClientTokenContext getTokenContext(String contextKey) {
-        return map2.get(contextKey);
-    }
-
-    @Override
-    public OidcClientTokenContext removeTokenContext(String contextKey) {
-        return map2.remove(contextKey);
+    public IdToken createContext(Message m) {
+        return ((OidcClientTokenContext)m.getContent(ClientTokenContext.class)).getIdToken();
     }
 }

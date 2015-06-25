@@ -25,9 +25,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import javax.servlet.http.HttpSession;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
@@ -51,6 +53,45 @@ public final class OAuthUtils {
     private OAuthUtils() {
     }
     
+    public static String setSessionToken(MessageContext mc) {
+        return setSessionToken(mc, 0);
+    }
+    public static String setSessionToken(MessageContext mc, int maxInactiveInterval) {
+        return setSessionToken(mc, generateRandomTokenKey());
+    }
+    public static String setSessionToken(MessageContext mc, String sessionToken) {
+        return setSessionToken(mc, sessionToken, 0);
+    }
+    public static String setSessionToken(MessageContext mc, String sessionToken, int maxInactiveInterval) {
+        return setSessionToken(mc, sessionToken, null, 0);
+    }
+    public static String setSessionToken(MessageContext mc, String sessionToken, 
+                                                String attribute, int maxInactiveInterval) {    
+        HttpSession session = mc.getHttpServletRequest().getSession();
+        if (maxInactiveInterval > 0) {
+            session.setMaxInactiveInterval(maxInactiveInterval);
+        }
+        String theAttribute = attribute == null ? OAuthConstants.SESSION_AUTHENTICITY_TOKEN : attribute;
+        session.setAttribute(theAttribute, sessionToken);
+        return sessionToken;
+    }
+
+    public static String getSessionToken(MessageContext mc) {
+        return getSessionToken(mc, null);
+    }
+    public static String getSessionToken(MessageContext mc, String attribute) {
+        return getSessionToken(mc, attribute, true);
+    }
+    public static String getSessionToken(MessageContext mc, String attribute, boolean remove) {    
+        HttpSession session = mc.getHttpServletRequest().getSession();
+        String theAttribute = attribute == null ? OAuthConstants.SESSION_AUTHENTICITY_TOKEN : attribute;  
+        String sessionToken = (String)session.getAttribute(theAttribute);
+        if (sessionToken != null && remove) {
+            session.removeAttribute(theAttribute);    
+        }
+        return sessionToken;
+    }
+
     public static UserSubject createSubject(SecurityContext securityContext) {
         List<String> roleNames = Collections.emptyList();
         if (securityContext instanceof LoginSecurityContext) {

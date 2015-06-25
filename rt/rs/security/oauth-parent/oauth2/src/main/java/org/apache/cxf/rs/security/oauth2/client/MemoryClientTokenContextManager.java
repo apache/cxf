@@ -21,6 +21,7 @@ package org.apache.cxf.rs.security.oauth2.client;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 
 public class MemoryClientTokenContextManager implements ClientTokenContextManager {
     private ConcurrentHashMap<String, ClientTokenContext> map = 
@@ -28,22 +29,23 @@ public class MemoryClientTokenContextManager implements ClientTokenContextManage
 
     @Override
     public void setClientTokenContext(MessageContext mc, ClientTokenContext request) {
-        map.put(getKey(mc), request);
+        String stateParam = OAuthUtils.generateRandomTokenKey();
+        OAuthUtils.setSessionToken(mc, stateParam, "org.apache.cxf.websso.context", 0);
+        map.put(stateParam, request);
         
-    }
-
-    private String getKey(MessageContext mc) {
-        return mc.getSecurityContext().getUserPrincipal().getName();
     }
 
     @Override
     public ClientTokenContext getClientTokenContext(MessageContext mc) {
-        // TODO: support an automatic removal based on the token expires property
-        return map.remove(getKey(mc));
+        return map.get(getKey(mc, false));
     }
 
     @Override
-    public void removeClientTokenContext(MessageContext mc, ClientTokenContext request) {
-        map.remove(getKey(mc));
+    public ClientTokenContext removeClientTokenContext(MessageContext mc) {
+        return map.remove(getKey(mc, true));
+    }
+    
+    private String getKey(MessageContext mc, boolean remove) {
+        return OAuthUtils.getSessionToken(mc, "org.apache.cxf.websso.context", remove);
     }
 }

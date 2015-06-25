@@ -23,5 +23,5 @@ import org.apache.cxf.jaxrs.ext.MessageContext;
 public interface ClientTokenContextManager {
     void setClientTokenContext(MessageContext mc, ClientTokenContext ctx);
     ClientTokenContext getClientTokenContext(MessageContext mc);
-    void removeClientTokenContext(MessageContext mc, ClientTokenContext ctx);
+    ClientTokenContext removeClientTokenContext(MessageContext mc);
 }

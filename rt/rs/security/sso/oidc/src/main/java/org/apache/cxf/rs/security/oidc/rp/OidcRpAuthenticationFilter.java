@@ -18,30 +18,31 @@
  */
 package org.apache.cxf.rs.security.oidc.rp;
 
-import java.util.Map;
-
 import javax.annotation.Priority;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
-import javax.ws.rs.core.Cookie;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
+import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.utils.FormUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.rs.security.oauth2.client.ClientTokenContext;
+import org.apache.cxf.rs.security.oauth2.client.ClientTokenContextManager;
 
 @PreMatching
 @Priority(Priorities.AUTHENTICATION)
 public class OidcRpAuthenticationFilter implements ContainerRequestFilter {
-    
-    private OidcRpStateManager stateManager;
+    @Context
+    private MessageContext mc;
+    private ClientTokenContextManager stateManager;
     private String rpServiceAddress;
     
     public void filter(ContainerRequestContext rc) {
@@ -56,15 +57,7 @@ public class OidcRpAuthenticationFilter implements ContainerRequestFilter {
         }
     }
     protected boolean checkSecurityContext(ContainerRequestContext rc) {
-        Map<String, Cookie> cookies = rc.getCookies();
-        
-        Cookie securityContextCookie = cookies.get("org.apache.cxf.websso.context");
-        if (securityContextCookie == null) {
-            return false;
-        }
-        String contextKey = securityContextCookie.getValue();
-        
-        OidcClientTokenContext tokenContext = stateManager.getTokenContext(contextKey);
+        OidcClientTokenContext tokenContext = (OidcClientTokenContext)stateManager.getClientTokenContext(mc);
         if (tokenContext == null) {
             return false;
         }
@@ -90,7 +83,7 @@ public class OidcRpAuthenticationFilter implements ContainerRequestFilter {
     public void setRpServiceAddress(String rpServiceAddress) {
         this.rpServiceAddress = rpServiceAddress;
     }
-    public void setStateManager(OidcRpStateManager stateManager) {
+    public void setStateManager(ClientTokenContextManager stateManager) {
         this.stateManager = stateManager;
     }
 }
