@@ -28,7 +28,7 @@ import org.apache.cxf.rs.security.oidc.common.IdToken;
 public class OidcSecurityContext extends SimpleSecurityContext implements SecurityContext {
     private OidcClientTokenContext oidcContext;
     public OidcSecurityContext(IdToken token) {
-        this(new OidcClientTokenContextImpl());
+        this(new OidcClientTokenContextImpl(token));
     }
     public OidcSecurityContext(OidcClientTokenContext oidcContext) {
         super(getUserName(oidcContext));
