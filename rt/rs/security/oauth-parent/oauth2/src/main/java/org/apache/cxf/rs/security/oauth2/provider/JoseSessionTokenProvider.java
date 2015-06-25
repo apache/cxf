@@ -46,13 +46,13 @@ public class JoseSessionTokenProvider implements SessionAuthenticityTokenProvide
                                      UserSubject subject, OAuthRedirectionState secData) {
         String stateString = convertStateToString(secData);
         String sessionToken = protectStateString(stateString);
-        return OAuthUtils.setDefaultSessionToken(mc, sessionToken, maxDefaultSessionInterval);
+        return OAuthUtils.setSessionToken(mc, sessionToken, maxDefaultSessionInterval);
     }
 
     @Override
     public String getSessionToken(MessageContext mc, MultivaluedMap<String, String> params,
                                   UserSubject subject) {
-        return OAuthUtils.getDefaultSessionToken(mc);
+        return OAuthUtils.getSessionToken(mc);
     }
 
     @Override

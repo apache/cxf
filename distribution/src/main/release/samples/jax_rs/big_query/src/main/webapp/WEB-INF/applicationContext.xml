@@ -120,7 +120,7 @@
         </jaxrs:features>
      </jaxrs:server>
      
-     <bean id="stateManager" class="org.apache.cxf.rs.security.oidc.rp.MemoryOidcRpStateManager"/>
+     <bean id="stateManager" class="org.apache.cxf.rs.security.oauth2.client.MemoryClientTokenContextManager"/>
      
      <bean id="oidcRpFilter" class="org.apache.cxf.rs.security.oidc.rp.OidcRpAuthenticationFilter">
          <property name="stateManager" ref="stateManager"/>

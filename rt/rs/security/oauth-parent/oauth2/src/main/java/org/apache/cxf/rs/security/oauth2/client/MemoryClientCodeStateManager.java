@@ -24,6 +24,7 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
+import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 
@@ -36,7 +37,7 @@ public class MemoryClientCodeStateManager implements ClientCodeStateManager {
                                                           MultivaluedMap<String, String> requestState) {
         String stateParam = OAuthUtils.generateRandomTokenKey();
         map.put(stateParam, requestState);
-        
+        OAuthUtils.setSessionToken(mc, stateParam, "state", 0);
         MultivaluedMap<String, String> redirectMap = new MetadataMap<String, String>();
         redirectMap.putSingle(OAuthConstants.STATE, stateParam);
         return redirectMap;
@@ -46,6 +47,10 @@ public class MemoryClientCodeStateManager implements ClientCodeStateManager {
     public MultivaluedMap<String, String> fromRedirectState(MessageContext mc, 
                                                             MultivaluedMap<String, String> redirectState) {
         String stateParam = redirectState.getFirst(OAuthConstants.STATE);
+        String sessionToken = OAuthUtils.getSessionToken(mc, "state");
+        if (!sessionToken.equals(stateParam)) {
+            throw new OAuthServiceException("Invalid session token");
+        }
         return map.remove(stateParam);
     }
 }

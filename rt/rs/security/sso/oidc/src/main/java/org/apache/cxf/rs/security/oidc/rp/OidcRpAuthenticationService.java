@@ -31,12 +31,12 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.rs.security.oauth2.client.ClientTokenContextManager;
 import org.apache.cxf.rs.security.oauth2.client.Consumer;
-import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 
 @Path("rp")
 public class OidcRpAuthenticationService {
-    private OidcRpStateManager stateManager;
+    private ClientTokenContextManager stateManager;
     private String defaultLocation;
     private String tokenFormParameter = "idtoken"; 
     @Context
@@ -61,8 +61,7 @@ public class OidcRpAuthenticationService {
     @GET
     @Path("complete")
     public Response completeAuthentication(@Context OidcClientTokenContext oidcContext) {
-        String key = OAuthUtils.generateRandomTokenKey();
-        stateManager.setTokenContext(key, oidcContext);
+        stateManager.setClientTokenContext(mc, oidcContext);
         URI redirectUri = null;
         String location = oidcContext.getState().getFirst("state");
         if (location == null) {
@@ -71,15 +70,14 @@ public class OidcRpAuthenticationService {
         } else {
             redirectUri = URI.create(location);
         }
-        return Response.seeOther(redirectUri).header("Set-Cookie", 
-                                                     "org.apache.cxf.websso.context=" + key + ";Path=/").build();
+        return Response.seeOther(redirectUri).build();
     }
 
     public void setDefaultLocation(String defaultLocation) {
         this.defaultLocation = defaultLocation;
     }
 
-    public void setStateManager(OidcRpStateManager stateManager) {
+    public void setStateManager(ClientTokenContextManager stateManager) {
         this.stateManager = stateManager;
     }
 

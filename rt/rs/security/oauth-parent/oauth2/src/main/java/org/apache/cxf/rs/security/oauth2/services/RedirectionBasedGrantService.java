@@ -380,7 +380,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
                                                                                subject,
                                                                                secData);
         } else {
-            sessionToken = OAuthUtils.setDefaultSessionToken(getMessageContext(), maxDefaultSessionInterval);
+            sessionToken = OAuthUtils.setSessionToken(getMessageContext(), maxDefaultSessionInterval);
         }
         secData.setAuthenticityToken(sessionToken);
     }
@@ -394,7 +394,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
                                                                                params,
                                                                                subject);
         } else {
-            sessionToken = OAuthUtils.getDefaultSessionToken(getMessageContext());
+            sessionToken = OAuthUtils.getSessionToken(getMessageContext());
         }
         if (StringUtils.isEmpty(sessionToken)) {
             return false;

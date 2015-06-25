@@ -53,28 +53,41 @@ public final class OAuthUtils {
     private OAuthUtils() {
     }
     
-    public static String setDefaultSessionToken(MessageContext mc) {
-        return setDefaultSessionToken(mc, 0);
+    public static String setSessionToken(MessageContext mc) {
+        return setSessionToken(mc, 0);
     }
-    public static String setDefaultSessionToken(MessageContext mc, int maxInactiveInterval) {
-        return setDefaultSessionToken(mc, generateRandomTokenKey());
+    public static String setSessionToken(MessageContext mc, int maxInactiveInterval) {
+        return setSessionToken(mc, generateRandomTokenKey());
     }
-    public static String setDefaultSessionToken(MessageContext mc, String sessionToken) {
-        return setDefaultSessionToken(mc, sessionToken, 0);
+    public static String setSessionToken(MessageContext mc, String sessionToken) {
+        return setSessionToken(mc, sessionToken, 0);
     }
-    public static String setDefaultSessionToken(MessageContext mc, String sessionToken, int maxInactiveInterval) {
+    public static String setSessionToken(MessageContext mc, String sessionToken, int maxInactiveInterval) {
+        return setSessionToken(mc, sessionToken, null, 0);
+    }
+    public static String setSessionToken(MessageContext mc, String sessionToken, 
+                                                String attribute, int maxInactiveInterval) {    
         HttpSession session = mc.getHttpServletRequest().getSession();
         if (maxInactiveInterval > 0) {
             session.setMaxInactiveInterval(maxInactiveInterval);
         }
-        session.setAttribute(OAuthConstants.SESSION_AUTHENTICITY_TOKEN, sessionToken);
+        String theAttribute = attribute == null ? OAuthConstants.SESSION_AUTHENTICITY_TOKEN : attribute;
+        session.setAttribute(theAttribute, sessionToken);
         return sessionToken;
     }
-    public static String getDefaultSessionToken(MessageContext mc) {
+
+    public static String getSessionToken(MessageContext mc) {
+        return getSessionToken(mc, null);
+    }
+    public static String getSessionToken(MessageContext mc, String attribute) {
+        return getSessionToken(mc, attribute, true);
+    }
+    public static String getSessionToken(MessageContext mc, String attribute, boolean remove) {    
         HttpSession session = mc.getHttpServletRequest().getSession();
-        String sessionToken = (String)session.getAttribute(OAuthConstants.SESSION_AUTHENTICITY_TOKEN);
-        if (sessionToken != null) {
-            session.removeAttribute(OAuthConstants.SESSION_AUTHENTICITY_TOKEN);    
+        String theAttribute = attribute == null ? OAuthConstants.SESSION_AUTHENTICITY_TOKEN : attribute;  
+        String sessionToken = (String)session.getAttribute(theAttribute);
+        if (sessionToken != null && remove) {
+            session.removeAttribute(theAttribute);    
         }
         return sessionToken;
     }

@@ -239,7 +239,7 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
             if (ctx != null) {
                 ClientAccessToken newAt = refreshAccessTokenIfExpired(ctx.getToken());
                 if (newAt != null) {
-                    clientTokenContextManager.removeClientTokenContext(mc, ctx);
+                    clientTokenContextManager.removeClientTokenContext(mc);
                     ClientTokenContext newCtx = initializeClientTokenContext(rc, newAt, ctx.getState());            
                     clientTokenContextManager.setClientTokenContext(mc, newCtx);
                     ctx = newCtx;
