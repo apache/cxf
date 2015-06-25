@@ -23,9 +23,13 @@ import javax.ws.rs.core.SecurityContext;
 import org.apache.cxf.common.security.SimpleSecurityContext;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.rs.security.oidc.common.IdToken;
 
 public class OidcSecurityContext extends SimpleSecurityContext implements SecurityContext {
     private OidcClientTokenContext oidcContext;
+    public OidcSecurityContext(IdToken token) {
+        this(new OidcClientTokenContextImpl());
+    }
     public OidcSecurityContext(OidcClientTokenContext oidcContext) {
         super(getUserName(oidcContext));
         this.oidcContext = oidcContext;

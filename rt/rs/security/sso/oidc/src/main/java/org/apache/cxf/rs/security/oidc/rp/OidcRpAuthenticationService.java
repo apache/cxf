@@ -32,29 +32,22 @@ import javax.ws.rs.core.UriBuilder;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.rs.security.oauth2.client.ClientTokenContextManager;
-import org.apache.cxf.rs.security.oauth2.client.OAuthClientUtils;
+import org.apache.cxf.rs.security.oidc.common.IdToken;
+
 
 @Path("rp")
 public class OidcRpAuthenticationService {
     private ClientTokenContextManager stateManager;
     private String defaultLocation;
-    private String tokenFormParameter = "idtoken"; 
     @Context
     private MessageContext mc; 
-    private IdTokenValidator idTokenValidator;
-    private OAuthClientUtils.Consumer consumer;
-    
-    public void setIdTokenValidator(IdTokenValidator validator) {
-        this.idTokenValidator = validator;
-    }
     
     @POST
     @Path("signin")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response completeScriptAuthentication(MultivaluedMap<String, String> map) {
-        String idTokenParamValue = map.getFirst(tokenFormParameter);
+    public Response completeScriptAuthentication(@Context IdToken idToken) {
         OidcClientTokenContextImpl ctx = new OidcClientTokenContextImpl();
-        ctx.setIdToken(idTokenValidator.getIdToken(idTokenParamValue, consumer.getKey()));
+        ctx.setIdToken(idToken);
         return completeAuthentication(ctx);   
     }
     
@@ -82,11 +75,4 @@ public class OidcRpAuthenticationService {
         this.stateManager = stateManager;
     }
 
-    public void setTokenFormParameter(String tokenFormParameter) {
-        this.tokenFormParameter = tokenFormParameter;
-    }
-
-    public void setConsumer(OAuthClientUtils.Consumer consumer) {
-        this.consumer = consumer;
-    }
 }

@@ -26,6 +26,11 @@ import org.apache.cxf.rs.security.oidc.common.IdToken;
 public class OidcIdTokenProvider implements ContextProvider<IdToken> {
     @Override
     public IdToken createContext(Message m) {
-        return ((OidcClientTokenContext)m.getContent(ClientTokenContext.class)).getIdToken();
+        
+        OidcClientTokenContext ctx = (OidcClientTokenContext)m.getContent(ClientTokenContext.class);
+        if (ctx != null) {
+            return ctx.getIdToken();
+        }
+        return m.getContent(IdToken.class);
     }
 }

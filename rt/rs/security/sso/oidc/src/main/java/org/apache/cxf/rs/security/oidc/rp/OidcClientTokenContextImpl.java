@@ -26,6 +26,12 @@ public class OidcClientTokenContextImpl extends ClientTokenContextImpl implement
     private static final long serialVersionUID = 117239739331303618L;
     private IdToken idToken;
     private UserInfo userInfo;
+    public OidcClientTokenContextImpl() {
+        
+    }
+    public OidcClientTokenContextImpl(IdToken idToken) {
+        this.idToken = idToken;
+    }
     public IdToken getIdToken() {
         return idToken;
     }
