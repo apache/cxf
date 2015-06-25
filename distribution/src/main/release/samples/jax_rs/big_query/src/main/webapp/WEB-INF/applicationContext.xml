@@ -130,8 +130,6 @@
      <bean id="oidcRpService" class="org.apache.cxf.rs.security.oidc.rp.OidcRpAuthenticationService">
          <property name="stateManager" ref="stateManager"/>
          <property name="defaultLocation" value="/forms/startSearch.jsp"/>
-         <property name="idTokenValidator" ref="userInfoClient"/>
-         <property name="consumer" ref="consumer"/>
      </bean>
      
      <jaxrs:server id="oidcRpServer" address="/oidc">
