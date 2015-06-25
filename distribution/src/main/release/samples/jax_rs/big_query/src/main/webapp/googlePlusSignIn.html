@@ -1,0 +1,21 @@
+<html lang="en">
+  <head>
+    <meta name="google-signin-scope" content="profile email">
+    <meta name="google-signin-client_id" content="${client_id}">
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+  </head>
+  <body>
+    <div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
+    <script>
+      function onSignIn(googleUser) {
+        var id_token = googleUser.getAuthResponse().id_token;
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', 'https://localhost:8080/bigquery/service/oidc/rp/signin');
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.send('idtoken=' + id_token);
+        var location = xhr.getResponseHeader('Location');
+        xhr.open('GET', location);
+      };
+    </script>
+  </body>
+</html>

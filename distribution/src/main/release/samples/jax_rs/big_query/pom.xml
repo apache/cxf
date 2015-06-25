@@ -103,7 +103,7 @@
                             <filtering>true</filtering>
                             <includes>
                                 <include>**/applicationContext.xml</include>
-                                <include>**/index.html</include>
+                                <include>**/googlePlusSignIn.html</include>
                             </includes>
                         </resource>
                     </webResources>

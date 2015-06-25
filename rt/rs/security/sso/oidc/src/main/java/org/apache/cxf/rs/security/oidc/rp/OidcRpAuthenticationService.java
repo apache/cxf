@@ -41,20 +41,20 @@ public class OidcRpAuthenticationService {
     private String tokenFormParameter = "idtoken"; 
     @Context
     private MessageContext mc; 
-    private UserInfoClient userInfoClient;
+    private IdTokenValidator idTokenValidator;
     private Consumer consumer;
     
-    public void setUserInfoClient(UserInfoClient userInfoClient) {
-        this.userInfoClient = userInfoClient;
+    public void setIdTokenValidator(IdTokenValidator validator) {
+        this.idTokenValidator = validator;
     }
     
     @POST
-    @Path("complete")
+    @Path("signin")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response completeScriptAuthentication(MultivaluedMap<String, String> map) {
         String idTokenParamValue = map.getFirst(tokenFormParameter);
         OidcClientTokenContextImpl ctx = new OidcClientTokenContextImpl();
-        ctx.setIdToken(userInfoClient.getIdToken(idTokenParamValue, consumer.getKey()));
+        ctx.setIdToken(idTokenValidator.getIdToken(idTokenParamValue, consumer.getKey()));
         return completeAuthentication(ctx);   
     }
     
@@ -63,7 +63,8 @@ public class OidcRpAuthenticationService {
     public Response completeAuthentication(@Context OidcClientTokenContext oidcContext) {
         stateManager.setClientTokenContext(mc, oidcContext);
         URI redirectUri = null;
-        String location = oidcContext.getState().getFirst("state");
+        MultivaluedMap<String, String> state = oidcContext.getState();
+        String location = state != null ? state.getFirst("state") : null;
         if (location == null) {
             String basePath = (String)mc.get("http.base.path");
             redirectUri = UriBuilder.fromUri(basePath).path(defaultLocation).build();
@@ -83,5 +84,9 @@ public class OidcRpAuthenticationService {
 
     public void setTokenFormParameter(String tokenFormParameter) {
         this.tokenFormParameter = tokenFormParameter;
+    }
+
+    public void setConsumer(Consumer consumer) {
+        this.consumer = consumer;
     }
 }
