@@ -29,7 +29,6 @@ import javax.ws.rs.core.Response;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.utils.FormUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
-import org.apache.cxf.rs.security.oauth2.client.ClientTokenContext;
 import org.apache.cxf.rs.security.oauth2.client.Consumer;
 import org.apache.cxf.rs.security.oidc.common.IdToken;
 
@@ -48,7 +47,7 @@ public class OidcIdTokenRequestFilter implements ContainerRequestFilter {
         }
         
         IdToken idToken = idTokenValidator.getIdToken(idTokenParamValue, consumer.getKey());
-        JAXRSUtils.getCurrentMessage().setContent(ClientTokenContext.class, idToken);
+        JAXRSUtils.getCurrentMessage().setContent(IdToken.class, idToken);
         requestContext.setSecurityContext(new OidcSecurityContext(idToken));
         
     }

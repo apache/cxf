@@ -137,8 +137,14 @@
            <ref bean="oidcRpService"/>
         </jaxrs:serviceBeans>
         <jaxrs:providers>
+           <!--
            <ref bean="rpOidcRequestFilter"/>
+           -->
+           <ref bean="rpOidcTokenFilter"/>
+           <!--
            <bean class="org.apache.cxf.rs.security.oauth2.client.ClientTokenContextProvider"/>
+           -->
+           <bean class="org.apache.cxf.rs.security.oidc.rp.OidcIdTokenProvider"/>
         </jaxrs:providers>
         <jaxrs:features>
            <ref bean="loggingFeature"/>
@@ -155,6 +161,10 @@
          <property name="authorizationServiceUri" value="https://accounts.google.com/o/oauth2/auth"/>
          <property name="startUri" value="rp"/>
          <property name="completeUri" value="rp/complete"/>
+     </bean>
+     <bean id="rpOidcTokenFilter" class="org.apache.cxf.rs.security.oidc.rp.OidcIdTokenRequestFilter">
+         <property name="idTokenValidator" ref="userInfoClient"/>
+         <property name="consumer" ref="consumer"/>
      </bean>
           
 </beans>
