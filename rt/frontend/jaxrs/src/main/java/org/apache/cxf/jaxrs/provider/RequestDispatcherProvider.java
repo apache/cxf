@@ -45,6 +45,7 @@ import javax.ws.rs.ext.Provider;
 
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
@@ -113,23 +114,34 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
     }
 
     private String getClassResourceName(Class<?> type) {
-        String simpleName = type.getSimpleName();
-        StringBuilder sb = new StringBuilder();
-        sb.append(Character.toLowerCase(simpleName.charAt(0)));
-        if (simpleName.length() > 1) {
-            sb.append(simpleName.substring(1));
+        String resourceName = doGetClassResourceName(type);
+        if (resourceName == null) {
+            for (Class<?> in : type.getInterfaces()) {
+                resourceName = doGetClassResourceName(in);
+                if (resourceName != null) {
+                    break;
+                }
+            }
         }
+        return resourceName;
+    }
+    private String doGetClassResourceName(Class<?> type) {
+        String simpleName = StringUtils.uncapitalize(type.getSimpleName());
         String thePrefix = locationPrefix == null ? DEFAULT_LOCATION_PREFIX : locationPrefix;
         String theExtension = resourceExtension == null ? DEFAULT_RESOURCE_EXTENSION : resourceExtension;
-        return thePrefix + sb.toString() + theExtension;  
+        String resourceName = thePrefix + simpleName + theExtension;
+        if (ResourceUtils.getClasspathResourceURL(resourceName,
+                                                  RequestDispatcherProvider.class,
+                                                  getBus()) != null) {
+            return resourceName;
+        } else {
+            return null;
+        }
     }
     
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
         
-        if (useClassNames 
-            && ResourceUtils.getClasspathResourceURL(getClassResourceName(type),
-                                                     RequestDispatcherProvider.class,
-                                                     getBus()) != null) {
+        if (useClassNames && getClassResourceName(type) != null) {
             return true;
         }
         if (resourcePath != null || classResourceSupported(type)) {
@@ -339,7 +351,20 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
             return beanName;
         }
         String name = beanNames.get(bean.getClass().getName());
-        return name != null ? name : bean.getClass().getSimpleName().toLowerCase();
+        if (name != null) {
+            return null;
+        } 
+        Class<?> resourceClass = bean.getClass();
+        if (useClassNames && doGetClassResourceName(resourceClass) == null) {
+            for (Class<?> cls : bean.getClass().getInterfaces()) {
+                if (doGetClassResourceName(cls) != null) {
+                    resourceClass = cls;
+                    break;
+                }
+            }
+        }
+        
+        return resourceClass.getSimpleName().toLowerCase();
     }
 
     protected void setRequestParameters(HttpServletRequestFilter request) {
