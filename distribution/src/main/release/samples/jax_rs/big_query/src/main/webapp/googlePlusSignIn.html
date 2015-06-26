@@ -10,11 +10,12 @@
       function onSignIn(googleUser) {
         var id_token = googleUser.getAuthResponse().id_token;
         var xhr = new XMLHttpRequest();
+        xhr.onload = function() {
+          alert(xhr.response);
+        }
         xhr.open('POST', 'https://localhost:8080/bigquery/service/oidc/rp/signin');
         xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
         xhr.send('idtoken=' + id_token);
-        var location = xhr.getResponseHeader('Location');
-        xhr.open('GET', location);
       };
     </script>
   </body>

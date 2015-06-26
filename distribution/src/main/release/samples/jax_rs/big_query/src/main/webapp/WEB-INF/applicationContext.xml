@@ -130,6 +130,9 @@
      <bean id="oidcRpService" class="org.apache.cxf.rs.security.oidc.rp.OidcRpAuthenticationService">
          <property name="stateManager" ref="stateManager"/>
          <property name="defaultLocation" value="/forms/startSearch.jsp"/>
+         <!--
+         <property name="useRedirect" value="false"/>
+         -->
      </bean>
      
      <jaxrs:server id="oidcRpServer" address="/oidc">
@@ -141,6 +144,9 @@
            <ref bean="rpOidcRequestFilter"/>
            -->
            <ref bean="rpOidcTokenFilter"/>
+           <!--
+           <ref bean="searchView"/>
+           -->
            <!--
            <bean class="org.apache.cxf.rs.security.oauth2.client.ClientTokenContextProvider"/>
            -->

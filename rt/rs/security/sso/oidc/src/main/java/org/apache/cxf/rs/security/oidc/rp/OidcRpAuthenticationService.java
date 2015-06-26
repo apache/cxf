@@ -38,6 +38,7 @@ import org.apache.cxf.rs.security.oidc.common.IdToken;
 public class OidcRpAuthenticationService {
     private ClientTokenContextManager stateManager;
     private String defaultLocation;
+    private boolean useRedirect;
     @Context
     private MessageContext mc; 
     
@@ -54,16 +55,20 @@ public class OidcRpAuthenticationService {
     @Path("complete")
     public Response completeAuthentication(@Context OidcClientTokenContext oidcContext) {
         stateManager.setClientTokenContext(mc, oidcContext);
-        URI redirectUri = null;
-        MultivaluedMap<String, String> state = oidcContext.getState();
-        String location = state != null ? state.getFirst("state") : null;
-        if (location == null) {
-            String basePath = (String)mc.get("http.base.path");
-            redirectUri = UriBuilder.fromUri(basePath).path(defaultLocation).build();
+        if (useRedirect) {
+            URI redirectUri = null;
+            MultivaluedMap<String, String> state = oidcContext.getState();
+            String location = state != null ? state.getFirst("state") : null;
+            if (location == null) {
+                String basePath = (String)mc.get("http.base.path");
+                redirectUri = UriBuilder.fromUri(basePath).path(defaultLocation).build();
+            } else {
+                redirectUri = URI.create(location);
+            }
+            return Response.seeOther(redirectUri).build();
         } else {
-            redirectUri = URI.create(location);
+            return Response.ok(oidcContext).build();
         }
-        return Response.seeOther(redirectUri).build();
     }
 
     public void setDefaultLocation(String defaultLocation) {
@@ -72,5 +77,9 @@ public class OidcRpAuthenticationService {
 
     public void setStateManager(ClientTokenContextManager stateManager) {
         this.stateManager = stateManager;
+    }
+
+    public void setUseRedirect(boolean useRedirect) {
+        this.useRedirect = useRedirect;
     }
 }
