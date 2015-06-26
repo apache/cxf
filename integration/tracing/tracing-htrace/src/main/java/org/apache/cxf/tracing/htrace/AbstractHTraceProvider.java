@@ -55,8 +55,7 @@ public abstract class AbstractHTraceProvider extends AbstractTracingProvider {
             Tracer.DONT_TRACE.spanId); 
         
         if (traceId == Tracer.DONT_TRACE.traceId || spanId == Tracer.DONT_TRACE.spanId) {
-            return Trace.startSpan(path, (Sampler< TraceInfo >)sampler, 
-                new TraceInfo(traceId, spanId));
+            return Trace.startSpan(path, (Sampler< TraceInfo >)sampler);
         } 
         
         return Trace.startSpan(path, new MilliSpan

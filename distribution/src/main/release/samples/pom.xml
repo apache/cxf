@@ -104,6 +104,7 @@
         <module>ws_discovery</module>
         <module>ws_eventing</module>
         <module>throttling</module>
+        <module>jax_rs/tracing_htrace</module>
         
         <!--
          These are removed from the build as they currently don't inherit the parent from 
