@@ -39,6 +39,7 @@ import javax.ws.rs.core.Link;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.jaxrs.client.ClientConfiguration;
 import org.apache.cxf.jaxrs.client.ClientProviderFactory;
@@ -52,6 +53,7 @@ public class ClientImpl implements Client {
     private static final String HTTP_RECEIVE_TIMEOUT_PROP = "http.receive.timeout";
     private static final String HTTP_PROXY_SERVER_PROP = "http.proxy.server.uri";
     private static final String HTTP_PROXY_SERVER_PORT_PROP = "http.proxy.server.port";
+    private static final String HTTP_AUTOREDIRECT_PROP = "http.autoredirect";
     
     private Configurable<Client> configImpl;
     private TLSConfiguration secConfig;
@@ -295,6 +297,10 @@ public class ClientImpl implements Client {
             Integer proxyServerPortValue = getIntValue(configProps.get(HTTP_PROXY_SERVER_PORT_PROP));
             if (proxyServerPortValue != null) {
                 clientCfg.getHttpConduit().getClient().setProxyServerPort(proxyServerPortValue);
+            }
+            Object autoRedirectValue = configProps.get(HTTP_AUTOREDIRECT_PROP);
+            if (PropertyUtils.isTrue(autoRedirectValue)) {
+                clientCfg.getHttpConduit().getClient().setAutoRedirect(true);
             }
         }
 
