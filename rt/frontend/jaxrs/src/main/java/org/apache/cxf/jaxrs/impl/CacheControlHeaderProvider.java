@@ -31,6 +31,7 @@ import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 
@@ -224,7 +225,10 @@ public class CacheControlHeaderProvider implements HeaderDelegate<CacheControl> 
         if (message != null) {
             Object sepProperty = message.getContextualProperty(CACHE_CONTROL_SEPARATOR_PROPERTY);
             if (sepProperty != null) {
-                separator = sepProperty.toString();
+                separator = sepProperty.toString().trim();
+                if (separator.length() != 1) {
+                    throw ExceptionUtils.toInternalServerErrorException(null, null);
+                }
             }
         }
         return separator;

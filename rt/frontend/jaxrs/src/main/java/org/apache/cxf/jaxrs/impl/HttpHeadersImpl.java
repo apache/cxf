@@ -42,6 +42,7 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
@@ -123,8 +124,14 @@ public class HttpHeadersImpl implements HttpHeaders {
     private String getCookieSeparator() {
         Object cookiePropValue = message.getContextualProperty(COOKIE_SEPARATOR_PROPERTY);
         if (cookiePropValue != null) {
-            return COOKIE_SEPARATOR_CRLF.equals(cookiePropValue.toString()) 
-                ? "\r\n" : cookiePropValue.toString();
+            String separator = cookiePropValue.toString().trim();
+            if (COOKIE_SEPARATOR_CRLF.equals(separator)) {
+                return "\r\n";
+            }
+            if (separator.length() != 1) {
+                throw ExceptionUtils.toInternalServerErrorException(null, null);
+            }
+            return separator;
         } else {
             return DEFAULT_COOKIE_SEPARATOR;
         }

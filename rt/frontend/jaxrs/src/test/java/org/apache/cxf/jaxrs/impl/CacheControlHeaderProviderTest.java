@@ -22,6 +22,7 @@ package org.apache.cxf.jaxrs.impl;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.core.CacheControl;
 
 import org.apache.cxf.message.Message;
@@ -75,6 +76,18 @@ public class CacheControlHeaderProviderTest extends Assert {
         assertEquals("foo", c.getPrivateFields().get(0));
         assertEquals("bar", c.getNoCacheFields().get(0));
         
+    }
+    
+    @Test(expected = InternalServerErrorException.class)
+    public void testInvalidSeparator() {
+        CacheControlHeaderProvider cp = new CacheControlHeaderProvider() {
+            protected Message getCurrentMessage() {
+                Message m = new MessageImpl();
+                m.put(CacheControlHeaderProvider.CACHE_CONTROL_SEPARATOR_PROPERTY, "(e+)+");
+                return m;
+            }
+        };
+        cp.fromString("no-store");
     }
     
     
