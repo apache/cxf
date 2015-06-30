@@ -77,14 +77,6 @@
                 <enabled>false</enabled>
             </releases>
         </repository>
-        <!-- needed for opensaml -->
-        <repository>
-            <id>shib-release</id>
-            <url>https://build.shibboleth.net/nexus/content/groups/public</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
     </repositories>
     <pluginRepositories>
         <pluginRepository>
