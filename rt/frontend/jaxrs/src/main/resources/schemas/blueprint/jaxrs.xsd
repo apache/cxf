@@ -68,6 +68,7 @@
           <xsd:attribute name="serviceName" type="xsd:QName"/>
           <xsd:attribute name="docLocation" type="xsd:string"/>
           <xsd:attribute name="publishedEndpointUrl" type="xsd:string"/>
+          <xsd:attribute name="publish" type="xsd:boolean"/>
         </xsd:extension>
       </xsd:complexContent>
     </xsd:complexType>
