@@ -73,6 +73,8 @@ public class JAXRSServerFactoryBeanDefinitionParser extends SimpleBPBeanDefiniti
         } else if ("serviceName".equals(name)) {
             QName q = parseQName(e, val);
             bean.addProperty(name, createValue(context, q));
+        } else if ("publish".equals(name)) {
+            mapToProperty(bean, "start", val, context);
         } else {
             mapToProperty(bean, name, val, context);
         }
