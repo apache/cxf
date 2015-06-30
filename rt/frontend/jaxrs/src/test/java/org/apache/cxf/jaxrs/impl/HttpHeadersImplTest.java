@@ -28,6 +28,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -420,6 +421,7 @@ public class HttpHeadersImplTest extends Assert {
         assertEquals(1, cookie.getVersion());
     }
     
+    
     @Test
     public void testGetCookiesWithComma() throws Exception {
         
@@ -436,6 +438,21 @@ public class HttpHeadersImplTest extends Assert {
         assertEquals(2, cookies.size());
         assertEquals("b", cookies.get("a").getValue());
         assertEquals("d", cookies.get("c").getValue());
+    }
+    
+    @Test(expected = InternalServerErrorException.class)
+    public void testInvalidCookieSeparator() throws Exception {
+        
+        Message m = new MessageImpl();
+        Exchange ex = new ExchangeImpl();
+        ex.setInMessage(m);
+        ex.put("org.apache.cxf.http.cookie.separator", "(e+)+");
+        m.setExchange(ex);
+        MetadataMap<String, String> headers = createHeaders();
+        headers.putSingle(HttpHeaders.COOKIE, "a=b,c=d");
+        m.put(Message.PROTOCOL_HEADERS, headers);
+        HttpHeaders h = new HttpHeadersImpl(m);
+        h.getCookies();
     }
     
     @Test
