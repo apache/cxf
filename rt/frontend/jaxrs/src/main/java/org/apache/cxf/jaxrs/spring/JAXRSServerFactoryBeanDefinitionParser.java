@@ -81,6 +81,8 @@ public class JAXRSServerFactoryBeanDefinitionParser extends AbstractBeanDefiniti
             bean.addPropertyValue("basePackages", ClasspathScanner.parsePackages(val));
         } else if ("serviceAnnotation".equals(name)) {
             bean.addPropertyValue("serviceAnnotation", val);
+        } else if ("publish".equals(name)) {
+            mapToProperty(bean, "start", val);
         } else {
             mapToProperty(bean, name, val);
         }
