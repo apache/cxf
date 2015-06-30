@@ -222,7 +222,7 @@ public class JweJsonProducerTest extends Assert {
                                          final byte[] iv,
                                          final byte[] cek,
                                          boolean canBeFlat) throws Exception {
-        if (contentEncryptionAlgo.equals(AlgorithmUtils.A128GCM_ALGO) && SKIP_AES_GCM_TESTS) {
+        if (contentEncryptionAlgo.equals(ContentAlgorithm.A128GCM) && SKIP_AES_GCM_TESTS) {
             return null;
         }
         JweHeaders headers = new JweHeaders(KeyAlgorithm.A128KW,
