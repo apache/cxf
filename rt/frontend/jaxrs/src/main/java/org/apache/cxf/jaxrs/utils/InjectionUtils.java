@@ -1010,12 +1010,15 @@ public final class InjectionUtils {
         } else if (SERVLET_CONFIG_CLASS_NAME.equals(name)) {
             proxyClassName = "org.apache.cxf.jaxrs.impl.tl.ThreadLocalServletConfig";
         }
-        try {
-            return (ThreadLocalProxy<?>)ClassLoaderUtils.loadClass(proxyClassName, InjectionUtils.class)
-                .newInstance();
-        } catch (Throwable t) {
-            throw new RuntimeException(t);
+        if (proxyClassName != null) {
+            try {
+                return (ThreadLocalProxy<?>)ClassLoaderUtils.loadClass(proxyClassName, InjectionUtils.class)
+                    .newInstance();
+            } catch (Throwable t) {
+                throw new RuntimeException(t);
+            }
         }
+        return null;
     }
     
     public static Method getGetterFromSetter(Method setter) throws Exception {
