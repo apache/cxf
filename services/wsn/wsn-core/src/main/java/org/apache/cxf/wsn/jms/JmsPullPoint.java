@@ -35,6 +35,7 @@ import javax.jms.Session;
 import javax.jms.TextMessage;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.cxf.common.logging.LogUtils;
@@ -124,7 +125,11 @@ public class JmsPullPoint extends AbstractPullPoint {
                 StringReader reader = new StringReader(txtMsg.getText());
                 XMLStreamReader xreader = StaxUtils.createXMLStreamReader(reader);
                 Notify notify = (Notify) jaxbContext.createUnmarshaller().unmarshal(xreader);
-                reader.close();
+                try {
+                    xreader.close();
+                } catch (XMLStreamException e) {
+                    //ignoreable
+                }
                 messages.addAll(notify.getNotificationMessage());
             }
             return messages;

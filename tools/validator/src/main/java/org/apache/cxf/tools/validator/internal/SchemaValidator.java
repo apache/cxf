@@ -107,6 +107,7 @@ public class SchemaValidator extends AbstractDefinitionValidator {
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         try {
             docFactory.setNamespaceAware(true);
+            docFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
             docBuilder = docFactory.newDocumentBuilder();
         } catch (ParserConfigurationException e) {
             throw new ToolException(e);
@@ -124,7 +125,7 @@ public class SchemaValidator extends AbstractDefinitionValidator {
         throws SAXException, IOException {
 
         SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-
+        sf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
         SchemaResourceResolver resourceResolver = new SchemaResourceResolver();
 
         sf.setResourceResolver(resourceResolver);
@@ -156,6 +157,7 @@ public class SchemaValidator extends AbstractDefinitionValidator {
     private Schema createSchema(String[] schemas) throws SAXException, IOException {
 
         SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        sf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
 
         SchemaResourceResolver resourceResolver = new SchemaResourceResolver();
 
@@ -181,6 +183,7 @@ public class SchemaValidator extends AbstractDefinitionValidator {
         try {
             SAXParserFactory saxFactory = SAXParserFactory.newInstance();
             saxFactory.setFeature("http://xml.org/sax/features/namespaces", true);
+            saxFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
             saxParser = saxFactory.newSAXParser();
 
             if (defaultSchemas != null) {
