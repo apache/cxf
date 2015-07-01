@@ -218,6 +218,7 @@ public class KerberosAuthenticationFilter implements ContainerRequestFilter {
     }
     
     public static class KerberosPrincipal extends SimplePrincipal {
+        private static final long serialVersionUID = 1L;
         private String complexName;
         public KerberosPrincipal(String simpleName, String complexName) {
             super(simpleName);
