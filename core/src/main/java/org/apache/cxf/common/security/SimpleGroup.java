@@ -31,6 +31,7 @@ import java.util.Set;
  */
 public class SimpleGroup extends SimplePrincipal implements Group {
     
+    private static final long serialVersionUID = 1L;
     private Set<Principal> members = new HashSet<Principal>();
     
     public SimpleGroup(String groupName) {

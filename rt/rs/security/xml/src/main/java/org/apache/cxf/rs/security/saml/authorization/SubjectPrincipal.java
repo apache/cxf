@@ -22,6 +22,8 @@ import org.apache.cxf.common.security.SimplePrincipal;
 import org.apache.cxf.rs.security.saml.assertion.Subject;
 
 public class SubjectPrincipal extends SimplePrincipal {
+    private static final long serialVersionUID = 1L;
+    
     private Subject subject;
     public SubjectPrincipal(String principalName, Subject subject) {
         super(principalName);
