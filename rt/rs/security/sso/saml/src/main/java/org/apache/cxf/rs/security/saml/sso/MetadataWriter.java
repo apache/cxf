@@ -19,8 +19,6 @@
 
 package org.apache.cxf.rs.security.saml.sso;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
@@ -46,13 +44,13 @@ import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
 import javax.xml.crypto.dsig.keyinfo.X509Data;
 import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
 import javax.xml.crypto.dsig.spec.TransformParameterSpec;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Document;
 
+import org.apache.cxf.helpers.LoadingByteArrayOutputStream;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.utils.Base64;
 import org.slf4j.Logger;
@@ -61,14 +59,8 @@ import org.slf4j.LoggerFactory;
 public class MetadataWriter {
     
     private static final Logger LOG = LoggerFactory.getLogger(MetadataWriter.class);
-    
-    private static final XMLOutputFactory XML_OUTPUT_FACTORY = XMLOutputFactory.newInstance();
-    private static final DocumentBuilderFactory DOC_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
     private static final XMLSignatureFactory XML_SIGNATURE_FACTORY = XMLSignatureFactory.getInstance("DOM");
     
-    static {
-        DOC_BUILDER_FACTORY.setNamespaceAware(true);
-    }
 
     //CHECKSTYLE:OFF
     public Document getMetaData(
@@ -80,9 +72,9 @@ public class MetadataWriter {
         boolean wantRequestsSigned
     ) throws Exception {
 
-        ByteArrayOutputStream bout = new ByteArrayOutputStream(4096);
+        LoadingByteArrayOutputStream bout = new LoadingByteArrayOutputStream(4096);
         Writer streamWriter = new OutputStreamWriter(bout, "UTF-8");
-        XMLStreamWriter writer = XML_OUTPUT_FACTORY.createXMLStreamWriter(streamWriter);
+        XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(streamWriter);
 
         writer.writeStartDocument("UTF-8", "1.0");
 
@@ -112,12 +104,12 @@ public class MetadataWriter {
             LOG.debug("***************** unsigned ****************");
         }
 
-        InputStream is = new ByteArrayInputStream(bout.toByteArray());
+        InputStream is = bout.createInputStream();
 
         if (signingKey != null) {
             return signMetaInfo(signingCert, signingKey, is, referenceID);
         }
-        return DOC_BUILDER_FACTORY.newDocumentBuilder().parse(is);
+        return StaxUtils.read(is);
     }
     
     private void writeSAMLMetadata(
@@ -248,7 +240,7 @@ public class MetadataWriter {
         KeyInfo ki = kif.newKeyInfo(Collections.singletonList(xd));
 
         // Instantiate the document to be signed.
-        Document doc = DOC_BUILDER_FACTORY.newDocumentBuilder().parse(metaInfo);
+        Document doc = StaxUtils.read(metaInfo);
 
         // Create a DOMSignContext and specify the RSA PrivateKey and
         // location of the resulting XMLSignature's parent element.

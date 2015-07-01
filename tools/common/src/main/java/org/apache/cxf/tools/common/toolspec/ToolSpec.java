@@ -27,6 +27,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.xml.XMLConstants;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -210,7 +212,9 @@ public class ToolSpec {
     }
 
     public void transform(InputStream stylesheet, OutputStream out) throws TransformerException {
-        Transformer trans = TransformerFactory.newInstance().newTransformer(new StreamSource(stylesheet));
+        TransformerFactory factory = TransformerFactory.newInstance();
+        factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
+        Transformer trans = factory.newTransformer(new StreamSource(stylesheet));
         trans.transform(new DOMSource(doc), new StreamResult(out));
     }
 
