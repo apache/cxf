@@ -50,9 +50,6 @@
                 </constructor-arg>
             </bean>
         </jaxws:inInterceptors>
-        <jaxws:properties>
-            <entry key="mtom-enabled" value="true"/>
-        </jaxws:properties>
     </jaxws:client>
     
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSignedMTOMSwAPort" createdFromAPI="true">
@@ -69,7 +66,6 @@
                         <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
                     </map>
                 </constructor-arg>
-                <property name="allowMTOM" value="true"/>
             </bean>
         </jaxws:outInterceptors>
         <jaxws:inInterceptors>

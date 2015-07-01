@@ -30,7 +30,7 @@ import java.util.logging.Logger;
 import javax.xml.soap.SOAPMessage;
 
 import org.w3c.dom.Document;
-
+import org.apache.cxf.attachment.AttachmentUtil;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.SoapVersion;
@@ -80,33 +80,14 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
         setProperties(props);
     }
     
+    @Deprecated
     public boolean isAllowMTOM() {
         return mtomEnabled;
     }
     
-    /**
-     * Enable or disable mtom with WS-Security. MTOM is disabled if we are signing or
-     * encrypting the message Body, as otherwise attachments would not get encrypted
-     * or be part of the signature.
-     * @param mtomEnabled
-     */
+    @Deprecated
     public void setAllowMTOM(boolean allowMTOM) {
         this.mtomEnabled = allowMTOM;
-    }
-    
-    protected void handleSecureMTOM(SoapMessage mc, List<HandlerAction> actions) {
-        if (mtomEnabled) {
-            return;
-        }
-        
-        //must turn off mtom when using WS-Sec so binary is inlined so it can
-        //be properly signed/encrypted/etc...
-        String mtomKey = org.apache.cxf.message.Message.MTOM_ENABLED;
-        if (mc.get(mtomKey) == Boolean.TRUE) {
-            LOG.warning("MTOM will be disabled as the WSS4JOutInterceptor.mtomEnabled property"
-                    + " is set to false");
-        }
-        mc.put(mtomKey, Boolean.FALSE);
     }
 
     @Override
@@ -213,8 +194,12 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
                 reqData.setMsgContext(mc);
                 reqData.setAttachmentCallbackHandler(new AttachmentCallbackHandler(mc));
                 
-                handleSecureMTOM(mc, actions);
-    
+                if (AttachmentUtil.isMtomEnabled(mc) && hasAttachments(mc)) {
+                    LOG.warning("MTOM is enabled with WS-Security. Please note that if an attachment is"
+                        + "referenced in the SOAP Body, only the reference will be signed and not the"
+                        + "SOAP Body!");
+                }
+                
                 /*
                  * For every action we need a username, so get this now. The
                  * username defined in the deployment descriptor takes precedence.
@@ -304,6 +289,11 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
 
         public void handleFault(SoapMessage message) {
             //nothing
+        }
+        
+        private boolean hasAttachments(SoapMessage mc) {
+            final Collection<org.apache.cxf.message.Attachment> attachments = mc.getAttachments();
+            return attachments != null && attachments.size() > 0;
         }
         
         private void configureActions(SoapMessage mc, boolean doDebug,
