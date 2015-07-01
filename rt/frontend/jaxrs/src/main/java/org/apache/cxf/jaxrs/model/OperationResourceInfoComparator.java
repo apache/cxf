@@ -22,10 +22,12 @@ package org.apache.cxf.jaxrs.model;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.MediaType;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.jaxrs.ext.DefaultMethod;
 import org.apache.cxf.jaxrs.ext.ResourceComparator;
@@ -33,7 +35,7 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 
 public class OperationResourceInfoComparator implements Comparator<OperationResourceInfo> {
-    
+    private static final Logger LOG = LogUtils.getL7dLogger(JAXRSUtils.class);
     private String httpMethod;
     private boolean getMethod;
     private Message message;
@@ -117,7 +119,14 @@ public class OperationResourceInfoComparator implements Comparator<OperationReso
                 result = -1;
             } 
         }
-        
+        if (result == 0) {
+            String m1Name = 
+                e1.getClassResourceInfo().getServiceClass().getName() + "#" + e1.getMethodToInvoke().getName();
+            String m2Name = 
+                e2.getClassResourceInfo().getServiceClass().getName() + "#" + e2.getMethodToInvoke().getName();
+            LOG.warning("Both " + m1Name + " and " + m2Name + " are equal candidates for handling the current request"
+                        + " which can lead to unpredictable results");
+        }
         return result;
     }
 

@@ -47,6 +47,7 @@ import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.provider.FormEncodingProvider;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 
 public final class FormUtils {
@@ -154,7 +155,8 @@ public final class FormUtils {
                                              javax.servlet.http.HttpServletRequest request) {
         if (!StringUtils.isEmpty(postBody)) {
             populateMapFromString(params, m, postBody, enc, decode);
-        } else if (request != null) {
+        } else if (request != null 
+            && MessageUtils.getContextualBoolean(m, "set.form.parameters.from.http.parameters", true)) {
             for (Enumeration<String> en = request.getParameterNames(); en.hasMoreElements();) {
                 String paramName = en.nextElement();
                 String[] values = request.getParameterValues(paramName);
