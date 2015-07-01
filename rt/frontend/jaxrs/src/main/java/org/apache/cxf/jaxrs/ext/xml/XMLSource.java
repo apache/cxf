@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -39,13 +40,12 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
+import javax.xml.xpath.XPathFactoryConfigurationException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import org.xml.sax.InputSource;
 
 import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.helpers.CastUtils;
@@ -283,16 +283,33 @@ public class XMLSource {
     
     
     private Object evaluate(String expression, Map<String, String> namespaces, QName type) {
-        XPath xpath = XPathFactory.newInstance().newXPath();
-        xpath.setNamespaceContext(new NamespaceContextImpl(namespaces));
+        XPathFactory factory = XPathFactory.newInstance();
         try {
-            if (stream == null) {
-                return xpath.compile(expression).evaluate(doc, type);
-            } else {
-                return xpath.compile(expression).evaluate(new InputSource(stream), type);
+            factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
+        } catch (XPathFactoryConfigurationException e) {
+            throw new RuntimeException(e);
+        }
+        XPath xpath = factory.newXPath();
+        xpath.setNamespaceContext(new NamespaceContextImpl(namespaces));
+        boolean releaseDoc = false;
+        try {
+            if (stream != null) {
+                //xalan xpath evaluate parses to a DOM via a DocumentBuilderFactory, but doesn't 
+                //set the SecureProcessing on that. Since a DOM is always created, might as well 
+                //do it via stax and avoid the service factory performance hits that the 
+                //DocumentBuilderFactory will entail as well as get the extra security 
+                //that woodstox provides
+                setBuffering();
+                releaseDoc = true;
             }
+            return xpath.compile(expression).evaluate(doc, type);
         } catch (XPathExpressionException ex) {
             throw new IllegalArgumentException("Illegal XPath expression '" + expression + "'", ex);
+        } finally {
+            if (releaseDoc) {
+                //don't need to maintain the doc
+                doc = null;
+            }
         }
     }
     

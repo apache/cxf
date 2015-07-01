@@ -61,6 +61,7 @@ public class JwtAuthenticationFilter extends AbstractJoseJwtConsumer implements 
         this.jweOnly = jweOnly;
     }
     public static class JwtPrincipal extends SimplePrincipal {
+        private static final long serialVersionUID = 1L;
         private JwtToken jwt;
         public JwtPrincipal(JwtToken jwt) {
             super(jwt.getClaims().getSubject());
