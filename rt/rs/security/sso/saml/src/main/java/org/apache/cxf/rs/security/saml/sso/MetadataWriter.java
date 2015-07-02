@@ -19,11 +19,14 @@
 
 package org.apache.cxf.rs.security.saml.sso;
 
+<<<<<<< HEAD
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+=======
+>>>>>>> fdab617... Switch to use W3CDOMStreamWriter for SAML SSO Metadata
 import java.net.MalformedURLException;
 import java.security.Key;
 import java.security.cert.CertificateEncodingException;
@@ -53,6 +56,11 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Document;
 
+<<<<<<< HEAD
+=======
+import org.apache.cxf.staxutils.W3CDOMStreamWriter;
+import org.apache.wss4j.common.util.DOM2Writer;
+>>>>>>> fdab617... Switch to use W3CDOMStreamWriter for SAML SSO Metadata
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.utils.Base64;
 import org.slf4j.Logger;
@@ -80,9 +88,13 @@ public class MetadataWriter {
         boolean wantRequestsSigned
     ) throws Exception {
 
+<<<<<<< HEAD
         ByteArrayOutputStream bout = new ByteArrayOutputStream(4096);
         Writer streamWriter = new OutputStreamWriter(bout, "UTF-8");
         XMLStreamWriter writer = XML_OUTPUT_FACTORY.createXMLStreamWriter(streamWriter);
+=======
+        W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
+>>>>>>> fdab617... Switch to use W3CDOMStreamWriter for SAML SSO Metadata
 
         writer.writeStartDocument("UTF-8", "1.0");
 
@@ -102,22 +114,29 @@ public class MetadataWriter {
 
         writer.writeEndDocument();
 
-        streamWriter.flush();
-        bout.flush();
+        writer.close();
 
         if (LOG.isDebugEnabled()) {
-            String out = new String(bout.toByteArray());
+            String out = DOM2Writer.nodeToString(writer.getDocument());
             LOG.debug("***************** unsigned ****************");
             LOG.debug(out);
             LOG.debug("***************** unsigned ****************");
         }
 
+<<<<<<< HEAD
         InputStream is = new ByteArrayInputStream(bout.toByteArray());
+=======
+        Document doc = writer.getDocument();
+>>>>>>> fdab617... Switch to use W3CDOMStreamWriter for SAML SSO Metadata
 
         if (signingKey != null) {
-            return signMetaInfo(signingCert, signingKey, is, referenceID);
+            return signMetaInfo(signingCert, signingKey, doc, referenceID);
         }
+<<<<<<< HEAD
         return DOC_BUILDER_FACTORY.newDocumentBuilder().parse(is);
+=======
+        return doc;
+>>>>>>> fdab617... Switch to use W3CDOMStreamWriter for SAML SSO Metadata
     }
     
     private void writeSAMLMetadata(
@@ -202,7 +221,7 @@ public class MetadataWriter {
     }
 
     private static Document signMetaInfo(X509Certificate signingCert, Key signingKey, 
-                                         InputStream metaInfo, String referenceID
+                                         Document doc, String referenceID
     ) throws Exception {
         String signatureMethod = null;
         if ("SHA1withDSA".equals(signingCert.getSigAlgName())) {
@@ -247,9 +266,12 @@ public class MetadataWriter {
         X509Data xd = kif.newX509Data(x509Content);
         KeyInfo ki = kif.newKeyInfo(Collections.singletonList(xd));
 
+<<<<<<< HEAD
         // Instantiate the document to be signed.
         Document doc = DOC_BUILDER_FACTORY.newDocumentBuilder().parse(metaInfo);
 
+=======
+>>>>>>> fdab617... Switch to use W3CDOMStreamWriter for SAML SSO Metadata
         // Create a DOMSignContext and specify the RSA PrivateKey and
         // location of the resulting XMLSignature's parent element.
         //DOMSignContext dsc = new DOMSignContext(keyEntry.getPrivateKey(), doc.getDocumentElement());
