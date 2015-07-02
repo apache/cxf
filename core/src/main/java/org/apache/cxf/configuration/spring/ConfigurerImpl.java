@@ -21,6 +21,8 @@ package org.apache.cxf.configuration.spring;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -117,6 +119,10 @@ public class ConfigurerImpl extends BeanConfigurerSupport
                     }
                 }
             }
+        }
+        Comparator<MatcherHolder> comp = new MatcherHolderComparator();
+        for (Map.Entry<String, List<MatcherHolder>> entry : wildCardBeanDefinitions.entrySet()) {
+            Collections.sort(entry.getValue(), comp);
         }
     }
 
@@ -277,5 +283,17 @@ public class ConfigurerImpl extends BeanConfigurerSupport
     
     protected Set<ApplicationContext> getAppContexts() {
         return appContexts;
+    }
+    private static class MatcherHolderComparator implements Comparator<MatcherHolder> {
+
+        @Override
+        public int compare(MatcherHolder mh1, MatcherHolder mh2) {
+            Integer literalCharsLen1 = mh1.wildCardId.replaceAll("\\*", "").length();
+            Integer literalCharsLen2 = mh2.wildCardId.replaceAll("\\*", "").length();
+            // The expression with more literal characters should end up on the top of the list
+            return literalCharsLen1.compareTo(literalCharsLen2) * -1;
+            
+        }
+        
     }
 }
