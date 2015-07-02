@@ -33,6 +33,7 @@
     <properties>
         <cxf.osgi.import>
             net.sf.ehcache*;resolution:=optional;version="[2.5, 3.0.0)",
+            javax.servlet*;version="${cxf.osgi.javax.servlet.version}"
         </cxf.osgi.import>
     </properties>
     <dependencies>
