@@ -155,7 +155,8 @@
         <cxf.spring.osgi.version>1.2.1</cxf.spring.osgi.version>
         <cxf.spring.ldap.version>1.3.1.RELEASE</cxf.spring.ldap.version>
         <cxf.spring.mock>spring-test</cxf.spring.mock>
-        <cxf.swagger.version>1.3.11</cxf.swagger.version>
+        <cxf.swagger.version>1.3.12</cxf.swagger.version>
+        <cxf.swagger2.version>1.5.0</cxf.swagger2.version>
         <cxf.velocity.version>1.7</cxf.velocity.version>
         <cxf.woodstox.core.version>4.4.1</cxf.woodstox.core.version>
         <cxf.woodstox.stax2-api.version>3.1.4</cxf.woodstox.stax2-api.version>
@@ -582,7 +583,7 @@
                             ${cxf.osgi.dynamic.import}
                         </DynamicImport-Package>
                         <Export-Service>
-                           	${cxf.export.service}
+                            ${cxf.export.service}
                         </Export-Service>
                         <Bundle-Activator>${cxf.bundle.activator}</Bundle-Activator>
                     </instructions>
@@ -1268,10 +1269,10 @@
                 <version>${cxf.spring.security.version}</version>
             </dependency>
             <dependency>
-			    <groupId>org.apache.olingo</groupId>
-			    <artifactId>olingo-odata2-core</artifactId>
-			    <version>${cxf.olingo.version}</version>
-			</dependency>
+                <groupId>org.apache.olingo</groupId>
+                <artifactId>olingo-odata2-core</artifactId>
+                <version>${cxf.olingo.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-core</artifactId>
@@ -1802,17 +1803,21 @@
                 <artifactId>swagger-jaxrs_2.10</artifactId>
                 <version>${cxf.swagger.version}</version>
             </dependency>
-			<dependency>
+            <dependency>
+                <groupId>io.swagger</groupId>
+                <artifactId>swagger-jaxrs</artifactId>
+                <version>${cxf.swagger2.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.apache.tika</groupId>
                 <artifactId>tika-core</artifactId>
                 <version>${cxf.tika.version}</version>
-			</dependency>
-			<dependency>
+            </dependency>
+            <dependency>
                 <groupId>org.apache.tika</groupId>
                 <artifactId>tika-parsers</artifactId>
                 <version>${cxf.tika.version}</version>
 			</dependency>
-
         </dependencies>
     </dependencyManagement>
     <profiles>
