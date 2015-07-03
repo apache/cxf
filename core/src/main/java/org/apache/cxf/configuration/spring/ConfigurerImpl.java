@@ -21,13 +21,11 @@ package org.apache.cxf.configuration.spring;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -61,15 +59,22 @@ public class ConfigurerImpl extends BeanConfigurerSupport
 
     private Set<ApplicationContext> appContexts;
     private final Map<String, List<MatcherHolder>> wildCardBeanDefinitions
-        = new HashMap<String, List<MatcherHolder>>();
+        = new TreeMap<String, List<MatcherHolder>>();
     private BeanFactory beanFactory;
     
-    static class MatcherHolder {
+    static class MatcherHolder implements Comparable<MatcherHolder> {
         Matcher matcher;
         String wildCardId;
         public MatcherHolder(String orig, Matcher matcher) {
             wildCardId = orig;
             this.matcher = matcher;
+        }
+        @Override
+        public int compareTo(MatcherHolder mh) {
+            Integer literalCharsLen1 = this.wildCardId.replaceAll("\\*", "").length();
+            Integer literalCharsLen2 = mh.wildCardId.replaceAll("\\*", "").length();
+            // The expression with more literal characters should end up on the top of the list
+            return literalCharsLen1.compareTo(literalCharsLen2) * -1;
         }
     }
     
@@ -119,10 +124,6 @@ public class ConfigurerImpl extends BeanConfigurerSupport
                     }
                 }
             }
-        }
-        Comparator<MatcherHolder> comp = new MatcherHolderComparator();
-        for (Map.Entry<String, List<MatcherHolder>> entry : wildCardBeanDefinitions.entrySet()) {
-            Collections.sort(entry.getValue(), comp);
         }
     }
 
@@ -284,16 +285,5 @@ public class ConfigurerImpl extends BeanConfigurerSupport
     protected Set<ApplicationContext> getAppContexts() {
         return appContexts;
     }
-    private static class MatcherHolderComparator implements Comparator<MatcherHolder> {
-
-        @Override
-        public int compare(MatcherHolder mh1, MatcherHolder mh2) {
-            Integer literalCharsLen1 = mh1.wildCardId.replaceAll("\\*", "").length();
-            Integer literalCharsLen2 = mh2.wildCardId.replaceAll("\\*", "").length();
-            // The expression with more literal characters should end up on the top of the list
-            return literalCharsLen1.compareTo(literalCharsLen2) * -1;
-            
-        }
-        
-    }
+    
 }
