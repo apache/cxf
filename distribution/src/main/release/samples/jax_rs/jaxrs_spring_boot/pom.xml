@@ -102,7 +102,7 @@
 			   <groupId>org.springframework.boot</groupId>
 			   <artifactId>spring-boot-maven-plugin</artifactId>
                            <configuration>
-	 	               <mainClass>sample.rs.service.SampleRestWsApplication</mainClass>
+	 	               <mainClass>sample.rs.service.SampleRestWSApplication</mainClass>
         		   </configuration>  
 			</plugin>
                         <plugin>

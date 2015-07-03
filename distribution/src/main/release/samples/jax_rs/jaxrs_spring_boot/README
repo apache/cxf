@@ -10,7 +10,7 @@ $ mvn spring-boot:run
 ----
 
 http://localhost:8080/services/helloservice/sayHello/ApacheCxfUser will now display the output in the browser
-like "Hello Elan, Welcome to CXF RS Spring Boot World!!!"
+like "Hello ApacheCxfUser, Welcome to CXF RS Spring Boot World!!!"
 
 To run the client from a command line open a new terminal window and run:
 

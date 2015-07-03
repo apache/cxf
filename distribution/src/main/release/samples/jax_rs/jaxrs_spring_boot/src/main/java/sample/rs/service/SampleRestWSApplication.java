@@ -20,6 +20,7 @@ package sample.rs.service;
 import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
+import org.apache.cxf.jaxrs.spring.JaxRsConfig;
 import org.apache.cxf.transport.servlet.CXFServlet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -30,11 +31,10 @@ import org.springframework.boot.context.web.SpringBootServletInitializer;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.ImportResource;
+import org.springframework.context.annotation.Import;
 
-@Configuration
 @EnableAutoConfiguration
-@ImportResource({ "classpath:META-INF/cxf/cxf.xml" })
+@Import(JaxRsConfig.class)
 public class SampleRestWSApplication extends SpringBootServletInitializer {
  
     @Autowired
