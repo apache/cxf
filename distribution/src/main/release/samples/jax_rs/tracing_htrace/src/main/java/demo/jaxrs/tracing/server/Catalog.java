@@ -20,15 +20,11 @@
 package demo.jaxrs.tracing.server;
 
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import javax.json.Json;
 import javax.json.JsonArray;
-import javax.json.JsonArrayBuilder;
 import javax.json.JsonObject;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
@@ -45,10 +41,18 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hbase.HBaseConfiguration;
+
 @Path("/catalog")
 public class Catalog {
     private final ExecutorService executor = Executors.newFixedThreadPool(2);
-    private ConcurrentMap<String, String> books = new ConcurrentHashMap<>();
+    private final CatalogStore store;
+    
+    public Catalog() throws IOException {
+        final Configuration configuration = HBaseConfiguration.create();
+        store = new CatalogStore(configuration, "books");
+    }
     
     @POST
     @Produces(MediaType.APPLICATION_JSON)
@@ -62,40 +66,28 @@ public class Catalog {
     
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public JsonArray getBooks() {
-        final JsonArrayBuilder builder = Json.createArrayBuilder();
-        
-        for (final Map.Entry<String, String> entry: books.entrySet()) {
-            builder.add(Json.createObjectBuilder()
-                .add("id", entry.getKey())
-                .add("title", entry.getValue())
-            );
-        }
-        
-        return builder.build();
+    public JsonArray getBooks() throws IOException {
+        return store.scan();
     }
     
     @GET
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public JsonObject getBook(@PathParam("id") final String id) {
-        final String title = books.get(id);
+    public JsonObject getBook(@PathParam("id") final String id) throws IOException {
+        final JsonObject book = store.get(id);
         
-        if (title == null) {
+        if (book == null) {
             throw new NotFoundException("Book with does not exists: " + id);
         }
         
-        return Json.createObjectBuilder()
-            .add("id", id)
-            .add("title", title)
-            .build();
+        return book;
     }
     
     @DELETE
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response delete(@PathParam("id") final String id) {
-        if (books.remove(id) == null) {
+    public Response delete(@PathParam("id") final String id) throws IOException {
+        if (!store.remove(id)) {
             throw new NotFoundException("Book with does not exists: " + id);
         }
         
