@@ -27,6 +27,7 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
 import org.apache.cxf.rs.security.jose.JoseUtils;
+import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 
 public class JwsCompactConsumer {
@@ -112,16 +113,16 @@ public class JwsCompactConsumer {
     public boolean verifySignatureWith(JsonWebKey key) {
         return verifySignatureWith(JwsUtils.getSignatureVerifier(key));
     }
-    public boolean verifySignatureWith(JsonWebKey key, String algo) {
+    public boolean verifySignatureWith(JsonWebKey key, SignatureAlgorithm algo) {
         return verifySignatureWith(JwsUtils.getSignatureVerifier(key, algo));
     }
-    public boolean verifySignatureWith(X509Certificate cert, String algo) {
+    public boolean verifySignatureWith(X509Certificate cert, SignatureAlgorithm algo) {
         return verifySignatureWith(JwsUtils.getPublicKeySignatureVerifier(cert, algo));
     }
-    public boolean verifySignatureWith(PublicKey key, String algo) {
+    public boolean verifySignatureWith(PublicKey key, SignatureAlgorithm algo) {
         return verifySignatureWith(JwsUtils.getPublicKeySignatureVerifier(key, algo));
     }
-    public boolean verifySignatureWith(byte[] key, String algo) {
+    public boolean verifySignatureWith(byte[] key, SignatureAlgorithm algo) {
         return verifySignatureWith(JwsUtils.getHmacSignatureVerifier(key, algo));
     }
     public boolean validateCriticalHeaders() {

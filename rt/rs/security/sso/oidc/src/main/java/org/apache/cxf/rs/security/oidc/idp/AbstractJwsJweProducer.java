@@ -23,7 +23,9 @@ import java.security.interfaces.RSAPublicKey;
 
 import javax.crypto.SecretKey;
 
-import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
+import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
+import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
+import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jwe.JweEncryptionProvider;
 import org.apache.cxf.rs.security.jose.jwe.JweUtils;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
@@ -48,7 +50,7 @@ public abstract class AbstractJwsJweProducer {
         
         if (signWithClientSecret) {
             byte[] hmac = CryptoUtils.decodeSequence(c.getClientSecret());
-            return JwsUtils.getHmacSignatureProvider(hmac, AlgorithmUtils.HMAC_SHA_256_ALGO);
+            return JwsUtils.getHmacSignatureProvider(hmac, SignatureAlgorithm.HS256);
         } else {
             return JwsUtils.loadSignatureProvider(required);
         }
@@ -60,13 +62,13 @@ public abstract class AbstractJwsJweProducer {
         JweEncryptionProvider theEncryptionProvider = null;
         if (encryptWithClientSecret) {
             SecretKey key = CryptoUtils.decodeSecretKey(c.getClientSecret());
-            theEncryptionProvider = JweUtils.getDirectKeyJweEncryption(key, AlgorithmUtils.A128GCM_ALGO);
+            theEncryptionProvider = JweUtils.getDirectKeyJweEncryption(key, ContentAlgorithm.A128GCM);
         } else if (encryptWithClientCertificates) {
             X509Certificate cert = 
                 (X509Certificate)CryptoUtils.decodeCertificate(c.getApplicationCertificates().get(0));
             theEncryptionProvider = JweUtils.createJweEncryptionProvider((RSAPublicKey)cert.getPublicKey(), 
-                                                                         AlgorithmUtils.RSA_OAEP_ALGO, 
-                                                                         AlgorithmUtils.A128GCM_ALGO, 
+                                                                         KeyAlgorithm.RSA_OAEP, 
+                                                                         ContentAlgorithm.A128GCM, 
                                                                          null);
         }
         if (theEncryptionProvider == null) {

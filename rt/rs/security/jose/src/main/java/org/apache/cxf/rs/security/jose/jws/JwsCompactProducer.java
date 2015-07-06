@@ -24,6 +24,7 @@ import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
 import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
+import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 
 public class JwsCompactProducer {
@@ -74,14 +75,17 @@ public class JwsCompactProducer {
         return getUnsignedEncodedJws(detached) + "." + (noSignature ? "" : signature);
     }
     public String signWith(JsonWebKey jwk) {
-        return signWith(JwsUtils.getSignatureProvider(jwk, headers.getAlgorithm()));
+        return signWith(JwsUtils.getSignatureProvider(jwk, 
+                            SignatureAlgorithm.getAlgorithm(headers.getAlgorithm())));
     }
     
     public String signWith(PrivateKey key) {
-        return signWith(JwsUtils.getPrivateKeySignatureProvider(key, headers.getAlgorithm()));
+        return signWith(JwsUtils.getPrivateKeySignatureProvider(key, 
+                                   SignatureAlgorithm.getAlgorithm(headers.getAlgorithm())));
     }
     public String signWith(byte[] key) {
-        return signWith(JwsUtils.getHmacSignatureProvider(key, headers.getAlgorithm()));
+        return signWith(JwsUtils.getHmacSignatureProvider(key, 
+                   SignatureAlgorithm.getAlgorithm(headers.getAlgorithm())));
     }
     
     public String signWith(JwsSignatureProvider signer) {

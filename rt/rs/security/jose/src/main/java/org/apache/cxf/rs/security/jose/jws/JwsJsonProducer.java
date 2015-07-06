@@ -32,6 +32,7 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.rs.security.jose.JoseConstants;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
+import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 public class JwsJsonProducer {
     protected static final Logger LOG = LogUtils.getL7dLogger(JwsJsonProducer.class);
@@ -110,10 +111,10 @@ public class JwsJsonProducer {
     public String signWith(JsonWebKey jwk) {
         return signWith(JwsUtils.getSignatureProvider(jwk));
     }
-    public String signWith(PrivateKey key, String algo) {
+    public String signWith(PrivateKey key, SignatureAlgorithm algo) {
         return signWith(JwsUtils.getPrivateKeySignatureProvider(key, algo));
     }
-    public String signWith(byte[] key, String algo) {
+    public String signWith(byte[] key, SignatureAlgorithm algo) {
         return signWith(JwsUtils.getHmacSignatureProvider(key, algo));
     }
     public String signWith(JwsSignatureProvider signer,

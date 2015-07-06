@@ -25,8 +25,11 @@ import javax.crypto.SecretKey;
 
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
+import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
+import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -70,7 +73,7 @@ public class JweJsonConsumerTest extends Assert {
         final String text = "The true sign of intelligence is not knowledge but imagination.";
         doTestSingleRecipient(text, 
                               JweJsonProducerTest.SINGLE_RECIPIENT_OUTPUT, 
-                              AlgorithmUtils.A128GCM_ALGO, 
+                              ContentAlgorithm.A128GCM, 
                               JweJsonProducerTest.WRAPPER_BYTES1,
                               null);
     }
@@ -79,7 +82,7 @@ public class JweJsonConsumerTest extends Assert {
         final String text = "The true sign of intelligence is not knowledge but imagination.";
         doTestSingleRecipient(text, 
                               JweJsonProducerTest.SINGLE_RECIPIENT_FLAT_OUTPUT, 
-                              AlgorithmUtils.A128GCM_ALGO, 
+                              ContentAlgorithm.A128GCM, 
                               JweJsonProducerTest.WRAPPER_BYTES1,
                               null);
     }
@@ -88,7 +91,7 @@ public class JweJsonConsumerTest extends Assert {
         final String text = "The true sign of intelligence is not knowledge but imagination.";
         doTestSingleRecipient(text, 
                               JweJsonProducerTest.SINGLE_RECIPIENT_DIRECT_OUTPUT, 
-                              AlgorithmUtils.A128GCM_ALGO, 
+                              ContentAlgorithm.A128GCM, 
                               null, 
                               JweJsonProducerTest.CEK_BYTES);
     }
@@ -97,7 +100,7 @@ public class JweJsonConsumerTest extends Assert {
         String text = "Live long and prosper.";
         doTestSingleRecipient(text, 
                               JweJsonProducerTest.SINGLE_RECIPIENT_A128CBCHS256_DIRECT_OUTPUT, 
-                              AlgorithmUtils.A128CBC_HS256_ALGO, 
+                              ContentAlgorithm.A128CBC_HS256, 
                               null,
                               JweCompactReaderWriterTest.CONTENT_ENCRYPTION_KEY_A3);
     }
@@ -106,7 +109,7 @@ public class JweJsonConsumerTest extends Assert {
         String text = "Live long and prosper.";
         doTestSingleRecipient(text, 
                               JweJsonProducerTest.SINGLE_RECIPIENT_A128CBCHS256_OUTPUT, 
-                              AlgorithmUtils.A128CBC_HS256_ALGO, 
+                              ContentAlgorithm.A128CBC_HS256, 
                               Base64UrlUtility.decode(JweCompactReaderWriterTest.KEY_ENCRYPTION_KEY_A3),
                               null);
     }
@@ -116,8 +119,9 @@ public class JweJsonConsumerTest extends Assert {
         
         SecretKey wrapperKey = CryptoUtils.createSecretKeySpec(JweJsonProducerTest.WRAPPER_BYTES1, 
                                                                "AES");
-        JweDecryptionProvider jwe = JweUtils.createJweDecryptionProvider(wrapperKey, AlgorithmUtils.A128KW_ALGO, 
-                                                                         AlgorithmUtils.A128GCM_ALGO);
+        JweDecryptionProvider jwe = JweUtils.createJweDecryptionProvider(wrapperKey, 
+                                                                         KeyAlgorithm.A128KW, 
+                                                                         ContentAlgorithm.A128GCM);
         JweJsonConsumer consumer = new JweJsonConsumer(JweJsonProducerTest.SINGLE_RECIPIENT_ALL_HEADERS_AAD_OUTPUT);
         JweDecryptionOutput out = consumer.decryptWith(jwe);
         assertEquals(text, out.getContentText());
@@ -127,8 +131,9 @@ public class JweJsonConsumerTest extends Assert {
     public void testSingleRecipientAllTypeOfHeadersAndAadModified() {
         SecretKey wrapperKey = CryptoUtils.createSecretKeySpec(JweJsonProducerTest.WRAPPER_BYTES1, 
                                                                "AES");
-        JweDecryptionProvider jwe = JweUtils.createJweDecryptionProvider(wrapperKey, AlgorithmUtils.A128KW_ALGO, 
-                                                                         AlgorithmUtils.A128GCM_ALGO);
+        JweDecryptionProvider jwe = JweUtils.createJweDecryptionProvider(wrapperKey, 
+                                                                         KeyAlgorithm.A128KW, 
+                                                                         ContentAlgorithm.A128GCM);
         JweJsonConsumer consumer = new JweJsonConsumer(SINGLE_RECIPIENT_ALL_HEADERS_AAD_MODIFIED_OUTPUT);
         try {
             consumer.decryptWith(jwe);
@@ -140,13 +145,15 @@ public class JweJsonConsumerTest extends Assert {
     }
     private void doTestSingleRecipient(String text,
                                        String input, 
-                                       String contentEncryptionAlgo,
+                                       ContentAlgorithm contentEncryptionAlgo,
                                        final byte[] wrapperKeyBytes,
                                        final byte[] cek) throws Exception {
         JweDecryptionProvider jwe = null;
         if (wrapperKeyBytes != null) {
             SecretKey wrapperKey = CryptoUtils.createSecretKeySpec(wrapperKeyBytes, "AES");
-            jwe = JweUtils.createJweDecryptionProvider(wrapperKey, AlgorithmUtils.A128KW_ALGO, contentEncryptionAlgo);
+            jwe = JweUtils.createJweDecryptionProvider(wrapperKey, 
+                                                       KeyAlgorithm.A128KW, 
+                                                       contentEncryptionAlgo);
         } else {
             SecretKey cekKey = CryptoUtils.createSecretKeySpec(cek, "AES");
             jwe = JweUtils.getDirectKeyJweDecryption(cekKey, contentEncryptionAlgo);
