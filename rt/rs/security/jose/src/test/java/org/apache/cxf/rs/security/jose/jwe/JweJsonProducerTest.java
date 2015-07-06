@@ -231,7 +231,7 @@ public class JweJsonProducerTest extends Assert {
         if (wrapperKeyBytes == null) {
             headers.asMap().remove("alg");
             SecretKey cekKey = CryptoUtils.createSecretKeySpec(cek, "AES");
-            jwe = JweUtils.getDirectKeyJweEncryption(cekKey, contentEncryptionAlgo.getJwaName());
+            jwe = JweUtils.getDirectKeyJweEncryption(cekKey, contentEncryptionAlgo);
         } else {
             SecretKey wrapperKey = CryptoUtils.createSecretKeySpec(wrapperKeyBytes, "AES");
             jwe = JweUtils.createJweEncryptionProvider(wrapperKey, headers);
@@ -261,8 +261,8 @@ public class JweJsonProducerTest extends Assert {
         sharedUnprotectedHeaders.setJsonWebKeysUrl("https://server.example.com/keys.jwks");
         
         JweEncryptionProvider jwe = JweUtils.createJweEncryptionProvider(wrapperKey, 
-                                                                         AlgorithmUtils.A128KW_ALGO,
-                                                                         AlgorithmUtils.A128GCM_ALGO,
+                                                                         KeyAlgorithm.A128KW,
+                                                                         ContentAlgorithm.A128GCM,
                                                                          null);
         JweJsonProducer p = new JweJsonProducer(protectedHeaders,
                                                 sharedUnprotectedHeaders,
@@ -298,12 +298,12 @@ public class JweJsonProducerTest extends Assert {
         List<JweEncryptionProvider> jweList = new LinkedList<JweEncryptionProvider>();
         
         KeyEncryptionProvider keyEncryption1 = 
-            JweUtils.getSecretKeyEncryptionAlgorithm(wrapperKey1, AlgorithmUtils.A128KW_ALGO);
+            JweUtils.getSecretKeyEncryptionAlgorithm(wrapperKey1, KeyAlgorithm.A128KW);
         ContentEncryptionProvider contentEncryption = 
             JweUtils.getContentEncryptionAlgorithm(AlgorithmUtils.A128GCM_ALGO);
         JweEncryptionProvider jwe1 = new JweEncryption(keyEncryption1, contentEncryption);
         KeyEncryptionProvider keyEncryption2 = 
-            JweUtils.getSecretKeyEncryptionAlgorithm(wrapperKey2, AlgorithmUtils.A128KW_ALGO);
+            JweUtils.getSecretKeyEncryptionAlgorithm(wrapperKey2, KeyAlgorithm.A128KW);
         JweEncryptionProvider jwe2 = new JweEncryption(keyEncryption2, contentEncryption);
         jweList.add(jwe1);
         jweList.add(jwe2);
