@@ -90,7 +90,9 @@ public class MTOMSecurityTest extends AbstractBusClientServerTestBase {
     }
     
     // Here we are not-inlining, but the attachments are signed (as is the SOAP Body)
+    // Temporarily @Ignoring this test
     @org.junit.Test
+    @org.junit.Ignore
     public void testSignedMTOMSwA() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
