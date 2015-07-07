@@ -73,6 +73,7 @@ public final class CryptoCoverageUtil {
         
         final List<WSDataRef> encryptedSignedRefs = new LinkedList<WSDataRef>();
         
+<<<<<<< HEAD
         for (WSDataRef encryptedRef : encryptedRefs) {
             final Iterator<WSDataRef> signedRefsIt = signedRefs.iterator();
             while (signedRefsIt.hasNext()) {
@@ -95,6 +96,33 @@ public final class CryptoCoverageUtil {
                     encryptedSignedRef.setXpath(encryptedRef.getXpath());
                     
                     encryptedSignedRefs.add(encryptedSignedRef);
+=======
+        for (WSDataRef signedRef : signedRefs) {
+            Element protectedElement = signedRef.getProtectedElement();
+            if (protectedElement != null
+                && ("EncryptedData".equals(protectedElement.getLocalName())
+                && WSConstants.ENC_NS.equals(protectedElement.getNamespaceURI())
+                || WSConstants.ENCRYPTED_HEADER.equals(protectedElement.getLocalName())
+                && WSConstants.WSSE11_NS.equals(protectedElement.getNamespaceURI())
+                || WSConstants.ENCRYPED_ASSERTION_LN.equals(protectedElement.getLocalName())
+                && WSConstants.SAML2_NS.equals(protectedElement.getNamespaceURI()))) {
+                for (WSDataRef encryptedRef : encryptedRefs) {
+                    if (protectedElement == encryptedRef.getEncryptedElement()) {
+
+                        final WSDataRef encryptedSignedRef = new WSDataRef();
+                        encryptedSignedRef.setWsuId(signedRef.getWsuId());
+                        
+                        encryptedSignedRef.setContent(false);
+                        encryptedSignedRef.setName(encryptedRef.getName());
+                        encryptedSignedRef.setProtectedElement(encryptedRef
+                                .getProtectedElement());
+                        
+                        encryptedSignedRef.setXpath(encryptedRef.getXpath());
+                        
+                        encryptedSignedRefs.add(encryptedSignedRef);
+                        break;
+                    }
+>>>>>>> 4ddc8d5... An efficiency improvement when reconciling encrypted and signed refs
                 }
             }
         }
