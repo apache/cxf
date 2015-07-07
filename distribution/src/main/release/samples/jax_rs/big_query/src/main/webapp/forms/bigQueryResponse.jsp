@@ -1,7 +1,7 @@
 <%@ page import="javax.servlet.http.HttpServletRequest, demo.jaxrs.server.BigQueryResponse, demo.jaxrs.server.ShakespeareText" %>
 
 <%
-    BigQueryResponse bgResponse = (BigQueryResponse) request.getAttribute("bigqueryresponse");
+    BigQueryResponse bgResponse = (BigQueryResponse) request.getAttribute("data");
     String basePath = request.getContextPath() + request.getServletPath();
     if (!basePath.endsWith("/")) {
         basePath += "/";
@@ -43,7 +43,7 @@
 
 <br/>
 <p>
-Back to <a href="<%= basePath %>forms/startSearch.jsp">Search Service</a>.
+Back to <a href="<%= basePath %>service/search/start">Search Service</a>.
 </p>
 </big></big>
 </div>

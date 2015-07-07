@@ -48,6 +48,7 @@
          <property name="bigQueryClient" ref="bigQueryClient"/>
      </bean>
 
+     <!-- project_id is allocated in Google Developer Console -->
      <jaxrsclient:client id="bigQueryClient" threadSafe="true" 
         address="https://www.googleapis.com/bigquery/v2/projects/${project_id}/queries"
         serviceClass="org.apache.cxf.jaxrs.client.WebClient">
@@ -63,6 +64,7 @@
      <bean id="searchView" class="org.apache.cxf.jaxrs.provider.RequestDispatcherProvider">
          <property name="useClassNames" value="true"/>
          <property name="locationPrefix" value="/forms/"/>
+         <property name="beanName" value="data"/>
      </bean>
      
      <bean id="oidcRpFilter" class="org.apache.cxf.rs.security.oidc.rp.OidcRpAuthenticationFilter">
@@ -72,8 +74,8 @@
          -->
          <property name="stateManager" ref="stateManager"/>
          
-         <!-- RP endpoint address to redirect to if no OIDC context is available -->
-         <property name="rpServiceAddress" value="oidc/rp"/>    
+         <!-- The address to redirect to if no OIDC context is available -->
+         <property name="redirectUri" value="/forms/simpleLogin.jsp"/>    
      </bean>
      
      <!-- 
@@ -102,11 +104,14 @@
               the context is available -->
          <property name="stateManager" ref="stateManager"/>
          <!-- Where to redirect to once the authentication is complete -->
-         <property name="defaultLocation" value="/forms/startSearch.jsp"/>
+         <property name="defaultLocation" value="/service/search/start"/>
      </bean>
      <!-- The state manager shared between the RP and application endpoints -->
      <bean id="stateManager" class="org.apache.cxf.rs.security.oauth2.client.MemoryClientTokenContextManager"/>
      
+     <!-- This filter redirect to Google Authorization service, exchanges an authorization code for access token,
+          extracts OIDC IdToken, requests OIDC UserInfo and makes it all available as OidcCientTokenContext
+     -->
      <bean id="rpOidcRequestFilter" class="org.apache.cxf.rs.security.oidc.rp.OidcClientCodeRequestFilter">
          <property name="clientCodeStateManager" ref="rpClientCodeStateManager"/>
          <property name="scopes" value="openid email profile https://www.googleapis.com/auth/bigquery.readonly"/>
@@ -117,9 +122,11 @@
          <property name="startUri" value="rp"/>
          <property name="completeUri" value="rp/complete"/>
      </bean>
+     <!-- This state manager creates an OAuth2 'state' parameter and saves it in the HTTP session -->
      <bean id="rpClientCodeStateManager" class="org.apache.cxf.rs.security.oauth2.client.MemoryClientCodeStateManager"/>
      
-     <!-- WebClient for requesting an OAuth2 Access token --> 
+     <!-- WebClient for requesting an OAuth2 Access token.
+          rpOidcRequestFilter uses it to exchange a code for a token --> 
      
      <jaxrsclient:client id="atServiceClient" threadSafe="true" 
         address="https://accounts.google.com/o/oauth2/token"
@@ -137,22 +144,21 @@
         </jaxrsclient:features>
      </jaxrsclient:client> 
      
-     <!-- WebClient for requesting an OIDC UserInfo -->
-     <jaxrsclient:client id="userInfoServiceClient" threadSafe="true" 
-        address="https://www.googleapis.com/plus/v1/people/me/openIdConnect"
-        serviceClass="org.apache.cxf.jaxrs.client.WebClient">
-        <jaxrsclient:headers>
-            <entry key="Accept" value="application/json"/>
-        </jaxrsclient:headers>
-        <jaxrsclient:providers>
-           <bean class="org.apache.cxf.jaxrs.provider.json.JsonMapObjectProvider"/> 
-        </jaxrsclient:providers>
-        <jaxrsclient:features>
-           <ref bean="loggingFeature"/>
-        </jaxrsclient:features>
-     </jaxrsclient:client>  
+     <!-- The RP filter uses this client to read OIDC IdToken from OAuth2 access token and
+          request OIDC UserInfo. If OIDC IdToken only is required then registering 
+          org.apache.cxf.rs.security.oidc.rp.IdTokenReader is enough. 
+     --> 
+     <bean id="userInfoClient" class="org.apache.cxf.rs.security.oidc.rp.UserInfoClient">
+         <!-- these properties are needed to validate IdToken -->
+         <property name="jwkSetClient" ref="jwkSetClient"/> 
+         <property name="issuerId" value="accounts.google.com"/>
+         <property name="clockOffset" value="10"/>
+         <!-- this one is needed to get OIDC UserInfo --> 
+         <property name="userInfoServiceClient" ref="userInfoServiceClient"/>
+     </bean>
      
-     <!-- WebClient for requesting an OIDC IDP JWK Set -->
+     <!-- WebClient for requesting an OIDC IDP JWK Set 
+          This client is used to get a JWK key required to validate OIDC IdToken returned with the OAuth2 access token -->
      <jaxrsclient:client id="jwkSetClient" threadSafe="true" 
         address="https://www.googleapis.com/oauth2/v2/certs"
         serviceClass="org.apache.cxf.jaxrs.client.WebClient">
@@ -167,13 +173,24 @@
         </jaxrsclient:features>
      </jaxrsclient:client>
      
-     <bean id="userInfoClient" class="org.apache.cxf.rs.security.oidc.rp.UserInfoClient">
-         <property name="jwkSetClient" ref="jwkSetClient"/> 
-         <property name="issuerId" value="accounts.google.com"/>
-         <property name="userInfoServiceClient" ref="userInfoServiceClient"/>
-         <property name="clockOffset" value="10"/>
-     </bean>
+     <!-- WebClient for requesting an OIDC UserInfo  
+     This client is optional if the application is happy working with OIDC IDToken only -->
      
+     <jaxrsclient:client id="userInfoServiceClient" threadSafe="true" 
+        address="https://www.googleapis.com/plus/v1/people/me/openIdConnect"
+        serviceClass="org.apache.cxf.jaxrs.client.WebClient">
+        <jaxrsclient:headers>
+            <entry key="Accept" value="application/json"/>
+        </jaxrsclient:headers>
+        <jaxrsclient:providers>
+           <bean class="org.apache.cxf.jaxrs.provider.json.JsonMapObjectProvider"/> 
+        </jaxrsclient:providers>
+        <jaxrsclient:features>
+           <ref bean="loggingFeature"/>
+        </jaxrsclient:features>
+     </jaxrsclient:client>
+     
+     <!-- Client id and secret allocated in Google Developer Console -->
      <bean id="consumer" class="org.apache.cxf.rs.security.oauth2.client.Consumer">
          <property name="key" value="${client_id}"/> 
          <property name="secret" value="${client_secret}"/>

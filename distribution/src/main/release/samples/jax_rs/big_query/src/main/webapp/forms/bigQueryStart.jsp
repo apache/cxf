@@ -1,3 +1,8 @@
+<%@ page import="javax.servlet.http.HttpServletRequest, demo.jaxrs.server.BigQueryStart" %>
+
+<%
+    BigQueryStart bq = (BigQueryStart) request.getAttribute("data");
+%>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <title>Shakespeare Text Search</title>
@@ -5,14 +10,14 @@
 	<!--
 	  input {font-family:verdana, arial, helvetica, sans-serif;font-size:20px;line-height:40px;}
 	  div.padded {  
-         padding-left: 15em;  
+         padding-left: 5em;  
       } 
 	-->
 </STYLE>
 </head>
 <body>
 <div class="padded">
-<h1>Welcome to Shakespeare Text Search Service</h1>
+<h1><%= bq.getUserName() %>, Welcome to Shakespeare Text Search Service</h1>
 <em></em>
 <p>
  <table>

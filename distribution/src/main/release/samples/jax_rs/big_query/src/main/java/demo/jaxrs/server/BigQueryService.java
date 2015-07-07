@@ -46,38 +46,39 @@ public class BigQueryService {
         + "\"maxResults\": %d" 
         + "}";
     
+    @Context
+    private OidcClientTokenContext oidcContext;
     private WebClient bigQueryClient;
+    
+    @GET
+    @Path("/start")
+    @Produces("text/html")
+    public BigQueryStart startBigQuerySearch() {
+        return new BigQueryStart(getUserInfo());
+    }
     
     @POST
     @Path("/complete")
     @Produces("text/html")
-    public BigQueryResponse completeBigQueryPost(@Context OidcClientTokenContext context) {
-        return completeBigQueryGet(context);
-    }
-    
-    @GET
-    @Path("/complete")
-    @Produces("text/html")
-    public BigQueryResponse completeBigQueryGet(@Context OidcClientTokenContext context) {
+    public BigQueryResponse completeBigQuerySearch() {
         
-        ClientAccessToken accessToken = context.getToken();
+        ClientAccessToken accessToken = oidcContext.getToken();
         
-        MultivaluedMap<String, String> state = context.getState();
+        MultivaluedMap<String, String> state = oidcContext.getState();
         
         String searchWord = state.getFirst("word");
         String maxResults = state.getFirst("maxResults");
         
-        BigQueryResponse bigQueryResponse = new BigQueryResponse(getUserInfo(context),
-                                                                 searchWord);
+        BigQueryResponse bigQueryResponse = new BigQueryResponse(getUserInfo(), searchWord);
         bigQueryResponse.setTexts(getMatchingTexts(bigQueryClient, accessToken, searchWord, maxResults));
         return bigQueryResponse;
     }
 
-    private String getUserInfo(OidcClientTokenContext context) {
-        if (context.getUserInfo() != null) {
-            return context.getUserInfo().getName();
+    private String getUserInfo() {
+        if (oidcContext.getUserInfo() != null) {
+            return oidcContext.getUserInfo().getName();
         } else {
-            return context.getIdToken().getSubject();
+            return oidcContext.getIdToken().getSubject();
         }
         
     }

@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.rs.security.oidc.rp;
 
+import java.net.URI;
+
 import javax.annotation.Priority;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -43,14 +45,23 @@ public class OidcRpAuthenticationFilter implements ContainerRequestFilter {
     @Context
     private MessageContext mc;
     private ClientTokenContextManager stateManager;
-    private String rpServiceAddress;
+    private String redirectUri;
     
     public void filter(ContainerRequestContext rc) {
         if (checkSecurityContext(rc)) {
             return;
         } else {
-            UriBuilder ub = rc.getUriInfo().getBaseUriBuilder().path(rpServiceAddress);
-            rc.abortWith(Response.seeOther(ub.build())
+            URI redirectAddress = null;
+            if (redirectUri.startsWith("/")) {
+                String basePath = (String)mc.get("http.base.path");
+                redirectAddress = UriBuilder.fromUri(basePath).path(redirectUri).build();
+            } else if (redirectUri.startsWith("http")) {
+                redirectAddress = URI.create(redirectUri);
+            } else {
+                UriBuilder ub = rc.getUriInfo().getBaseUriBuilder().path(redirectUri);
+                redirectAddress = ub.build();
+            }
+            rc.abortWith(Response.seeOther(redirectAddress)
                            .header(HttpHeaders.CACHE_CONTROL, "no-cache, no-store")
                            .header("Pragma", "no-cache") 
                            .build());
@@ -80,8 +91,8 @@ public class OidcRpAuthenticationFilter implements ContainerRequestFilter {
         }
         return requestState;
     }
-    public void setRpServiceAddress(String rpServiceAddress) {
-        this.rpServiceAddress = rpServiceAddress;
+    public void setRedirectUri(String redirectUri) {
+        this.redirectUri = redirectUri;
     }
     public void setStateManager(ClientTokenContextManager stateManager) {
         this.stateManager = stateManager;
