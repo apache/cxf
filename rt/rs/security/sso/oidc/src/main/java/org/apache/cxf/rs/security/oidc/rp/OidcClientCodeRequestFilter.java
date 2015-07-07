@@ -28,8 +28,8 @@ import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 
 public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
 
-    private UserInfoClient userInfoClient;
-    private boolean userInfoRequired = true; 
+    private IdTokenReader idTokenReader;
+    
     @Override
     protected ClientTokenContext createTokenContext(ContainerRequestContext rc, ClientAccessToken at) {
         if (rc.getSecurityContext() instanceof OidcSecurityContext) {
@@ -37,8 +37,9 @@ public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
         }
         OidcClientTokenContextImpl ctx = new OidcClientTokenContextImpl();
         if (at != null) {
-            ctx.setIdToken(userInfoClient.getIdToken(at, getConsumer().getKey()));
-            if (userInfoRequired) {
+            ctx.setIdToken(idTokenReader.getIdToken(at, getConsumer().getKey()));
+            if (idTokenReader instanceof UserInfoClient) {
+                UserInfoClient userInfoClient = (UserInfoClient)idTokenReader;
                 ctx.setUserInfo(userInfoClient.getUserInfo(at, ctx.getIdToken()));
             }
             rc.setSecurityContext(new OidcSecurityContext(ctx));
@@ -46,12 +47,10 @@ public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
         
         return ctx;
     }
-    public void setUserInfoClient(UserInfoClient userInfoClient) {
-        this.userInfoClient = userInfoClient;
+    public void setIdTokenReader(IdTokenReader idTokenReader) {
+        this.idTokenReader = idTokenReader;
     }
-    public void setUserInfoRequired(boolean userInfoRequired) {
-        this.userInfoRequired = userInfoRequired;
-    }
+    
     @Override
     protected void checkSecurityContextStart(ContainerRequestContext rc) {
         SecurityContext sc = rc.getSecurityContext();

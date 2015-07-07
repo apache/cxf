@@ -25,7 +25,7 @@ import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oidc.common.IdToken;
 import org.apache.cxf.rs.security.oidc.common.UserInfo;
 
-public class UserInfoClient extends IdTokenValidator {
+public class UserInfoClient extends IdTokenReader {
     private boolean encryptedOnly;
     private WebClient profileClient;
     public UserInfo getUserInfo(ClientAccessToken at, IdToken idToken) {

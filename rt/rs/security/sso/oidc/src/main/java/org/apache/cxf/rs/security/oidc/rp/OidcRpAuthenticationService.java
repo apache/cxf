@@ -58,13 +58,17 @@ public class OidcRpAuthenticationService {
         URI redirectUri = null;
         MultivaluedMap<String, String> state = oidcContext.getState();
         String location = state != null ? state.getFirst("state") : null;
-        if (location == null) {
+        if (location == null && defaultLocation != null) {
             String basePath = (String)mc.get("http.base.path");
             redirectUri = UriBuilder.fromUri(basePath).path(defaultLocation).build();
         } else {
             redirectUri = URI.create(location);
         }
-        return Response.seeOther(redirectUri).build();
+        if (redirectUri != null) {
+            return Response.seeOther(redirectUri).build();
+        } else {
+            return Response.ok(oidcContext).build();
+        }
     }
 
     public void setDefaultLocation(String defaultLocation) {
