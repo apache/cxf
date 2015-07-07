@@ -67,10 +67,19 @@ public class BigQueryService {
         String searchWord = state.getFirst("word");
         String maxResults = state.getFirst("maxResults");
         
-        BigQueryResponse bigQueryResponse = new BigQueryResponse(context.getUserInfo().getName(),
+        BigQueryResponse bigQueryResponse = new BigQueryResponse(getUserInfo(context),
                                                                  searchWord);
         bigQueryResponse.setTexts(getMatchingTexts(bigQueryClient, accessToken, searchWord, maxResults));
         return bigQueryResponse;
+    }
+
+    private String getUserInfo(OidcClientTokenContext context) {
+        if (context.getUserInfo() != null) {
+            return context.getUserInfo().getName();
+        } else {
+            return context.getIdToken().getSubject();
+        }
+        
     }
 
     public void setBigQueryClient(WebClient bigQueryClient) {

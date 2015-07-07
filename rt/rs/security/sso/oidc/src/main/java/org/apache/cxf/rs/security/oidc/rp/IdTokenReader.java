@@ -23,7 +23,7 @@ import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oidc.common.IdToken;
 import org.apache.cxf.rs.security.oidc.utils.OidcUtils;
 
-public class IdTokenValidator extends AbstractTokenValidator {
+public class IdTokenReader extends AbstractTokenValidator {
     private boolean requireAtHash = true;
     
     public IdToken getIdToken(ClientAccessToken at, String clientId) {

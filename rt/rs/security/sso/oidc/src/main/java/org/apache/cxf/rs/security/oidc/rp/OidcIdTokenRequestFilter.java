@@ -34,7 +34,7 @@ import org.apache.cxf.rs.security.oidc.common.IdToken;
 
 public class OidcIdTokenRequestFilter implements ContainerRequestFilter {
     private String tokenFormParameter = "idtoken"; 
-    private IdTokenValidator idTokenValidator;
+    private IdTokenReader idTokenReader;
     private Consumer consumer;
     
     @Override
@@ -46,7 +46,7 @@ public class OidcIdTokenRequestFilter implements ContainerRequestFilter {
             return;
         }
         
-        IdToken idToken = idTokenValidator.getIdToken(idTokenParamValue, consumer.getKey());
+        IdToken idToken = idTokenReader.getIdToken(idTokenParamValue, consumer.getKey());
         JAXRSUtils.getCurrentMessage().setContent(IdToken.class, idToken);
         requestContext.setSecurityContext(new OidcSecurityContext(idToken));
         
@@ -60,8 +60,8 @@ public class OidcIdTokenRequestFilter implements ContainerRequestFilter {
         }
         return requestState;
     }
-    public void setIdTokenValidator(IdTokenValidator validator) {
-        this.idTokenValidator = validator;
+    public void setIdTokenReader(IdTokenReader idTokenReader) {
+        this.idTokenReader = idTokenReader;
     }
     public void setTokenFormParameter(String tokenFormParameter) {
         this.tokenFormParameter = tokenFormParameter;

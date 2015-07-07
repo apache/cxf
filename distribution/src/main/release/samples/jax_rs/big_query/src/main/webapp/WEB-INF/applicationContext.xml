@@ -6,24 +6,119 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:jaxrs="http://cxf.apache.org/jaxrs"
       xmlns:jaxrsclient="http://cxf.apache.org/jaxrs-client"
-      xmlns:http="http://cxf.apache.org/transports/http/configuration"
-      xmlns:sec="http://cxf.apache.org/configuration/security"
       xsi:schemaLocation="
          http://www.springframework.org/schema/beans 
          http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
          http://cxf.apache.org/jaxrs
          http://cxf.apache.org/schemas/jaxrs.xsd
          http://cxf.apache.org/jaxrs-client
-         http://cxf.apache.org/schemas/jaxrs-client.xsd
-         http://cxf.apache.org/transports/http/configuration
-         http://cxf.apache.org/schemas/configuration/http-conf.xsd
-         http://cxf.apache.org/configuration/security
-         http://cxf.apache.org/schemas/configuration/security.xsd">
+         http://cxf.apache.org/schemas/jaxrs-client.xsd">
 
-     
      <!-- CXF Logging Feature -->
      <bean id="loggingFeature" class="org.apache.cxf.feature.LoggingFeature"/>
 
+     <!-- 
+        1. Big Query Client Application: 
+        accepts a form query and uses an OAuth2 access token to query BigQuery service
+        with a bigQueryClient client  
+     -->
+     <jaxrs:server id="bigQueryServer" address="/search">
+        <jaxrs:serviceBeans>
+           <ref bean="bigQueryService"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+           <!-- Checks that a client is authenticated with Google -->
+           <ref bean="oidcRpFilter"/>
+           
+           <!-- supports the mapping of the big query search result to HTML --> 
+           <ref bean="searchView"/>
+           
+           <!-- JAX-RS provider that makes OidcClientTokenContext available as JAX-RS @Context -->
+           <ref bean="clientTokenContextProvider"/>
+        </jaxrs:providers>
+        <jaxrs:features>
+           <ref bean="loggingFeature"/>
+        </jaxrs:features>
+     </jaxrs:server> 
+     
+     <!-- JAX-RS provider that makes OidcClientTokenContext available as JAX-RS @Context -->
+     <bean id="clientTokenContextProvider" class="org.apache.cxf.rs.security.oauth2.client.ClientTokenContextProvider"/>
+     
+     <bean id="bigQueryService" class="demo.jaxrs.server.BigQueryService">
+         <property name="bigQueryClient" ref="bigQueryClient"/>
+     </bean>
+
+     <jaxrsclient:client id="bigQueryClient" threadSafe="true" 
+        address="https://www.googleapis.com/bigquery/v2/projects/${project_id}/queries"
+        serviceClass="org.apache.cxf.jaxrs.client.WebClient">
+        <jaxrsclient:headers>
+            <entry key="Accept" value="application/json"/>
+            <entry key="Content-Type" value="application/json"/>
+        </jaxrsclient:headers>
+        <jaxrsclient:providers>
+           <bean class="org.apache.cxf.jaxrs.provider.json.JsonMapObjectProvider"/>
+        </jaxrsclient:providers>
+     </jaxrsclient:client>
+     
+     <bean id="searchView" class="org.apache.cxf.jaxrs.provider.RequestDispatcherProvider">
+         <property name="useClassNames" value="true"/>
+         <property name="locationPrefix" value="/forms/"/>
+     </bean>
+     
+     <bean id="oidcRpFilter" class="org.apache.cxf.rs.security.oidc.rp.OidcRpAuthenticationFilter">
+         <!-- 
+              This state manager is shared between this filter and the RP endpoint, 
+              the RP endpoint sets an OIDC context on it and this filter checks the context is available 
+         -->
+         <property name="stateManager" ref="stateManager"/>
+         
+         <!-- RP endpoint address to redirect to if no OIDC context is available -->
+         <property name="rpServiceAddress" value="oidc/rp"/>    
+     </bean>
+     
+     <!-- 
+        2. OIDC RP endpoint: authenticates a user by redirecting a user to Google, and redirects the user 
+                             to the initial application form once the authentication is done
+     -->                        
+     <jaxrs:server id="oidcRpServer" address="/oidc">
+        <jaxrs:serviceBeans>
+           <ref bean="oidcRpService"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+           <!-- the filter which does the actual work for obtaining an OIDC context -->
+           <ref bean="rpOidcRequestFilter"/>
+           
+           <!-- JAX-RS provider that makes OidcClientTokenContext available as JAX-RS @Context -->
+           <ref bean="clientTokenContextProvider"/>
+        </jaxrs:providers>
+        <jaxrs:features>
+           <ref bean="loggingFeature"/>
+        </jaxrs:features>
+     </jaxrs:server>
+     
+     <bean id="oidcRpService" class="org.apache.cxf.rs.security.oidc.rp.OidcRpAuthenticationService">
+         <!-- This state manager is shared between this RP endpoint and the oidcRpFilter which protects
+              the application endpoint, the RP endpoint sets an OIDC context on it and the filter checks 
+              the context is available -->
+         <property name="stateManager" ref="stateManager"/>
+         <!-- Where to redirect to once the authentication is complete -->
+         <property name="defaultLocation" value="/forms/startSearch.jsp"/>
+     </bean>
+     <!-- The state manager shared between the RP and application endpoints -->
+     <bean id="stateManager" class="org.apache.cxf.rs.security.oauth2.client.MemoryClientTokenContextManager"/>
+     
+     <bean id="rpOidcRequestFilter" class="org.apache.cxf.rs.security.oidc.rp.OidcClientCodeRequestFilter">
+         <property name="clientCodeStateManager" ref="rpClientCodeStateManager"/>
+         <property name="scopes" value="openid email profile https://www.googleapis.com/auth/bigquery.readonly"/>
+         <property name="accessTokenServiceClient" ref="atServiceClient"/>
+         <property name="idTokenReader" ref="userInfoClient"/>
+         <property name="consumer" ref="consumer"/>
+         <property name="authorizationServiceUri" value="https://accounts.google.com/o/oauth2/auth"/>
+         <property name="startUri" value="rp"/>
+         <property name="completeUri" value="rp/complete"/>
+     </bean>
+     <bean id="rpClientCodeStateManager" class="org.apache.cxf.rs.security.oauth2.client.MemoryClientCodeStateManager"/>
+     
      <!-- WebClient for requesting an OAuth2 Access token --> 
      
      <jaxrsclient:client id="atServiceClient" threadSafe="true" 
@@ -78,100 +173,10 @@
          <property name="userInfoServiceClient" ref="userInfoServiceClient"/>
          <property name="clockOffset" value="10"/>
      </bean>
-
+     
      <bean id="consumer" class="org.apache.cxf.rs.security.oauth2.client.Consumer">
          <property name="key" value="${client_id}"/> 
          <property name="secret" value="${client_secret}"/>
-     </bean>
-     <bean id="clientCodeStateManager" class="org.apache.cxf.rs.security.oauth2.client.MemoryClientCodeStateManager"/>
-     
-     <bean id="bigQueryService" class="demo.jaxrs.server.BigQueryService">
-         <property name="bigQueryClient" ref="bigQueryClient"/>
-     </bean>
-     
-     <!-- BigQuery WebClient -->
-     <jaxrsclient:client id="bigQueryClient" threadSafe="true" 
-        address="https://www.googleapis.com/bigquery/v2/projects/${project_id}/queries"
-        serviceClass="org.apache.cxf.jaxrs.client.WebClient">
-        <jaxrsclient:headers>
-            <entry key="Accept" value="application/json"/>
-            <entry key="Content-Type" value="application/json"/>
-        </jaxrsclient:headers>
-        <jaxrsclient:providers>
-           <bean class="org.apache.cxf.jaxrs.provider.json.JsonMapObjectProvider"/>
-        </jaxrsclient:providers>
-     </jaxrsclient:client>
-     
-     <bean id="searchView" class="org.apache.cxf.jaxrs.provider.RequestDispatcherProvider">
-         <property name="useClassNames" value="true"/>
-         <property name="locationPrefix" value="/forms/"/>
-     </bean>
-     <jaxrs:server id="bigQueryServer" address="/search">
-        <jaxrs:serviceBeans>
-           <ref bean="bigQueryService"/>
-        </jaxrs:serviceBeans>
-        <jaxrs:providers>
-           <ref bean="oidcRpFilter"/>
-           <ref bean="searchView"/>
-           <bean class="org.apache.cxf.rs.security.oauth2.client.ClientTokenContextProvider"/>
-        </jaxrs:providers>
-        <jaxrs:features>
-           <ref bean="loggingFeature"/>
-        </jaxrs:features>
-     </jaxrs:server>
-     
-     <bean id="stateManager" class="org.apache.cxf.rs.security.oauth2.client.MemoryClientTokenContextManager"/>
-     
-     <bean id="oidcRpFilter" class="org.apache.cxf.rs.security.oidc.rp.OidcRpAuthenticationFilter">
-         <property name="stateManager" ref="stateManager"/>
-         <property name="rpServiceAddress" value="oidc/rp"/>    
-     </bean>
-     
-     <bean id="oidcRpService" class="org.apache.cxf.rs.security.oidc.rp.OidcRpAuthenticationService">
-         <property name="stateManager" ref="stateManager"/>
-         <property name="defaultLocation" value="/forms/startSearch.jsp"/>
-         <!--
-         <property name="useRedirect" value="false"/>
-         -->
-     </bean>
-     
-     <jaxrs:server id="oidcRpServer" address="/oidc">
-        <jaxrs:serviceBeans>
-           <ref bean="oidcRpService"/>
-        </jaxrs:serviceBeans>
-        <jaxrs:providers>
-           <!--
-           <ref bean="rpOidcRequestFilter"/>
-           -->
-           <ref bean="rpOidcTokenFilter"/>
-           <!--
-           <ref bean="searchView"/>
-           -->
-           <!--
-           <bean class="org.apache.cxf.rs.security.oauth2.client.ClientTokenContextProvider"/>
-           -->
-           <bean class="org.apache.cxf.rs.security.oidc.rp.OidcIdTokenProvider"/>
-        </jaxrs:providers>
-        <jaxrs:features>
-           <ref bean="loggingFeature"/>
-        </jaxrs:features>
-     </jaxrs:server>
-     
-     <bean id="rpClientCodeStateManager" class="org.apache.cxf.rs.security.oauth2.client.MemoryClientCodeStateManager"/>
-     <bean id="rpOidcRequestFilter" class="org.apache.cxf.rs.security.oidc.rp.OidcClientCodeRequestFilter">
-         <property name="clientCodeStateManager" ref="rpClientCodeStateManager"/>
-         <property name="scopes" value="openid email profile https://www.googleapis.com/auth/bigquery.readonly"/>
-         <property name="accessTokenServiceClient" ref="atServiceClient"/>
-         <property name="userInfoClient" ref="userInfoClient"/>
-         <property name="consumer" ref="consumer"/>
-         <property name="authorizationServiceUri" value="https://accounts.google.com/o/oauth2/auth"/>
-         <property name="startUri" value="rp"/>
-         <property name="completeUri" value="rp/complete"/>
-     </bean>
-     <bean id="rpOidcTokenFilter" class="org.apache.cxf.rs.security.oidc.rp.OidcIdTokenRequestFilter">
-         <property name="idTokenValidator" ref="userInfoClient"/>
-         <property name="consumer" ref="consumer"/>
-     </bean>
-          
+     </bean>     
 </beans>
 
