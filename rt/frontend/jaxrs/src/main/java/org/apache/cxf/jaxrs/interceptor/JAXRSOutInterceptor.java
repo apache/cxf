@@ -34,7 +34,6 @@ import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.HttpMethod;
-import javax.ws.rs.NotAcceptableException;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -55,6 +54,7 @@ import org.apache.cxf.jaxrs.impl.WriterInterceptorMBW;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.provider.AbstractConfigurableProvider;
 import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
@@ -108,7 +108,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             }
         } else {
             int status = getStatus(message, responseObj != null ? 200 : 204);
-            response = Response.status(status).entity(responseObj).build();
+            response = JAXRSUtils.toResponseBuilder(status).entity(responseObj).build();
         }
         
         Exchange exchange = message.getExchange();
@@ -406,7 +406,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             if ("application".equals(mt.getType()) || mt.isWildcardType()) {
                 mt = MediaType.APPLICATION_OCTET_STREAM_TYPE;
             } else {
-                throw new NotAcceptableException();
+                throw ExceptionUtils.toNotAcceptableException(null,  null);
             }
         }
         return mt;
