@@ -137,11 +137,11 @@ public class JettyServerEngineFactoryParser extends AbstractBPBeanDefinitionPars
         for (Element engine : engines) {
             String port = engine.getAttribute("port");
             ValueMetadata keyValue = createValue(context, port);
-            Element sessionSupport = DOMUtils
+            Element simpleElement = DOMUtils
                 .getFirstChildWithName(engine, HTTPJettyTransportNamespaceHandler.JETTY_TRANSPORT,
                                        propertyName);
-            if (sessionSupport != null) {
-                String text = DOMUtils.getContent(sessionSupport);
+            if (simpleElement != null) {
+                String text = DOMUtils.getContent(simpleElement);
                 ValueMetadata valValue = createValue(context, text);
                 entries.add(new MapEntryImpl(keyValue, valValue));
             }
