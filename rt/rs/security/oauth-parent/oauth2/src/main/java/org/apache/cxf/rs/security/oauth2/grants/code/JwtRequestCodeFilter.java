@@ -26,6 +26,7 @@ import javax.crypto.SecretKey;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.provider.json.JsonMapObjectReaderWriter;
 import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
@@ -44,6 +45,7 @@ import org.apache.cxf.rt.security.crypto.CryptoUtils;
 
 public class JwtRequestCodeFilter implements AuthorizationCodeRequestFilter {
     private static final String REQUEST_PARAM = "request";
+    private static final String REQUEST_URI_PARAM = "request_uri";
     private JweDecryptionProvider jweDecryptor;
     private JwsSignatureVerifier jwsVerifier;
     private boolean verifyWithClientCertificates;
@@ -56,6 +58,12 @@ public class JwtRequestCodeFilter implements AuthorizationCodeRequestFilter {
                                                   UserSubject endUser,
                                                   Client client) {
         String requestToken = params.getFirst(REQUEST_PARAM);
+        if (requestToken == null) {
+            String requestUri = params.getFirst(REQUEST_URI_PARAM);
+            if (requestUri != null && requestUri.startsWith(getPrefix(client))) {
+                requestToken = WebClient.create(requestUri).get(String.class);
+            }
+        }
         if (requestToken != null) {
             JweDecryptionProvider theJweDecryptor = getInitializedDecryptionProvider(client);
             if (theJweDecryptor != null) {
@@ -91,6 +99,10 @@ public class JwtRequestCodeFilter implements AuthorizationCodeRequestFilter {
         } else {
             return params;
         }
+    }
+    private String getPrefix(Client client) {
+        //TODO: consider restricting to specific hosts
+        return "https://";
     }
     public void setJweDecryptor(JweDecryptionProvider jweDecryptor) {
         this.jweDecryptor = jweDecryptor;
