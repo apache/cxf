@@ -28,7 +28,9 @@ import javax.security.auth.callback.CallbackHandler;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.Text;
+
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.sts.STSPropertiesMBean;
@@ -146,7 +148,9 @@ public class X509TokenValidator implements TokenValidator {
             binarySecurity.setEncodingType(encodingType);
             binarySecurity.setValueType(binarySecurityType.getValueType());
             String data = binarySecurityType.getValue();
-            ((Text)binarySecurity.getElement().getFirstChild()).setData(data);
+            
+            Node textNode = doc.createTextNode(data);
+            binarySecurity.getElement().appendChild(textNode);
         } else if (validateTarget.isDOMElement()) {
             try {
                 Document doc = DOMUtils.createDocument();
