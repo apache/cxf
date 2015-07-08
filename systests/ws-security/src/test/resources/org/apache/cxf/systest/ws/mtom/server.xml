@@ -83,6 +83,7 @@
                     <map>
                         <entry key="action" value="Signature Timestamp"/>
                         <entry key="signatureVerificationPropFile" value="bob.properties"/>
+                        <entry key="expandXOPIncludeForSignature" value="false"/>
                     </map>
                 </constructor-arg>
             </bean>
