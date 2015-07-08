@@ -493,6 +493,7 @@ public class MAPCodec extends AbstractSoapInterceptor {
                                     VersionTransformer.getExposedJAXBContext(headerURI);
                                 unmarshaller = 
                                     jaxbContext.createUnmarshaller();
+                                unmarshaller.setEventHandler(null);
                             }
                             if (maps == null) {
                                 maps = new AddressingProperties();

@@ -378,6 +378,7 @@ public abstract class AbstractBPBeanDefinitionParser {
 
             } catch (Exception ex) {                
                 u = getContext(c).createUnmarshaller();
+                u.setEventHandler(null);
                 Object obj;
                 if (c != null) {
                     obj = u.unmarshal(data, c);

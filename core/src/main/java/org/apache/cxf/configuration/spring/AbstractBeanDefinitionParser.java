@@ -352,6 +352,7 @@ public abstract class AbstractBeanDefinitionParser
                 bean.addPropertyValue(propertyName, jaxbbean.getBeanDefinition());
             } catch (Exception ex) {
                 u = getContext(c).createUnmarshaller();
+                u.setEventHandler(null);
                 Object obj;
                 if (c != null) {
                     obj = u.unmarshal(data, c);

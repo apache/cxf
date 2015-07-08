@@ -99,7 +99,9 @@ public class JaxbAssertionBuilder<T> implements AssertionBuilder<Element> {
     
     protected Unmarshaller getUnmarshaller() {
         try {
-            return getContext().createUnmarshaller();
+            Unmarshaller um = getContext().createUnmarshaller();
+            um.setEventHandler(null);
+            return um;
         } catch (JAXBException e) {
             throw new RuntimeException(e);
         }
