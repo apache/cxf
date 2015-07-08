@@ -34,7 +34,6 @@ import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.HttpMethod;
-import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.Produces;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.HttpHeaders;
@@ -61,6 +60,7 @@ import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.provider.AbstractConfigurableProvider;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
@@ -136,7 +136,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             }
         } else {
             int status = getStatus(message, responseObj != null ? 200 : 204);
-            response = Response.status(status).entity(responseObj).build();
+            response = JAXRSUtils.toResponseBuilder(status).entity(responseObj).build();
         }
         
         Exchange exchange = message.getExchange();
@@ -397,7 +397,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         }
         if (excResponse == null) {
             setResponseStatus(message, 500);
-            throw new InternalServerErrorException(ex);
+            throw ExceptionUtils.toInternalServerErrorException(ex,  null);
         } else {
             serializeMessage(pf, message, excResponse, null, false);
         } 
