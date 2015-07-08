@@ -30,11 +30,8 @@ import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 
 import org.w3c.dom.Element;
-<<<<<<< HEAD
 
-=======
 import org.apache.cxf.attachment.AttachmentUtil;
->>>>>>> 419478e... Add a warning for MTOM for the policy case as well
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor;
@@ -133,16 +130,13 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
                 );
             String actor = (String)message.getContextualProperty(SecurityConstants.ACTOR);
             
-<<<<<<< HEAD
-            AssertionInfoMap aim = message.get(AssertionInfoMap.class);
-=======
             if (AttachmentUtil.isMtomEnabled(message) && hasAttachments(message)) {
                 LOG.warning("MTOM is enabled with WS-Security. Please note that if an attachment is"
                     + "referenced in the SOAP Body, only the reference will be signed and not the"
                     + "SOAP Body!");
             }
-            
->>>>>>> 419478e... Add a warning for MTOM for the policy case as well
+
+            AssertionInfoMap aim = message.get(AssertionInfoMap.class);
             // extract Assertion information
             if (aim != null) {
                 AbstractBinding transport = null;
@@ -222,16 +216,12 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
             }
             
         }
-<<<<<<< HEAD
-
-=======
         
         private boolean hasAttachments(SoapMessage mc) {
             final Collection<org.apache.cxf.message.Attachment> attachments = mc.getAttachments();
             return attachments != null && attachments.size() > 0;
         }
         
->>>>>>> 419478e... Add a warning for MTOM for the policy case as well
         public Set<String> getAfter() {
             return Collections.emptySet();
         }
