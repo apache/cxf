@@ -44,9 +44,9 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
 
     @Override
     protected void addSwaggerResource(Server server) {
-        ApiListingResource apiListingResource = new ApiListingResource();
         if (!runAsFilter) {
             List<Object> serviceBeans = new ArrayList<Object>();
+            ApiListingResource apiListingResource = new ApiListingResource();
             serviceBeans.add(apiListingResource);
             JAXRSServiceFactoryBean sfb = 
                 (JAXRSServiceFactoryBean)server.getEndpoint().get(JAXRSServiceFactoryBean.class.getName());
@@ -59,11 +59,11 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         }
         List<Object> providers = new ArrayList<Object>();
         if (runAsFilter) {
-            providers.add(new SwaggerContainerRequestFilter(apiListingResource));
+            providers.add(new SwaggerContainerRequestFilter());
         }
         providers.add(new SwaggerSerializers());
         ((ServerProviderFactory)server.getEndpoint().get(
-                ServerProviderFactory.class.getName())).setUserProviders(providers);
+            ServerProviderFactory.class.getName())).setUserProviders(providers);
         
         BeanConfig beanConfig = new BeanConfig();
         beanConfig.setResourcePackage(getResourcePackage());
@@ -78,30 +78,23 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
     }
 
     @PreMatching
-    private static class SwaggerContainerRequestFilter implements ContainerRequestFilter {
+    private static class SwaggerContainerRequestFilter extends ApiListingResource implements ContainerRequestFilter {
         private static final String APIDOCS_LISTING_PATH_JSON = "swagger.json";
         private static final String APIDOCS_LISTING_PATH_YAML = "swagger.yaml";
         
-        private ApiListingResource apiListingResource;
         @Context
         private MessageContext mc;
-        public SwaggerContainerRequestFilter(ApiListingResource apiListingResource) {
-            this.apiListingResource = apiListingResource;
-        }
 
         @Override
         public void filter(ContainerRequestContext requestContext) throws IOException {
             UriInfo ui = mc.getUriInfo();
             if (ui.getPath().endsWith(APIDOCS_LISTING_PATH_JSON)) {
-                Response r = 
-                    apiListingResource.getListingJson(null, mc.getServletConfig(), mc.getHttpHeaders(), ui);
+                Response r = getListingJson(null, mc.getServletConfig(), mc.getHttpHeaders(), ui);
                 requestContext.abortWith(r);
             } else if (ui.getPath().endsWith(APIDOCS_LISTING_PATH_YAML)) {
-                Response r = 
-                    apiListingResource.getListingYaml(null, mc.getServletConfig(), mc.getHttpHeaders(), ui);
+                Response r = getListingYaml(null, mc.getServletConfig(), mc.getHttpHeaders(), ui); 
                 requestContext.abortWith(r);
             }
         }
-        
     }
 }

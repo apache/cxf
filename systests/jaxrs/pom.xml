@@ -38,9 +38,21 @@
 
     </properties>
     <dependencies>
+        <!-- for swagger 1.2 tests -->
         <dependency>
             <groupId>com.wordnik</groupId>
             <artifactId>swagger-jaxrs_2.10</artifactId>
+            <exclusions>
+                <exclusion>
+                     <groupId>javax.ws.rs</groupId>
+                     <artifactId>jsr311-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- for swagger 2.0 tests -->
+        <dependency>
+            <groupId>io.swagger</groupId>
+            <artifactId>swagger-jaxrs</artifactId>
             <exclusions>
                 <exclusion>
                      <groupId>javax.ws.rs</groupId>
