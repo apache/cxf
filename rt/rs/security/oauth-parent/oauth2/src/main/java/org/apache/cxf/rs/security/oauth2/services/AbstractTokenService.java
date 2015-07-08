@@ -260,4 +260,8 @@ public class AbstractTokenService extends AbstractOAuthService {
     public void setClientIdProvider(ClientIdProvider clientIdProvider) {
         this.clientIdProvider = clientIdProvider;
     }
+
+    public void setClientSecretVerifier(ClientSecretVerifier clientSecretVerifier) {
+        this.clientSecretVerifier = clientSecretVerifier;
+    }
 }
