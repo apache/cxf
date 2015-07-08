@@ -183,6 +183,7 @@ public final class JAXBUtils {
     public static Object unmarshall(JAXBContext c, Element e) throws JAXBException {
         Unmarshaller u = c.createUnmarshaller();
         try {
+            u.setEventHandler(null);
             return u.unmarshal(e);
         } finally {
             closeUnmarshaller(u);
@@ -191,6 +192,7 @@ public final class JAXBUtils {
     public static <T> JAXBElement<T> unmarshall(JAXBContext c, Element e, Class<T> cls) throws JAXBException {
         Unmarshaller u = c.createUnmarshaller();
         try {
+            u.setEventHandler(null);
             return u.unmarshal(e, cls);
         } finally {
             closeUnmarshaller(u);
@@ -199,16 +201,29 @@ public final class JAXBUtils {
     public static Object unmarshall(JAXBContext c, Source s) throws JAXBException {
         Unmarshaller u = c.createUnmarshaller();
         try {
+            u.setEventHandler(null);
             return u.unmarshal(s);
         } finally {
             closeUnmarshaller(u);
         }
     }
-    public static <T> JAXBElement<T> unmarshall(JAXBContext c, XMLStreamReader reader,
+    public static <T> JAXBElement<T> unmarshall(JAXBContext c,
+                                                XMLStreamReader reader,
                                                 Class<T> cls) throws JAXBException {
         Unmarshaller u = c.createUnmarshaller();
         try {
+            u.setEventHandler(null);
             return u.unmarshal(reader, cls);
+        } finally {
+            closeUnmarshaller(u);
+        }
+    }
+    public static Object unmarshall(JAXBContext c,
+                                    XMLStreamReader reader) throws JAXBException {
+        Unmarshaller u = c.createUnmarshaller();
+        try {
+            u.setEventHandler(null);
+            return u.unmarshal(reader);
         } finally {
             closeUnmarshaller(u);
         }

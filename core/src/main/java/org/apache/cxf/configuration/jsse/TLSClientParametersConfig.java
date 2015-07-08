@@ -29,7 +29,6 @@ import javax.net.ssl.TrustManager;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
@@ -141,10 +140,10 @@ public final class TLSClientParametersConfig {
         
         StringReader reader = new StringReader(s);
         XMLStreamReader data = StaxUtils.createXMLStreamReader(reader);
-        Unmarshaller u = null;
         try {
-            u = getContext().createUnmarshaller();
-            JAXBElement<TLSClientParametersType> type = u.unmarshal(data, TLSClientParametersType.class);
+            JAXBElement<TLSClientParametersType> type = JAXBUtils.unmarshall(getContext(), 
+                                                                             data,
+                                                                             TLSClientParametersType.class);
             TLSClientParametersType cpt = type.getValue();
             return createTLSClientParametersFromType(cpt);
         } catch (RuntimeException e) {
@@ -157,7 +156,6 @@ public final class TLSClientParametersConfig {
             } catch (XMLStreamException ex) {
                 throw new RuntimeException(ex);
             }
-            JAXBUtils.closeUnmarshaller(u);
         }
     }
     

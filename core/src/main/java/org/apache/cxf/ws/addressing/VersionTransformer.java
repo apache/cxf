@@ -441,6 +441,7 @@ public class VersionTransformer {
         }
         JAXBContext ctx = getExposedJAXBContext(tns);
         Unmarshaller um = ctx.createUnmarshaller();
+        um.setEventHandler(null);
         try {
             JAXBElement<?> o = um.unmarshal(ref, getExposedReferenceType(tns));
             if (o != null) {

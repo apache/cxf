@@ -24,7 +24,6 @@ import java.io.StringReader;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
@@ -39,25 +38,25 @@ public final class JAXBBeanFactory {
         //nothing
     }
     
-    public static Object createJAXBBean(JAXBContext context, 
+    public static <T> T createJAXBBean(JAXBContext context, 
                                         String s,
-                                        Class<?> c) {
+                                        Class<T> c) {
         
         StringReader reader = new StringReader(s);
         XMLStreamReader data = StaxUtils.createXMLStreamReader(reader);
-        Unmarshaller u = null;
         try {
-            Object obj;
-            u = context.createUnmarshaller();
+            
+            T obj = null;
             if (c != null) {
-                obj = u.unmarshal(data, c);
+                obj = JAXBUtils.unmarshall(context, data, c).getValue();
             } else {
-                obj = u.unmarshal(data);
-            }
-            if (obj instanceof JAXBElement<?>) {
-                JAXBElement<?> el = (JAXBElement<?>)obj;
-                obj = el.getValue();
-
+                Object o = JAXBUtils.unmarshall(context, data);
+                if (o instanceof JAXBElement<?>) {
+                    JAXBElement<?> el = (JAXBElement<?>)o;
+                    @SuppressWarnings("unchecked")
+                    T ot = (T)el.getValue();
+                    obj = ot;
+                }                
             }
             return obj;
         } catch (JAXBException e) {
@@ -68,7 +67,6 @@ public final class JAXBBeanFactory {
             } catch (XMLStreamException ex) {
                 throw new RuntimeException(ex);
             }
-            JAXBUtils.closeUnmarshaller(u);
         }
     }
 

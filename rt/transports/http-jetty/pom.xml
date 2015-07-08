@@ -172,9 +172,15 @@
                         <id>generate-sources</id>
                         <phase>generate-sources</phase>
                         <configuration>
+                            <extensions>
+                                <extension>org.apache.cxf.xjcplugins:cxf-xjc-bug986:${cxf.xjc-utils.version}</extension>
+                            </extensions>
                             <sourceRoot>${basedir}/target/generated/src/main/java</sourceRoot>
                             <xsdOptions>
                                 <xsdOption>
+                                    <extensionArgs>
+                                        <arg>-Xbug986</arg>
+                                    </extensionArgs>
                                     <xsd>${basedir}/src/main/resources/schemas/configuration/http-jetty.xsd</xsd>
                                     <catalog>${basedir}/src/main/build-resources/catalog.cat</catalog>
                                     <deleteDirs>

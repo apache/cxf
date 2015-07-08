@@ -30,11 +30,11 @@ import java.util.logging.Logger;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 
 import org.w3c.dom.Element;
 
 import org.apache.cxf.common.jaxb.JAXBContextCache;
+import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
@@ -228,12 +228,10 @@ public class JettyHTTPServerEngineFactoryHolder {
         this.handlersMap = handlersMap;
     }
 
-    protected Object getJaxbObject(Element parent, Class<?> c) {
+    protected <T> T getJaxbObject(Element parent, Class<T> c) {
 
         try {
-            Unmarshaller umr = getContext(c).createUnmarshaller();
-            JAXBElement<?> ele = (JAXBElement<?>) umr.unmarshal(parent);
-
+            JAXBElement<T> ele = JAXBUtils.unmarshall(getContext(c), parent, c);
             return ele.getValue();
         } catch (JAXBException e) {
             LOG.warning("Unable to parse property due to " + e);
