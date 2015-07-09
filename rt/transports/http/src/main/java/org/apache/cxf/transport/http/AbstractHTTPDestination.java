@@ -103,6 +103,8 @@ public abstract class AbstractHTTPDestination
 
     private static final String SSL_CIPHER_SUITE_ATTRIBUTE = "javax.servlet.request.cipher_suite";
     private static final String SSL_PEER_CERT_CHAIN_ATTRIBUTE = "javax.servlet.request.X509Certificate";
+    private static final String AUTH_TYPE_BASIC = "Basic";
+    private static final int AUTH_TYPE_BASIC_LENGTH = "Basic".length();
 
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractHTTPDestination.class);
     
@@ -159,10 +161,9 @@ public abstract class AbstractHTTPDestination
         if (credentials == null || StringUtils.isEmpty(credentials.trim())) {
             return null;
         }
-        String creds[] = StringUtils.split(credentials, " ");
-        String authType = creds[0];
-        if ("Basic".equals(authType)) {
-            String authEncoded = creds[1];
+        String authType = credentials.substring(0, AUTH_TYPE_BASIC_LENGTH);
+        String authEncoded = credentials.substring(AUTH_TYPE_BASIC_LENGTH).trim();
+        if (AUTH_TYPE_BASIC.equals(authType) && !StringUtils.isEmpty(authEncoded)) {
             try {
                 String authDecoded = new String(Base64Utility.decode(authEncoded));
                 int idx = authDecoded.indexOf(':');
