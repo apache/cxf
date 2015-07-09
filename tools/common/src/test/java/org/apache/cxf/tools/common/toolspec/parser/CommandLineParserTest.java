@@ -247,8 +247,12 @@ public class CommandLineParserTest extends Assert {
             Class<?> c = Class.forName("org.apache.xerces.impl.Version");
             Object o = c.newInstance();
             String v =  (String) c.getMethod("getVersion").invoke(o);
-            float vn = Float.parseFloat(StringUtils.getFirstFound(v, "(\\d+.\\d+)"));
-            return vn >= 2.7;
+            v = StringUtils.getFirstFound(v, "(\\d+.\\d+)").trim();
+            if (v.charAt(0) >= '3') {
+                return true;
+            }
+            v = v.substring(2);
+            return Integer.parseInt(v) >= 7;
         } catch (Exception e) {
             // ignore
         }

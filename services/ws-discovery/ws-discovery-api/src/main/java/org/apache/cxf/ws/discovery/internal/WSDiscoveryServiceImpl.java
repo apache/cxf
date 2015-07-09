@@ -56,6 +56,7 @@ import org.w3c.dom.Document;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.jaxb.JAXBContextCache;
+import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Server;
@@ -498,7 +499,7 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
                     return null;
                 }
                 
-                Object obj = context.createUnmarshaller().unmarshal(doc.getDocumentElement());
+                Object obj = JAXBUtils.unmarshall(context, doc.getDocumentElement());
                 if (obj instanceof JAXBElement) {
                     obj = ((JAXBElement)obj).getValue();
                 }

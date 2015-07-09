@@ -29,13 +29,13 @@ import javax.net.ssl.TrustManager;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.jaxb.JAXBContextCache;
 import org.apache.cxf.common.jaxb.JAXBContextCache.CachedContextAndSchemas;
+import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.configuration.security.TLSClientParametersType;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -140,10 +140,10 @@ public final class TLSClientParametersConfig {
         
         StringReader reader = new StringReader(s);
         XMLStreamReader data = StaxUtils.createXMLStreamReader(reader);
-        Unmarshaller u;
         try {
-            u = getContext().createUnmarshaller();
-            JAXBElement<TLSClientParametersType> type = u.unmarshal(data, TLSClientParametersType.class);
+            JAXBElement<TLSClientParametersType> type = JAXBUtils.unmarshall(getContext(), 
+                                                                             data,
+                                                                             TLSClientParametersType.class);
             TLSClientParametersType cpt = type.getValue();
             return createTLSClientParametersFromType(cpt);
         } catch (RuntimeException e) {

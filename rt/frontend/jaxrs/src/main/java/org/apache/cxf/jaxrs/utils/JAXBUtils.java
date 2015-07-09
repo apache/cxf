@@ -18,9 +18,12 @@
  */
 package org.apache.cxf.jaxrs.utils;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
@@ -28,7 +31,18 @@ public final class JAXBUtils {
     private JAXBUtils() {
         
     }
-    
+    public static void closeUnmarshaller(Unmarshaller u) {
+        if (u instanceof Closeable) {
+            //need to do this to clear the ThreadLocal cache
+            //see https://java.net/jira/browse/JAXB-1000
+
+            try {
+                ((Closeable)u).close();
+            } catch (IOException e) {
+                //ignore
+            }
+        }        
+    }
     public static Object convertWithAdapter(Object obj,
                                             Class<?> adapterClass,
                                             Annotation[] anns) {

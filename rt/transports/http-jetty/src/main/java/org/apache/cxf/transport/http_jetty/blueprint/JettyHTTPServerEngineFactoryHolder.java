@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.transport.http_jetty.blueprint;
 
-import java.io.ByteArrayInputStream;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -30,17 +30,17 @@ import java.util.logging.Logger;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Element;
 
 import org.apache.cxf.common.jaxb.JAXBContextCache;
+import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.configuration.jsse.TLSServerParametersConfig;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngine;
 import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngineFactory;
 import org.apache.cxf.transport.http_jetty.ThreadingParameters;
@@ -71,13 +71,8 @@ public class JettyHTTPServerEngineFactoryHolder {
 
     public void init() {
         try {
-
-            DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-            docFactory.setNamespaceAware(true);
-
-            Element element = docFactory.newDocumentBuilder()
-                .parse(new ByteArrayInputStream(parsedElement.getBytes())).getDocumentElement();
-
+            Element element = StaxUtils.read(new StringReader(parsedElement)).getDocumentElement();
+            
             JettyHTTPServerEngineFactoryConfigType config 
                 = (JettyHTTPServerEngineFactoryConfigType) getJaxbObject(element,
                     JettyHTTPServerEngineFactoryConfigType.class);
@@ -215,12 +210,10 @@ public class JettyHTTPServerEngineFactoryHolder {
         this.handlersMap = handlersMap;
     }
 
-    protected Object getJaxbObject(Element parent, Class<?> c) {
+    protected <T> T getJaxbObject(Element parent, Class<T> c) {
 
         try {
-            Unmarshaller umr = getContext(c).createUnmarshaller();
-            JAXBElement<?> ele = (JAXBElement<?>) umr.unmarshal(parent);
-
+            JAXBElement<T> ele = JAXBUtils.unmarshall(getContext(c), parent, c);
             return ele.getValue();
         } catch (JAXBException e) {
             LOG.warning("Unable to parse property due to " + e);

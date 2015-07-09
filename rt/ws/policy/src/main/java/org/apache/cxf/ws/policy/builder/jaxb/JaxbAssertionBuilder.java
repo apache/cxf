@@ -99,7 +99,9 @@ public class JaxbAssertionBuilder<T> implements AssertionBuilder<Element> {
     
     protected Unmarshaller getUnmarshaller() {
         try {
-            return getContext().createUnmarshaller();
+            Unmarshaller um = getContext().createUnmarshaller();
+            um.setEventHandler(null);
+            return um;
         } catch (JAXBException e) {
             throw new RuntimeException(e);
         }
@@ -138,10 +140,13 @@ public class JaxbAssertionBuilder<T> implements AssertionBuilder<Element> {
     @SuppressWarnings("unchecked")
     protected T getData(Element element) {
         Object obj = null;
+        Unmarshaller um = getUnmarshaller();
         try {
-            obj = getUnmarshaller().unmarshal(element);
+            obj = um.unmarshal(element);
         } catch (JAXBException ex) {
             LogUtils.log(LOG, Level.SEVERE, "UNMARSHAL_ELEMENT_EXC", ex);
+        } finally {
+            JAXBUtils.closeUnmarshaller(um);
         }
         if (obj instanceof JAXBElement<?>) {
             JAXBElement<?> el = (JAXBElement<?>)obj;

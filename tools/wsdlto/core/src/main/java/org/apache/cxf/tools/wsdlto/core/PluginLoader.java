@@ -35,14 +35,17 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
+import javax.xml.stream.XMLStreamException;
+
+import org.w3c.dom.Document;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
+import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.tools.common.FrontEndGenerator;
 import org.apache.cxf.tools.common.Processor;
 import org.apache.cxf.tools.common.ToolException;
@@ -64,7 +67,7 @@ public final class PluginLoader {
 
     private Map<String, DataBinding> databindings = new TreeMap<String, DataBinding>();
 
-    private Unmarshaller unmarshaller;
+    private JAXBContext jaxbContext;
 
     private PluginLoader() {
         init();
@@ -72,8 +75,7 @@ public final class PluginLoader {
 
     private void init() {
         try {
-            JAXBContext jc = JAXBContext.newInstance("org.apache.cxf.tools.plugin");
-            unmarshaller = jc.createUnmarshaller();
+            jaxbContext = JAXBContext.newInstance("org.apache.cxf.tools.plugin");
             loadPlugins(ClassLoaderUtils.getResources(PLUGIN_FILE_NAME, getClass()));
         } catch (JAXBException e) {
             Message msg = new Message("JAXB_CONTEXT_INIT_FAIL", LOG);
@@ -230,7 +232,18 @@ public final class PluginLoader {
     }
 
     private Plugin getPlugin(InputStream is) throws JAXBException {
-        return (Plugin) ((JAXBElement<?>)unmarshaller.unmarshal(is)).getValue();
+        try {
+            Document doc = StaxUtils.read(is);
+            return JAXBUtils.unmarshall(jaxbContext, doc.getDocumentElement(), Plugin.class).getValue();
+        } catch (XMLStreamException xse) {
+            throw new JAXBException(xse);
+        } finally {
+            try {
+                is.close();
+            } catch (IOException e) {
+                //ignore
+            }
+        }
     }
 
     public FrontEnd getFrontEnd(String name) {

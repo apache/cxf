@@ -25,16 +25,22 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.XMLConstants;
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
     
+
+
+
 import org.w3c.dom.Document;
+
 import org.xml.sax.SAXException;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.staxutils.StaxUtils;
 
 /**
  * (not thread safe)
@@ -44,15 +50,11 @@ public class ExtendedDocumentBuilder {
 
     private static final Logger LOG = LogUtils.getL7dLogger(ExtendedDocumentBuilder.class);
 
-    private final DocumentBuilderFactory parserFactory;
-    private DocumentBuilder parser;
-
+    private DocumentBuilderFactory parserFactory;
     private SchemaFactory schemaFactory;
     private Schema schema;
 
     public ExtendedDocumentBuilder() {
-        parserFactory = DocumentBuilderFactory.newInstance();
-        parserFactory.setNamespaceAware(true);
     }
 
     private InputStream getSchemaLocation() {
@@ -69,30 +71,33 @@ public class ExtendedDocumentBuilder {
                 LOG.log(Level.SEVERE, "SCHEMA_FACTORY_EXCEPTION_MSG");
             }
             try {
-                this.parserFactory.setSchema(this.schema);                
+                parserFactory = DocumentBuilderFactory.newInstance();
+                try {
+                    parserFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
+                } catch (ParserConfigurationException e) {
+                    //old version, not supported.
+                }
+                parserFactory.setNamespaceAware(true);
+                parserFactory.setSchema(this.schema);                
             } catch (UnsupportedOperationException e) {
                 LOG.log(Level.WARNING, "DOC_PARSER_NOT_SUPPORTED", e);
             }
         }
     }
 
-
-    private DocumentBuilder getParser() {
-        if (parser == null) {
+    public Document parse(InputStream in) throws SAXException, IOException, XMLStreamException {
+        if (in == null && LOG.isLoggable(Level.FINE)) {
+            LOG.fine("ExtendedDocumentBuilder trying to parse a null inputstream");
+        }
+        if (parserFactory != null) {
+            //validating, so need to use the validating parser factory
             try {
-                parser = parserFactory.newDocumentBuilder();
+                return parserFactory.newDocumentBuilder().parse(in);
             } catch (javax.xml.parsers.ParserConfigurationException e) {
                 LOG.log(Level.SEVERE, "NEW_DOCUMENT_BUILDER_EXCEPTION_MSG");
             }
         }
-        return parser;
-    }
-    
-    public Document parse(InputStream in) throws SAXException, IOException {
-        if (in == null && LOG.isLoggable(Level.FINE)) {
-            LOG.fine("ExtendedDocumentBuilder trying to parse a null inputstream");
-        }
-        return getParser().parse(in);
+        return StaxUtils.read(in);
     }
 
 }

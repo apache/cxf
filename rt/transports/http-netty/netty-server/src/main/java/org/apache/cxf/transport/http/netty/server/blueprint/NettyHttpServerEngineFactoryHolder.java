@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.transport.http.netty.server.blueprint;
 
-import java.io.ByteArrayInputStream;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -26,11 +26,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.logging.Logger;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.parsers.DocumentBuilderFactory;
+
 import org.w3c.dom.Element;
 
 import org.apache.cxf.common.jaxb.JAXBContextCache;
@@ -39,6 +40,7 @@ import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.configuration.jsse.TLSServerParametersConfig;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.transport.http.netty.server.NettyHttpServerEngine;
 import org.apache.cxf.transport.http.netty.server.NettyHttpServerEngineFactory;
 import org.apache.cxf.transport.http.netty.server.ThreadingParameters;
@@ -63,12 +65,7 @@ public class NettyHttpServerEngineFactoryHolder {
 
     public void init() {
         try {
-
-            DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-            docFactory.setNamespaceAware(true);
-
-            Element element = docFactory.newDocumentBuilder()
-                .parse(new ByteArrayInputStream(parsedElement.getBytes())).getDocumentElement();
+            Element element = StaxUtils.read(new StringReader(parsedElement)).getDocumentElement();
 
             NettyHttpServerEngineFactoryConfigType config 
                 = (NettyHttpServerEngineFactoryConfigType) getJaxbObject(element,

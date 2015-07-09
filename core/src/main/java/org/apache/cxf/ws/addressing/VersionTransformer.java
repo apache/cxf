@@ -26,12 +26,16 @@ import java.util.Map;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 //import javax.xml.ws.EndpointReference;
 //import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
+
+
 import org.w3c.dom.Element;
 
+import org.apache.cxf.common.jaxb.JAXBUtils;
 // importation convention: if the same class name is used for 
 // 2005/08 and 2004/08, then the former version is imported
 // and the latter is fully qualified when used
@@ -436,12 +440,17 @@ public class VersionTransformer {
             return null;
         }
         JAXBContext ctx = getExposedJAXBContext(tns);
-        JAXBElement<?> o = ctx.createUnmarshaller().unmarshal(ref, getExposedReferenceType(tns));
-        if (o != null) {
-            return convertToNative(o.getValue());
+        Unmarshaller um = ctx.createUnmarshaller();
+        um.setEventHandler(null);
+        try {
+            JAXBElement<?> o = um.unmarshal(ref, getExposedReferenceType(tns));
+            if (o != null) {
+                return convertToNative(o.getValue());
+            }
+            return convertToNative(null);
+        } finally {
+            JAXBUtils.closeUnmarshaller(um);
         }
-        return convertToNative(null);
-        
     }
     /**
      * Converts a version specific EndpointReferenceType to the native version

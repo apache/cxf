@@ -670,9 +670,7 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
                 reportError("Object of type " + cls.getName() + " can not be deserialized from Entry", ex, 400);
             } finally {
                 try {
-                    if (xreader != null) {
-                        StaxUtils.close(xreader);
-                    }
+                    StaxUtils.close(xreader);
                 } catch (XMLStreamException e) {
                     //ignore
                 }

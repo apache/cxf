@@ -40,6 +40,7 @@ import javax.xml.ws.handler.soap.SOAPMessageContext;
 
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor;
+import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.Message;
@@ -97,9 +98,7 @@ public class SOAPMessageContextImpl extends WrappedMessageContext implements SOA
                 if ((allRoles
                     || roles.contains(she.getActor())) 
                     && name.equals(she.getElementQName())) {
-                    
-                    ret.add(context.createUnmarshaller().unmarshal(she));
-                    
+                    ret.add(JAXBUtils.unmarshall(context, she));
                 }
             }
             return ret.toArray(new Object[ret.size()]);

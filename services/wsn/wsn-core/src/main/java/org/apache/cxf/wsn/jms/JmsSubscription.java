@@ -31,10 +31,10 @@ import javax.jms.MessageListener;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 import javax.jms.Topic;
+import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
@@ -46,6 +46,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.wsn.AbstractSubscription;
 import org.oasis_open.docs.wsn.b_2.InvalidTopicExpressionFaultType;
@@ -200,9 +201,7 @@ public abstract class JmsSubscription extends AbstractSubscription implements Me
                 NotificationMessageHolderType h = ith.next();
                 Object content = h.getMessage().getAny();
                 if (!(content instanceof Element)) {
-                    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-                    factory.setNamespaceAware(true);
-                    Document doc = factory.newDocumentBuilder().newDocument();
+                    Document doc = DOMUtils.createDocument();
                     jaxbContext.createMarshaller().marshal(content, doc);
                     content = doc.getDocumentElement();
                 }
@@ -228,6 +227,11 @@ public abstract class JmsSubscription extends AbstractSubscription implements Me
             }
             try {
                 XPathFactory xpfactory = XPathFactory.newInstance();
+                try {
+                    xpfactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
+                } catch (Throwable t) {
+                    //possibly old version, though doesn't really matter as content is already parsed as an Element
+                }
                 XPath xpath = xpfactory.newXPath();
                 XPathExpression exp = xpath.compile(contentFilter.getContent().get(0).toString());
                 Boolean ret = (Boolean) exp.evaluate(content, XPathConstants.BOOLEAN);

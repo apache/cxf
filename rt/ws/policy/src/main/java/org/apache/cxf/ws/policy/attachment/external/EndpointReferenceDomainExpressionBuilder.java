@@ -26,13 +26,13 @@ import java.util.ResourceBundle;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.i18n.Message;
+import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.policy.PolicyException;
@@ -48,7 +48,7 @@ public class EndpointReferenceDomainExpressionBuilder implements DomainExpressio
     private static final Collection<QName> SUPPORTED_TYPES = Collections.singletonList(
         new QName("http://www.w3.org/2005/08/addressing", "EndpointReference"));
     
-    private Unmarshaller unmarshaller;
+    private JAXBContext context;
     
     public EndpointReferenceDomainExpressionBuilder() {
 
@@ -61,7 +61,7 @@ public class EndpointReferenceDomainExpressionBuilder implements DomainExpressio
     public DomainExpression build(Element e) {
         Object obj = null;
         try {
-            obj = getUnmarshaller().unmarshal(e);
+            obj = JAXBUtils.unmarshall(createJAXBContext(), e);
         } catch (JAXBException ex) {
             throw new PolicyException(new Message("EPR_DOMAIN_EXPRESSION_BUILD_EXC", BUNDLE, 
                                                   (Object[])null), ex);
@@ -75,28 +75,18 @@ public class EndpointReferenceDomainExpressionBuilder implements DomainExpressio
         eprde.setEndpointReference((EndpointReferenceType)obj);
         return eprde;
     }
-
-    protected Unmarshaller getUnmarshaller() {
-        if (unmarshaller == null) {
-            createUnmarshaller();
-        }
-        
-        return unmarshaller;
-    }
     
-    protected synchronized void createUnmarshaller() {
-        if (unmarshaller != null) {
-            return;
+    protected synchronized JAXBContext createJAXBContext() {
+        if (context == null) {
+            try {
+                Class<?> clz = EndpointReferenceType.class;
+                String pkg = PackageUtils.getPackageName(clz);
+                context = JAXBContext.newInstance(pkg, clz.getClassLoader());
+            } catch (JAXBException ex) {
+                throw new PolicyException(new Message("EPR_DOMAIN_EXPRESSION_BUILDER_INIT_EXC", BUNDLE, 
+                                                      (Object[])null), ex);
+            }
         }
-        
-        try {
-            Class<?> clz = EndpointReferenceType.class;
-            String pkg = PackageUtils.getPackageName(clz);
-            JAXBContext context = JAXBContext.newInstance(pkg, clz.getClassLoader());
-            unmarshaller = context.createUnmarshaller();
-        } catch (JAXBException ex) {
-            throw new PolicyException(new Message("EPR_DOMAIN_EXPRESSION_BUILDER_INIT_EXC", BUNDLE, 
-                                                  (Object[])null), ex);
-        }
+        return context;
     }
 }

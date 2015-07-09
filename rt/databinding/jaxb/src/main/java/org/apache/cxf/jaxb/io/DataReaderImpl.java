@@ -34,6 +34,7 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.common.i18n.Message;
+import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.databinding.DataReader;
 import org.apache.cxf.interceptor.Fault;
@@ -173,20 +174,32 @@ public class DataReaderImpl<T> extends JAXBDataBase implements DataReader<T> {
             }
         }
         
-        Object obj = JAXBEncoderDecoder.unmarshall(createUnmarshaller(), reader, part, 
-                                             unwrapJAXBElement);
-        onCompleteUnmarshalling();
-        
-        return obj;
+        Unmarshaller um = createUnmarshaller();
+        try {
+            Object obj = JAXBEncoderDecoder.unmarshall(um, reader, part, 
+                                                 unwrapJAXBElement);
+            onCompleteUnmarshalling();
+            
+            return obj;
+        } finally {
+            JAXBUtils.closeUnmarshaller(um);
+        }
     }
 
     public Object read(QName name, T input, Class<?> type) {
-        Object obj = JAXBEncoderDecoder.unmarshall(createUnmarshaller(), input,
+        Unmarshaller um = createUnmarshaller();
+        
+        try {
+            Object obj = JAXBEncoderDecoder.unmarshall(um, input,
                                              name, type, 
                                              unwrapJAXBElement);
-        onCompleteUnmarshalling();
-        
-        return obj;
+            onCompleteUnmarshalling();
+            
+            return obj;
+        } finally {
+            JAXBUtils.closeUnmarshaller(um);
+        }
+
     }
 
     private void onCompleteUnmarshalling() {

@@ -20,12 +20,14 @@
 package org.apache.cxf.management.web.browser.bootstrapping;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -37,8 +39,10 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.stream.XMLStreamReader;
 
 import org.apache.commons.lang.Validate;
+import org.apache.cxf.staxutils.StaxUtils;
 
 public class SimpleXMLSettingsStorage implements SettingsStorage {
     private static final String DEFAULT_FILENAME = "logbrowser-settings.xml";
@@ -68,12 +72,15 @@ public class SimpleXMLSettingsStorage implements SettingsStorage {
             File file = new File(filename);
             if (file.exists()) {
                 Unmarshaller unmarshaller = context.createUnmarshaller();
-                entries = (Entries) unmarshaller.unmarshal(file);
+                XMLStreamReader reader = StaxUtils.createXMLStreamReader(new FileInputStream(file));
+                entries = (Entries) unmarshaller.unmarshal(reader);
             }
 
             if (entries == null) {
                 entries = new Entries();
             }
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
         } catch (JAXBException e) {
             throw new RuntimeException(e);
         }

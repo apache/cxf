@@ -47,6 +47,7 @@ import org.w3c.dom.Node;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.saaj.SAAJFactoryResolver;
 import org.apache.cxf.binding.soap.saaj.SAAJUtils;
+import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
@@ -241,14 +242,14 @@ public class LogicalMessageImpl implements LogicalMessage {
                     parent.removeChild(ds.getNode());
                 }
                 try {
-                    return arg0.createUnmarshaller().unmarshal(ds);
+                    return JAXBUtils.unmarshall(arg0, ds);
                 } finally {
                     if (parent instanceof DocumentFragment) {
                         parent.insertBefore(ds.getNode(), next);
                     }
                 }
             } 
-            return arg0.createUnmarshaller().unmarshal(getPayload());
+            return JAXBUtils.unmarshall(arg0, getPayload());
         } catch (JAXBException e) {
             throw new WebServiceException(e);
         }
