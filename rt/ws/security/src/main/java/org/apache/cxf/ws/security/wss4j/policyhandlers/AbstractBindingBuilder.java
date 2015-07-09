@@ -50,11 +50,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-<<<<<<< HEAD
 import org.apache.cxf.Bus;
-=======
 import org.apache.cxf.attachment.AttachmentUtil;
->>>>>>> f399b92... Support the ability to store BASE-64 encoded (encryption) bytes in message attachments
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.saaj.SAAJUtils;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
@@ -173,12 +170,8 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
     protected Element bstElement;
     protected Element lastEncryptedKeyElement;
     
-<<<<<<< HEAD
-=======
-    protected final CallbackLookup callbackLookup;
     protected boolean storeBytesInAttachment;
     
->>>>>>> f399b92... Support the ability to store BASE-64 encoded (encryption) bytes in message attachments
     private Element lastSupportingTokenElement;
     private Element lastDerivedKeyElement;
     
@@ -200,8 +193,6 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         this.secHeader = secHeader;
         this.saaj = saaj;
         message.getExchange().put(WSHandlerConstants.SEND_SIGV, signatures);
-<<<<<<< HEAD
-=======
         
         boolean storeBytes = 
             MessageUtils.getContextualBoolean(
@@ -219,13 +210,6 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             }
         }
         
-        Element soapBody = SAAJUtils.getBody(saaj);
-        if (soapBody != null) {
-            callbackLookup = new CXFCallbackLookup(soapBody.getOwnerDocument(), soapBody);
-        } else {
-            callbackLookup = null;
-        }
->>>>>>> f399b92... Support the ability to store BASE-64 encoded (encryption) bytes in message attachments
     }
     
     protected void insertAfter(Element child, Element sib) {
@@ -1419,15 +1403,9 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
     }
     
     protected WSSecEncryptedKey getEncryptedKeyBuilder(AbstractToken token) throws WSSecurityException {
-<<<<<<< HEAD
         WSSecEncryptedKey encrKey = new WSSecEncryptedKey(wssConfig);
-=======
-        WSSecEncryptedKey encrKey = new WSSecEncryptedKey();
-        encrKey.setIdAllocator(wssConfig.getIdAllocator());
-        encrKey.setCallbackLookup(callbackLookup);
         encrKey.setAttachmentCallbackHandler(new AttachmentCallbackHandler(message));
         encrKey.setStoreBytesInAttachment(storeBytesInAttachment);
->>>>>>> f399b92... Support the ability to store BASE-64 encoded (encryption) bytes in message attachments
         Crypto crypto = getEncryptionCrypto();
         message.getExchange().put(SecurityConstants.ENCRYPT_CRYPTO, crypto);
         setKeyIdentifierType(encrKey, token);

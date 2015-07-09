@@ -453,15 +453,9 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             AlgorithmSuite algorithmSuite = abinding.getAlgorithmSuite();
             if (encrToken.getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
                 try {
-<<<<<<< HEAD
                     WSSecDKEncrypt dkEncr = new WSSecDKEncrypt(wssConfig);
-=======
-                    WSSecDKEncrypt dkEncr = new WSSecDKEncrypt();
-                    dkEncr.setIdAllocator(wssConfig.getIdAllocator());
-                    dkEncr.setCallbackLookup(callbackLookup);
                     dkEncr.setAttachmentCallbackHandler(new AttachmentCallbackHandler(message));
                     dkEncr.setStoreBytesInAttachment(storeBytesInAttachment);
->>>>>>> f399b92... Support the ability to store BASE-64 encoded (encryption) bytes in message attachments
                     if (recToken.getToken().getVersion() == SPConstants.SPVersion.SP11) {
                         dkEncr.setWscVersion(ConversationConstants.VERSION_05_02);
                     }
@@ -624,15 +618,9 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             // Set up the encrypted key to use
             setupEncryptedKey(wrapper, sigToken);
             
-<<<<<<< HEAD
             WSSecDKSign dkSign = new WSSecDKSign(wssConfig);
-=======
-            WSSecDKSign dkSign = new WSSecDKSign();
-            dkSign.setIdAllocator(wssConfig.getIdAllocator());
-            dkSign.setCallbackLookup(callbackLookup);
             dkSign.setAttachmentCallbackHandler(new AttachmentCallbackHandler(message));
             dkSign.setStoreBytesInAttachment(storeBytesInAttachment);
->>>>>>> f399b92... Support the ability to store BASE-64 encoded (encryption) bytes in message attachments
             if (wrapper.getToken().getVersion() == SPConstants.SPVersion.SP11) {
                 dkSign.setWscVersion(ConversationConstants.VERSION_05_02);
             }
