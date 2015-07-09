@@ -43,7 +43,7 @@
             <version>${project.version}</version>
             <type>xml</type>
         </dependency>
-	<!-- to force the karaf cxf feature to be available before testing -->
+    <!-- to force the karaf cxf feature to be available before testing -->
         <dependency>
             <groupId>org.apache.cxf.karaf</groupId>
             <artifactId>apache-cxf</artifactId>
@@ -92,20 +92,20 @@
             <artifactId>slf4j-api</artifactId>
         </dependency>
         <dependency>
-        	<groupId>org.slf4j</groupId>
-        	<artifactId>slf4j-jcl</artifactId>
-        	<version>1.7.7</version>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-jcl</artifactId>
+            <version>1.7.7</version>
         </dependency>
     </dependencies>
     <build>
         <plugins>
-        	<!-- generate dependency versions -->
+            <!-- generate dependency versions -->
             <plugin>
                 <groupId>org.apache.servicemix.tooling</groupId>
                 <artifactId>depends-maven-plugin</artifactId>
                 <executions>
                     <execution>
-                    	<phase>generate-resources</phase>
+                        <phase>generate-resources</phase>
                         <id>generate-depends-file</id>
                         <goals>
                             <goal>generate-depends-file</goal>

@@ -31,7 +31,7 @@
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
-    	<cxf.bundle.activator>org.apache.cxf.ws.rm.blueprint.Activator</cxf.bundle.activator>
+        <cxf.bundle.activator>org.apache.cxf.ws.rm.blueprint.Activator</cxf.bundle.activator>
         <cxf.osgi.import>
             org.apache.aries*;version="${cxf.aries.version.range}";resolution:=optional,
             org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}"

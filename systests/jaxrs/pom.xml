@@ -490,10 +490,10 @@
             <artifactId>tika-parsers</artifactId>
             <scope>test</scope>
             <exclusions>
-            	<exclusion>
-            		<groupId>org.apache.poi</groupId>
-            		<artifactId>poi-ooxml</artifactId>
-            	</exclusion>
+                <exclusion>
+                    <groupId>org.apache.poi</groupId>
+                    <artifactId>poi-ooxml</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>

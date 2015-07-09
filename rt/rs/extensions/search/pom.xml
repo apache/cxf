@@ -66,10 +66,10 @@
             <optional>true</optional>
         </dependency>
         <dependency>
-		    <groupId>org.apache.olingo</groupId>
-		    <artifactId>olingo-odata2-core</artifactId>
-		    <optional>true</optional>
-		</dependency>
+            <groupId>org.apache.olingo</groupId>
+            <artifactId>olingo-odata2-core</artifactId>
+            <optional>true</optional>
+        </dependency>
         <dependency>
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-core</artifactId>
@@ -86,10 +86,10 @@
             <artifactId>tika-parsers</artifactId>
             <scope>test</scope>
             <exclusions>
-            	<exclusion>
-            		<groupId>org.apache.poi</groupId>
-            		<artifactId>poi-ooxml</artifactId>            	
-            	</exclusion>       
+                <exclusion>
+                    <groupId>org.apache.poi</groupId>
+                    <artifactId>poi-ooxml</artifactId>                
+                </exclusion>       
             </exclusions>
         </dependency>
         <dependency>
@@ -116,10 +116,10 @@
             <scope>test</scope>
             <!-- Conflicts with Apache Tika dependencies -->
             <exclusions>
-            	<exclusion>
-            		<groupId>xml-apis</groupId>
-	                <artifactId>xml-apis</artifactId>            	
-            	</exclusion>
+                <exclusion>
+                    <groupId>xml-apis</groupId>
+                    <artifactId>xml-apis</artifactId>                
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>

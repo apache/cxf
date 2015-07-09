@@ -31,7 +31,7 @@
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
-    	<cxf.bundle.activator>org.apache.cxf.transport.http.asyncclient.Activator</cxf.bundle.activator>
+        <cxf.bundle.activator>org.apache.cxf.transport.http.asyncclient.Activator</cxf.bundle.activator>
         <cxf.osgi.import>
             javax.annotation;version="${cxf.osgi.javax.annotation.version}",
             *

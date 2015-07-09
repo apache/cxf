@@ -1817,7 +1817,7 @@
                 <groupId>org.apache.tika</groupId>
                 <artifactId>tika-parsers</artifactId>
                 <version>${cxf.tika.version}</version>
-			</dependency>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <profiles>

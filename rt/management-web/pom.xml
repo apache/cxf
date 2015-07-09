@@ -32,11 +32,11 @@
     </parent>
     <properties>
         <cxf.osgi.import>
-	  !com.google.*,
-	  org.apache.abdera.parser.stax,
-	  org.apache.abdera,
-	  com.ctc.wstx.stax,
-	  *
+      !com.google.*,
+      org.apache.abdera.parser.stax,
+      org.apache.abdera,
+      com.ctc.wstx.stax,
+      *
         </cxf.osgi.import>
         <gwt.version>2.6.0</gwt.version>
         <gwt.inject.version>1.5.0</gwt.inject.version>
@@ -178,11 +178,11 @@
                           {maven-resources},
                           static-content=${gwt.classes.dir}/static-content
                         </Include-Resource>
-			<Export-Package>
-			  org.apache.cxf.management.web.browser,
-			  org.apache.cxf.management.web.browser*,
-			  org.apache.cxf.management.web.logging.atom*,
-			</Export-Package>
+            <Export-Package>
+              org.apache.cxf.management.web.browser,
+              org.apache.cxf.management.web.browser*,
+              org.apache.cxf.management.web.logging.atom*,
+            </Export-Package>
                     </instructions>
                 </configuration>
             </plugin>
