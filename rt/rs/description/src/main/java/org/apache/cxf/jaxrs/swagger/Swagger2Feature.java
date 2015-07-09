@@ -63,7 +63,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         }
         providers.add(new SwaggerSerializers());
         ((ServerProviderFactory)server.getEndpoint().get(
-            ServerProviderFactory.class.getName())).setUserProviders(providers);
+                ServerProviderFactory.class.getName())).setUserProviders(providers);
         
         BeanConfig beanConfig = new BeanConfig();
         beanConfig.setResourcePackage(getResourcePackage());
