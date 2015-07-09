@@ -145,7 +145,7 @@
                 <method name="POST" id="addBookOrBook2">
                     <request>
                         <representation mediaType="application/xml" element="prefix1:thebook"/>
-                        <representation mediaType="application/xml" element="prefix1:the-Book2"/>
+                        <representation mediaType="application/v2+xml" element="prefix1:the-Book2"/>
                         <representation mediaType="application/json"/>
                     </request>
                     <response status="201"/>
