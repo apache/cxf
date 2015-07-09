@@ -85,8 +85,6 @@ public class JettyServerEngineFactoryParser extends AbstractBPBeanDefinitionPars
                 .getChildrenWithName(element, HTTPJettyTransportNamespaceHandler.JETTY_TRANSPORT, "engine");
             ef.addProperty("connectorMap", parseEngineConnector(engines, ef, context));
             ef.addProperty("handlersMap", parseEngineHandlers(engines, ef, context));
-            ef.addProperty("sessionSupportMap", parseEngineBooleanProperty(engines, ef, context, "sessionSupport"));
-            ef.addProperty("reuseAddressMap", parseEngineBooleanProperty(engines, ef, context, "reuseAddress"));
             return ef;
         } catch (Exception e) {
             throw new RuntimeException("Could not process configuration.", e);
@@ -129,24 +127,5 @@ public class JettyServerEngineFactoryParser extends AbstractBPBeanDefinitionPars
         return new MapMetadataImpl("java.lang.String", "java.util.List", entries);
     }
     
-    protected Metadata parseEngineBooleanProperty(List<Element> engines, 
-                                                  ComponentMetadata enclosingComponent,
-                                                  ParserContext context,
-                                                  String propertyName) {
-        List<MapEntry> entries = new ArrayList<MapEntry>();
-        for (Element engine : engines) {
-            String port = engine.getAttribute("port");
-            ValueMetadata keyValue = createValue(context, port);
-            Element simpleElement = DOMUtils
-                .getFirstChildWithName(engine, HTTPJettyTransportNamespaceHandler.JETTY_TRANSPORT,
-                                       propertyName);
-            if (simpleElement != null) {
-                String text = DOMUtils.getContent(simpleElement);
-                ValueMetadata valValue = createValue(context, text);
-                entries.add(new MapEntryImpl(keyValue, valValue));
-            }
-        }
-
-        return new MapMetadataImpl("java.lang.String", "java.lang.Boolean", entries);
-    }
+    
 }
