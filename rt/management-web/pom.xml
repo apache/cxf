@@ -32,11 +32,11 @@
     </parent>
     <properties>
         <cxf.osgi.import>
-	  !com.google.*,
-	  org.apache.abdera.parser.stax,
-	  org.apache.abdera,
-	  com.ctc.wstx.stax,
-	  *
+      !com.google.*,
+      org.apache.abdera.parser.stax,
+      org.apache.abdera,
+      com.ctc.wstx.stax,
+      *
         </cxf.osgi.import>
         <gwt.version>2.6.0</gwt.version>
         <gwt.inject.version>1.5.0</gwt.inject.version>
@@ -174,50 +174,50 @@
                           {maven-resources},
                           static-content=${gwt.classes.dir}/static-content
                         </Include-Resource>
-			<Export-Package>
-			  org.apache.cxf.management.web.browser,
-			  org.apache.cxf.management.web.browser*,
-			  org.apache.cxf.management.web.logging.atom*,
-			</Export-Package>
+            <Export-Package>
+              org.apache.cxf.management.web.browser,
+              org.apache.cxf.management.web.browser*,
+              org.apache.cxf.management.web.logging.atom*,
+            </Export-Package>
                     </instructions>
                 </configuration>
             </plugin>
 
         </plugins>
         <pluginManagement>
-        	<plugins>
-        		<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
-        		<plugin>
-        			<groupId>org.eclipse.m2e</groupId>
-        			<artifactId>lifecycle-mapping</artifactId>
-        			<version>1.0.0</version>
-        			<configuration>
-        				<lifecycleMappingMetadata>
-        					<pluginExecutions>
-        						<pluginExecution>
-        							<pluginExecutionFilter>
-        								<groupId>
-        									org.codehaus.mojo
-        								</groupId>
-        								<artifactId>
-        									gwt-maven-plugin
-        								</artifactId>
-        								<versionRange>
-        									[2.6.0,)
-        								</versionRange>
-        								<goals>
-        									<goal>compile</goal>
-        								</goals>
-        							</pluginExecutionFilter>
-        							<action>
-        								<ignore />
-        							</action>
-        						</pluginExecution>
-        					</pluginExecutions>
-        				</lifecycleMappingMetadata>
-        			</configuration>
-        		</plugin>
-        	</plugins>
+            <plugins>
+                <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+                <plugin>
+                    <groupId>org.eclipse.m2e</groupId>
+                    <artifactId>lifecycle-mapping</artifactId>
+                    <version>1.0.0</version>
+                    <configuration>
+                        <lifecycleMappingMetadata>
+                            <pluginExecutions>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>
+                                            org.codehaus.mojo
+                                        </groupId>
+                                        <artifactId>
+                                            gwt-maven-plugin
+                                        </artifactId>
+                                        <versionRange>
+                                            [2.6.0,)
+                                        </versionRange>
+                                        <goals>
+                                            <goal>compile</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore />
+                                    </action>
+                                </pluginExecution>
+                            </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                    </configuration>
+                </plugin>
+            </plugins>
         </pluginManagement>
     </build>
     <profiles>

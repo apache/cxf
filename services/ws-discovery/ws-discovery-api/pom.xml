@@ -31,12 +31,12 @@
         <version>3.1.2-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
-	<properties>
+    <properties>
         <cxf.osgi.export>
-			=org.apache.cxf.ws.discovery.internal,
+            =org.apache.cxf.ws.discovery.internal,
             org.apache.cxf.ws.discovery.*,
         </cxf.osgi.export>
-	</properties>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -118,7 +118,7 @@
                     </execution>
                 </executions>
             </plugin>
-			<plugin>
+            <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
                 <extensions>true</extensions>
@@ -127,7 +127,7 @@
                         <Export-Package>${cxf.osgi.export}</Export-Package>
                     </instructions>
                 </configuration>
-			</plugin>
+            </plugin>
         </plugins>
     </build>
     <profiles>

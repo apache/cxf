@@ -1,5 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
@@ -7,28 +7,28 @@
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <groupId>org.apache.cxf.services.xkms</groupId>
-	<artifactId>cxf-services-xkms-x509-repo-ldap</artifactId>
+    <artifactId>cxf-services-xkms-x509-repo-ldap</artifactId>
     <packaging>bundle</packaging>
     <name>Apache CXF XKMS LDAP repository</name>
     <url>http://cxf.apache.org</url>
     
-	<dependencies>
-		<dependency>
-			<groupId>org.apache.cxf.services.xkms</groupId>
-			<artifactId>cxf-services-xkms-common</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.cxf.services.xkms</groupId>
+            <artifactId>cxf-services-xkms-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.easymock</groupId>
-			<artifactId>easymock</artifactId>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
-	
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.easymock</groupId>
+            <artifactId>easymock</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    
 </project>

@@ -32,64 +32,64 @@
         <pax.url.version>1.2.8</pax.url.version>
     </properties>
     <dependencies>
-    	<dependency>
-    		<groupId>org.apache.cxf</groupId>
-    		<artifactId>cxf-core</artifactId>
-    		<version>${project.version}</version>
-    	</dependency>
-    	<dependency>
-    		<groupId>org.apache.ws.xmlschema</groupId>
-    		<artifactId>xmlschema-core</artifactId>
-    	</dependency>
-    	<dependency>
-    		<groupId>org.apache.servicemix.bundles</groupId>
-    		<artifactId>org.apache.servicemix.bundles.wsdl4j</artifactId>
-    		<version>${cxf.wsdl4j.bundle.version}</version>
-    	</dependency>
-    	<dependency>
-    		<groupId>org.apache.cxf</groupId>
-    		<artifactId>cxf-rt-wsdl</artifactId>
-    		<version>${project.version}</version>
-    	</dependency>
-     	<dependency>
-    		<groupId>org.apache.cxf</groupId>
-    		<artifactId>cxf-rt-frontend-simple</artifactId>
-    		<version>${project.version}</version>
-    	</dependency>
-    	<dependency>
-    		<groupId>org.apache.cxf</groupId>
-    		<artifactId>cxf-rt-databinding-jaxb</artifactId>
-    		<version>${project.version}</version>
-    	</dependency>
-    	<dependency>
-    		<groupId>org.apache.cxf</groupId>
-    		<artifactId>cxf-rt-bindings-xml</artifactId>
-    		<version>${project.version}</version>
-    	</dependency>
-    	<dependency>
-    		<groupId>org.apache.cxf</groupId>
-    		<artifactId>cxf-rt-bindings-soap</artifactId>
-    		<version>${project.version}</version>
-    	</dependency>
-    	<dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.ws.xmlschema</groupId>
+            <artifactId>xmlschema-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.servicemix.bundles</groupId>
+            <artifactId>org.apache.servicemix.bundles.wsdl4j</artifactId>
+            <version>${cxf.wsdl4j.bundle.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-wsdl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+         <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-frontend-simple</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-databinding-jaxb</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-bindings-xml</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-bindings-soap</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-servlet_3.0_spec</artifactId>
-    	</dependency>
-    	<dependency>
-    		<groupId>org.apache.cxf</groupId>
-    		<artifactId>cxf-rt-transports-http</artifactId>
-    		<version>${project.version}</version>
-    	</dependency>
-     	<dependency>
-    		<groupId>org.apache.cxf</groupId>
-    		<artifactId>cxf-rt-frontend-jaxws</artifactId>
-    		<version>${project.version}</version>
-    	</dependency>
-    	
-    	<dependency>
-    		<groupId>org.apache.aries.blueprint</groupId>
-    		<artifactId>org.apache.aries.blueprint.core</artifactId>
-    	</dependency>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-transports-http</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+         <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-frontend-jaxws</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.apache.aries.blueprint</groupId>
+            <artifactId>org.apache.aries.blueprint.core</artifactId>
+        </dependency>
     
         <dependency>
             <groupId>org.ops4j.pax.exam</groupId>
@@ -171,41 +171,41 @@
             </plugin>
         </plugins>
         <pluginManagement>
-        	<plugins>
-        		<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
-        		<plugin>
-        			<groupId>org.eclipse.m2e</groupId>
-        			<artifactId>lifecycle-mapping</artifactId>
-        			<version>1.0.0</version>
-        			<configuration>
-        				<lifecycleMappingMetadata>
-        					<pluginExecutions>
-        						<pluginExecution>
-        							<pluginExecutionFilter>
-        								<groupId>
-        									org.apache.servicemix.tooling
-        								</groupId>
-        								<artifactId>
-        									depends-maven-plugin
-        								</artifactId>
-        								<versionRange>
-        									[1.2,)
-        								</versionRange>
-        								<goals>
-        									<goal>
-        										generate-depends-file
-        									</goal>
-        								</goals>
-        							</pluginExecutionFilter>
-        							<action>
-        								<ignore />
-        							</action>
-        						</pluginExecution>
-        					</pluginExecutions>
-        				</lifecycleMappingMetadata>
-        			</configuration>
-        		</plugin>
-        	</plugins>
+            <plugins>
+                <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+                <plugin>
+                    <groupId>org.eclipse.m2e</groupId>
+                    <artifactId>lifecycle-mapping</artifactId>
+                    <version>1.0.0</version>
+                    <configuration>
+                        <lifecycleMappingMetadata>
+                            <pluginExecutions>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>
+                                            org.apache.servicemix.tooling
+                                        </groupId>
+                                        <artifactId>
+                                            depends-maven-plugin
+                                        </artifactId>
+                                        <versionRange>
+                                            [1.2,)
+                                        </versionRange>
+                                        <goals>
+                                            <goal>
+                                                generate-depends-file
+                                            </goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore />
+                                    </action>
+                                </pluginExecution>
+                            </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                    </configuration>
+                </plugin>
+            </plugins>
         </pluginManagement>
     </build>
 </project>

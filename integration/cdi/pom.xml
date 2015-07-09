@@ -78,8 +78,8 @@
     </dependencies>
     
     <build>
-    	<plugins>
-    		<!-- Generate Manifest file required for OSGI bundles -->
+        <plugins>
+            <!-- Generate Manifest file required for OSGI bundles -->
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
@@ -112,7 +112,7 @@
                         </Provide-Capability>        
                     </instructions>
                 </configuration>
-            </plugin>    		
-    	</plugins>
+            </plugin>            
+        </plugins>
     </build>
 </project>
