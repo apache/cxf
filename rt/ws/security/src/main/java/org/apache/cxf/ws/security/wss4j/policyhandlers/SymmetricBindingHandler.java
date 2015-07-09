@@ -404,6 +404,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             dkEncr.setIdAllocator(wssConfig.getIdAllocator());
             dkEncr.setCallbackLookup(callbackLookup);
             dkEncr.setAttachmentCallbackHandler(new AttachmentCallbackHandler(message));
+            dkEncr.setStoreBytesInAttachment(storeBytesInAttachment);
             if (recToken.getToken().getVersion() == SPConstants.SPVersion.SP11) {
                 dkEncr.setWscVersion(ConversationConstants.VERSION_05_02);
             }
@@ -519,6 +520,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                     encr.setIdAllocator(wssConfig.getIdAllocator());
                     encr.setCallbackLookup(callbackLookup);
                     encr.setAttachmentCallbackHandler(new AttachmentCallbackHandler(message));
+                    encr.setStoreBytesInAttachment(storeBytesInAttachment);
                     String encrTokId = encrTok.getId();
                     if (attached) {
                         encrTokId = encrTok.getWsuId();
@@ -636,6 +638,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
         dkSign.setIdAllocator(wssConfig.getIdAllocator());
         dkSign.setCallbackLookup(callbackLookup);
         dkSign.setAttachmentCallbackHandler(new AttachmentCallbackHandler(message));
+        dkSign.setStoreBytesInAttachment(storeBytesInAttachment);
         if (policyAbstractTokenWrapper.getToken().getVersion() == SPConstants.SPVersion.SP11) {
             dkSign.setWscVersion(ConversationConstants.VERSION_05_02);
         }
@@ -765,6 +768,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             sig.setIdAllocator(wssConfig.getIdAllocator());
             sig.setCallbackLookup(callbackLookup);
             sig.setAttachmentCallbackHandler(new AttachmentCallbackHandler(message));
+            sig.setStoreBytesInAttachment(storeBytesInAttachment);
             // If a EncryptedKeyToken is used, set the correct value type to
             // be used in the wsse:Reference in ds:KeyInfo
             int type = included ? WSConstants.CUSTOM_SYMM_SIGNING 

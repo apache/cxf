@@ -456,6 +456,8 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                     WSSecDKEncrypt dkEncr = new WSSecDKEncrypt();
                     dkEncr.setIdAllocator(wssConfig.getIdAllocator());
                     dkEncr.setCallbackLookup(callbackLookup);
+                    dkEncr.setAttachmentCallbackHandler(new AttachmentCallbackHandler(message));
+                    dkEncr.setStoreBytesInAttachment(storeBytesInAttachment);
                     if (recToken.getToken().getVersion() == SPConstants.SPVersion.SP11) {
                         dkEncr.setWscVersion(ConversationConstants.VERSION_05_02);
                     }
@@ -487,6 +489,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                     encr.setIdAllocator(wssConfig.getIdAllocator());
                     encr.setCallbackLookup(callbackLookup);
                     encr.setAttachmentCallbackHandler(new AttachmentCallbackHandler(message));
+                    encr.setStoreBytesInAttachment(storeBytesInAttachment);
                     
                     encr.setDocument(saaj.getSOAPPart());
                     Crypto crypto = getEncryptionCrypto();
@@ -622,6 +625,8 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             WSSecDKSign dkSign = new WSSecDKSign();
             dkSign.setIdAllocator(wssConfig.getIdAllocator());
             dkSign.setCallbackLookup(callbackLookup);
+            dkSign.setAttachmentCallbackHandler(new AttachmentCallbackHandler(message));
+            dkSign.setStoreBytesInAttachment(storeBytesInAttachment);
             if (wrapper.getToken().getVersion() == SPConstants.SPVersion.SP11) {
                 dkSign.setWscVersion(ConversationConstants.VERSION_05_02);
             }

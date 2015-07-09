@@ -119,8 +119,7 @@ public class MTOMSecurityTest extends AbstractBusClientServerTestBase {
     // Here we moving encrypted bytes to attachments instead, and referencing them via xop:Include
     // This avoids the BASE-64 encoding/decoding step when the raw bytes are included in the SOAP Envelope
     @org.junit.Test
-    @org.junit.Ignore
-    public void testEncryptedDataInAttachment() throws Exception {
+    public void testAsymmetricBytesInAttachment() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = MTOMSecurityTest.class.getResource("client.xml");
@@ -132,6 +131,54 @@ public class MTOMSecurityTest extends AbstractBusClientServerTestBase {
         URL wsdl = MTOMSecurityTest.class.getResource("DoubleItMtom.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricPort");
+        DoubleItPortType port = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT);
+        
+        int result = port.doubleIt(25);
+        assertEquals(result, 50);
+        
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testSymmetricBytesInAttachment() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = MTOMSecurityTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        URL wsdl = MTOMSecurityTest.class.getResource("DoubleItMtom.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSymmetricPort");
+        DoubleItPortType port = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT);
+        
+        int result = port.doubleIt(25);
+        assertEquals(result, 50);
+        
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testActionBytesInAttachment() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = MTOMSecurityTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        URL wsdl = MTOMSecurityTest.class.getResource("DoubleItMtom.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItActionPort");
         DoubleItPortType port = 
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, PORT);
