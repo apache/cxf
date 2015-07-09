@@ -63,9 +63,6 @@ public class JettyHTTPServerEngineFactoryHolder {
     
     private Map<String, List<Handler>> handlersMap;
     
-    private Map<String, Boolean> sessionSupportMap;
-    private Map<String, Boolean> reuseAddressMap;
-
     private JAXBContext jaxbContext;
     private Set<Class<?>> jaxbClasses;
 
@@ -142,18 +139,6 @@ public class JettyHTTPServerEngineFactoryHolder {
                             + engine.getPort().toString());
                     }
                 }
-                if (sessionSupportMap != null) {
-                    Boolean sessionSupport = sessionSupportMap.get(engine.getPort().toString());
-                    if (sessionSupport != null) {
-                        eng.setSessionSupport(sessionSupport);
-                    }    
-                }
-                if (reuseAddressMap != null) {
-                    Boolean reuseAddress = reuseAddressMap.get(engine.getPort().toString());
-                    if (reuseAddress != null) {
-                        eng.setReuseAddress(reuseAddress);
-                    }    
-                }
                 
                 if (engine.isContinuationsEnabled() != null) {
                     eng.setContinuationsEnabled(engine.isContinuationsEnabled());
@@ -168,7 +153,12 @@ public class JettyHTTPServerEngineFactoryHolder {
                 if (engine.getPort() != null) {
                     eng.setPort(engine.getPort());
                 }
-                
+                if (engine.isReuseAddress() != null) {
+                    eng.setReuseAddress(engine.isReuseAddress());
+                }
+                if (engine.isSessionSupport() != null) {
+                    eng.setSessionSupport(engine.isSessionSupport());
+                }
                 if (engine.getThreadingParameters() != null) {
                     ThreadingParametersType threads = engine.getThreadingParameters();
                     ThreadingParameters rThreads = new ThreadingParameters();
@@ -219,14 +209,6 @@ public class JettyHTTPServerEngineFactoryHolder {
     
     public void setConnectorMap(Map<String, Connector> connectorMap) {
         this.connectorMap = connectorMap;
-    }
-    
-    public void setSessionSupportMap(Map<String, Boolean> sessionMap) {
-        this.sessionSupportMap = sessionMap;
-    }
-    
-    public void setReuseAddressMap(Map<String, Boolean> reuseMap) {
-        this.reuseAddressMap = reuseMap;
     }
     
     public void setHandlersMap(Map<String, List<Handler>> handlersMap) {
