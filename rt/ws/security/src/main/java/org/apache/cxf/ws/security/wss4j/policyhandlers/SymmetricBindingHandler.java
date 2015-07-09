@@ -399,6 +399,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
         try {
             WSSecDKEncrypt dkEncr = new WSSecDKEncrypt(wssConfig);
             dkEncr.setAttachmentCallbackHandler(new AttachmentCallbackHandler(message));
+            dkEncr.setStoreBytesInAttachment(storeBytesInAttachment);
             if (recToken.getToken().getVersion() == SPConstants.SPVersion.SP11) {
                 dkEncr.setWscVersion(ConversationConstants.VERSION_05_02);
             }
@@ -512,6 +513,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                 try {
                     WSSecEncrypt encr = new WSSecEncrypt(wssConfig);
                     encr.setAttachmentCallbackHandler(new AttachmentCallbackHandler(message));
+                    encr.setStoreBytesInAttachment(storeBytesInAttachment);
                     String encrTokId = encrTok.getId();
                     if (attached) {
                         encrTokId = encrTok.getWsuId();
@@ -627,6 +629,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
         Document doc = saaj.getSOAPPart();
         WSSecDKSign dkSign = new WSSecDKSign(wssConfig);
         dkSign.setAttachmentCallbackHandler(new AttachmentCallbackHandler(message));
+        dkSign.setStoreBytesInAttachment(storeBytesInAttachment);
         if (policyAbstractTokenWrapper.getToken().getVersion() == SPConstants.SPVersion.SP11) {
             dkSign.setWscVersion(ConversationConstants.VERSION_05_02);
         }
@@ -754,6 +757,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
         } else {
             WSSecSignature sig = new WSSecSignature(wssConfig);
             sig.setAttachmentCallbackHandler(new AttachmentCallbackHandler(message));
+            sig.setStoreBytesInAttachment(storeBytesInAttachment);
             // If a EncryptedKeyToken is used, set the correct value type to
             // be used in the wsse:Reference in ds:KeyInfo
             int type = included ? WSConstants.CUSTOM_SYMM_SIGNING 

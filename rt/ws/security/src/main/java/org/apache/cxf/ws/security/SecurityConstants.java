@@ -244,8 +244,21 @@ public final class SecurityConstants {
      * SAML Token contains Audience Restriction URIs, one of them must match either the
      * request URL or the Service QName. The default is "true".
      */
+<<<<<<< HEAD
     public static final String AUDIENCE_RESTRICTION_VALIDATION = "ws-security.validate.audience-restriction";
     
+=======
+    public static final String ENABLE_SAML_ONE_TIME_USE_CACHE = "ws-security.enable.saml.cache";
+    
+    /**
+     * Whether to store bytes (CipherData or BinarySecurityToken) in an attachment. The default is 
+     * true if MTOM is enabled. Set it to false to BASE-64 encode the bytes and "inlined" them in 
+     * the message instead. Setting this to true is more efficient, as it means that the BASE-64 
+     * encoding step can be skipped. This only applies to the DOM WS-Security stack.
+     */
+    public static final String STORE_BYTES_IN_ATTACHMENT = "ws-security.store.bytes.in.attachment";
+
+>>>>>>> f399b92... Support the ability to store BASE-64 encoded (encryption) bytes in message attachments
     //
     // Non-boolean WS-Security Configuration parameters
     //
@@ -650,8 +663,13 @@ public final class SecurityConstants {
             CACHE_IDENTIFIER, CACHE_ISSUED_TOKEN_IN_ENDPOINT, PREFER_WSMEX_OVER_STS_CLIENT_CONFIG,
             DELEGATED_CREDENTIAL, KERBEROS_USE_CREDENTIAL_DELEGATION, 
             KERBEROS_IS_USERNAME_IN_SERVICENAME_FORM, STS_TOKEN_IMMINENT_EXPIRY_VALUE,
+<<<<<<< HEAD
             KERBEROS_REQUEST_CREDENTIAL_DELEGATION, ENABLE_UNSIGNED_SAML_ASSERTION_PRINCIPAL,
             AUDIENCE_RESTRICTION_VALIDATION
+=======
+            KERBEROS_REQUEST_CREDENTIAL_DELEGATION, POLICY_VALIDATOR_MAP,
+            STORE_BYTES_IN_ATTACHMENT
+>>>>>>> f399b92... Support the ability to store BASE-64 encoded (encryption) bytes in message attachments
         }));
         ALL_PROPERTIES = Collections.unmodifiableSet(s);
     }
