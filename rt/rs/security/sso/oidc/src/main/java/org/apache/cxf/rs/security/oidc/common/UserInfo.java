@@ -33,7 +33,9 @@ public class UserInfo extends JwtClaims {
     public static final String ADDRESS_CLAIM = "address";
     public UserInfo() {
     }
-    
+    public UserInfo(JwtClaims claims) {
+        this(claims.asMap());
+    }
     public UserInfo(Map<String, Object> claims) {
         super(claims);
     }

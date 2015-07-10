@@ -33,7 +33,7 @@ import org.apache.cxf.rs.security.oauth2.client.Consumer;
 import org.apache.cxf.rs.security.oidc.common.IdToken;
 
 public class OidcIdTokenRequestFilter implements ContainerRequestFilter {
-    private String tokenFormParameter = "idtoken"; 
+    private String tokenFormParameter = "id_token"; 
     private IdTokenReader idTokenReader;
     private Consumer consumer;
     

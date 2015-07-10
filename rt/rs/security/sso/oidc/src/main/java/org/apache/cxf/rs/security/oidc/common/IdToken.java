@@ -18,8 +18,10 @@
  */
 package org.apache.cxf.rs.security.oidc.common;
 
+import java.util.List;
 import java.util.Map;
 
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 
 public class IdToken extends JwtClaims {
@@ -27,8 +29,13 @@ public class IdToken extends JwtClaims {
     public static final String NONCE_CLAIM = "nonce";
     public static final String ACR_CLAIM = "acr";
     public static final String AZP_CLAIM = "azp";
+    public static final String AMR_CLAIM = "amr";
     
     public IdToken() {
+    }
+    
+    public IdToken(JwtClaims claims) {
+        this(claims.asMap());
     }
     
     public IdToken(Map<String, Object> claims) {
@@ -52,10 +59,17 @@ public class IdToken extends JwtClaims {
     public String getAuthenticationContextRef() {
         return (String)getProperty(ACR_CLAIM);
     }
+    public void setAuthenticationMethodRefs(List<String> refs) {
+        setProperty(AMR_CLAIM, refs);
+    }
+    public List<String> getAuthenticationMethodRefs() {
+        return CastUtils.cast((List<?>)getProperty(AMR_CLAIM));
+    }
     public void setAuthorizedParty(String azp) {
         setProperty(AZP_CLAIM, azp);
     }
     public String getAuthorizedParty() {
         return (String)getProperty(AZP_CLAIM);
     }
+    
 }

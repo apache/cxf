@@ -32,6 +32,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
+import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.cxf.jaxrs.client.WebClient;
@@ -63,7 +64,8 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
     private boolean decodeRequestParameters;
     private long expiryThreshold;
     private String redirectUri;
-    
+    private boolean setFormPostResponseMode;
+        
     @Override
     public void filter(ContainerRequestContext rc) throws IOException {
         checkSecurityContextStart(rc);
@@ -111,12 +113,22 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
         String theState = redirectState != null ? redirectState.getFirst(OAuthConstants.STATE) : null;
         String redirectScope = redirectState != null ? redirectState.getFirst(OAuthConstants.SCOPE) : null;
         String theScope = redirectScope != null ? redirectScope : scopes;
-        URI uri = OAuthClientUtils.getAuthorizationURI(authorizationServiceUri, 
+        UriBuilder ub = OAuthClientUtils.getAuthorizationURIBuilder(authorizationServiceUri, 
                                              consumer.getKey(), 
                                              getAbsoluteRedirectUri(ui).toString(), 
                                              theState, 
                                              theScope);
+        setAdditionalCodeRequestParams(ub, redirectState);
+        URI uri = ub.build();
         return Response.seeOther(uri).build();
+    }
+
+    protected void setAdditionalCodeRequestParams(UriBuilder ub, MultivaluedMap<String, String> redirectState) {
+        if (setFormPostResponseMode) {
+            // This property is described in OIDC OAuth 2.0 Form Post Response Mode which is technically
+            // can be used without OIDC hence this is set in this filter as opposed to the OIDC specific one.
+            ub.queryParam("response_mode", "form_post");
+        }
     }
 
     private URI getAbsoluteRedirectUri(UriInfo ui) {
@@ -146,19 +158,21 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
     
     protected ClientTokenContext initializeClientTokenContext(ContainerRequestContext rc, 
                                                               ClientAccessToken at, 
-                                                            MultivaluedMap<String, String> params) {
-        ClientTokenContext tokenContext = createTokenContext(rc, at);
-        ((ClientTokenContextImpl)tokenContext).setToken(at);
+                                                              MultivaluedMap<String, String> params) {
+        MultivaluedMap<String, String> state = null;
         if (clientStateManager != null) {
-            MultivaluedMap<String, String> state = clientStateManager.fromRedirectState(mc, params);
-            ((ClientTokenContextImpl)tokenContext).setState(state);
+            state = clientStateManager.fromRedirectState(mc, params);
         }
-        
+        ClientTokenContext tokenContext = createTokenContext(rc, at, state);
+        ((ClientTokenContextImpl)tokenContext).setToken(at);
+        ((ClientTokenContextImpl)tokenContext).setState(state);
         return tokenContext;
         
     }
 
-    protected ClientTokenContext createTokenContext(ContainerRequestContext rc, ClientAccessToken at) {
+    protected ClientTokenContext createTokenContext(ContainerRequestContext rc, 
+                                                    ClientAccessToken at,
+                                                    MultivaluedMap<String, String> state) {
         return new ClientTokenContextImpl();
     }
     
@@ -166,14 +180,17 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
         JAXRSUtils.getCurrentMessage().setContent(ClientTokenContext.class, request);
     }
 
-    private MultivaluedMap<String, String> createRedirectState(ContainerRequestContext rc, UriInfo ui) {
+    protected MultivaluedMap<String, String> createRedirectState(ContainerRequestContext rc, UriInfo ui) {
         if (clientStateManager == null) {
             return null;
         }
-        return clientStateManager.toRedirectState(mc, toRequestState(rc, ui));
+        return clientStateManager.toRedirectState(mc, 
+                                                  toCodeRequestState(rc, ui));
     }
-
-    private MultivaluedMap<String, String> toRequestState(ContainerRequestContext rc, UriInfo ui) {
+    protected MultivaluedMap<String, String> toCodeRequestState(ContainerRequestContext rc, UriInfo ui) {
+        return toRequestState(rc, ui);
+    }
+    protected MultivaluedMap<String, String> toRequestState(ContainerRequestContext rc, UriInfo ui) {
         MultivaluedMap<String, String> requestState = new MetadataMap<String, String>();
         requestState.putAll(ui.getQueryParameters(decodeRequestParameters));
         if (MediaType.APPLICATION_FORM_URLENCODED_TYPE.isCompatible(rc.getMediaType())) {
@@ -265,5 +282,9 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
     public void setRedirectUri(String redirectUri) {
         // Can be set to something like "postmessage" in some flows
         this.redirectUri = redirectUri;
+    }
+
+    public void setSetFormPostResponseMode(boolean setFormPostResponseMode) {
+        this.setFormPostResponseMode = setFormPostResponseMode;
     }
 }
