@@ -42,9 +42,7 @@ public abstract class AbstractTokenValidator {
     private WebClient jwkSetClient;
     private ConcurrentHashMap<String, JsonWebKey> keyMap = new ConcurrentHashMap<String, JsonWebKey>(); 
     
-    protected JwtToken getJwtToken(String wrappedJwtToken, 
-                                   String idTokenKid, 
-                                   boolean jweOnly) {
+    protected JwtToken getJwtToken(String wrappedJwtToken, boolean jweOnly) {
         if (wrappedJwtToken == null) {
             throw new SecurityException("ID Token is missing");
         }
@@ -58,7 +56,7 @@ public abstract class AbstractTokenValidator {
 
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(wrappedJwtToken);
         JwtToken jwt = jwtConsumer.getJwtToken(); 
-        JwsSignatureVerifier theSigVerifier = getInitializedSigVerifier(jwt, idTokenKid);
+        JwsSignatureVerifier theSigVerifier = getInitializedSigVerifier(jwt);
         return validateToken(jwtConsumer, jwt, theSigVerifier);
         
     }
@@ -115,7 +113,7 @@ public abstract class AbstractTokenValidator {
         } 
         return JweUtils.loadDecryptionProvider(jweOnly);
     }
-    protected JwsSignatureVerifier getInitializedSigVerifier(JwtToken jwt, String idTokenKid) {
+    protected JwsSignatureVerifier getInitializedSigVerifier(JwtToken jwt) {
         if (jwsVerifier != null) {
             return jwsVerifier;    
         } 
@@ -123,12 +121,13 @@ public abstract class AbstractTokenValidator {
         if (theJwsVerifier != null) {
             return theJwsVerifier;
         }
-        if (jwkSetClient == null) {
-            throw new SecurityException("Provider Jwk Set Client is not available");
-        }
-        String keyId = idTokenKid != null ? idTokenKid : jwt.getHeaders().getKeyId();
+        
+        String keyId = jwt.getHeaders().getKeyId();
         JsonWebKey key = keyId != null ? keyMap.get(keyId) : null;
         if (key == null) {
+            if (jwkSetClient == null) {
+                throw new SecurityException("Provider Jwk Set Client is not available");
+            }
             JsonWebKeys keys = jwkSetClient.get(JsonWebKeys.class);
             if (keyId != null) {
                 key = keys.getKey(keyId);
@@ -141,9 +140,11 @@ public abstract class AbstractTokenValidator {
             throw new SecurityException("JWK key with the key id: \"" + keyId + "\" is not available");
         }
         theJwsVerifier = JwsUtils.getSignatureVerifier(key);
-        if (jwkSetClient == null) {
-            throw new SecurityException();
+        
+        if (theJwsVerifier == null) {
+            throw new SecurityException("JWS Verifier is not available");
         }
+        
         return theJwsVerifier;
     }
 

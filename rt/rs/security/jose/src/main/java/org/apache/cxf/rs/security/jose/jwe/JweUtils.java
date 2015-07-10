@@ -625,4 +625,5 @@ public final class JweUtils {
                                                                   RSSEC_ENCRYPTION_IN_PROPS, RSSEC_ENCRYPTION_PROPS);
         KeyManagementUtils.validateCertificateChain(props, certs);
     }
+    
 }

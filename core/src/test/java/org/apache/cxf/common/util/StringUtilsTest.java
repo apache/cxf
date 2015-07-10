@@ -53,6 +53,16 @@ public class StringUtilsTest extends Assert {
     }
     
     @Test
+    public void testSplitWithDot() throws Exception {
+        String str = "a.b.c";
+        String[] parts = StringUtils.split(str, "\\.", -1);
+        assertEquals(3, parts.length);
+        assertEquals("a", parts[0]);
+        assertEquals("b", parts[1]);
+        assertEquals("c", parts[2]);
+    }
+    
+    @Test
     public void testGetFound() throws Exception {
         String regex = "velocity-\\d+\\.\\d+\\.jar";
         
