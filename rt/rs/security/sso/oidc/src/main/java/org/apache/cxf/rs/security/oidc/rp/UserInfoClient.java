@@ -52,7 +52,7 @@ public class UserInfoClient extends IdTokenReader {
         return profile;
     }
     public JwtToken getUserInfoJwt(String profileJwtToken, IdToken idToken) {
-        return getJwtToken(profileJwtToken, (String)idToken.getProperty("kid"), encryptedOnly);
+        return getJwtToken(profileJwtToken, encryptedOnly);
     }
     public void validateUserInfo(UserInfo profile, IdToken idToken) {
         validateJwtClaims(profile, idToken.getAudience(), false);

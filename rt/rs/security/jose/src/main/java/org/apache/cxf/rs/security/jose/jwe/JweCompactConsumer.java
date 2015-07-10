@@ -28,16 +28,14 @@ import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.rs.security.jose.JoseException;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
+import org.apache.cxf.rs.security.jose.JoseUtils;
 
 
 public class JweCompactConsumer {
     protected static final Logger LOG = LogUtils.getL7dLogger(JweCompactConsumer.class);
     private JweDecryptionInput jweDecryptionInput;
     public JweCompactConsumer(String jweContent) {
-        if (jweContent.startsWith("\"") && jweContent.endsWith("\"")) {
-            jweContent = jweContent.substring(1, jweContent.length() - 1);
-        }
-        String[] parts = jweContent.split("\\.");
+        String[] parts = JoseUtils.getCompactParts(jweContent);
         if (parts.length != 5) {
             LOG.warning("5 JWE parts are expected");
             throw new JweException(JweException.Error.INVALID_COMPACT_JWE);
