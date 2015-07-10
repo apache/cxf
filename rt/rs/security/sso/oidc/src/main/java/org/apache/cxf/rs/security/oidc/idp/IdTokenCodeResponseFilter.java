@@ -28,7 +28,7 @@ import org.apache.cxf.rs.security.oauth2.provider.AccessTokenResponseFilter;
 import org.apache.cxf.rs.security.oidc.common.IdToken;
 import org.apache.cxf.rs.security.oidc.utils.OidcUtils;
 
-public class UserInfoCodeResponseFilter extends AbstractJwsJweProducer implements AccessTokenResponseFilter {
+public class IdTokenCodeResponseFilter extends AbstractJwsJweProducer implements AccessTokenResponseFilter {
     private UserInfoProvider userInfoProvider;
     private String issuer;
     @Override
