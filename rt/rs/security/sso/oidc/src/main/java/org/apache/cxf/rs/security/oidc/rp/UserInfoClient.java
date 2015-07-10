@@ -43,7 +43,7 @@ public class UserInfoClient extends IdTokenReader {
         }
     }
     public UserInfo getUserInfoFromJwt(String profileJwtToken, IdToken idToken) {
-        JwtToken jwt = getUserInfoJwt(profileJwtToken, idToken);
+        JwtToken jwt = getUserInfoJwt(profileJwtToken);
         return getUserInfoFromJwt(jwt, idToken);
     }
     public UserInfo getUserInfoFromJwt(JwtToken jwt, IdToken idToken) {
@@ -51,7 +51,7 @@ public class UserInfoClient extends IdTokenReader {
         validateUserInfo(profile, idToken);
         return profile;
     }
-    public JwtToken getUserInfoJwt(String profileJwtToken, IdToken idToken) {
+    public JwtToken getUserInfoJwt(String profileJwtToken) {
         return getJwtToken(profileJwtToken, encryptedOnly);
     }
     public void validateUserInfo(UserInfo profile, IdToken idToken) {
