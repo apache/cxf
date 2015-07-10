@@ -162,7 +162,7 @@ public class JweJsonConsumerTest extends Assert {
                                        ContentAlgorithm contentEncryptionAlgo,
                                        final byte[] wrapperKeyBytes,
                                        final byte[] cek) throws Exception {
-        if (contentEncryptionAlgo.equals(AlgorithmUtils.A128GCM_ALGO) && SKIP_AES_GCM_TESTS) {
+        if (AlgorithmUtils.A128GCM_ALGO.equals(contentEncryptionAlgo.getJwaName()) && SKIP_AES_GCM_TESTS) {
             return;
         }
         JweDecryptionProvider jwe = null;
