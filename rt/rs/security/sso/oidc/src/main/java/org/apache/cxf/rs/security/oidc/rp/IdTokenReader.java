@@ -25,7 +25,6 @@ import org.apache.cxf.rs.security.oidc.utils.OidcUtils;
 
 public class IdTokenReader extends AbstractTokenValidator {
     private boolean requireAtHash = true;
-    
     public IdToken getIdToken(ClientAccessToken at, String clientId) {
         JwtToken jwt = getIdJwtToken(at, clientId);
         return getIdTokenFromJwt(jwt);
@@ -45,8 +44,7 @@ public class IdTokenReader extends AbstractTokenValidator {
         validateJwtClaims(jwt.getClaims(), clientId, true);
         return jwt;
     }
-    public IdToken getIdTokenFromJwt(JwtToken jwt) {
-        //TODO: do the extra validation if needed
+    private IdToken getIdTokenFromJwt(JwtToken jwt) {
         return new IdToken(jwt.getClaims().asMap());
     }
     public void setRequireAtHash(boolean requireAtHash) {
