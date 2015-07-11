@@ -47,6 +47,8 @@ abstract class AbstractSwaggerFeature extends AbstractFeature {
 
     protected abstract void addSwaggerResource(Server server);
 
+    protected abstract void setBasePathByAddress(String address);
+
     private void calculateDefaultResourcePackage(Server server) {
         JAXRSServiceFactoryBean serviceFactoryBean = 
             (JAXRSServiceFactoryBean)server.getEndpoint().get(JAXRSServiceFactoryBean.class.getName());
@@ -61,9 +63,10 @@ abstract class AbstractSwaggerFeature extends AbstractFeature {
     private void calculateDefaultBasePath(Server server) {
         if (getBasePath() == null || getBasePath().length() == 0) {
             String address = server.getEndpoint().getEndpointInfo().getAddress();
-            setBasePath(address);
+            setBasePathByAddress(address);
         }
     }
+
     public String getResourcePackage() {
         return resourcePackage;
     }

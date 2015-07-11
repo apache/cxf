@@ -19,6 +19,7 @@
 package org.apache.cxf.jaxrs.swagger;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -75,6 +76,15 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         beanConfig.setLicense(getLicense());
         beanConfig.setLicenseUrl(getLicenseUrl());
         beanConfig.setScan(isScan());
+    }
+
+    @Override
+    protected void setBasePathByAddress(String address) {
+        if (!address.startsWith("/")) {
+            // get rid of the path
+            address = URI.create(address).getPath();
+        }
+        setBasePath(address);
     }
 
     @PreMatching

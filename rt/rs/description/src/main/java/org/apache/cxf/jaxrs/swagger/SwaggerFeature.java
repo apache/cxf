@@ -73,6 +73,11 @@ public class SwaggerFeature extends AbstractSwaggerFeature {
         beanConfig.setScan(isScan());
     }    
 
+    @Override
+    protected void setBasePathByAddress(String address) {
+        setBasePath(address);
+    }
+
     @PreMatching
     private static class SwaggerContainerRequestFilter implements ContainerRequestFilter {
         private static final String APIDOCS_LISTING_PATH = "api-docs";

@@ -40,6 +40,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import org.skyscreamer.jsonassert.JSONAssert;
+import org.yaml.snakeyaml.Yaml;
 
 public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBusClientServerTestBase {
     
@@ -96,9 +97,23 @@ public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBus
             assertEquals(Status.OK.getStatusCode(), r.getStatus());
             JSONAssert.assertEquals(
                 IOUtils.readStringFromStream((InputStream)r.getEntity()), 
-                String.format(IOUtils.readStringFromStream(getClass().getResourceAsStream("swagger2-json.txt")), 
-                              getPort()),
+                IOUtils.readStringFromStream(getClass().getResourceAsStream("swagger2-json.txt")),
                 false);
+        } finally {
+            client.close();
+        }
+    }
+
+    @Test
+    public void testApiListingIsProperlyReturnedYAML() throws Exception {
+        final WebClient client = createWebClient("/swagger.yaml");
+        
+        try {
+            final Response r = client.get();
+            assertEquals(Status.OK.getStatusCode(), r.getStatus());
+            Yaml yaml = new Yaml();
+            assertEquals(yaml.load(getClass().getResourceAsStream("swagger2-yaml.txt")),
+                         yaml.load(IOUtils.readStringFromStream((InputStream)r.getEntity())));
         } finally {
             client.close();
         }
@@ -108,6 +123,6 @@ public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBus
         return WebClient
             .create("http://localhost:" + getPort() + url, 
                 Arrays.< Object >asList(new JacksonJsonProvider()))
-            .accept(MediaType.APPLICATION_JSON);
+            .accept(MediaType.APPLICATION_JSON).accept("application/yaml");
     }
 }
