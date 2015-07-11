@@ -81,7 +81,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
     @Override
     protected void setBasePathByAddress(String address) {
         if (!address.startsWith("/")) {
-            // get rid of the path
+            // get the path part
             address = URI.create(address).getPath();
         }
         setBasePath(address);
