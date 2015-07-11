@@ -503,6 +503,12 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+           <groupId>org.yaml</groupId>
+           <artifactId>snakeyaml</artifactId>
+           <version>1.15</version>
+           <scope>test</scope>
+        </dependency>
+        <dependency>
             <!-- activate atmosphere. Its use can be disabled by setting
                  org.apache.cxf.transport.websocket.atmosphere.disabled to "true" -->
             <groupId>org.atmosphere</groupId>
