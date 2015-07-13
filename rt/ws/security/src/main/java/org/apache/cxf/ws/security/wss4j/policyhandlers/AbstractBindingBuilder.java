@@ -196,7 +196,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         
         boolean storeBytes = 
             MessageUtils.getContextualBoolean(
-                message, SecurityConstants.STORE_BYTES_IN_ATTACHMENT, true
+                message, SecurityConstants.STORE_BYTES_IN_ATTACHMENT, false
             );
         if (storeBytes && AttachmentUtil.isMtomEnabled(message)) {
             storeBytesInAttachment = true;

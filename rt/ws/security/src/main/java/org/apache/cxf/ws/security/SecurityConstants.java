@@ -248,9 +248,8 @@ public final class SecurityConstants {
     
     /**
      * Whether to store bytes (CipherData or BinarySecurityToken) in an attachment. The default is 
-     * true if MTOM is enabled. Set it to false to BASE-64 encode the bytes and "inlined" them in 
-     * the message instead. Setting this to true is more efficient, as it means that the BASE-64 
-     * encoding step can be skipped. This only applies to the DOM WS-Security stack.
+     * false. Setting this to true is more efficient, as it means that the BASE-64 encoding step can be 
+     * skipped. MTOM must be enabled for this to work. This only applies to the DOM WS-Security stack.
      */
     public static final String STORE_BYTES_IN_ATTACHMENT = "ws-security.store.bytes.in.attachment";
 
