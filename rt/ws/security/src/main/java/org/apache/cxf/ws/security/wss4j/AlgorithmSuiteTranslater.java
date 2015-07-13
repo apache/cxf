@@ -101,37 +101,39 @@ public final class AlgorithmSuiteTranslater {
             }
             
             AlgorithmSuiteType algorithmSuiteType = cxfAlgorithmSuite.getAlgorithmSuiteType();
+            if (algorithmSuiteType != null) {
             // Set asymmetric key lengths
-            if (algorithmSuite.getMaximumAsymmetricKeyLength() 
-                < algorithmSuiteType.getMaximumAsymmetricKeyLength()) {
-                algorithmSuite.setMaximumAsymmetricKeyLength(
-                    algorithmSuiteType.getMaximumAsymmetricKeyLength());
-            }
-            if (algorithmSuite.getMinimumAsymmetricKeyLength() 
-                > algorithmSuiteType.getMinimumAsymmetricKeyLength()) {
-                algorithmSuite.setMinimumAsymmetricKeyLength(
-                    algorithmSuiteType.getMinimumAsymmetricKeyLength());
-            }
-            
-            // Set symmetric key lengths
-            if (algorithmSuite.getMaximumSymmetricKeyLength() 
-                < algorithmSuiteType.getMaximumSymmetricKeyLength()) {
-                algorithmSuite.setMaximumSymmetricKeyLength(
-                    algorithmSuiteType.getMaximumSymmetricKeyLength());
-            }
-            if (algorithmSuite.getMinimumSymmetricKeyLength() 
-                > algorithmSuiteType.getMinimumSymmetricKeyLength()) {
-                algorithmSuite.setMinimumSymmetricKeyLength(
-                    algorithmSuiteType.getMinimumSymmetricKeyLength());
-            }
+                if (algorithmSuite.getMaximumAsymmetricKeyLength() 
+                    < algorithmSuiteType.getMaximumAsymmetricKeyLength()) {
+                    algorithmSuite.setMaximumAsymmetricKeyLength(
+                        algorithmSuiteType.getMaximumAsymmetricKeyLength());
+                }
+                if (algorithmSuite.getMinimumAsymmetricKeyLength() 
+                    > algorithmSuiteType.getMinimumAsymmetricKeyLength()) {
+                    algorithmSuite.setMinimumAsymmetricKeyLength(
+                        algorithmSuiteType.getMinimumAsymmetricKeyLength());
+                }
                 
-            algorithmSuite.addEncryptionMethod(algorithmSuiteType.getEncryption());
-            algorithmSuite.addKeyWrapAlgorithm(algorithmSuiteType.getSymmetricKeyWrap());
-            algorithmSuite.addKeyWrapAlgorithm(algorithmSuiteType.getAsymmetricKeyWrap());
+                // Set symmetric key lengths
+                if (algorithmSuite.getMaximumSymmetricKeyLength() 
+                    < algorithmSuiteType.getMaximumSymmetricKeyLength()) {
+                    algorithmSuite.setMaximumSymmetricKeyLength(
+                        algorithmSuiteType.getMaximumSymmetricKeyLength());
+                }
+                if (algorithmSuite.getMinimumSymmetricKeyLength() 
+                    > algorithmSuiteType.getMinimumSymmetricKeyLength()) {
+                    algorithmSuite.setMinimumSymmetricKeyLength(
+                        algorithmSuiteType.getMinimumSymmetricKeyLength());
+                }
+                    
+                algorithmSuite.addEncryptionMethod(algorithmSuiteType.getEncryption());
+                algorithmSuite.addKeyWrapAlgorithm(algorithmSuiteType.getSymmetricKeyWrap());
+                algorithmSuite.addKeyWrapAlgorithm(algorithmSuiteType.getAsymmetricKeyWrap());
+                algorithmSuite.addDigestAlgorithm(algorithmSuiteType.getDigest());
+            }
     
             algorithmSuite.addSignatureMethod(cxfAlgorithmSuite.getAsymmetricSignature());
             algorithmSuite.addSignatureMethod(cxfAlgorithmSuite.getSymmetricSignature());
-            algorithmSuite.addDigestAlgorithm(algorithmSuiteType.getDigest());
             algorithmSuite.addC14nAlgorithm(cxfAlgorithmSuite.getC14n().getValue());
     
             algorithmSuite.addTransformAlgorithm(cxfAlgorithmSuite.getC14n().getValue());
