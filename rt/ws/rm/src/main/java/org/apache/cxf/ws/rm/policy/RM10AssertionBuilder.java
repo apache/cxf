@@ -28,7 +28,6 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.ws.policy.builder.jaxb.JaxbAssertion;
 import org.apache.cxf.ws.policy.builder.jaxb.JaxbAssertionBuilder;
 import org.apache.cxf.ws.rm.RM10Constants;
-import org.apache.cxf.ws.rm.RM11Constants;
 import org.apache.cxf.ws.rmp.v200502.RMAssertion;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.Constants;
@@ -53,13 +52,13 @@ public class RM10AssertionBuilder extends JaxbAssertionBuilder<RMAssertion> {
     
     class RMPolicyAssertion extends JaxbAssertion<RMAssertion> {
         RMPolicyAssertion() {
-            super(RM11Constants.WSRMP_RMASSERTION_QNAME, false);
+            super(RM10Constants.WSRMP_RMASSERTION_QNAME, false);
         }
         RMPolicyAssertion(boolean opt) {
-            super(RM11Constants.WSRMP_RMASSERTION_QNAME, opt);
+            super(RM10Constants.WSRMP_RMASSERTION_QNAME, opt);
         }
         RMPolicyAssertion(boolean opt, boolean ignore) {
-            super(RM11Constants.WSRMP_RMASSERTION_QNAME, opt, ignore);
+            super(RM10Constants.WSRMP_RMASSERTION_QNAME, opt, ignore);
         }
 
         @Override
