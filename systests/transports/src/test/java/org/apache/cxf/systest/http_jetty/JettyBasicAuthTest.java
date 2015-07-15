@@ -24,15 +24,21 @@ import java.net.URL;
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
+import org.apache.cxf.bus.CXFBusFactory;
+import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
+import org.apache.cxf.jaxws.endpoint.dynamic.JaxWsDynamicClientFactory;
 import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
+import org.apache.cxf.transport.http.HTTPConduit;
+import org.apache.cxf.transport.http.HTTPConduitConfigurer;
 import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.SOAPService;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Test;
 
 /**
  * Tests thread pool config.
@@ -64,8 +70,33 @@ public class JettyBasicAuthTest extends AbstractClientServerTestBase {
         bp.getRequestContext().put(BindingProvider.PASSWORD_PROPERTY, "pswd");
     }
 
-    @Test
+    @org.junit.Test
     public void testBasicAuth() throws Exception { 
         assertEquals("Hello Alice", greeter.greetMe("Alice"));
+    }
+    
+    @org.junit.Test
+    public void testGetWSDL() throws Exception {
+        BusFactory bf = CXFBusFactory.newInstance();
+        Bus bus = bf.createBus();
+        bus.getInInterceptors().add(new LoggingInInterceptor());
+        bus.getOutInterceptors().add(new LoggingOutInterceptor());
+       
+        MyHTTPConduitConfigurer myHttpConduitConfig = new MyHTTPConduitConfigurer();
+        bus.setExtension(myHttpConduitConfig, HTTPConduitConfigurer.class);
+        JaxWsDynamicClientFactory factory = JaxWsDynamicClientFactory.newInstance(bus);
+        factory.createClient(ADDRESS + "?wsdl");
+    }
+
+    private static class MyHTTPConduitConfigurer implements HTTPConduitConfigurer {
+        public void configure(String name, String address, HTTPConduit c) {
+
+            AuthorizationPolicy authorizationPolicy = new AuthorizationPolicy();
+
+            authorizationPolicy.setUserName("ffang");
+            authorizationPolicy.setPassword("pswd");
+            authorizationPolicy.setAuthorizationType("Basic");
+            c.setAuthorization(authorizationPolicy);
+        }
     }
 }

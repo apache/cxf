@@ -28,18 +28,23 @@ import javax.xml.ws.Endpoint;
 import javax.xml.ws.WebServiceException;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
+import org.apache.cxf.bus.CXFBusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
+import org.apache.cxf.jaxws.endpoint.dynamic.JaxWsDynamicClientFactory;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
 import org.apache.cxf.transport.http.HTTPConduit;
+import org.apache.cxf.transport.http.HTTPConduitConfigurer;
 import org.apache.cxf.transport.http.asyncclient.AsyncHTTPConduit;
 import org.apache.cxf.transport.http.auth.DigestAuthSupplier;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
@@ -47,7 +52,6 @@ import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.SOAPService;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -147,7 +151,7 @@ public class JettyDigestAuthTest extends AbstractClientServerTestBase {
         //which async client can handle but we cannot.
         doTest(true);
     }
-    
+  
     private void doTest(boolean async) throws Exception {
         setupClient(async);
         assertEquals("Hello Alice", greeter.greetMe("Alice"));
@@ -166,6 +170,31 @@ public class JettyDigestAuthTest extends AbstractClientServerTestBase {
             fail("Password was wrong, should have failed");
         } catch (WebServiceException wse) {
             //ignore - expected
+        }
+    }
+    
+    @org.junit.Test
+    public void testGetWSDL() throws Exception {
+        BusFactory bf = CXFBusFactory.newInstance();
+        Bus bus = bf.createBus();
+        bus.getInInterceptors().add(new LoggingInInterceptor());
+        bus.getOutInterceptors().add(new LoggingOutInterceptor());
+       
+        MyHTTPConduitConfigurer myHttpConduitConfig = new MyHTTPConduitConfigurer();
+        bus.setExtension(myHttpConduitConfig, HTTPConduitConfigurer.class);
+        JaxWsDynamicClientFactory factory = JaxWsDynamicClientFactory.newInstance(bus);
+        factory.createClient(ADDRESS + "?wsdl");
+    }
+
+    private static class MyHTTPConduitConfigurer implements HTTPConduitConfigurer {
+        public void configure(String name, String address, HTTPConduit c) {
+
+            AuthorizationPolicy authorizationPolicy = new AuthorizationPolicy();
+
+            authorizationPolicy.setUserName("ffang");
+            authorizationPolicy.setPassword("pswd");
+            authorizationPolicy.setAuthorizationType("Digest");
+            c.setAuthorization(authorizationPolicy);
         }
     }
 }
