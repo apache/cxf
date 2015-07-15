@@ -31,6 +31,7 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
+import org.apache.cxf.feature.LoggingFeature;
 import org.apache.cxf.systest.jaxrs.Book;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.https.CertificateHostnameVerifier;
@@ -65,6 +66,7 @@ public class JAXRS20HttpsBookTest extends AbstractBusClientServerTestBase {
         builder.keyStore(keyStore, "password");
         
         Client client = builder.build();
+        client.register(new LoggingFeature());
         
         WebTarget target = client.target("https://localhost:" + PORT + "/bookstore/securebooks/123");
         Book b = target.request().accept(MediaType.APPLICATION_XML_TYPE).get(Book.class);

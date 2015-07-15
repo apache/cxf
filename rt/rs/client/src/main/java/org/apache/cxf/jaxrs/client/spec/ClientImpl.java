@@ -248,9 +248,13 @@ public class ClientImpl implements Client {
             ClientProviderFactory pf = 
                 ClientProviderFactory.getInstance(WebClient.getConfig(targetClient).getEndpoint());
             List<Object> providers = new LinkedList<Object>();
+            List<org.apache.cxf.feature.Feature> cxfFeatures = 
+                new LinkedList<org.apache.cxf.feature.Feature>();
             Configuration cfg = configImpl.getConfiguration();
             for (Object p : cfg.getInstances()) {
-                if (!(p instanceof Feature)) {
+                if (p instanceof org.apache.cxf.feature.Feature) {
+                    cxfFeatures.add((org.apache.cxf.feature.Feature)p);
+                } else if (!(p instanceof Feature)) {
                     Map<Class<?>, Integer> contracts = cfg.getContracts(p.getClass());
                     if (contracts == null || contracts.isEmpty()) {
                         providers.add(p);
@@ -277,8 +281,11 @@ public class ClientImpl implements Client {
             }
             
             setConnectionProperties(configProps, clientCfg);
-            
-            // start building the invocation
+            // CXF Features
+            for (org.apache.cxf.feature.Feature cxfFeature : cxfFeatures) {
+                cxfFeature.initialize(clientCfg, clientCfg.getBus());
+            }
+            // Start building the invocation
             return new InvocationBuilderImpl(WebClient.fromClient(targetClient));
         }
         private void setConnectionProperties(Map<String, Object> configProps, ClientConfiguration clientCfg) {
