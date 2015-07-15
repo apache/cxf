@@ -157,7 +157,12 @@ public class BookStore {
     public void preDestroy() {
         //System.out.println("PreDestroy called");
     }
-
+    @GET
+    @Path("/booktype")
+    @Produces("application/json")
+    public BookType getBookType() {
+        return new BookType("root", 124L);
+    }
     @GET
     @Path("/")
     public Book getBookRoot() {
