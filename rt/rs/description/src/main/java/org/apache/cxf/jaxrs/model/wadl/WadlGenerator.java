@@ -163,6 +163,7 @@ public class WadlGenerator implements ContainerRequestFilter {
     private boolean ignoreOverloadedMethods;
     private boolean checkAbsolutePathSlash;
     private boolean keepRelativeDocLinks;
+    private boolean usePathParamsToCompareOperations = true;
     
     private List<String> externalSchemasCache;
     private List<URI> externalSchemaLinks;
@@ -625,27 +626,31 @@ public class WadlGenerator implements ContainerRequestFilter {
             && ori1.getHttpMethod() == null) {
             return false;
         }
-        int ori1PathParams = 0;
-        int ori1MatrixParams = 0;
-        for (Parameter p : ori1.getParameters()) {
-            if (p.getType() == ParameterType.PATH) {
-                ori1PathParams++;
-            } else if (p.getType() == ParameterType.MATRIX) {
-                ori1MatrixParams++;
+        if (usePathParamsToCompareOperations) {
+            int ori1PathParams = 0;
+            int ori1MatrixParams = 0;
+            for (Parameter p : ori1.getParameters()) {
+                if (p.getType() == ParameterType.PATH) {
+                    ori1PathParams++;
+                } else if (p.getType() == ParameterType.MATRIX) {
+                    ori1MatrixParams++;
+                }
             }
-        }
-
-        int ori2PathParams = 0;
-        int ori2MatrixParams = 0;
-        for (Parameter p : ori2.getParameters()) {
-            if (p.getType() == ParameterType.PATH) {
-                ori2PathParams++;
-            } else if (p.getType() == ParameterType.MATRIX) {
-                ori2MatrixParams++;
+    
+            int ori2PathParams = 0;
+            int ori2MatrixParams = 0;
+            for (Parameter p : ori2.getParameters()) {
+                if (p.getType() == ParameterType.PATH) {
+                    ori2PathParams++;
+                } else if (p.getType() == ParameterType.MATRIX) {
+                    ori2MatrixParams++;
+                }
             }
+    
+            return ori1PathParams == ori2PathParams && ori1MatrixParams == ori2MatrixParams;
+        } else {
+            return true;
         }
-
-        return ori1PathParams == ori2PathParams && ori1MatrixParams == ori2MatrixParams;
     }
 
     private boolean openResource(String path) {
