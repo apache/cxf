@@ -74,6 +74,7 @@
             <plugin>
                 <groupId>org.eclipse.tycho</groupId>
                 <artifactId>tycho-packaging-plugin</artifactId>
+                <version>0.22.0</version>
                 <executions>
                     <execution>
                         <id>timestamp</id>
