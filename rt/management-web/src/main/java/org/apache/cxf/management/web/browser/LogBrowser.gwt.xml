@@ -24,8 +24,6 @@
     <inherits name="com.google.gwt.http.HTTP"/>
     <inherits name="com.google.gwt.json.JSON"/>
     <inherits name="com.google.gwt.xml.XML"/>
-    <script src="uuid.min.js"/>
-    <script src="json2.min.js"/>
     <stylesheet src="custom.css"/>
     <entry-point class="org.apache.cxf.management.web.browser.client.LogBrowser"/>
     <public path="resources"/>
