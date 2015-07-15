@@ -21,10 +21,10 @@
     <category rdf:resource="http://projects.apache.org/category/network-client" />
     <category rdf:resource="http://projects.apache.org/category/network-server" />
     <repository>
-      <SVNRepository>
-        <location rdf:resource="http://svn.apache.org/repos/asf/cxf"/>
-        <browse rdf:resource="http://svn.apache.org/viewvc/cxf/"/>
-      </SVNRepository>
+      <GitRepository>
+        <location rdf:resource="https://git-wip-us.apache.org/repos/asf/cxf.git"/>
+        <browse rdf:resource="https://git-wip-us.apache.org/repos/asf?p=cxf.git"/>
+      </GitRepository>
     </repository>
     <maintainer>
       <foaf:Person>
