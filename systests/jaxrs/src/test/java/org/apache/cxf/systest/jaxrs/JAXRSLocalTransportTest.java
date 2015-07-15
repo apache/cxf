@@ -21,9 +21,12 @@ package org.apache.cxf.systest.jaxrs;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.ws.rs.core.Response;
+
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.interceptor.Fault;
@@ -55,6 +58,7 @@ public class JAXRSLocalTransportTest extends AbstractBusClientServerTestBase {
                                new SingletonResourceProvider(new BookStore(), true));
         sf.setResourceProvider(BookStoreSpring.class,
                                new SingletonResourceProvider(new BookStoreSpring(), true));
+        sf.setProvider(new JacksonJsonProvider());
         List<Interceptor<? extends Message>> outInts = new ArrayList<Interceptor<? extends Message>>();
         outInts.add(new CustomOutInterceptor());
         sf.setOutInterceptors(outInts);
@@ -81,6 +85,15 @@ public class JAXRSLocalTransportTest extends AbstractBusClientServerTestBase {
             JAXRSClientFactory.create("local://books", BookStore.class);
         Book book = localProxy.getBook("123");
         assertEquals(123L, book.getId());
+    }
+    @Test
+    public void testProxyPipedDispatchGetBookType() throws Exception {
+        BookStore localProxy = 
+            JAXRSClientFactory.create("local://books", 
+                                      BookStore.class,
+                                      Collections.singletonList(new JacksonJsonProvider()));
+        BookType book = localProxy.getBookType();
+        assertEquals(124L, book.getId());
     }
     
     @Test
@@ -188,6 +201,17 @@ public class JAXRSLocalTransportTest extends AbstractBusClientServerTestBase {
         localClient.path("bookstore/books/123");
         Book book = localClient.get(Book.class);
         assertEquals(123L, book.getId());
+    }
+    
+    @Test
+    public void testWebClientDirectDispatchBookType() throws Exception {
+        WebClient localClient = WebClient.create("local://books",
+                                                 Collections.singletonList(new JacksonJsonProvider()));
+        
+        WebClient.getConfig(localClient).getRequestContext().put(LocalConduit.DIRECT_DISPATCH, Boolean.TRUE);
+        localClient.path("bookstore/booktype");
+        BookType book = localClient.get(BookType.class);
+        assertEquals(124L, book.getId());
     }
     
     @Test
