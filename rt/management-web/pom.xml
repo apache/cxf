@@ -260,7 +260,7 @@
                         <executions>
                             <execution>
                                 <id>add-source-dir</id>
-                                <phase>generate-sources</phase>
+                                <phase>process-classes</phase>
                                 <goals>
                                     <goal>add-source</goal>
                                 </goals>
