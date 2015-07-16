@@ -1,0 +1,39 @@
+<html lang="en">
+  <head>
+    <title>Welcome to IdTokenService</title>
+    <STYLE TYPE="text/css">
+	<!--
+	  input {font-family:verdana, arial, helvetica, sans-serif;font-size:20px;line-height:40px;}
+	  div.padded {  
+         padding-left: 5em;  
+      } 
+	-->
+    </STYLE>
+    <meta name="google-signin-scope" content="profile email">
+    <meta name="google-signin-client_id" content="${client_id}">
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+  </head>
+  <body>
+    <div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
+    <script>
+      function onSignIn(googleUser) {
+        var id_token = googleUser.getAuthResponse().id_token;
+        var xhr = new XMLHttpRequest();
+        xhr.onload = function() {
+          
+        }
+        xhr.open('POST', 'https://localhost:8080/user/service/oidc/rp/signin');
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.send('idtoken=' + id_token);
+      };
+    </script>
+    <div class="padded">
+<h1>Welcome to IdToken Service</h1>
+<em/>
+<p/>
+     <form action="https://localhost:8080/user/service/info/token" method="POST">
+         <input type="submit" value="Display IdToken Properties"/>
+     </form>
+</div>
+  </body>
+</html>

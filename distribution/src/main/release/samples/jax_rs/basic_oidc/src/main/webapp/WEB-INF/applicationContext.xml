@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright (C) 2011 Talend Inc. - www.talend.com
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+      xmlns:jaxrsclient="http://cxf.apache.org/jaxrs-client"
+      xsi:schemaLocation="
+         http://www.springframework.org/schema/beans 
+         http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+         http://cxf.apache.org/jaxrs
+         http://cxf.apache.org/schemas/jaxrs.xsd
+         http://cxf.apache.org/jaxrs-client
+         http://cxf.apache.org/schemas/jaxrs-client.xsd">
+
+     <!-- CXF Logging Feature -->
+     <bean id="loggingFeature" class="org.apache.cxf.feature.LoggingFeature"/>
+
+     <bean id="idTokenService" class="demo.jaxrs.server.IdTokenService"/>
+     <jaxrs:server id="idTokenServer" address="/info">
+        <jaxrs:serviceBeans>
+           <ref bean="idTokenService"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+           <!-- Checks that a client is authenticated with Google -->
+           <ref bean="oidcRpFilter"/>
+           
+           <ref bean="searchView"/>
+           
+           <!-- JAX-RS provider that makes IdToken available as JAX-RS @Context -->
+           <ref bean="oidcIdTokenProvider"/>
+        </jaxrs:providers>
+        <jaxrs:features>
+           <ref bean="loggingFeature"/>
+        </jaxrs:features>
+     </jaxrs:server> 
+     
+     <!-- JAX-RS provider that makes IdToken available as JAX-RS @Context -->
+     <bean id="oidcIdTokenProvider" class="org.apache.cxf.rs.security.oidc.rp.OidcIdTokenProvider"/>
+          
+     <bean id="oidcRpFilter" class="org.apache.cxf.rs.security.oidc.rp.OidcRpAuthenticationFilter">
+         <!-- 
+              This state manager is shared between this filter and the RP endpoint, 
+              the RP endpoint sets an OIDC context on it and this filter checks the context is available 
+         -->
+         <property name="stateManager" ref="stateManager"/>
+     </bean>
+
+     <bean id="searchView" class="org.apache.cxf.jaxrs.provider.RequestDispatcherProvider">
+         <property name="useClassNames" value="true"/>
+         <property name="locationPrefix" value="/forms/"/>
+         <property name="beanName" value="data"/>
+     </bean>
+     
+     <!-- 
+        2. OIDC RP endpoint: authenticates a user by redirecting a user to Google, and redirects the user 
+                             to the initial application form once the authentication is done
+     -->                        
+     <jaxrs:server id="oidcRpServer" address="/oidc">
+        <jaxrs:serviceBeans>
+           <ref bean="oidcRpService"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+           <!-- the filter which does the actual work for obtaining an OIDC context -->
+           <ref bean="oidcIdTokenFilter"/>
+           <ref bean="searchView"/>
+           <!-- JAX-RS provider that makes OidcClientTokenContext available as JAX-RS @Context -->
+           <ref bean="oidcIdTokenProvider"/>
+        </jaxrs:providers>
+        <jaxrs:features>
+           <ref bean="loggingFeature"/>
+        </jaxrs:features>
+     </jaxrs:server>
+     
+     <bean id="oidcRpService" class="org.apache.cxf.rs.security.oidc.rp.OidcRpAuthenticationService">
+         <!-- This state manager is shared between this RP endpoint and the oidcRpFilter which protects
+              the application endpoint, the RP endpoint sets an OIDC context on it and the filter checks 
+              the context is available -->
+         <property name="stateManager" ref="stateManager"/>
+     </bean>
+     <!-- The state manager shared between the RP and application endpoints -->
+     <bean id="stateManager" class="org.apache.cxf.rs.security.oauth2.client.MemoryClientTokenContextManager"/>
+     
+     <!-- This RP filter reads OIDC IdToken -->
+     <bean id="oidcIdTokenFilter" class="org.apache.cxf.rs.security.oidc.rp.OidcIdTokenRequestFilter">
+         <property name="idTokenReader" ref="idTokenReader"/>
+         <property name="consumer" ref="consumer"/>
+         <property name="tokenFormParameter" value="idtoken"/>
+     </bean>
+     
+     <!-- The RP filter uses this reader to read and validate OIDC IdToken --> 
+     <bean id="idTokenReader" class="org.apache.cxf.rs.security.oidc.rp.IdTokenReader">
+         <property name="jwkSetClient" ref="jwkSetClient"/> 
+         <property name="issuerId" value="accounts.google.com"/>
+         <property name="clockOffset" value="10"/>
+     </bean>
+     
+     <!-- WebClient for requesting an OIDC IDP JWK Set 
+          This client is used to get a JWK key required to validate OIDC IdToken returned with the OAuth2 access token -->
+     <jaxrsclient:client id="jwkSetClient" threadSafe="true" 
+        address="https://www.googleapis.com/oauth2/v2/certs"
+        serviceClass="org.apache.cxf.jaxrs.client.WebClient">
+        <jaxrsclient:headers>
+            <entry key="Accept" value="application/json"/>
+        </jaxrsclient:headers>
+        <jaxrsclient:providers>
+           <bean class="org.apache.cxf.rs.security.jose.jaxrs.JsonWebKeysProvider"/> 
+        </jaxrsclient:providers>
+        <jaxrsclient:features>
+           <ref bean="loggingFeature"/>
+        </jaxrsclient:features>
+     </jaxrsclient:client>
+     <bean id="consumer" class="org.apache.cxf.rs.security.oauth2.client.Consumer">
+         <property name="key" value="${client_id}"/> 
+     </bean>
+          
+</beans>
+
