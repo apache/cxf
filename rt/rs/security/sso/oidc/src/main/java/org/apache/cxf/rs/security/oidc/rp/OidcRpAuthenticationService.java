@@ -61,7 +61,7 @@ public class OidcRpAuthenticationService {
         if (location == null && defaultLocation != null) {
             String basePath = (String)mc.get("http.base.path");
             redirectUri = UriBuilder.fromUri(basePath).path(defaultLocation).build();
-        } else {
+        } else if (location != null) {
             redirectUri = URI.create(location);
         }
         if (redirectUri != null) {
