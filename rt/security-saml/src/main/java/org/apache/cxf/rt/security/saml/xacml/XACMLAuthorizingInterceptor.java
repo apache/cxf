@@ -19,6 +19,7 @@
 
 package org.apache.cxf.rt.security.saml.xacml;
 
+import javax.xml.XMLConstants;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
@@ -41,8 +42,10 @@ import org.opensaml.xacml.ctx.ResponseType;
  * and make an authorization decision based on the response. It takes the principal and roles
  * from the SecurityContext, and uses the XACMLRequestBuilder to construct an XACML Request
  * statement. 
+ * 
+ * @deprecated: Use pep.OpenSAMLXACMLAuthorizingInterceptor instead
  */
-@SuppressWarnings("deprecation")
+@Deprecated
 public class XACMLAuthorizingInterceptor extends AbstractXACMLAuthorizingInterceptor {
     private PolicyDecisionPoint pdp;
     
@@ -71,9 +74,12 @@ public class XACMLAuthorizingInterceptor extends AbstractXACMLAuthorizingInterce
 
     private ResponseType responseSourceToResponseType(Source responseSource) {
         try {
-            Transformer trans = TransformerFactory.newInstance().newTransformer();
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            transformerFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            Transformer transformer = transformerFactory.newTransformer();
+            
             DOMResult res = new DOMResult();
-            trans.transform(responseSource, res);
+            transformer.transform(responseSource, res);
             Node nd = res.getNode();
             if (nd instanceof Document) {
                 nd = ((Document)nd).getDocumentElement();

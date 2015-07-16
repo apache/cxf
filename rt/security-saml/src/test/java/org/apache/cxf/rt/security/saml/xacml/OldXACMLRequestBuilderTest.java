@@ -27,9 +27,6 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
-import org.apache.cxf.rt.security.saml.xacml.pep.OpenSAMLXACMLRequestBuilder;
-import org.apache.cxf.rt.security.saml.xacml.pep.XACMLRequestBuilder;
-
 import org.opensaml.xacml.ctx.AttributeType;
 import org.opensaml.xacml.ctx.RequestType;
 import org.opensaml.xacml.ctx.ResourceType;
@@ -38,7 +35,8 @@ import org.opensaml.xacml.ctx.ResourceType;
 /**
  * Some unit tests to create a XACML Request via the XACMLRequestBuilder interface.
  */
-public class XACMLRequestBuilderTest extends org.junit.Assert {
+@SuppressWarnings("deprecation")
+public class OldXACMLRequestBuilderTest extends org.junit.Assert {
     
     static {
         org.apache.wss4j.common.saml.OpenSAMLUtil.initSamlEngine();
@@ -61,9 +59,9 @@ public class XACMLRequestBuilderTest extends org.junit.Assert {
         String resourceURL = "https://localhost:8080/doubleit";
         msg.put(Message.REQUEST_URI, resourceURL);
         
-        XACMLRequestBuilder builder = new OpenSAMLXACMLRequestBuilder();
+        XACMLRequestBuilder builder = new DefaultXACMLRequestBuilder();
         RequestType request = 
-            (RequestType)builder.createRequest(principal, Collections.singletonList("manager"), msg);
+            builder.createRequest(principal, Collections.singletonList("manager"), msg);
         assertNotNull(request);
     }
 
@@ -85,9 +83,9 @@ public class XACMLRequestBuilderTest extends org.junit.Assert {
         String resourceURL = "https://localhost:8080/doubleit";
         msg.put(Message.REQUEST_URI, resourceURL);
         
-        OpenSAMLXACMLRequestBuilder builder = new OpenSAMLXACMLRequestBuilder();
+        DefaultXACMLRequestBuilder builder = new DefaultXACMLRequestBuilder();
         RequestType request = 
-            (RequestType)builder.createRequest(principal, Collections.singletonList("manager"), msg);
+            builder.createRequest(principal, Collections.singletonList("manager"), msg);
         assertNotNull(request); 
         
         String action = 
@@ -95,7 +93,7 @@ public class XACMLRequestBuilderTest extends org.junit.Assert {
         assertEquals("execute", action);
         
         builder.setAction("write");
-        request = (RequestType)builder.createRequest(principal, Collections.singletonList("manager"), msg);
+        request = builder.createRequest(principal, Collections.singletonList("manager"), msg);
         assertNotNull(request); 
         
         action = 
@@ -120,14 +118,14 @@ public class XACMLRequestBuilderTest extends org.junit.Assert {
         String resourceURL = "https://localhost:8080/doubleit";
         msg.put(Message.REQUEST_URL, resourceURL);
         
-        XACMLRequestBuilder builder = new OpenSAMLXACMLRequestBuilder();
+        XACMLRequestBuilder builder = new DefaultXACMLRequestBuilder();
         RequestType request = 
-            (RequestType)builder.createRequest(principal, Collections.singletonList("manager"), msg);
+            builder.createRequest(principal, Collections.singletonList("manager"), msg);
         assertNotNull(request);
         assertFalse(request.getEnvironment().getAttributes().isEmpty());
         
-        ((OpenSAMLXACMLRequestBuilder)builder).setSendDateTime(false);
-        request = (RequestType)builder.createRequest(principal, Collections.singletonList("manager"), msg);
+        ((DefaultXACMLRequestBuilder)builder).setSendDateTime(false);
+        request = builder.createRequest(principal, Collections.singletonList("manager"), msg);
         assertNotNull(request);
         assertTrue(request.getEnvironment().getAttributes().isEmpty());
     }
@@ -149,9 +147,9 @@ public class XACMLRequestBuilderTest extends org.junit.Assert {
         String resourceURL = "https://localhost:8080/doubleit";
         msg.put(Message.REQUEST_URL, resourceURL);
         
-        XACMLRequestBuilder builder = new OpenSAMLXACMLRequestBuilder();
+        XACMLRequestBuilder builder = new DefaultXACMLRequestBuilder();
         RequestType request = 
-            (RequestType)builder.createRequest(principal, Collections.singletonList("manager"), msg);
+            builder.createRequest(principal, Collections.singletonList("manager"), msg);
         assertNotNull(request);
         
         List<ResourceType> resources = request.getResources();
@@ -204,9 +202,9 @@ public class XACMLRequestBuilderTest extends org.junit.Assert {
         String resourceURL = "https://localhost:8080/doubleit";
         msg.put(Message.REQUEST_URL, resourceURL);
         
-        XACMLRequestBuilder builder = new OpenSAMLXACMLRequestBuilder();
+        XACMLRequestBuilder builder = new DefaultXACMLRequestBuilder();
         RequestType request = 
-            (RequestType)builder.createRequest(principal, Collections.singletonList("manager"), msg);
+            builder.createRequest(principal, Collections.singletonList("manager"), msg);
         assertNotNull(request);
         
         List<ResourceType> resources = request.getResources();
@@ -256,9 +254,9 @@ public class XACMLRequestBuilderTest extends org.junit.Assert {
         String resourceURL = "https://localhost:8080/doubleit";
         msg.put(Message.REQUEST_URL, resourceURL);
         
-        XACMLRequestBuilder builder = new OpenSAMLXACMLRequestBuilder();
+        XACMLRequestBuilder builder = new DefaultXACMLRequestBuilder();
         RequestType request = 
-            (RequestType)builder.createRequest(principal, Collections.singletonList("manager"), msg);
+            builder.createRequest(principal, Collections.singletonList("manager"), msg);
         assertNotNull(request);
         
         List<ResourceType> resources = request.getResources();
@@ -289,10 +287,10 @@ public class XACMLRequestBuilderTest extends org.junit.Assert {
         String resourceURI = "/doubleit";
         msg.put(Message.REQUEST_URI, resourceURI);
         
-        XACMLRequestBuilder builder = new OpenSAMLXACMLRequestBuilder();
-        ((OpenSAMLXACMLRequestBuilder)builder).setSendFullRequestURL(false);
+        XACMLRequestBuilder builder = new DefaultXACMLRequestBuilder();
+        ((DefaultXACMLRequestBuilder)builder).setSendFullRequestURL(false);
         RequestType request = 
-            (RequestType)builder.createRequest(principal, Collections.singletonList("manager"), msg);
+            builder.createRequest(principal, Collections.singletonList("manager"), msg);
         assertNotNull(request);
         
         List<ResourceType> resources = request.getResources();

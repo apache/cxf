@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.rt.security.saml.xacml;
+package org.apache.cxf.rt.security.saml.xacml.pep;
 
 import java.security.Principal;
 import java.util.ArrayList;
@@ -27,12 +27,14 @@ import java.util.List;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.message.Message;
+import org.apache.cxf.rt.security.saml.xacml.CXFMessageParser;
+import org.apache.cxf.rt.security.saml.xacml.RequestComponentBuilder;
+import org.apache.cxf.rt.security.saml.xacml.XACMLConstants;
 import org.joda.time.DateTime;
 import org.opensaml.xacml.ctx.ActionType;
 import org.opensaml.xacml.ctx.AttributeType;
 import org.opensaml.xacml.ctx.AttributeValueType;
 import org.opensaml.xacml.ctx.EnvironmentType;
-import org.opensaml.xacml.ctx.RequestType;
 import org.opensaml.xacml.ctx.ResourceType;
 import org.opensaml.xacml.ctx.SubjectType;
 
@@ -51,11 +53,8 @@ import org.opensaml.xacml.ctx.SubjectType;
  * For a REST service the request URL is the resource. You can also configure the ability to 
  * send the truncated request URI instead for a SOAP or REST service. The current DateTime is 
  * also sent in an Environment, however this can be disabled via configuration.
- * 
- * @deprecated: Use pep.OpenSAMLXACMLRequestBuilder instead
  */
-@Deprecated
-public class DefaultXACMLRequestBuilder implements XACMLRequestBuilder {
+public class OpenSAMLXACMLRequestBuilder implements XACMLRequestBuilder {
 
     private boolean sendDateTime = true;
     private String action = "execute";
@@ -64,7 +63,7 @@ public class DefaultXACMLRequestBuilder implements XACMLRequestBuilder {
     /**
      * Create an XACML Request given a Principal, list of roles and Message.
      */
-    public RequestType createRequest(Principal principal, List<String> roles, Message message)
+    public Object createRequest(Principal principal, List<String> roles, Message message)
         throws Exception {
         CXFMessageParser messageParser = new CXFMessageParser(message);
         String issuer = messageParser.getIssuer();
@@ -205,16 +204,6 @@ public class DefaultXACMLRequestBuilder implements XACMLRequestBuilder {
      */
     public void setSendFullRequestURL(boolean sendFullRequestURL) {
         this.sendFullRequestURL = sendFullRequestURL;
-    }
-
-    @Override
-    public List<String> getResources(Message message) {
-        throw new IllegalAccessError("Deprecated");
-    }
-
-    @Override
-    public String getResource(Message message) {
-        throw new IllegalAccessError("Deprecated");
     }
 
 }

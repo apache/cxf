@@ -17,21 +17,17 @@
  * under the License.
  */
 
-package org.apache.cxf.rt.security.saml.xacml;
+package org.apache.cxf.rt.security.saml.xacml.pep;
 
 import java.security.Principal;
 import java.util.List;
 
 import org.apache.cxf.message.Message;
-import org.opensaml.xacml.ctx.RequestType;
 
 
 /**
  * This interface defines a way to create an XACML Request.
- * 
- * @deprecated use pep.XACMLRequestBuilder instead
  */
-@Deprecated
 public interface XACMLRequestBuilder {
     
     /**
@@ -40,26 +36,9 @@ public interface XACMLRequestBuilder {
      * @param principal The principal to insert into the Subject of the Request
      * @param roles The list of roles associated with the principal
      * @param message The Message from which to retrieve the resource
-     * @return An OpenSAML RequestType object
+     * @return An object representing the Request
      * @throws Exception
      */
-    RequestType createRequest(Principal principal, List<String> roles, Message message) throws Exception;
+    Object createRequest(Principal principal, List<String> roles, Message message) throws Exception;
     
-    /**
-     * Return the list of Resources that have been inserted into the Request.
-     * 
-     * @param message The Message from which to retrieve the resource
-     * @return the list of Resources that have been inserted into the Request
-     */
-    @Deprecated
-    List<String> getResources(Message message);
-    
-    /**
-     * Return the Resource that has been inserted into the Request.
-     * 
-     * @param message The Message from which to retrieve the resource
-     * @return the Resource that has been inserted into the Request
-     */
-    @Deprecated
-    String getResource(Message message);
 }

@@ -17,27 +17,29 @@
  * under the License.
  */
 
-package org.apache.cxf.rt.security.saml.xacml;
+package org.apache.cxf.rt.security.saml.xacml.pep;
 
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.XMLConstants;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMResult;
+import javax.xml.transform.dom.DOMSource;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.interceptor.Fault;
-import org.apache.cxf.interceptor.security.AccessDeniedException;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.phase.AbstractPhaseInterceptor;
-import org.apache.cxf.phase.Phase;
-import org.apache.cxf.security.LoginSecurityContext;
-import org.apache.cxf.security.SecurityContext;
+import org.apache.cxf.rt.security.saml.xacml.pdp.api.PolicyDecisionPoint;
+import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.OpenSAMLUtil;
 import org.apache.wss4j.common.util.DOM2Writer;
 import org.opensaml.xacml.ctx.DecisionType.DECISION;
@@ -46,88 +48,47 @@ import org.opensaml.xacml.ctx.ResponseType;
 import org.opensaml.xacml.ctx.ResultType;
 import org.opensaml.xacml.ctx.StatusType;
 
-
 /**
- * An abstract interceptor to perform an XACML authorization request to a remote PDP,
+ * An interceptor to perform an XACML 2.0 authorization request to a remote PDP using OpenSAML,
  * and make an authorization decision based on the response. It takes the principal and roles
  * from the SecurityContext, and uses the XACMLRequestBuilder to construct an XACML Request
  * statement. 
- * 
- * This class must be subclassed to actually perform the request to the PDP.
- * 
- * @deprecated: Use pep.AbstractXACMLAuthorizingInterceptor instead
  */
-@Deprecated
-public abstract class AbstractXACMLAuthorizingInterceptor extends AbstractPhaseInterceptor<Message> {
+public class OpenSAMLXACMLAuthorizingInterceptor extends AbstractXACMLAuthorizingInterceptor {
+    private static final Logger LOG = LogUtils.getL7dLogger(OpenSAMLXACMLAuthorizingInterceptor.class);
     
-    private static final Logger LOG = LogUtils.getL7dLogger(AbstractXACMLAuthorizingInterceptor.class);
+    private PolicyDecisionPoint pdp;
     
-    private XACMLRequestBuilder requestBuilder = new DefaultXACMLRequestBuilder();
-    
-    public AbstractXACMLAuthorizingInterceptor() {
-        super(Phase.PRE_INVOKE);
-        org.apache.wss4j.common.saml.OpenSAMLUtil.initSamlEngine();
-    }
-    
-    public void handleMessage(Message message) throws Fault {
-        SecurityContext sc = message.get(SecurityContext.class);
-        
-        if (sc instanceof LoginSecurityContext) {
-            Principal principal = sc.getUserPrincipal();
-            
-            LoginSecurityContext loginSecurityContext = (LoginSecurityContext)sc;
-            Set<Principal> principalRoles = loginSecurityContext.getUserRoles();
-            List<String> roles = new ArrayList<>();
-            if (principalRoles != null) {
-                for (Principal p : principalRoles) {
-                    if (p != principal) {
-                        roles.add(p.getName());
-                    }
-                }
-            }
-            
-            try {
-                if (authorize(principal, roles, message)) {
-                    return;
-                }
-            } catch (Exception e) {
-                LOG.log(Level.FINE, "Unauthorized: " + e.getMessage(), e);
-                throw new AccessDeniedException("Unauthorized");
-            }
-        } else {
-            LOG.log(
-                Level.FINE,
-                "The SecurityContext was not an instance of LoginSecurityContext. No authorization "
-                + "is possible as a result"
-            );
-        }
-        
-        throw new AccessDeniedException("Unauthorized");
-    }
-    
-    public XACMLRequestBuilder getRequestBuilder() {
-        return requestBuilder;
-    }
-
-    public void setRequestBuilder(XACMLRequestBuilder requestBuilder) {
-        this.requestBuilder = requestBuilder;
+    public OpenSAMLXACMLAuthorizingInterceptor(PolicyDecisionPoint pdp) {
+        super();
+        this.pdp = pdp;
     }
 
     /**
      * Perform a (remote) authorization decision and return a boolean depending on the result
      */
+    @Override
     protected boolean authorize(
-        Principal principal, List<String> roles, Message message
+        Object xacmlRequest, Principal principal, Message message
     ) throws Exception {
-        RequestType request = requestBuilder.createRequest(principal, roles, message);
+        if (!(xacmlRequest instanceof RequestType)) {
+            String error = "XACMLRequest parameter is not an instance of OpenSAML RequestType!";
+            LOG.warning(error);
+            throw new Exception(error);
+        }
+        
+        RequestType request = (RequestType)xacmlRequest;
         if (LOG.isLoggable(Level.FINE)) {
             Document doc = DOMUtils.createDocument();
             Element requestElement = OpenSAMLUtil.toDom(request, doc);
             LOG.log(Level.FINE, DOM2Writer.nodeToString(requestElement));
         }
         
-        ResponseType response = performRequest(request, message);
+        // Evaluate the request
+        Source responseSource = this.pdp.evaluate(requestType2Source(request));
         
+        // Parse the Response into an OpenSAML ResponseType Object
+        ResponseType response = responseSourceToResponseType(responseSource);
         List<ResultType> results = response.getResults();
         
         if (results == null) {
@@ -153,7 +114,34 @@ public abstract class AbstractXACMLAuthorizingInterceptor extends AbstractPhaseI
         return false;
     }
     
-    public abstract ResponseType performRequest(RequestType request, Message message) throws Exception;
+    private ResponseType responseSourceToResponseType(Source responseSource) {
+        try {
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            transformerFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            Transformer trans = transformerFactory.newTransformer();
+            
+            DOMResult res = new DOMResult();
+            trans.transform(responseSource, res);
+            Node nd = res.getNode();
+            if (nd instanceof Document) {
+                nd = ((Document)nd).getDocumentElement();
+            }
+            return (ResponseType)OpenSAMLUtil.fromDom((Element)nd);
+        } catch (Exception e) {
+            throw new RuntimeException("Error converting pdp response to ResponseType", e);
+        }
+    }
+    
+    private Source requestType2Source(RequestType request) {
+        Document doc = DOMUtils.createDocument();
+        Element requestElement;
+        try {
+            requestElement = OpenSAMLUtil.toDom(request, doc);
+        } catch (WSSecurityException e) {
+            throw new RuntimeException("Error converting PDP RequestType to Dom", e);
+        }
+        return new DOMSource(requestElement);
+    }
     
     /**
      * Handle any Obligations returned by the PDP

@@ -217,4 +217,10 @@
             <entry key="security.encryption.username" value="bob"/>
         </jaxws:properties>
     </jaxws:client>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSaml2PEP2Port" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="security.encryption.properties" value="bob.properties"/>
+            <entry key="security.encryption.username" value="bob"/>
+        </jaxws:properties>
+    </jaxws:client>
 </beans>
