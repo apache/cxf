@@ -59,9 +59,11 @@ import org.apache.cxf.systest.sts.deployment.STSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.policy.interceptors.STSTokenOutInterceptor;
+import org.apache.cxf.ws.security.policy.interceptors.STSTokenOutInterceptor.AuthMode;
+import org.apache.cxf.ws.security.policy.interceptors.STSTokenOutInterceptor.AuthParams;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.trust.STSClient;
-import org.apache.cxf.ws.security.trust.STSTokenRetriever;
 
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -71,7 +73,7 @@ import org.junit.Test;
 /**
  * Some tests for STSClient configuration.
  */
-public class STSTokenRetrieverTest extends AbstractBusClientServerTestBase {    
+public class STSTokenOutInterceptorTest extends AbstractBusClientServerTestBase {    
     static final String STSPORT = allocatePort(STSServer.class);
     static final String STSPORT2 = allocatePort(STSServer.class, 2);
    
@@ -113,32 +115,92 @@ public class STSTokenRetrieverTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
-    public void testSTSAsymmetricBinding() throws Exception {
+    public void testBasicAsymmetricBinding() throws Exception {
         Bus bus = BusFactory.getThreadDefaultBus();        
-        STSClient stsClient = initStsClientAsymmeticBinding(bus);
         
-        MessageImpl message = prepareMessage(bus, stsClient, SERVICE_ENDPOINT_ASSYMETRIC);
-        STSTokenRetriever.TokenRequestParams params = new STSTokenRetriever.TokenRequestParams();
+        AuthParams authParams = new AuthParams(
+                 AuthMode.X509, 
+                 null,
+                 "org.apache.cxf.systest.sts.common.CommonCallbackHandler",
+                 "mystskey",
+                 "clientKeystore.properties");
         
-        SecurityToken token = STSTokenRetriever.getToken(message, params);
+        STSTokenOutInterceptor interceptor = new STSTokenOutInterceptor(
+                 authParams,
+                 "http://localhost:" + STSPORT2 + STS_X509_WSDL_LOCATION_RELATIVE,
+                 bus);
+        
+        MessageImpl message = prepareMessage(bus, null, SERVICE_ENDPOINT_ASSYMETRIC);
+        
+        interceptor.handleMessage(message);
+        
+        SecurityToken token = (SecurityToken)message.getExchange().get(SecurityConstants.TOKEN);
         validateSecurityToken(token);
     }
 
     @Test
-    public void testSTSTransportBinding() throws Exception {
+    public void testBasicTransportBinding() throws Exception {
+        // Setup HttpsURLConnection to get STS WSDL
+        configureDefaultHttpsConnection();
+        
+        Bus bus = BusFactory.getThreadDefaultBus();  
+        AuthParams authParams = new AuthParams(
+                   AuthMode.TRANSPORT, 
+                   "alice",
+                   "org.apache.cxf.systest.sts.common.CommonCallbackHandler",
+                   null,
+                   null);
+                                      
+        STSTokenOutInterceptor interceptor = new STSTokenOutInterceptor(
+                    authParams,
+                    "https://localhost:" + STSPORT + STS_TRANSPORT_WSDL_LOCATION_RELATIVE,
+                    bus);
+        
+        TLSClientParameters tlsParams = prepareTLSParams();
+        STSClient stsClient = interceptor.getSTSClient();
+        ((HTTPConduit)stsClient.getClient().getConduit()).setTlsClientParameters(tlsParams);
+        
+        MessageImpl message = prepareMessage(bus, null, SERVICE_ENDPOINT_TRANSPORT); 
+        
+        interceptor.handleMessage(message);
+        
+        SecurityToken token = (SecurityToken)message.getExchange().get(SecurityConstants.TOKEN);
+        validateSecurityToken(token);
+    }
+
+    @Test
+    public void testSTSClientAsymmetricBinding() throws Exception {
+        Bus bus = BusFactory.getThreadDefaultBus();        
+        
+        STSClient stsClient = initStsClientAsymmeticBinding(bus);
+        STSTokenOutInterceptor interceptor = new STSTokenOutInterceptor(stsClient);
+        
+        MessageImpl message = prepareMessage(bus, null, SERVICE_ENDPOINT_ASSYMETRIC);
+        
+        interceptor.handleMessage(message);
+        
+        SecurityToken token = (SecurityToken)message.getExchange().get(SecurityConstants.TOKEN);
+        validateSecurityToken(token);
+    }
+
+    @Test
+    public void testSTSClientTransportBinding() throws Exception {
         // Setup HttpsURLConnection to get STS WSDL
         configureDefaultHttpsConnection();
         
         Bus bus = BusFactory.getThreadDefaultBus();  
         STSClient stsClient = initStsClientTransportBinding(bus);
+                                      
+        STSTokenOutInterceptor interceptor = new STSTokenOutInterceptor(stsClient);
         
         TLSClientParameters tlsParams = prepareTLSParams();
         ((HTTPConduit)stsClient.getClient().getConduit()).setTlsClientParameters(tlsParams);
         
-        MessageImpl message = prepareMessage(bus, stsClient, SERVICE_ENDPOINT_TRANSPORT);       
-        STSTokenRetriever.TokenRequestParams params = new STSTokenRetriever.TokenRequestParams();
+        MessageImpl message = prepareMessage(bus, null, SERVICE_ENDPOINT_TRANSPORT); 
         
-        SecurityToken token = STSTokenRetriever.getToken(message, params);
+        interceptor.handleMessage(message);
+        
+        SecurityToken token = (SecurityToken)message.getExchange().get(SecurityConstants.TOKEN);
         validateSecurityToken(token);
     }
 
@@ -247,7 +309,7 @@ public class STSTokenRetrieverTest extends AbstractBusClientServerTestBase {
     private KeyStore loadClientKeystore() throws KeyStoreException, IOException, NoSuchAlgorithmException,
         CertificateException {
         KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
-        InputStream keystoreStream = STSTokenRetrieverTest.class.getResourceAsStream(CLIENTSTORE);
+        InputStream keystoreStream = STSTokenOutInterceptorTest.class.getResourceAsStream(CLIENTSTORE);
         try {
             keystore.load(keystoreStream, KEYSTORE_PASS.toCharArray());
         } finally {
