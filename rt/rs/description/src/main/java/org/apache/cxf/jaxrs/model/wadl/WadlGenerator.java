@@ -2157,6 +2157,10 @@ public class WadlGenerator implements ContainerRequestFilter {
         this.applyStylesheetLocally = applyStylesheetLocally;
     }
 
+    public void setUsePathParamsToCompareOperations(boolean usePathParamsToCompareOperations) {
+        this.usePathParamsToCompareOperations = usePathParamsToCompareOperations;
+    }
+
     private static class SchemaConverter extends DelegatingXMLStreamWriter {
         private static final String SCHEMA_LOCATION = "schemaLocation";
         private Map<String, String> locsMap;
