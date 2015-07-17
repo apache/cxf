@@ -779,26 +779,7 @@ public class SourceGenerator {
                 }
                 sbCode.append(genMethodName.replace("-", ""));
             } else {
-                boolean expandedQName = id.startsWith("{");
-                QName qname = convertToQName(id, expandedQName);
-                String packageName = possiblyConvertNamespaceURI(qname.getNamespaceURI(), expandedQName);
-                
-                String clsFullName = getSchemaClassName(packageName, info.getGrammarInfo(), 
-                        qname.getLocalPart(), info.getTypeClassNames());
-                int lastDotIndex = clsFullName == null ? -1 : clsFullName.lastIndexOf(".");
-                String localName = clsFullName == null 
-                    ? getClassName(qname.getLocalPart(), true, info.getTypeClassNames()) 
-                    : clsFullName.substring(lastDotIndex + 1);
-                String subResponseNs = clsFullName == null ? getClassPackageName(packageName) 
-                    : clsFullName.substring(0, lastDotIndex);
-                Object parentNode = resourceEl.getParentNode();
-                String parentId = parentNode instanceof Element 
-                    ? ((Element)parentNode).getAttribute("id")
-                    : ""; 
-                writeSubResponseType(id.equals(parentId), subResponseNs, localName, 
-                        sbCode, imports);
-                
-                sbCode.append("get" + localName + suffixName);
+                writeSubresourceMethod(resourceEl, imports, sbCode, info, id, suffixName);
             }
             
             sbCode.append("(");
@@ -817,6 +798,34 @@ public class SourceGenerator {
             }
             sbCode.append(getLineSep()).append(getLineSep());
         }
+    }
+    
+    private void writeSubresourceMethod(Element resourceEl,
+                                        Set<String> imports,
+                                        StringBuilder sbCode,
+                                        ContextInfo info,
+                                        String id,
+                                        String suffixName) {
+        boolean expandedQName = id.startsWith("{");
+        QName qname = convertToQName(id, expandedQName);
+        String packageName = possiblyConvertNamespaceURI(qname.getNamespaceURI(), expandedQName);
+        
+        String clsFullName = getSchemaClassName(packageName, info.getGrammarInfo(), 
+                qname.getLocalPart(), info.getTypeClassNames());
+        int lastDotIndex = clsFullName == null ? -1 : clsFullName.lastIndexOf(".");
+        String localName = clsFullName == null 
+            ? getClassName(qname.getLocalPart(), true, info.getTypeClassNames()) 
+            : clsFullName.substring(lastDotIndex + 1);
+        String subResponseNs = clsFullName == null ? getClassPackageName(packageName) 
+            : clsFullName.substring(0, lastDotIndex);
+        Object parentNode = resourceEl.getParentNode();
+        String parentId = parentNode instanceof Element 
+            ? ((Element)parentNode).getAttribute("id")
+            : ""; 
+        writeSubResponseType(id.equals(parentId), subResponseNs, localName, 
+                sbCode, imports);
+        
+        sbCode.append("get" + localName + suffixName);
     }
     
     private static boolean isMethodMatched(Set<String> methodNames, String methodNameLowerCase, String id) {
