@@ -19,17 +19,19 @@
 package org.apache.cxf.io;
 
 import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.io.StringWriter;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.helpers.IOUtils;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -171,10 +173,8 @@ public abstract class CachedStreamTestBase extends Assert {
         assertEquals("text is not decoded correctly", text, dectext);
 
         // close the partially read stream
-        if (fin instanceof InputStream) {
-            ((InputStream)fin).close();
-        } else if (fin instanceof Reader) {
-            ((Reader)fin).close();
+        if (fin instanceof Closeable) {
+            ((Closeable)fin).close();
         }
 
         // the file is deleted when cos is closed while all the associated inputs are closed
@@ -245,53 +245,27 @@ public abstract class CachedStreamTestBase extends Assert {
     }
     
     private static void close(Object obj) throws IOException {
-        if (obj instanceof CachedOutputStream) {
-            ((CachedOutputStream)obj).close();
-        } else if (obj instanceof CachedWriter) {
-            ((CachedWriter)obj).close();
-        } else if (obj instanceof InputStream) {
-            ((InputStream)obj).close();
-        } else if (obj instanceof Reader) {
-            ((Reader)obj).close();
+        if (obj instanceof Closeable) {
+            ((Closeable)obj).close();
         }
     }
 
     protected static String readFromStream(InputStream is) throws IOException {
-        ByteArrayOutputStream buf = new ByteArrayOutputStream();
-        try {
-            byte[] b = new byte[100];
-            for (;;) {
-                int n = is.read(b, 0, b.length);
-                if (n < 0) {
-                    break;
-                }
-                buf.write(b, 0, n);
-            }
-        } finally {
-            is.close();
+        try (ByteArrayOutputStream buf = new ByteArrayOutputStream()) {
+            IOUtils.copyAndCloseInput(is, buf);
+            return new String(buf.toByteArray(), "UTF-8");
         }
-        return new String(buf.toByteArray(), "UTF-8");
     }
 
     protected static String readPartiallyFromStream(InputStream is, int len) throws IOException {
-        ByteArrayOutputStream buf = new ByteArrayOutputStream();
-        byte[] b = new byte[len];
-        int rn = 0;
-        for (;;) {
-            int n = is.read(b, 0, b.length);
-            if (n < 0) {
-                break;
-            }
-            buf.write(b, 0, n);
-            rn += n;
-            if (len <= rn) {
-                break;
-            }
+        try (ByteArrayOutputStream buf = new ByteArrayOutputStream()) {
+            IOUtils.copyAtLeast(is, buf, len);
+            return new String(buf.toByteArray(), "UTF-8");
         }
-        return new String(buf.toByteArray(), "UTF-8");
     }
  
     protected static String readFromReader(Reader is) throws IOException {
+<<<<<<< HEAD
         StringBuffer buf = new StringBuffer();
         try {
             char[] b = new char[100];
@@ -304,11 +278,16 @@ public abstract class CachedStreamTestBase extends Assert {
             }
         } finally {
             is.close();
+=======
+        try (StringWriter writer = new StringWriter()) {
+            IOUtils.copyAndCloseInput(is, writer);
+            return writer.toString();
+>>>>>>> 17f140e... Use IOUtils methods in CachedStreamTestBase to handle stream reading
         }
-        return buf.toString();
     }
     
     protected static String readPartiallyFromReader(Reader is, int len) throws IOException {
+<<<<<<< HEAD
         StringBuffer buf = new StringBuffer();
         char[] b = new char[len];
         int rn = 0;
@@ -322,8 +301,12 @@ public abstract class CachedStreamTestBase extends Assert {
             if (len <= rn) {
                 break;
             }
+=======
+        try (StringWriter writer = new StringWriter()) {
+            IOUtils.copyAtLeast(is, writer, len);
+            return writer.toString();
+>>>>>>> 17f140e... Use IOUtils methods in CachedStreamTestBase to handle stream reading
         }
-        return buf.toString();
     }
     
     private static String initTestData(int packetSize) {

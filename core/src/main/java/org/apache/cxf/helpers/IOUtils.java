@@ -229,13 +229,32 @@ public final class IOUtils {
             n = input.read(buffer, 0, n);
         }
     }
+    
+    public static void copyAtLeast(final Reader input, 
+                                   final Writer output,
+                                   int atLeast) throws IOException {
+        final char[] buffer = new char[4096];
+        int n = atLeast > buffer.length ? buffer.length : atLeast;
+        n = input.read(buffer, 0, n);
+        while (-1 != n) {
+            if (n == 0) {
+                throw new IOException("0 bytes read in violation of Reader.read(char[])");
+            }
+            output.write(buffer, 0, n);
+            atLeast -= n;
+            if (atLeast <= 0) {
+                return;
+            }
+            n = atLeast > buffer.length ? buffer.length : atLeast;
+            n = input.read(buffer, 0, n);
+        }
+    }
 
 
     public static void copy(final Reader input, final Writer output,
             final int bufferSize) throws IOException {
         final char[] buffer = new char[bufferSize];
-        int n = 0;
-        n = input.read(buffer);
+        int n = input.read(buffer);
         while (-1 != n) {
             output.write(buffer, 0, n);
             n = input.read(buffer);
