@@ -268,21 +268,6 @@
             <ref bean="XACMLInterceptor"/>
         </jaxws:inInterceptors>
     </jaxws:endpoint>
-    <bean class="org.apache.cxf.rt.security.saml.xacml.pep.OpenSAMLXACMLAuthorizingInterceptor" id="XACMLInterceptor2">
-        <constructor-arg ref="MockPDP"/>
-    </bean>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Saml2TokenOverSymmetricPEP2" address="http://localhost:${testutil.ports.saml.StaxServer}/DoubleItSaml2PEP2" serviceName="s:DoubleItService" endpointName="s:DoubleItSaml2PEP2Port" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl">
-        <jaxws:properties>
-            <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-            <entry key="security.signature.properties" value="bob.properties"/>
-            <!--<entry key="ws-security.saml2.validator" 
-                  value="org.apache.cxf.systest.ws.saml.CustomSaml2Validator"/>-->
-            <entry key="ws-security.enable.streaming" value="true"/>
-        </jaxws:properties>
-        <jaxws:inInterceptors>
-            <ref bean="XACMLInterceptor2"/>
-        </jaxws:inInterceptors>
-    </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Saml2TransportToken" address="https://localhost:${testutil.ports.saml.StaxServer.2}/DoubleItSaml2Transport" serviceName="s:DoubleItService" endpointName="s:DoubleItSaml2TransportPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>

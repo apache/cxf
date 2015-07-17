@@ -377,9 +377,6 @@
         <wsdl:port name="DoubleItSaml2PEPPort" binding="tns:DoubleItSaml2SymmetricBinding">
             <soap:address location="http://localhost:9001/DoubleItSaml2PEP"/>
         </wsdl:port>
-        <wsdl:port name="DoubleItSaml2PEP2Port" binding="tns:DoubleItSaml2SymmetricBinding">
-            <soap:address location="http://localhost:9001/DoubleItSaml2PEP2"/>
-        </wsdl:port>
         <wsdl:port name="DoubleItSaml2TransportPort" binding="tns:DoubleItSaml2TransportBinding">
             <soap:address location="https://localhost:9009/DoubleItSaml2Transport"/>
         </wsdl:port>

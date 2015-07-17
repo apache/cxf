@@ -28,10 +28,7 @@ import org.opensaml.xacml.ctx.RequestType;
 
 /**
  * This interface defines a way to create an XACML Request.
- * 
- * @deprecated use pep.XACMLRequestBuilder instead
  */
-@Deprecated
 public interface XACMLRequestBuilder {
     
     /**

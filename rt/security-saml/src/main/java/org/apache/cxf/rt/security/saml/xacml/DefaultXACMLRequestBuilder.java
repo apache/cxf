@@ -52,9 +52,7 @@ import org.opensaml.xacml.ctx.SubjectType;
  * send the truncated request URI instead for a SOAP or REST service. The current DateTime is 
  * also sent in an Environment, however this can be disabled via configuration.
  * 
- * @deprecated: Use pep.OpenSAMLXACMLRequestBuilder instead
  */
-@Deprecated
 public class DefaultXACMLRequestBuilder implements XACMLRequestBuilder {
 
     private boolean sendDateTime = true;

@@ -940,54 +940,6 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.Test
-    public void testSaml2OpenSAMLPEP() throws Exception {
-
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
-
-        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
-        Service service = Service.create(wsdl, SERVICE_QNAME);
-        QName portQName = new QName(NAMESPACE, "DoubleItSaml2PEP2Port");
-        DoubleItPortType saml2Port = 
-                service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(saml2Port, test.getPort());
-       
-        try {
-            saml2Port.doubleIt(25);
-            fail("Failure expected as Assertion doesn't contain Role information");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            // expected
-        }
-        
-        SamlRoleCallbackHandler roleCallbackHandler = 
-            new SamlRoleCallbackHandler();
-        roleCallbackHandler.setSignAssertion(true);
-        roleCallbackHandler.setRoleName("manager");
-        ((BindingProvider)saml2Port).getRequestContext().put(
-            "security.saml-callback-handler", roleCallbackHandler
-        );
-        
-        int result = saml2Port.doubleIt(25);
-        assertTrue(result == 50);
-        
-        // Expected failure on incorrect role
-        roleCallbackHandler.setRoleName("boss");
-        try {
-            saml2Port.doubleIt(25);
-            fail("Failure expected as Assertion doesn't contain correct role");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            // expected
-        }
-        
-        ((java.io.Closeable)saml2Port).close();
-        bus.shutdown(true);
-    }
-   
-    @org.junit.Test
     public void testSaml2Replay() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();

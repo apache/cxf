@@ -42,10 +42,7 @@ import org.opensaml.xacml.ctx.ResponseType;
  * and make an authorization decision based on the response. It takes the principal and roles
  * from the SecurityContext, and uses the XACMLRequestBuilder to construct an XACML Request
  * statement. 
- * 
- * @deprecated: Use pep.OpenSAMLXACMLAuthorizingInterceptor instead
  */
-@Deprecated
 public class XACMLAuthorizingInterceptor extends AbstractXACMLAuthorizingInterceptor {
     private PolicyDecisionPoint pdp;
     
