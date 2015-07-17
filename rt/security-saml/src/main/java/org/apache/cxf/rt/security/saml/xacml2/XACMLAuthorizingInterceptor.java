@@ -47,7 +47,7 @@ import org.opensaml.xacml.ctx.ResultType;
 import org.opensaml.xacml.ctx.StatusType;
 
 /**
- * An interceptor to perform an XACML authorization request to a remote PDP,
+ * An interceptor to perform an XACML 2.0 authorization request to a remote PDP using OpenSAML,
  * and make an authorization decision based on the response. It takes the principal and roles
  * from the SecurityContext, and uses the XACMLRequestBuilder to construct an XACML Request
  * statement. 

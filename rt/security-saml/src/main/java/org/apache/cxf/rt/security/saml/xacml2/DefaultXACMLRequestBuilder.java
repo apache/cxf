@@ -39,7 +39,7 @@ import org.opensaml.xacml.ctx.ResourceType;
 import org.opensaml.xacml.ctx.SubjectType;
 
 /**
- * This class constructs an XACML Request given a Principal, list of roles and MessageContext, 
+ * This class constructs an XACML 2.0 Request given a Principal, list of roles and MessageContext, 
  * following the SAML 2.0 profile of XACML 2.0. The principal name is inserted as the Subject ID,
  * and the list of roles associated with that principal are inserted as Subject roles. The action
  * to send defaults to "execute". 

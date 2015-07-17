@@ -27,7 +27,7 @@ import org.opensaml.xacml.ctx.RequestType;
 
 
 /**
- * This interface defines a way to create an XACML Request.
+ * This interface defines a way to create an XACML 2.0 Request using OpenSAML
  */
 public interface XACMLRequestBuilder {
     

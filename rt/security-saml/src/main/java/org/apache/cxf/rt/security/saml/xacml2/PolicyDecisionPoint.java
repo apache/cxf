@@ -22,7 +22,7 @@ import org.opensaml.xacml.ctx.RequestType;
 import org.opensaml.xacml.ctx.ResponseType;
 
 /**
- * An interface that describes a PolicyDecisionPoint (PDP).
+ * An interface that describes a PolicyDecisionPoint (PDP) that supports XACML 2.0 using OpenSAML
  */
 public interface PolicyDecisionPoint {
     
