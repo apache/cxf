@@ -17,23 +17,11 @@
  * under the License.
  */
 
-package org.apache.cxf.rt.security.saml.xacml;
+package org.apache.cxf.rt.security.saml.xacml2;
 
 import java.util.List;
 
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMResult;
-import javax.xml.transform.dom.DOMSource;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.rt.security.saml.xacml.pdp.api.PolicyDecisionPoint;
-import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.saml.OpenSAMLUtil;
+import org.apache.cxf.rt.security.saml.xacml.XACMLConstants;
 import org.opensaml.core.xml.XMLObjectBuilderFactory;
 import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
 import org.opensaml.xacml.XACMLObjectBuilder;
@@ -54,40 +42,12 @@ import org.opensaml.xacml.ctx.SubjectType;
  */
 public class DummyPDP implements PolicyDecisionPoint {
 
-    public Source evaluate(Source requestSource) {
-        RequestType request = requestSourceToRequestType(requestSource); 
+    public ResponseType evaluate(RequestType request) {
         String role = getSubjectRole(request);
         DECISION decision = "manager".equals(role) ? DecisionType.DECISION.Permit : DecisionType.DECISION.Deny;        
-        ResponseType response = createResponse(decision);
-        return responseType2Source(response);
+        return createResponse(decision);
     }
     
-    private RequestType requestSourceToRequestType(Source requestSource) {
-        try {
-            Transformer trans = TransformerFactory.newInstance().newTransformer();
-            DOMResult res = new DOMResult();
-            trans.transform(requestSource, res);
-            Node nd = res.getNode();
-            if (nd instanceof Document) {
-                nd = ((Document)nd).getDocumentElement();
-            }
-            return (RequestType)OpenSAMLUtil.fromDom((Element)nd);
-        } catch (Exception e) {
-            throw new RuntimeException("Error converting pdp response to ResponseType", e);
-        }
-    }
-    
-    private Source responseType2Source(ResponseType response) {
-        Document doc = DOMUtils.createDocument();
-        Element responseElement;
-        try {
-            responseElement = OpenSAMLUtil.toDom(response, doc);
-        } catch (WSSecurityException e) {
-            throw new RuntimeException("Error converting PDP RequestType to Dom", e);
-        }
-        return new DOMSource(responseElement);
-    }
-
     private ResponseType createResponse(DECISION decision) {
         XMLObjectBuilderFactory builderFactory = XMLObjectProviderRegistrySupport.getBuilderFactory();
         

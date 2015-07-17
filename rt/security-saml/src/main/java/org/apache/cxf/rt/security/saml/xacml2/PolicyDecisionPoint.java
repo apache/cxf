@@ -16,9 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rt.security.saml.xacml.pdp.api;
+package org.apache.cxf.rt.security.saml.xacml2;
 
-import javax.xml.transform.Source;
+import org.opensaml.xacml.ctx.RequestType;
+import org.opensaml.xacml.ctx.ResponseType;
 
 /**
  * An interface that describes a PolicyDecisionPoint (PDP).
@@ -27,9 +28,9 @@ public interface PolicyDecisionPoint {
     
     /**
      * Evaluate an XACML Request and return a Response
-     * @param request an XACML Request as a Source
-     * @return the XACML Response as a Source
+     * @param request an XACML Request as a RequestType
+     * @return the XACML Response as a ResponseType
      */
-    Source evaluate(Source request);
+    ResponseType evaluate(RequestType request);
     
 }

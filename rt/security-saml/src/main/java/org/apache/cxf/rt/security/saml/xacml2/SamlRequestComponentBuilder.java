@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.rt.security.saml.xacml;
+package org.apache.cxf.rt.security.saml.xacml2;
 
 import java.util.UUID;
 

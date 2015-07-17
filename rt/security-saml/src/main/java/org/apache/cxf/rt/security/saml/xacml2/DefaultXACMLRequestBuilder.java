@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.rt.security.saml.xacml;
+package org.apache.cxf.rt.security.saml.xacml2;
 
 import java.security.Principal;
 import java.util.ArrayList;
@@ -27,6 +27,8 @@ import java.util.List;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.message.Message;
+import org.apache.cxf.rt.security.saml.xacml.CXFMessageParser;
+import org.apache.cxf.rt.security.saml.xacml.XACMLConstants;
 import org.joda.time.DateTime;
 import org.opensaml.xacml.ctx.ActionType;
 import org.opensaml.xacml.ctx.AttributeType;
@@ -203,16 +205,6 @@ public class DefaultXACMLRequestBuilder implements XACMLRequestBuilder {
      */
     public void setSendFullRequestURL(boolean sendFullRequestURL) {
         this.sendFullRequestURL = sendFullRequestURL;
-    }
-
-    @Override
-    public List<String> getResources(Message message) {
-        throw new IllegalAccessError("Deprecated");
-    }
-
-    @Override
-    public String getResource(Message message) {
-        throw new IllegalAccessError("Deprecated");
     }
 
 }

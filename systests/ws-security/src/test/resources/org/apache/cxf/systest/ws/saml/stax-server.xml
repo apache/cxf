@@ -253,7 +253,7 @@
         </jaxws:features>
     </jaxws:endpoint>
     <bean class="org.apache.cxf.systest.ws.saml.PolicyDecisionPointMockImpl" id="MockPDP" />
-    <bean class="org.apache.cxf.rt.security.saml.xacml.XACMLAuthorizingInterceptor" id="XACMLInterceptor">
+    <bean class="org.apache.cxf.rt.security.saml.xacml2.XACMLAuthorizingInterceptor" id="XACMLInterceptor">
         <constructor-arg ref="MockPDP"/>
     </bean>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Saml2TokenOverSymmetricPEP" address="http://localhost:${testutil.ports.saml.StaxServer}/DoubleItSaml2PEP" serviceName="s:DoubleItService" endpointName="s:DoubleItSaml2PEPPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl">

@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.rt.security.saml.xacml;
+package org.apache.cxf.rt.security.saml.xacml2;
 
 import java.security.Principal;
 import java.util.Collections;
@@ -27,6 +27,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.rt.security.saml.xacml.XACMLConstants;
 import org.opensaml.xacml.ctx.AttributeType;
 import org.opensaml.xacml.ctx.RequestType;
 import org.opensaml.xacml.ctx.ResourceType;
@@ -35,7 +36,6 @@ import org.opensaml.xacml.ctx.ResourceType;
 /**
  * Some unit tests to create a XACML Request via the XACMLRequestBuilder interface.
  */
-@SuppressWarnings("deprecation")
 public class XACMLRequestBuilderTest extends org.junit.Assert {
     
     static {

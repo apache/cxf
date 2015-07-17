@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.rt.security.saml.xacml;
+package org.apache.cxf.rt.security.saml.xacml2;
 
 import java.security.Principal;
 import java.util.ArrayList;
@@ -46,24 +46,22 @@ import org.opensaml.xacml.ctx.ResponseType;
 import org.opensaml.xacml.ctx.ResultType;
 import org.opensaml.xacml.ctx.StatusType;
 
-
 /**
- * An abstract interceptor to perform an XACML authorization request to a remote PDP,
+ * An interceptor to perform an XACML authorization request to a remote PDP,
  * and make an authorization decision based on the response. It takes the principal and roles
  * from the SecurityContext, and uses the XACMLRequestBuilder to construct an XACML Request
  * statement. 
- * 
- * This class must be subclassed to actually perform the request to the PDP.
  */
-public abstract class AbstractXACMLAuthorizingInterceptor extends AbstractPhaseInterceptor<Message> {
-    
-    private static final Logger LOG = LogUtils.getL7dLogger(AbstractXACMLAuthorizingInterceptor.class);
+public class XACMLAuthorizingInterceptor extends AbstractPhaseInterceptor<Message> {
+    private static final Logger LOG = LogUtils.getL7dLogger(XACMLAuthorizingInterceptor.class);
     
     private XACMLRequestBuilder requestBuilder = new DefaultXACMLRequestBuilder();
+    private PolicyDecisionPoint pdp;
     
-    public AbstractXACMLAuthorizingInterceptor() {
+    public XACMLAuthorizingInterceptor(PolicyDecisionPoint pdp) {
         super(Phase.PRE_INVOKE);
         org.apache.wss4j.common.saml.OpenSAMLUtil.initSamlEngine();
+        this.pdp = pdp;
     }
     
     public void handleMessage(Message message) throws Fault {
@@ -150,8 +148,6 @@ public abstract class AbstractXACMLAuthorizingInterceptor extends AbstractPhaseI
         return false;
     }
     
-    public abstract ResponseType performRequest(RequestType request, Message message) throws Exception;
-    
     /**
      * Handle any Obligations returned by the PDP
      */
@@ -162,6 +158,10 @@ public abstract class AbstractXACMLAuthorizingInterceptor extends AbstractPhaseI
         ResultType result
     ) throws Exception {
         // Do nothing by default
+    }
+
+    protected ResponseType performRequest(RequestType request, Message message) throws Exception {
+        return this.pdp.evaluate(request);
     }
     
 }

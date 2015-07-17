@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.rt.security.saml.xacml;
+package org.apache.cxf.rt.security.saml.xacml2;
 
 import java.security.Principal;
 import java.util.List;
@@ -42,21 +42,4 @@ public interface XACMLRequestBuilder {
      */
     RequestType createRequest(Principal principal, List<String> roles, Message message) throws Exception;
     
-    /**
-     * Return the list of Resources that have been inserted into the Request.
-     * 
-     * @param message The Message from which to retrieve the resource
-     * @return the list of Resources that have been inserted into the Request
-     */
-    @Deprecated
-    List<String> getResources(Message message);
-    
-    /**
-     * Return the Resource that has been inserted into the Request.
-     * 
-     * @param message The Message from which to retrieve the resource
-     * @return the Resource that has been inserted into the Request
-     */
-    @Deprecated
-    String getResource(Message message);
 }

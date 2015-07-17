@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.rt.security.saml.xacml;
+package org.apache.cxf.rt.security.saml.xacml2;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,41 +29,37 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
+import org.apache.cxf.rt.security.saml.xacml.XACMLConstants;
 import org.apache.wss4j.common.saml.OpenSAMLUtil;
+import org.joda.time.DateTime;
 import org.opensaml.xacml.ctx.ActionType;
 import org.opensaml.xacml.ctx.AttributeType;
 import org.opensaml.xacml.ctx.AttributeValueType;
+import org.opensaml.xacml.ctx.EnvironmentType;
 import org.opensaml.xacml.ctx.RequestType;
 import org.opensaml.xacml.ctx.ResourceType;
 import org.opensaml.xacml.ctx.SubjectType;
-import org.opensaml.xacml.profile.saml.SAMLProfileConstants;
-import org.opensaml.xacml.profile.saml.XACMLAuthzDecisionQueryType;
 
 
 /**
- * Some unit tests for creating a SAML XACML Request.
+ * Some unit tests to create a XACML Request using the RequestComponentBuilder.
  */
-public class SamlRequestComponentBuilderTest extends org.junit.Assert {
+public class RequestComponentBuilderTest extends org.junit.Assert {
     
     private DocumentBuilder docBuilder;
     static {
         OpenSAMLUtil.initSamlEngine();
     }
     
-    public SamlRequestComponentBuilderTest() throws ParserConfigurationException {
+    public RequestComponentBuilderTest() throws ParserConfigurationException {
         DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
         docBuilderFactory.setNamespaceAware(true);
         docBuilder = docBuilderFactory.newDocumentBuilder();
     }
 
     @org.junit.Test
-    public void testCreateXACMLSamlAuthzQueryRequest() throws Exception {
+    public void testCreateXACMLRequest() throws Exception {
         Document doc = docBuilder.newDocument();
-        
-        //
-        // Create XACML request
-        //
         
         // Subject
         AttributeValueType subjectIdAttributeValue = 
@@ -135,19 +131,92 @@ public class SamlRequestComponentBuilderTest extends org.junit.Assert {
                     null
             );
         
-        //
-        // Create SAML wrapper
-        //
-        
-        XACMLAuthzDecisionQueryType authzQuery = 
-            SamlRequestComponentBuilder.createAuthzDecisionQuery(
-                    "Issuer", request, SAMLProfileConstants.SAML20XACML20P_NS
-            );
-        
-        Element policyElement = OpenSAMLUtil.toDom(authzQuery, doc);
+        Element policyElement = OpenSAMLUtil.toDom(request, doc);
         // String outputString = DOM2Writer.nodeToString(policyElement);
         assertNotNull(policyElement);
     }
     
+    @org.junit.Test
+    public void testEnvironment() throws Exception {
+        Document doc = docBuilder.newDocument();
+        
+        // Subject
+        AttributeValueType subjectIdAttributeValue = 
+            RequestComponentBuilder.createAttributeValueType(
+                    "alice-user@apache.org"
+            );
+        AttributeType subjectIdAttribute = 
+            RequestComponentBuilder.createAttributeType(
+                    XACMLConstants.SUBJECT_ID,
+                    XACMLConstants.RFC_822_NAME,
+                    null,
+                    Collections.singletonList(subjectIdAttributeValue)
+            );
+        
+        List<AttributeType> attributes = new ArrayList<AttributeType>();
+        attributes.add(subjectIdAttribute);
+        SubjectType subject = RequestComponentBuilder.createSubjectType(attributes, null);
+        
+        // Resource
+        AttributeValueType resourceAttributeValue = 
+            RequestComponentBuilder.createAttributeValueType(
+                    "{http://www.example.org/contract/DoubleIt}DoubleIt"
+            );
+        AttributeType resourceAttribute = 
+            RequestComponentBuilder.createAttributeType(
+                    XACMLConstants.RESOURCE_ID,
+                    XACMLConstants.XS_STRING,
+                    null,
+                    Collections.singletonList(resourceAttributeValue)
+            );
+        attributes.clear();
+        attributes.add(resourceAttribute);
+        ResourceType resource = RequestComponentBuilder.createResourceType(attributes, null);
+        
+        // Action
+        AttributeValueType actionAttributeValue = 
+            RequestComponentBuilder.createAttributeValueType(
+                    "execute"
+            );
+        AttributeType actionAttribute = 
+            RequestComponentBuilder.createAttributeType(
+                    XACMLConstants.ACTION_ID,
+                    XACMLConstants.XS_STRING,
+                    null,
+                    Collections.singletonList(actionAttributeValue)
+            );
+        attributes.clear();
+        attributes.add(actionAttribute);
+        ActionType action = RequestComponentBuilder.createActionType(attributes);
+        
+        // Environment
+        DateTime dateTime = new DateTime();
+        AttributeValueType environmentAttributeValue = 
+            RequestComponentBuilder.createAttributeValueType(dateTime.toString());
+        AttributeType environmentAttribute = 
+            RequestComponentBuilder.createAttributeType(
+                    XACMLConstants.CURRENT_DATETIME,
+                    XACMLConstants.XS_DATETIME,
+                    null,
+                    Collections.singletonList(environmentAttributeValue)
+            );
+        attributes.clear();
+        attributes.add(environmentAttribute);
+        EnvironmentType environmentType = 
+             RequestComponentBuilder.createEnvironmentType(attributes);
+        
+        // Request
+        RequestType request = 
+            RequestComponentBuilder.createRequestType(
+                    Collections.singletonList(subject), 
+                    Collections.singletonList(resource), 
+                    action, 
+                    environmentType
+            );
+        
+        Element policyElement = OpenSAMLUtil.toDom(request, doc);
+        // String outputString = DOM2Writer.nodeToString(policyElement);
+        assertNotNull(policyElement);
+    }
     
 }
