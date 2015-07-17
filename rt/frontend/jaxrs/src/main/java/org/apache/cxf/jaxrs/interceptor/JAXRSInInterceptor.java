@@ -118,7 +118,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         // Content-Type
         String requestContentType = null;
         List<String> ctHeaderValues = protocolHeaders.get(Message.CONTENT_TYPE);
-        if (ctHeaderValues != null) {
+        if (ctHeaderValues != null && !ctHeaderValues.isEmpty()) {
             requestContentType = ctHeaderValues.get(0);
             message.put(Message.CONTENT_TYPE, requestContentType);
         }
