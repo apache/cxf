@@ -251,61 +251,42 @@ public abstract class CachedStreamTestBase extends Assert {
     }
 
     protected static String readFromStream(InputStream is) throws IOException {
-        try (ByteArrayOutputStream buf = new ByteArrayOutputStream()) {
+        ByteArrayOutputStream buf = new ByteArrayOutputStream();
+        try {
             IOUtils.copyAndCloseInput(is, buf);
             return new String(buf.toByteArray(), "UTF-8");
+        } finally {
+            buf.close();
         }
     }
 
     protected static String readPartiallyFromStream(InputStream is, int len) throws IOException {
-        try (ByteArrayOutputStream buf = new ByteArrayOutputStream()) {
+        ByteArrayOutputStream buf = new ByteArrayOutputStream();
+        try {
             IOUtils.copyAtLeast(is, buf, len);
             return new String(buf.toByteArray(), "UTF-8");
+        } finally {
+            buf.close();
         }
     }
  
     protected static String readFromReader(Reader is) throws IOException {
-<<<<<<< HEAD
-        StringBuffer buf = new StringBuffer();
+        StringWriter writer = new StringWriter();
         try {
-            char[] b = new char[100];
-            for (;;) {
-                int n = is.read(b, 0, b.length);
-                if (n < 0) {
-                    break;
-                }
-                buf.append(b, 0, n);
-            }
-        } finally {
-            is.close();
-=======
-        try (StringWriter writer = new StringWriter()) {
             IOUtils.copyAndCloseInput(is, writer);
             return writer.toString();
->>>>>>> 17f140e... Use IOUtils methods in CachedStreamTestBase to handle stream reading
+        } finally {
+            writer.close();
         }
     }
     
     protected static String readPartiallyFromReader(Reader is, int len) throws IOException {
-<<<<<<< HEAD
-        StringBuffer buf = new StringBuffer();
-        char[] b = new char[len];
-        int rn = 0;
-        for (;;) {
-            int n = is.read(b, 0, b.length);
-            if (n < 0) {
-                break;
-            }
-            buf.append(b, 0, n);
-            rn += n;
-            if (len <= rn) {
-                break;
-            }
-=======
-        try (StringWriter writer = new StringWriter()) {
+        StringWriter writer = new StringWriter();
+        try {
             IOUtils.copyAtLeast(is, writer, len);
             return writer.toString();
->>>>>>> 17f140e... Use IOUtils methods in CachedStreamTestBase to handle stream reading
+        } finally {
+            writer.close();
         }
     }
     
