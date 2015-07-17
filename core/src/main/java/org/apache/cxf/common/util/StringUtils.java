@@ -34,7 +34,7 @@ import java.util.regex.Pattern;
 public final class StringUtils {
     public static final Map<String, Pattern> PATTERN_MAP = new HashMap<String, Pattern>();
     static {
-        String patterns[] = {"/", " ", ":", "," , ";", "=", "\\."}; 
+        String patterns[] = {"/", " ", ":", "," , ";", "=", "\\.", "\\+"}; 
         for (String p : patterns) {
             PATTERN_MAP.put(p, Pattern.compile(p));
         }

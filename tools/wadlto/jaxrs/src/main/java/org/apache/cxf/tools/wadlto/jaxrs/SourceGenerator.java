@@ -688,7 +688,9 @@ public class SourceGenerator {
         List<Element> requestEls = getWadlElements(methodEl, "request");
         Element firstRequestEl = requestEls.size() >= 1 ? requestEls.get(0) : null;
         List<Element> allRequestReps = getWadlElements(firstRequestEl, "representation");
-        List<Element> requestRepsWithElements = getRepsWithElements(allRequestReps, info.getGrammarInfo());
+        List<Element> requestRepsWithElements = new LinkedList<Element>();
+        boolean duplicatesAvailable = 
+            getRepsWithElements(allRequestReps, requestRepsWithElements, info.getGrammarInfo());
         
         final String methodNameLowerCase = methodEl.getAttribute("name").toLowerCase();
         String id = methodEl.getAttribute("id");
@@ -701,16 +703,30 @@ public class SourceGenerator {
         
         boolean jaxpSourceRequired = requestRepsWithElements.size() > 1 && !supportMultipleRepsWithElements;
         int numOfMethods = jaxpSourceRequired ? 1 : requestRepsWithElements.size(); 
+         
         for (int i = 0; i < numOfMethods; i++) {
             
             List<Element> requestReps = allRequestReps;
             
             Element requestRepWithElement = requestRepsWithElements.get(i);
             String suffixName = "";
-            if (!jaxpSourceRequired && requestRepWithElement != null && requestRepsWithElements.size() > 1) {
-                String value = requestRepWithElement.getAttribute("element");
-                int index = value.indexOf(":");
-                suffixName = value.substring(index + 1).replace("-", "");
+            if (supportMultipleRepsWithElements && requestRepWithElement != null 
+                && requestRepsWithElements.size() > 1) {
+                String elementRef = requestRepWithElement.getAttribute("element");
+                int index = elementRef.indexOf(":");
+                suffixName = elementRef.substring(index + 1).replace("-", "");
+                if (duplicatesAvailable) {
+                    String mediaType = requestRepWithElement.getAttribute("mediaType");
+                    if (!StringUtils.isEmpty(mediaType)) {
+                        String subType = MediaType.valueOf(mediaType).getSubtype();
+                        String[] parts = StringUtils.split(subType, "\\+");
+                        if (parts.length == 2) {
+                            suffixName += StringUtils.capitalize(parts[1]);    
+                        } else {
+                            suffixName += StringUtils.capitalize(parts[0].replaceAll("[\\.-]", ""));
+                        }
+                    }
+                }
                 requestReps = Collections.singletonList(requestRepWithElement);
             }
             if (writeAnnotations(info.isInterfaceGenerated())) {
@@ -723,9 +739,9 @@ public class SourceGenerator {
                     } else {
                         // TODO : write a custom annotation class name based on HttpMethod    
                     }
-                    writeFormatAnnotations(requestReps, sbCode, imports, true);
+                    writeFormatAnnotations(requestReps, sbCode, imports, true, null);
                     writeFormatAnnotations(getWadlElements(getOKResponse(responseEls), "representation"),
-                            sbCode, imports, false);
+                            sbCode, imports, false, requestRepWithElement);
                 }
                 if (!isRoot && !"/".equals(currentPath)) {
                     writeAnnotation(sbCode, imports, Path.class, currentPath, true, true);
@@ -740,8 +756,13 @@ public class SourceGenerator {
             boolean responseTypeAvailable = true;
             
             if (methodNameLowerCase.length() > 0) {
-                responseTypeAvailable = writeResponseType(responseEls, sbCode, imports, info, 
-                                                          responseRequired, suspendedAsync);
+                responseTypeAvailable = writeResponseType(responseEls,
+                                                          requestRepWithElement,
+                                                          sbCode, 
+                                                          imports, 
+                                                          info, 
+                                                          responseRequired, 
+                                                          suspendedAsync);
                 String genMethodName = id + suffixName;
                 if (methodNameLowerCase.equals(genMethodName)) {
                     List<PathSegment> segments = JAXRSUtils.getPathSegments(currentPath, true, true);
@@ -807,22 +828,25 @@ public class SourceGenerator {
             || methodNames.size() == 1 && "*".equals(methodNames.iterator().next());
     }
 
-    private List<Element> getRepsWithElements(List<Element> repElements, GrammarInfo gInfo) {
-        Set<String> values = new HashSet<String>(repElements.size());
-        List<Element> xmlReps = new ArrayList<Element>();
+    private boolean getRepsWithElements(List<Element> repElements,
+                                              List<Element> requestRepsWithElements,
+                                              GrammarInfo gInfo) {
+        int duplicatesCount = 0;
+        Set<String> elementRefs = new HashSet<String>();
         for (Element el : repElements) {
             String value = el.getAttribute("element");
             if (value.length() > 0 
-                && (value.contains(":") || gInfo.isSchemaWithoutTargetNamespace()) 
-                && !values.contains(value)) {
-                xmlReps.add(el);
-                values.add(value);
+                && (value.contains(":") || gInfo.isSchemaWithoutTargetNamespace())) {
+                requestRepsWithElements.add(el);
+                if (!elementRefs.add(value)) {
+                    duplicatesCount++;
+                }
             }
         }
-        if (xmlReps.isEmpty()) {
-            xmlReps.add(null);
+        if (requestRepsWithElements.isEmpty()) {
+            requestRepsWithElements.add(null);
         }
-        return xmlReps;
+        return duplicatesCount > 0;
     }
     
     private List<Element> getParameters(Element resourceEl, List<Element> inheritedParams, 
@@ -916,6 +940,7 @@ public class SourceGenerator {
     }
     
     private boolean writeResponseType(List<Element> responseEls,
+                                      Element requestRepWithElement,
                                       StringBuilder sbCode,
                                       Set<String> imports,  
                                       ContextInfo info,
@@ -947,10 +972,33 @@ public class SourceGenerator {
                 return true;
             }
         }
-        
-        String elementType = responseRequired ? null : getElementRefName(
-                getActualRepElement(repElements, getRepsWithElements(repElements, info.getGrammarInfo()).get(0)), 
-                info, imports, true);
+        String elementType = null;
+        if (!responseRequired) {
+            List<Element> responseRepWithElements = new LinkedList<Element>();
+            getRepsWithElements(repElements, responseRepWithElements, info.getGrammarInfo());
+            
+            Element responseRepWithElement = null;
+            if (responseRepWithElements.size() == 1) {
+                responseRepWithElement = responseRepWithElements.get(0);
+            } else if (requestRepWithElement != null 
+                && supportMultipleRepsWithElements
+                && responseRepWithElements.size() > 1) {
+                String mediaType = requestRepWithElement.getAttribute("mediaType"); 
+                for (Element el : responseRepWithElements) {
+                    if (el.getAttribute("mediaType").equals(mediaType)) {
+                        responseRepWithElement = el;
+                        break;
+                    }
+                }
+                if (responseRepWithElement == null) {
+                    responseRepWithElement = responseRepWithElements.get(0);
+                }
+            }
+            
+            elementType = getElementRefName(
+                               getActualRepElement(repElements, responseRepWithElement), 
+                               info, imports, true);
+        }
         if (elementType != null) {
             sbCode.append(elementType + " ");
         } else {
@@ -1343,7 +1391,7 @@ public class SourceGenerator {
         } else {
             // try mediaTypesMap first
             String mediaType = repElement.getAttribute("mediaType");
-            if (!StringUtils.isEmpty(mediaType) && mediaTypesMap.containsKey(mediaType)) {
+            if (mediaTypesMap.containsKey(mediaType)) {
                 return addImportsAndGetSimpleName(imports, mediaTypesMap.get(mediaType));
             }
             if (checkPrimitive) {
@@ -1401,7 +1449,9 @@ public class SourceGenerator {
     
     
     private void writeFormatAnnotations(List<Element> repElements, StringBuilder sbCode, 
-                                        Set<String> imports, boolean inRep) {
+                                        Set<String> imports, 
+                                        boolean inRep,
+                                        Element requestRepWithElement) {
         if (repElements.size() == 0) {    
             return;
         }
@@ -1415,7 +1465,15 @@ public class SourceGenerator {
         StringBuilder mediaTypes = new StringBuilder("");
         for (int i = 0; i < repElements.size(); i++) {
             String mediaType = repElements.get(i).getAttribute("mediaType");
-            if (mediaType != null && (mediaTypes.indexOf(mediaType) < 0)) {
+            if (!StringUtils.isEmpty(mediaType) && mediaTypes.indexOf(mediaType) < 0) {
+                if (!inRep
+                    && supportMultipleRepsWithElements
+                    && repElements.size() > 1
+                    && requestRepWithElement != null
+                    && !requestRepWithElement.getAttribute("mediaType").equals(mediaType)) {
+                    continue;
+                }
+                
                 if (!first) { 
                     mediaTypes.append(", ");
                 }
