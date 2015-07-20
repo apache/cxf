@@ -19,6 +19,8 @@
 package org.apache.cxf.interceptor.security;
 
 import java.security.Principal;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.w3c.dom.Element;
@@ -33,7 +35,7 @@ public class SAMLSecurityContext implements LoginSecurityContext {
     private String issuer;
     
     public SAMLSecurityContext(Principal principal) {
-        this.principal = principal;
+        this(principal, null);
     }
     
     public SAMLSecurityContext(
@@ -53,7 +55,7 @@ public class SAMLSecurityContext implements LoginSecurityContext {
             return false;
         }
         for (Principal principalRole : roles) {
-            if (principalRole.getName().equals(role)) {
+            if (principalRole != principal && principalRole.getName().equals(role)) {
                 return true;
             }
         }
@@ -69,7 +71,14 @@ public class SAMLSecurityContext implements LoginSecurityContext {
     }
     
     public Set<Principal> getUserRoles() {
-        return roles;
+        if (roles == null) {
+            return Collections.emptySet();
+        }
+        Set<Principal> retRoles = new HashSet<Principal>(roles);
+        if (principal != null && retRoles.contains(principal)) {
+            retRoles.remove(principal);
+        }
+        return retRoles;
     }
     
     public void setAssertionElement(Element assertionElement) {
