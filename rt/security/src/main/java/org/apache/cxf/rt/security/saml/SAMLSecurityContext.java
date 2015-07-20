@@ -19,6 +19,8 @@
 package org.apache.cxf.rt.security.saml;
 
 import java.security.Principal;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.w3c.dom.Element;
@@ -67,7 +69,7 @@ public class SAMLSecurityContext implements ClaimsSecurityContext {
             return false;
         }
         for (Principal principalRole : roles) {
-            if (principalRole.getName().equals(role)) {
+            if (principalRole != principal && principalRole.getName().equals(role)) {
                 return true;
             }
         }
@@ -83,7 +85,14 @@ public class SAMLSecurityContext implements ClaimsSecurityContext {
     }
     
     public Set<Principal> getUserRoles() {
-        return roles;
+        if (roles == null) {
+            return Collections.emptySet();
+        }
+        Set<Principal> retRoles = new HashSet<Principal>(roles);
+        if (principal != null && retRoles.contains(principal)) {
+            retRoles.remove(principal);
+        }
+        return retRoles;
     }
     
     public void setAssertionElement(Element assertionElement) {
