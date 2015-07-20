@@ -70,13 +70,17 @@ public abstract class AbstractXACMLAuthorizingInterceptor extends AbstractPhaseI
         
         if (sc instanceof LoginSecurityContext) {
             Principal principal = sc.getUserPrincipal();
+            String principalName = null;
+            if (principal != null) {
+                principalName = principal.getName();
+            }
             
             LoginSecurityContext loginSecurityContext = (LoginSecurityContext)sc;
             Set<Principal> principalRoles = loginSecurityContext.getUserRoles();
             List<String> roles = new ArrayList<String>();
             if (principalRoles != null) {
                 for (Principal p : principalRoles) {
-                    if (p != principal) {
+                    if (p != null && p.getName() != null && !p.getName().equals(principalName)) {
                         roles.add(p.getName());
                     }
                 }
