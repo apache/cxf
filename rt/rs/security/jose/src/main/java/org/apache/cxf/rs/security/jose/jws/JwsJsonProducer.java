@@ -29,9 +29,9 @@ import javax.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.jaxrs.provider.json.JsonMapObjectReaderWriter;
 import org.apache.cxf.rs.security.jose.JoseConstants;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
-import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 public class JwsJsonProducer {
@@ -40,7 +40,7 @@ public class JwsJsonProducer {
     private String plainPayload;
     private String encodedPayload;
     private List<JwsJsonSignatureEntry> signatures = new LinkedList<JwsJsonSignatureEntry>();
-    private JoseHeadersReaderWriter writer = new JoseHeadersReaderWriter();
+    private JsonMapObjectReaderWriter writer = new JsonMapObjectReaderWriter();
     public JwsJsonProducer(String tbsDocument) {
         this(tbsDocument, false);
     }
@@ -90,7 +90,7 @@ public class JwsJsonProducer {
         return signatures;
     }
     
-    public MultivaluedMap<String, JwsJsonSignatureEntry> getSignatureEntryMap() {
+    public MultivaluedMap<SignatureAlgorithm, JwsJsonSignatureEntry> getSignatureEntryMap() {
         return JwsUtils.getJwsJsonSignatureMap(signatures);
     }
     public String signWith(List<JwsSignatureProvider> signers) {
@@ -100,12 +100,12 @@ public class JwsJsonProducer {
         return getJwsJsonSignedDocument(); 
     }
     public String signWith(JwsSignatureProvider signer) {
-        JoseHeaders headers = new JoseHeaders();
-        headers.setAlgorithm(signer.getAlgorithm().getJwaName());
+        JwsHeaders headers = new JwsHeaders();
+        headers.setSignatureAlgorithm(signer.getAlgorithm());
         return signWith(signer, headers);
     }
     public String signWith(JwsSignatureProvider signer, 
-                           JoseHeaders protectedHeader) {
+                           JwsHeaders protectedHeader) {
         return signWith(signer, protectedHeader, null);
     }
     public String signWith(JsonWebKey jwk) {
@@ -118,8 +118,8 @@ public class JwsJsonProducer {
         return signWith(JwsUtils.getHmacSignatureProvider(key, algo));
     }
     public String signWith(JwsSignatureProvider signer,
-                           JoseHeaders protectedHeader,
-                           JoseHeaders unprotectedHeader) {
+                           JwsHeaders protectedHeader,
+                           JwsHeaders unprotectedHeader) {
         JwsHeaders unionHeaders = new JwsHeaders();
          
         if (protectedHeader != null) {
@@ -134,7 +134,7 @@ public class JwsJsonProducer {
             }
             unionHeaders.asMap().putAll(unprotectedHeader.asMap());
         }
-        if (unionHeaders.getAlgorithm() == null) {
+        if (unionHeaders.getSignatureAlgorithm() == null) {
             LOG.warning("Algorithm header is not set");
             throw new JwsException(JwsException.Error.INVALID_JSON_JWS);
         }

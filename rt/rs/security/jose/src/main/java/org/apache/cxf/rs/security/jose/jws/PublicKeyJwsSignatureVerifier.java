@@ -48,14 +48,16 @@ public class PublicKeyJwsSignatureVerifier implements JwsSignatureVerifier {
             return CryptoUtils.verifySignature(StringUtils.toBytesUTF8(unsignedText), 
                                                signature, 
                                                key, 
-                                               AlgorithmUtils.toJavaName(checkAlgorithm(headers.getAlgorithm())),
+                                               AlgorithmUtils.toJavaName(checkAlgorithm(
+                                                                              headers.getSignatureAlgorithm())),
                                                signatureSpec);
         } catch (Exception ex) {
             LOG.warning("Invalid signature: " + ex.getMessage());
             throw new JwsException(JwsException.Error.INVALID_SIGNATURE, ex);
         }
     }
-    protected String checkAlgorithm(String algo) {
+    protected String checkAlgorithm(SignatureAlgorithm sigAlgo) {
+        String algo = sigAlgo.getJwaName();
         if (algo == null) {
             LOG.warning("Signature algorithm is not set");
             throw new JwsException(JwsException.Error.ALGORITHM_NOT_SET);

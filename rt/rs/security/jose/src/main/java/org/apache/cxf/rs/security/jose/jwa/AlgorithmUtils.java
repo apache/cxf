@@ -79,7 +79,7 @@ public final class AlgorithmUtils {
     public static final String ES_SHA_256_ALGO = "ES256";
     public static final String ES_SHA_384_ALGO = "ES384";
     public static final String ES_SHA_512_ALGO = "ES512";
-    public static final String PLAIN_TEXT_ALGO = "none";
+    public static final String NONE_TEXT_ALGO = "none";
     // Java
     public static final String HMAC_SHA_256_JAVA = "HmacSHA256";
     public static final String HMAC_SHA_384_JAVA = "HmacSHA384";

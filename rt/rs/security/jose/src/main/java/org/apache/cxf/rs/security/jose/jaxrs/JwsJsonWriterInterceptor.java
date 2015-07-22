@@ -33,10 +33,10 @@ import org.apache.cxf.common.util.Base64UrlOutputStream;
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.io.CachedOutputStream;
+import org.apache.cxf.jaxrs.provider.json.JsonMapObjectReaderWriter;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.rs.security.jose.JoseConstants;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
-import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
 import org.apache.cxf.rs.security.jose.jws.JwsHeaders;
 import org.apache.cxf.rs.security.jose.jws.JwsJsonOutputStream;
 import org.apache.cxf.rs.security.jose.jws.JwsJsonProducer;
@@ -45,7 +45,7 @@ import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
 
 @Priority(Priorities.JWS_WRITE_PRIORITY)
 public class JwsJsonWriterInterceptor extends AbstractJwsJsonWriterProvider implements WriterInterceptor {
-    private JoseHeadersReaderWriter writer = new JoseHeadersReaderWriter();
+    private JsonMapObjectReaderWriter writer = new JsonMapObjectReaderWriter();
     private boolean contentTypeRequired = true;
     private boolean useJwsOutputStream;
     @Override
@@ -82,7 +82,7 @@ public class JwsJsonWriterInterceptor extends AbstractJwsJsonWriterProvider impl
             ctx.proceed();
             JwsJsonProducer p = new JwsJsonProducer(new String(cos.getBytes(), "UTF-8"));
             for (JwsSignatureProvider signer : sigProviders) {
-                JoseHeaders protectedHeader = prepareProtectedHeader(ctx, signer);
+                JwsHeaders protectedHeader = prepareProtectedHeader(ctx, signer);
                 p.signWith(signer, protectedHeader, null);    
             }
             ctx.setMediaType(JAXRSUtils.toMediaType(JoseConstants.MEDIA_TYPE_JOSE_JSON));
@@ -92,9 +92,9 @@ public class JwsJsonWriterInterceptor extends AbstractJwsJsonWriterProvider impl
     }
     
     private JwsHeaders prepareProtectedHeader(WriterInterceptorContext ctx, 
-                                                          JwsSignatureProvider signer) {
+                                              JwsSignatureProvider signer) {
         JwsHeaders headers = new JwsHeaders();
-        headers.setAlgorithm(signer.getAlgorithm().getJwaName());
+        headers.setSignatureAlgorithm(signer.getAlgorithm());
         setContentTypeIfNeeded(headers, ctx);
         return headers;
     }

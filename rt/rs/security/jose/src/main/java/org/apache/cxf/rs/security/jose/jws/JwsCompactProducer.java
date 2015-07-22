@@ -22,13 +22,12 @@ import java.security.PrivateKey;
 
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
-import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
+import org.apache.cxf.jaxrs.provider.json.JsonMapObjectReaderWriter;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 
 public class JwsCompactProducer {
-    private JoseHeadersReaderWriter writer = new JoseHeadersReaderWriter();
+    private JsonMapObjectReaderWriter writer = new JsonMapObjectReaderWriter();
     private JwsHeaders headers;
     private String plainJwsPayload;
     private String signature;
@@ -38,14 +37,14 @@ public class JwsCompactProducer {
     public JwsCompactProducer(JwsHeaders headers, String plainJwsPayload) {
         this(headers, null, plainJwsPayload);
     }
-    protected JwsCompactProducer(JwsHeaders headers, JoseHeadersReaderWriter w, String plainJwsPayload) {
+    protected JwsCompactProducer(JwsHeaders headers, JsonMapObjectReaderWriter w, String plainJwsPayload) {
         this.headers = headers;
         if (w != null) {
             this.writer = w;
         }
         this.plainJwsPayload = plainJwsPayload;
     }
-    public JwsHeaders getJoseHeaders() {
+    public JwsHeaders getJwsHeaders() {
         if (headers == null) {
             headers = new JwsHeaders();
         }
@@ -56,7 +55,7 @@ public class JwsCompactProducer {
     }
     private String getUnsignedEncodedJws(boolean detached) {
         checkAlgorithm();
-        return Base64UrlUtility.encode(writer.headersToJson(getJoseHeaders())) 
+        return Base64UrlUtility.encode(writer.toJson(getJwsHeaders())) 
                + "." 
                + (detached ? "" : Base64UrlUtility.encode(plainJwsPayload));
     }
@@ -76,21 +75,21 @@ public class JwsCompactProducer {
     }
     public String signWith(JsonWebKey jwk) {
         return signWith(JwsUtils.getSignatureProvider(jwk, 
-                            SignatureAlgorithm.getAlgorithm(headers.getAlgorithm())));
+                        headers.getSignatureAlgorithm()));
     }
     
     public String signWith(PrivateKey key) {
         return signWith(JwsUtils.getPrivateKeySignatureProvider(key, 
-                                   SignatureAlgorithm.getAlgorithm(headers.getAlgorithm())));
+                                   headers.getSignatureAlgorithm()));
     }
     public String signWith(byte[] key) {
         return signWith(JwsUtils.getHmacSignatureProvider(key, 
-                   SignatureAlgorithm.getAlgorithm(headers.getAlgorithm())));
+                   headers.getSignatureAlgorithm()));
     }
     
     public String signWith(JwsSignatureProvider signer) {
         byte[] bytes = StringUtils.toBytesUTF8(getUnsignedEncodedJws());
-        byte[] sig = signer.sign(getJoseHeaders(), bytes);
+        byte[] sig = signer.sign(getJwsHeaders(), bytes);
         return setSignatureBytes(sig);
     }
     
@@ -108,10 +107,10 @@ public class JwsCompactProducer {
         this.signature = sig;
     }
     private boolean isPlainText() {
-        return AlgorithmUtils.PLAIN_TEXT_ALGO.equals(getAlgorithm());
+        return SignatureAlgorithm.NONE == getAlgorithm();
     }
-    private String getAlgorithm() {
-        return getJoseHeaders().getAlgorithm();
+    private SignatureAlgorithm getAlgorithm() {
+        return getJwsHeaders().getSignatureAlgorithm();
     }
     private void checkAlgorithm() {
         if (getAlgorithm() == null) {

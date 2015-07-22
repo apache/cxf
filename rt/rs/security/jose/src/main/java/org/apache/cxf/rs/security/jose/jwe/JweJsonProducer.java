@@ -29,12 +29,12 @@ import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.Base64UrlUtility;
+import org.apache.cxf.jaxrs.provider.json.JsonMapObjectReaderWriter;
 import org.apache.cxf.rs.security.jose.JoseConstants;
-import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
 
 public class JweJsonProducer {
     protected static final Logger LOG = LogUtils.getL7dLogger(JweJsonProducer.class);
-    private JoseHeadersReaderWriter writer = new JoseHeadersReaderWriter();
+    private JsonMapObjectReaderWriter writer = new JsonMapObjectReaderWriter();
     private JweHeaders protectedHeader;
     private JweHeaders unprotectedHeader;
     private byte[] content;

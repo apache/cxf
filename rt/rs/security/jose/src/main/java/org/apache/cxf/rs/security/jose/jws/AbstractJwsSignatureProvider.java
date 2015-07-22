@@ -21,7 +21,6 @@ package org.apache.cxf.rs.security.jose.jws;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 
 
@@ -37,12 +36,12 @@ public abstract class AbstractJwsSignatureProvider implements JwsSignatureProvid
         if (headers == null) {
             headers = new JwsHeaders();
         }
-        String algo = headers.getAlgorithm();
-        if (algo != null) {
-            checkAlgorithm(algo);
+        SignatureAlgorithm sigAlgo = headers.getSignatureAlgorithm();
+        if (sigAlgo != null) {
+            checkAlgorithm(sigAlgo.getJwaName());
         } else {
             checkAlgorithm(algorithm.getJwaName());
-            headers.setAlgorithm(algorithm.getJwaName());
+            headers.setSignatureAlgorithm(algorithm);
         }
         return headers;
     }
@@ -61,7 +60,7 @@ public abstract class AbstractJwsSignatureProvider implements JwsSignatureProvid
         return doCreateJwsSignature(prepareHeaders(headers));
     }
     
-    protected abstract JwsSignature doCreateJwsSignature(JoseHeaders headers);
+    protected abstract JwsSignature doCreateJwsSignature(JwsHeaders headers);
     
     protected void checkAlgorithm(String algo) {
         if (algo == null) {

@@ -31,10 +31,10 @@ import org.apache.cxf.common.util.Base64UrlOutputStream;
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.io.CachedOutputStream;
+import org.apache.cxf.jaxrs.provider.json.JsonMapObjectReaderWriter;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.rs.security.jose.JoseConstants;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
-import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
 import org.apache.cxf.rs.security.jose.jws.JwsCompactProducer;
 import org.apache.cxf.rs.security.jose.jws.JwsHeaders;
 import org.apache.cxf.rs.security.jose.jws.JwsOutputStream;
@@ -45,7 +45,7 @@ import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
 public class JwsWriterInterceptor extends AbstractJwsWriterProvider implements WriterInterceptor {
     private boolean contentTypeRequired = true;
     private boolean useJwsOutputStream;
-    private JoseHeadersReaderWriter writer = new JoseHeadersReaderWriter();
+    private JsonMapObjectReaderWriter writer = new JsonMapObjectReaderWriter();
     @Override
     public void aroundWriteTo(WriterInterceptorContext ctx) throws IOException, WebApplicationException {
         if (ctx.getEntity() == null) {
@@ -59,7 +59,7 @@ public class JwsWriterInterceptor extends AbstractJwsWriterProvider implements W
         if (useJwsOutputStream) {
             JwsSignature jwsSignature = sigProvider.createJwsSignature(headers);
             JwsOutputStream jwsStream = new JwsOutputStream(actualOs, jwsSignature);
-            byte[] headerBytes = StringUtils.toBytesUTF8(writer.headersToJson(headers));
+            byte[] headerBytes = StringUtils.toBytesUTF8(writer.toJson(headers));
             Base64UrlUtility.encodeAndStream(headerBytes, 0, headerBytes.length, jwsStream);
             jwsStream.write(new byte[]{'.'});
                         

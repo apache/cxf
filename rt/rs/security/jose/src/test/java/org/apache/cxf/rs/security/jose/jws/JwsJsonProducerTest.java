@@ -17,8 +17,6 @@
  * under the License.
  */
 package org.apache.cxf.rs.security.jose.jws;
-import org.apache.cxf.rs.security.jose.JoseHeaders;
-import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 
 import org.junit.Assert;
@@ -72,8 +70,8 @@ public class JwsJsonProducerTest extends Assert {
     @Test
     public void testSignWithProtectedHeaderOnly() {
         JwsJsonProducer producer = new JwsJsonProducer(UNSIGNED_PLAIN_JSON_DOCUMENT);
-        JoseHeaders headerEntries = new JoseHeaders();
-        headerEntries.setAlgorithm(AlgorithmUtils.HMAC_SHA_256_ALGO);
+        JwsHeaders headerEntries = new JwsHeaders();
+        headerEntries.setSignatureAlgorithm(SignatureAlgorithm.HS256);
                
         producer.signWith(new HmacJwsSignatureProvider(ENCODED_MAC_KEY_1, SignatureAlgorithm.HS256),
                           headerEntries);
@@ -83,8 +81,8 @@ public class JwsJsonProducerTest extends Assert {
     @Test
     public void testSignWithProtectedHeaderOnlyFlat() {
         JwsJsonProducer producer = new JwsJsonProducer(UNSIGNED_PLAIN_JSON_DOCUMENT, true);
-        JoseHeaders headerEntries = new JoseHeaders();
-        headerEntries.setAlgorithm(AlgorithmUtils.HMAC_SHA_256_ALGO);
+        JwsHeaders headerEntries = new JwsHeaders();
+        headerEntries.setSignatureAlgorithm(SignatureAlgorithm.HS256);
                
         producer.signWith(new HmacJwsSignatureProvider(ENCODED_MAC_KEY_1, SignatureAlgorithm.HS256),
                           headerEntries);
@@ -94,8 +92,8 @@ public class JwsJsonProducerTest extends Assert {
     @Test
     public void testDualSignWithProtectedHeaderOnly() {
         JwsJsonProducer producer = new JwsJsonProducer(UNSIGNED_PLAIN_JSON_DOCUMENT);
-        JoseHeaders headerEntries = new JoseHeaders();
-        headerEntries.setAlgorithm(AlgorithmUtils.HMAC_SHA_256_ALGO);
+        JwsHeaders headerEntries = new JwsHeaders();
+        headerEntries.setSignatureAlgorithm(SignatureAlgorithm.HS256);
                
         producer.signWith(new HmacJwsSignatureProvider(ENCODED_MAC_KEY_1, SignatureAlgorithm.HS256),
                           headerEntries);

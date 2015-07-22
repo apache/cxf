@@ -37,14 +37,14 @@ public class JwsClientResponseFilter extends AbstractJwsReaderProvider implement
     @Override
     public void filter(ClientRequestContext req, ClientResponseContext res) throws IOException {
         JwsCompactConsumer p = new JwsCompactConsumer(IOUtils.readStringFromStream(res.getEntityStream()));
-        JwsSignatureVerifier theSigVerifier = getInitializedSigVerifier(p.getJoseHeaders());
+        JwsSignatureVerifier theSigVerifier = getInitializedSigVerifier(p.getJwsHeaders());
         if (!p.verifySignatureWith(theSigVerifier)) {
             throw new JwsException(JwsException.Error.INVALID_SIGNATURE);
         }
         byte[] bytes = p.getDecodedJwsPayloadBytes();
         res.setEntityStream(new ByteArrayInputStream(bytes));
         res.getHeaders().putSingle("Content-Length", Integer.toString(bytes.length));
-        String ct = JoseUtils.checkContentType(p.getJoseHeaders().getContentType(), getDefaultMediaType());
+        String ct = JoseUtils.checkContentType(p.getJwsHeaders().getContentType(), getDefaultMediaType());
         if (ct != null) {
             res.getHeaders().putSingle("Content-Type", ct);
         }

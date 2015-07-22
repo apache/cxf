@@ -49,7 +49,7 @@ public class JwtJwsAuthenticationFilter extends AbstractJwsReaderProvider implem
         }
         
         JwsJwtCompactConsumer p = new JwsJwtCompactConsumer(schemeData[1]);
-        JwsSignatureVerifier theSigVerifier = getInitializedSigVerifier(p.getJoseHeaders());
+        JwsSignatureVerifier theSigVerifier = getInitializedSigVerifier(p.getJwsHeaders());
         if (!p.verifySignatureWith(theSigVerifier)) {
             context.abortWith(JAXRSUtils.toResponse(400));
             return;
@@ -61,7 +61,7 @@ public class JwtJwsAuthenticationFilter extends AbstractJwsReaderProvider implem
         
     }
     protected void setRequestContextProperty(Message m, JwsCompactConsumer c) {
-        Object headerContext = c.getJoseHeaders().getHeader(JWS_CONTEXT_PROPERTY);
+        Object headerContext = c.getJwsHeaders().getHeader(JWS_CONTEXT_PROPERTY);
         if (headerContext != null) {
             m.put(JWS_CONTEXT_PROPERTY, headerContext);
         }

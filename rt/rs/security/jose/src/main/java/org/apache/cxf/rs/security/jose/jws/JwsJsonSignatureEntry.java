@@ -24,9 +24,9 @@ import java.util.logging.Logger;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.jaxrs.provider.json.JsonMapObjectReaderWriter;
 import org.apache.cxf.rs.security.jose.JoseConstants;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
-import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
 import org.apache.cxf.rs.security.jose.JoseUtils;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 
@@ -36,15 +36,15 @@ public class JwsJsonSignatureEntry {
     private String encodedJwsPayload;
     private String encodedProtectedHeader;
     private String encodedSignature;
-    private JoseHeaders protectedHeader;
-    private JoseHeaders unprotectedHeader;
+    private JwsHeaders protectedHeader;
+    private JwsHeaders unprotectedHeader;
     private JwsHeaders unionHeaders;
-    private JoseHeadersReaderWriter writer = new JoseHeadersReaderWriter();
+    private JsonMapObjectReaderWriter writer = new JsonMapObjectReaderWriter();
       
     public JwsJsonSignatureEntry(String encodedJwsPayload,
                                  String encodedProtectedHeader,
                                  String encodedSignature,
-                                 JoseHeaders unprotectedHeader) {
+                                 JwsHeaders unprotectedHeader) {
         if (encodedProtectedHeader == null && unprotectedHeader == null || encodedSignature == null) {
             LOG.warning("Invalid Signature entry");
             throw new JwsException(JwsException.Error.INVALID_JSON_JWS);
@@ -55,7 +55,7 @@ public class JwsJsonSignatureEntry {
         this.encodedSignature = encodedSignature;
         this.unprotectedHeader = unprotectedHeader;
         if (encodedProtectedHeader != null) {
-            this.protectedHeader = writer.fromJsonHeaders(JoseUtils.decodeToString(encodedProtectedHeader));
+            this.protectedHeader = new JwsHeaders(writer.fromJson(JoseUtils.decodeToString(encodedProtectedHeader)));
         }
         prepare();
     }

@@ -24,7 +24,6 @@ import java.security.Signature;
 import java.security.SignatureException;
 import java.security.spec.AlgorithmParameterSpec;
 
-import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
@@ -47,9 +46,10 @@ public class PrivateKeyJwsSignatureProvider extends AbstractJwsSignatureProvider
         this.random = random;
         this.signatureSpec = spec;
     }
-    protected JwsSignature doCreateJwsSignature(JoseHeaders headers) {
+    protected JwsSignature doCreateJwsSignature(JwsHeaders headers) {
+        final String sigAlgo = headers.getSignatureAlgorithm().getJwaName();
         final Signature s = CryptoUtils.getSignature(key, 
-                                                     AlgorithmUtils.toJavaName(headers.getAlgorithm()),
+                                                     AlgorithmUtils.toJavaName(sigAlgo),
                                                      random,
                                                      signatureSpec);
         return doCreateJwsSignature(s);

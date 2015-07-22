@@ -51,7 +51,7 @@ public class PbesHmacAesWrapKeyDecryptionAlgorithm implements KeyDecryptionAlgor
         JweHeaders jweHeaders = jweDecryptionInput.getJweHeaders();
         byte[] saltInput = getDecodedBytes(jweHeaders.getHeader("p2s"));
         int pbesCount = jweHeaders.getIntegerHeader("p2c");
-        String keyAlgoJwt = jweHeaders.getAlgorithm();
+        String keyAlgoJwt = jweHeaders.getKeyEncryptionAlgorithm().getJwaName();
         int keySize = PbesHmacAesWrapKeyEncryptionAlgorithm.getKeySize(keyAlgoJwt);
         byte[] derivedKey = PbesHmacAesWrapKeyEncryptionAlgorithm
             .createDerivedKey(keyAlgoJwt, keySize, password, saltInput, pbesCount);

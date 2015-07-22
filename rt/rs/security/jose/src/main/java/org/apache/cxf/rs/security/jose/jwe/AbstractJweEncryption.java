@@ -27,8 +27,8 @@ import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.jaxrs.provider.json.JsonMapObjectReaderWriter;
 import org.apache.cxf.rs.security.jose.JoseConstants;
-import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
 import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
 import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
@@ -40,7 +40,7 @@ public abstract class AbstractJweEncryption implements JweEncryptionProvider {
     protected static final int DEFAULT_AUTH_TAG_LENGTH = 128;
     private ContentEncryptionProvider contentEncryptionAlgo;
     private KeyEncryptionProvider keyEncryptionAlgo;
-    private JoseHeadersReaderWriter writer = new JoseHeadersReaderWriter();
+    private JsonMapObjectReaderWriter writer = new JsonMapObjectReaderWriter();
     protected AbstractJweEncryption(ContentEncryptionProvider contentEncryptionAlgo,
                                     KeyEncryptionProvider keyEncryptionAlgo) {
         this.keyEncryptionAlgo = keyEncryptionAlgo;
@@ -150,7 +150,7 @@ public abstract class AbstractJweEncryption implements JweEncryptionProvider {
     public ContentAlgorithm getContentAlgorithm() {
         return getContentEncryptionAlgorithm().getAlgorithm();
     }
-    protected JoseHeadersReaderWriter getJwtHeadersWriter() {
+    protected JsonMapObjectReaderWriter getJwtHeadersWriter() {
         return writer;
     }
     
@@ -209,7 +209,7 @@ public abstract class AbstractJweEncryption implements JweEncryptionProvider {
             getEncryptedContentEncryptionKey(theHeaders, theCek);
         
         
-        String protectedHeadersJson = writer.headersToJson(protectedHeaders);
+        String protectedHeadersJson = writer.toJson(protectedHeaders);
         
         byte[] additionalEncryptionParam = getAAD(protectedHeadersJson, 
                                                   jweInput == null ? null : jweInput.getAad());
