@@ -42,17 +42,17 @@ public class JwsContainerRequestFilter extends AbstractJwsReaderProvider impleme
             return;
         }
         JwsCompactConsumer p = new JwsCompactConsumer(IOUtils.readStringFromStream(context.getEntityStream()));
-        JwsSignatureVerifier theSigVerifier = getInitializedSigVerifier(p.getJoseHeaders());
+        JwsSignatureVerifier theSigVerifier = getInitializedSigVerifier(p.getJwsHeaders());
         if (!p.verifySignatureWith(theSigVerifier)) {
             context.abortWith(JAXRSUtils.toResponse(400));
             return;
         }
-        JoseUtils.validateRequestContextProperty(p.getJoseHeaders());
+        JoseUtils.validateRequestContextProperty(p.getJwsHeaders());
         byte[] bytes = p.getDecodedJwsPayloadBytes();
         context.setEntityStream(new ByteArrayInputStream(bytes));
         context.getHeaders().putSingle("Content-Length", Integer.toString(bytes.length));
         
-        String ct = JoseUtils.checkContentType(p.getJoseHeaders().getContentType(), getDefaultMediaType());
+        String ct = JoseUtils.checkContentType(p.getJwsHeaders().getContentType(), getDefaultMediaType());
         if (ct != null) {
             context.getHeaders().putSingle("Content-Type", ct);
         }

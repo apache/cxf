@@ -24,12 +24,13 @@ public class NoneJwsSignatureVerifier implements JwsSignatureVerifier {
 
     @Override
     public boolean verify(JwsHeaders headers, String unsignedText, byte[] signature) {
-        return headers.getAlgorithm().equals(getAlgorithm().getJwaName()) && signature.length == 0;
+        return headers.getSignatureAlgorithm() == getAlgorithm() 
+            && signature.length == 0;
     }
 
     @Override
     public SignatureAlgorithm getAlgorithm() {
-        return SignatureAlgorithm.PLAIN;
+        return SignatureAlgorithm.NONE;
     }
 
 }

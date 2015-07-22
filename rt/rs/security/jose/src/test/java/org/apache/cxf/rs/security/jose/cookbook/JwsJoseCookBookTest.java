@@ -27,8 +27,6 @@ import javax.crypto.Cipher;
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.provider.json.JsonMapObjectReaderWriter;
-import org.apache.cxf.rs.security.jose.JoseHeaders;
-import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
 import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
@@ -37,6 +35,7 @@ import org.apache.cxf.rs.security.jose.jwk.JwkUtils;
 import org.apache.cxf.rs.security.jose.jws.EcDsaJwsSignatureProvider;
 import org.apache.cxf.rs.security.jose.jws.JwsCompactConsumer;
 import org.apache.cxf.rs.security.jose.jws.JwsCompactProducer;
+import org.apache.cxf.rs.security.jose.jws.JwsHeaders;
 import org.apache.cxf.rs.security.jose.jws.JwsJsonConsumer;
 import org.apache.cxf.rs.security.jose.jws.JwsJsonProducer;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
@@ -354,10 +353,10 @@ public class JwsJoseCookBookTest {
     @Test
     public void testRSAv15Signature() throws Exception {
         JwsCompactProducer compactProducer = new JwsCompactProducer(PAYLOAD);
-        compactProducer.getJoseHeaders().setAlgorithm(AlgorithmUtils.RS_SHA_256_ALGO);
-        compactProducer.getJoseHeaders().setKeyId(RSA_KID_VALUE);
+        compactProducer.getJwsHeaders().setSignatureAlgorithm(SignatureAlgorithm.RS256);
+        compactProducer.getJwsHeaders().setKeyId(RSA_KID_VALUE);
         JsonMapObjectReaderWriter reader = new JsonMapObjectReaderWriter();
-        assertEquals(reader.toJson(compactProducer.getJoseHeaders().asMap()), RSA_V1_5_SIGNATURE_PROTECTED_HEADER_JSON);
+        assertEquals(reader.toJson(compactProducer.getJwsHeaders().asMap()), RSA_V1_5_SIGNATURE_PROTECTED_HEADER_JSON);
         assertEquals(compactProducer.getUnsignedEncodedJws(),
                 RSA_V1_5_SIGNATURE_PROTECTED_HEADER + "." + ENCODED_PAYLOAD);
         JsonWebKeys jwks = readKeySet("cookbookPrivateSet.txt");
@@ -376,8 +375,8 @@ public class JwsJoseCookBookTest {
         JwsJsonProducer jsonProducer = new JwsJsonProducer(PAYLOAD);
         assertEquals(jsonProducer.getPlainPayload(), PAYLOAD);
         assertEquals(jsonProducer.getUnsignedEncodedPayload(), ENCODED_PAYLOAD);
-        JoseHeaders protectedHeader = new JoseHeaders();
-        protectedHeader.setAlgorithm(AlgorithmUtils.RS_SHA_256_ALGO);
+        JwsHeaders protectedHeader = new JwsHeaders();
+        protectedHeader.setSignatureAlgorithm(SignatureAlgorithm.RS256);
         protectedHeader.setKeyId(RSA_KID_VALUE);
         jsonProducer.signWith(JwsUtils.getSignatureProvider(rsaKey, 
                                                             SignatureAlgorithm.RS256), protectedHeader);
@@ -400,10 +399,10 @@ public class JwsJoseCookBookTest {
         }
 
         JwsCompactProducer compactProducer = new JwsCompactProducer(PAYLOAD);
-        compactProducer.getJoseHeaders().setAlgorithm(AlgorithmUtils.PS_SHA_384_ALGO);
-        compactProducer.getJoseHeaders().setKeyId(RSA_KID_VALUE);
+        compactProducer.getJwsHeaders().setSignatureAlgorithm(SignatureAlgorithm.PS384);
+        compactProducer.getJwsHeaders().setKeyId(RSA_KID_VALUE);
         JsonMapObjectReaderWriter reader = new JsonMapObjectReaderWriter();
-        assertEquals(reader.toJson(compactProducer.getJoseHeaders().asMap()), RSA_PSS_SIGNATURE_PROTECTED_HEADER_JSON);
+        assertEquals(reader.toJson(compactProducer.getJwsHeaders().asMap()), RSA_PSS_SIGNATURE_PROTECTED_HEADER_JSON);
         assertEquals(compactProducer.getUnsignedEncodedJws(),
                 RSA_PSS_SIGNATURE_PROTECTED_HEADER + "." + ENCODED_PAYLOAD);
         JsonWebKeys jwks = readKeySet("cookbookPrivateSet.txt");
@@ -421,8 +420,8 @@ public class JwsJoseCookBookTest {
         JwsJsonProducer jsonProducer = new JwsJsonProducer(PAYLOAD);
         assertEquals(jsonProducer.getPlainPayload(), PAYLOAD);
         assertEquals(jsonProducer.getUnsignedEncodedPayload(), ENCODED_PAYLOAD);
-        JoseHeaders protectedHeader = new JoseHeaders();
-        protectedHeader.setAlgorithm(AlgorithmUtils.PS_SHA_384_ALGO);
+        JwsHeaders protectedHeader = new JwsHeaders();
+        protectedHeader.setSignatureAlgorithm(SignatureAlgorithm.PS384);
         protectedHeader.setKeyId(RSA_KID_VALUE);
         jsonProducer.signWith(JwsUtils.getSignatureProvider(rsaKey, SignatureAlgorithm.PS384), protectedHeader);
         assertEquals(jsonProducer.getJwsJsonSignedDocument().length(), RSA_PSS_JSON_GENERAL_SERIALIZATION.length());
@@ -447,10 +446,10 @@ public class JwsJoseCookBookTest {
         }
         try {
             JwsCompactProducer compactProducer = new JwsCompactProducer(PAYLOAD);
-            compactProducer.getJoseHeaders().setAlgorithm(AlgorithmUtils.ES_SHA_512_ALGO);
-            compactProducer.getJoseHeaders().setKeyId(ECDSA_KID_VALUE);
+            compactProducer.getJwsHeaders().setSignatureAlgorithm(SignatureAlgorithm.ES512);
+            compactProducer.getJwsHeaders().setKeyId(ECDSA_KID_VALUE);
             JsonMapObjectReaderWriter reader = new JsonMapObjectReaderWriter();
-            assertEquals(reader.toJson(compactProducer.getJoseHeaders().asMap()), 
+            assertEquals(reader.toJson(compactProducer.getJwsHeaders().asMap()), 
                          ECDSA_SIGNATURE_PROTECTED_HEADER_JSON);
             assertEquals(compactProducer.getUnsignedEncodedJws(),
                     ECSDA_SIGNATURE_PROTECTED_HEADER + "." + ENCODED_PAYLOAD);
@@ -475,10 +474,10 @@ public class JwsJoseCookBookTest {
     @Test
     public void testHMACSignature() throws Exception {
         JwsCompactProducer compactProducer = new JwsCompactProducer(PAYLOAD);
-        compactProducer.getJoseHeaders().setAlgorithm(AlgorithmUtils.HMAC_SHA_256_ALGO);
-        compactProducer.getJoseHeaders().setKeyId(HMAC_KID_VALUE);
+        compactProducer.getJwsHeaders().setSignatureAlgorithm(SignatureAlgorithm.HS256);
+        compactProducer.getJwsHeaders().setKeyId(HMAC_KID_VALUE);
         JsonMapObjectReaderWriter reader = new JsonMapObjectReaderWriter();
-        assertEquals(reader.toJson(compactProducer.getJoseHeaders().asMap()), HMAC_SIGNATURE_PROTECTED_HEADER_JSON);
+        assertEquals(reader.toJson(compactProducer.getJwsHeaders().asMap()), HMAC_SIGNATURE_PROTECTED_HEADER_JSON);
         assertEquals(compactProducer.getUnsignedEncodedJws(),
                 HMAC_SIGNATURE_PROTECTED_HEADER + "." + ENCODED_PAYLOAD);
         JsonWebKeys jwks = readKeySet("cookbookSecretSet.txt");
@@ -493,8 +492,8 @@ public class JwsJoseCookBookTest {
         JwsJsonProducer jsonProducer = new JwsJsonProducer(PAYLOAD);
         assertEquals(jsonProducer.getPlainPayload(), PAYLOAD);
         assertEquals(jsonProducer.getUnsignedEncodedPayload(), ENCODED_PAYLOAD);
-        JoseHeaders protectedHeader = new JoseHeaders();
-        protectedHeader.setAlgorithm(AlgorithmUtils.HMAC_SHA_256_ALGO);
+        JwsHeaders protectedHeader = new JwsHeaders();
+        protectedHeader.setSignatureAlgorithm(SignatureAlgorithm.HS256);
         protectedHeader.setKeyId(HMAC_KID_VALUE);
         jsonProducer.signWith(JwsUtils.getSignatureProvider(key, SignatureAlgorithm.HS256), protectedHeader);
         assertEquals(jsonProducer.getJwsJsonSignedDocument(), HMAC_JSON_GENERAL_SERIALIZATION);
@@ -510,10 +509,10 @@ public class JwsJoseCookBookTest {
     @Test
     public void testDetachedHMACSignature() throws Exception {
         JwsCompactProducer compactProducer = new JwsCompactProducer(PAYLOAD);
-        compactProducer.getJoseHeaders().setAlgorithm(AlgorithmUtils.HMAC_SHA_256_ALGO);
-        compactProducer.getJoseHeaders().setKeyId(HMAC_KID_VALUE);
+        compactProducer.getJwsHeaders().setSignatureAlgorithm(SignatureAlgorithm.HS256);
+        compactProducer.getJwsHeaders().setKeyId(HMAC_KID_VALUE);
         JsonMapObjectReaderWriter reader = new JsonMapObjectReaderWriter();
-        assertEquals(reader.toJson(compactProducer.getJoseHeaders().asMap()), HMAC_SIGNATURE_PROTECTED_HEADER_JSON);
+        assertEquals(reader.toJson(compactProducer.getJwsHeaders().asMap()), HMAC_SIGNATURE_PROTECTED_HEADER_JSON);
         assertEquals(compactProducer.getUnsignedEncodedJws(),
                 HMAC_SIGNATURE_PROTECTED_HEADER + "." + ENCODED_PAYLOAD);
         JsonWebKeys jwks = readKeySet("cookbookSecretSet.txt");
@@ -528,8 +527,8 @@ public class JwsJoseCookBookTest {
         JwsJsonProducer jsonProducer = new JwsJsonProducer(PAYLOAD);
         assertEquals(jsonProducer.getPlainPayload(), PAYLOAD);
         assertEquals(jsonProducer.getUnsignedEncodedPayload(), ENCODED_PAYLOAD);
-        JoseHeaders protectedHeader = new JoseHeaders();
-        protectedHeader.setAlgorithm(AlgorithmUtils.HMAC_SHA_256_ALGO);
+        JwsHeaders protectedHeader = new JwsHeaders();
+        protectedHeader.setSignatureAlgorithm(SignatureAlgorithm.HS256);
         protectedHeader.setKeyId(HMAC_KID_VALUE);
         jsonProducer.signWith(JwsUtils.getSignatureProvider(key, SignatureAlgorithm.HS256), protectedHeader);
         assertEquals(jsonProducer.getJwsJsonSignedDocument(true), HMAC_DETACHED_JSON_GENERAL_SERIALIZATION);
@@ -548,9 +547,9 @@ public class JwsJoseCookBookTest {
         JwsJsonProducer jsonProducer = new JwsJsonProducer(PAYLOAD);
         assertEquals(jsonProducer.getPlainPayload(), PAYLOAD);
         assertEquals(jsonProducer.getUnsignedEncodedPayload(), ENCODED_PAYLOAD);
-        JoseHeaders protectedHeader = new JoseHeaders();
-        protectedHeader.setAlgorithm(AlgorithmUtils.HMAC_SHA_256_ALGO);
-        JoseHeaders unprotectedHeader = new JoseHeaders();
+        JwsHeaders protectedHeader = new JwsHeaders();
+        protectedHeader.setSignatureAlgorithm(SignatureAlgorithm.HS256);
+        JwsHeaders unprotectedHeader = new JwsHeaders();
         unprotectedHeader.setKeyId(HMAC_KID_VALUE);
         JsonWebKeys jwks = readKeySet("cookbookSecretSet.txt");
         List<JsonWebKey> keys = jwks.getKeys();
@@ -576,8 +575,8 @@ public class JwsJoseCookBookTest {
         JwsJsonProducer jsonProducer = new JwsJsonProducer(PAYLOAD);
         assertEquals(jsonProducer.getPlainPayload(), PAYLOAD);
         assertEquals(jsonProducer.getUnsignedEncodedPayload(), ENCODED_PAYLOAD);
-        JoseHeaders unprotectedHeader = new JoseHeaders();
-        unprotectedHeader.setAlgorithm(AlgorithmUtils.HMAC_SHA_256_ALGO);
+        JwsHeaders unprotectedHeader = new JwsHeaders();
+        unprotectedHeader.setSignatureAlgorithm(SignatureAlgorithm.HS256);
         unprotectedHeader.setKeyId(HMAC_KID_VALUE);
         JsonWebKeys jwks = readKeySet("cookbookSecretSet.txt");
         List<JsonWebKey> keys = jwks.getKeys();
@@ -609,9 +608,9 @@ public class JwsJoseCookBookTest {
             JwsJsonProducer jsonProducer = new JwsJsonProducer(PAYLOAD);
             assertEquals(jsonProducer.getPlainPayload(), PAYLOAD);
             assertEquals(jsonProducer.getUnsignedEncodedPayload(), ENCODED_PAYLOAD);
-            JoseHeaders firstSignerProtectedHeader = new JoseHeaders();
-            firstSignerProtectedHeader.setAlgorithm(AlgorithmUtils.RS_SHA_256_ALGO);
-            JoseHeaders firstSignerUnprotectedHeader = new JoseHeaders();
+            JwsHeaders firstSignerProtectedHeader = new JwsHeaders();
+            firstSignerProtectedHeader.setSignatureAlgorithm(SignatureAlgorithm.RS256);
+            JwsHeaders firstSignerUnprotectedHeader = new JwsHeaders();
             firstSignerUnprotectedHeader.setKeyId(RSA_KID_VALUE);
             JsonWebKeys jwks = readKeySet("cookbookPrivateSet.txt");
             List<JsonWebKey> keys = jwks.getKeys();
@@ -621,20 +620,20 @@ public class JwsJoseCookBookTest {
             assertEquals(jsonProducer.getSignatureEntries().get(0).toJson(),
                     FIRST_SIGNATURE_ENTRY_MULTIPLE_SIGNATURES);
 
-            JoseHeaders secondSignerUnprotectedHeader = new JoseHeaders();
-            secondSignerUnprotectedHeader.setAlgorithm(AlgorithmUtils.ES_SHA_512_ALGO);
+            JwsHeaders secondSignerUnprotectedHeader = new JwsHeaders();
+            secondSignerUnprotectedHeader.setSignatureAlgorithm(SignatureAlgorithm.ES512);
             secondSignerUnprotectedHeader.setKeyId(ECDSA_KID_VALUE);
             JsonWebKey ecKey = keys.get(0);
             jsonProducer.signWith(JwsUtils.getSignatureProvider(ecKey, SignatureAlgorithm.ES512),
                     null, secondSignerUnprotectedHeader);
-            assertEquals(new JoseHeadersReaderWriter().toJson(
+            assertEquals(new JsonMapObjectReaderWriter().toJson(
                 jsonProducer.getSignatureEntries().get(1).getUnprotectedHeader()),
                     SECOND_SIGNATURE_UNPROTECTED_HEADER_MULTIPLE_SIGNATURES);
             assertEquals(jsonProducer.getSignatureEntries().get(1).toJson().length(),
                     SECOND_SIGNATURE_ENTRY_MULTIPLE_SIGNATURES.length());
 
-            JoseHeaders thirdSignerProtectedHeader = new JoseHeaders();
-            thirdSignerProtectedHeader.setAlgorithm(AlgorithmUtils.HMAC_SHA_256_ALGO);
+            JwsHeaders thirdSignerProtectedHeader = new JwsHeaders();
+            thirdSignerProtectedHeader.setSignatureAlgorithm(SignatureAlgorithm.HS256);
             thirdSignerProtectedHeader.setKeyId(HMAC_KID_VALUE);
             JsonWebKeys secretJwks = readKeySet("cookbookSecretSet.txt");
             List<JsonWebKey> secretKeys = secretJwks.getKeys();

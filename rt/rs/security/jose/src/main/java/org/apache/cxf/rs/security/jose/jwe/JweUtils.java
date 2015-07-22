@@ -541,7 +541,7 @@ public final class JweUtils {
                                                 String compression) {
         JweHeaders headers = new JweHeaders();
         if (keyEncryptionAlgo != null) {
-            headers.setAlgorithm(keyEncryptionAlgo);
+            headers.setKeyEncryptionAlgorithm(KeyAlgorithm.getAlgorithm(keyEncryptionAlgo));
         }
         headers.setContentEncryptionAlgorithm(ContentAlgorithm.getAlgorithm(contentEncryptionAlgo));
         if (compression != null) {

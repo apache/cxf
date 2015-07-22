@@ -24,7 +24,7 @@ public class NoneJwsSignatureProvider implements JwsSignatureProvider {
 
     @Override
     public SignatureAlgorithm getAlgorithm() {
-        return SignatureAlgorithm.PLAIN;
+        return SignatureAlgorithm.NONE;
     }
 
     @Override

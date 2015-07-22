@@ -57,17 +57,20 @@ public class HmacJwsSignatureVerifier implements JwsSignatureVerifier {
     }
     
     private byte[] computeMac(JwsHeaders headers, String text) {
+        final String sigAlgo = checkAlgorithm(headers.getSignatureAlgorithm());
         return HmacUtils.computeHmac(key, 
-                                     AlgorithmUtils.toJavaName(checkAlgorithm(headers.getAlgorithm())),
+                                     AlgorithmUtils.toJavaName(sigAlgo),
                                      hmacSpec,
                                      text);
     }
     
-    protected String checkAlgorithm(String algo) {
-        if (algo == null) {
+    protected String checkAlgorithm(SignatureAlgorithm sigAlgo) {
+        
+        if (sigAlgo == null) {
             LOG.warning("Signature algorithm is not set");
             throw new JwsException(JwsException.Error.ALGORITHM_NOT_SET);
         }
+        String algo = sigAlgo.getJwaName();
         if (!AlgorithmUtils.isHmacSign(algo)
             || !algo.equals(supportedAlgo.getJwaName())) {
             LOG.warning("Invalid signature algorithm: " + algo);

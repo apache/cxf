@@ -20,7 +20,6 @@ package org.apache.cxf.rs.security.jose.jws;
 
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
-import org.apache.cxf.rs.security.jose.jwt.JwtTokenJson;
 import org.apache.cxf.rs.security.jose.jwt.JwtTokenReaderWriter;
 
 public class JwsJwtCompactConsumer extends JwsCompactConsumer {
@@ -28,16 +27,15 @@ public class JwsJwtCompactConsumer extends JwsCompactConsumer {
     public JwsJwtCompactConsumer(String encodedJws) {
         super(encodedJws, null, new JwtTokenReaderWriter());
     }
-    public JwtTokenJson getDecodedJsonToken() {
-        return new JwtTokenJson(getDecodedJsonHeaders(), getDecodedJwsPayload());
-    }
     public JwtClaims getJwtClaims() {
         return getJwtToken().getClaims();
     }
     public JwtToken getJwtToken() {
         if (token == null) {
-            token = ((JwtTokenReaderWriter)getReader()).fromJson(
-                new JwtTokenJson(getDecodedJsonHeaders(), getDecodedJwsPayload()));
+            JwsHeaders theHeaders = super.getJwsHeaders();
+            JwtClaims theClaims = 
+                ((JwtTokenReaderWriter)getReader()).fromJsonClaims(getDecodedJwsPayload());
+            token = new JwtToken(theHeaders, theClaims);
         }
         return token;
     }

@@ -173,18 +173,19 @@ public final class JwsUtils {
         }
         return null;
     }
-    public static MultivaluedMap<String, JwsJsonSignatureEntry> getJwsJsonSignatureMap(
+    public static MultivaluedMap<SignatureAlgorithm, JwsJsonSignatureEntry> getJwsJsonSignatureMap(
         List<JwsJsonSignatureEntry> signatures) {
-        MultivaluedMap<String, JwsJsonSignatureEntry> map = new MetadataMap<String, JwsJsonSignatureEntry>();
+        MultivaluedMap<SignatureAlgorithm, JwsJsonSignatureEntry> map = 
+            new MetadataMap<SignatureAlgorithm, JwsJsonSignatureEntry>();
         for (JwsJsonSignatureEntry entry : signatures) {
-            map.add(entry.getUnionHeader().getAlgorithm(), entry);
+            map.add(entry.getUnionHeader().getSignatureAlgorithm(), entry);
         }
         return map;
     }
     public static JwsSignatureProvider loadSignatureProvider(boolean required) {
         return loadSignatureProvider(null, required);    
     }
-    public static JwsSignatureProvider loadSignatureProvider(JoseHeaders headers, boolean required) {
+    public static JwsSignatureProvider loadSignatureProvider(JwsHeaders headers, boolean required) {
         Message m = JAXRSUtils.getCurrentMessage();
         Properties props = KeyManagementUtils.loadStoreProperties(m, required, 
                                                                   RSSEC_SIGNATURE_OUT_PROPS, RSSEC_SIGNATURE_PROPS);
@@ -193,14 +194,14 @@ public final class JwsUtils {
         }
         JwsSignatureProvider theSigProvider = loadSignatureProvider(m, props, headers, false);
         if (headers != null) {
-            headers.setAlgorithm(theSigProvider.getAlgorithm().getJwaName());
+            headers.setSignatureAlgorithm(theSigProvider.getAlgorithm());
         }
         return theSigProvider;
     }
     public static JwsSignatureVerifier loadSignatureVerifier(boolean required) {
         return loadSignatureVerifier(null, required);
     }
-    public static JwsSignatureVerifier loadSignatureVerifier(JoseHeaders headers, boolean required) {
+    public static JwsSignatureVerifier loadSignatureVerifier(JwsHeaders headers, boolean required) {
         Message m = JAXRSUtils.getCurrentMessage();
         Properties props = KeyManagementUtils.loadStoreProperties(m, required, 
                                                                   RSSEC_SIGNATURE_IN_PROPS, RSSEC_SIGNATURE_PROPS);
@@ -297,7 +298,7 @@ public final class JwsUtils {
     }
     private static JwsSignatureVerifier loadSignatureVerifier(Message m, 
                                                               Properties props,
-                                                              JoseHeaders inHeaders, 
+                                                              JwsHeaders inHeaders, 
                                                               boolean ignoreNullVerifier) {
         JwsSignatureVerifier theVerifier = null;
         String inHeaderKid = null;
@@ -311,12 +312,12 @@ public final class JwsUtils {
                     throw new JwsException(JwsException.Error.INVALID_KEY);
                 }
                 return getSignatureVerifier(publicJwk, 
-                                            SignatureAlgorithm.getAlgorithm(inHeaders.getAlgorithm()));
+                                            inHeaders.getSignatureAlgorithm());
             } else if (inHeaders.getHeader(JoseConstants.HEADER_X509_CHAIN) != null) {
                 List<X509Certificate> chain = KeyManagementUtils.toX509CertificateChain(inHeaders.getX509Chain());
                 KeyManagementUtils.validateCertificateChain(props, chain);
                 return getPublicKeySignatureVerifier(chain.get(0).getPublicKey(), 
-                                                     SignatureAlgorithm.getAlgorithm(inHeaders.getAlgorithm()));
+                                                     inHeaders.getSignatureAlgorithm());
             }
         }
         

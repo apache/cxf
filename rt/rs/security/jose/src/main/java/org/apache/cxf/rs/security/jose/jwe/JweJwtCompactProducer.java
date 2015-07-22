@@ -22,7 +22,6 @@ import java.security.interfaces.RSAPublicKey;
 import javax.crypto.SecretKey;
 
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
@@ -33,12 +32,12 @@ public class JweJwtCompactProducer  {
     private JweHeaders headers;
     private String claimsJson;
     public JweJwtCompactProducer(JwtToken token) {
-        this(token.getHeaders(), token.getClaims());
+        this(new JweHeaders(token.getHeaders()), token.getClaims());
     }
     public JweJwtCompactProducer(JwtClaims claims) {
-        this(new JoseHeaders(), claims);
+        this(new JweHeaders(), claims);
     }
-    public JweJwtCompactProducer(JoseHeaders joseHeaders, JwtClaims claims) {
+    public JweJwtCompactProducer(JweHeaders joseHeaders, JwtClaims claims) {
         headers = new JweHeaders(joseHeaders);
         claimsJson = JwtUtils.claimsToJson(claims);
     }

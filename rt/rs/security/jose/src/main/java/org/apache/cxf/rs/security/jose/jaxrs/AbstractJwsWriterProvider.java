@@ -27,6 +27,7 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.JoseUtils;
 import org.apache.cxf.rs.security.jose.jws.JwsCompactProducer;
+import org.apache.cxf.rs.security.jose.jws.JwsHeaders;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 
@@ -37,7 +38,7 @@ public class AbstractJwsWriterProvider {
         this.sigProvider = signatureProvider;
     }
     
-    protected JwsSignatureProvider getInitializedSigProvider(JoseHeaders headers) {
+    protected JwsSignatureProvider getInitializedSigProvider(JwsHeaders headers) {
         setRequestContextProperty(headers);
         if (sigProvider != null) {
             return sigProvider;    

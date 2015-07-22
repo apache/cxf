@@ -23,9 +23,9 @@ import java.util.Map;
 
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.jaxrs.provider.json.JsonMapObjectReaderWriter;
 import org.apache.cxf.rs.security.jose.JoseConstants;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
-import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
 import org.apache.cxf.rs.security.jose.JoseType;
 import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
 import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
@@ -100,7 +100,7 @@ public class JweHeaders extends JoseHeaders {
         return (JoseHeaders)super.setHeader(name, value);
     }
     public byte[] toCipherAdditionalAuthData() { 
-        return toCipherAdditionalAuthData(new JoseHeadersReaderWriter().headersToJson(this));
+        return toCipherAdditionalAuthData(new JsonMapObjectReaderWriter().toJson(this));
     }
     public static byte[] toCipherAdditionalAuthData(String headersJson) { 
         byte[] headerBytes = StringUtils.toBytesUTF8(headersJson);

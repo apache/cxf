@@ -24,7 +24,7 @@ import java.io.OutputStream;
 
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.rs.security.jose.JoseHeadersReaderWriter;
+import org.apache.cxf.jaxrs.provider.json.JsonMapObjectReaderWriter;
 
 
 public class JweCompactProducer {
@@ -85,7 +85,7 @@ public class JweCompactProducer {
                                cipherInitVector);
     }
     private static String getHeadersJson(JweHeaders headers) {
-        return new JoseHeadersReaderWriter().headersToJson(headers);
+        return new JsonMapObjectReaderWriter().toJson(headers);
         
     }
     public static StringBuilder startJweContent(StringBuilder sb,

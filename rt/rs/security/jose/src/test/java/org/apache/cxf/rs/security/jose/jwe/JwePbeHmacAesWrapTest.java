@@ -20,7 +20,6 @@ package org.apache.cxf.rs.security.jose.jwe;
 
 import java.security.Security;
 
-import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
 import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -59,7 +58,7 @@ public class JwePbeHmacAesWrapTest extends Assert {
     public void testEncryptDecryptPbesHmacAesWrapAesGcm() throws Exception {
         final String specPlainText = "Live long and prosper.";
         JweHeaders headers = new JweHeaders();
-        headers.setAlgorithm(AlgorithmUtils.PBES2_HS256_A128KW_ALGO);
+        headers.setKeyEncryptionAlgorithm(KeyAlgorithm.PBES2_HS256_A128KW);
         headers.setContentEncryptionAlgorithm(ContentAlgorithm.A128GCM);
         final String password = "Thus from my lips, by yours, my sin is purged."; 
         KeyEncryptionProvider keyEncryption = 

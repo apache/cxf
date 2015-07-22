@@ -26,7 +26,7 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.provider.json.JsonMapObject;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 
-public class JoseHeaders extends JsonMapObject {
+public abstract class JoseHeaders extends JsonMapObject {
     public JoseHeaders() {
     }
     
@@ -61,11 +61,11 @@ public class JoseHeaders extends JsonMapObject {
         return (String)getHeader(JoseConstants.HEADER_CONTENT_TYPE);
     }
     
-    public void setAlgorithm(String algo) {
+    protected void setAlgorithm(String algo) {
         setHeader(JoseConstants.HEADER_ALGORITHM, algo);
     }
     
-    public String getAlgorithm() {
+    protected String getAlgorithm() {
         Object prop = getHeader(JoseConstants.HEADER_ALGORITHM);
         return prop == null ? null : prop.toString();
     }

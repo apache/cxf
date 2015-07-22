@@ -39,7 +39,7 @@ public enum SignatureAlgorithm {
     ES384(AlgorithmUtils.ES_SHA_384_ALGO, AlgorithmUtils.ES_SHA_384_JAVA, 384),
     ES512(AlgorithmUtils.ES_SHA_512_ALGO, AlgorithmUtils.ES_SHA_512_JAVA, 512),
     
-    PLAIN(AlgorithmUtils.PLAIN_TEXT_ALGO, null, -1);
+    NONE(AlgorithmUtils.NONE_TEXT_ALGO, null, -1);
     
     
     private final String jwaName;
@@ -71,6 +71,9 @@ public enum SignatureAlgorithm {
     public static SignatureAlgorithm getAlgorithm(String algo) {
         if (algo == null) {
             return null;
+        }
+        if (AlgorithmUtils.NONE_TEXT_ALGO.equals(algo)) {
+            return NONE;
         }
         return SignatureAlgorithm.valueOf(algo.replace('-', '_')
                                         .replace('+', '_'));
