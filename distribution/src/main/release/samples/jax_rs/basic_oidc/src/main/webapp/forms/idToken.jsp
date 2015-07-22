@@ -1,4 +1,4 @@
-<%@ page import="javax.servlet.http.HttpServletRequest, org.apache.cxf.rs.security.oidc.common.IdToken" %>
+<%@ page import="javax.servlet.http.HttpServletRequest, java.util.Map, org.apache.cxf.rs.security.oidc.common.IdToken" %>
 
 <%
     IdToken token = (IdToken) request.getAttribute("data");
@@ -10,7 +10,7 @@
 	<!--
 	  input {font-family:verdana, arial, helvetica, sans-serif;font-size:20px;line-height:40px;}
 	  div.padded {  
-         padding-left: 5em;  
+         padding-left: 1em;  
       } 
 	-->
 </STYLE>
@@ -22,10 +22,16 @@
 <p>
 <table border="1">
     <tr><th><big><big>Property</big></big></th><th><big><big>Value</big></big></th></tr> 
+    <%
+       for (Map.Entry<String, Object> entry : token.asMap().entrySet()) {
+    %>
     <tr>
-       <td><big>Email</big></big></td>
-       <td><big><big><%= token.getClaim("email") %></big></big></td>
+       <td><big><%= entry.getKey() %></big></big></td>
+       <td><big><big><%= entry.getValue().toString() %></big></big></td>
     </tr>
+    <%
+       }
+    %>
 </table> 
 </div> 
 </body>

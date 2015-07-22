@@ -2,13 +2,9 @@
 
 <%
     OidcClientTokenContext oidc = (OidcClientTokenContext) request.getAttribute("data");
-    String basePath = request.getContextPath() + request.getServletPath();
-    if (!basePath.endsWith("/")) {
-        basePath += "/";
-    }
 %>
-<html xmlns="http://www.w3.org/1999/xhtml">
-<div class="padded">
-</div>
+<html>
+<body>
+<name><%= oidc.getIdToken().getClaim("name") %></name>
 </body>
 </html>
