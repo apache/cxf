@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -196,7 +197,12 @@ public final class AttachmentUtil {
         
         String name = ATT_UUID + "-" + String.valueOf(++counter);
         if (ns != null && (ns.length() > 0)) {
-            cid = ns;
+            try {
+                URI uri = new URI(ns);
+                cid = uri.getHost();
+            } catch (Exception e) {
+                cid = ns;
+            }
         }
         return URLEncoder.encode(name, "UTF-8") + "@" + URLEncoder.encode(cid, "UTF-8");
     }
