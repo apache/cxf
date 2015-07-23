@@ -22,7 +22,15 @@ package org.apache.cxf.systest.jaxrs;
 
 import java.util.List;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
+@Path("/int")
+@Produces({"application/json" })
 public interface GenericBookInterface<A> {
+    @GET
+    @Path("/books/superbook")
     List<A> getSuperBook();
 }
 
