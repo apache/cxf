@@ -333,7 +333,7 @@ public class InjectionUtilsTest extends Assert {
         }
         @Override
         public List<String> list() {
-            return new ArrayList<>();
+            return new ArrayList<String>();
         }
     }
 }
