@@ -24,6 +24,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
+import java.lang.reflect.GenericDeclaration;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -116,34 +117,57 @@ public final class InjectionUtils {
         return !cls.isInterface() && !Modifier.isAbstract(cls.getModifiers());
     }
     
+    private static ParameterizedType findGenericDeclaration(GenericDeclaration declaration, Type scope) {
+        if (scope instanceof ParameterizedType) {
+            ParameterizedType type = (ParameterizedType) scope;
+            if (type.getRawType() == declaration) {
+                return type;
+            } else {
+                scope = type.getRawType();
+            }
+        }
+        if (scope instanceof Class) {
+            Class<?> classScope = (Class<?>)scope;
+            ParameterizedType result = findGenericDeclaration(declaration, classScope.getGenericSuperclass());
+            if (result == null) {
+                for (Type type : classScope.getGenericInterfaces()) {
+                    result = findGenericDeclaration(declaration, type);
+                    if (result != null) {
+                        break;
+                    }
+                }
+            }
+            return result;
+        }
+        return null;
+    }
+    
     public static Type getSuperType(Class<?> serviceClass, TypeVariable<?> var) {
         
         int pos = 0;
-        TypeVariable<?>[] vars = var.getGenericDeclaration().getTypeParameters();
+        GenericDeclaration genericDeclaration = var.getGenericDeclaration();
+        TypeVariable<?>[] vars = genericDeclaration.getTypeParameters();
         for (; pos < vars.length; pos++) {
             if (vars[pos].getName().equals(var.getName())) {
                 break;
             }
         }
         
-        Type genericSubtype = serviceClass.getGenericSuperclass();
-        if (!(genericSubtype instanceof ParameterizedType)) {
-            Type[] genInterfaces = serviceClass.getGenericInterfaces();
-            for (Type t : genInterfaces) {
-                genericSubtype = t;
-                break;
-            }
+        ParameterizedType genericSubtype = findGenericDeclaration(genericDeclaration, serviceClass);
+        Type result = null;
+        if (genericSubtype != null) {
+            result = genericSubtype.getActualTypeArguments()[pos];
         }
-        if (!(genericSubtype instanceof ParameterizedType)) {
-            genericSubtype = null;
+        if (result instanceof TypeVariable) {
+            result = getSuperType(serviceClass, (TypeVariable<?>) result);
         }
-        Type result = InjectionUtils.getActualType(genericSubtype, pos);
                                              
         if (result == null || result == Object.class) {
-            Type[] bounds = var.getBounds();
-            int boundPos = bounds.length > pos ? pos : 0; 
-            if (bounds.length > boundPos && bounds[boundPos] != Object.class) {
-                result = bounds[boundPos];
+            for (Type bound : var.getBounds()) {
+                if (bound != Object.class) {
+                    result = bound;
+                    break;
+                }
             }
         }
         return result;

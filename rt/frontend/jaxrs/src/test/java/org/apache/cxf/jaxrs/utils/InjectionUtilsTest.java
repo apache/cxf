@@ -18,7 +18,10 @@
  */
 package org.apache.cxf.jaxrs.utils;
 
+import java.io.Serializable;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -42,6 +45,7 @@ import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.easymock.EasyMock;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -145,6 +149,17 @@ public class InjectionUtilsTest extends Assert {
         assertEquals("Type is wrong", CarType.AUDI, carType);
     }
 
+    @Test
+    public void testGenericInterfaceType() throws NoSuchMethodException {
+        Type str = InjectionUtils.getGenericResponseType(GenericInterface.class.getMethod("get"),
+                       TestService.class, "", String.class, new ExchangeImpl());
+        assertEquals(String.class, str);
+        ParameterizedType list = (ParameterizedType) InjectionUtils.getGenericResponseType(
+            GenericInterface.class.getMethod("list"), TestService.class,
+            new ArrayList<String>(), ArrayList.class, new ExchangeImpl());
+        assertEquals(String.class, list.getActualTypeArguments()[0]);
+    }
+    
     static class CustomerBean1 {
         private String a;
         private Long b;
@@ -304,5 +319,21 @@ public class InjectionUtilsTest extends Assert {
         }
 
     }
-
+    interface GenericInterface<A> {
+        A get();
+        List<A> list();
+    }
+    interface ServiceInterface extends Serializable, GenericInterface<String> {
+    }
+    public static class TestService implements Serializable, ServiceInterface {
+        private static final long serialVersionUID = 1L;
+        @Override
+        public String get() {
+            return "";
+        }
+        @Override
+        public List<String> list() {
+            return new ArrayList<>();
+        }
+    }
 }

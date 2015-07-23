@@ -44,7 +44,6 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class JAXRSClientServerResourceJacksonSpringProviderTest extends AbstractBusClientServerTestBase {
@@ -190,7 +189,6 @@ public class JAXRSClientServerResourceJacksonSpringProviderTest extends Abstract
         
     }
     @Test
-    @Ignore
     public void testGetGenericSuperBookInt2() throws Exception {
         
         String endpointAddress =
