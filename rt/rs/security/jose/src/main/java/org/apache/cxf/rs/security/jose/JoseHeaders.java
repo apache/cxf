@@ -61,11 +61,11 @@ public abstract class JoseHeaders extends JsonMapObject {
         return (String)getHeader(JoseConstants.HEADER_CONTENT_TYPE);
     }
     
-    protected void setAlgorithm(String algo) {
+    public void setAlgorithm(String algo) {
         setHeader(JoseConstants.HEADER_ALGORITHM, algo);
     }
     
-    protected String getAlgorithm() {
+    public String getAlgorithm() {
         Object prop = getHeader(JoseConstants.HEADER_ALGORITHM);
         return prop == null ? null : prop.toString();
     }
