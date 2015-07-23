@@ -81,10 +81,18 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
         </jaxrs:providers>
     </jaxrs:server>
     
-    <jaxrs:server id="genericBookStoreInt"
-                  address="/genericstoreInt">
+    <jaxrs:server id="genericBookStoreInt1"
+                  address="/genericstoreInt1">
         <jaxrs:serviceBeans>
             <ref bean="gBookStoreInt1"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="jackson"/>
+        </jaxrs:providers>
+    </jaxrs:server>
+    <jaxrs:server id="genericBookStoreInt2"
+                  address="/genericstoreInt2">
+        <jaxrs:serviceBeans>
             <ref bean="gBookStoreInt2"/>
         </jaxrs:serviceBeans>
         <jaxrs:providers>

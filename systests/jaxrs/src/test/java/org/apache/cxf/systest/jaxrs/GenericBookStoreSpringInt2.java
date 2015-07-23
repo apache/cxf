@@ -23,18 +23,7 @@ package org.apache.cxf.systest.jaxrs;
 import java.util.Collections;
 import java.util.List;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-
-import org.apache.cxf.annotations.Logging;
-
-@Path("/int2")
-@Produces({"application/json" })
-@Logging
 public class GenericBookStoreSpringInt2 implements GenericBookServiceInterface {
-    @GET
-    @Path("/books/superbook")
     public List<SuperBook> getSuperBook() {
         return Collections.singletonList(new SuperBook("super", 111L, true));
     }

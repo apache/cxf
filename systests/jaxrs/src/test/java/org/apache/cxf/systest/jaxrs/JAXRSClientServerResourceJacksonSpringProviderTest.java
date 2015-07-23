@@ -44,6 +44,7 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class JAXRSClientServerResourceJacksonSpringProviderTest extends AbstractBusClientServerTestBase {
@@ -174,25 +175,28 @@ public class JAXRSClientServerResourceJacksonSpringProviderTest extends Abstract
     }
     
     @Test
-    public void testGetGenericSuperBookProxy1() throws Exception {
+    public void testGetGenericSuperBookInt1() throws Exception {
         
         String endpointAddress =
-            "http://localhost:" + PORT + "/webapp/genericstoreInt";
-        GenericBookStoreSpringInt1 proxy = JAXRSClientFactory.create(endpointAddress, 
-            GenericBookStoreSpringInt1.class, Collections.singletonList(new JacksonJsonProvider()));
-        WebClient.getConfig(proxy).getHttpConduit().getClient().setReceiveTimeout(1000000000L);
-        List<SuperBook> books = proxy.getSuperBook();
+            "http://localhost:" + PORT + "/webapp/genericstoreInt1/int/books/superbook";
+        WebClient wc = WebClient.create(endpointAddress, 
+            Collections.singletonList(new JacksonJsonProvider()));
+        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(1000000000L);
+        GenericType<List<SuperBook>> genericResponseType = new GenericType<List<SuperBook>>() {        
+        };
+        List<SuperBook> books = wc.get(genericResponseType);
         assertEquals(1, books.size());
         assertEquals(111L, books.get(0).getId());
         
     }
     @Test
-    public void testGetGenericSuperBookProxy2() throws Exception {
+    @Ignore
+    public void testGetGenericSuperBookInt2() throws Exception {
         
         String endpointAddress =
-            "http://localhost:" + PORT + "/webapp/genericstoreInt";
-        GenericBookStoreSpringInt2 proxy = JAXRSClientFactory.create(endpointAddress, 
-            GenericBookStoreSpringInt2.class, Collections.singletonList(new JacksonJsonProvider()));
+            "http://localhost:" + PORT + "/webapp/genericstoreInt2";
+        GenericBookServiceInterface proxy = JAXRSClientFactory.create(endpointAddress, 
+            GenericBookServiceInterface.class, Collections.singletonList(new JacksonJsonProvider()));
         WebClient.getConfig(proxy).getHttpConduit().getClient().setReceiveTimeout(1000000000L);
         List<SuperBook> books = proxy.getSuperBook();
         assertEquals(1, books.size());
