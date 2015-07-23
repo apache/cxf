@@ -129,7 +129,7 @@ public class SOAPMessageContextImpl extends WrappedMessageContext implements SOA
                 if (!isRequestor() && isOutbound() && MessageContext.HTTP_RESPONSE_HEADERS.equals(key)) {
                     return null;
                 }
-                if (isRequestor() && isOutbound() && MessageContext.HTTP_REQUEST_HEADERS.equals(key)) {
+                if (isRequestor() && !isOutbound() && MessageContext.HTTP_REQUEST_HEADERS.equals(key)) {
                     return null;
                 }
             }
