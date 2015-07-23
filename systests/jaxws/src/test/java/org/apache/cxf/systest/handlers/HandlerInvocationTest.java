@@ -1134,7 +1134,7 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
             assertTrue(e.getMessage().indexOf("HandleMessage throws exception") >= 0);
         }
     }
-
+    
     @Test
     public void testDescription() throws PingException {
         TestHandler<LogicalMessageContext> handler = new TestHandler<LogicalMessageContext>(false) {
@@ -1223,6 +1223,17 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
                  + "should not be returned for one way operation");
         }
 
+    }
+    
+    @Test
+    public void testHandlerMessgeContext() throws PingException {
+        MessageContextFirstHandler handler1 = new MessageContextFirstHandler();
+        MessageContextSecondHandler handler2 = new MessageContextSecondHandler();
+        addHandlersToChain((BindingProvider)handlerTest, handler1, handler2);
+
+        List<String> resp = handlerTest.ping();
+        assertNotNull(resp);
+        assertNotNull("handler2 can't retrieve header map from message context", handler2.getHeaderMap());
     }
 
     void addHandlersToChain(BindingProvider bp, Handler<?>... handlers) {
