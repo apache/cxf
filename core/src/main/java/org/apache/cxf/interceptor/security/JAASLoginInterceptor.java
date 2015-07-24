@@ -51,7 +51,7 @@ public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
     private String roleClassifierType = ROLE_CLASSIFIER_PREFIX;
     private boolean reportFault;
     private boolean useDoAs = true;
-    
+    private boolean allowNamedPrincipals = true;
     
     public JAASLoginInterceptor() {
         super(Phase.UNMARSHAL);
@@ -103,7 +103,14 @@ public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
     }
 
     public void handleMessage(final Message message) throws Fault {
-
+        if (allowNamedPrincipals) {
+            SecurityContext sc = message.get(SecurityContext.class);
+            if (sc != null && sc.getUserPrincipal() != null 
+                && sc.getUserPrincipal().getName() != null) {
+                return;
+            }
+        }
+        
         String name = null;
         String password = null;
         
@@ -182,5 +189,8 @@ public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
         this.loginConfig = loginConfig;
     }
     
-    
+    public void setAllowNamedPrincipals(boolean allowNamedPrincipals) {
+        this.allowNamedPrincipals = allowNamedPrincipals;
+    }
+
 }
