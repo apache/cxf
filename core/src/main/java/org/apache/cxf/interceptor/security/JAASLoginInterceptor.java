@@ -57,6 +57,7 @@ public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
     private boolean useDoAs = true;
     private List<CallbackHandlerProvider> callbackHandlerProviders;
     private boolean allowAnonymous = true;
+    private boolean allowNamedPrincipals = true;
     
     public JAASLoginInterceptor() {
         this(Phase.UNMARSHAL);
@@ -121,6 +122,14 @@ public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
     }
 
     public void handleMessage(final Message message) throws Fault {
+        if (allowNamedPrincipals) {
+            SecurityContext sc = message.get(SecurityContext.class);
+            if (sc != null && sc.getUserPrincipal() != null 
+                && sc.getUserPrincipal().getName() != null) {
+                return;
+            }
+        }
+        
         CallbackHandler handler = getFirstCallbackHandler(message);
 
         if (handler == null && !allowAnonymous) {
@@ -213,6 +222,10 @@ public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
 
     public void setAllowAnonymous(boolean allowAnonymous) {
         this.allowAnonymous = allowAnonymous;
+    }
+
+    public void setAllowNamedPrincipals(boolean allowNamedPrincipals) {
+        this.allowNamedPrincipals = allowNamedPrincipals;
     }
 
 }
