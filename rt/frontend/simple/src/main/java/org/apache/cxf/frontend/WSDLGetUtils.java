@@ -175,7 +175,7 @@ public class WSDLGetUtils {
                 if (!smp.containsKey(URLDecoder.decode(key, "utf-8"))) {
                     // if the result is not known, check if we can resolve it into something known
                     String resolved = resolveWithCatalogs(OASISCatalogManager.getCatalogManager(bus), key, base);
-                    if (smp.containsKey(URLDecoder.decode(resolved, "utf-8"))) {
+                    if (resolved != null  && smp.containsKey(URLDecoder.decode(resolved, "utf-8"))) {
                         // if it is resolvable, we can use it
                         return base + "?xsd=" + key.replace(" ", "%20");
                     }
