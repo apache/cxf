@@ -51,7 +51,7 @@ public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
     private String roleClassifierType = ROLE_CLASSIFIER_PREFIX;
     private boolean reportFault;
     private boolean useDoAs = true;
-    private boolean allowNamedPrincipals = true;
+    private boolean allowNamedPrincipals;
     
     public JAASLoginInterceptor() {
         super(Phase.UNMARSHAL);
