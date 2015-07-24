@@ -32,6 +32,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.Binding;
+import org.apache.cxf.binding.soap.interceptor.SoapOutInterceptor;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
@@ -224,7 +225,8 @@ public class RMCaptureOutInterceptor extends AbstractRMInterceptor<Message>  {
     }
     private class CaptureEnd extends AbstractPhaseInterceptor<Message> {
         public CaptureEnd() {
-            super(Phase.POST_PROTOCOL);
+            super(Phase.WRITE_ENDING);
+            addAfter(SoapOutInterceptor.SoapOutEndingInterceptor.class.getName());
         }
 
         @Override
