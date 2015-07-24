@@ -44,6 +44,8 @@ public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
     private List<String> authenticationContextRef;
     private String promptLogin;
     private Long maxAgeOffset;
+    private String claims;
+    private String claimsLocales;
     
     public void setAuthenticationContextRef(String acr) {
         this.authenticationContextRef = Arrays.asList(StringUtils.split(acr, " "));
@@ -114,6 +116,12 @@ public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
     }
     @Override
     protected void setAdditionalCodeRequestParams(UriBuilder ub, MultivaluedMap<String, String> redirectState) {
+        if (claims != null) {
+            ub.queryParam("claims", claims);
+        }
+        if (claimsLocales != null) {
+            ub.queryParam("claims_locales", claimsLocales);
+        }
         if (redirectState != null) {
             if (redirectState.getFirst(IdToken.NONCE_CLAIM) != null) {
                 ub.queryParam(IdToken.NONCE_CLAIM, redirectState.getFirst(IdToken.NONCE_CLAIM));
@@ -139,5 +147,11 @@ public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
     }
     public void setMaxAgeOffset(Long maxAgeOffset) {
         this.maxAgeOffset = maxAgeOffset;
+    }
+    public void setClaims(String claims) {
+        this.claims = claims;
+    }
+    public void setClaimsLocales(String claimsLocales) {
+        this.claimsLocales = claimsLocales;
     }
 }
