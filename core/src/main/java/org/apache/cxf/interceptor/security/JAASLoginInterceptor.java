@@ -57,7 +57,7 @@ public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
     private boolean useDoAs = true;
     private List<CallbackHandlerProvider> callbackHandlerProviders;
     private boolean allowAnonymous = true;
-    private boolean allowNamedPrincipals = true;
+    private boolean allowNamedPrincipals;
     
     public JAASLoginInterceptor() {
         this(Phase.UNMARSHAL);
