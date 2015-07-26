@@ -34,12 +34,14 @@ import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rs.security.jose.jwt.JwtUtils;
 
 public abstract class AbstractTokenValidator {
+    private static final String SELF_ISSUED_ISSUER = "https://self-issued.me";
     private JweDecryptionProvider jweDecryptor;
     private JwsSignatureVerifier jwsVerifier;
     private String issuerId;
     private int issuedAtRange;
     private int clockOffset;
     private WebClient jwkSetClient;
+    private boolean supportSelfIssuedProvider;
     private ConcurrentHashMap<String, JsonWebKey> keyMap = new ConcurrentHashMap<String, JsonWebKey>(); 
     
     protected JwtToken getJwtToken(String wrappedJwtToken, boolean jweOnly) {
@@ -62,22 +64,30 @@ public abstract class AbstractTokenValidator {
     }
     
     protected void validateJwtClaims(JwtClaims claims, String clientId, boolean validateClaimsAlways) {
-        // validate subject
-        if (claims.getSubject() == null) {
-            throw new SecurityException("Invalid subject");
-        }
-        // validate audience
-        String aud = claims.getAudience();
-        if (aud == null && validateClaimsAlways || aud != null && !clientId.equals(aud)) {
-            throw new SecurityException("Invalid audience");
-        }
-
-        // validate the provider
+        // validate the issuer
         String issuer = claims.getIssuer();
-        if (issuer == null && validateClaimsAlways || issuer != null && !issuer.equals(issuerId)) {
+        if (issuer == null && validateClaimsAlways) {
             throw new SecurityException("Invalid provider");
         }
-        JwtUtils.validateJwtTimeClaims(claims, clockOffset, issuedAtRange, validateClaimsAlways);
+        if (supportSelfIssuedProvider && issuerId == null 
+            && issuer != null && SELF_ISSUED_ISSUER.equals(issuer)) {
+            //TODO: self-issued provider token validation
+        } else {
+            if (issuer != null && !issuer.equals(issuerId)) {
+                throw new SecurityException("Invalid provider");
+            }
+            // validate subject
+            if (claims.getSubject() == null) {
+                throw new SecurityException("Invalid subject");
+            }
+            // validate audience
+            String aud = claims.getAudience();
+            if (aud == null && validateClaimsAlways || aud != null && !clientId.equals(aud)) {
+                throw new SecurityException("Invalid audience");
+            }
+    
+            JwtUtils.validateJwtTimeClaims(claims, clockOffset, issuedAtRange, validateClaimsAlways);
+        }
     }
     
     
@@ -125,6 +135,7 @@ public abstract class AbstractTokenValidator {
         String keyId = jwt.getHeaders().getKeyId();
         JsonWebKey key = keyId != null ? keyMap.get(keyId) : null;
         if (key == null) {
+            //TODO: check self-issued JWK 
             if (jwkSetClient == null) {
                 throw new SecurityException("Provider Jwk Set Client is not available");
             }
@@ -150,5 +161,9 @@ public abstract class AbstractTokenValidator {
 
     public void setClockOffset(int clockOffset) {
         this.clockOffset = clockOffset;
+    }
+
+    public void setSupportSelfIssuedProvider(boolean supportSelfIssuedProvider) {
+        this.supportSelfIssuedProvider = supportSelfIssuedProvider;
     }
 }
