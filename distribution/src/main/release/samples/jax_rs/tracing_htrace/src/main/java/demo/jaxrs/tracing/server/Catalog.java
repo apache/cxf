@@ -43,6 +43,9 @@ import javax.ws.rs.core.UriInfo;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
+import org.apache.hadoop.hbase.trace.SpanReceiverHost;
+
+import demo.jaxrs.tracing.conf.TracingConfiguration;
 
 @Path("/catalog")
 public class Catalog {
@@ -51,7 +54,10 @@ public class Catalog {
     
     public Catalog() throws IOException {
         final Configuration configuration = HBaseConfiguration.create();
-        store = new CatalogStore(configuration, "books");
+        configuration.set("hbase.zookeeper.quorum", "hbase");
+        configuration.set("hbase.zookeeper.property.clientPort", "2181");
+        configuration.set(SpanReceiverHost.SPAN_RECEIVERS_CONF_KEY, TracingConfiguration.SPAN_RECEIVER.getName());
+        store = new CatalogStore(configuration, "catalog");
     }
     
     @POST

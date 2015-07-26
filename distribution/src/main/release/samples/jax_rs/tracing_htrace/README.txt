@@ -19,6 +19,18 @@ traces:
 A HTTP DELETE request to URL http://localhost:9000/catalog/<id> generates following 
 traces:
 
+Running Apache HBase using Docker
+---------------------------------------
+Official repository: https://registry.hub.docker.com/u/nerdammer/hbase/
+docker run -p 2181:2181 -p 60010:60010 -p 60000:60000 -p 60020:60020 -p 60030:60030 -h hbase nerdammer/hbase
+
+Preparing test dataset
+---------------------------------------
+create 'catalog', {NAME => 'c', VERSIONS => 5}
+put 'catalog', '1', 'c:title', 'Apache CXF Web Service Development'
+put 'catalog', '2', 'c:title', 'HBase: The Definitive Guide'
+put 'catalog', '3', 'c:title', 'HBase in Action'
+
 Building and running the demo using Maven
 ---------------------------------------
 

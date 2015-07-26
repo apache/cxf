@@ -19,14 +19,34 @@
 
 package demo.jaxrs.tracing.server;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.cxf.jaxrs.provider.jsrjsonp.JsrJsonpProvider;
 import org.apache.cxf.jaxrs.servlet.CXFNonSpringJaxrsServlet;
 import org.apache.cxf.tracing.htrace.jaxrs.HTraceFeature;
+import org.apache.htrace.HTraceConfiguration;
+import org.apache.htrace.impl.AlwaysSampler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 
+import demo.jaxrs.tracing.conf.TracingConfiguration;
+
 public class Server {
+    public static class TracingFeature extends HTraceFeature {
+        public TracingFeature() {
+            super(HTraceConfiguration.fromMap(getTracingProperties()));
+        }
+
+        private static Map<String, String> getTracingProperties() {
+            final Map<String, String> properties = new HashMap<String, String>();
+            properties.put("span.receiver", TracingConfiguration.SPAN_RECEIVER.getName());
+            properties.put("sampler", AlwaysSampler.class.getName());
+            return properties;
+        }
+    }
+    
     protected Server() throws Exception {
         org.eclipse.jetty.server.Server server = new org.eclipse.jetty.server.Server(9000);
 
@@ -37,7 +57,7 @@ public class Server {
         context.addServlet(servletHolder, "/*");
         
         servletHolder.setInitParameter("jaxrs.serviceClasses", Catalog.class.getName());
-        servletHolder.setInitParameter("jaxrs.features", HTraceFeature.class.getName());
+        servletHolder.setInitParameter("jaxrs.features", TracingFeature.class.getName());
         servletHolder.setInitParameter("jaxrs.providers", StringUtils.join(
             new String[] { 
                 JsrJsonpProvider.class.getName()

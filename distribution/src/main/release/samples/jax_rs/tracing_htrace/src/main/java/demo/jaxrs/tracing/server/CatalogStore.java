@@ -28,6 +28,7 @@ import javax.json.JsonObject;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.Cell;
+import org.apache.hadoop.hbase.CellUtil;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.ConnectionFactory;
@@ -73,8 +74,8 @@ public class CatalogStore {
                 final Cell cell = result.getColumnLatestCell(Bytes.toBytes("c"), Bytes.toBytes("title"));
                 
                 return Json.createObjectBuilder()
-                    .add("id", Bytes.toString(cell.getRowArray()))
-                    .add("title", Bytes.toString(cell.getValueArray()))
+                    .add("id", Bytes.toString(CellUtil.cloneRow(cell)))
+                    .add("title", Bytes.toString(CellUtil.cloneValue(cell)))
                     .build();
             }
         }
@@ -92,8 +93,8 @@ public class CatalogStore {
                 final Cell cell = result.getColumnLatestCell(Bytes.toBytes("c"), Bytes.toBytes("title"));
                 
                 builder.add(Json.createObjectBuilder()
-                    .add("id", new String(cell.getRowArray()))
-                    .add("title", new String(cell.getValueArray()))
+                    .add("id", Bytes.toString(CellUtil.cloneRow(cell)))
+                    .add("title", Bytes.toString(CellUtil.cloneValue(cell)))
                 );
             }
         }
