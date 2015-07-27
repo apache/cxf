@@ -33,13 +33,13 @@ public class MessageContextFirstHandler implements SOAPHandler<SOAPMessageContex
 
     @Override
     public boolean handleMessage(SOAPMessageContext context) {
-        boolean isOutbound = (boolean)context.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
+        Boolean isOutbound = (Boolean)context.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
         if (isOutbound) {
             @SuppressWarnings("unchecked")
             Map<String, List<String>> headerMap = (Map<String, List<String>>)context
                 .get(MessageContext.HTTP_REQUEST_HEADERS);
             if (headerMap == null) {
-                headerMap = new HashMap<>();
+                headerMap = new HashMap<String, List<String>>();
             }
             // Add custom header.
             headerMap.put("MY_HEADER", Arrays.asList("FIRST_VALUE"));

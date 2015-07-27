@@ -34,7 +34,7 @@ public class MessageContextSecondHandler implements SOAPHandler<SOAPMessageConte
     @SuppressWarnings("unchecked")
     @Override
     public boolean handleMessage(SOAPMessageContext context) {
-        boolean isOutbound = (boolean)context.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
+        Boolean isOutbound = (Boolean)context.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
         if (isOutbound) {
             headerMap = (Map<String, List<String>>)context.get(MessageContext.HTTP_REQUEST_HEADERS);
         }
