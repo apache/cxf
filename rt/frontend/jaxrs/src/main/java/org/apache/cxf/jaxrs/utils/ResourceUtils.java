@@ -76,6 +76,7 @@ import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.feature.Feature;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
@@ -768,6 +769,7 @@ public final class ResourceUtils {
     public static JAXRSServerFactoryBean createApplication(Application app, boolean ignoreAppPath) {
         return createApplication(app, ignoreAppPath, false);
     }
+    @SuppressWarnings("unchecked")
     public static JAXRSServerFactoryBean createApplication(Application app, boolean ignoreAppPath,
                                                            boolean staticSubresourceResolution) {
         
@@ -776,6 +778,7 @@ public final class ResourceUtils {
         
         List<Class<?>> resourceClasses = new ArrayList<Class<?>>();
         List<Object> providers = new ArrayList<Object>();
+        List<Feature> features = new ArrayList<Feature>();
         Map<Class<?>, ResourceProvider> map = new HashMap<Class<?>, ResourceProvider>();
         
         // Note, app.getClasses() returns a list of per-request classes
@@ -784,6 +787,8 @@ public final class ResourceUtils {
             if (isValidApplicationClass(cls, singletons)) {
                 if (isValidProvider(cls)) {
                     providers.add(createProviderInstance(cls));
+                } else if (Feature.class.isAssignableFrom(cls)) {
+                    features.add(createFeatureInstance((Class<? extends Feature>) cls));
                 } else {
                     resourceClasses.add(cls);
                     map.put(cls, new PerRequestResourceProvider(cls));
@@ -795,6 +800,8 @@ public final class ResourceUtils {
         for (Object o : singletons) {
             if (isValidProvider(o.getClass())) {
                 providers.add(o);
+            } else if (o instanceof Feature) {
+                features.add((Feature) o);
             } else {
                 resourceClasses.add(o.getClass());
                 map.put(o.getClass(), new SingletonResourceProvider(o));
@@ -816,6 +823,7 @@ public final class ResourceUtils {
         bean.setStaticSubresourceResolution(staticSubresourceResolution);
         bean.setResourceClasses(resourceClasses);
         bean.setProviders(providers);
+        bean.setFeatures(features);
         for (Map.Entry<Class<?>, ResourceProvider> entry : map.entrySet()) {
             bean.setResourceProvider(entry.getKey(), entry.getValue());
         }
@@ -837,6 +845,20 @@ public final class ResourceUtils {
             }
         } catch (Throwable ex) {
             throw new RuntimeException("Provider " + cls.getName() + " can not be created", ex); 
+        }
+    }
+    
+    public static Feature createFeatureInstance(Class<? extends Feature> cls) {
+        try {
+            Constructor<?> c = ResourceUtils.findResourceConstructor(cls, false);
+            
+            if (c == null) {
+                throw new RuntimeException("No valid constructor found for " + cls.getName());
+            }
+            
+            return (Feature) c.newInstance();
+        } catch (Throwable ex) {
+            throw new RuntimeException("Feature " + cls.getName() + " can not be created", ex); 
         }
     }
     
