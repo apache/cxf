@@ -1,4 +1,4 @@
-Apache CXF 2.7.16 Release Notes
+Apache CXF 2.7.17 Release Notes
 
 1. Overview
 
@@ -28,7 +28,7 @@ In particular, Apache CXF no longer supports Java5.   Users must upgrade to
 Java 6 in order to upgrade to Apache CXF 2.7.x.
 
 
-2.7.16 fixes over 20 JIRA issues reported by users and the community.
+2.7.17 fixes over 18 JIRA issues reported by users and the community.
 
 
 
@@ -74,30 +74,26 @@ for caveats when upgrading from CXF 2.6.x to 2.7.x.
 
 
 ** Bug
-    * [CXF-6007] - WebClient does not resend request in Digest authentication for HTTP methods GET, HEAD, DELETE, OPTIONS (with no body).
-    * [CXF-6257] - Creating and Endpoint using JAX-WS API, getting the binding and then publishing causes a NullPointerException
-    * [CXF-6274] - NullPointerException in DestinationSequence because of RMCaptureInInterceptor not in interceptor chain
-    * [CXF-6276] - Some non-primitive properties lost during generating WADL
-    * [CXF-6284] - JAX-RS servlet run-time leaks additional strong references
-    * [CXF-6292] - Init parameters on OSGi service are not picked up
-    * [CXF-6299] - Providers registered in cxf bus are ignored.
-    * [CXF-6300] - cipherSuite configuration does not work with HTTPJ servers
-    * [CXF-6302] - JAXRS endpoints with URL encoded addresses can not be located
-    * [CXF-6309] - Client processing exception has its cause set to the original exception wrapped in Fault
-    * [CXF-6313] - SamlHeaderOutInterceptor does not set headers on the message if it had none
-    * [CXF-6317] - Authorization not possible with multiple service beans
-    * [CXF-6319] - Regression: failing namespace resolution after CXF-5891
-    * [CXF-6321] - Make sure global JAX-RS filters are applied once per request even if made to sub-resource
-    * [CXF-6332] - Wadl Genertion: @Description cannot be bound to field
-    * [CXF-6336] - Client ParamConverterProvider may be lost if Client runs in the server scope
-    * [CXF-6359] - NullPointerException when certAlias specified but no keyManagers are configured
-    * [CXF-6361] - HttpCondiut is not detecting the redirect loop properly
-    * [CXF-6376] - Unexpected exception thrown from ResponseHandler is swallowed and status code 200 is returned
-    * [CXF-6379] - Separate HTTP headers for multiple header values not possible - bug in CXF-3714 fix
-
+    * [CXF-6392] - Schema imports are not handled correctly in generated WSDL and XSD files
+    * [CXF-6402] - JettyHTTPServerEngine cannot set a provided Jetty Server
+    * [CXF-6408] - HTTP Conduit throws NPE exception for "invalid" 401 HTTP response
+    * [CXF-6430] - SwA: Wrong Content-Type of root part
+    * [CXF-6431] - Attachment serialization does not conform to the relevant specs
+    * [CXF-6433] - SOAPAction value may not be extracted correctly for SOAP 1.2 with Attachments
+    * [CXF-6444] - CrossOriginResourceSharingFilter.java should not set Origin=* when Credentials=true
+    * [CXF-6467] - Jaxrs client handles array type property in a form object as a single element
+    * [CXF-6469] - schemaLocation in xsd import is not rewritten correctly in Java 8
+    * [CXF-6473] - Double signatures while using AsymmetricBindingHandler
+    * [CXF-6479] - Denial of Service: Regular Expression in StringUtils
+    * [CXF-6480] - InjectionUtils createThreadLocalServletApiContext better error message for invalid @Context classes
+    * [CXF-6484] - Regression in Content-id format
+    * [CXF-6502] - JAXRSInInterceptor throw java.lang.IndexOutOfBoundsException if content-type header is empty
 
 ** Improvement
-    * [CXF-6337] - Support the redirection directly via the injected JAX-RS ServletContext context
-    * [CXF-6344] - Support system file location for JexlClaimMapper scripts
-    * [CXF-6345] - Support Logging in JexlClaimMapper scripts
+    * [CXF-5926] - Extend SSL KeyManagers with password callback handler 
+    * [CXF-6394] - Add an option to add the namespace map of the container element in the message
+    * [CXF-6432] - Remove default empty password in SamlTokenInterceptor 
+
+** New Feature
+    * [CXF-6477] - Add "publish" attribute to jaxrs blueprint bean
 
