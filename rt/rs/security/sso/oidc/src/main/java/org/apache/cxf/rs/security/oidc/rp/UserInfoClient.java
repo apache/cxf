@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.rs.security.oidc.rp;
 
+import javax.ws.rs.core.Form;
+
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rs.security.oauth2.client.OAuthClientUtils;
@@ -27,19 +29,32 @@ import org.apache.cxf.rs.security.oidc.common.UserInfo;
 
 public class UserInfoClient extends IdTokenReader {
     private boolean encryptedOnly;
+    private boolean sendTokenAsFormParameter;
     private WebClient profileClient;
     public UserInfo getUserInfo(ClientAccessToken at, IdToken idToken) {
         return getUserInfo(at, idToken, false);
     }
     public UserInfo getUserInfo(ClientAccessToken at, IdToken idToken, boolean asJwt) {
-        OAuthClientUtils.setAuthorizationHeader(profileClient, at);
-        if (asJwt) {
-            String jwt = profileClient.get(String.class);
-            return getUserInfoFromJwt(jwt, idToken);
+        if (!sendTokenAsFormParameter) {
+            OAuthClientUtils.setAuthorizationHeader(profileClient, at);
+            if (asJwt) {
+                String jwt = profileClient.get(String.class);
+                return getUserInfoFromJwt(jwt, idToken);
+            } else {
+                UserInfo profile = profileClient.get(UserInfo.class);
+                validateUserInfo(profile, idToken);
+                return profile;
+            }
         } else {
-            UserInfo profile = profileClient.get(UserInfo.class);
-            validateUserInfo(profile, idToken);
-            return profile;
+            Form form = new Form().param("access_token", at.getTokenKey());
+            if (asJwt) {
+                String jwt = profileClient.form(form).readEntity(String.class);
+                return getUserInfoFromJwt(jwt, idToken);
+            } else {
+                UserInfo profile = profileClient.form(form).readEntity(UserInfo.class);
+                validateUserInfo(profile, idToken);
+                return profile;
+            }
         }
     }
     public UserInfo getUserInfoFromJwt(String profileJwtToken, IdToken idToken) {
@@ -66,6 +81,9 @@ public class UserInfoClient extends IdTokenReader {
     }
     public void setUserInfoServiceClient(WebClient client) {
         this.profileClient = client;
+    }
+    public void setSendTokenAsFormParameter(boolean sendTokenAsFormParameter) {
+        this.sendTokenAsFormParameter = sendTokenAsFormParameter;
     }
     
 }
