@@ -25,7 +25,7 @@
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
-        <version>3.1.2</version>
+        <version>3.1.3-SNAPSHOT</version>
         <relativePath>../..</relativePath>
     </parent>
     <properties>
@@ -84,23 +84,23 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http</artifactId>
-            <version>3.1.2</version>
+            <version>3.1.3-SNAPSHOT</version>
         </dependency>
         <!-- This dependency is needed if you're using the Jetty container -->
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http-jetty</artifactId>
-            <version>3.1.2</version>
+            <version>3.1.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxrs</artifactId>
-            <version>3.1.2</version>
+            <version>3.1.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-extension-providers</artifactId>
-            <version>3.1.2</version>
+            <version>3.1.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.jettison</groupId>
