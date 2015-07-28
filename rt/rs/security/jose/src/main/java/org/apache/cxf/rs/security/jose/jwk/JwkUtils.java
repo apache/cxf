@@ -29,8 +29,11 @@ import java.security.interfaces.RSAPrivateCrtKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.crypto.SecretKey;
@@ -40,6 +43,7 @@ import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.jaxrs.provider.json.JsonMapObjectReaderWriter;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
@@ -64,13 +68,40 @@ import org.apache.cxf.rs.security.jose.jwe.PbesHmacAesWrapKeyDecryptionAlgorithm
 import org.apache.cxf.rs.security.jose.jwe.PbesHmacAesWrapKeyEncryptionAlgorithm;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
+import org.apache.cxf.rt.security.crypto.MessageDigestUtils;
 
 public final class JwkUtils {
     public static final String JWK_KEY_STORE_TYPE = "jwk";
     public static final String RSSEC_KEY_STORE_JWKSET = "rs.security.keystore.jwkset";
     public static final String RSSEC_KEY_STORE_JWKKEY = "rs.security.keystore.jwkkey";
+    private static final Map<KeyType, List<String>> JWK_REQUIRED_FIELDS_MAP;
+    static {
+        JWK_REQUIRED_FIELDS_MAP = new HashMap<KeyType, List<String>>();
+        JWK_REQUIRED_FIELDS_MAP.put(KeyType.RSA, Arrays.asList(
+            JsonWebKey.RSA_PUBLIC_EXP, JsonWebKey.KEY_TYPE, JsonWebKey.RSA_MODULUS));
+        JWK_REQUIRED_FIELDS_MAP.put(KeyType.EC, Arrays.asList(
+            JsonWebKey.EC_CURVE, JsonWebKey.KEY_TYPE, JsonWebKey.EC_X_COORDINATE, JsonWebKey.EC_Y_COORDINATE));
+        JWK_REQUIRED_FIELDS_MAP.put(KeyType.OCTET, Arrays.asList(
+            JsonWebKey.OCTET_KEY_VALUE, JsonWebKey.KEY_TYPE));
+    }
     private JwkUtils() {
         
+    }
+    public static String getThumbprint(String keySequence) {
+        return getThumbprint(readJwkKey(keySequence));
+    }
+    public static String getThumbprint(JsonWebKey key) {
+        List<String> fields = getRequiredFields(key.getKeyType());
+        JsonWebKey thumbprintKey = new JsonWebKey();
+        for (String f : fields) {
+            thumbprintKey.setProperty(f, key.getProperty(f));
+        }
+        String json = new JsonMapObjectReaderWriter().toJson(thumbprintKey);
+        byte[] digest = MessageDigestUtils.createDigest(json, MessageDigestUtils.ALGO_SHA_256);
+        return Base64UrlUtility.encode(digest);
+    }
+    public static List<String> getRequiredFields(KeyType keyType) {
+        return JWK_REQUIRED_FIELDS_MAP.get(keyType);
     }
     public static JsonWebKey readJwkKey(URI uri) throws IOException {
         return readJwkKey(uri.toURL().openStream());
