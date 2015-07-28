@@ -40,8 +40,8 @@ public class BigQueryService {
 
     private static final String BQ_SELECT = 
         "SELECT corpus,corpus_date FROM publicdata:samples.shakespeare WHERE word=\\\"%s\\\"";
-    private static final String BQ_REQUEST = "{" +
-        "\"kind\": \"bigquery#queryRequest\"," 
+    private static final String BQ_REQUEST = "{"
+        + "\"kind\": \"bigquery#queryRequest\"," 
         + "\"query\": \"%s\","
         + "\"maxResults\": %d" 
         + "}";
