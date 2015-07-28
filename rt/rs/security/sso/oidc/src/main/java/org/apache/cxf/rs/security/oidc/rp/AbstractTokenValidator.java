@@ -26,6 +26,7 @@ import org.apache.cxf.rs.security.jose.jwe.JweJwtCompactConsumer;
 import org.apache.cxf.rs.security.jose.jwe.JweUtils;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKeys;
+import org.apache.cxf.rs.security.jose.jwk.JwkUtils;
 import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactConsumer;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
@@ -132,24 +133,39 @@ public abstract class AbstractTokenValidator {
             return theJwsVerifier;
         }
         
-        String keyId = jwt.getHeaders().getKeyId();
-        JsonWebKey key = keyId != null ? keyMap.get(keyId) : null;
-        if (key == null) {
-            //TODO: check self-issued JWK 
-            if (jwkSetClient == null) {
-                throw new SecurityException("Provider Jwk Set Client is not available");
+        JsonWebKey key = null;
+        if (supportSelfIssuedProvider && SELF_ISSUED_ISSUER.equals(jwt.getClaim("issuer"))) {
+            String publicKeyJson = (String)jwt.getClaim("sub_jwk");
+            if (publicKeyJson != null) {
+                JsonWebKey publicKey = JwkUtils.readJwkKey(publicKeyJson);
+                String thumbprint = JwkUtils.getThumbprint(publicKey);
+                if (thumbprint.equals(jwt.getClaim("sub"))) {
+                    key = publicKey;
+                }
             }
-            JsonWebKeys keys = jwkSetClient.get(JsonWebKeys.class);
-            if (keyId != null) {
-                key = keys.getKey(keyId);
-            } else if (keys.getKeys().size() == 1) {
-                key = keys.getKeys().get(0);
+            if (key == null) {
+                throw new SecurityException("Self-issued JWK key is invalid or not available");
             }
-            keyMap.putAll(keys.getKeyIdMap());
+        } else {
+            String keyId = jwt.getHeaders().getKeyId();
+            key = keyId != null ? keyMap.get(keyId) : null;
+            if (key == null) {
+                if (jwkSetClient == null) {
+                    throw new SecurityException("Provider Jwk Set Client is not available");
+                }
+                JsonWebKeys keys = jwkSetClient.get(JsonWebKeys.class);
+                if (keyId != null) {
+                    key = keys.getKey(keyId);
+                } else if (keys.getKeys().size() == 1) {
+                    key = keys.getKeys().get(0);
+                }
+                keyMap.putAll(keys.getKeyIdMap());
+            }
+            if (key == null) {
+                throw new SecurityException("JWK key with the key id: \"" + keyId + "\" is not available");
+            }
         }
-        if (key == null) {
-            throw new SecurityException("JWK key with the key id: \"" + keyId + "\" is not available");
-        }
+        
         theJwsVerifier = JwsUtils.getSignatureVerifier(key);
         
         if (theJwsVerifier == null) {
