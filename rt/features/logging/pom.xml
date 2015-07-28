@@ -3,14 +3,14 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.1.3-SNAPSHOT</version>
+        <version>3.1.2</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <artifactId>cxf-rt-features-logging</artifactId>
     <packaging>bundle</packaging>
     
     <properties>
-        <cxf.version>3.1.3-SNAPSHOT</cxf.version>
+        <cxf.version>3.1.2</cxf.version>
         <cxf.bundle.activator>org.apache.cxf.ext.logging.osgi.Activator</cxf.bundle.activator>
     </properties>
 
