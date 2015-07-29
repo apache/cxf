@@ -116,7 +116,8 @@
          <property name="clientCodeStateManager" ref="rpClientCodeStateManager"/>
          <property name="scopes" value="openid email profile https://www.googleapis.com/auth/bigquery.readonly"/>
          <property name="accessTokenServiceClient" ref="atServiceClient"/>
-         <property name="idTokenReader" ref="userInfoClient"/>
+         <property name="idTokenReader" ref="idTokenReader"/>
+         <property name="userInfoClient" ref="userInfoClient"/>
          <property name="consumer" ref="consumer"/>
          <property name="authorizationServiceUri" value="https://accounts.google.com/o/oauth2/auth"/>
          <property name="startUri" value="rp"/>
@@ -144,16 +145,12 @@
         </jaxrsclient:features>
      </jaxrsclient:client> 
      
-     <!-- The RP filter uses this client to read OIDC IdToken from OAuth2 access token and
-          request OIDC UserInfo. If OIDC IdToken only is required then registering 
-          org.apache.cxf.rs.security.oidc.rp.IdTokenReader is enough. 
-     --> 
-     <bean id="userInfoClient" class="org.apache.cxf.rs.security.oidc.rp.UserInfoClient">
-         <!-- these properties are needed to validate IdToken -->
+     <bean id="idTokenReader" class="org.apache.cxf.rs.security.oidc.rp.IdTokenReader">
          <property name="jwkSetClient" ref="jwkSetClient"/> 
          <property name="issuerId" value="accounts.google.com"/>
          <property name="clockOffset" value="10"/>
-         <!-- this one is needed to get OIDC UserInfo --> 
+     </bean>
+     <bean id="userInfoClient" class="org.apache.cxf.rs.security.oidc.rp.UserInfoClient">
          <property name="userInfoServiceClient" ref="userInfoServiceClient"/>
      </bean>
      

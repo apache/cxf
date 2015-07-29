@@ -40,7 +40,7 @@ public class IdTokenReader extends AbstractTokenValidator {
         return jwt;
     }
     public JwtToken getIdJwtToken(String idJwtToken, String clientId) {
-        JwtToken jwt = getJwtToken(idJwtToken, false);
+        JwtToken jwt = getJwtToken(idJwtToken);
         validateJwtClaims(jwt.getClaims(), clientId, true);
         return jwt;
     }

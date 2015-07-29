@@ -27,7 +27,7 @@ import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 
 public abstract class AbstractJoseJwtConsumer extends AbstractJoseConsumer {
     private boolean jwsRequired = true;
-    private boolean jweRequired = true;
+    private boolean jweRequired;
     
     protected JwtToken getJwtToken(String wrappedJwtToken) {
         if (!isJwsRequired() && !isJweRequired()) {
@@ -42,13 +42,16 @@ public abstract class AbstractJoseJwtConsumer extends AbstractJoseConsumer {
         } 
 
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(wrappedJwtToken);
-        JwsSignatureVerifier theSigVerifier = getInitializedSignatureVerifier(isJwsRequired());
+        JwtToken jwt = jwtConsumer.getJwtToken();
+        JwsSignatureVerifier theSigVerifier = getInitializedSignatureVerifier(jwt);
         if (!jwtConsumer.verifySignatureWith(theSigVerifier)) {
             throw new SecurityException("Invalid Signature");
         }
-        JwtToken jwt = jwtConsumer.getJwtToken(); 
         validateToken(jwt);
         return jwt; 
+    }
+    protected JwsSignatureVerifier getInitializedSignatureVerifier(JwtToken jwt) {
+        return super.getInitializedSignatureVerifier(isJwsRequired());
     }
     protected void validateToken(JwtToken jwt) {
     }

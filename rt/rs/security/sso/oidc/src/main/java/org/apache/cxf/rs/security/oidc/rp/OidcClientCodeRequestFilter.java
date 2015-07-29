@@ -41,6 +41,7 @@ public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
     private static final String MAX_AGE_PARAMETER = "max_age";
     private static final List<String> PROMPTS = Arrays.asList("none", "consent", "login", "select_account");
     private IdTokenReader idTokenReader;
+    private UserInfoClient userInfoClient;
     private List<String> authenticationContextRef;
     private String promptLogin;
     private Long maxAgeOffset;
@@ -64,8 +65,7 @@ public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
             validateIdToken(idToken, state);
             
             ctx.setIdToken(idToken);
-            if (idTokenReader instanceof UserInfoClient) {
-                UserInfoClient userInfoClient = (UserInfoClient)idTokenReader;
+            if (userInfoClient != null) {
                 ctx.setUserInfo(userInfoClient.getUserInfo(at, ctx.getIdToken()));
             }
             rc.setSecurityContext(new OidcSecurityContext(ctx));
@@ -105,6 +105,9 @@ public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
     }
     public void setIdTokenReader(IdTokenReader idTokenReader) {
         this.idTokenReader = idTokenReader;
+    }
+    public void setUserInfoClient(UserInfoClient userInfoClient) {
+        this.userInfoClient = userInfoClient; 
     }
     
     @Override
