@@ -44,8 +44,7 @@ public class JwtAuthenticationClientFilter extends AbstractJoseJwtProducer
     @Override
     public void filter(ClientRequestContext requestContext) throws IOException {
         JwtToken jwt = getJwtToken(requestContext);
-        boolean jweRequired = false;
-        if (jwt == null) {
+        if (jwt == null && super.isJweRequired()) {
             AuthorizationPolicy ap = JAXRSUtils.getCurrentMessage().getExchange()
                 .getEndpoint().getEndpointInfo().getExtensor(AuthorizationPolicy.class);
             if (ap != null && ap.getUserName() != null) {
@@ -54,7 +53,6 @@ public class JwtAuthenticationClientFilter extends AbstractJoseJwtProducer
                 claims.setClaim("password", ap.getPassword());
                 claims.setIssuedAt(System.currentTimeMillis() / 1000);
                 jwt = new JwtToken(new JweHeaders(), claims);
-                jweRequired = true;
             }
         }
         if (jwt == null) {
@@ -62,7 +60,7 @@ public class JwtAuthenticationClientFilter extends AbstractJoseJwtProducer
         }
         JoseUtils.setJoseMessageContextProperty(jwt.getHeaders(),
                                                 getContextPropertyValue());
-        String data = super.processJwt(jwt, true, jweRequired);
+        String data = super.processJwt(jwt);
         requestContext.getHeaders().putSingle(HttpHeaders.AUTHORIZATION, 
                                               "JWT " + data);
     }
@@ -72,4 +70,5 @@ public class JwtAuthenticationClientFilter extends AbstractJoseJwtProducer
     protected String getContextPropertyValue() {
         return Base64UrlUtility.encode(CryptoUtils.generateSecureRandomBytes(16));
     }
+    
 }

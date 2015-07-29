@@ -42,7 +42,6 @@ import org.apache.cxf.security.SecurityContext;
 @Priority(Priorities.AUTHENTICATION)
 public class JwtAuthenticationFilter extends AbstractJoseJwtConsumer implements ContainerRequestFilter {
     protected static final Logger LOG = LogUtils.getL7dLogger(JwtAuthenticationFilter.class);
-    private boolean jweOnly;
     
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
@@ -51,14 +50,10 @@ public class JwtAuthenticationFilter extends AbstractJoseJwtConsumer implements 
         if (parts == null || !"JWT".equals(parts[0]) || parts.length != 2) {
             throw new JoseException("JWT scheme is expected");
         }
-        JwtToken jwt = super.getJwtToken(parts[1], jweOnly);
+        JwtToken jwt = super.getJwtToken(parts[1]);
         JoseUtils.setMessageContextProperty(jwt.getHeaders());
         JAXRSUtils.getCurrentMessage().put(SecurityContext.class, 
               new SimpleSecurityContext(new JwtPrincipal(jwt)));
-    }
-
-    public void setJweOnly(boolean jweOnly) {
-        this.jweOnly = jweOnly;
     }
     public static class JwtPrincipal extends SimplePrincipal {
         private static final long serialVersionUID = 1L;
