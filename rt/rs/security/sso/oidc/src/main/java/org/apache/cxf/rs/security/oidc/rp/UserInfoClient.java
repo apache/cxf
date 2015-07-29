@@ -27,17 +27,14 @@ import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oidc.common.IdToken;
 import org.apache.cxf.rs.security.oidc.common.UserInfo;
 
-public class UserInfoClient extends IdTokenReader {
-    private boolean encryptedOnly;
+public class UserInfoClient extends AbstractTokenValidator {
     private boolean sendTokenAsFormParameter;
     private WebClient profileClient;
+    private boolean getUserInfoFromJwt;
     public UserInfo getUserInfo(ClientAccessToken at, IdToken idToken) {
-        return getUserInfo(at, idToken, false);
-    }
-    public UserInfo getUserInfo(ClientAccessToken at, IdToken idToken, boolean asJwt) {
         if (!sendTokenAsFormParameter) {
             OAuthClientUtils.setAuthorizationHeader(profileClient, at);
-            if (asJwt) {
+            if (getUserInfoFromJwt) {
                 String jwt = profileClient.get(String.class);
                 return getUserInfoFromJwt(jwt, idToken);
             } else {
@@ -47,7 +44,7 @@ public class UserInfoClient extends IdTokenReader {
             }
         } else {
             Form form = new Form().param("access_token", at.getTokenKey());
-            if (asJwt) {
+            if (getUserInfoFromJwt) {
                 String jwt = profileClient.form(form).readEntity(String.class);
                 return getUserInfoFromJwt(jwt, idToken);
             } else {
@@ -67,7 +64,7 @@ public class UserInfoClient extends IdTokenReader {
         return profile;
     }
     public JwtToken getUserInfoJwt(String profileJwtToken) {
-        return getJwtToken(profileJwtToken, encryptedOnly);
+        return getJwtToken(profileJwtToken);
     }
     public void validateUserInfo(UserInfo profile, IdToken idToken) {
         validateJwtClaims(profile, idToken.getAudience(), false);
@@ -76,14 +73,14 @@ public class UserInfoClient extends IdTokenReader {
             throw new SecurityException("Invalid subject");
         }
     }
-    public void setEncryptedOnly(boolean encryptedOnly) {
-        this.encryptedOnly = encryptedOnly;
-    }
     public void setUserInfoServiceClient(WebClient client) {
         this.profileClient = client;
     }
     public void setSendTokenAsFormParameter(boolean sendTokenAsFormParameter) {
         this.sendTokenAsFormParameter = sendTokenAsFormParameter;
+    }
+    public void setGetUserInfoFromJwt(boolean getUserInfoFromJwt) {
+        this.getUserInfoFromJwt = getUserInfoFromJwt;
     }
     
 }

@@ -28,7 +28,7 @@ import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
 
 public abstract class AbstractJoseJwtProducer extends AbstractJoseProducer {
     private boolean jwsRequired = true;
-    private boolean jweRequired = true;
+    private boolean jweRequired;
     
     protected String processJwt(JwtToken jwt) {
         if (!isJwsRequired() && !isJweRequired()) {
