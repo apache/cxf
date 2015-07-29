@@ -44,7 +44,6 @@ public abstract class AbstractTokenValidator {
     private WebClient jwkSetClient;
     private boolean supportSelfIssuedProvider;
     private ConcurrentHashMap<String, JsonWebKey> keyMap = new ConcurrentHashMap<String, JsonWebKey>(); 
-    
     protected JwtToken getJwtToken(String wrappedJwtToken, boolean jweOnly) {
         if (wrappedJwtToken == null) {
             throw new SecurityException("ID Token is missing");
@@ -59,7 +58,7 @@ public abstract class AbstractTokenValidator {
 
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(wrappedJwtToken);
         JwtToken jwt = jwtConsumer.getJwtToken(); 
-        JwsSignatureVerifier theSigVerifier = getInitializedSigVerifier(jwt);
+        JwsSignatureVerifier theSigVerifier = getInitializedSignatureVerifier(jwt);
         return validateToken(jwtConsumer, jwt, theSigVerifier);
         
     }
@@ -102,7 +101,7 @@ public abstract class AbstractTokenValidator {
         this.jweDecryptor = jweDecryptor;
     }
 
-    public void setJweVerifier(JwsSignatureVerifier theJwsVerifier) {
+    public void setJwsVerifier(JwsSignatureVerifier theJwsVerifier) {
         this.jwsVerifier = theJwsVerifier;
     }
 
@@ -124,7 +123,7 @@ public abstract class AbstractTokenValidator {
         } 
         return JweUtils.loadDecryptionProvider(jweOnly);
     }
-    protected JwsSignatureVerifier getInitializedSigVerifier(JwtToken jwt) {
+    protected JwsSignatureVerifier getInitializedSignatureVerifier(JwtToken jwt) {
         if (jwsVerifier != null) {
             return jwsVerifier;    
         } 
@@ -182,4 +181,6 @@ public abstract class AbstractTokenValidator {
     public void setSupportSelfIssuedProvider(boolean supportSelfIssuedProvider) {
         this.supportSelfIssuedProvider = supportSelfIssuedProvider;
     }
+
+    
 }

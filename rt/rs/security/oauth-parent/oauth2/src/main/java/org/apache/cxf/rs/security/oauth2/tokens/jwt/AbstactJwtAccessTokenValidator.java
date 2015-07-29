@@ -25,7 +25,6 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.rs.security.jose.jwt.AbstractJoseJwtConsumer;
-import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenValidation;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.provider.AccessTokenValidator;
@@ -48,8 +47,7 @@ public abstract class AbstactJwtAccessTokenValidator extends AbstractJoseJwtCons
                                                      MultivaluedMap<String, String> extraProps)
         throws OAuthServiceException {
         ServerAccessToken at = dataProvider.getAccessToken(authSchemeData);
-        JwtToken token = super.getJwtToken(at.getTokenKey(), false);
-        validateToken(token);
+        super.getJwtToken(at.getTokenKey());
         return new AccessTokenValidation(at);
     }
 
@@ -57,7 +55,5 @@ public abstract class AbstactJwtAccessTokenValidator extends AbstractJoseJwtCons
         this.dataProvider = dataProvider;
     }
 
-    protected void validateToken(JwtToken jwt) {
-        
-    }
+    
 }

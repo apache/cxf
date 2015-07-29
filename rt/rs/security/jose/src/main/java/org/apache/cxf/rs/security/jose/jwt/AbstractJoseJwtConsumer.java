@@ -18,56 +18,54 @@
  */
 package org.apache.cxf.rs.security.jose.jwt;
 
+import org.apache.cxf.rs.security.jose.AbstractJoseConsumer;
+import org.apache.cxf.rs.security.jose.JoseException;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionProvider;
 import org.apache.cxf.rs.security.jose.jwe.JweJwtCompactConsumer;
-import org.apache.cxf.rs.security.jose.jwe.JweUtils;
 import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactConsumer;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
-import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 
-public abstract class AbstractJoseJwtConsumer {
-    private JweDecryptionProvider jweDecryptor;
-    private JwsSignatureVerifier jwsVerifier;
-    protected JwtToken getJwtToken(String wrappedJwtToken, boolean jweOnly) {
-        JweDecryptionProvider theJweDecryptor = getInitializedDecryptionProvider(jweOnly);
-        if (theJweDecryptor != null) {
-            if (jweOnly) {
+public abstract class AbstractJoseJwtConsumer extends AbstractJoseConsumer {
+    private boolean jwsRequired = true;
+    private boolean jweRequired = true;
+    
+    protected JwtToken getJwtToken(String wrappedJwtToken) {
+        if (!isJwsRequired() && !isJweRequired()) {
+            throw new JoseException("Unable to process JWT");
+        }
+        JweDecryptionProvider jweDecryptor = getInitializedDecryptionProvider(isJweRequired());
+        if (jweDecryptor != null) {
+            if (!isJwsRequired()) {
                 return new JweJwtCompactConsumer(wrappedJwtToken).decryptWith(jweDecryptor);    
             }
             wrappedJwtToken = jweDecryptor.decrypt(wrappedJwtToken).getContentText();
-        } else if (jweOnly) {
-            throw new SecurityException();
-        }
+        } 
 
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(wrappedJwtToken);
-        JwtToken jwt = jwtConsumer.getJwtToken(); 
-        JwsSignatureVerifier theSigVerifier = getInitializedSigVerifier();
-        return validateToken(jwtConsumer, jwt, theSigVerifier);
-    }
-    protected JwtToken validateToken(JwsJwtCompactConsumer consumer, JwtToken jwt, JwsSignatureVerifier jws) {
-        if (!consumer.verifySignatureWith(jws)) {
+        JwsSignatureVerifier theSigVerifier = getInitializedSignatureVerifier(isJwsRequired());
+        if (!jwtConsumer.verifySignatureWith(theSigVerifier)) {
             throw new SecurityException("Invalid Signature");
         }
-        return jwt;
+        JwtToken jwt = jwtConsumer.getJwtToken(); 
+        validateToken(jwt);
+        return jwt; 
     }
-    public void setJweDecryptor(JweDecryptionProvider jweDecryptor) {
-        this.jweDecryptor = jweDecryptor;
+    protected void validateToken(JwtToken jwt) {
+    }
+    public boolean isJwsRequired() {
+        return jwsRequired;
     }
 
-    public void setJweVerifier(JwsSignatureVerifier theJwsVerifier) {
-        this.jwsVerifier = theJwsVerifier;
+    public void setJwsRequired(boolean jwsRequired) {
+        this.jwsRequired = jwsRequired;
     }
 
-    protected JweDecryptionProvider getInitializedDecryptionProvider(boolean jweOnly) {
-        if (jweDecryptor != null) {
-            return jweDecryptor;    
-        } 
-        return JweUtils.loadDecryptionProvider(jweOnly);
+    public boolean isJweRequired() {
+        return jweRequired;
     }
-    protected JwsSignatureVerifier getInitializedSigVerifier() {
-        if (jwsVerifier != null) {
-            return jwsVerifier;    
-        } 
-        return JwsUtils.loadSignatureVerifier(true);
+
+    public void setJweRequired(boolean jweRequired) {
+        this.jweRequired = jweRequired;
     }
+    
 }

@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.oidc.idp;
+package org.apache.cxf.rs.security.oauth2.provider;
 
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPublicKey;
@@ -30,35 +30,23 @@ import org.apache.cxf.rs.security.jose.jwe.JweEncryptionProvider;
 import org.apache.cxf.rs.security.jose.jwe.JweUtils;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
+import org.apache.cxf.rs.security.jose.jwt.AbstractJoseJwtProducer;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
 
-public abstract class AbstractJwsJweProducer {
-    private JwsSignatureProvider sigProvider;
-    private JweEncryptionProvider encryptionProvider;
+public abstract class AbstractOAuthJoseJwtProducer extends AbstractJoseJwtProducer {
     private boolean encryptWithClientCertificates;
     private boolean encryptWithClientSecret;
     private boolean signWithClientSecret;
-    public void setSignatureProvider(JwsSignatureProvider signatureProvider) {
-        this.sigProvider = signatureProvider;
-    }
     
     protected JwsSignatureProvider getInitializedSigProvider(Client c, boolean required) {
-        if (sigProvider != null) {
-            return sigProvider;    
-        } 
-        
         if (signWithClientSecret) {
             byte[] hmac = CryptoUtils.decodeSequence(c.getClientSecret());
             return JwsUtils.getHmacSignatureProvider(hmac, SignatureAlgorithm.HS256);
-        } else {
-            return JwsUtils.loadSignatureProvider(required);
-        }
+        } 
+        return super.getInitializedSignatureProvider(required);
     }
     protected JweEncryptionProvider getInitializedEncryptionProvider(Client c, boolean required) {
-        if (encryptionProvider != null) {
-            return encryptionProvider;    
-        }
         JweEncryptionProvider theEncryptionProvider = null;
         if (encryptWithClientSecret) {
             SecretKey key = CryptoUtils.decodeSecretKey(c.getClientSecret());
@@ -72,7 +60,7 @@ public abstract class AbstractJwsJweProducer {
                                                                          null);
         }
         if (theEncryptionProvider == null) {
-            theEncryptionProvider = JweUtils.loadEncryptionProvider(required);
+            theEncryptionProvider = super.getInitializedEncryptionProvider(required);
         }
         return theEncryptionProvider;
         

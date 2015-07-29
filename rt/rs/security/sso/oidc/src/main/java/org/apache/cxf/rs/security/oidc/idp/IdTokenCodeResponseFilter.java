@@ -18,17 +18,15 @@
  */
 package org.apache.cxf.rs.security.oidc.idp;
 
-import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.rs.security.jose.jwe.JweEncryptionProvider;
-import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactProducer;
-import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
+import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
+import org.apache.cxf.rs.security.oauth2.provider.AbstractOAuthJoseJwtProducer;
 import org.apache.cxf.rs.security.oauth2.provider.AccessTokenResponseFilter;
 import org.apache.cxf.rs.security.oidc.common.IdToken;
 import org.apache.cxf.rs.security.oidc.utils.OidcUtils;
 
-public class IdTokenCodeResponseFilter extends AbstractJwsJweProducer implements AccessTokenResponseFilter {
+public class IdTokenCodeResponseFilter extends AbstractOAuthJoseJwtProducer implements AccessTokenResponseFilter {
     private UserInfoProvider userInfoProvider;
     private String issuer;
     @Override
@@ -38,15 +36,8 @@ public class IdTokenCodeResponseFilter extends AbstractJwsJweProducer implements
         token.setIssuer(issuer);
         token.setAudience(st.getClient().getClientId());
         
-        JwsJwtCompactProducer producer = new JwsJwtCompactProducer(token);
-        JwsSignatureProvider theSigProvider = getInitializedSigProvider(st.getClient(), true);
-        String idToken = producer.signWith(theSigProvider);
-        
-        JweEncryptionProvider theEncryptionProvider = getInitializedEncryptionProvider(st.getClient(), false);
-        if (theEncryptionProvider != null) {
-            idToken = theEncryptionProvider.encrypt(StringUtils.toBytesUTF8(idToken), null);
-        }
-        ct.getParameters().put(OidcUtils.ID_TOKEN, idToken);
+        String responseEntity = super.processJwt(new JwtToken(token));
+        ct.getParameters().put(OidcUtils.ID_TOKEN, responseEntity);
         
     }
     

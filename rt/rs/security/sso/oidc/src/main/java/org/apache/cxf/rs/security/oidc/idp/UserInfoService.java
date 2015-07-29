@@ -24,18 +24,15 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
-import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
-import org.apache.cxf.rs.security.jose.jwe.JweEncryptionProvider;
-import org.apache.cxf.rs.security.jose.jwe.JweJwtCompactProducer;
-import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactProducer;
-import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
+import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rs.security.oauth2.common.OAuthContext;
+import org.apache.cxf.rs.security.oauth2.provider.AbstractOAuthJoseJwtProducer;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthContextUtils;
 import org.apache.cxf.rs.security.oidc.common.UserInfo;
 
 @Path("/userinfo")
-public class UserInfoService extends AbstractJwsJweProducer {
+public class UserInfoService extends AbstractOAuthJoseJwtProducer {
     private UserInfoProvider userInfoProvider;
     private String issuer;
     
@@ -51,21 +48,9 @@ public class UserInfoService extends AbstractJwsJweProducer {
             userInfo.setIssuer(issuer);
         }
         userInfo.setAudience(oauth.getClientId());
-        
         Object responseEntity = userInfo;
-        
-        JwsJwtCompactProducer producer = new JwsJwtCompactProducer(userInfo);
-        JwsSignatureProvider theSigProvider = getInitializedSigProvider(null, false);
-        JweEncryptionProvider theEncryptionProvider = getInitializedEncryptionProvider(null, false);
-        if (theSigProvider != null) {
-            String userInfoString = producer.signWith(theSigProvider);
-            if (theEncryptionProvider != null) {
-                userInfoString = theEncryptionProvider.encrypt(StringUtils.toBytesUTF8(userInfoString), null);
-            }
-            responseEntity = userInfoString;
-        } else if (theEncryptionProvider != null) {
-            JweJwtCompactProducer jwe = new JweJwtCompactProducer(userInfo);
-            responseEntity = jwe.encryptWith(theEncryptionProvider);
+        if (super.isJwsRequired() || super.isJweRequired()) {
+            responseEntity = super.processJwt(new JwtToken(userInfo));
         }
         return Response.ok(responseEntity).build();
         
