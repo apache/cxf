@@ -92,7 +92,7 @@ public class SAMLSSOResponseValidator {
         }
         
         // Validate Assertions
-        boolean foundValidSubject = false;
+        org.opensaml.saml.saml2.core.Assertion validAssertion = null;
         Date sessionNotOnOrAfter = null;
         for (org.opensaml.saml2.core.Assertion assertion : samlResponse.getAssertions()) {
             // Check the Issuer
@@ -114,7 +114,7 @@ public class SAMLSSOResponseValidator {
                 org.opensaml.saml2.core.Subject subject = assertion.getSubject();
                 if (validateAuthenticationSubject(subject, assertion.getID(), postBinding)) {
                     validateAudienceRestrictionCondition(assertion.getConditions());
-                    foundValidSubject = true;
+                    validAssertion = assertion;
                     // Store Session NotOnOrAfter
                     for (AuthnStatement authnStatment : assertion.getAuthnStatements()) {
                         if (authnStatment.getSessionNotOnOrAfter() != null) {
@@ -123,10 +123,9 @@ public class SAMLSSOResponseValidator {
                     }
                 }
             }
-            
         }
         
-        if (!foundValidSubject) {
+        if (validAssertion == null) {
             LOG.fine("The Response did not contain any Authentication Statement that matched "
                      + "the Subject Confirmation criteria");
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
@@ -140,7 +139,7 @@ public class SAMLSSOResponseValidator {
         }
         
         // the assumption for now is that SAMLResponse will contain only a single assertion
-        Element assertionElement = samlResponse.getAssertions().get(0).getDOM();
+        Element assertionElement = validAssertion.getDOM();
         Element clonedAssertionElement = (Element)assertionElement.cloneNode(true);
         validatorResponse.setAssertionElement(clonedAssertionElement);
         validatorResponse.setAssertion(DOM2Writer.nodeToString(clonedAssertionElement));
