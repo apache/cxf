@@ -92,7 +92,7 @@ public class SAMLSSOResponseValidator {
         }
         
         // Validate Assertions
-        org.opensaml.saml.saml2.core.Assertion validAssertion = null;
+        org.opensaml.saml2.core.Assertion validAssertion = null;
         Date sessionNotOnOrAfter = null;
         for (org.opensaml.saml2.core.Assertion assertion : samlResponse.getAssertions()) {
             // Check the Issuer

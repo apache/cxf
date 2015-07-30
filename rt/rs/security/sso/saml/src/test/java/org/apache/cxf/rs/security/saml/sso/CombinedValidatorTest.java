@@ -43,9 +43,9 @@ import org.apache.wss4j.common.util.Loader;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
 import org.joda.time.DateTime;
-import org.opensaml.saml.common.xml.SAMLConstants;
-import org.opensaml.saml.saml2.core.Response;
-import org.opensaml.saml.saml2.core.Status;
+import org.opensaml.common.xml.SAMLConstants;
+import org.opensaml.saml2.core.Response;
+import org.opensaml.saml2.core.Status;
 
 /**
  * Some unit tests for the SAMLProtocolResponseValidator and the SAMLSSOResponseValidator
