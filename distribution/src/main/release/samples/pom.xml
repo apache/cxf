@@ -52,6 +52,7 @@
         <module>jax_rs/basic</module>
         <module>jax_rs/websocket</module>
         <module>jax_rs/description_swagger</module>
+        <module>jax_rs/description_swagger2</module>
         <module>callback</module>
         <module>wsdl_first_pure_xml</module>
         <module>jaxws_dispatch_provider</module>
