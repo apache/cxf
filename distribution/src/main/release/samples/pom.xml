@@ -76,6 +76,7 @@
         <module>js_provider</module>
         <module>ws_security/ut</module>
         <module>ws_security/sign_enc</module>
+        <module>ws_security/sign_enc_policy</module>
         <module>ws_security/ut_policy</module>
         <module>mtom</module>
         <module>jaxws_async</module>
