@@ -138,7 +138,6 @@ public class SAMLSSOResponseValidator {
             validatorResponse.setCreated(samlResponse.getIssueInstant().toDate());
         }
         
-        // the assumption for now is that SAMLResponse will contain only a single assertion
         Element assertionElement = validAssertion.getDOM();
         Element clonedAssertionElement = (Element)assertionElement.cloneNode(true);
         validatorResponse.setAssertionElement(clonedAssertionElement);
