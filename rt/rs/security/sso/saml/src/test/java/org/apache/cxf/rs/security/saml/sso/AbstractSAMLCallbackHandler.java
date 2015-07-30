@@ -130,6 +130,10 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
         this.subjectLocalityDnsAddress = dnsAddress;
     }
     
+    public void setSubjectName(String subjectName) {
+        this.subjectName = subjectName;
+    }
+    
     public void setResource(String resource) {
         this.resource = resource;
     }
