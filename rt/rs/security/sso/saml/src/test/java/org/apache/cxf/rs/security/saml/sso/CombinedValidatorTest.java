@@ -46,21 +46,15 @@ import org.apache.wss4j.common.util.Loader;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
 import org.joda.time.DateTime;
-<<<<<<< HEAD
+import org.opensaml.common.SignableSAMLObject;
 import org.opensaml.common.xml.SAMLConstants;
 import org.opensaml.saml2.core.Response;
 import org.opensaml.saml2.core.Status;
-=======
-import org.opensaml.saml.common.SignableSAMLObject;
-import org.opensaml.saml.common.xml.SAMLConstants;
-import org.opensaml.saml.saml2.core.Response;
-import org.opensaml.saml.saml2.core.Status;
-import org.opensaml.security.x509.BasicX509Credential;
-import org.opensaml.xmlsec.keyinfo.impl.X509KeyInfoGeneratorFactory;
-import org.opensaml.xmlsec.signature.KeyInfo;
-import org.opensaml.xmlsec.signature.Signature;
-import org.opensaml.xmlsec.signature.support.SignatureConstants;
->>>>>>> 3228637... Adding more SAML SSO tests
+import org.opensaml.xml.security.x509.BasicX509Credential;
+import org.opensaml.xml.security.x509.X509KeyInfoGeneratorFactory;
+import org.opensaml.xml.signature.KeyInfo;
+import org.opensaml.xml.signature.Signature;
+import org.opensaml.xml.signature.SignatureConstants;
 
 /**
  * Some unit tests for the SAMLProtocolResponseValidator and the SAMLSSOResponseValidator
@@ -344,14 +338,15 @@ public class CombinedValidatorTest extends org.junit.Assert {
         //
         Signature signature = OpenSAMLUtil.buildSignature();
         signature.setCanonicalizationAlgorithm(SignatureConstants.ALGO_ID_C14N_EXCL_OMIT_COMMENTS);
-
+        
         // prepare to sign the SAML token
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
         cryptoType.setAlias(issuerKeyName);
         X509Certificate[] issuerCerts = issuerCrypto.getX509Certificates(cryptoType);
         if (issuerCerts == null) {
             throw new Exception(
-                "No issuer certs were found to sign the SAML Assertion using issuer name: " + issuerKeyName);
+                    "No issuer certs were found to sign the SAML Assertion using issuer name: "
+                            + issuerKeyName);
         }
 
         String sigAlgo = SignatureConstants.ALGO_ID_SIGNATURE_RSA_SHA1;
@@ -360,24 +355,27 @@ public class CombinedValidatorTest extends org.junit.Assert {
         if (pubKeyAlgo.equalsIgnoreCase("DSA")) {
             sigAlgo = SignatureConstants.ALGO_ID_SIGNATURE_DSA;
         }
-
+        
         PrivateKey privateKey = issuerCrypto.getPrivateKey(issuerKeyName, issuerKeyPassword);
 
         signature.setSignatureAlgorithm(sigAlgo);
 
-        BasicX509Credential signingCredential = 
-            new BasicX509Credential(issuerCerts[0], privateKey);
+        BasicX509Credential signingCredential = new BasicX509Credential();
+        signingCredential.setEntityCertificate(issuerCerts[0]);
+        signingCredential.setPrivateKey(privateKey);
+
         signature.setSigningCredential(signingCredential);
 
         if (useKeyInfo) {
             X509KeyInfoGeneratorFactory kiFactory = new X509KeyInfoGeneratorFactory();
             kiFactory.setEmitEntityCertificate(true);
-
+            
             try {
                 KeyInfo keyInfo = kiFactory.newInstance().generate(signingCredential);
                 signature.setKeyInfo(keyInfo);
-            } catch (org.opensaml.security.SecurityException ex) {
-                throw new Exception("Error generating KeyInfo from signing credential", ex);
+            } catch (org.opensaml.xml.security.SecurityException ex) {
+                throw new Exception(
+                        "Error generating KeyInfo from signing credential", ex);
             }
         }
 
