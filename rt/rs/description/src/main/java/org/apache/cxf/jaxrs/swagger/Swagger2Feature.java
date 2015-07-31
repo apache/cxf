@@ -42,6 +42,7 @@ import io.swagger.jaxrs.listing.ApiListingResource;
 import io.swagger.jaxrs.listing.SwaggerSerializers;
 
 public class Swagger2Feature extends AbstractSwaggerFeature {
+    private String host;
 
     @Override
     protected void addSwaggerResource(Server server) {
@@ -70,6 +71,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         beanConfig.setResourcePackage(getResourcePackage());
         beanConfig.setVersion(getVersion());
         beanConfig.setBasePath(getBasePath());
+        beanConfig.setHost(getHost());
         beanConfig.setTitle(getTitle());
         beanConfig.setDescription(getDescription());
         beanConfig.setContact(getContact());
@@ -78,13 +80,23 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         beanConfig.setScan(isScan());
     }
 
+    public String getHost() {
+        return host;
+    }
+    public void setHost(String host) {
+        this.host = host;
+    }
+
     @Override
     protected void setBasePathByAddress(String address) {
         if (!address.startsWith("/")) {
             // get the path part
-            address = URI.create(address).getPath();
+            URI u = URI.create(address); 
+            setBasePath(u.getPath());
+            setHost(u.getPort() < 0 ? u.getHost() : u.getHost() + ":" + u.getPort());
+        } else {
+            setBasePath(address);
         }
-        setBasePath(address);
     }
 
     @PreMatching
