@@ -65,6 +65,7 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
     private boolean enforceAssertionsSigned = true;
     private boolean enforceKnownIssuer = true;
     private boolean keyInfoMustBeAvailable = true;
+    private boolean enforceResponseSigned;
     private TokenReplayCache<String> replayCache;
 
     private MessageContext messageContext;
@@ -318,6 +319,7 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
             ssoResponseValidator.setRequestId(requestState.getSamlRequestId());
             ssoResponseValidator.setSpIdentifier(requestState.getIssuerId());
             ssoResponseValidator.setEnforceAssertionsSigned(enforceAssertionsSigned);
+            ssoResponseValidator.setEnforceResponseSigned(enforceResponseSigned);
             ssoResponseValidator.setEnforceKnownIssuer(enforceKnownIssuer);
             ssoResponseValidator.setReplayCache(getReplayCache());
 
@@ -336,5 +338,16 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
     
     public void setKeyInfoMustBeAvailable(boolean keyInfoMustBeAvailable) {
         this.keyInfoMustBeAvailable = keyInfoMustBeAvailable;
+    }
+
+    public boolean isEnforceResponseSigned() {
+        return enforceResponseSigned;
+    }
+
+    /**
+     * Enforce that a SAML Response must be signed.
+     */
+    public void setEnforceResponseSigned(boolean enforceResponseSigned) {
+        this.enforceResponseSigned = enforceResponseSigned;
     }
 }
