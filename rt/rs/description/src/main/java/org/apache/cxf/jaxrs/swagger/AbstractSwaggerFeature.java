@@ -29,6 +29,7 @@ abstract class AbstractSwaggerFeature extends AbstractFeature {
     protected boolean runAsFilter;
     private String resourcePackage;
     private String version = "1.0.0";
+    // depending on swagger version basePath is set differently
     private String basePath;
     private String title = "Sample REST Application";
     private String description = "The Application";
