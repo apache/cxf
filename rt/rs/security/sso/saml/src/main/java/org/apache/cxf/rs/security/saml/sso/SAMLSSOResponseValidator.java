@@ -94,7 +94,7 @@ public class SAMLSSOResponseValidator {
         
         if (enforceResponseSigned && !samlResponse.isSigned()) {
             LOG.fine("The Response must be signed!");
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
+            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
         }
         
         // Validate Assertions

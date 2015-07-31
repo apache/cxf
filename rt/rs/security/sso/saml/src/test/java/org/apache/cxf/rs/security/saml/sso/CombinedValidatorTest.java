@@ -31,11 +31,12 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-<<<<<<< HEAD
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSConfig;
+import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.components.crypto.CryptoType;
 import org.apache.ws.security.components.crypto.Merlin;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.saml.ext.OpenSAMLUtil;
@@ -45,23 +46,6 @@ import org.apache.ws.security.saml.ext.bean.ConditionsBean;
 import org.apache.ws.security.saml.ext.bean.SubjectConfirmationDataBean;
 import org.apache.ws.security.saml.ext.builder.SAML2Constants;
 import org.apache.ws.security.util.Loader;
-=======
-import org.apache.wss4j.common.crypto.Crypto;
-import org.apache.wss4j.common.crypto.CryptoType;
-import org.apache.wss4j.common.crypto.Merlin;
-import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.saml.OpenSAMLUtil;
-import org.apache.wss4j.common.saml.SAMLCallback;
-import org.apache.wss4j.common.saml.SAMLUtil;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
-import org.apache.wss4j.common.saml.bean.AudienceRestrictionBean;
-import org.apache.wss4j.common.saml.bean.ConditionsBean;
-import org.apache.wss4j.common.saml.bean.SubjectConfirmationDataBean;
-import org.apache.wss4j.common.saml.builder.SAML2Constants;
-import org.apache.wss4j.common.util.Loader;
-import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSSConfig;
->>>>>>> a61db28... Adding more SAML SSO tests
 import org.joda.time.DateTime;
 import org.opensaml.common.SignableSAMLObject;
 import org.opensaml.common.xml.SAMLConstants;
@@ -242,10 +226,11 @@ public class CombinedValidatorTest extends org.junit.Assert {
         // Parse the response
         SSOValidatorResponse ssoResponse = 
             ssoValidator.validateSamlResponse(marshalledResponse, false);
-        SamlAssertionWrapper parsedAssertion = 
-            new SamlAssertionWrapper(ssoResponse.getAssertionElement());
+        Document assertionDoc = StaxUtils.read(new StringReader(ssoResponse.getAssertion()));
+        AssertionWrapper parsedAssertion = 
+            new AssertionWrapper(assertionDoc.getDocumentElement());
         
-        assertEquals("alice", parsedAssertion.getSubjectName());
+        assertEquals("alice", parsedAssertion.getSaml2().getSubject().getNameID().getValue());
     }
     
     @org.junit.Test

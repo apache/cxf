@@ -65,11 +65,7 @@ public class AbstractRequestAssertionConsumerHandler extends AbstractSSOSpHandle
     private boolean supportBase64Encoding = true;
     private boolean enforceAssertionsSigned = true;
     private boolean enforceKnownIssuer = true;
-<<<<<<< HEAD
-=======
-    private boolean keyInfoMustBeAvailable = true;
     private boolean enforceResponseSigned;
->>>>>>> a61db28... Adding more SAML SSO tests
     private TokenReplayCache<String> replayCache;
 
     private MessageContext messageContext;
@@ -340,12 +336,6 @@ public class AbstractRequestAssertionConsumerHandler extends AbstractSSOSpHandle
         LOG.warning(errorMsg.toString());
     }
     
-<<<<<<< HEAD
-=======
-    public void setKeyInfoMustBeAvailable(boolean keyInfoMustBeAvailable) {
-        this.keyInfoMustBeAvailable = keyInfoMustBeAvailable;
-    }
-
     public boolean isEnforceResponseSigned() {
         return enforceResponseSigned;
     }
@@ -356,5 +346,4 @@ public class AbstractRequestAssertionConsumerHandler extends AbstractSSOSpHandle
     public void setEnforceResponseSigned(boolean enforceResponseSigned) {
         this.enforceResponseSigned = enforceResponseSigned;
     }
->>>>>>> a61db28... Adding more SAML SSO tests
 }
