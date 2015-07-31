@@ -44,6 +44,7 @@ public class SAMLSSOResponseValidator {
     private String clientAddress;
     private String requestId;
     private String spIdentifier;
+    private boolean enforceResponseSigned;
     private boolean enforceAssertionsSigned = true;
     private boolean enforceKnownIssuer = true;
     private TokenReplayCache<String> replayCache;
@@ -89,6 +90,11 @@ public class SAMLSSOResponseValidator {
             && (destination == null || !destination.equals(assertionConsumerURL))) {
             LOG.fine("The Response must contain a destination that matches the assertion consumer URL");
             throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+        }
+        
+        if (enforceResponseSigned && !samlResponse.isSigned()) {
+            LOG.fine("The Response must be signed!");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
         
         // Validate Assertions
@@ -332,6 +338,17 @@ public class SAMLSSOResponseValidator {
     
     public void setReplayCache(TokenReplayCache<String> replayCache) {
         this.replayCache = replayCache;
+    }
+
+    public boolean isEnforceResponseSigned() {
+        return enforceResponseSigned;
+    }
+
+    /**
+     * Enforce whether a SAML Response must be signed.
+     */
+    public void setEnforceResponseSigned(boolean enforceResponseSigned) {
+        this.enforceResponseSigned = enforceResponseSigned;
     }
     
 }
