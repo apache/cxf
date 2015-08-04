@@ -61,6 +61,7 @@ public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBus
                 new SingletonResourceProvider(new BookStoreSwagger2()));
             sf.setProvider(new JacksonJsonProvider());
             final Swagger2Feature feature = new Swagger2Feature();
+            feature.setIgnoreHostPort(true);
             feature.setRunAsFilter(runAsFilter);
             sf.setFeatures(Arrays.asList(feature));
             sf.setAddress("http://localhost:" + port + "/");
