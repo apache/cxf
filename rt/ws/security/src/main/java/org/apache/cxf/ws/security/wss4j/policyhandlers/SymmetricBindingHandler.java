@@ -250,10 +250,11 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                         && !secondEncrParts.isEmpty()) {
                         secondRefList = ((WSSecDKEncrypt)encr).encryptForExternalRef(null, 
                                 secondEncrParts);
-                        this.addDerivedKeyElement(secondRefList);
                     } else if (!secondEncrParts.isEmpty()) {
                         //Encrypt, get hold of the ref list and add it
                         secondRefList = ((WSSecEncrypt)encr).encryptForRef(null, secondEncrParts);
+                    }
+                    if (secondRefList != null) {
                         this.addDerivedKeyElement(secondRefList);
                     }
                 }
@@ -612,14 +613,18 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
     
     private void addAttachmentsForEncryption(boolean atEnd, Element refList, List<Element> attachments) {
         if (atEnd) {
-            this.insertBeforeBottomUp(refList);
+            if (refList != null) {
+                this.insertBeforeBottomUp(refList);
+            }
             if (attachments != null) {
                 for (Element attachment : attachments) {
                     this.insertBeforeBottomUp(attachment);
                 }
             }
         } else {
-            this.addDerivedKeyElement(refList);
+            if (refList != null) {
+                this.addDerivedKeyElement(refList);
+            }
             if (attachments != null) {
                 for (Element attachment : attachments) {
                     this.addDerivedKeyElement(attachment);
