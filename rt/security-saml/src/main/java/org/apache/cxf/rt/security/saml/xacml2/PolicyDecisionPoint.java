@@ -31,6 +31,6 @@ public interface PolicyDecisionPoint {
      * @param request an XACML Request as a RequestType
      * @return the XACML Response as a ResponseType
      */
-    ResponseType evaluate(RequestType request);
+    ResponseType evaluate(RequestType request) throws Exception;
     
 }
