@@ -454,39 +454,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             assertPolicy(encrToken);
             AlgorithmSuite algorithmSuite = abinding.getAlgorithmSuite();
             if (encrToken.getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
-<<<<<<< HEAD
-                try {
-                    WSSecDKEncrypt dkEncr = new WSSecDKEncrypt(wssConfig);
-                    dkEncr.setAttachmentCallbackHandler(new AttachmentCallbackHandler(message));
-                    dkEncr.setStoreBytesInAttachment(storeBytesInAttachment);
-                    if (recToken.getToken().getVersion() == SPConstants.SPVersion.SP11) {
-                        dkEncr.setWscVersion(ConversationConstants.VERSION_05_02);
-                    }
-                    
-                    if (encrKey == null) {
-                        setupEncryptedKey(recToken, encrToken);
-                    }
-                    
-                    dkEncr.setExternalKey(this.encryptedKeyValue, this.encryptedKeyId);
-                    dkEncr.setParts(encrParts);
-                    dkEncr.setCustomValueType(WSConstants.SOAPMESSAGE_NS11 + "#"
-                            + WSConstants.ENC_KEY_VALUE_TYPE);
-                    AlgorithmSuiteType algType = algorithmSuite.getAlgorithmSuiteType();
-                    dkEncr.setSymmetricEncAlgorithm(algType.getEncryption());
-                    dkEncr.setDerivedKeyLength(algType.getEncryptionDerivedKeyLength() / 8);
-                    dkEncr.prepare(saaj.getSOAPPart());
-                    
-                    addDerivedKeyElement(dkEncr.getdktElement());
-                    Element refList = dkEncr.encryptForExternalRef(null, encrParts);
-                    insertBeforeBottomUp(refList);
-                    return dkEncr;
-                } catch (Exception e) {
-                    LOG.log(Level.FINE, e.getMessage(), e);
-                    policyNotAsserted(recToken, e);
-                }
-=======
                 return doEncryptionDerived(recToken, encrToken, encrParts, algorithmSuite);
->>>>>>> 5048d0b... Some refactoring due to WSS-549
             } else {
                 try {
                     WSSecEncrypt encr = new WSSecEncrypt(wssConfig);
@@ -585,28 +553,26 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                                      List<WSEncryptionPart> encrParts,
                                      AlgorithmSuite algorithmSuite) {
         try {
-            WSSecDKEncrypt dkEncr = new WSSecDKEncrypt();
-            dkEncr.setIdAllocator(wssConfig.getIdAllocator());
-            dkEncr.setCallbackLookup(callbackLookup);
+            WSSecDKEncrypt dkEncr = new WSSecDKEncrypt(wssConfig);
             dkEncr.setAttachmentCallbackHandler(new AttachmentCallbackHandler(message));
             dkEncr.setStoreBytesInAttachment(storeBytesInAttachment);
             if (recToken.getToken().getVersion() == SPConstants.SPVersion.SP11) {
                 dkEncr.setWscVersion(ConversationConstants.VERSION_05_02);
             }
-
+            
             if (encrKey == null) {
                 setupEncryptedKey(recToken, encrToken);
             }
-
+                    
             dkEncr.setExternalKey(this.encryptedKeyValue, this.encryptedKeyId);
-            dkEncr.getParts().addAll(encrParts);
+            dkEncr.setParts(encrParts);
             dkEncr.setCustomValueType(WSConstants.SOAPMESSAGE_NS11 + "#"
-                + WSConstants.ENC_KEY_VALUE_TYPE);
+                    + WSConstants.ENC_KEY_VALUE_TYPE);
             AlgorithmSuiteType algType = algorithmSuite.getAlgorithmSuiteType();
             dkEncr.setSymmetricEncAlgorithm(algType.getEncryption());
             dkEncr.setDerivedKeyLength(algType.getEncryptionDerivedKeyLength() / 8);
             dkEncr.prepare(saaj.getSOAPPart());
-
+            
             addDerivedKeyElement(dkEncr.getdktElement());
             Element refList = dkEncr.encryptForExternalRef(null, encrParts);
             if (refList != null) {
@@ -615,7 +581,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             return dkEncr;
         } catch (Exception e) {
             LOG.log(Level.FINE, e.getMessage(), e);
-            unassertPolicy(recToken, e);
+            policyNotAsserted(recToken, e);
         }
         
         return null;
