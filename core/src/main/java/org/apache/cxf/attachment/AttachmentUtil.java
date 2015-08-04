@@ -199,7 +199,12 @@ public final class AttachmentUtil {
         if (ns != null && (ns.length() > 0)) {
             try {
                 URI uri = new URI(ns);
-                cid = uri.getHost();
+                String host = uri.getHost();
+                if (host != null) {
+                    cid = host;
+                } else {
+                    cid = ns;
+                }
             } catch (Exception e) {
                 cid = ns;
             }
