@@ -27,6 +27,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -96,6 +97,39 @@ public class ProviderFactoryTest extends Assert {
         assertEquals(10, readers.size());
         assertSame(reader1, readers.get(6).getProvider());
         assertSame(reader2, readers.get(7).getProvider());
+    }
+    
+    @Test
+    public void testCustomProviderSorting() {
+        ProviderFactory pf = ServerProviderFactory.getInstance();
+        Comparator<?> comp = new Comparator<ProviderInfo<?>>() {
+
+            @Override
+            public int compare(ProviderInfo<?> o1, ProviderInfo<?> o2) {
+                Object provider1 = o1.getProvider();
+                Object provider2 = o2.getProvider();
+                if (provider1 instanceof StringTextProvider) {
+                    return 1;
+                } else if (provider2 instanceof StringTextProvider) {
+                    return -1;
+                } else {
+                    return 0;
+                }
+            }    
+        
+        };
+        // writers
+        pf.setMessageWriterComparator(comp);
+        List<ProviderInfo<MessageBodyWriter<?>>> writers = pf.getMessageWriters();
+        assertEquals(8, writers.size());
+        Object lastWriter = writers.get(7).getProvider();
+        assertTrue(lastWriter instanceof StringTextProvider);
+        //readers
+        pf.setMessageReaderComparator(comp);
+        List<ProviderInfo<MessageBodyReader<?>>> readers = pf.getMessageReaders();
+        assertEquals(8, readers.size());
+        Object lastReader = readers.get(7).getProvider();
+        assertTrue(lastReader instanceof StringTextProvider);
     }
     
     @Test

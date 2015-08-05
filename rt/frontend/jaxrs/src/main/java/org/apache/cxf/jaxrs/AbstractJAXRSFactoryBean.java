@@ -71,7 +71,8 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
     protected List<String> schemaLocations;
     protected JAXRSServiceFactoryBean serviceFactory;
     protected List<Object> entityProviders = new LinkedList<Object>();
-    private Comparator<?> providerComparator;
+    private Comparator<?> messageReaderComparator;
+    private Comparator<?> messageWriterComparator;
     
     protected AbstractJAXRSFactoryBean(JAXRSServiceFactoryBean serviceFactory) {
         this.serviceFactory = serviceFactory;
@@ -325,8 +326,11 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
     }
     
     protected void setupFactory(ProviderFactory factory, Endpoint ep) { 
-        if (providerComparator != null) {
-            factory.setProviderComparator(providerComparator);
+        if (messageReaderComparator != null) {
+            factory.setMessageReaderComparator(messageReaderComparator);
+        }
+        if (messageWriterComparator != null) {
+            factory.setMessageWriterComparator(messageWriterComparator);
         }
         if (entityProviders != null) {
             factory.setUserProviders(entityProviders); 
@@ -432,8 +436,11 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
         }
     }
 
-    public void setProviderComparator(Comparator<?> providerComparator) {
-        this.providerComparator = providerComparator;
+    public void setMessageWriterComparator(Comparator<?> messageWriterComparator) {
+        this.messageWriterComparator = messageWriterComparator;
+    }
+    public void setMessageReaderComparator(Comparator<?> messageReaderComparator) {
+        this.messageReaderComparator = messageReaderComparator;
     }
     
     
