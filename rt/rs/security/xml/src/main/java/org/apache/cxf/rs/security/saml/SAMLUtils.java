@@ -24,10 +24,13 @@ import java.util.logging.Logger;
 
 import javax.security.auth.callback.CallbackHandler;
 
+import org.w3c.dom.Element;
+
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.rs.security.common.CryptoLoader;
 import org.apache.cxf.rs.security.common.RSSecurityUtils;
 import org.apache.cxf.rs.security.saml.assertion.Subject;
@@ -64,6 +67,16 @@ public final class SAMLUtils {
     
     public static SamlAssertionWrapper createAssertion(Message message) throws Fault {
         try {
+            // Check if the token is already available in the current context;
+            // For example, STS Client can set it up.
+            Element samlToken = 
+                (Element)MessageUtils.getContextualProperty(message, 
+                                                            SAMLConstants.WS_SAML_TOKEN_ELEMENT,
+                                                            SAMLConstants.SAML_TOKEN_ELEMENT);
+            if (samlToken != null) {
+                return new SamlAssertionWrapper(samlToken);
+            }
+            // Finally try to get a self-signed assertion
             CallbackHandler handler = RSSecurityUtils.getCallbackHandler(
                 message, SAMLUtils.class, SecurityConstants.SAML_CALLBACK_HANDLER);
             return createAssertion(message, handler);

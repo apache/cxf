@@ -69,12 +69,14 @@ public final class STSTokenRetriever {
         if (cacheIssuedToken) {
             message.getExchange().getEndpoint().put(SecurityConstants.TOKEN, tok);
             message.getExchange().put(SecurityConstants.TOKEN, tok);
+            message.put(SecurityConstants.TOKEN_ELEMENT, tok.getToken());
             message.getExchange().put(SecurityConstants.TOKEN_ID, tok.getId());
             message.getExchange().getEndpoint().put(SecurityConstants.TOKEN_ID,
                                                           tok.getId());
         } else {
             message.put(SecurityConstants.TOKEN, tok);
             message.put(SecurityConstants.TOKEN_ID, tok.getId());
+            message.put(SecurityConstants.TOKEN_ELEMENT, tok.getToken());
         }
         // ?
         TokenStoreUtils.getTokenStore(message).add(tok);

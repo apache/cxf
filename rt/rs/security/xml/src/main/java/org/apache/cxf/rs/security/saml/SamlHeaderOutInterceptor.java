@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
@@ -42,14 +43,7 @@ public class SamlHeaderOutInterceptor extends AbstractSamlOutInterceptor {
     
     public void handleMessage(Message message) throws Fault {
         try {
-            Element samlToken = 
-                (Element)message.getContextualProperty(SAMLConstants.SAML_TOKEN_ELEMENT);
-            SamlAssertionWrapper assertionWrapper;
-            if (samlToken != null) {
-                assertionWrapper = new SamlAssertionWrapper(samlToken);
-            } else {
-                assertionWrapper = createAssertion(message);
-            }
+            SamlAssertionWrapper assertionWrapper = createAssertion(message);
             
             Document doc = DOMUtils.newDocument();
             Element assertionElement = assertionWrapper.toDOM(doc);

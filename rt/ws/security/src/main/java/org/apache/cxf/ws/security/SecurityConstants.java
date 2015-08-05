@@ -496,6 +496,7 @@ public final class SecurityConstants extends org.apache.cxf.rt.security.Security
     
     public static final String TOKEN = "ws-security.token";
     public static final String TOKEN_ID = "ws-security.token.id";
+    public static final String TOKEN_ELEMENT = "ws-security.token.element";
     
     public static final Set<String> ALL_PROPERTIES;
     

@@ -29,6 +29,7 @@ public final class SAMLConstants {
      * SamlHeaderOutInterceptor will use this token instead of creating a new SAML Token.
      */
     public static final String SAML_TOKEN_ELEMENT = "rs-security.saml.token.element";
+    public static final String WS_SAML_TOKEN_ELEMENT = "ws-security.token.element";
     
     private SAMLConstants() {
         // complete

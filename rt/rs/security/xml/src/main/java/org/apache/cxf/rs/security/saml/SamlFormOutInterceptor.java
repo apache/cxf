@@ -28,6 +28,7 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
@@ -48,14 +49,7 @@ public class SamlFormOutInterceptor extends AbstractSamlOutInterceptor {
         }
         
         try {
-            Element samlToken = 
-                (Element)message.getContextualProperty(SAMLConstants.SAML_TOKEN_ELEMENT);
-            SamlAssertionWrapper assertionWrapper;
-            if (samlToken != null) {
-                assertionWrapper = new SamlAssertionWrapper(samlToken);
-            } else {
-                assertionWrapper = createAssertion(message);
-            }
+            SamlAssertionWrapper assertionWrapper = SAMLUtils.createAssertion(message);
             
             Document doc = DOMUtils.newDocument();
             Element assertionElement = assertionWrapper.toDOM(doc);
