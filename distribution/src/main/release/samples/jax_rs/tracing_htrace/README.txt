@@ -27,9 +27,9 @@ docker run -p 2181:2181 -p 60010:60010 -p 60000:60000 -p 60020:60020 -p 60030:60
 Preparing test dataset
 ---------------------------------------
 create 'catalog', {NAME => 'c', VERSIONS => 5}
-put 'catalog', '1', 'c:title', 'Apache CXF Web Service Development'
-put 'catalog', '2', 'c:title', 'HBase: The Definitive Guide'
-put 'catalog', '3', 'c:title', 'HBase in Action'
+put 'catalog', '7e51155e-70fd-4b2a-b3ae-0b6352945ecf', 'c:title', 'Apache CXF Web Service Development'
+put 'catalog', 'f948c2ca-9687-4d56-8388-75bfde31fae9', 'c:title', 'HBase: The Definitive Guide'
+put 'catalog', 'bd80053a-9542-47fa-9a36-25af5521f2fb', 'c:title', 'HBase in Action'
 
 Building and running the demo using Maven
 ---------------------------------------

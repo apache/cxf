@@ -34,6 +34,7 @@ import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.ConnectionFactory;
 import org.apache.hadoop.hbase.client.Delete;
 import org.apache.hadoop.hbase.client.Get;
+import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.Scan;
@@ -81,6 +82,14 @@ public class CatalogStore {
         }
         
         return null;
+    }
+    
+    public void put(final String key, final String title) throws IOException {
+        try (final Table table = connection.getTable(TableName.valueOf(tableName))) {
+            final Put put = new Put(Bytes.toBytes(key));
+            put.addColumn(Bytes.toBytes("c"), Bytes.toBytes("title"), Bytes.toBytes(title));
+            table.put(put);
+        }
     }
     
     public JsonArray scan() throws IOException {
