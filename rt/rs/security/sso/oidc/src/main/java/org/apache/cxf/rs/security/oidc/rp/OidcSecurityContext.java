@@ -41,7 +41,7 @@ public class OidcSecurityContext extends SimpleSecurityContext implements Securi
         if (oidcContext.getUserInfo() != null) {
             return oidcContext.getUserInfo().getEmail();
         } else {
-            return oidcContext.getIdToken().getSubject();
+            return oidcContext.getIdToken().getEmail();
         }
     }
     @Override
