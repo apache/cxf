@@ -517,7 +517,7 @@ public abstract class AbstractClient implements Client {
             && MessageUtils.isTrue(outMessage.getContextualProperty("response.stream.auto.close"));
     }
     
-    protected void completeExchange(Object response, Exchange exchange, boolean proxy) {
+    protected void completeExchange(Exchange exchange, boolean proxy) {
         // higher level conduits such as FailoverTargetSelector need to
         // clear the request state but a fair number of response objects 
         // depend on InputStream being still open thus lower-level conduits
