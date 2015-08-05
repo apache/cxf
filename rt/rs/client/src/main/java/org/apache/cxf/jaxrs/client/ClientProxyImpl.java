@@ -700,15 +700,10 @@ public class ClientProxyImpl extends AbstractClient implements
                 return results[0];
             }
             
-            Object response = null;
             try {
-                response = handleResponse(outMessage, ori.getClassResourceInfo().getServiceClass());
-                return response;
-            } catch (Exception ex) {
-                response = ex;
-                throw ex;
+                return handleResponse(outMessage, ori.getClassResourceInfo().getServiceClass());
             } finally {
-                completeExchange(response, outMessage.getExchange(), true);
+                completeExchange(outMessage.getExchange(), true);
             }
         } finally {
             if (origLoader != null) {
