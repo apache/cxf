@@ -114,7 +114,8 @@ public abstract class ProviderFactory {
     
     private Bus bus;
     
-    private Comparator<?> providerComparator;
+    private Comparator<?> messageWriterComparator;
+    private Comparator<?> messageReaderComparator;
     
     protected ProviderFactory(Bus bus) {
         this.bus = bus;
@@ -562,25 +563,25 @@ public abstract class ProviderFactory {
      * x/y;q=1.0 < x/y;q=0.7.
      */    
     private void sortReaders() {
-        if (providerComparator == null) {
+        if (messageReaderComparator == null) {
             Collections.sort(messageReaders, new MessageBodyReaderComparator());
         } else {
-            doCustomSort(messageReaders);
+            doCustomSort(messageReaderComparator, messageReaders);
         }
     }
     private <T> void sortWriters() {
-        if (providerComparator == null) {
+        if (messageWriterComparator == null) {
             Collections.sort(messageWriters, new MessageBodyWriterComparator());
         } else {
-            doCustomSort(messageWriters);
+            doCustomSort(messageWriterComparator, messageWriters);
         }
     }
     
-    private <T> void doCustomSort(List<?> listOfProviders) {
+    private static <T> void doCustomSort(Comparator<?> comparator, List<?> listOfProviders) {
         @SuppressWarnings("unchecked")
-        List<T> theProviders = (List<T>)messageReaders;
+        List<T> theProviders = (List<T>)listOfProviders;
         @SuppressWarnings("unchecked")
-        Comparator<? super T> theComparator = (Comparator<? super T>)providerComparator;
+        Comparator<? super T> theComparator = (Comparator<? super T>)comparator;
         Collections.sort((List<T>)theProviders, theComparator);
     }
     
@@ -1174,11 +1175,12 @@ public abstract class ProviderFactory {
         return null;
     }
 
-    public Comparator<?> getProviderComparator() {
-        return providerComparator;
+    public void setMessageWriterComparator(Comparator<?> messageWriterComparator) {
+        this.messageWriterComparator = messageWriterComparator;
+        sortWriters();
     }
-
-    public void setProviderComparator(Comparator<?> providerComparator) {
-        this.providerComparator = providerComparator;
+    public void setMessageReaderComparator(Comparator<?> messageReaderComparator) {
+        this.messageReaderComparator = messageReaderComparator;
+        sortReaders();
     }
 }
