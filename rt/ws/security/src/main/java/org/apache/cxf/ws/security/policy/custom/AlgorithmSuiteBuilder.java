@@ -57,7 +57,7 @@ public class AlgorithmSuiteBuilder implements AssertionBuilder<Element> {
             loader = new DefaultAlgorithmSuiteLoader();
         }
         AlgorithmSuite algorithmSuite = loader.getAlgorithmSuite(bus, spVersion, nestedPolicy);
-        if (algorithmSuite == null) {
+        if (algorithmSuite == null || algorithmSuite.getAlgorithmSuiteType() == null) {
             String algorithmSuiteName = DOMUtils.getFirstElement(nestedPolicyElement).getLocalName();
             throw new IllegalArgumentException(
                 "Algorithm suite \"" + algorithmSuiteName + "\" is not registered"
