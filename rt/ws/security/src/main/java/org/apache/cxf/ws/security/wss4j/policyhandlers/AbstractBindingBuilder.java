@@ -1414,6 +1414,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         AlgorithmSuiteType algType = binding.getAlgorithmSuite().getAlgorithmSuiteType();
         encrKey.setSymmetricEncAlgorithm(algType.getEncryption());
         encrKey.setKeyEncAlgo(algType.getAsymmetricKeyWrap());
+        encrKey.setMGFAlgorithm(algType.getMGFAlgo());
         
         encrKey.prepare(saaj.getSOAPPart(), crypto);
         
