@@ -39,6 +39,8 @@ import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.rm.manager.DestinationPolicyType;
 import org.apache.cxf.ws.rm.v200702.AcceptType;
+import org.apache.cxf.ws.rm.v200702.CloseSequenceResponseType;
+import org.apache.cxf.ws.rm.v200702.CloseSequenceType;
 import org.apache.cxf.ws.rm.v200702.CreateSequenceResponseType;
 import org.apache.cxf.ws.rm.v200702.CreateSequenceType;
 import org.apache.cxf.ws.rm.v200702.Expires;
@@ -106,6 +108,8 @@ public class Servant implements Invoker {
             if (tsr != null) {
                 return Collections.singletonList(tsr);
             }
+        } else if (RM11Constants.INSTANCE.getCloseSequenceOperationName().equals(oi.getName())) {
+            return Collections.singletonList(closeSequence(exchange.getInMessage()));
         }
         
         return null;
@@ -288,6 +292,40 @@ public class Servant implements Invoker {
             terminateResponse.setIdentifier(sid);
         }
         return terminateResponse;
+    }
+
+    public Object closeSequence(Message message) {
+        LOG.fine("Closing sequence");
+        
+        CloseSequenceType close = (CloseSequenceType)getParameter(message);
+        
+        // check if the terminated sequence was created in response to a a createSequence
+        // request
+        
+        Destination destination = reliableEndpoint.getDestination();
+        Identifier sid = close.getIdentifier();
+        DestinationSequence closedSeq = destination.getSequence(sid);
+        if (null == closedSeq) {
+            //  TODO
+            LOG.severe("No such sequence.");
+            return null;
+        } 
+        closedSeq.scheduleImmediateAcknowledgement();
+        closedSeq.setLastMessageNumber(close.getLastMsgNumber());
+        CloseSequenceResponseType closeResponse = new CloseSequenceResponseType();
+        closeResponse.setIdentifier(close.getIdentifier());
+        AddressingProperties maps = RMContextUtils.retrieveMAPs(message, false, false);        
+        Message outMessage = message.getExchange().getOutMessage();
+
+        if (null == outMessage) {
+            // outMessage may be null e.g. if ReplyTo is not set for TS 
+            outMessage = ContextUtils.createMessage(message.getExchange());
+            message.getExchange().setOutMessage(outMessage);
+        }
+        if (null != outMessage) {
+            RMContextUtils.storeMAPs(maps, outMessage, false, false);
+        }
+        return closeResponse;
     }
 
     Object getParameter(Message message) {

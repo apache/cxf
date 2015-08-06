@@ -69,6 +69,8 @@ import org.apache.cxf.ws.policy.PolicyEngine;
 import org.apache.cxf.ws.policy.PolicyInterceptorProviderRegistry;
 import org.apache.cxf.ws.rm.manager.SequenceTerminationPolicyType;
 import org.apache.cxf.ws.rm.manager.SourcePolicyType;
+import org.apache.cxf.ws.rm.v200702.CloseSequenceResponseType;
+import org.apache.cxf.ws.rm.v200702.CloseSequenceType;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.Policy;
 
@@ -84,6 +86,8 @@ public class RMEndpoint {
     private static final String CREATE_RESPONSE_PART_NAME = "createResponse";
     private static final String TERMINATE_PART_NAME = "terminate";
     private static final String TERMINATE_RESPONSE_PART_NAME = "terminateResponse";
+    private static final String CLOSE_PART_NAME = "close";
+    private static final String CLOSE_RESPONSE_PART_NAME = "closeResponse";
     
     private static Schema rmSchema;
 
@@ -543,6 +547,21 @@ public class RMEndpoint {
         messageInfo = operationInfo.createMessage(consts.getCloseSequenceOperationName(),
                                                   MessageInfo.Type.INPUT);
         operationInfo.setInput(messageInfo.getName().getLocalPart(), messageInfo);
+        if (RM11Constants.NAMESPACE_URI.equals(protocol.getWSRMNamespace())) {
+            MessagePartInfo partInfo = messageInfo.addMessagePart(CLOSE_PART_NAME);
+            partInfo.setElementQName(consts.getCloseSequenceOperationName());
+            partInfo.setElement(true);
+            partInfo.setTypeClass(CloseSequenceType.class);
+            messageInfo = operationInfo.createMessage(
+                RM11Constants.INSTANCE.getCloseSequenceResponseOperationName(),
+                MessageInfo.Type.OUTPUT);
+            operationInfo.setOutput(messageInfo.getName().getLocalPart(), messageInfo);
+            partInfo = messageInfo.addMessagePart(CLOSE_RESPONSE_PART_NAME);
+            partInfo.setElementQName(RM11Constants.INSTANCE.getCloseSequenceResponseOperationName());
+            partInfo.setElement(true);
+            partInfo.setTypeClass(CloseSequenceResponseType.class);
+            partInfo.setIndex(0);
+        }
     }
 
     void buildAckRequestedOperationInfo(InterfaceInfo ii, ProtocolVariation protocol) {
@@ -599,7 +618,12 @@ public class RMEndpoint {
             bi.addOperation(boi);
 
             boi = bi.buildOperation(consts.getCloseSequenceOperationName(), null, null);
-            addAction(boi, consts.getCloseSequenceAction());
+            if (RM11Constants.NAMESPACE_URI.equals(protocol.getWSRMNamespace())) {
+                addAction(boi, consts.getCloseSequenceAction(), 
+                        RM11Constants.INSTANCE.getCloseSequenceResponseAction());
+            } else {
+                addAction(boi, consts.getCloseSequenceAction());
+            }
             bi.addOperation(boi);
 
             boi = bi.buildOperation(consts.getAckRequestedOperationName(), null, null);

@@ -74,6 +74,8 @@ public final class RM11Constants extends RMConstants {
         new QName(NAMESPACE_URI, "SequenceAcknowledgement");
     
     public static final QName CLOSE_SEQUENCE_QNAME = new QName(NAMESPACE_URI, "CloseSequence");
+
+    public static final QName CLOSE_SEQUENCE_RESPONSE_QNAME = new QName(NAMESPACE_URI, "CloseSequenceResponse");
     
     public static final QName ACK_REQ_QNAME = new QName(NAMESPACE_URI, "AckRequested");
     
@@ -191,6 +193,11 @@ public final class RM11Constants extends RMConstants {
     public String getCloseSequenceAction() {
         return CLOSE_SEQUENCE_ACTION;
     }
+
+    // only defined for WS-RM 1.1/1.2
+    public String getCloseSequenceResponseAction() {
+        return CLOSE_SEQUENCE_RESPONSE_ACTION;
+    }
     
     public String getAckRequestedAction() {
         return ACK_REQUESTED_ACTION;
@@ -242,6 +249,11 @@ public final class RM11Constants extends RMConstants {
         return CLOSE_SEQUENCE_QNAME;
     }
     
+    // not part of the interface, only in WS-RM 1.1/1.2
+    public QName getCloseSequenceResponseOperationName() {
+        return CLOSE_SEQUENCE_RESPONSE_QNAME;
+    }
+
     public QName getSequenceAckOperationName() {
         return SEQUENCE_ACKNOWLEDGEMENT_QNAME;
     }
