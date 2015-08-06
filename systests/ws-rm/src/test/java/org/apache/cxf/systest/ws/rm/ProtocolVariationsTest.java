@@ -414,40 +414,45 @@ public class ProtocolVariationsTest extends AbstractBusClientServerTestBase {
     
 
     private void verifyTerminateSequence(String wsaUri, RMConstants consts) throws Exception {
-        if (RM11Constants.NAMESPACE_URI.equals(consts.getWSRMNamespace())) {
-            awaitMessages(3, 3);
-        } else {
-            awaitMessages(3, 2);
-        }
-        
         MessageFlow mf = new MessageFlow(outRecorder.getOutboundMessages(),
-            inRecorder.getInboundMessages(), wsaUri, consts.getWSRMNamespace());
-        
-        mf.verifyMessages(3, true);
-        String[] expectedActions = new String[] {consts.getCreateSequenceAction(), 
-                                                 GREETME_ONEWAY_ACTION,
-                                                 consts.getTerminateSequenceAction()};
-        mf.verifyActions(expectedActions, true);
-        mf.verifyMessageNumbers(new String[] {null, "1", null}, true);
+                                         inRecorder.getInboundMessages(), wsaUri, consts.getWSRMNamespace());
         if (RM11Constants.NAMESPACE_URI.equals(consts.getWSRMNamespace())) {
-            // no LastMessage
-            mf.verifyLastMessage(new boolean[] {false, false, false}, true);
-        } else {
-            // uses LastMessage
-            mf.verifyLastMessage(new boolean[] {false, true, false}, true);
-        }
+            awaitMessages(4, 4);
+            
+            mf.verifyMessages(4, true);
+            String[] expectedActions = new String[] {consts.getCreateSequenceAction(), 
+                                                     GREETME_ONEWAY_ACTION,
+                                                     consts.getCloseSequenceAction(),
+                                                     consts.getTerminateSequenceAction()};
+            mf.verifyActions(expectedActions, true);
+            mf.verifyMessageNumbers(new String[] {null, "1", null, null}, true);
 
-        if (RM11Constants.NAMESPACE_URI.equals(consts.getWSRMNamespace())) {
-            // CSR, ACK, TSR
-            mf.verifyMessages(3, false);
+            // no LastMessage
+            mf.verifyLastMessage(new boolean[] {false, false, false, false}, true);
+
+            // CrSR, ACK, ClSR, TSR
+            mf.verifyMessages(4, false);
             expectedActions = new String[] {consts.getCreateSequenceResponseAction(), 
                                             consts.getSequenceAckAction(),
+                                            RM11Constants.INSTANCE.getCloseSequenceResponseAction(),
                                             RM11Constants.INSTANCE.getTerminateSequenceResponseAction()};
             mf.verifyActions(expectedActions, false);
-            mf.verifyAcknowledgements(new boolean[] {false, true, false}, false);
+            mf.verifyAcknowledgements(new boolean[] {false, true, false, false}, false);
 
         } else {
-            // CSR, ACK, PR
+            awaitMessages(3, 2);
+            
+            mf.verifyMessages(3, true);
+            String[] expectedActions = new String[] {consts.getCreateSequenceAction(), 
+                                                     GREETME_ONEWAY_ACTION,
+                                                     consts.getTerminateSequenceAction()};
+            mf.verifyActions(expectedActions, true);
+            mf.verifyMessageNumbers(new String[] {null, "1", null}, true);
+
+            // uses LastMessage
+            mf.verifyLastMessage(new boolean[] {false, true, false}, true);
+
+            // CrSR, ACK, PR
             mf.verifyMessages(2, false);
             expectedActions = new String[] {consts.getCreateSequenceResponseAction(), 
                                             consts.getSequenceAckAction()};
