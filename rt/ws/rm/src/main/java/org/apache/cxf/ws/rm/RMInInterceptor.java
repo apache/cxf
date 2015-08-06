@@ -161,8 +161,8 @@ public class RMInInterceptor extends AbstractRMInterceptor<Message> {
             if (RM10Constants.SEQUENCE_ACKNOWLEDGMENT_ACTION.equals(action)
                 || RM11Constants.SEQUENCE_ACKNOWLEDGMENT_ACTION.equals(action)) {
                 processAcknowledgments(rme, rmps, protocol);
-            } else if (RM10Constants.CLOSE_SEQUENCE_ACTION.equals(action)
-                || RM11Constants.SEQUENCE_ACKNOWLEDGMENT_ACTION.equals(action)) {
+            } else if (RM10Constants.CLOSE_SEQUENCE_ACTION.equals(action)) {
+                // RM10 out-of-band CloseSequence/lastMessage is a special case; RM11 needs no special handling
                 processSequence(destination, message);
             } else if ((RM10Constants.CREATE_SEQUENCE_ACTION.equals(action)
                 || RM11Constants.CREATE_SEQUENCE_ACTION.equals(action)) && !isServer) {

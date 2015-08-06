@@ -152,6 +152,7 @@ public class SourceSequence extends AbstractSequence {
             } else {
                 RMEndpoint rme = source.getReliableEndpoint();
                 Proxy proxy = rme.getProxy();
+                // REVIST for rm 1.1, provide an option to how the close and terminate messages are sent
                 proxy.terminate(this);
                 source.removeSequence(this);
             }
