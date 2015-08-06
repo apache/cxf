@@ -20,6 +20,7 @@
 package org.apache.cxf.jaxrs.impl.tl;
 
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 
@@ -43,6 +44,10 @@ public class ThreadLocalInvocationHandler<T> extends AbstractThreadLocalProxy<T>
                                                    + " Check if ContextProvider supporting this class is registered");
             }
         }
-        return m.invoke(target, args);
+        try {
+            return m.invoke(target, args);
+        } catch (InvocationTargetException e) {
+            throw e.getCause();
+        }
     }
 }
