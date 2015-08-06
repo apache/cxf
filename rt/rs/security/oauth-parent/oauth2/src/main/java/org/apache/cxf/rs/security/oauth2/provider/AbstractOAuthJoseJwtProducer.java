@@ -39,7 +39,7 @@ public abstract class AbstractOAuthJoseJwtProducer extends AbstractJoseJwtProduc
     private boolean encryptWithClientSecret;
     private boolean signWithClientSecret;
     
-    protected JwsSignatureProvider getInitializedSigProvider(Client c, boolean required) {
+    protected JwsSignatureProvider getInitializedSignatureProvider(Client c, boolean required) {
         if (signWithClientSecret) {
             byte[] hmac = CryptoUtils.decodeSequence(c.getClientSecret());
             return JwsUtils.getHmacSignatureProvider(hmac, SignatureAlgorithm.HS256);
