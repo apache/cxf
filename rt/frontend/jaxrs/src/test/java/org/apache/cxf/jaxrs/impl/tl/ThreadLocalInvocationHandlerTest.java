@@ -46,7 +46,7 @@ public class ThreadLocalInvocationHandlerTest {
 
     @Before
     public void setUp() throws Exception {
-        ThreadLocalInvocationHandler<TestClass> subject = new ThreadLocalInvocationHandler<>();
+        ThreadLocalInvocationHandler<TestClass> subject = new ThreadLocalInvocationHandler<TestClass>();
         subject.set(new TestClass());
 
         testIface = (TestIface) Proxy.newProxyInstance(ThreadLocalInvocationHandler.class.getClassLoader(),
