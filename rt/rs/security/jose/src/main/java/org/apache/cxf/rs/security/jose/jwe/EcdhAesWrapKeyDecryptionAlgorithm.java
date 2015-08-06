@@ -23,7 +23,7 @@ import java.security.interfaces.ECPrivateKey;
 import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 
-public class EcdhAesWrapKeyDecryptionAlgorithm implements KeyDecryptionAlgorithm {
+public class EcdhAesWrapKeyDecryptionAlgorithm implements KeyDecryptionProvider {
     private ECPrivateKey key;
     private KeyAlgorithm algo;
     public EcdhAesWrapKeyDecryptionAlgorithm(ECPrivateKey key) {    
@@ -38,7 +38,7 @@ public class EcdhAesWrapKeyDecryptionAlgorithm implements KeyDecryptionAlgorithm
         byte[] derivedKey = 
             EcdhDirectKeyJweDecryption.getDecryptedContentEncryptionKeyFromHeaders(
                 jweDecryptionInput.getJweHeaders(), key);
-        KeyDecryptionAlgorithm aesWrap = new AesWrapKeyDecryptionAlgorithm(derivedKey) {
+        KeyDecryptionProvider aesWrap = new AesWrapKeyDecryptionAlgorithm(derivedKey) {
             protected boolean isValidAlgorithmFamily(String wrapAlgo) {
                 return AlgorithmUtils.isEcdhEsWrap(wrapAlgo);
             }    

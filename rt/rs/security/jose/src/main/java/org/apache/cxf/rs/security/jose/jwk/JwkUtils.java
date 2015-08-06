@@ -62,7 +62,7 @@ import org.apache.cxf.rs.security.jose.jwe.JweDecryptionProvider;
 import org.apache.cxf.rs.security.jose.jwe.JweEncryptionProvider;
 import org.apache.cxf.rs.security.jose.jwe.JweHeaders;
 import org.apache.cxf.rs.security.jose.jwe.JweUtils;
-import org.apache.cxf.rs.security.jose.jwe.KeyDecryptionAlgorithm;
+import org.apache.cxf.rs.security.jose.jwe.KeyDecryptionProvider;
 import org.apache.cxf.rs.security.jose.jwe.KeyEncryptionProvider;
 import org.apache.cxf.rs.security.jose.jwe.PbesHmacAesWrapKeyDecryptionAlgorithm;
 import org.apache.cxf.rs.security.jose.jwe.PbesHmacAesWrapKeyEncryptionAlgorithm;
@@ -486,7 +486,7 @@ public final class JwkUtils {
         return new AesCbcHmacJweEncryption(ContentAlgorithm.A128CBC_HS256, keyEncryption);
     }
     private static JweDecryptionProvider createDefaultDecryption(char[] password) {
-        KeyDecryptionAlgorithm keyDecryption = new PbesHmacAesWrapKeyDecryptionAlgorithm(password);
+        KeyDecryptionProvider keyDecryption = new PbesHmacAesWrapKeyDecryptionAlgorithm(password);
         return new AesCbcHmacJweDecryption(keyDecryption);
     }
     private static JsonWebKey prepareRSAJwk(BigInteger modulus, String algo) {

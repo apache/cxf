@@ -25,7 +25,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
 
-public class DirectKeyDecryptionAlgorithm implements KeyDecryptionAlgorithm {
+public class DirectKeyDecryptionAlgorithm implements KeyDecryptionProvider {
     private static final Logger LOG = LogUtils.getL7dLogger(DirectKeyDecryptionAlgorithm.class);
     private byte[] contentDecryptionKey;
     public DirectKeyDecryptionAlgorithm(Key contentDecryptionKey) {    

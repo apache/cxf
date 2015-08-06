@@ -34,10 +34,10 @@ import org.apache.cxf.rt.security.crypto.KeyProperties;
 public abstract class AbstractJweDecryption implements JweDecryptionProvider {
     protected static final Logger LOG = LogUtils.getL7dLogger(JwsUtils.class);
     
-    private KeyDecryptionAlgorithm keyDecryptionAlgo;
-    private ContentDecryptionAlgorithm contentDecryptionAlgo;
-    protected AbstractJweDecryption(KeyDecryptionAlgorithm keyDecryptionAlgo,
-                                    ContentDecryptionAlgorithm contentDecryptionAlgo) {
+    private KeyDecryptionProvider keyDecryptionAlgo;
+    private ContentDecryptionProvider contentDecryptionAlgo;
+    protected AbstractJweDecryption(KeyDecryptionProvider keyDecryptionAlgo,
+                                    ContentDecryptionProvider contentDecryptionAlgo) {
         this.keyDecryptionAlgo = keyDecryptionAlgo;
         this.contentDecryptionAlgo = contentDecryptionAlgo;
     }

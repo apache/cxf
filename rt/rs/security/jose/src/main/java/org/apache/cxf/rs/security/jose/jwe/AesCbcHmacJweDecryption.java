@@ -28,10 +28,10 @@ import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
 
 public class AesCbcHmacJweDecryption extends JweDecryption {
     private String supportedAlgo;
-    public AesCbcHmacJweDecryption(KeyDecryptionAlgorithm keyDecryptionAlgo) {
+    public AesCbcHmacJweDecryption(KeyDecryptionProvider keyDecryptionAlgo) {
         this(keyDecryptionAlgo, null);
     }
-    public AesCbcHmacJweDecryption(KeyDecryptionAlgorithm keyDecryptionAlgo,
+    public AesCbcHmacJweDecryption(KeyDecryptionProvider keyDecryptionAlgo,
                                    ContentAlgorithm supportedAlgo) {
         super(keyDecryptionAlgo, new AesCbcContentDecryptionAlgorithm(supportedAlgo));
         this.supportedAlgo = supportedAlgo == null ? null : supportedAlgo.getJwaName();
@@ -63,7 +63,7 @@ public class AesCbcHmacJweDecryption extends JweDecryption {
         
     }
     private static class AesCbcContentDecryptionAlgorithm extends AbstractContentEncryptionCipherProperties
-        implements ContentDecryptionAlgorithm {
+        implements ContentDecryptionProvider {
         public AesCbcContentDecryptionAlgorithm(ContentAlgorithm supportedAlgo) {
             super(supportedAlgo);
         }

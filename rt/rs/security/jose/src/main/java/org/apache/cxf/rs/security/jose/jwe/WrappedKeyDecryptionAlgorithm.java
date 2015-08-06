@@ -28,7 +28,7 @@ import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
 import org.apache.cxf.rt.security.crypto.KeyProperties;
 
-public class WrappedKeyDecryptionAlgorithm implements KeyDecryptionAlgorithm {
+public class WrappedKeyDecryptionAlgorithm implements KeyDecryptionProvider {
     protected static final Logger LOG = LogUtils.getL7dLogger(WrappedKeyDecryptionAlgorithm.class);
     private Key cekDecryptionKey;
     private boolean unwrap;
