@@ -875,12 +875,23 @@ public class ProviderFactoryTest extends Assert {
     private static class SecurityExceptionMapper 
         extends AbstractBadRequestExceptionMapper<SecurityException> {
     }
+    private static class CustomWebApplicationExceptionMapper 
+        extends AbstractBadRequestExceptionMapper<WebApplicationException> {
+    }
     private abstract static class AbstractBadRequestExceptionMapper<T extends Throwable> 
         implements ExceptionMapper<T> {
         @Override
         public Response toResponse(T exception) {
             return Response.status(Status.BAD_REQUEST).entity(exception.getMessage()).build();
         }
+    }
+    @Test
+    public void testWebApplicationMapperWithGenerics() throws Exception {
+        ServerProviderFactory pf = ServerProviderFactory.getInstance();
+        CustomWebApplicationExceptionMapper mapper = new CustomWebApplicationExceptionMapper();
+        pf.registerUserProvider(mapper);
+        Object mapperResponse = pf.createExceptionMapper(WebApplicationException.class, new MessageImpl());
+        assertSame(mapperResponse, mapper);
     }
     
     @Test
