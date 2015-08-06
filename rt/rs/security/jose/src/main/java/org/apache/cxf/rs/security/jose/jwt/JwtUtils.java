@@ -42,7 +42,7 @@ public final class JwtUtils {
         Long expiryTimeInSecs = claims.getExpiryTime();
         if (expiryTimeInSecs == null && claimsRequired 
             || expiryTimeInSecs != null && currentTimeInSecs > expiryTimeInSecs) {
-            throw new SecurityException("The token expired");
+            throw new JwtException("The token expired");
         }
         Long issuedAtInSecs = claims.getIssuedAt();
         if (clockOffset <= 0) {
@@ -51,7 +51,7 @@ public final class JwtUtils {
         if (issuedAtInSecs == null && claimsRequired 
             || issuedAtInSecs != null && (issuedAtInSecs - clockOffset > currentTimeInSecs || issuedAtRange > 0
             && issuedAtInSecs < currentTimeInSecs - issuedAtRange)) {
-            throw new SecurityException("Invalid issuedAt");
+            throw new JwtException("Invalid issuedAt");
         }
     }
     

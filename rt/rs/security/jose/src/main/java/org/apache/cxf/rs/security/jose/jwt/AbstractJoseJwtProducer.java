@@ -20,7 +20,6 @@ package org.apache.cxf.rs.security.jose.jwt;
 
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.rs.security.jose.AbstractJoseProducer;
-import org.apache.cxf.rs.security.jose.JoseException;
 import org.apache.cxf.rs.security.jose.jwe.JweEncryptionProvider;
 import org.apache.cxf.rs.security.jose.jwe.JweJwtCompactProducer;
 import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactProducer;
@@ -32,7 +31,7 @@ public abstract class AbstractJoseJwtProducer extends AbstractJoseProducer {
     
     protected String processJwt(JwtToken jwt) {
         if (!isJwsRequired() && !isJweRequired()) {
-            throw new JoseException("Unable to secure JWT");
+            throw new JwtException("Unable to secure JWT");
         }
         String data = null;
         JweEncryptionProvider theEncProvider = getInitializedEncryptionProvider(isJweRequired());
