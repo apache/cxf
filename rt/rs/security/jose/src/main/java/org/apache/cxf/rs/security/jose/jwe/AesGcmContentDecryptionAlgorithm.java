@@ -24,7 +24,7 @@ import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
 
 
 public class AesGcmContentDecryptionAlgorithm extends AbstractContentEncryptionCipherProperties
-    implements ContentDecryptionAlgorithm {
+    implements ContentDecryptionProvider {
     public AesGcmContentDecryptionAlgorithm(ContentAlgorithm supportedAlgo) {
         super(supportedAlgo);
     }

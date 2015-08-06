@@ -21,7 +21,7 @@ package org.apache.cxf.rs.security.jose.jwe;
 import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 
 
-public interface KeyDecryptionAlgorithm {
+public interface KeyDecryptionProvider {
     KeyAlgorithm getAlgorithm();
     byte[] getDecryptedContentEncryptionKey(JweDecryptionInput jweDecryptionInput);
 }

@@ -21,11 +21,11 @@ package org.apache.cxf.rs.security.jose.jwe;
 
 
 public class DirectKeyJweDecryption extends JweDecryption {
-    public DirectKeyJweDecryption(String encodedKey, ContentDecryptionAlgorithm ctAlgo) {
+    public DirectKeyJweDecryption(String encodedKey, ContentDecryptionProvider ctAlgo) {
         super(new DirectKeyDecryptionAlgorithm(encodedKey), 
               ctAlgo);
     }
-    public DirectKeyJweDecryption(byte[] key, ContentDecryptionAlgorithm ctAlgo) {
+    public DirectKeyJweDecryption(byte[] key, ContentDecryptionProvider ctAlgo) {
         super(new DirectKeyDecryptionAlgorithm(key), 
               ctAlgo);
     }

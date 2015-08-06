@@ -156,7 +156,7 @@ public class JweCompactReaderWriterTest extends Assert {
         
         RSAPrivateKey privateKey = CryptoUtils.getRSAPrivateKey(RSA_MODULUS_ENCODED_A1, 
                                                                 RSA_PRIVATE_EXPONENT_ENCODED_A1);
-        KeyDecryptionAlgorithm keyDecryption = new RSAKeyDecryptionAlgorithm(privateKey,
+        KeyDecryptionProvider keyDecryption = new RSAKeyDecryptionAlgorithm(privateKey,
                                                                              KeyAlgorithm.RSA1_5);
         JweDecryptionProvider decryption = new AesCbcHmacJweDecryption(keyDecryption);
         String decryptedText = decryption.decrypt(jweContent).getContentText();
