@@ -29,6 +29,8 @@ import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.service.model.BindingOperationInfo;
+import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.ContextUtils;
@@ -41,6 +43,7 @@ import org.apache.cxf.ws.rm.v200502.Expires;
 import org.apache.cxf.ws.rm.v200502.Identifier;
 import org.apache.cxf.ws.rm.v200502.OfferType;
 import org.apache.cxf.ws.rm.v200502.TerminateSequenceType;
+import org.apache.cxf.ws.rm.v200702.CloseSequenceType;
 import org.apache.cxf.ws.rm.v200702.TerminateSequenceResponseType;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
@@ -277,6 +280,38 @@ public class ServantTest extends Assert {
         return message;
     }
 
+    private static Message createTestCloseSequenceMessage(String sidstr) {
+        Message message = new MessageImpl();
+        Exchange exchange = new ExchangeImpl();
+        exchange.setInMessage(message);
+
+        message.put(Message.REQUESTOR_ROLE, Boolean.FALSE);
+        
+        AddressingProperties maps = new AddressingProperties();
+        String msgId = "urn:uuid:12345-" + Math.random();
+        AttributedURIType id = ContextUtils.getAttributedURI(msgId);
+        maps.setMessageID(id);
+
+        maps.setAction(ContextUtils.getAttributedURI(RM10Constants.INSTANCE.getTerminateSequenceAction()));
+        maps.setTo(ContextUtils.getAttributedURI(SERVICE_URL));
+
+        maps.setReplyTo(RMUtils.createReference(DECOUPLED_URL));
+        
+        message.put(JAXWSAConstants.ADDRESSING_PROPERTIES_INBOUND, maps);
+
+        CloseSequenceType cs = new CloseSequenceType();
+        org.apache.cxf.ws.rm.v200702.Identifier sid = new  org.apache.cxf.ws.rm.v200702.Identifier();
+        sid.setValue(sidstr);
+        cs.setIdentifier(sid);
+        MessageContentsList contents = new MessageContentsList();
+        contents.add(cs);
+        message.setContent(List.class, contents);
+
+        RMContextUtils.setProtocolVariation(message, ProtocolVariation.RM11WSA200508);
+        
+        return message;
+    }
+
     private void verifyTerminateSequenceDefault(Servant servant, RMManager manager, 
                                                 String sidstr, ProtocolVariation protocol) throws SequenceFault {
         DestinationPolicyType dp = RMMANGER_FACTORY.createDestinationPolicyType();
@@ -302,5 +337,47 @@ public class ServantTest extends Assert {
         
     }
 
+    @Test
+    public void testInvokeForCloseSequence() {
+        RMEndpoint rme = control.createMock(RMEndpoint.class);
+        RMManager manager = new RMManager();
+        Destination destination = new Destination(rme);
+        Source source = new Source(rme);
+        DestinationSequence seq = control.createMock(DestinationSequence.class);
+        org.apache.cxf.ws.rm.v200702.Identifier sid = new org.apache.cxf.ws.rm.v200702.Identifier();
+        sid.setValue("123");
+        EasyMock.expect(seq.getIdentifier()).andReturn(sid).anyTimes();
+        
+        EasyMock.expect(rme.getDestination()).andReturn(destination).anyTimes();
+        EasyMock.expect(rme.getManager()).andReturn(manager).anyTimes();
+        EasyMock.expect(rme.getSource()).andReturn(source).anyTimes();
+        Message message = createTestCloseSequenceMessage(sid.getValue());
+        
+        BindingOperationInfo boi = control.createMock(BindingOperationInfo.class);
+        OperationInfo oi = control.createMock(OperationInfo.class);
+        EasyMock.expect(boi.getOperationInfo()).andReturn(oi).anyTimes();
+        EasyMock.expect(oi.getName()).andReturn(RM11Constants.INSTANCE.getCloseSequenceOperationName()).anyTimes();
+        message.getExchange().put(BindingOperationInfo.class, boi);
+        
+        control.replay();
+        
+        TestServant servant = new TestServant(rme);
 
+        servant.invoke(message.getExchange(), message.getContent(List.class).get(0));
+        assertTrue(servant.called);
+    }
+    
+    private static class TestServant extends Servant {
+        boolean called;
+
+        TestServant(RMEndpoint rme) {
+            super(rme);
+        }
+
+        @Override
+        public Object closeSequence(Message message) {
+            called = true;
+            return null;
+        }
+    }
 }
