@@ -112,15 +112,19 @@ public class JsonWebKeys extends JsonMapObject {
         return map;
     }
     public List<JsonWebKey> getKeys(String keyType) {
-        return getKeyTypeMap().get(keyType);
+        KeyType kt = KeyType.getKeyType(keyType);
+        if (kt == null) {
+            return null;
+        }
+        return getKeyTypeMap().get(kt);
     }
     public List<JsonWebKey> getRsaKeys() {
-        return getKeyTypeMap().get(JsonWebKey.KEY_TYPE_RSA);
+        return getKeyTypeMap().get(KeyType.RSA);
     }
     public List<JsonWebKey> getEllipticKeys() {
-        return getKeyTypeMap().get(JsonWebKey.KEY_TYPE_ELLIPTIC);
+        return getKeyTypeMap().get(KeyType.EC);
     }
     public List<JsonWebKey> getSecretKeys() {
-        return getKeyTypeMap().get(JsonWebKey.KEY_TYPE_OCTET);
+        return getKeyTypeMap().get(KeyType.OCTET);
     }
 }
