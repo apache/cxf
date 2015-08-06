@@ -26,7 +26,7 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.provider.json.JsonMapObject;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 
-public class JoseHeaders extends JsonMapObject {
+public abstract class JoseHeaders extends JsonMapObject {
     public JoseHeaders() {
     }
     
