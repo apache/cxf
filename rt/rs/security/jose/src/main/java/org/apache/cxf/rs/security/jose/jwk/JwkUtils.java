@@ -512,7 +512,7 @@ public final class JwkUtils {
     }
     public static void setPublicKeyInfo(JsonWebKey jwk, JoseHeaders headers, String algo,
                                         boolean reportPublicKey, boolean reportPublicKeyId) {
-        if (reportPublicKey && JsonWebKey.KEY_TYPE_RSA.equals(jwk.getKeyType())) {
+        if (reportPublicKey && KeyType.RSA.equals(jwk.getKeyType())) {
             List<String> chain = CastUtils.cast((List<?>)jwk.getProperty("x5c"));
             //TODO: if needed the chain can be reported as part of a 'jwk' property
             if (chain != null) {
