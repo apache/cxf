@@ -26,7 +26,7 @@ public class JwtToken {
     private JoseHeaders headers;
     private JwtClaims claims;
     public JwtToken(JwtClaims claims) {
-        this(new JoseHeaders(), claims);
+        this(new JoseHeaders() { }, claims);
     }
     public JwtToken(JoseHeaders headers, JwtClaims claims) {
         this.headers = headers;
