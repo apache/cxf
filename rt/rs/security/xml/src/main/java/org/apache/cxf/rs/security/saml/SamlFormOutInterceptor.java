@@ -34,6 +34,7 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
+import org.apache.cxf.phase.Phase;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.util.DOM2Writer;
 
@@ -41,6 +42,14 @@ public class SamlFormOutInterceptor extends AbstractSamlOutInterceptor {
     private static final Logger LOG = 
         LogUtils.getL7dLogger(SamlFormOutInterceptor.class);
     private static final String SAML_ELEMENT = "SAMLToken";
+    
+    public SamlFormOutInterceptor() {
+        this(Phase.WRITE);
+    }
+    
+    public SamlFormOutInterceptor(String phase) {
+        super(phase);
+    }
     
     public void handleMessage(Message message) throws Fault {
         Form form = getRequestForm(message);

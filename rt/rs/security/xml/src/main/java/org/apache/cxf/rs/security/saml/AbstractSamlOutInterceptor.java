@@ -26,7 +26,6 @@ import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
-import org.apache.cxf.phase.Phase;
 import org.apache.wss4j.common.crypto.WSProviderConfig;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 
@@ -38,10 +37,10 @@ public abstract class AbstractSamlOutInterceptor extends AbstractPhaseIntercepto
     
     private boolean useDeflateEncoding = true;
     
-    protected AbstractSamlOutInterceptor() {
-        super(Phase.WRITE);
-    } 
-
+    protected AbstractSamlOutInterceptor(String phase) {
+        super(phase);
+    }
+    
     public void setUseDeflateEncoding(boolean deflate) {
         useDeflateEncoding = deflate;
     }
