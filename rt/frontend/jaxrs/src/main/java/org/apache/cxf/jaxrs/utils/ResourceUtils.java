@@ -291,6 +291,8 @@ public final class ResourceUtils {
     private static void evaluateResourceClass(ClassResourceInfo cri, boolean enableStatic) {
         MethodDispatcher md = new MethodDispatcher();
         Class<?> serviceClass = cri.getServiceClass();
+        
+        boolean isFineLevelLoggable = LOG.isLoggable(Level.FINE);
         for (Method m : serviceClass.getMethods()) {
             
             Method annotatedMethod = AnnotationUtils.getAnnotatedMethod(serviceClass, m);
@@ -317,6 +319,11 @@ public final class ResourceUtils {
                         }
                     }
                 }
+            } else if (isFineLevelLoggable) {
+                LOG.fine(new org.apache.cxf.common.i18n.Message("NOT_RESOURCE_METHOD", 
+                                                                 BUNDLE, 
+                                                                 m.getDeclaringClass().getName(),
+                                                                 m.getName()).toString());
             }
         }
         cri.setMethodDispatcher(md);
