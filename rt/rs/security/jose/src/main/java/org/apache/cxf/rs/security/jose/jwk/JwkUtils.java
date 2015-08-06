@@ -278,11 +278,11 @@ public final class JwkUtils {
             try {
                 InputStream is = ResourceUtils.getResourceStream(keyStoreLoc, bus);
                 if (is == null) {
-                    throw new SecurityException("Error in loading keystore location: " + keyStoreLoc);
+                    throw new JwkException("Error in loading keystore location: " + keyStoreLoc);
                 }
                 keyContent = IOUtils.readStringFromStream(is);
             } catch (Exception ex) {
-                throw new SecurityException(ex);
+                throw new JwkException(ex);
             }
         } else {
             keyContent = props.getProperty(RSSEC_KEY_STORE_JWKSET);
@@ -469,7 +469,7 @@ public final class JwkUtils {
     }
     public static JsonWebKey fromSecretKey(SecretKey secretKey, String algo) {
         if (!AlgorithmUtils.isOctet(algo)) {
-            throw new SecurityException("Invalid algorithm");
+            throw new JwkException("Invalid algorithm");
         }
         JsonWebKey jwk = new JsonWebKey();
         jwk.setKeyType(KeyType.OCTET);
@@ -491,7 +491,7 @@ public final class JwkUtils {
     }
     private static JsonWebKey prepareRSAJwk(BigInteger modulus, String algo) {
         if (!AlgorithmUtils.isRsa(algo)) {
-            throw new SecurityException("Invalid algorithm");
+            throw new JwkException("Invalid algorithm");
         }
         JsonWebKey jwk = new JsonWebKey();
         jwk.setKeyType(KeyType.RSA);

@@ -19,7 +19,6 @@
 package org.apache.cxf.rs.security.jose.jwt;
 
 import org.apache.cxf.rs.security.jose.AbstractJoseConsumer;
-import org.apache.cxf.rs.security.jose.JoseException;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionProvider;
 import org.apache.cxf.rs.security.jose.jwe.JweJwtCompactConsumer;
 import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactConsumer;
@@ -31,7 +30,7 @@ public abstract class AbstractJoseJwtConsumer extends AbstractJoseConsumer {
     
     protected JwtToken getJwtToken(String wrappedJwtToken) {
         if (!isJwsRequired() && !isJweRequired()) {
-            throw new JoseException("Unable to process JWT");
+            throw new JwtException("Unable to process JWT");
         }
         JweDecryptionProvider jweDecryptor = getInitializedDecryptionProvider(isJweRequired());
         if (jweDecryptor != null) {
@@ -45,7 +44,7 @@ public abstract class AbstractJoseJwtConsumer extends AbstractJoseConsumer {
         JwtToken jwt = jwtConsumer.getJwtToken();
         JwsSignatureVerifier theSigVerifier = getInitializedSignatureVerifier(jwt);
         if (!jwtConsumer.verifySignatureWith(theSigVerifier)) {
-            throw new SecurityException("Invalid Signature");
+            throw new JwtException("Invalid Signature");
         }
         validateToken(jwt);
         return jwt; 
