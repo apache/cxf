@@ -929,6 +929,10 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
             Attachments attachments = parts.getAttachments();
             if (attachments != null) {
                 SecurePart securePart = new SecurePart("cid:Attachments", Modifier.Element);
+                if (MessageUtils.getContextualBoolean(
+                    message, SecurityConstants.USE_ATTACHMENT_ENCRYPTION_CONTENT_ONLY_TRANSFORM, false)) {
+                    securePart.setModifier(Modifier.Content);
+                }
                 securePart.setRequired(false);
                 encryptedParts.add(securePart);
             }

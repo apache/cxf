@@ -172,7 +172,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
     protected Element topDownElement;
     protected Element bstElement;
     protected Element lastEncryptedKeyElement;
-    
+
     protected final CallbackLookup callbackLookup;
     protected boolean storeBytesInAttachment;
     
@@ -1082,10 +1082,15 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                                                             "Header");
                 securedParts.add(wep);
             }
-            
+
             Attachments attachments = parts.getAttachments();
             if (attachments != null) {
-                WSEncryptionPart wep = new WSEncryptionPart("cid:Attachments", "Element");
+                String encModifier = "Element";
+                if (MessageUtils.getContextualBoolean(
+                    message, SecurityConstants.USE_ATTACHMENT_ENCRYPTION_CONTENT_ONLY_TRANSFORM, false)) {
+                    encModifier = "Content";
+                }
+                WSEncryptionPart wep = new WSEncryptionPart("cid:Attachments", encModifier);
                 securedParts.add(wep);
             }
         }
