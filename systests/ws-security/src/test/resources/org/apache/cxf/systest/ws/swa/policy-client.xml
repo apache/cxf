@@ -48,8 +48,8 @@
     
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSWAEncryptionContentPolicyPort" createdFromAPI="true">
          <jaxws:properties>
-            <entry key="security.encryption.properties" value="bob.properties"/>
-            <entry key="security.encryption.username" value="bob"/>
+            <entry key="ws-security.encryption.properties" value="bob.properties"/>
+            <entry key="ws-security.encryption.username" value="bob"/>
             <entry key="ws-security.swa.encryption.attachment.transform.content" value="true"/>
         </jaxws:properties>
     </jaxws:client>
