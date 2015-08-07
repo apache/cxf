@@ -98,7 +98,7 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
         boolean isApplicationMessage = !RMContextUtils.isRMProtocolMessage(action);
         boolean isPartialResponse = MessageUtils.isPartialResponse(msg);
         RMConstants constants = protocol.getConstants();
-        boolean isLastMessage = constants.getCloseSequenceAction().equals(action);
+        boolean isLastMessage = RM10Constants.CLOSE_SEQUENCE_ACTION.equals(action);
         
         if (isApplicationMessage && !isPartialResponse) {
             RetransmissionInterceptor ri = new RetransmissionInterceptor();
@@ -159,6 +159,7 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
 
                 // increase message number and store a sequence type object in
                 // context
+
                 seq.nextMessageNumber(inSeqId, inMessageNumber, isLastMessage);
                 
                 if (Boolean.TRUE.equals(msg.getContextualProperty(RMManager.WSRM_LAST_MESSAGE_PROPERTY))) {

@@ -47,6 +47,7 @@ import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.RelatesToType;
 import org.apache.cxf.ws.rm.manager.SourcePolicyType;
+import org.apache.cxf.ws.rm.v200702.CloseSequenceType;
 import org.apache.cxf.ws.rm.v200702.CreateSequenceResponseType;
 import org.apache.cxf.ws.rm.v200702.CreateSequenceType;
 import org.apache.cxf.ws.rm.v200702.Expires;
@@ -210,7 +211,14 @@ public class Proxy {
                 Collections.singletonMap(SourceSequence.class.getName(), 
                                          (Object)s));
 
-        invoke(oi, protocol, new Object[] {}, context);
+        if (constants instanceof RM11Constants) {
+            CloseSequenceType csr = new CloseSequenceType();
+            csr.setIdentifier(s.getIdentifier());
+            csr.setLastMsgNumber(s.getCurrentMessageNr());
+            invoke(oi, protocol, new Object[] {csr}, context);
+        } else {
+            invoke(oi, protocol, new Object[] {}, context);
+        }
     }
     
     void ackRequested(SourceSequence s) throws RMException {

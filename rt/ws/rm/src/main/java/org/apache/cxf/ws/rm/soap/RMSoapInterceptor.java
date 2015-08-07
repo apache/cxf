@@ -418,6 +418,9 @@ public class RMSoapInterceptor extends AbstractSoapInterceptor {
             isOneway = false;
         } else if (consts.getCloseSequenceAction().equals(action)) {
             boi = bi.getOperation(consts.getCloseSequenceOperationName()); 
+        } else if (RM11Constants.INSTANCE.getCloseSequenceResponseAction().equals(action)) {
+            boi = bi.getOperation(RM11Constants.INSTANCE.getCloseSequenceOperationName());
+            isOneway = false;
         }
         assert boi != null;
         exchange.put(BindingOperationInfo.class, boi);
@@ -433,7 +436,8 @@ public class RMSoapInterceptor extends AbstractSoapInterceptor {
         
         if (!consts.getCreateSequenceResponseAction().equals(action)
             && !consts.getSequenceAckAction().equals(action)
-            && !RM11Constants.INSTANCE.getTerminateSequenceResponseAction().equals(action)) {
+            && !RM11Constants.INSTANCE.getTerminateSequenceResponseAction().equals(action)
+            && !RM11Constants.INSTANCE.getCloseSequenceResponseAction().equals(action)) {
             LOG.fine("Changing requestor role from " + message.get(Message.REQUESTOR_ROLE)
                      + " to false");
             Object originalRequestorRole = message.get(Message.REQUESTOR_ROLE);
