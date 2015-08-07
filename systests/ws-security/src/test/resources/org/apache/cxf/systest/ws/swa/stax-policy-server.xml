@@ -62,6 +62,18 @@
         </jaxws:properties>
     </jaxws:endpoint>
     
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="EncryptionContentPolicy" 
+        address="http://localhost:${testutil.ports.swa.StaxPolicyServer}/DoubleItSWAEncryptionContentPolicy" 
+        serviceName="s:DoubleItService" endpointName="s:DoubleItSWAEncryptionContentPolicyPort" 
+        implementor="org.apache.cxf.systest.ws.swa.DoubleIt3Impl" 
+        wsdlLocation="org/apache/cxf/systest/ws/swa/DoubleItSwa.wsdl">
+        <jaxws:properties>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+            <entry key="security.signature.properties" value="bob.properties"/>
+            <entry key="ws-security.enable.streaming" value="true"/>
+        </jaxws:properties>
+    </jaxws:endpoint>
+    
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="CombinedPolicy" 
         address="http://localhost:${testutil.ports.swa.StaxPolicyServer}/DoubleItSWACombinedPolicy" 
         serviceName="s:DoubleItService" endpointName="s:DoubleItSWACombinedPolicyPort" 

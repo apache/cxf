@@ -252,6 +252,15 @@ public final class SecurityConstants {
      * skipped. MTOM must be enabled for this to work. This only applies to the DOM WS-Security stack.
      */
     public static final String STORE_BYTES_IN_ATTACHMENT = "ws-security.store.bytes.in.attachment";
+    
+    /**
+     * This configuration flag allows the user to decide whether the default Attachment-Complete 
+     * transform or the Attachment-Content-Only transform should be used when an Attachment is encrypted 
+     * via a WS-SecurityPolicy expression. The default is "false", meaning that the "complete" 
+     * transformation is used.
+     */
+    public static final String USE_ATTACHMENT_ENCRYPTION_CONTENT_ONLY_TRANSFORM = 
+        "ws-security.swa.encryption.attachment.transform.content";
 
     //
     // Non-boolean WS-Security Configuration parameters
@@ -373,7 +382,7 @@ public final class SecurityConstants {
      */
     public static final String ASYMMETRIC_SIGNATURE_ALGORITHM = 
         "ws-security.asymmetric.signature.algorithm";
-    
+
     /**
      * This holds a reference to a PasswordEncryptor instance, which is used to encrypt or 
      * decrypt passwords in the Merlin Crypto implementation (or any custom Crypto implementations).
@@ -657,8 +666,13 @@ public final class SecurityConstants {
             CACHE_IDENTIFIER, CACHE_ISSUED_TOKEN_IN_ENDPOINT, PREFER_WSMEX_OVER_STS_CLIENT_CONFIG,
             DELEGATED_CREDENTIAL, KERBEROS_USE_CREDENTIAL_DELEGATION, 
             KERBEROS_IS_USERNAME_IN_SERVICENAME_FORM, STS_TOKEN_IMMINENT_EXPIRY_VALUE,
+<<<<<<< HEAD
             KERBEROS_REQUEST_CREDENTIAL_DELEGATION, ENABLE_UNSIGNED_SAML_ASSERTION_PRINCIPAL,
             AUDIENCE_RESTRICTION_VALIDATION, STORE_BYTES_IN_ATTACHMENT
+=======
+            KERBEROS_REQUEST_CREDENTIAL_DELEGATION, POLICY_VALIDATOR_MAP,
+            STORE_BYTES_IN_ATTACHMENT, USE_ATTACHMENT_ENCRYPTION_CONTENT_ONLY_TRANSFORM
+>>>>>>> eafa719... [CXF-6525] - Support for http://docs.oasis-open.org/wss/oasis-wss-SwAProfile-1.1#Attachment-Content-Only when using WSS-Policy. Thanks to Christian Koch for the patch. Tests added.
         }));
         ALL_PROPERTIES = Collections.unmodifiableSet(s);
     }

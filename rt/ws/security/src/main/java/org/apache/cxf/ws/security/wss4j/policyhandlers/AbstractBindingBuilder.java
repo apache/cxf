@@ -169,7 +169,12 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
     protected Element topDownElement;
     protected Element bstElement;
     protected Element lastEncryptedKeyElement;
+<<<<<<< HEAD
     
+=======
+
+    protected final CallbackLookup callbackLookup;
+>>>>>>> eafa719... [CXF-6525] - Support for http://docs.oasis-open.org/wss/oasis-wss-SwAProfile-1.1#Attachment-Content-Only when using WSS-Policy. Thanks to Christian Koch for the patch. Tests added.
     protected boolean storeBytesInAttachment;
     
     private Element lastSupportingTokenElement;
@@ -1087,11 +1092,21 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                                                             "Header");
                 signedParts.add(wep);
             }
-            
+
             Attachments attachments = parts.getAttachments();
             if (attachments != null) {
+<<<<<<< HEAD
                 WSEncryptionPart wep = new WSEncryptionPart("cid:Attachments", "Element");
                 signedParts.add(wep);
+=======
+                String encModifier = "Element";
+                if (MessageUtils.getContextualBoolean(
+                    message, SecurityConstants.USE_ATTACHMENT_ENCRYPTION_CONTENT_ONLY_TRANSFORM, false)) {
+                    encModifier = "Content";
+                }
+                WSEncryptionPart wep = new WSEncryptionPart("cid:Attachments", encModifier);
+                securedParts.add(wep);
+>>>>>>> eafa719... [CXF-6525] - Support for http://docs.oasis-open.org/wss/oasis-wss-SwAProfile-1.1#Attachment-Content-Only when using WSS-Policy. Thanks to Christian Koch for the patch. Tests added.
             }
         }
     

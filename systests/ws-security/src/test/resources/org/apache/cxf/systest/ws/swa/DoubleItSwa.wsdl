@@ -214,6 +214,9 @@
         <wsdl:port name="DoubleItSWAEncryptionPolicyPort" binding="tns:DoubleItEncryptionBinding">
             <soap:address location="http://localhost:9001/DoubleItSWAEncryptionPolicy"/>
         </wsdl:port>
+        <wsdl:port name="DoubleItSWAEncryptionContentPolicyPort" binding="tns:DoubleItEncryptionBinding">
+            <soap:address location="http://localhost:9001/DoubleItSWAEncryptionContentPolicy"/>
+        </wsdl:port>
         <wsdl:port name="DoubleItSWACombinedPolicyPort" binding="tns:DoubleItCombinedBinding">
             <soap:address location="http://localhost:9001/DoubleItSWACombinedPolicy"/>
         </wsdl:port>
