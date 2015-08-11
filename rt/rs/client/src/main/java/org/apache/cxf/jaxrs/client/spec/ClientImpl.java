@@ -39,7 +39,6 @@ import javax.ws.rs.core.Link;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 
-import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.jaxrs.client.ClientConfiguration;
 import org.apache.cxf.jaxrs.client.ClientProviderFactory;
@@ -54,6 +53,7 @@ public class ClientImpl implements Client {
     private static final String HTTP_PROXY_SERVER_PROP = "http.proxy.server.uri";
     private static final String HTTP_PROXY_SERVER_PORT_PROP = "http.proxy.server.port";
     private static final String HTTP_AUTOREDIRECT_PROP = "http.autoredirect";
+    private static final String HTTP_RESPONSE_AUTOCLOSE_PROP = "http.response.stream.auto.close";
     
     private Configurable<Client> configImpl;
     private TLSConfiguration secConfig;
@@ -273,6 +273,12 @@ public class ClientImpl implements Client {
             clientCfg.getRequestContext().put(Client.class.getName(), ClientImpl.this);
             clientCfg.getRequestContext().put(Configuration.class.getName(), 
                                                                       getConfiguration());
+            
+            // Response auto-close
+            Boolean responseAutoClose = getBooleanValue(configProps.get(HTTP_RESPONSE_AUTOCLOSE_PROP));
+            if (responseAutoClose != null) {
+                clientCfg.getResponseContext().put("response.stream.auto.close", responseAutoClose);
+            }
             // TLS
             TLSClientParameters tlsParams = secConfig.getTlsClientParams();
             if (tlsParams.getSSLSocketFactory() != null 
@@ -305,9 +311,9 @@ public class ClientImpl implements Client {
             if (proxyServerPortValue != null) {
                 clientCfg.getHttpConduit().getClient().setProxyServerPort(proxyServerPortValue);
             }
-            Object autoRedirectValue = configProps.get(HTTP_AUTOREDIRECT_PROP);
-            if (PropertyUtils.isTrue(autoRedirectValue)) {
-                clientCfg.getHttpConduit().getClient().setAutoRedirect(true);
+            Boolean autoRedirectValue = getBooleanValue(configProps.get(HTTP_AUTOREDIRECT_PROP));
+            if (autoRedirectValue != null) {
+                clientCfg.getHttpConduit().getClient().setAutoRedirect(autoRedirectValue);
             }
         }
 
@@ -386,7 +392,7 @@ public class ClientImpl implements Client {
             checkNull(name, value);
             return newWebTarget(getUriBuilder().resolveTemplate(name, value, encodeSlash));
         }
-
+        
         @Override
         public WebTarget resolveTemplateFromEncoded(String name, Object value) {
             checkNull(name, value);
@@ -513,5 +519,8 @@ public class ClientImpl implements Client {
     }
     private static Integer getIntValue(Object o) {
         return o instanceof Integer ? (Integer)o : o instanceof String ? Integer.valueOf(o.toString()) : null;
+    }
+    private static Boolean getBooleanValue(Object o) {
+        return o instanceof Boolean ? (Boolean)o : o instanceof Boolean ? Boolean.valueOf(o.toString()) : null;
     }
 }
