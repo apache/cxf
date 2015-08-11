@@ -163,9 +163,8 @@ public abstract class AbstractSwaggerServiceDescriptionTest extends AbstractBusC
         try {
             final Response r = client.get();
             assertEquals(Status.OK.getStatusCode(), r.getStatus());
-            
+
             JSONAssert.assertEquals(
-                IOUtils.readStringFromStream((InputStream)r.getEntity()), 
                 Json.createObjectBuilder()
                     .add("apiVersion", "1.0.0")
                     .add("swaggerVersion", "1.2")
@@ -178,10 +177,11 @@ public abstract class AbstractSwaggerServiceDescriptionTest extends AbstractBusC
                     .add("info", Json.createObjectBuilder()
                         .add("title", "Sample REST Application")
                         .add("description", "The Application")
-                        .add("contact", "committer@apache.org")
+                        .add("contact", "users@cxf.apache.org")
                         .add("license", "Apache 2.0 License")
                         .add("licenseUrl", "http://www.apache.org/licenses/LICENSE-2.0.html")
-                    ).build().toString(), false);
+                    ).build().toString(), 
+                    IOUtils.readStringFromStream((InputStream)r.getEntity()), false);
         } finally {
             client.close();
         }
@@ -194,9 +194,8 @@ public abstract class AbstractSwaggerServiceDescriptionTest extends AbstractBusC
         try {
             final Response r = client.get();
             assertEquals(Status.OK.getStatusCode(), r.getStatus());
-                    
+
             JSONAssert.assertEquals(
-                IOUtils.readStringFromStream((InputStream)r.getEntity()), 
                 Json.createObjectBuilder()
                     .add("apiVersion", "1.0.0")
                     .add("swaggerVersion", "1.2")
@@ -211,7 +210,8 @@ public abstract class AbstractSwaggerServiceDescriptionTest extends AbstractBusC
                         .add(Json.createObjectBuilder()
                             .add("path", "/bookstore")
                             .add("operations", Json.createArrayBuilder().add(GET_METHOD_SPEC))))
-                    .add("models", BOOK_MODEL_SPEC).build().toString(), false);
+                    .add("models", BOOK_MODEL_SPEC).build().toString(), 
+                    IOUtils.readStringFromStream((InputStream)r.getEntity()), false);
         } finally {
             client.close();
         }

@@ -2,7 +2,7 @@
  "info":{"description":"The Application",
          "version":"1.0.0",
          "title":"Sample REST Application",
-         "contact":{"name":"committer@apache.org"},
+         "contact":{"name":"users@cxf.apache.org"},
          "license":{"name":"Apache 2.0 License",
                     "url":"http://www.apache.org/licenses/LICENSE-2.0.html"}},
  "host":"localhost",
