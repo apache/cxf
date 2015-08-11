@@ -33,7 +33,7 @@ abstract class AbstractSwaggerFeature extends AbstractFeature {
     private String basePath;
     private String title = "Sample REST Application";
     private String description = "The Application";
-    private String contact = "committer@apache.org";
+    private String contact = "users@cxf.apache.org";
     private String license = "Apache 2.0 License";
     private String licenseUrl = "http://www.apache.org/licenses/LICENSE-2.0.html";
     
