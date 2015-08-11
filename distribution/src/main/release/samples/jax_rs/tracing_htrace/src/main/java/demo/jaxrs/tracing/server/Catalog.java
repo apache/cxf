@@ -22,12 +22,12 @@ package demo.jaxrs.tracing.server;
 
 import java.io.IOException;
 import java.util.UUID;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import javax.json.Json;
-import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
@@ -37,6 +37,8 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -97,8 +99,14 @@ public class Catalog {
     
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public JsonArray getBooks() throws IOException {
-        return store.scan();
+    public void getBooks(@Suspended final AsyncResponse response) throws IOException {
+        executor.submit(new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                response.resume(store.scan());
+                return null;
+            }
+        });
     }
     
     @GET

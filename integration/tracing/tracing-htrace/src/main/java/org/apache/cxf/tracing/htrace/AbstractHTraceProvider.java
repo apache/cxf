@@ -18,10 +18,15 @@
  */
 package org.apache.cxf.tracing.htrace;
 
+import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.ws.rs.container.ResourceInfo;
+import javax.ws.rs.container.Suspended;
+import javax.ws.rs.core.Context;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
@@ -38,6 +43,7 @@ public abstract class AbstractHTraceProvider extends AbstractTracingProvider {
     protected static final String TRACE_SPAN = "org.apache.cxf.tracing.htrace.span";
         
     private final Sampler< ? > sampler;
+    @Context private ResourceInfo resourceInfo;
     
     public AbstractHTraceProvider(final Sampler< ? > sampler) {
         this.sampler = sampler;
@@ -54,15 +60,24 @@ public abstract class AbstractHTraceProvider extends AbstractTracingProvider {
         final long spanId = getFirstValueOrDefault(requestHeaders, getSpanIdHeader(), 
             Tracer.DONT_TRACE.spanId); 
         
+        TraceScope traceScope = null;
         if (traceId == Tracer.DONT_TRACE.traceId || spanId == Tracer.DONT_TRACE.spanId) {
-            return Trace.startSpan(path, (Sampler< TraceInfo >)sampler);
-        } 
+            traceScope = Trace.startSpan(path, (Sampler< TraceInfo >)sampler);
+        } else {
+            traceScope = Trace.startSpan(path, new MilliSpan
+                .Builder()
+                .spanId(spanId)
+                .traceId(traceId)
+                .build());
+        }
         
-        return Trace.startSpan(path, new MilliSpan
-            .Builder()
-            .spanId(spanId)
-            .traceId(traceId)
-            .build());
+        // If the JAX-RS resource is using asynchronous processing mode, the trace
+        // scope will be closed in another thread and as such should be detached.
+        if (isAsyncResponse()) {
+            traceScope.detach();
+        }
+        
+        return traceScope;
     }
     
     protected void stopTraceSpan(final Map<String, List<String>> requestHeaders,
@@ -78,8 +93,30 @@ public abstract class AbstractHTraceProvider extends AbstractTracingProvider {
         }
         
         if (span != null) {
-            span.close();
+            // If the JAX-RS resource is using asynchronous processing mode, the trace
+            // scope has been created in another thread and should be re-attached to the current 
+            // one.
+            if (span.isDetached()) {
+                final TraceScope continueSpan = Trace.continueSpan(span.getSpan()); 
+                continueSpan.close();
+            } else {            
+                span.close();
+            }
         }
+    }
+    
+    private boolean isAsyncResponse() {
+        if (resourceInfo != null) {
+            for (final Annotation[] annotations: resourceInfo.getResourceMethod().getParameterAnnotations()) {
+                for (final Annotation annotation: annotations) {
+                    if (annotation.annotationType().equals(Suspended.class)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        
+        return false;
     }
     
     private static Long getFirstValueOrDefault(final Map<String, List<String>> headers, 

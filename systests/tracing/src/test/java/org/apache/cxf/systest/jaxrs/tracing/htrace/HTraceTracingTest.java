@@ -160,6 +160,30 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
         assertTrue(r.getHeaders().containsKey(TracerHeaders.DEFAULT_HEADER_SPAN_ID));
     }
     
+    @Test
+    public void testThatNewInnerSpanIsCreatedUsingAsyncInvocation() {
+        final Response r = createWebClient("/bookstore/books/async")
+            .header(TracerHeaders.DEFAULT_HEADER_TRACE_ID, 10L)
+            .header(TracerHeaders.DEFAULT_HEADER_SPAN_ID, 20L)
+            .get();
+        assertEquals(Status.OK.getStatusCode(), r.getStatus());
+        
+        assertThat(TestSpanReceiver.getAllSpans().size(), equalTo(1));
+        assertThat(TestSpanReceiver.getAllSpans().get(0).getDescription(), equalTo("bookstore/books/async"));
+        
+        assertThat((String)r.getHeaders().getFirst(TracerHeaders.DEFAULT_HEADER_TRACE_ID), equalTo("10"));
+        assertThat((String)r.getHeaders().getFirst(TracerHeaders.DEFAULT_HEADER_SPAN_ID), equalTo("20"));
+    }
+    
+    @Test
+    public void testThatNewSpanIsCreatedUsingAsyncInvocation() {
+        final Response r = createWebClient("/bookstore/books/async").get();
+        assertEquals(Status.OK.getStatusCode(), r.getStatus());
+        
+        assertThat(TestSpanReceiver.getAllSpans().size(), equalTo(1));
+        assertThat(TestSpanReceiver.getAllSpans().get(0).getDescription(), equalTo("bookstore/books/async"));
+    }
+    
     protected WebClient createWebClient(final String url, final Object ... providers) {
         return WebClient
             .create("http://localhost:" + PORT + url, Arrays.asList(providers))

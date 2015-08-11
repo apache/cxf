@@ -29,6 +29,8 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -52,6 +54,30 @@ public class BookStore {
                 new Book("Mastering Apache CXF", UUID.randomUUID().toString())
             );
         }
+    }
+    
+    @GET
+    @Path("/books/async")
+    @Produces(MediaType.APPLICATION_JSON)
+    public void getBooksAsync(@Suspended final AsyncResponse response) {
+        executor.submit(
+            tracer.wrap("Processing books", new Traceable<Void>() {
+                @Override
+                public Void call(final TracerContext context) throws Exception {
+                    // Simulate some running job 
+                    Thread.sleep(100);
+                    
+                    response.resume(
+                        Arrays.asList(
+                            new Book("Apache CXF in Action", UUID.randomUUID().toString()),
+                            new Book("Mastering Apache CXF", UUID.randomUUID().toString())
+                        )
+                    );
+                    
+                    return null;
+                }
+            })
+        );
     }
     
     @GET
