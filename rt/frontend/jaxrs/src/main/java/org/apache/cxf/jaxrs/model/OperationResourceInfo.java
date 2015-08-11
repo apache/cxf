@@ -30,6 +30,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.Encoded;
 import javax.ws.rs.Produces;
+import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.cxf.jaxrs.ext.Oneway;
@@ -48,7 +49,8 @@ public class OperationResourceInfo {
     private boolean encoded;
     private String defaultParamValue;
     private List<Parameter> parameters;
-    private boolean oneway; 
+    private boolean oneway;
+    private boolean async;
     private Set<String> nameBindings = new LinkedHashSet<String>();
     private Class<?>[] actualInParamTypes;
     private Type[] actualInGenericParamTypes;
@@ -70,6 +72,7 @@ public class OperationResourceInfo {
         this.defaultParamValue = ori.defaultParamValue;
         this.parameters = ori.parameters;
         this.oneway = ori.oneway;
+        this.async = ori.async;
         this.classResourceInfo = cri;
         this.nameBindings = ori.nameBindings;
         initActualMethodProperties();
@@ -87,6 +90,7 @@ public class OperationResourceInfo {
         checkEncoded();
         checkDefaultParameterValue();
         checkOneway();
+        checkSuspended();
         initActualMethodProperties();
     }
     
@@ -154,9 +158,22 @@ public class OperationResourceInfo {
             oneway = AnnotationUtils.getAnnotation(annotatedMethod.getAnnotations(), Oneway.class) != null;
         }
     }
+    private void checkSuspended() {
+        if (annotatedMethod != null) {
+            for (Annotation[] anns : annotatedMethod.getParameterAnnotations()) {
+                if (AnnotationUtils.getAnnotation(anns, Suspended.class) != null) {
+                    async = true;
+                    break;
+                }
+            }
+        }
+    }
 
     public boolean isOneway() {
         return oneway;
+    }
+    public boolean isAsync() {
+        return async;
     }
     
     public List<Parameter> getParameters() {
