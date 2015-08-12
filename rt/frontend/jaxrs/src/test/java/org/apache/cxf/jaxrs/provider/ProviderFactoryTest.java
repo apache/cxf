@@ -133,6 +133,36 @@ public class ProviderFactoryTest extends Assert {
         Object lastReader = readers.get(7).getProvider();
         assertTrue(lastReader instanceof StringTextProvider);
     }
+    @Test
+    public void testCustomProviderSorting2() {
+        ProviderFactory pf = ServerProviderFactory.getInstance();
+        Comparator<Object> comp = new Comparator<Object>() {
+
+            @Override
+            public int compare(Object provider1, Object provider2) {
+                if (provider1 instanceof StringTextProvider) {
+                    return 1;
+                } else if (provider2 instanceof StringTextProvider) {
+                    return -1;
+                } else {
+                    return 0;
+                }
+            }    
+        
+        };
+        pf.setProviderComparator(comp);
+        
+        // writers
+        List<ProviderInfo<MessageBodyWriter<?>>> writers = pf.getMessageWriters();
+        assertEquals(8, writers.size());
+        Object lastWriter = writers.get(7).getProvider();
+        assertTrue(lastWriter instanceof StringTextProvider);
+        //readers
+        List<ProviderInfo<MessageBodyReader<?>>> readers = pf.getMessageReaders();
+        assertEquals(8, readers.size());
+        Object lastReader = readers.get(7).getProvider();
+        assertTrue(lastReader instanceof StringTextProvider);
+    }
     @SuppressWarnings("rawtypes")
     @Test
     public void testCustomProviderSortingMBROnly() {

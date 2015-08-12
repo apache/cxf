@@ -593,16 +593,24 @@ public abstract class ProviderFactory {
                         return true;
                     }
                 }
+            } else if (type == Object.class) {
+                return true;
             }
         }
         return false;
     }
     
+    @SuppressWarnings("unchecked")
     private <T> void doCustomSort(List<?> listOfProviders) {
-        @SuppressWarnings("unchecked")
+        Comparator<?> theProviderComparator = providerComparator;
+        Type type = ((ParameterizedType)providerComparator.getClass()
+            .getGenericInterfaces()[0]).getActualTypeArguments()[0];
+        if (type == Object.class) {
+            theProviderComparator = 
+                (Comparator<?>)(new ProviderInfoClassComparator((Comparator<Object>)theProviderComparator));
+        }
         List<T> theProviders = (List<T>)listOfProviders;
-        @SuppressWarnings("unchecked")
-        Comparator<? super T> theComparator = (Comparator<? super T>)providerComparator;
+        Comparator<? super T> theComparator = (Comparator<? super T>)theProviderComparator;
         Collections.sort((List<T>)theProviders, theComparator);
     }
     
@@ -876,14 +884,20 @@ public abstract class ProviderFactory {
             return compareClasses(expectedCls, em1, em2);
         }
     }
+    
     public static class ProviderInfoClassComparator implements Comparator<ProviderInfo<?>> {
-        private ClassComparator comp;
+        private Comparator<Object> comp;
+        private boolean defaultComp;
         public ProviderInfoClassComparator(Class<?> expectedCls) {
             this.comp = new ClassComparator(expectedCls);
+            this.defaultComp = true;
+        }
+        public ProviderInfoClassComparator(Comparator<Object> comp) {
+            this.comp = comp;
         }
         public int compare(ProviderInfo<?> p1, ProviderInfo<?> p2) {
             int result = comp.compare(p1.getProvider(), p2.getProvider());
-            if (result == 0) {
+            if (result == 0 && defaultComp) {
                 result = compareCustomStatus(p1, p2);
             }
             return result;
@@ -1210,4 +1224,5 @@ public abstract class ProviderFactory {
         sortReaders();
         sortWriters();
     }
+    
 }
