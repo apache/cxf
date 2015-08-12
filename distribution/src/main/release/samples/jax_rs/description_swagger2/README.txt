@@ -1,7 +1,7 @@
-JAX-RS Search Demo 
+JAX-RS Swagger2Feature Demo
 =================
 
-The demo shows a basic usage of Swagger API documentation with REST based Web Services using 
+The demo shows a basic usage of Swagger 2.0 API documentation with REST based Web Services using 
 JAX-RS 2.0 (JSR-339). Swagger UI is available at: http://localhost:9000/
 
 Building and running the demo using Maven

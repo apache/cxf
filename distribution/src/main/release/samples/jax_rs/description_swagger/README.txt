@@ -1,4 +1,4 @@
-JAX-RS Search Demo 
+JAX-RS SwaggerFeature Demo
 =================
 
 The demo shows a basic usage of Swagger API documentation with REST based Web Services using 
