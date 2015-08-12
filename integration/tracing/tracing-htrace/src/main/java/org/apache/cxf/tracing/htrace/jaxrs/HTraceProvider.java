@@ -19,11 +19,15 @@
 package org.apache.cxf.tracing.htrace.jaxrs;
 
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
+import javax.ws.rs.container.ResourceInfo;
+import javax.ws.rs.container.Suspended;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.ext.Provider;
 
 import org.apache.cxf.tracing.htrace.AbstractHTraceProvider;
@@ -33,7 +37,9 @@ import org.apache.htrace.impl.NeverSampler;
 
 @Provider
 public class HTraceProvider extends AbstractHTraceProvider 
-    implements ContainerRequestFilter, ContainerResponseFilter { 
+    implements ContainerRequestFilter, ContainerResponseFilter {
+    @Context 
+    private ResourceInfo resourceInfo;
     public HTraceProvider() {
         this(NeverSampler.INSTANCE);
     }
@@ -58,5 +64,17 @@ public class HTraceProvider extends AbstractHTraceProvider
         super.stopTraceSpan(requestContext.getHeaders(), 
                             responseContext.getHeaders(), 
                             (TraceScope)requestContext.getProperty(TRACE_SPAN));
+    }
+    
+    @Override
+    protected boolean isAsyncResponse() {
+        for (final Annotation[] annotations: resourceInfo.getResourceMethod().getParameterAnnotations()) {
+            for (final Annotation annotation: annotations) {
+                if (annotation.annotationType().equals(Suspended.class)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
