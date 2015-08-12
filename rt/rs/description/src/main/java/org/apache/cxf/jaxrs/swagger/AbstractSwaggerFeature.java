@@ -24,7 +24,7 @@ import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.jaxrs.JAXRSServiceFactoryBean;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 
-abstract class AbstractSwaggerFeature extends AbstractFeature {
+public abstract class AbstractSwaggerFeature extends AbstractFeature {
     protected boolean scan = true;
     protected boolean runAsFilter;
     private String resourcePackage;
