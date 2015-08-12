@@ -25,6 +25,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
+import java.lang.reflect.WildcardType;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -114,8 +115,7 @@ public abstract class ProviderFactory {
     
     private Bus bus;
     
-    private Comparator<?> messageWriterComparator;
-    private Comparator<?> messageReaderComparator;
+    private Comparator<?> providerComparator;
     
     protected ProviderFactory(Bus bus) {
         this.bus = bus;
@@ -564,25 +564,45 @@ public abstract class ProviderFactory {
      * x/y;q=1.0 < x/y;q=0.7.
      */    
     private void sortReaders() {
-        if (messageReaderComparator == null) {
+        if (!customComparatorAvailable(MessageBodyReader.class)) {
             Collections.sort(messageReaders, new MessageBodyReaderComparator());
         } else {
-            doCustomSort(messageReaderComparator, messageReaders);
+            doCustomSort(messageReaders);
         }
     }
     private <T> void sortWriters() {
-        if (messageWriterComparator == null) {
+        if (!customComparatorAvailable(MessageBodyWriter.class)) {
             Collections.sort(messageWriters, new MessageBodyWriterComparator());
         } else {
-            doCustomSort(messageWriterComparator, messageWriters);
+            doCustomSort(messageWriters);
         }
     }
     
-    private static <T> void doCustomSort(Comparator<?> comparator, List<?> listOfProviders) {
+    private boolean customComparatorAvailable(Class<?> providerClass) {
+        if (providerComparator != null) {
+            Type type = ((ParameterizedType)providerComparator.getClass()
+                .getGenericInterfaces()[0]).getActualTypeArguments()[0];
+            if (type instanceof ParameterizedType) {
+                ParameterizedType pt = (ParameterizedType)type;
+                if (pt.getRawType() == ProviderInfo.class) {
+                    Type type2 = pt.getActualTypeArguments()[0];
+                    if (type2 == providerClass
+                        || type2 instanceof WildcardType
+                        || type2 instanceof ParameterizedType 
+                           && ((ParameterizedType)type2).getRawType() == providerClass) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    
+    private <T> void doCustomSort(List<?> listOfProviders) {
         @SuppressWarnings("unchecked")
         List<T> theProviders = (List<T>)listOfProviders;
         @SuppressWarnings("unchecked")
-        Comparator<? super T> theComparator = (Comparator<? super T>)comparator;
+        Comparator<? super T> theComparator = (Comparator<? super T>)providerComparator;
         Collections.sort((List<T>)theProviders, theComparator);
     }
     
@@ -1185,12 +1205,9 @@ public abstract class ProviderFactory {
         return null;
     }
 
-    public void setMessageWriterComparator(Comparator<?> messageWriterComparator) {
-        this.messageWriterComparator = messageWriterComparator;
-        sortWriters();
-    }
-    public void setMessageReaderComparator(Comparator<?> messageReaderComparator) {
-        this.messageReaderComparator = messageReaderComparator;
+    public void setProviderComparator(Comparator<?> providerComparator) {
+        this.providerComparator = providerComparator;
         sortReaders();
+        sortWriters();
     }
 }

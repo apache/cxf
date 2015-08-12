@@ -120,18 +120,85 @@ public class ProviderFactoryTest extends Assert {
             }    
         
         };
+        pf.setProviderComparator(comp);
+        
         // writers
-        pf.setMessageWriterComparator(comp);
         List<ProviderInfo<MessageBodyWriter<?>>> writers = pf.getMessageWriters();
         assertEquals(8, writers.size());
         Object lastWriter = writers.get(7).getProvider();
         assertTrue(lastWriter instanceof StringTextProvider);
         //readers
-        pf.setMessageReaderComparator(comp);
         List<ProviderInfo<MessageBodyReader<?>>> readers = pf.getMessageReaders();
         assertEquals(8, readers.size());
         Object lastReader = readers.get(7).getProvider();
         assertTrue(lastReader instanceof StringTextProvider);
+    }
+    @SuppressWarnings("rawtypes")
+    @Test
+    public void testCustomProviderSortingMBROnly() {
+        ProviderFactory pf = ServerProviderFactory.getInstance();
+        Comparator<ProviderInfo<MessageBodyReader>> comp = 
+            new Comparator<ProviderInfo<MessageBodyReader>>() {
+
+            @Override
+            public int compare(ProviderInfo<MessageBodyReader> o1, ProviderInfo<MessageBodyReader> o2) {
+                MessageBodyReader<?> provider1 = o1.getProvider();
+                MessageBodyReader<?> provider2 = o2.getProvider();
+                if (provider1 instanceof StringTextProvider) {
+                    return 1;
+                } else if (provider2 instanceof StringTextProvider) {
+                    return -1;
+                } else {
+                    return 0;
+                }
+            }    
+        
+        };
+        pf.setProviderComparator(comp);
+        
+        // writers
+        List<ProviderInfo<MessageBodyWriter<?>>> writers = pf.getMessageWriters();
+        assertEquals(8, writers.size());
+        Object lastWriter = writers.get(7).getProvider();
+        assertFalse(lastWriter instanceof StringTextProvider);
+        //readers
+        List<ProviderInfo<MessageBodyReader<?>>> readers = pf.getMessageReaders();
+        assertEquals(8, readers.size());
+        Object lastReader = readers.get(7).getProvider();
+        assertTrue(lastReader instanceof StringTextProvider);
+    }
+    @Test
+    public void testCustomProviderSortingMBWOnly() {
+        ProviderFactory pf = ServerProviderFactory.getInstance();
+        Comparator<ProviderInfo<MessageBodyWriter<?>>> comp = 
+            new Comparator<ProviderInfo<MessageBodyWriter<?>>>() {
+
+            @Override
+            public int compare(ProviderInfo<MessageBodyWriter<?>> o1, ProviderInfo<MessageBodyWriter<?>> o2) {
+                MessageBodyWriter<?> provider1 = o1.getProvider();
+                MessageBodyWriter<?> provider2 = o2.getProvider();
+                if (provider1 instanceof StringTextProvider) {
+                    return 1;
+                } else if (provider2 instanceof StringTextProvider) {
+                    return -1;
+                } else {
+                    return 0;
+                }
+            }    
+        
+        };
+        pf.setProviderComparator(comp);
+        
+        // writers
+        List<ProviderInfo<MessageBodyWriter<?>>> writers = pf.getMessageWriters();
+        assertEquals(8, writers.size());
+        Object lastWriter = writers.get(7).getProvider();
+        assertTrue(lastWriter instanceof StringTextProvider);
+        //readers
+        List<ProviderInfo<MessageBodyReader<?>>> readers = pf.getMessageReaders();
+        assertEquals(8, readers.size());
+        Object lastReader = readers.get(7).getProvider();
+        assertFalse(lastReader instanceof StringTextProvider);
     }
     
     @Test
