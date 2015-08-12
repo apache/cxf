@@ -68,9 +68,9 @@ public final class ClientProviderFactory extends ProviderFactory {
        
     
     @Override
-    protected void setProviders(boolean custom, Object... providers) {
+    protected void setProviders(boolean custom, boolean busGlobal, Object... providers) {
         List<ProviderInfo<? extends Object>> theProviders = 
-            prepareProviders(custom, (Object[])providers, null);
+            prepareProviders(custom, busGlobal, (Object[])providers, null);
         super.setCommonProviders(theProviders);
         for (ProviderInfo<? extends Object> provider : theProviders) {
             Class<?> providerCls = ClassHelper.getRealClass(getBus(), provider.getProvider());

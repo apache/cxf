@@ -112,7 +112,7 @@ public final class ServerProviderFactory extends ProviderFactory {
         }
         ServerProviderFactory factory = new ServerProviderFactory(bus);
         ProviderFactory.initFactory(factory);
-        factory.setProviders(false, new WebApplicationExceptionMapper());
+        factory.setProviders(false, false, new WebApplicationExceptionMapper());
         factory.setBusProviders();
         return factory;
     }
@@ -183,14 +183,14 @@ public final class ServerProviderFactory extends ProviderFactory {
     
     @SuppressWarnings("unchecked")
     @Override
-    protected void setProviders(boolean custom, Object... providers) {
+    protected void setProviders(boolean custom, boolean busGlobal, Object... providers) {
         List<ProviderInfo<ContainerRequestFilter>> postMatchRequestFilters = 
             new LinkedList<ProviderInfo<ContainerRequestFilter>>();
         List<ProviderInfo<ContainerResponseFilter>> postMatchResponseFilters = 
             new LinkedList<ProviderInfo<ContainerResponseFilter>>();
         
         List<ProviderInfo<? extends Object>> theProviders = 
-            prepareProviders(custom, (Object[])providers, application);
+            prepareProviders(custom, busGlobal, (Object[])providers, application);
         super.setCommonProviders(theProviders);
         for (ProviderInfo<? extends Object> provider : theProviders) {
             Class<?> providerCls = ClassHelper.getRealClass(getBus(), provider.getProvider());
