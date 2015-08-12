@@ -127,6 +127,7 @@ public abstract class ProviderFactory {
     
     protected static void initFactory(ProviderFactory factory) {
         factory.setProviders(false,
+                             false,
                      new BinaryDataProvider<Object>(),
                      new SourceProvider<Object>(),
                      new DataSourceProvider<Object>(),
@@ -137,7 +138,7 @@ public abstract class ProviderFactory {
                      new MultipartProvider());
         Object prop = factory.getBus().getProperty("skip.default.json.provider.registration");
         if (!PropertyUtils.isTrue(prop)) {
-            factory.setProviders(false, createProvider(JSON_PROVIDER_NAME));
+            factory.setProviders(false, false, createProvider(JSON_PROVIDER_NAME));
         }
             
     }
@@ -442,7 +443,7 @@ public abstract class ProviderFactory {
                             MessageBodyWriter.class,
                             ExceptionMapper.class);
             if (!extensions.isEmpty()) {
-                setProviders(true, extensions.toArray());
+                setProviders(true, true, extensions.toArray());
                 bus.setProperty(alreadySetProp, "");
             }
         }
@@ -464,7 +465,7 @@ public abstract class ProviderFactory {
         }
     }
     
-    protected abstract void setProviders(boolean custom, Object... providers);
+    protected abstract void setProviders(boolean custom, boolean busGlobal, Object... providers);
     
     @SuppressWarnings("unchecked")
     protected void setCommonProviders(List<ProviderInfo<? extends Object>> theProviders) {
@@ -657,7 +658,7 @@ public abstract class ProviderFactory {
      * @param entityProviders the entityProviders to set
      */
     public void setUserProviders(List<?> userProviders) {
-        setProviders(true, userProviders.toArray());
+        setProviders(true, false, userProviders.toArray());
     }
 
     private static class MessageBodyReaderComparator 
@@ -713,7 +714,13 @@ public abstract class ProviderFactory {
     private static int compareCustomStatus(ProviderInfo<?> p1, ProviderInfo<?> p2) {
         Boolean custom1 = p1.isCustom();
         Boolean custom2 = p2.isCustom();
-        return custom1.compareTo(custom2) * -1;
+        int result = custom1.compareTo(custom2) * -1;
+        if (result == 0 && custom1) {
+            Boolean busGlobal1 = p1.isBusGlobal();
+            Boolean busGlobal2 = p2.isBusGlobal();
+            result = busGlobal1.compareTo(busGlobal2);
+        }
+        return result;
     }
     
     private static class ContextResolverComparator 
@@ -1138,6 +1145,7 @@ public abstract class ProviderFactory {
     }
     
     protected List<ProviderInfo<? extends Object>> prepareProviders(boolean custom,
+                                                                    boolean busGlobal,
                                                                     Object[] providers,
                                                                     ProviderInfo<Application> application) {
         List<ProviderInfo<? extends Object>> theProviders = 
@@ -1158,7 +1166,9 @@ public abstract class ProviderFactory {
             } else if (provider instanceof ProviderInfo) {
                 theProviders.add((ProviderInfo<?>)provider);
             } else {    
-                theProviders.add(new ProviderInfo<Object>(provider, getBus(), custom));
+                ProviderInfo<Object> theProvider = new ProviderInfo<Object>(provider, getBus(), custom);
+                theProvider.setBusGlobal(busGlobal);
+                theProviders.add(theProvider);
             }
         }
         return theProviders;

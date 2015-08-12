@@ -28,6 +28,7 @@ public class ProviderInfo<T> extends AbstractResourceInfo {
 
     private T provider;
     private boolean custom;
+    private boolean busGlobal;
     
     public ProviderInfo(T provider, Bus bus, boolean custom) {
         this(provider, bus, true, custom);
@@ -76,6 +77,14 @@ public class ProviderInfo<T> extends AbstractResourceInfo {
 
     public boolean isCustom() {
         return custom;
+    }
+
+    public boolean isBusGlobal() {
+        return busGlobal;
+    }
+
+    public void setBusGlobal(boolean busGlobal) {
+        this.busGlobal = busGlobal;
     }
 
 }

@@ -50,6 +50,8 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.validation.Schema;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.Customer;
@@ -130,6 +132,33 @@ public class ProviderFactoryTest extends Assert {
         assertEquals(8, readers.size());
         Object lastReader = readers.get(7).getProvider();
         assertTrue(lastReader instanceof StringTextProvider);
+    }
+    
+    @Test
+    public void testCustomProviderSortingWithBus() {
+        WildcardReader wc1 = new WildcardReader();
+        WildcardReader2 wc2 = new WildcardReader2();
+        Bus bus = BusFactory.newInstance().createBus();
+        bus.setProperty(MessageBodyReader.class.getName(), wc1);
+        ProviderFactory pf = ServerProviderFactory.createInstance(bus);
+        pf.registerUserProvider(wc2);
+        List<ProviderInfo<MessageBodyReader<?>>> readers = pf.getMessageReaders();
+        assertEquals(10, readers.size());
+        assertSame(wc2, readers.get(6).getProvider());
+        assertSame(wc1, readers.get(7).getProvider());
+    }
+    @Test
+    public void testCustomProviderSortingWithBus2() {
+        WildcardReader wc1 = new WildcardReader();
+        WildcardReader2 wc2 = new WildcardReader2();
+        Bus bus = BusFactory.newInstance().createBus();
+        bus.setProperty(MessageBodyReader.class.getName(), wc2);
+        ProviderFactory pf = ServerProviderFactory.createInstance(bus);
+        pf.registerUserProvider(wc1);
+        List<ProviderInfo<MessageBodyReader<?>>> readers = pf.getMessageReaders();
+        assertEquals(10, readers.size());
+        assertSame(wc1, readers.get(6).getProvider());
+        assertSame(wc2, readers.get(7).getProvider());
     }
     
     @Test
