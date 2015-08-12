@@ -54,6 +54,7 @@
         <module>jax_rs/search</module>
         <module>jax_rs/description_swagger</module>
         <module>jax_rs/description_swagger2</module>
+        <module>jax_rs/description_swagger2_web</module>
         <module>jax_rs/basic_oidc</module>
         <module>jax_rs/big_query</module>
         <module>callback</module>
