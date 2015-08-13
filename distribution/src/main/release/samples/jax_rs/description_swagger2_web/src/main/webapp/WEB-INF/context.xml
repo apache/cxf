@@ -36,7 +36,7 @@
 
     <!-- CXF Swagger2Feature -->  
     <bean id="swagger2Feature" class="org.apache.cxf.jaxrs.swagger.Swagger2Feature">
-        <property name="basePath" value="/app"/>
+        <property name="basePath" value="/app/swaggerSample"/>
     </bean>
 
     <cxf:bus>
@@ -45,7 +45,7 @@
         </cxf:features>
     </cxf:bus>
 
-    <jaxrs:server id="sampleServer" address="/">
+    <jaxrs:server id="sampleServer" address="/swaggerSample">
         <jaxrs:serviceBeans>
             <ref bean="sampleResource" />
         </jaxrs:serviceBeans>
