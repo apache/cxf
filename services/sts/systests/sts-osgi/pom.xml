@@ -19,21 +19,22 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.apache.cxf.services.sts</groupId>
-    <artifactId>cxf-services-sts-systests</artifactId>
-    <packaging>pom</packaging>
-    <name>Apache CXF STS systests</name>
+    <groupId>org.apache.cxf.services.sts.systests</groupId>
+    <artifactId>cxf-services-sts-systests-osgi</artifactId>
+    <packaging>bundle</packaging>
+    <name>Apache CXF STS test OSGi deployment</name>
     <url>http://cxf.apache.org</url>
     <parent>
-        <groupId>org.apache.cxf.services.sts</groupId>
-        <artifactId>cxf-services-sts</artifactId>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-parent</artifactId>
         <version>3.1.3-SNAPSHOT</version>
+        <relativePath>../../../../parent/pom.xml</relativePath>
     </parent>
-    <modules>
-        <module>basic</module>
-        <module>advanced</module>
-        <module>sts-osgi</module>
-        <module>sts-features</module>
-        <module>sts-itests</module>
-    </modules>
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.cxf.services.sts</groupId>
+            <artifactId>cxf-services-sts-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
 </project>
