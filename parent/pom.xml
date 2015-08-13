@@ -137,10 +137,16 @@
         <cxf.netty.version.range>[4,5)</cxf.netty.version.range>
         <cxf.oauth.bundle.version>20100527_1</cxf.oauth.bundle.version>
         <cxf.oauth.version>20100527</cxf.oauth.version>
+<<<<<<< HEAD
         <cxf.opensaml.version>2.6.1</cxf.opensaml.version>
         <cxf.opensaml.osgi.version>2.6.1_1</cxf.opensaml.osgi.version>
         <cxf.opensaml.xmltooling.version>1.4.0_1</cxf.opensaml.xmltooling.version>
         <cxf.opensamlws.version>1.5.0_1</cxf.opensamlws.version>
+=======
+        <cxf.opensaml.version>3.1.1_3-SNAPSHOT</cxf.opensaml.version>
+        <cxf.opensaml.osgi.version>3.1.0_1</cxf.opensaml.osgi.version>
+        <cxf.opensaml.osgi.version.range>[3.1,4)</cxf.opensaml.osgi.version.range>
+>>>>>>> cf87907... Adding an STS OSGi test
         <cxf.rhino.version>1.7R2</cxf.rhino.version>
         <cxf.saaj-api.version>1.3.5</cxf.saaj-api.version>
         <cxf.servlet-api.group>org.apache.geronimo.specs</cxf.servlet-api.group>
