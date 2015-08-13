@@ -31,7 +31,6 @@ import org.junit.Assert;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.options.MavenArtifactUrlReference;
-import org.ops4j.pax.exam.options.MavenUrlReference;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 import org.w3._2002._03.xkms_wsdl.XKMSPortType;
@@ -52,24 +51,26 @@ public class BasicIntegrationTest {
     private static final String XKMS_ENDPOINT = "http://localhost:" + HTTP_PORT + "/cxf/XKMS";
 
     // Adding apache snapshots as cxf trunk may contain snapshot dependencies
-    private static final String REPOS = "http://repo1.maven.org/maven2@id=central, "
-        + "http://repository.apache.org/content/groups/snapshots-group@snapshots@noreleases@id=apache-snapshots ";
-
-    protected MavenArtifactUrlReference karafUrl;
-    protected MavenUrlReference xkmsFeatures;
+    //private static final String REPOS = "http://repo1.maven.org/maven2@id=central, "
+    //    + "http://repository.apache.org/content/groups/snapshots-group@snapshots@noreleases@id=apache-snapshots ";
 
     @Inject
     protected XKMSPortType xkmsService;
 
     @Configuration
     public Option[] getConfig() {
-        String karafVersion = System.getProperty("karaf.version", "3.0.2");
+        String karafVersion = System.getProperty("karaf.version", "3.0.4");
         String localRepository = System.getProperty("localRepository");
-        karafUrl = maven().groupId("org.apache.karaf").artifactId("apache-karaf")
-            .version(karafVersion).type("tar.gz");
-        xkmsFeatures = maven().groupId("org.apache.cxf.services.xkms")
-            .artifactId("cxf-services-xkms-features").versionAsInProject().type("xml");
-
+        MavenArtifactUrlReference karafUrl = maven() //
+            .groupId("org.apache.karaf") //
+            .artifactId("apache-karaf") //
+            .version(karafVersion)
+            .type("tar.gz");
+        MavenArtifactUrlReference xkmsFeatures = maven() //
+            .groupId("org.apache.cxf.services.xkms") //
+            .artifactId("cxf-services-xkms-features") //
+            .versionAsInProject() //
+            .type("xml");
 
         return new Option[] {
             karafDistributionConfiguration().frameworkUrl(karafUrl).karafVersion(karafVersion)
@@ -82,7 +83,7 @@ public class BasicIntegrationTest {
             copy("data/xkms/certificates/dave.cer"),
             copy("data/xkms/certificates/http___localhost_8080_services_TestService.cer"),
             copy("etc/org.ops4j.pax.logging.cfg"),
-            editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg", "org.ops4j.pax.url.mvn.repositories", REPOS),
+            //editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg", "org.ops4j.pax.url.mvn.repositories", REPOS),
             editConfigurationFilePut("etc/org.ops4j.pax.web.cfg", "org.osgi.service.http.port", HTTP_PORT),
             editConfigurationFilePut("etc/org.apache.cxf.xkms.client.cfg", "xkms.endpoint", XKMS_ENDPOINT),
             when(localRepository != null)
