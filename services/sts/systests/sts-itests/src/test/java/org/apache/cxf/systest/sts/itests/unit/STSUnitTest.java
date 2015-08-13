@@ -86,10 +86,10 @@ public class STSUnitTest extends BasicSTSIntegrationTest {
     }
     
     private SecurityToken requestSecurityToken(
-       String tokenType, 
-       String keyType, 
-       Bus bus,
-       String endpointAddress
+        String tokenType, 
+        String keyType, 
+        Bus bus,
+        String endpointAddress
     ) throws Exception {
         STSClient stsClient = new STSClient(bus);
 
