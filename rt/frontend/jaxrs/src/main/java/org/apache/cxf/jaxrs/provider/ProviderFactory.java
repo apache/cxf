@@ -580,8 +580,8 @@ public abstract class ProviderFactory {
     
     private boolean customComparatorAvailable(Class<?> providerClass) {
         if (providerComparator != null) {
-            Type type = ((ParameterizedType)providerComparator.getClass()
-                .getGenericInterfaces()[0]).getActualTypeArguments()[0];
+            ParameterizedType ptFirst = (ParameterizedType)providerComparator.getClass().getGenericInterfaces()[0];
+            Type type = ptFirst.getActualTypeArguments()[0];
             if (type instanceof ParameterizedType) {
                 ParameterizedType pt = (ParameterizedType)type;
                 if (pt.getRawType() == ProviderInfo.class) {
@@ -603,8 +603,8 @@ public abstract class ProviderFactory {
     @SuppressWarnings("unchecked")
     private <T> void doCustomSort(List<?> listOfProviders) {
         Comparator<?> theProviderComparator = providerComparator;
-        Type type = ((ParameterizedType)providerComparator.getClass()
-            .getGenericInterfaces()[0]).getActualTypeArguments()[0];
+        ParameterizedType pt = (ParameterizedType)providerComparator.getClass().getGenericInterfaces()[0];
+        Type type = pt.getActualTypeArguments()[0];
         if (type == Object.class) {
             theProviderComparator = 
                 (Comparator<?>)(new ProviderInfoClassComparator((Comparator<Object>)theProviderComparator));

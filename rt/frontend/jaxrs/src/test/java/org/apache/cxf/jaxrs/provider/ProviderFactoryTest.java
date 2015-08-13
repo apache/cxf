@@ -170,20 +170,20 @@ public class ProviderFactoryTest extends Assert {
         Comparator<ProviderInfo<MessageBodyReader>> comp = 
             new Comparator<ProviderInfo<MessageBodyReader>>() {
 
-            @Override
-            public int compare(ProviderInfo<MessageBodyReader> o1, ProviderInfo<MessageBodyReader> o2) {
-                MessageBodyReader<?> provider1 = o1.getProvider();
-                MessageBodyReader<?> provider2 = o2.getProvider();
-                if (provider1 instanceof StringTextProvider) {
-                    return 1;
-                } else if (provider2 instanceof StringTextProvider) {
-                    return -1;
-                } else {
-                    return 0;
-                }
-            }    
+                @Override
+                public int compare(ProviderInfo<MessageBodyReader> o1, ProviderInfo<MessageBodyReader> o2) {
+                    MessageBodyReader<?> provider1 = o1.getProvider();
+                    MessageBodyReader<?> provider2 = o2.getProvider();
+                    if (provider1 instanceof StringTextProvider) {
+                        return 1;
+                    } else if (provider2 instanceof StringTextProvider) {
+                        return -1;
+                    } else {
+                        return 0;
+                    }
+                }    
         
-        };
+            };
         pf.setProviderComparator(comp);
         
         // writers
@@ -203,20 +203,20 @@ public class ProviderFactoryTest extends Assert {
         Comparator<ProviderInfo<MessageBodyWriter<?>>> comp = 
             new Comparator<ProviderInfo<MessageBodyWriter<?>>>() {
 
-            @Override
-            public int compare(ProviderInfo<MessageBodyWriter<?>> o1, ProviderInfo<MessageBodyWriter<?>> o2) {
-                MessageBodyWriter<?> provider1 = o1.getProvider();
-                MessageBodyWriter<?> provider2 = o2.getProvider();
-                if (provider1 instanceof StringTextProvider) {
-                    return 1;
-                } else if (provider2 instanceof StringTextProvider) {
-                    return -1;
-                } else {
-                    return 0;
-                }
-            }    
+                @Override
+                public int compare(ProviderInfo<MessageBodyWriter<?>> o1, ProviderInfo<MessageBodyWriter<?>> o2) {
+                    MessageBodyWriter<?> provider1 = o1.getProvider();
+                    MessageBodyWriter<?> provider2 = o2.getProvider();
+                    if (provider1 instanceof StringTextProvider) {
+                        return 1;
+                    } else if (provider2 instanceof StringTextProvider) {
+                        return -1;
+                    } else {
+                        return 0;
+                    }
+                }    
         
-        };
+            };
         pf.setProviderComparator(comp);
         
         // writers
