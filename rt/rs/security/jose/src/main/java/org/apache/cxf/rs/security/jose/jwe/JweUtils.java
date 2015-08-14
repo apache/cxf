@@ -20,6 +20,7 @@ package org.apache.cxf.rs.security.jose.jwe;
 
 import java.nio.ByteBuffer;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
@@ -66,13 +67,13 @@ public final class JweUtils {
     private JweUtils() {
         
     }
-    public static String encrypt(RSAPublicKey key, KeyAlgorithm keyAlgo, ContentAlgorithm contentAlgo, 
+    public static String encrypt(PublicKey key, KeyAlgorithm keyAlgo, ContentAlgorithm contentAlgo, 
                                  byte[] content) {
         return encrypt(key, keyAlgo, contentAlgo, content, null);
     }
-    public static String encrypt(RSAPublicKey key, KeyAlgorithm keyAlgo, 
+    public static String encrypt(PublicKey key, KeyAlgorithm keyAlgo, 
                                  ContentAlgorithm contentAlgo, byte[] content, String ct) {
-        KeyEncryptionProvider keyEncryptionProvider = getRSAKeyEncryptionProvider(key, keyAlgo);
+        KeyEncryptionProvider keyEncryptionProvider = getPublicKeyEncryptionProvider(key, keyAlgo);
         return encrypt(keyEncryptionProvider, contentAlgo, content, ct);
     }
     public static String encrypt(SecretKey key, KeyAlgorithm keyAlgo, ContentAlgorithm contentAlgo, 
@@ -136,7 +137,7 @@ public final class JweUtils {
         KeyEncryptionProvider keyEncryptionProvider = null;
         KeyType keyType = jwk.getKeyType();
         if (KeyType.RSA == keyType) {
-            keyEncryptionProvider = getRSAKeyEncryptionProvider(JwkUtils.toRSAPublicKey(jwk, true), 
+            keyEncryptionProvider = getPublicKeyEncryptionProvider(JwkUtils.toRSAPublicKey(jwk, true), 
                                                                  keyAlgo);
         } else if (KeyType.OCTET == keyType) {
             keyEncryptionProvider = getSecretKeyEncryptionAlgorithm(JwkUtils.toSecretKey(jwk), 
@@ -148,8 +149,12 @@ public final class JweUtils {
         }
         return keyEncryptionProvider;
     }
-    public static KeyEncryptionProvider getRSAKeyEncryptionProvider(RSAPublicKey key, KeyAlgorithm algo) {
-        return new RSAKeyEncryptionAlgorithm(key, algo);
+    public static KeyEncryptionProvider getPublicKeyEncryptionProvider(PublicKey key, KeyAlgorithm algo) {
+        if (key instanceof PublicKey) {
+            return new RSAKeyEncryptionAlgorithm((RSAPublicKey)key, algo);
+        } else {
+            return new EcdhAesWrapKeyEncryptionAlgorithm((ECPublicKey)key, algo);
+        }
     }
     public static KeyEncryptionProvider getSecretKeyEncryptionAlgorithm(SecretKey key, KeyAlgorithm algo) {
         if (AlgorithmUtils.isAesKeyWrap(algo.getJwaName())) {
@@ -305,8 +310,8 @@ public final class JweUtils {
                 }
             }
         } else {
-            keyEncryptionProvider = getRSAKeyEncryptionProvider(
-                (RSAPublicKey)KeyManagementUtils.loadPublicKey(m, props), 
+            keyEncryptionProvider = getPublicKeyEncryptionProvider(
+                KeyManagementUtils.loadPublicKey(m, props), 
                 keyAlgo);
             if (reportPublicKey) {
                 headers.setX509Chain(KeyManagementUtils.loadAndEncodeX509CertificateOrChain(m, props));
@@ -365,15 +370,15 @@ public final class JweUtils {
         return createJweDecryptionProvider(keyDecryptionProvider, ctDecryptionKey, 
                                            getContentAlgo(contentEncryptionAlgo));
     }
-    public static JweEncryptionProvider createJweEncryptionProvider(RSAPublicKey key,
+    public static JweEncryptionProvider createJweEncryptionProvider(PublicKey key,
                                                                     KeyAlgorithm keyAlgo,
                                                                     ContentAlgorithm contentEncryptionAlgo,
                                                                     String compression) {
-        KeyEncryptionProvider keyEncryptionProvider = getRSAKeyEncryptionProvider(key, keyAlgo);
+        KeyEncryptionProvider keyEncryptionProvider = getPublicKeyEncryptionProvider(key, keyAlgo);
         return createJweEncryptionProvider(keyEncryptionProvider, contentEncryptionAlgo, compression);
     }
-    public static JweEncryptionProvider createJweEncryptionProvider(RSAPublicKey key, JweHeaders headers) {
-        KeyEncryptionProvider keyEncryptionProvider = getRSAKeyEncryptionProvider(key, 
+    public static JweEncryptionProvider createJweEncryptionProvider(PublicKey key, JweHeaders headers) {
+        KeyEncryptionProvider keyEncryptionProvider = getPublicKeyEncryptionProvider(key, 
                                                            headers.getKeyEncryptionAlgorithm());
         return createJweEncryptionProvider(keyEncryptionProvider, headers);
     }

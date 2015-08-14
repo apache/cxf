@@ -25,6 +25,7 @@ import java.util.Map;
 import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 import org.apache.cxf.rs.security.jose.jwe.EcdhDirectKeyJweEncryption.EcdhHelper;
+import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 
 public class EcdhAesWrapKeyEncryptionAlgorithm implements KeyEncryptionProvider {
     
@@ -38,6 +39,11 @@ public class EcdhAesWrapKeyEncryptionAlgorithm implements KeyEncryptionProvider 
     private KeyAlgorithm keyAlgo;
     private EcdhHelper helper;
     
+    public EcdhAesWrapKeyEncryptionAlgorithm(ECPublicKey peerPublicKey,
+                                             KeyAlgorithm keyAlgo) {
+        //TODO: figure out the curve *name* given ECPublicKey
+        this(peerPublicKey, JsonWebKey.EC_CURVE_P256, null, null, keyAlgo);
+    }
     public EcdhAesWrapKeyEncryptionAlgorithm(ECPublicKey peerPublicKey,
                                              String curve,
                                              KeyAlgorithm keyAlgo) {
