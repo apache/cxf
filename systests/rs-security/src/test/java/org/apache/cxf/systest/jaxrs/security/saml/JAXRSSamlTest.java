@@ -42,7 +42,6 @@ import org.apache.cxf.rs.security.saml.SamlEnvelopedOutInterceptor;
 import org.apache.cxf.rs.security.saml.SamlFormOutInterceptor;
 import org.apache.cxf.rs.security.saml.SamlHeaderOutInterceptor;
 import org.apache.cxf.rs.security.xml.XmlSigOutInterceptor;
-import org.apache.cxf.rt.security.SecurityConstants;
 import org.apache.cxf.systest.jaxrs.security.Book;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
@@ -237,20 +236,11 @@ public class JAXRSSamlTest extends AbstractBusClientServerTestBase {
         bean.setBus(springBus);
 
         Map<String, Object> properties = new HashMap<String, Object>();
-<<<<<<< HEAD
         properties.put("ws-security.callback-handler", 
                        "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
-        properties.put("ws-security.saml-callback-handler", 
-                       "org.apache.cxf.systest.jaxrs.security.saml.SamlCallbackHandler");
+        properties.put("ws-security.saml-callback-handler", samlCallbackHandler);
         properties.put("ws-security.signature.username", "alice");
-        properties.put("ws-security.signature.properties", 
-=======
-        properties.put(SecurityConstants.CALLBACK_HANDLER, 
-                       "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
-        properties.put(SecurityConstants.SAML_CALLBACK_HANDLER, samlCallbackHandler);
-        properties.put(SecurityConstants.SIGNATURE_USERNAME, "alice");
-        properties.put(SecurityConstants.SIGNATURE_PROPERTIES, 
->>>>>>> 953d23f... [CXF-6543] - It's not possible to specify the signature + digest algorithms for self-signed SAML Assertions with JAX-RS
+        properties.put("ws-security.signature.properties",
                        "org/apache/cxf/systest/jaxrs/security/alice.properties");
         bean.setProperties(properties);
         

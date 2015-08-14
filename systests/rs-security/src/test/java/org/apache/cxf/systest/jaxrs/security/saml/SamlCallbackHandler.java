@@ -108,13 +108,8 @@ public class SamlCallbackHandler implements CallbackHandler {
                                                          SecurityConstants.SIGNATURE_CRYPTO,
                                                          SecurityConstants.SIGNATURE_PROPERTIES);
                         X509Certificate cert = 
-<<<<<<< HEAD
                             SecurityUtils.getCertificates(crypto, 
-                                SecurityUtils.getUserName(m, crypto, "ws-security.signature.username"))[0];
-=======
-                            RSSecurityUtils.getCertificates(crypto, 
-                                RSSecurityUtils.getUserName(m, crypto, SecurityConstants.SIGNATURE_USERNAME))[0];
->>>>>>> 953d23f... [CXF-6543] - It's not possible to specify the signature + digest algorithms for self-signed SAML Assertions with JAX-RS
+                                SecurityUtils.getUserName(m, crypto, SecurityConstants.SIGNATURE_USERNAME))[0];
                         
                         KeyInfoBean keyInfo = new KeyInfoBean();
                         keyInfo.setCertificate(cert);
