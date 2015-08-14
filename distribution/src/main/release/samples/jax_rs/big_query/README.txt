@@ -25,7 +25,9 @@ mvn jetty:run-war -Dclient_id=${client_id} -Dclient_secret=${client_secret} -Dpr
 
 where ${client_id} and ${client_secret} are Client Id and Secret, and ${project_id} is the id of your Google project.
 
-Then start a browser and go to "localhost:8080/bigquery/simpleLogin.jsp"
+Then start a browser and go to 
+
+https://localhost:8080/bigquery/simpleLogin.jsp
 
 2. Server to Server Flow.
 
@@ -36,9 +38,9 @@ choose "Generate New P12 Key" and save it to the local disk.
 
 Build the demo with "mvn install" and start it with
 
-mvn exec:java -Dexec.args="/home/pathto/BigQueryProjectKey.p12 notasecret ${client_id} ${project_id}"
+mvn exec:java -Dexec.args="/home/pathto/BigQueryProjectKey.p12 notasecret ${client_email} ${project_id}"
 
-where ${client_id} is Client Id and ${project_id} is the id of your Google project.
+where ${client_email} is Service Account Client Email and ${project_id} is the id of your Google project.
 
 
 

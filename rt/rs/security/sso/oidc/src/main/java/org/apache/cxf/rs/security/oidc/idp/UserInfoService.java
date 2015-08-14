@@ -27,13 +27,15 @@ import javax.ws.rs.core.Response;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rs.security.oauth2.common.OAuthContext;
-import org.apache.cxf.rs.security.oauth2.provider.AbstractOAuthJoseJwtProducer;
+import org.apache.cxf.rs.security.oauth2.provider.AbstractOAuthServerJoseJwtProducer;
+import org.apache.cxf.rs.security.oauth2.provider.OAuthDataProvider;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthContextUtils;
 import org.apache.cxf.rs.security.oidc.common.UserInfo;
 
 @Path("/userinfo")
-public class UserInfoService extends AbstractOAuthJoseJwtProducer {
+public class UserInfoService extends AbstractOAuthServerJoseJwtProducer {
     private UserInfoProvider userInfoProvider;
+    private OAuthDataProvider oauthDataProvider;
     private String issuer;
     
     @Context
@@ -50,7 +52,8 @@ public class UserInfoService extends AbstractOAuthJoseJwtProducer {
         userInfo.setAudience(oauth.getClientId());
         Object responseEntity = userInfo;
         if (super.isJwsRequired() || super.isJweRequired()) {
-            responseEntity = super.processJwt(new JwtToken(userInfo));
+            responseEntity = super.processJwt(new JwtToken(userInfo),
+                                              oauthDataProvider.getClient(oauth.getClientId()));
         }
         return Response.ok(responseEntity).build();
         
@@ -61,5 +64,9 @@ public class UserInfoService extends AbstractOAuthJoseJwtProducer {
     }
     public void setUserInfoProvider(UserInfoProvider userInfoProvider) {
         this.userInfoProvider = userInfoProvider;
+    }
+
+    public void setOauthDataProvider(OAuthDataProvider oauthDataProvider) {
+        this.oauthDataProvider = oauthDataProvider;
     }
 }

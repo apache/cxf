@@ -35,17 +35,17 @@ public abstract class AbstractJoseConsumer {
         this.jwsVerifier = theJwsVerifier;
     }
 
-    protected JweDecryptionProvider getInitializedDecryptionProvider(boolean required) {
+    protected JweDecryptionProvider getInitializedDecryptionProvider() {
         if (jweDecryptor != null) {
             return jweDecryptor;    
         } 
-        return JweUtils.loadDecryptionProvider(required);
+        return JweUtils.loadDecryptionProvider(false);
     }
-    protected JwsSignatureVerifier getInitializedSignatureVerifier(boolean required) {
+    protected JwsSignatureVerifier getInitializedSignatureVerifier() {
         if (jwsVerifier != null) {
             return jwsVerifier;    
         } 
-        return JwsUtils.loadSignatureVerifier(required);
+        return JwsUtils.loadSignatureVerifier(false);
     }
 
 }

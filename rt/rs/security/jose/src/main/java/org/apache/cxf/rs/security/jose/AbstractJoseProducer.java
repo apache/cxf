@@ -27,18 +27,18 @@ public abstract class AbstractJoseProducer {
     private JwsSignatureProvider sigProvider;
     private JweEncryptionProvider encryptionProvider;
     
-    protected JwsSignatureProvider getInitializedSignatureProvider(boolean required) {
+    protected JwsSignatureProvider getInitializedSignatureProvider() {
         if (sigProvider != null) {
             return sigProvider;    
         } 
         
-        return JwsUtils.loadSignatureProvider(required);
+        return JwsUtils.loadSignatureProvider(false);
     }
-    protected JweEncryptionProvider getInitializedEncryptionProvider(boolean required) {
+    protected JweEncryptionProvider getInitializedEncryptionProvider() {
         if (encryptionProvider != null) {
             return encryptionProvider;    
         }
-        return JweUtils.loadEncryptionProvider(required);
+        return JweUtils.loadEncryptionProvider(false);
     }
 
     public void setEncryptionProvider(JweEncryptionProvider encryptionProvider) {

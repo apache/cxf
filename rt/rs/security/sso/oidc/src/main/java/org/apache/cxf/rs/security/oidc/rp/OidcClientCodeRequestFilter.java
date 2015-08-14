@@ -60,13 +60,15 @@ public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
         }
         OidcClientTokenContextImpl ctx = new OidcClientTokenContextImpl();
         if (at != null) {
-            IdToken idToken = idTokenReader.getIdToken(at, getConsumer().getKey());
+            IdToken idToken = idTokenReader.getIdToken(at, getConsumer());
             // Validate the properties set up at the redirection time.
             validateIdToken(idToken, state);
             
             ctx.setIdToken(idToken);
             if (userInfoClient != null) {
-                ctx.setUserInfo(userInfoClient.getUserInfo(at, ctx.getIdToken()));
+                ctx.setUserInfo(userInfoClient.getUserInfo(at, 
+                                                           ctx.getIdToken(),
+                                                           getConsumer()));
             }
             rc.setSecurityContext(new OidcSecurityContext(ctx));
         }

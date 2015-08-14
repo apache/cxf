@@ -13,6 +13,8 @@ Build the demo with "mvn install" and start it with
 
 mvn jetty:run-war -Dclient_id=${client_id}
 
-Then start a browser and go to "localhost:8080/user/simpleLogin.jsp"
+Then start a browser and go to 
+
+https://localhost:8080/user/simpleLogin.html
 
 

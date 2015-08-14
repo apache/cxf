@@ -30,14 +30,29 @@ public abstract class AbstractJoseJwtProducer extends AbstractJoseProducer {
     private boolean jweRequired;
     
     protected String processJwt(JwtToken jwt) {
+        return processJwt(jwt, null, null);
+    }
+    protected String processJwt(JwtToken jwt,
+                                JweEncryptionProvider theEncProvider,
+                                JwsSignatureProvider theSigProvider) {
         if (!isJwsRequired() && !isJweRequired()) {
             throw new JwtException("Unable to secure JWT");
         }
         String data = null;
-        JweEncryptionProvider theEncProvider = getInitializedEncryptionProvider(isJweRequired());
+        if (theEncProvider == null) {
+            theEncProvider = getInitializedEncryptionProvider();
+        }
+        if (theEncProvider == null && isJweRequired()) {
+            throw new JwtException("Unable to encrypt JWT");
+        }
         if (isJwsRequired()) {
+            if (theSigProvider == null) {
+                theSigProvider = getInitializedSignatureProvider();
+            }
+            if (theSigProvider == null) {
+                throw new JwtException("Unable to sign JWT");
+            }
             JwsJwtCompactProducer jws = new JwsJwtCompactProducer(jwt); 
-            JwsSignatureProvider theSigProvider = getInitializedSignatureProvider(isJwsRequired());
             data = jws.signWith(theSigProvider);
             if (theEncProvider != null) {
                 data = theEncProvider.encrypt(StringUtils.toBytesUTF8(data), null);

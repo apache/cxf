@@ -46,7 +46,7 @@ public class OidcIdTokenRequestFilter implements ContainerRequestFilter {
             return;
         }
         
-        IdToken idToken = idTokenReader.getIdToken(idTokenParamValue, consumer.getKey());
+        IdToken idToken = idTokenReader.getIdToken(idTokenParamValue, consumer);
         JAXRSUtils.getCurrentMessage().setContent(IdToken.class, idToken);
         requestContext.setSecurityContext(new OidcSecurityContext(idToken));
         

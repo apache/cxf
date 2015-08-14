@@ -21,12 +21,12 @@ package org.apache.cxf.rs.security.oidc.idp;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
-import org.apache.cxf.rs.security.oauth2.provider.AbstractOAuthJoseJwtProducer;
+import org.apache.cxf.rs.security.oauth2.provider.AbstractOAuthServerJoseJwtProducer;
 import org.apache.cxf.rs.security.oauth2.provider.AccessTokenResponseFilter;
 import org.apache.cxf.rs.security.oidc.common.IdToken;
 import org.apache.cxf.rs.security.oidc.utils.OidcUtils;
 
-public class IdTokenCodeResponseFilter extends AbstractOAuthJoseJwtProducer implements AccessTokenResponseFilter {
+public class IdTokenCodeResponseFilter extends AbstractOAuthServerJoseJwtProducer implements AccessTokenResponseFilter {
     private UserInfoProvider userInfoProvider;
     private String issuer;
     @Override
@@ -36,7 +36,8 @@ public class IdTokenCodeResponseFilter extends AbstractOAuthJoseJwtProducer impl
         token.setIssuer(issuer);
         token.setAudience(st.getClient().getClientId());
         
-        String responseEntity = super.processJwt(new JwtToken(token));
+        String responseEntity = super.processJwt(new JwtToken(token), 
+                                                 st.getClient());
         ct.getParameters().put(OidcUtils.ID_TOKEN, responseEntity);
         
     }
