@@ -41,6 +41,7 @@ import org.apache.wss4j.common.saml.bean.SubjectBean;
 import org.apache.wss4j.common.saml.bean.Version;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
+import org.apache.wss4j.dom.WSConstants;
 
 /**
  * A CallbackHandler instance that is used by the STS to mock up a SAML Attribute Assertion.
@@ -54,6 +55,8 @@ public class SamlCallbackHandler implements CallbackHandler {
     private String cryptoAlias = "alice";
     private String cryptoPassword = "password";
     private String cryptoPropertiesFile = "alice.properties";
+    private String signatureAlgorithm = WSConstants.RSA_SHA1;
+    private String digestAlgorithm = WSConstants.SHA1;
     
     public SamlCallbackHandler() {
         //
@@ -123,6 +126,8 @@ public class SamlCallbackHandler implements CallbackHandler {
                 attributeBean.addAttributeValue("system-user");
                 attrBean.setSamlAttributes(Collections.singletonList(attributeBean));
                 callback.setAttributeStatementData(Collections.singletonList(attrBean));
+                callback.setSignatureAlgorithm(signatureAlgorithm);
+                callback.setSignatureDigestAlgorithm(digestAlgorithm);
                 
                 try {
                     Crypto crypto = CryptoFactory.getInstance(cryptoPropertiesFile);
@@ -193,6 +198,22 @@ public class SamlCallbackHandler implements CallbackHandler {
 
     public void setCryptoPropertiesFile(String cryptoPropertiesFile) {
         this.cryptoPropertiesFile = cryptoPropertiesFile;
+    }
+
+    public String getSignatureAlgorithm() {
+        return signatureAlgorithm;
+    }
+
+    public void setSignatureAlgorithm(String signatureAlgorithm) {
+        this.signatureAlgorithm = signatureAlgorithm;
+    }
+
+    public String getDigestAlgorithm() {
+        return digestAlgorithm;
+    }
+
+    public void setDigestAlgorithm(String digestAlgorithm) {
+        this.digestAlgorithm = digestAlgorithm;
     }
     
 }
