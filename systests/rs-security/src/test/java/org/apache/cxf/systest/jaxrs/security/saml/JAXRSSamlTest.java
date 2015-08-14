@@ -23,6 +23,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.security.auth.callback.CallbackHandler;
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Form;
@@ -41,9 +42,11 @@ import org.apache.cxf.rs.security.saml.SamlEnvelopedOutInterceptor;
 import org.apache.cxf.rs.security.saml.SamlFormOutInterceptor;
 import org.apache.cxf.rs.security.saml.SamlHeaderOutInterceptor;
 import org.apache.cxf.rs.security.xml.XmlSigOutInterceptor;
+import org.apache.cxf.rt.security.SecurityConstants;
 import org.apache.cxf.systest.jaxrs.security.Book;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-
+import org.apache.wss4j.common.saml.builder.SAML2Constants;
+import org.apache.wss4j.dom.WSConstants;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -125,6 +128,16 @@ public class JAXRSSamlTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testBearerSignedDifferentAlgorithms() throws Exception {
+        SamlCallbackHandler callbackHandler = new SamlCallbackHandler();
+        callbackHandler.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
+        callbackHandler.setDigestAlgorithm(WSConstants.SHA256);
+        callbackHandler.setConfirmationMethod(SAML2Constants.CONF_BEARER);
+        callbackHandler.setSignAssertion(true);
+        doTestEnvelopedSAMLToken(true, callbackHandler);
+    }
+    
+    @Test
     public void testEnvelopedUnsignedSAMLToken() throws Exception {
         doTestEnvelopedSAMLToken(false);
     }
@@ -177,8 +190,12 @@ public class JAXRSSamlTest extends AbstractBusClientServerTestBase {
     }
     
     public void doTestEnvelopedSAMLToken(boolean signed) throws Exception {
+        doTestEnvelopedSAMLToken(signed, new SamlCallbackHandler());
+    }
+    
+    public void doTestEnvelopedSAMLToken(boolean signed, CallbackHandler samlCallbackHandler) throws Exception {
         String address = "https://localhost:" + PORT + "/samlxml/bookstore/books";
-        WebClient wc = createWebClient(address, new SamlEnvelopedOutInterceptor(!signed), null);
+        WebClient wc = createWebClient(address, new SamlEnvelopedOutInterceptor(!signed), null, samlCallbackHandler);
         XmlSigOutInterceptor xmlSig = new XmlSigOutInterceptor();
         if (signed) {
             xmlSig.setStyle(XmlSigOutInterceptor.DETACHED_SIG);
@@ -204,6 +221,13 @@ public class JAXRSSamlTest extends AbstractBusClientServerTestBase {
     private WebClient createWebClient(String address, 
                                       Interceptor<Message> outInterceptor,
                                       Object provider) {
+        return createWebClient(address, outInterceptor, provider, new SamlCallbackHandler());
+    }
+    
+    private WebClient createWebClient(String address, 
+                                      Interceptor<Message> outInterceptor,
+                                      Object provider,
+                                      CallbackHandler samlCallbackHandler) {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         bean.setAddress(address);
         
@@ -213,12 +237,11 @@ public class JAXRSSamlTest extends AbstractBusClientServerTestBase {
         bean.setBus(springBus);
 
         Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("security.callback-handler", 
+        properties.put(SecurityConstants.CALLBACK_HANDLER, 
                        "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
-        properties.put("security.saml-callback-handler", 
-                       "org.apache.cxf.systest.jaxrs.security.saml.SamlCallbackHandler");
-        properties.put("security.signature.username", "alice");
-        properties.put("security.signature.properties", 
+        properties.put(SecurityConstants.SAML_CALLBACK_HANDLER, samlCallbackHandler);
+        properties.put(SecurityConstants.SIGNATURE_USERNAME, "alice");
+        properties.put(SecurityConstants.SIGNATURE_PROPERTIES, 
                        "org/apache/cxf/systest/jaxrs/security/alice.properties");
         bean.setProperties(properties);
         
