@@ -59,6 +59,9 @@ import org.joda.time.DateTime;
 public class SamlCallbackHandler implements CallbackHandler {
     private boolean saml2 = true;
     private String confirmationMethod = SAML2Constants.CONF_SENDER_VOUCHES;
+    private String signatureAlgorithm;
+    private String digestAlgorithm;
+    private boolean signAssertion;
     
     public SamlCallbackHandler() {
         //
@@ -105,8 +108,13 @@ public class SamlCallbackHandler implements CallbackHandler {
                                                          SecurityConstants.SIGNATURE_CRYPTO,
                                                          SecurityConstants.SIGNATURE_PROPERTIES);
                         X509Certificate cert = 
+<<<<<<< HEAD
                             SecurityUtils.getCertificates(crypto, 
                                 SecurityUtils.getUserName(m, crypto, "ws-security.signature.username"))[0];
+=======
+                            RSSecurityUtils.getCertificates(crypto, 
+                                RSSecurityUtils.getUserName(m, crypto, SecurityConstants.SIGNATURE_USERNAME))[0];
+>>>>>>> 953d23f... [CXF-6543] - It's not possible to specify the signature + digest algorithms for self-signed SAML Assertions with JAX-RS
                         
                         KeyInfoBean keyInfo = new KeyInfoBean();
                         keyInfo.setCertificate(cert);
@@ -172,8 +180,37 @@ public class SamlCallbackHandler implements CallbackHandler {
                 
                 attrBean.setSamlAttributes(claims);
                 callback.setAttributeStatementData(Collections.singletonList(attrBean));
+                
+                callback.setSignatureAlgorithm(signatureAlgorithm);
+                callback.setSignatureDigestAlgorithm(digestAlgorithm);
+                
+                callback.setSignAssertion(signAssertion);
             }
         }
+    }
+
+    public String getSignatureAlgorithm() {
+        return signatureAlgorithm;
+    }
+
+    public void setSignatureAlgorithm(String signatureAlgorithm) {
+        this.signatureAlgorithm = signatureAlgorithm;
+    }
+
+    public String getDigestAlgorithm() {
+        return digestAlgorithm;
+    }
+
+    public void setDigestAlgorithm(String digestAlgorithm) {
+        this.digestAlgorithm = digestAlgorithm;
+    }
+
+    public boolean isSignAssertion() {
+        return signAssertion;
+    }
+
+    public void setSignAssertion(boolean signAssertion) {
+        this.signAssertion = signAssertion;
     }
     
 }

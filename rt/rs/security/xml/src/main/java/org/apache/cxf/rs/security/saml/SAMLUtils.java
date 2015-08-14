@@ -92,7 +92,10 @@ public final class SAMLUtils {
                     SecurityUtils.getPassword(message, user, WSPasswordCallback.SIGNATURE, 
                             SAMLUtils.class);
                 
-                assertion.signAssertion(user, password, crypto, false);
+                assertion.signAssertion(user, password, crypto, false,
+                                        samlCallback.getCanonicalizationAlgorithm(),
+                                        samlCallback.getSignatureAlgorithm(),
+                                        samlCallback.getSignatureDigestAlgorithm());
             }
             return assertion;
         } catch (Exception ex) {
