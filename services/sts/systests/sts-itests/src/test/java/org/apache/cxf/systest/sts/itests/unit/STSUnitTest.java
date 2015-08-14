@@ -103,10 +103,14 @@ public class STSUnitTest extends BasicSTSIntegrationTest {
         properties.put(
             SecurityConstants.CALLBACK_HANDLER, new CommonCallbackHandler()
         );
+        
+        Crypto crypto = CryptoFactory.getInstance("clientKeystore.properties", 
+                                                  this.getClass().getClassLoader());
+        
         properties.put(SecurityConstants.SIGNATURE_USERNAME, "myclientkey");
-        properties.put(SecurityConstants.SIGNATURE_PROPERTIES, "clientKeystore.properties");
+        properties.put(SecurityConstants.SIGNATURE_CRYPTO, crypto);
         properties.put(SecurityConstants.ENCRYPT_USERNAME, "mystskey");
-        properties.put(SecurityConstants.ENCRYPT_PROPERTIES, "clientKeystore.properties");
+        properties.put(SecurityConstants.ENCRYPT_CRYPTO, crypto);
 
         stsClient.setProperties(properties);
         stsClient.setTokenType(tokenType);
