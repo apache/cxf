@@ -895,7 +895,8 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                     crypto,
                     samlCallback.isSendKeyValue(),
                     samlCallback.getCanonicalizationAlgorithm(),
-                    samlCallback.getSignatureAlgorithm()
+                    samlCallback.getSignatureAlgorithm(),
+                    samlCallback.getSignatureDigestAlgorithm()
             );
         }
         
