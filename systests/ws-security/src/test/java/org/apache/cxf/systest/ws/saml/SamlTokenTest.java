@@ -1184,7 +1184,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         callbackHandler.setDigestAlgorithm(WSConstants.SHA256);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
         ((BindingProvider)saml2Port).getRequestContext().put(
-            "security.saml-callback-handler", callbackHandler
+            "ws-security.saml-callback-handler", callbackHandler
         );
 
         int result = saml2Port.doubleIt(25);
