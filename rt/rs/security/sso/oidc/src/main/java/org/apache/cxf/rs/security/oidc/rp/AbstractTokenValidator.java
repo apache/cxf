@@ -26,12 +26,12 @@ import org.apache.cxf.rs.security.jose.jwk.JsonWebKeys;
 import org.apache.cxf.rs.security.jose.jwk.JwkUtils;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
-import org.apache.cxf.rs.security.jose.jwt.AbstractJoseJwtConsumer;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rs.security.jose.jwt.JwtUtils;
+import org.apache.cxf.rs.security.oauth2.provider.AbstractOAuthJoseJwtConsumer;
 
-public abstract class AbstractTokenValidator extends AbstractJoseJwtConsumer {
+public abstract class AbstractTokenValidator extends AbstractOAuthJoseJwtConsumer {
     private static final String SELF_ISSUED_ISSUER = "https://self-issued.me";
     private String issuerId;
     private int issuedAtRange;

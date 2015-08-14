@@ -18,62 +18,45 @@
  */
 package org.apache.cxf.rs.security.oauth2.provider;
 
-import java.security.cert.X509Certificate;
-import java.security.interfaces.RSAPublicKey;
-
 import javax.crypto.SecretKey;
 
 import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
-import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jwe.JweEncryptionProvider;
 import org.apache.cxf.rs.security.jose.jwe.JweUtils;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 import org.apache.cxf.rs.security.jose.jwt.AbstractJoseJwtProducer;
-import org.apache.cxf.rs.security.oauth2.common.Client;
+import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
 
 public abstract class AbstractOAuthJoseJwtProducer extends AbstractJoseJwtProducer {
-    private boolean encryptWithClientCertificates;
     private boolean encryptWithClientSecret;
     private boolean signWithClientSecret;
     
-    protected JwsSignatureProvider getInitializedSignatureProvider(Client c, boolean required) {
-        if (signWithClientSecret) {
-            byte[] hmac = CryptoUtils.decodeSequence(c.getClientSecret());
-            return JwsUtils.getHmacSignatureProvider(hmac, SignatureAlgorithm.HS256);
-        } 
-        return super.getInitializedSignatureProvider(required);
+    protected String processJwt(JwtToken jwt, String clientSecret) {
+        return processJwt(jwt, 
+                         getInitializedEncryptionProvider(clientSecret),
+                         getInitializedSignatureProvider(clientSecret));
     }
-    protected JweEncryptionProvider getInitializedEncryptionProvider(Client c, boolean required) {
-        JweEncryptionProvider theEncryptionProvider = null;
+    
+    protected JwsSignatureProvider getInitializedSignatureProvider(String clientSecret) {
+        if (signWithClientSecret) {
+            byte[] hmac = CryptoUtils.decodeSequence(clientSecret);
+            return JwsUtils.getHmacSignatureProvider(hmac, SignatureAlgorithm.HS256);
+        }
+        return null;
+    }
+    protected JweEncryptionProvider getInitializedEncryptionProvider(String clientSecret) {
         if (encryptWithClientSecret) {
-            SecretKey key = CryptoUtils.decodeSecretKey(c.getClientSecret());
-            theEncryptionProvider = JweUtils.getDirectKeyJweEncryption(key, ContentAlgorithm.A128GCM);
-        } else if (encryptWithClientCertificates) {
-            X509Certificate cert = 
-                (X509Certificate)CryptoUtils.decodeCertificate(c.getApplicationCertificates().get(0));
-            theEncryptionProvider = JweUtils.createJweEncryptionProvider((RSAPublicKey)cert.getPublicKey(), 
-                                                                         KeyAlgorithm.RSA_OAEP, 
-                                                                         ContentAlgorithm.A128GCM, 
-                                                                         null);
+            SecretKey key = CryptoUtils.decodeSecretKey(clientSecret);
+            return JweUtils.getDirectKeyJweEncryption(key, ContentAlgorithm.A128GCM);
         }
-        if (theEncryptionProvider == null) {
-            theEncryptionProvider = super.getInitializedEncryptionProvider(required);
-        }
-        return theEncryptionProvider;
-        
+        return null;
     }
 
-    public void setEncryptWithClientCertificates(boolean encryptWithClientCertificates) {
-        if (encryptWithClientSecret) {
-            throw new SecurityException();
-        }
-        this.encryptWithClientCertificates = encryptWithClientCertificates;
-    }
     public void setEncryptWithClientSecret(boolean encryptWithClientSecret) {
-        if (signWithClientSecret || encryptWithClientCertificates) {
+        if (signWithClientSecret) {
             throw new SecurityException();
         }
         this.encryptWithClientSecret = encryptWithClientSecret;
@@ -83,5 +66,11 @@ public abstract class AbstractOAuthJoseJwtProducer extends AbstractJoseJwtProduc
             throw new SecurityException();
         }
         this.signWithClientSecret = signWithClientSecret;
+    }
+    public boolean isSignWithClientSecret() {
+        return signWithClientSecret;
+    }
+    public boolean isEncryptWithClientSecret() {
+        return encryptWithClientSecret;
     }
 }

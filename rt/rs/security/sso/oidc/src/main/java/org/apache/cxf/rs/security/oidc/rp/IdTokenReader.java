@@ -19,29 +19,30 @@
 package org.apache.cxf.rs.security.oidc.rp;
 
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
+import org.apache.cxf.rs.security.oauth2.client.OAuthClientUtils;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oidc.common.IdToken;
 import org.apache.cxf.rs.security.oidc.utils.OidcUtils;
 
 public class IdTokenReader extends AbstractTokenValidator {
     private boolean requireAtHash = true;
-    public IdToken getIdToken(ClientAccessToken at, String clientId) {
-        JwtToken jwt = getIdJwtToken(at, clientId);
+    public IdToken getIdToken(ClientAccessToken at, OAuthClientUtils.Consumer client) {
+        JwtToken jwt = getIdJwtToken(at, client);
         return getIdTokenFromJwt(jwt);
     }
-    public IdToken getIdToken(String idJwtToken, String clientId) {
-        JwtToken jwt = getIdJwtToken(idJwtToken, clientId);
+    public IdToken getIdToken(String idJwtToken, OAuthClientUtils.Consumer client) {
+        JwtToken jwt = getIdJwtToken(idJwtToken, client);
         return getIdTokenFromJwt(jwt);
     }
-    public JwtToken getIdJwtToken(ClientAccessToken at, String clientId) {
+    public JwtToken getIdJwtToken(ClientAccessToken at, OAuthClientUtils.Consumer client) {
         String idJwtToken = at.getParameters().get(OidcUtils.ID_TOKEN);
-        JwtToken jwt = getIdJwtToken(idJwtToken, clientId); 
+        JwtToken jwt = getIdJwtToken(idJwtToken, client); 
         OidcUtils.validateAccessTokenHash(at, jwt, requireAtHash);
         return jwt;
     }
-    public JwtToken getIdJwtToken(String idJwtToken, String clientId) {
-        JwtToken jwt = getJwtToken(idJwtToken);
-        validateJwtClaims(jwt.getClaims(), clientId, true);
+    public JwtToken getIdJwtToken(String idJwtToken, OAuthClientUtils.Consumer client) {
+        JwtToken jwt = getJwtToken(idJwtToken, client.getSecret());
+        validateJwtClaims(jwt.getClaims(), client.getKey(), true);
         return jwt;
     }
     private IdToken getIdTokenFromJwt(JwtToken jwt) {

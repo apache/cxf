@@ -31,12 +31,12 @@ public class UserInfoClient extends AbstractTokenValidator {
     private boolean sendTokenAsFormParameter;
     private WebClient profileClient;
     private boolean getUserInfoFromJwt;
-    public UserInfo getUserInfo(ClientAccessToken at, IdToken idToken) {
+    public UserInfo getUserInfo(ClientAccessToken at, IdToken idToken, OAuthClientUtils.Consumer client) {
         if (!sendTokenAsFormParameter) {
             OAuthClientUtils.setAuthorizationHeader(profileClient, at);
             if (getUserInfoFromJwt) {
                 String jwt = profileClient.get(String.class);
-                return getUserInfoFromJwt(jwt, idToken);
+                return getUserInfoFromJwt(jwt, idToken, client);
             } else {
                 UserInfo profile = profileClient.get(UserInfo.class);
                 validateUserInfo(profile, idToken);
@@ -46,7 +46,7 @@ public class UserInfoClient extends AbstractTokenValidator {
             Form form = new Form().param("access_token", at.getTokenKey());
             if (getUserInfoFromJwt) {
                 String jwt = profileClient.form(form).readEntity(String.class);
-                return getUserInfoFromJwt(jwt, idToken);
+                return getUserInfoFromJwt(jwt, idToken, client);
             } else {
                 UserInfo profile = profileClient.form(form).readEntity(UserInfo.class);
                 validateUserInfo(profile, idToken);
@@ -54,8 +54,10 @@ public class UserInfoClient extends AbstractTokenValidator {
             }
         }
     }
-    public UserInfo getUserInfoFromJwt(String profileJwtToken, IdToken idToken) {
-        JwtToken jwt = getUserInfoJwt(profileJwtToken);
+    public UserInfo getUserInfoFromJwt(String profileJwtToken, 
+                                       IdToken idToken,
+                                       OAuthClientUtils.Consumer client) {
+        JwtToken jwt = getUserInfoJwt(profileJwtToken, client);
         return getUserInfoFromJwt(jwt, idToken);
     }
     public UserInfo getUserInfoFromJwt(JwtToken jwt, IdToken idToken) {
@@ -63,7 +65,7 @@ public class UserInfoClient extends AbstractTokenValidator {
         validateUserInfo(profile, idToken);
         return profile;
     }
-    public JwtToken getUserInfoJwt(String profileJwtToken) {
+    public JwtToken getUserInfoJwt(String profileJwtToken, OAuthClientUtils.Consumer client) {
         return getJwtToken(profileJwtToken);
     }
     public void validateUserInfo(UserInfo profile, IdToken idToken) {

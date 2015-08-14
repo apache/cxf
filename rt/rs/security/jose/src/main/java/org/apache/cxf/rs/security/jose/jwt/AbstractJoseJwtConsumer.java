@@ -28,21 +28,36 @@ public abstract class AbstractJoseJwtConsumer extends AbstractJoseConsumer {
     private boolean jwsRequired = true;
     private boolean jweRequired;
     
+    
     protected JwtToken getJwtToken(String wrappedJwtToken) {
+        return getJwtToken(wrappedJwtToken, null, null);
+    }
+    protected JwtToken getJwtToken(String wrappedJwtToken,
+                                   JweDecryptionProvider jweDecryptor,
+                                   JwsSignatureVerifier theSigVerifier) {
         if (!isJwsRequired() && !isJweRequired()) {
             throw new JwtException("Unable to process JWT");
         }
-        JweDecryptionProvider jweDecryptor = getInitializedDecryptionProvider(isJweRequired());
+        if (jweDecryptor == null) {
+            jweDecryptor = getInitializedDecryptionProvider();
+        }
         if (jweDecryptor != null) {
             if (!isJwsRequired()) {
                 return new JweJwtCompactConsumer(wrappedJwtToken).decryptWith(jweDecryptor);    
             }
             wrappedJwtToken = jweDecryptor.decrypt(wrappedJwtToken).getContentText();
-        } 
+        } else if (isJweRequired()) {
+            throw new JwtException("Unable to decrypt JWT");
+        }
 
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(wrappedJwtToken);
         JwtToken jwt = jwtConsumer.getJwtToken();
-        JwsSignatureVerifier theSigVerifier = getInitializedSignatureVerifier(jwt);
+        if (theSigVerifier == null) {
+            theSigVerifier = getInitializedSignatureVerifier(jwt);
+        }
+        if (theSigVerifier == null && isJwsRequired()) {
+            throw new JwtException("Unable to validate JWT");
+        }
         if (!jwtConsumer.verifySignatureWith(theSigVerifier)) {
             throw new JwtException("Invalid Signature");
         }
@@ -50,7 +65,7 @@ public abstract class AbstractJoseJwtConsumer extends AbstractJoseConsumer {
         return jwt; 
     }
     protected JwsSignatureVerifier getInitializedSignatureVerifier(JwtToken jwt) {
-        return super.getInitializedSignatureVerifier(isJwsRequired());
+        return super.getInitializedSignatureVerifier();
     }
     protected void validateToken(JwtToken jwt) {
     }
