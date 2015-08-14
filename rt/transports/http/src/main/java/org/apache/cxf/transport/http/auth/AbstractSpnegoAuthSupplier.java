@@ -101,23 +101,6 @@ public abstract class AbstractSpnegoAuthSupplier {
                             Message message) throws GSSException, 
         LoginException {
         
-        Subject subject = null;
-        if (authPolicy != null) {
-            String contextName = authPolicy.getAuthorization();
-            if (contextName == null) {
-                contextName = "";
-            }
-        
-            if (!(StringUtils.isEmpty(authPolicy.getUserName())
-                && StringUtils.isEmpty(contextName) && loginConfig == null)) {
-                CallbackHandler callbackHandler = getUsernamePasswordHandler(
-                    authPolicy.getUserName(), authPolicy.getPassword());
-                LoginContext lc = new LoginContext(contextName, null, callbackHandler, loginConfig);
-                lc.login();
-                subject = lc.getSubject();
-            }
-        }
-                                                                 
         GSSManager manager = GSSManager.getInstance();
         GSSName serverName = manager.createName(spn, serviceNameType);
 
@@ -135,6 +118,23 @@ public abstract class AbstractSpnegoAuthSupplier {
         final byte[] token = new byte[0];
         if (delegatedCred != null) {
             return context.initSecContext(token, 0, token.length);
+        }
+        
+        Subject subject = null;
+        if (authPolicy != null) {
+            String contextName = authPolicy.getAuthorization();
+            if (contextName == null) {
+                contextName = "";
+            }
+        
+            if (!(StringUtils.isEmpty(authPolicy.getUserName())
+                && StringUtils.isEmpty(contextName) && loginConfig == null)) {
+                CallbackHandler callbackHandler = getUsernamePasswordHandler(
+                    authPolicy.getUserName(), authPolicy.getPassword());
+                LoginContext lc = new LoginContext(contextName, null, callbackHandler, loginConfig);
+                lc.login();
+                subject = lc.getSubject();
+            }
         }
         
         try {
