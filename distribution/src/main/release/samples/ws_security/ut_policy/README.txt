@@ -1,4 +1,4 @@
-WS-Security Demo  (UsernameToken and Timestamp)
+WS-SecurityPolicy Demo  (UsernameToken and Timestamp using WS-SecurityPolicy)
 ===============================================
 This demo shows how WS-Security support in Apache CXF may be enabled.
 

@@ -20,8 +20,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>wssec_sign_enc</artifactId>
-    <name>CXF WS-Security Sign Encoding Demo</name>
-    <description>CXF WS-Security Sign Encoding Demo</description>
+    <name>CXF WS-Security Signature Encryption Demo</name>
+    <description>CXF WS-Security Signature Encryption Demo</description>
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>

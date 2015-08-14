@@ -19,9 +19,9 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>wssec_ut_policy</artifactId>
-    <name>WS-Security UT Policy Demo</name>
-    <description>WS-Security UT Policy Demo</description>
+    <artifactId>wssec_sign_enc_policy</artifactId>
+    <name>CXF WS-SecurityPolicy Signature Encryption Demo</name>
+    <description>CXF WS-SecurityPolicy Signature Encryption Demo</description>
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
