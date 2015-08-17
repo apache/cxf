@@ -238,85 +238,81 @@ public class UDPConduit extends AbstractConduit {
 
         public void close() throws IOException {
             super.close();
-            DatagramSocket socket;
-            if (multicast != null) {
-                socket = new MulticastSocket(null);
-            } else {
-                socket = new DatagramSocket();
-            }
-            socket.setSendBufferSize(this.size());
-            socket.setReceiveBufferSize(64 * 1024);
-            socket.setBroadcast(true);
             
-            if (multicast == null) {
-                Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-                while (interfaces.hasMoreElements()) {
-                    NetworkInterface networkInterface = interfaces.nextElement();
-                    if (!networkInterface.isUp() || networkInterface.isLoopback()) {
-                        continue;  
-                    }
-                    for (InterfaceAddress interfaceAddress : networkInterface.getInterfaceAddresses()) {
-                        InetAddress broadcast = interfaceAddress.getBroadcast();
-                        if (broadcast == null) {
-                            continue;
-                        }
-                        DatagramPacket sendPacket = new DatagramPacket(this.getRawBytes(), 
-                                                                       0,
-                                                                       this.size(),
-                                                                       broadcast, 
-                                                                       port);
-                        
-                        try {
-                            socket.send(sendPacket);
-                        } catch (Exception e) {
-                            //ignore
-                        }
-                    }
-                }
-            } else {
-                DatagramPacket sendPacket = new DatagramPacket(this.getRawBytes(), 
-                                                               0,
-                                                               this.size(),
-                                                               multicast);
+            try (DatagramSocket socket = multicast != null ? new MulticastSocket(null) : new DatagramSocket()) {
+                socket.setSendBufferSize(this.size());
+                socket.setReceiveBufferSize(64 * 1024);
+                socket.setBroadcast(true);
                 
-                try {
-                    socket.send(sendPacket);
-                } catch (Exception e) {
-                    //ignore
-                }
-            }
-            
-            if (!message.getExchange().isOneWay()) {
-                byte bytes[] = new byte[64 * 1024];
-                DatagramPacket p = new DatagramPacket(bytes, bytes.length);
-                Object to = message.getContextualProperty(MULTI_RESPONSE_TIMEOUT);
-                Integer i = null;
-                if (to instanceof String) {
-                    i = Integer.parseInt((String)to);
-                } else if (to instanceof Integer) {
-                    i = (Integer)to;
-                }
-                if (i == null || i <= 0 || message.getExchange().isSynchronous()) {
-                    socket.setSoTimeout(30000);
-                    socket.receive(p);
-                    dataReceived(message, IoBuffer.wrap(bytes, 0, p.getLength()), false, false);
-                } else {
-                    socket.setSoTimeout(i);
-                    boolean found = false;
-                    try {
-                        while (true) {
-                            socket.receive(p);
-                            dataReceived(message, IoBuffer.wrap(bytes, 0, p.getLength()), false, true);
-                            found = true;
+                if (multicast == null) {
+                    Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+                    while (interfaces.hasMoreElements()) {
+                        NetworkInterface networkInterface = interfaces.nextElement();
+                        if (!networkInterface.isUp() || networkInterface.isLoopback()) {
+                            continue;  
                         }
-                    } catch (java.net.SocketTimeoutException ex) {
-                        if (!found) {
-                            throw ex;
+                        for (InterfaceAddress interfaceAddress : networkInterface.getInterfaceAddresses()) {
+                            InetAddress broadcast = interfaceAddress.getBroadcast();
+                            if (broadcast == null) {
+                                continue;
+                            }
+                            DatagramPacket sendPacket = new DatagramPacket(this.getRawBytes(), 
+                                                                           0,
+                                                                           this.size(),
+                                                                           broadcast, 
+                                                                           port);
+                            
+                            try {
+                                socket.send(sendPacket);
+                            } catch (Exception e) {
+                                //ignore
+                            }
+                        }
+                    }
+                } else {
+                    DatagramPacket sendPacket = new DatagramPacket(this.getRawBytes(), 
+                                                                   0,
+                                                                   this.size(),
+                                                                   multicast);
+                    
+                    try {
+                        socket.send(sendPacket);
+                    } catch (Exception e) {
+                        //ignore
+                    }
+                }
+                
+                if (!message.getExchange().isOneWay()) {
+                    byte bytes[] = new byte[64 * 1024];
+                    DatagramPacket p = new DatagramPacket(bytes, bytes.length);
+                    Object to = message.getContextualProperty(MULTI_RESPONSE_TIMEOUT);
+                    Integer i = null;
+                    if (to instanceof String) {
+                        i = Integer.parseInt((String)to);
+                    } else if (to instanceof Integer) {
+                        i = (Integer)to;
+                    }
+                    if (i == null || i <= 0 || message.getExchange().isSynchronous()) {
+                        socket.setSoTimeout(30000);
+                        socket.receive(p);
+                        dataReceived(message, IoBuffer.wrap(bytes, 0, p.getLength()), false, false);
+                    } else {
+                        socket.setSoTimeout(i);
+                        boolean found = false;
+                        try {
+                            while (true) {
+                                socket.receive(p);
+                                dataReceived(message, IoBuffer.wrap(bytes, 0, p.getLength()), false, true);
+                                found = true;
+                            }
+                        } catch (java.net.SocketTimeoutException ex) {
+                            if (!found) {
+                                throw ex;
+                            }
                         }
                     }
                 }
             }
-            socket.close();
         }
 
         public void flush() throws IOException {

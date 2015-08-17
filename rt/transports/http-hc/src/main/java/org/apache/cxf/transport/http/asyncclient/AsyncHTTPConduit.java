@@ -771,7 +771,6 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
                 } else if (isChunked || isEofTerminated) {
                     // ensure chunked or EOF-terminated response is non-empty
                     try {
-                        @SuppressWarnings("resource")
                         PushbackInputStream pin = 
                             new PushbackInputStream(getInputStream());
                         int c = pin.read();

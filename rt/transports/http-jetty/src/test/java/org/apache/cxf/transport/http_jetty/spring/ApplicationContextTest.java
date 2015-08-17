@@ -67,7 +67,7 @@ public class ApplicationContextTest extends Assert {
             .getResource("/org/apache/cxf/transport/http_jetty/spring/invalid-beans.xml").toString();
     
         try {
-            new TestApplicationContext(new String[] {S1, s4});
+            new TestApplicationContext(new String[] {S1, s4}).close();
             fail("Expected XmlBeanDefinitionStoreException not thrown.");
         } catch (XmlBeanDefinitionStoreException ex) {
             assertTrue(ex.getCause() instanceof SAXParseException);

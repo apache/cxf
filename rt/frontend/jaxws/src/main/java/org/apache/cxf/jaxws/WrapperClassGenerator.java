@@ -347,7 +347,7 @@ public final class WrapperClassGenerator extends ASMHelper {
         if (!addJAXBAnnotations(fv, jaxbAnnos, name)) {
             AnnotationVisitor av0 = fv.visitAnnotation("Ljavax/xml/bind/annotation/XmlElement;", true);
             av0.visit("name", name);
-            if (factory.isWrapperPartQualified(mpi)) {
+            if (Boolean.TRUE.equals(factory.isWrapperPartQualified(mpi))) {
                 av0.visit("namespace", mpi.getConcreteName().getNamespaceURI());            
             }
             if (factory.isWrapperPartNillable(mpi)) {

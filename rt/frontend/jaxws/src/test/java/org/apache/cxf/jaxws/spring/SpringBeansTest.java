@@ -437,7 +437,7 @@ public class SpringBeansTest extends Assert {
     @Test
     public void testEndpointWithUndefinedBus() throws Exception {
         try {
-            new ClassPathXmlApplicationContext("/org/apache/cxf/jaxws/spring/endpoints3.xml");
+            new ClassPathXmlApplicationContext("/org/apache/cxf/jaxws/spring/endpoints3.xml").close();
             fail("Should have thrown an exception");
         } catch (BeanCreationException ex) {
             assertEquals("ep2", ex.getBeanName());

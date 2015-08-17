@@ -182,7 +182,7 @@ public class EndpointImplTest extends AbstractJaxWsTest {
         serviceFactory.setServiceClass(HelloWrongAnnotation.class);
         
         try {
-            new EndpointImpl(getBus(), hello, new JaxWsServerFactoryBean(serviceFactory));
+            new EndpointImpl(getBus(), hello, new JaxWsServerFactoryBean(serviceFactory)).close();
         } catch (Exception e) {
             String expeced = "Method [sayHi] processing error: SOAPBinding can not on method with RPC style";
             assertEquals(expeced, e.getMessage());

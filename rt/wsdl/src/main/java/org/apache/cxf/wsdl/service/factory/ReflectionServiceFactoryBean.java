@@ -2279,14 +2279,14 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
         return null;
     }
 
-    public boolean isWrapperPartQualified(MessagePartInfo mpi) {
+    public Boolean isWrapperPartQualified(MessagePartInfo mpi) {
         for (AbstractServiceConfiguration c : serviceConfigurations) {
             Boolean b = c.isWrapperPartQualified(mpi);
             if (b != null) {
                 return b;
             }
         }
-        return false;
+        return null;
     }
     public boolean isWrapperPartNillable(MessagePartInfo mpi) {
         for (AbstractServiceConfiguration c : serviceConfigurations) {

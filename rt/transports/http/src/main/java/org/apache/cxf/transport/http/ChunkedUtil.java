@@ -83,7 +83,6 @@ final class ChunkedUtil {
     ) {
         InputStream in = null;
         try {
-            @SuppressWarnings("resource")
             PushbackInputStream pin = 
                 new PushbackInputStream(connection.getInputStream());
             int c = pin.read();
