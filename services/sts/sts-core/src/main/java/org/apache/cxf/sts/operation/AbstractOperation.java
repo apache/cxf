@@ -76,10 +76,10 @@ import org.apache.cxf.ws.security.sts.provider.model.secext.ReferenceType;
 import org.apache.cxf.ws.security.sts.provider.model.secext.SecurityTokenReferenceType;
 import org.apache.cxf.ws.security.sts.provider.model.utility.AttributedDateTime;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.WSSecEncrypt;
@@ -543,6 +543,7 @@ public abstract class AbstractOperation {
         List<WSHandlerResult> results = 
             (List<WSHandlerResult>) context.get(WSHandlerConstants.RECV_RESULTS);
         // DOM
+<<<<<<< HEAD
         if (results != null) {
             for (WSHandlerResult rResult : results) {
                 List<WSSecurityEngineResult> wsSecEngineResults = rResult.getResults();
@@ -558,6 +559,11 @@ public abstract class AbstractOperation {
                     }
                 }
             }
+=======
+        X509Certificate cert = WSS4JUtils.getReqSigCert(results);
+        if (cert != null) {
+            return cert;
+>>>>>>> 17dbc12... Consolidate some code in WS-Security/STS
         }
         
         // Streaming

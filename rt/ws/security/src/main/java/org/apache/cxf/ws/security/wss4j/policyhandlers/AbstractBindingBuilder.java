@@ -1611,7 +1611,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                 CastUtils.cast((List<?>)
                     message.getExchange().getInMessage().get(WSHandlerConstants.RECV_RESULTS));
             if (results != null) {
-                encrKeyBuilder.setUseThisCert(getReqSigCert(results));
+                encrKeyBuilder.setUseThisCert(WSS4JUtils.getReqSigCert(results));
                  
                 //TODO This is a hack, this should not come under USE_REQ_SIG_CERT
                 if (encrKeyBuilder.isCertSet()) {
@@ -1627,6 +1627,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         return encrUser;
     }
     
+<<<<<<< HEAD
     private static X509Certificate getReqSigCert(List<WSHandlerResult> results) {
         /*
         * Scan the results for a matching actor. Use results only if the
@@ -1650,6 +1651,8 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         return null;
     }
     
+=======
+>>>>>>> 17dbc12... Consolidate some code in WS-Security/STS
     /**
      * Scan through <code>WSHandlerResult<code> list for a Username token and return
      * the username if a Username Token found 
