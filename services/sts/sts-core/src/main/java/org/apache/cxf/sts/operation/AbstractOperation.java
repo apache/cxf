@@ -543,27 +543,9 @@ public abstract class AbstractOperation {
         List<WSHandlerResult> results = 
             (List<WSHandlerResult>) context.get(WSHandlerConstants.RECV_RESULTS);
         // DOM
-<<<<<<< HEAD
-        if (results != null) {
-            for (WSHandlerResult rResult : results) {
-                List<WSSecurityEngineResult> wsSecEngineResults = rResult.getResults();
-                for (WSSecurityEngineResult wser : wsSecEngineResults) {
-                    int wserAction = 
-                        ((java.lang.Integer)wser.get(WSSecurityEngineResult.TAG_ACTION)).intValue();
-                    if (wserAction == WSConstants.SIGN) {
-                        X509Certificate cert = 
-                            (X509Certificate)wser.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
-                        if (cert != null) {
-                            return cert;
-                        }
-                    }
-                }
-            }
-=======
         X509Certificate cert = WSS4JUtils.getReqSigCert(results);
         if (cert != null) {
             return cert;
->>>>>>> 17dbc12... Consolidate some code in WS-Security/STS
         }
         
         // Streaming

@@ -24,11 +24,7 @@ import java.net.URL;
 import java.security.Key;
 import java.security.cert.X509Certificate;
 import java.util.Date;
-<<<<<<< HEAD
-=======
 import java.util.List;
-import java.util.Map;
->>>>>>> 17dbc12... Consolidate some code in WS-Security/STS
 import java.util.Properties;
 
 import javax.crypto.SecretKey;
@@ -55,13 +51,9 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.PasswordEncryptor;
 import org.apache.wss4j.common.ext.WSSecurityException;
-<<<<<<< HEAD
-=======
-import org.apache.wss4j.common.util.Loader;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
->>>>>>> 17dbc12... Consolidate some code in WS-Security/STS
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
@@ -363,36 +355,6 @@ public final class WSS4JUtils {
         return CryptoFactory.getInstance(propFilename, classLoader);
     }
     
-<<<<<<< HEAD
-=======
-    public static Crypto getSignatureCrypto(
-        Object s, 
-        SoapMessage message, 
-        PasswordEncryptor passwordEncryptor
-    ) throws WSSecurityException {
-        Crypto signCrypto = null;
-        if (s instanceof Crypto) {
-            signCrypto = (Crypto)s;
-        } else if (s != null) {
-            URL propsURL = SecurityUtils.loadResource(message, s);
-            Properties props = WSS4JUtils.getProps(s, propsURL);
-            if (props == null) {
-                LOG.fine("Cannot find Crypto Signature properties: " + s);
-                Exception ex = new Exception("Cannot find Crypto Signature properties: " + s);
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
-            }
-            
-            signCrypto = CryptoFactory.getInstance(props, Loader.getClassLoader(CryptoFactory.class),
-                                                   passwordEncryptor);
-
-            EndpointInfo info = message.getExchange().getEndpoint().getEndpointInfo();
-            synchronized (info) {
-                info.setProperty(SecurityConstants.SIGNATURE_CRYPTO, signCrypto);
-            }
-        }
-        return signCrypto;
-    }
-    
     /**
      * Get the certificate that was used to sign the request
      */
@@ -402,20 +364,24 @@ public final class WSS4JUtils {
         }
         
         for (WSHandlerResult rResult : results) {
-            List<WSSecurityEngineResult> signedResults = 
-                rResult.getActionResults().get(WSConstants.SIGN);
+            List<WSSecurityEngineResult> wsSecEngineResults = rResult.getResults();
             
-            if (signedResults != null && !signedResults.isEmpty()) {
-                for (WSSecurityEngineResult signedResult : signedResults) {
-                    if (signedResult.containsKey(WSSecurityEngineResult.TAG_X509_CERTIFICATE)) {
-                        return (X509Certificate)signedResult.get(
-                            WSSecurityEngineResult.TAG_X509_CERTIFICATE);
+            if (wsSecEngineResults != null && !wsSecEngineResults.isEmpty()) {
+                for (WSSecurityEngineResult wser : wsSecEngineResults) {
+                    Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
+                    if (actInt.intValue() == WSConstants.SIGN) {
+                        X509Certificate cert =
+                            (X509Certificate)wser.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
+                        if (cert != null) {
+                            return cert;
+                        }
                     }
                 }
+
             }
         }
         
         return null;
     }
->>>>>>> 17dbc12... Consolidate some code in WS-Security/STS
 }
+

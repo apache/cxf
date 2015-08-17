@@ -1627,32 +1627,6 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         return encrUser;
     }
     
-<<<<<<< HEAD
-    private static X509Certificate getReqSigCert(List<WSHandlerResult> results) {
-        /*
-        * Scan the results for a matching actor. Use results only if the
-        * receiving Actor and the sending Actor match.
-        */
-        for (WSHandlerResult rResult : results) {
-            List<WSSecurityEngineResult> wsSecEngineResults = rResult.getResults();
-            /*
-            * Scan the results for the first Signature action. Use the
-            * certificate of this Signature to set the certificate for the
-            * encryption action :-).
-            */
-            for (WSSecurityEngineResult wser : wsSecEngineResults) {
-                Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
-                if (actInt.intValue() == WSConstants.SIGN) {
-                    return (X509Certificate)wser.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
-                }
-            }
-        }
-        
-        return null;
-    }
-    
-=======
->>>>>>> 17dbc12... Consolidate some code in WS-Security/STS
     /**
      * Scan through <code>WSHandlerResult<code> list for a Username token and return
      * the username if a Username Token found 
