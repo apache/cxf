@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<!-- 
+  http://www.ws-i.org/profiles/attachmentsprofile-1.0.html#Referencing_Attachments_from_the_SOAP_Envelope 
+-->
+<wsdl:definitions xmlns:types="http://example.com/mimetypes"
+                  xmlns:ref="http://ws-i.org/profiles/basic/1.1/xsd"
+                  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                  xmlns:soapbind="http://schemas.xmlsoap.org/wsdl/soap/"
+                  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+                  xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/"
+                  targetNamespace="http://example.com/mimewsdl"
+                  xmlns:tns="http://example.com/mimewsdl">
+
+    <wsdl:types>
+        <xsd:schema targetNamespace="http://example.com/mimetypes"
+                xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+            <xsd:import namespace="http://ws-i.org/profiles/basic/1.1/xsd" />
+            <xsd:element name="ClaimDetail" type="types:ClaimDetailType"/>
+            <xsd:complexType name="ClaimDetailType">
+                <xsd:sequence>
+                    <xsd:element name="Name" type="xsd:string"/>
+                    <xsd:element name="ClaimForm" type="ref:swaRef"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:element name="ClaimRefNo" type="xsd:string"/>
+        </xsd:schema>
+    </wsdl:types>
+
+    <wsdl:message name="ClaimIn">
+        <wsdl:part name="body" element="types:ClaimDetail"/>
+        <wsdl:part name="ClaimPhoto" type="xsd:base64Binary"/>
+    </wsdl:message>
+
+    <wsdl:message name="ClaimOut">
+        <wsdl:part name="out" element="types:ClaimRefNo"/>
+    </wsdl:message>
+
+    <wsdl:portType name="ClaimPortType">
+        <wsdl:operation name="SendClaim">
+            <wsdl:input message="tns:ClaimIn"/>
+            <wsdl:output message="tns:ClaimOut"/>
+        </wsdl:operation>
+    </wsdl:portType>
+
+    <wsdl:binding name="ClaimBinding" type="tns:ClaimPortType">
+        <soapbind:binding style="document" 
+                          transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="SendClaim">
+            <soapbind:operation soapAction="http://example.com/soapaction"/>
+            <wsdl:input>
+                <mime:multipartRelated>
+                    <mime:part>
+                        <soapbind:body parts="body" use="literal"/>
+                    </mime:part>
+                    <mime:part>
+                        <mime:content part="ClaimPhoto" type="image/jpeg"/>
+                    </mime:part>
+                </mime:multipartRelated>
+            </wsdl:input>
+            <wsdl:output>
+                <soapbind:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+</wsdl:definitions>

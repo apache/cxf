@@ -22,8 +22,11 @@ package org.apache.cxf.tools.validator.internal;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+
 import javax.jws.soap.SOAPBinding;
 import javax.wsdl.Binding;
 import javax.wsdl.BindingOperation;
@@ -33,6 +36,10 @@ import javax.wsdl.Message;
 import javax.wsdl.Operation;
 import javax.wsdl.Part;
 import javax.wsdl.PortType;
+import javax.wsdl.WSDLElement;
+import javax.wsdl.extensions.mime.MIMEContent;
+import javax.wsdl.extensions.mime.MIMEMultipartRelated;
+import javax.wsdl.extensions.mime.MIMEPart;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.binding.soap.SOAPBindingUtil;
@@ -306,11 +313,12 @@ public class WSIBPValidator extends AbstractDefinitionValidator {
                 BindingOperation bop = wsdlHelper.getBindingOperation(def, operation.getName());
                 if (operation.getInput() != null && operation.getInput().getMessage() != null) {
                     Message inMess = operation.getInput().getMessage();
+                    Set<String> ignorableParts = getIgnorableParts(bop.getBindingInput());
 
                     for (Iterator<?> ite3 = inMess.getParts().values().iterator(); ite3.hasNext();) {
                         Part p = (Part)ite3.next();
                         if (SOAPBinding.Style.RPC.name().equalsIgnoreCase(style) && p.getTypeName() == null
-                            && !isHeaderPart(bop, p)) {
+                            && !isHeaderPart(bop, p) && !isIgnorablePart(p.getName(), ignorableParts)) {
                             addErrorMessage("An rpc-literal binding in a DESCRIPTION MUST refer, "
                                             + "in its soapbind:body element(s), only to "
                                             + "wsdl:part element(s) that have been defined "
@@ -319,7 +327,7 @@ public class WSIBPValidator extends AbstractDefinitionValidator {
                         }
 
                         if (SOAPBinding.Style.DOCUMENT.name().equalsIgnoreCase(style)
-                            && p.getElementName() == null) {
+                            && p.getElementName() == null && !isIgnorablePart(p.getName(), ignorableParts)) {
                             addErrorMessage("A document-literal binding in a DESCRIPTION MUST refer, "
                                             + "in each of its soapbind:body element(s),"
                                             + "only to wsdl:part element(s)"
@@ -331,10 +339,12 @@ public class WSIBPValidator extends AbstractDefinitionValidator {
                 }
                 if (operation.getOutput() != null && operation.getOutput().getMessage() != null) {
                     Message outMess = operation.getOutput().getMessage();
+                    Set<String> ignorableParts = getIgnorableParts(bop.getBindingInput());
+
                     for (Iterator<?> ite3 = outMess.getParts().values().iterator(); ite3.hasNext();) {
                         Part p = (Part)ite3.next();
                         if (style.equalsIgnoreCase(SOAPBinding.Style.RPC.name()) && p.getTypeName() == null
-                            &&  !isHeaderPart(bop, p)) {
+                            && !isHeaderPart(bop, p) && !isIgnorablePart(p.getName(), ignorableParts)) {
                             addErrorMessage("An rpc-literal binding in a DESCRIPTION MUST refer, "
                                             + "in its soapbind:body element(s), only to "
                                             + "wsdl:part element(s) that have been defined "
@@ -343,7 +353,7 @@ public class WSIBPValidator extends AbstractDefinitionValidator {
                         }
 
                         if (style.equalsIgnoreCase(SOAPBinding.Style.DOCUMENT.name())
-                            && p.getElementName() == null) {
+                            && p.getElementName() == null && !isIgnorablePart(p.getName(), ignorableParts)) {
                             addErrorMessage("A document-literal binding in a DESCRIPTION MUST refer, "
                                             + "in each of its soapbind:body element(s),"
                                             + "only to wsdl:part element(s)"
@@ -357,6 +367,29 @@ public class WSIBPValidator extends AbstractDefinitionValidator {
 
         }
         return true;
+    }
+
+    private static boolean isIgnorablePart(String name, Set<String> ignorableParts) {
+        return ignorableParts != null && ignorableParts.contains(name);
+    }
+
+    private static Set<String> getIgnorableParts(WSDLElement ext) {
+        Set<String> parts = null;
+        if (ext != null && ext.getExtensibilityElements() != null && ext.getExtensibilityElements().size() > 0
+            && ext.getExtensibilityElements().get(0) instanceof MIMEMultipartRelated) {
+            MIMEMultipartRelated mpr = (MIMEMultipartRelated)ext.getExtensibilityElements().get(0);
+            List<MIMEPart> mps = CastUtils.cast(mpr.getMIMEParts());
+            parts = new HashSet<String>(mps.size());
+            for (Iterator<MIMEPart> it = mps.iterator(); it.hasNext();) {
+                MIMEPart mp = it.next();
+                if (mp.getExtensibilityElements() != null && mp.getExtensibilityElements().size() > 0
+                    && mp.getExtensibilityElements().get(0) instanceof MIMEContent) {
+                    parts.add(((MIMEContent)mp.getExtensibilityElements().get(0)).getPart());
+                }
+            }
+        }
+
+        return parts;
     }
 
     // TODO: Should also check SoapHeader/SoapHeaderFault
