@@ -20,6 +20,9 @@
 package demo.jaxrs.swagger.server;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Map;
+import java.util.TreeMap;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -47,6 +50,15 @@ import com.wordnik.swagger.annotations.ApiParam;
 @Path("/sample") 
 @Api(value = "/sample", description = "Sample JAX-RS service with Swagger documentation")
 public class Sample {
+    private Map<String, Item> items;
+
+    public Sample() {
+        items = Collections.synchronizedMap(new TreeMap<String, Item>(String.CASE_INSENSITIVE_ORDER));
+        items.put("Item 1", new Item("Item 1", "Value 1"));
+        items.put("Item 2", new Item("Item 2", "Value 2"));
+    }
+
+
     @Produces({ MediaType.APPLICATION_JSON })
     @GET
     @ApiOperation(
@@ -57,12 +69,7 @@ public class Sample {
     )
     public Response getItems(
         @ApiParam(value = "Page to fetch", required = true) @QueryParam("page") @DefaultValue("1") int page) {
-        return Response.ok(
-            Arrays.asList(
-                new Item("Item 1", "Value 1"),
-                new Item("Item 2", "Value 2")
-            )
-        ).build();
+        return Response.ok(items.values()).build();
     }
     
     @Produces({ MediaType.APPLICATION_JSON })
@@ -76,7 +83,7 @@ public class Sample {
     public Item getItem(
         @ApiParam(value = "language", required = true) @HeaderParam("Accept-Language") final String language,
         @ApiParam(value = "name", required = true) @PathParam("name") String name) {
-        return new Item("name", "Value in " + language);
+        return items.get(name);
     }
     
     @Consumes({ MediaType.APPLICATION_JSON })
@@ -89,7 +96,7 @@ public class Sample {
     public Response createItem(
         @Context final UriInfo uriInfo,
         @ApiParam(value = "item", required = true) final Item item) {
-        
+        items.put(item.getName(), item);        
         return Response
             .created(uriInfo.getBaseUriBuilder().path(item.getName()).build())
             .entity(item).build();
@@ -106,7 +113,9 @@ public class Sample {
     public Item updateItem(
         @ApiParam(value = "name", required = true) @PathParam("name") String name,
         @ApiParam(value = "value", required = true) @FormParam("value") String value) {        
-        return new Item(name, value);
+        Item item = new Item(name, value);
+        items.put(name,  item);
+        return item;
     }
     
     @Path("/{name}")
@@ -125,6 +134,7 @@ public class Sample {
        )
     )
     public Response delete(@ApiParam(value = "name", required = true) @PathParam("name") String name) {
+        items.remove(name);
         return Response.ok().build();
     }
 }
