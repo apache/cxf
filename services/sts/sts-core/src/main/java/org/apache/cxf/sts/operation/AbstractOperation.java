@@ -77,11 +77,11 @@ import org.apache.cxf.ws.security.sts.provider.model.secext.ReferenceType;
 import org.apache.cxf.ws.security.sts.provider.model.secext.SecurityTokenReferenceType;
 import org.apache.cxf.ws.security.sts.provider.model.utility.AttributedDateTime;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.WSSecEncrypt;
@@ -541,20 +541,9 @@ public abstract class AbstractOperation {
         List<WSHandlerResult> results = 
             (List<WSHandlerResult>) context.get(WSHandlerConstants.RECV_RESULTS);
         // DOM
-        if (results != null) {
-            for (WSHandlerResult rResult : results) {
-                List<WSSecurityEngineResult> signedResults = 
-                    rResult.getActionResults().get(WSConstants.SIGN);
-                if (signedResults != null) {
-                    for (WSSecurityEngineResult wser : signedResults) {
-                        X509Certificate cert = 
-                            (X509Certificate)wser.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
-                        if (cert != null) {
-                            return cert;
-                        }
-                    }
-                }
-            }
+        X509Certificate cert = WSS4JUtils.getReqSigCert(results);
+        if (cert != null) {
+            return cert;
         }
         
         // Streaming

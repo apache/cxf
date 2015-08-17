@@ -1618,7 +1618,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                 CastUtils.cast((List<?>)
                     message.getExchange().getInMessage().get(WSHandlerConstants.RECV_RESULTS));
             if (results != null) {
-                encrKeyBuilder.setUseThisCert(getReqSigCert(results));
+                encrKeyBuilder.setUseThisCert(WSS4JUtils.getReqSigCert(results));
                  
                 //TODO This is a hack, this should not come under USE_REQ_SIG_CERT
                 if (encrKeyBuilder.isCertSet()) {
@@ -1632,32 +1632,6 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         }
         
         return encrUser;
-    }
-    
-    private static X509Certificate getReqSigCert(List<WSHandlerResult> results) {
-        /*
-        * Scan the results for a matching actor. Use results only if the
-        * receiving Actor and the sending Actor match.
-        */
-        for (WSHandlerResult rResult : results) {
-            List<WSSecurityEngineResult> signedResults = 
-                rResult.getActionResults().get(WSConstants.SIGN);
-            if (signedResults != null) {
-                /*
-                 * Scan the results for the first Signature action. Use the
-                 * certificate of this Signature to set the certificate for the
-                 * encryption action :-).
-                 */
-                for (WSSecurityEngineResult signedResult : signedResults) {
-                    if (signedResult.containsKey(WSSecurityEngineResult.TAG_X509_CERTIFICATE)) {
-                        return (X509Certificate)signedResult.get(
-                            WSSecurityEngineResult.TAG_X509_CERTIFICATE);
-                    }
-                }
-            }
-        }
-        
-        return null;
     }
     
     /**

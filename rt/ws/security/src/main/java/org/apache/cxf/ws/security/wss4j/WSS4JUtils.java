@@ -22,7 +22,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.security.Key;
+import java.security.cert.X509Certificate;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -50,6 +52,9 @@ import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.PasswordEncryptor;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.Loader;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
@@ -311,5 +316,30 @@ public final class WSS4JUtils {
             }
         }
         return signCrypto;
+    }
+    
+    /**
+     * Get the certificate that was used to sign the request
+     */
+    public static X509Certificate getReqSigCert(List<WSHandlerResult> results) {
+        if (results == null || results.isEmpty()) {
+            return null;
+        }
+        
+        for (WSHandlerResult rResult : results) {
+            List<WSSecurityEngineResult> signedResults = 
+                rResult.getActionResults().get(WSConstants.SIGN);
+            
+            if (signedResults != null && !signedResults.isEmpty()) {
+                for (WSSecurityEngineResult signedResult : signedResults) {
+                    if (signedResult.containsKey(WSSecurityEngineResult.TAG_X509_CERTIFICATE)) {
+                        return (X509Certificate)signedResult.get(
+                            WSSecurityEngineResult.TAG_X509_CERTIFICATE);
+                    }
+                }
+            }
+        }
+        
+        return null;
     }
 }
