@@ -175,6 +175,14 @@ public class WSDLValidationTest extends ToolTestBase {
     }
 
     @Test
+    public void testWSIBPR2203ExcludeMIMEParts() throws Exception {
+        String[] args = new String[] {"-verbose",
+                                      getLocation("/validator_wsdl/cxf6488.wsdl")};
+        WSDLValidator.main(args);
+        assertTrue(getStdOut().indexOf("Passed Validation : Valid WSDL") > -1);
+    }
+
+    @Test
     public void testWSIBPR2209() throws Exception {
         String[] args = new String[] {"-verbose",
                                       getLocation("/validator_wsdl/hello_world_unbound_porttype_elements.wsdl")};
