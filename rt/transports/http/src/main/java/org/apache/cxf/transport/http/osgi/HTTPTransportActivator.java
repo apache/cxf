@@ -113,8 +113,8 @@ public class HTTPTransportActivator
                 properties = new Properties();
             }
             Properties sprops = new Properties();
-            sprops.put("init-param", 
-                   getProp(properties, "org.apache.cxf.servlet.init-param", ""));
+            sprops.put("init-prefix", 
+                   getProp(properties, "org.apache.cxf.servlet.init-prefix", ""));
             sprops.put("alias",
                        getProp(properties, "org.apache.cxf.servlet.context", "/cxf"));
             sprops.put("servlet-name", 
