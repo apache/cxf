@@ -19,11 +19,6 @@
 
 package org.apache.cxf.transport.http.osgi;
 
-import java.util.Dictionary;
-import java.util.Properties;
-
-import javax.servlet.Servlet;
-
 import org.apache.cxf.bus.blueprint.BlueprintNameSpaceHandlerFactory;
 import org.apache.cxf.bus.blueprint.NamespaceHandlerRegisterer;
 import org.apache.cxf.common.util.PropertyUtils;
@@ -40,6 +35,10 @@ import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.cm.ManagedServiceFactory;
+
+import javax.servlet.Servlet;
+import java.util.Dictionary;
+import java.util.Properties;
 
 public class HTTPTransportActivator 
     implements BundleActivator {
@@ -117,33 +116,34 @@ public class HTTPTransportActivator
                        getProp(properties, "org.apache.cxf.servlet.context", "/cxf"));
             sprops.put("servlet-name", 
                        getProp(properties, "org.apache.cxf.servlet.name", "cxf-osgi-transport-servlet"));
-            sprops.put("hide-service-list-page", 
+            sprops.put("init.hide-service-list-page",
                        getProp(properties, "org.apache.cxf.servlet.hide-service-list-page", "false"));
-            sprops.put("disable-address-updates", 
+            sprops.put("init.disable-address-updates",
                        getProp(properties, "org.apache.cxf.servlet.disable-address-updates", "true"));
-            sprops.put("base-address", 
+            sprops.put("init.base-address",
                        getProp(properties, "org.apache.cxf.servlet.base-address", ""));
-            sprops.put("service-list-path", 
+            sprops.put("init.service-list-path",
                        getProp(properties, "org.apache.cxf.servlet.service-list-path", ""));
-            sprops.put("static-resources-list", 
+            sprops.put("init.static-resources-list",
                        getProp(properties, "org.apache.cxf.servlet.static-resources-list", ""));
-            sprops.put("redirects-list", 
+            sprops.put("init.redirects-list",
                        getProp(properties, "org.apache.cxf.servlet.redirects-list", ""));
-            sprops.put("redirect-servlet-name", 
+            sprops.put("init.redirect-servlet-name",
                        getProp(properties, "org.apache.cxf.servlet.redirect-servlet-name", ""));
-            sprops.put("redirect-servlet-path", 
+            sprops.put("init.redirect-servlet-path",
                        getProp(properties, "org.apache.cxf.servlet.redirect-servlet-path", ""));
-            sprops.put("service-list-all-contexts", 
+            sprops.put("init.service-list-all-contexts",
                        getProp(properties, "org.apache.cxf.servlet.service-list-all-contexts", ""));
-            sprops.put("service-list-page-authenticate", 
+            sprops.put("init.service-list-page-authenticate",
                        getProp(properties, "org.apache.cxf.servlet.service-list-page-authenticate", "false"));
-            sprops.put("service-list-page-authenticate-realm", 
+            sprops.put("init.service-list-page-authenticate-realm",
                        getProp(properties, "org.apache.cxf.servlet.service-list-page-authenticate-realm", "karaf"));
-            sprops.put("use-x-forwarded-headers", 
+            sprops.put("init.use-x-forwarded-headers",
                        getProp(properties, "org.apache.cxf.servlet.use-x-forwarded-headers", "false"));
             if (serviceRegistration != null) {
                 serviceRegistration.unregister();
             }
+
             serviceRegistration = context.registerService(Servlet.class.getName(), servlet, sprops);
         }
 
