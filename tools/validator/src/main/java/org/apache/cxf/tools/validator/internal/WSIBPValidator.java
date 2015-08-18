@@ -339,7 +339,7 @@ public class WSIBPValidator extends AbstractDefinitionValidator {
                 }
                 if (operation.getOutput() != null && operation.getOutput().getMessage() != null) {
                     Message outMess = operation.getOutput().getMessage();
-                    Set<String> ignorableParts = getIgnorableParts(bop.getBindingInput());
+                    Set<String> ignorableParts = getIgnorableParts(bop.getBindingOutput());
 
                     for (Iterator<?> ite3 = outMess.getParts().values().iterator(); ite3.hasNext();) {
                         Part p = (Part)ite3.next();
