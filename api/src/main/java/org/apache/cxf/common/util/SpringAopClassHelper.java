@@ -23,7 +23,6 @@ import org.springframework.aop.TargetSource;
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.BeanCreationException;
-import org.springframework.util.ClassUtils;
 
 /**
  * 
@@ -83,7 +82,7 @@ class SpringAopClassHelper extends ClassHelper {
                 // ignore
             }
             
-        } else if (ClassUtils.isCglibProxyClass(o.getClass())) {
+        } else if (AopUtils.isCglibProxyClass(o.getClass())) {
             return getRealClassFromClassInternal(AopUtils.getTargetClass(o));
         }
         return o.getClass();
