@@ -299,7 +299,7 @@ public class Headers {
             dropContentType = !MessageUtils.getContextualBoolean(message, SET_EMPTY_REQUEST_CT_PROPERTY, true);
         }
         if (!dropContentType) {
-            String ct = emptyRequest ? "*/*" : determineContentType();
+            String ct = emptyRequest && !headers.containsKey(Message.CONTENT_TYPE) ? "*/*" : determineContentType();
             connection.setRequestProperty(HttpHeaderHelper.CONTENT_TYPE, ct);
         }
          
