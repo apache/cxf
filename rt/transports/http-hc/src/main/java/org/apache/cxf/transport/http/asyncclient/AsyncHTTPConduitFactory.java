@@ -168,6 +168,9 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
 
     private boolean setProperties(Map<String, Object> s) {
         //properties that can be updated "live"
+        if (s == null) {
+            return false;
+        }
         Object st = s.get(USE_POLICY);
         if (st == null) {
             st = SystemPropertyAction.getPropertyOrNull(USE_POLICY);
