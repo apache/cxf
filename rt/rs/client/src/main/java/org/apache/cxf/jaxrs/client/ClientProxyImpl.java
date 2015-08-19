@@ -204,10 +204,7 @@ public class ClientProxyImpl extends AbstractClient implements
             proxyImpl.setConfiguration(getConfiguration());
             return JAXRSClientFactory.createProxy(m.getReturnType(), proxyLoader, proxyImpl);
         } 
-        
         headers.putAll(paramHeaders);
-        setRequestHeaders(headers, ori, types.containsKey(ParameterType.FORM), 
-            bodyIndex == -1 || params[bodyIndex] == null ? null : params[bodyIndex].getClass(), m.getReturnType());
         
         getState().setTemplates(getTemplateParametersMap(ori.getURITemplate(), pathParams));
         
@@ -222,6 +219,10 @@ public class ClientProxyImpl extends AbstractClient implements
         } else if (types.containsKey(ParameterType.REQUEST_BODY))  {
             body = handleMultipart(types, ori, params);
         }
+        
+        setRequestHeaders(headers, ori, types.containsKey(ParameterType.FORM), 
+            body == null ? null : body.getClass(), m.getReturnType());
+        
         
         return doChainedInvocation(uri, headers, ori, body, bodyIndex, null, null);
         
@@ -344,7 +345,7 @@ public class ClientProxyImpl extends AbstractClient implements
         if (headers.getFirst(HttpHeaders.CONTENT_TYPE) == null) {
             if (formParams || bodyClass != null && MultivaluedMap.class.isAssignableFrom(bodyClass)) {
                 headers.putSingle(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED);
-            } else {
+            } else if (bodyClass != null) {
                 String cType = ori.getConsumeTypes().isEmpty() 
                     || ori.getConsumeTypes().get(0).equals(MediaType.WILDCARD_TYPE) 
                     ? MediaType.APPLICATION_XML : JAXRSUtils.mediaTypeToString(ori.getConsumeTypes().get(0));   
