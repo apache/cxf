@@ -32,10 +32,13 @@ import java.net.URLConnection;
 import java.util.logging.Level;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.util.ReflectionUtil;
+import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CacheAndWriteOutputStream;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.https.HttpsURLConnectionFactory;
 import org.apache.cxf.transport.https.HttpsURLConnectionInfo;
@@ -46,7 +49,13 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
  * 
  */
 public class URLConnectionHTTPConduit extends HTTPConduit {
+    public static final String HTTPURL_CONNECTION_METHOD_HACK = "httpurlconnection.method.hack";
 
+    private static final boolean DEFAULT_USE_HACK;
+    static {
+        DEFAULT_USE_HACK = Boolean.valueOf(SystemPropertyAction.getProperty(HTTPURL_CONNECTION_METHOD_HACK, "false"));
+    }
+    
     /**
      * This field holds the connection factory, which primarily is used to 
      * factor out SSL specific code from this implementation.
@@ -125,7 +134,26 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
             httpRequestMethod = "POST";
             message.put(Message.HTTP_REQUEST_METHOD, "POST");
         }
-        connection.setRequestMethod(httpRequestMethod);
+        try {
+            connection.setRequestMethod(httpRequestMethod);
+        } catch (java.net.ProtocolException ex) {
+            Object o = message.getContextualProperty(HTTPURL_CONNECTION_METHOD_HACK);
+            boolean b = DEFAULT_USE_HACK;
+            if (o != null) {
+                b = MessageUtils.isTrue(o);
+            }
+            if (b) {
+                try {
+                    java.lang.reflect.Field f = ReflectionUtil.getDeclaredField(HttpURLConnection.class, "method");
+                    ReflectionUtil.setAccessible(f).set(connection, httpRequestMethod);
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                    throw ex;
+                }
+            } else {
+                throw ex;
+            }
+        }
         
         // We place the connection on the message to pick it up
         // in the WrappedOutputStream.
