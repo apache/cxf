@@ -40,9 +40,6 @@ import javax.ws.rs.NotAcceptableException;
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.ServerErrorException;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.client.ClientRequestContext;
-import javax.ws.rs.client.ClientResponseContext;
-import javax.ws.rs.client.ClientResponseFilter;
 import javax.ws.rs.client.ResponseProcessingException;
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.GenericEntity;
@@ -62,22 +59,17 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
-import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.common.util.ClassHelper;
 import org.apache.cxf.helpers.IOUtils;
-import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
-import org.apache.cxf.jaxrs.client.ResponseExceptionMapper;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.xml.XMLSource;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
 import org.apache.cxf.jaxrs.provider.XSLTJaxbProvider;
-import org.apache.cxf.message.Message;
-import org.apache.cxf.phase.AbstractPhaseInterceptor;
-import org.apache.cxf.phase.Phase;
 import org.apache.cxf.systest.jaxrs.BookStore.BookInfo;
 import org.apache.cxf.systest.jaxrs.BookStore.BookInfoInterface;
 import org.apache.cxf.systest.jaxrs.BookStore.BookNotReturnedException;
@@ -97,6 +89,32 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         assertTrue("server did not launch correctly",
                    launchServer(BookServer.class, true));
         createStaticBus();
+    }
+    
+    @Test
+    public void testRetrieveBookCustomMethodReflection() throws Exception {
+        double version = ClassHelper.getJavaVersion();
+        if (version < 1.8) {
+            return;
+        }
+        try {
+            doRetrieveBook(false);
+            fail("HTTPUrlConnection does not support custom verbs without the reflection");
+        } catch (ProcessingException ex) {
+            // continue
+        }
+        Book book = doRetrieveBook(true);
+        assertEquals("Retrieve", book.getName());
+    }
+    
+    private Book doRetrieveBook(boolean useReflection) {
+        String address = "http://localhost:" + PORT + "/bookstore/retrieve";
+        WebClient wc = WebClient.create(address);
+        wc.type("application/xml").accept("application/xml");
+        if (useReflection) {
+            WebClient.getConfig(wc).getRequestContext().put("use.httpurlconnection.method.reflection", true);
+        }
+        return wc.invoke("RETRIEVE", new Book("Retrieve", 123L), Book.class);
     }
     
     @Test
@@ -133,7 +151,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     public void testNonExistent() throws Exception {
         String address = "http://localhostt/bookstore";
         WebClient wc = WebClient.create(address, 
-                                        Collections.singletonList(new TestResponseFilter()));
+                                        Collections.singletonList(new BookServer.TestResponseFilter()));
         try {
             wc.get();
             fail();
@@ -773,8 +791,8 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     @Test
     public void testBookWithMultipleExceptions() throws Exception {
         List<Object> providers = new LinkedList<Object>();
-        providers.add(new NotReturnedExceptionMapper());
-        providers.add(new NotFoundExceptionMapper());
+        providers.add(new BookServer.NotReturnedExceptionMapper());
+        providers.add(new BookServer.NotFoundExceptionMapper());
         BookStore store = JAXRSClientFactory.create("http://localhost:" + PORT, 
                                                     BookStore.class,
                                                     providers);
@@ -808,8 +826,8 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     @Test
     public void testBookWithMultipleExceptions2() throws Exception {
         List<Object> providers = new LinkedList<Object>();
-        providers.add(new NotReturnedExceptionMapper());
-        providers.add(NotFoundExceptionMapper.class);
+        providers.add(new BookServer.NotReturnedExceptionMapper());
+        providers.add(BookServer.NotFoundExceptionMapper.class);
         BookStore store = JAXRSClientFactory.create("http://localhost:" + PORT, 
                                                     BookStore.class,
                                                     providers);
@@ -1566,7 +1584,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         WebClient wc = 
             WebClient.create("http://localhost:" + PORT + "/bookstore/books/check/malformedmt/123");
         wc.accept(MediaType.TEXT_PLAIN);
-        WebClient.getConfig(wc).getInInterceptors().add(new ReplaceContentTypeInterceptor());
+        WebClient.getConfig(wc).getInInterceptors().add(new BookServer.ReplaceContentTypeInterceptor());
         assertTrue(wc.get(Boolean.class));
     }
     
@@ -1783,7 +1801,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     
     private void doTestEmptyResponse(String mt) {
         WebClient wc = WebClient.create("http://localhost:" + PORT + "/bookstore/emptybook");
-        WebClient.getConfig(wc).getInInterceptors().add(new ReplaceStatusInterceptor());
+        WebClient.getConfig(wc).getInInterceptors().add(new BookServer.ReplaceStatusInterceptor());
         wc.accept(mt);
         wc.get(Book.class);
     }
@@ -1791,7 +1809,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     @Test(expected = ResponseProcessingException.class)
     public void testEmptyResponseProxy() {
         BookStore store = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class);
-        WebClient.getConfig(store).getInInterceptors().add(new ReplaceStatusInterceptor());
+        WebClient.getConfig(store).getInInterceptors().add(new BookServer.ReplaceStatusInterceptor());
         store.getEmptyBook();
     }
     
@@ -2727,61 +2745,5 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         return str;
     }
 
-    public static class ReplaceContentTypeInterceptor extends AbstractPhaseInterceptor<Message> {
-        public ReplaceContentTypeInterceptor() {
-            super(Phase.READ);
-        }
-
-        public void handleMessage(Message message) throws Fault {
-            Map<String, List<String>> headers = 
-                CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
-            headers.put(Message.CONTENT_TYPE, Collections.singletonList("text/plain"));
-        }
-    }
-
-    public static class ReplaceStatusInterceptor extends AbstractPhaseInterceptor<Message> {
-        public ReplaceStatusInterceptor() {
-            super(Phase.READ);
-        }
-
-        public void handleMessage(Message message) throws Fault {
-            message.getExchange().put(Message.RESPONSE_CODE, 200);
-        }
-    }
     
-    public static class NotReturnedExceptionMapper implements ResponseExceptionMapper<BookNotReturnedException> {
-
-        public BookNotReturnedException fromResponse(Response r) {
-            String status = r.getHeaderString("Status");
-            if ("notReturned".equals(status)) { 
-                return new BookNotReturnedException(status);
-            } else {
-                return null;
-            }
-        }
-        
-    }
-    
-    public static class NotFoundExceptionMapper implements ResponseExceptionMapper<BookNotFoundFault> {
-
-        public BookNotFoundFault fromResponse(Response r) {
-            String status = r.getHeaderString("Status");
-            if ("notFound".equals(status)) { 
-                return new BookNotFoundFault(status);
-            } else {
-                return null;
-            }
-        }
-        
-    }
-    public static class TestResponseFilter implements ClientResponseFilter {
-
-        @Override
-        public void filter(ClientRequestContext requestContext, ClientResponseContext responseContext)
-            throws IOException {
-            // TODO Auto-generated method stub
-            
-        }
-        
-    }
 }
