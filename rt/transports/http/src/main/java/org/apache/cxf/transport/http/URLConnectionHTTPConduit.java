@@ -49,11 +49,12 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
  * 
  */
 public class URLConnectionHTTPConduit extends HTTPConduit {
-    public static final String HTTPURL_CONNECTION_METHOD_HACK = "httpurlconnection.method.hack";
+    public static final String HTTPURL_CONNECTION_METHOD_REFLECTION = "use.httpurlconnection.method.reflection";
 
-    private static final boolean DEFAULT_USE_HACK;
+    private static final boolean DEFAULT_USE_REFLECTION;
     static {
-        DEFAULT_USE_HACK = Boolean.valueOf(SystemPropertyAction.getProperty(HTTPURL_CONNECTION_METHOD_HACK, "false"));
+        DEFAULT_USE_REFLECTION = 
+            Boolean.valueOf(SystemPropertyAction.getProperty(HTTPURL_CONNECTION_METHOD_REFLECTION, "false"));
     }
     
     /**
@@ -137,8 +138,8 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
         try {
             connection.setRequestMethod(httpRequestMethod);
         } catch (java.net.ProtocolException ex) {
-            Object o = message.getContextualProperty(HTTPURL_CONNECTION_METHOD_HACK);
-            boolean b = DEFAULT_USE_HACK;
+            Object o = message.getContextualProperty(HTTPURL_CONNECTION_METHOD_REFLECTION);
+            boolean b = DEFAULT_USE_REFLECTION;
             if (o != null) {
                 b = MessageUtils.isTrue(o);
             }

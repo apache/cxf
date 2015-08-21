@@ -85,5 +85,9 @@ public class ClassHelper {
             return HELPER.getRealClassInternal(o);
         }
     }
+    public static double getJavaVersion() {
+        String version = System.getProperty("java.version");
+        return Double.parseDouble(version.substring(0, 3));    
+    }
     
 }

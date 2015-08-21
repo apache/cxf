@@ -26,6 +26,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.client.ClientRequestContext;
+import javax.ws.rs.client.ClientResponseContext;
+import javax.ws.rs.client.ClientResponseFilter;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseContext;
@@ -37,9 +40,12 @@ import javax.ws.rs.ext.ExceptionMapper;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.util.PropertyUtils;
+import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
+import org.apache.cxf.jaxrs.client.ResponseExceptionMapper;
 import org.apache.cxf.jaxrs.ext.search.QueryContextProvider;
 import org.apache.cxf.jaxrs.ext.search.SearchBean;
 import org.apache.cxf.jaxrs.ext.search.SearchContextProvider;
@@ -49,6 +55,9 @@ import org.apache.cxf.jaxrs.provider.BinaryDataProvider;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
 import org.apache.cxf.jaxrs.provider.StreamingResponseProvider;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.AbstractPhaseInterceptor;
+import org.apache.cxf.phase.Phase;
+import org.apache.cxf.systest.jaxrs.BookStore.BookNotReturnedException;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
     
 public class BookServer extends AbstractBusTestServerBase {
@@ -187,6 +196,64 @@ public class BookServer extends AbstractBusTestServerBase {
     }
     @SuppressWarnings("serial")
     public static class BlockedException extends RuntimeException {
+        
+    }
+    
+    public static class ReplaceContentTypeInterceptor extends AbstractPhaseInterceptor<Message> {
+        public ReplaceContentTypeInterceptor() {
+            super(Phase.READ);
+        }
+
+        public void handleMessage(Message message) throws Fault {
+            Map<String, List<String>> headers = 
+                CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
+            headers.put(Message.CONTENT_TYPE, Collections.singletonList("text/plain"));
+        }
+    }
+
+    public static class ReplaceStatusInterceptor extends AbstractPhaseInterceptor<Message> {
+        public ReplaceStatusInterceptor() {
+            super(Phase.READ);
+        }
+
+        public void handleMessage(Message message) throws Fault {
+            message.getExchange().put(Message.RESPONSE_CODE, 200);
+        }
+    }
+    
+    public static class NotReturnedExceptionMapper implements ResponseExceptionMapper<BookNotReturnedException> {
+
+        public BookNotReturnedException fromResponse(Response r) {
+            String status = r.getHeaderString("Status");
+            if ("notReturned".equals(status)) { 
+                return new BookNotReturnedException(status);
+            } else {
+                return null;
+            }
+        }
+        
+    }
+    
+    public static class NotFoundExceptionMapper implements ResponseExceptionMapper<BookNotFoundFault> {
+
+        public BookNotFoundFault fromResponse(Response r) {
+            String status = r.getHeaderString("Status");
+            if ("notFound".equals(status)) { 
+                return new BookNotFoundFault(status);
+            } else {
+                return null;
+            }
+        }
+        
+    }
+    public static class TestResponseFilter implements ClientResponseFilter {
+
+        @Override
+        public void filter(ClientRequestContext requestContext, ClientResponseContext responseContext)
+            throws IOException {
+            // TODO Auto-generated method stub
+            
+        }
         
     }
 }
