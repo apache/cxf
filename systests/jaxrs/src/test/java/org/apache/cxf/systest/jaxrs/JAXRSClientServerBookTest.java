@@ -59,7 +59,6 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
-import org.apache.cxf.common.util.ClassHelper;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.io.CachedOutputStream;
@@ -93,10 +92,6 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testRetrieveBookCustomMethodReflection() throws Exception {
-        double version = ClassHelper.getJavaVersion();
-        if (version < 1.8) {
-            return;
-        }
         try {
             doRetrieveBook(false);
             fail("HTTPUrlConnection does not support custom verbs without the reflection");

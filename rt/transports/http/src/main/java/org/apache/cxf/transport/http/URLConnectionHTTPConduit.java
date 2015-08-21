@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.ProtocolException;
 import java.net.Proxy;
 import java.net.SocketException;
 import java.net.URI;
@@ -147,6 +148,7 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
                 try {
                     java.lang.reflect.Field f = ReflectionUtil.getDeclaredField(HttpURLConnection.class, "method");
                     ReflectionUtil.setAccessible(f).set(connection, httpRequestMethod);
+                    message.put(HTTPURL_CONNECTION_METHOD_REFLECTION, true);
                 } catch (Throwable t) {
                     t.printStackTrace();
                     throw ex;
@@ -205,16 +207,41 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
             super(wos);
             this.connection = wos.connection;
         }
+        private OutputStream connectAndGetOutputStream(Boolean b) throws IOException {
+            OutputStream cout = null;
+
+            if (b != null && b) {
+                String method = connection.getRequestMethod();
+                connection.connect();
+                try {
+                    java.lang.reflect.Field f = ReflectionUtil.getDeclaredField(HttpURLConnection.class, "method");
+                    ReflectionUtil.setAccessible(f).set(connection, "POST");
+                    cout = connection.getOutputStream();
+                    ReflectionUtil.setAccessible(f).set(connection, method);                        
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                }
+                
+            } else {
+                cout = connection.getOutputStream(); 
+            }
+            return cout;
+        }
         protected void setupWrappedStream() throws IOException {
             // If we need to cache for retransmission, store data in a
             // CacheAndWriteOutputStream. Otherwise write directly to the output stream.
             OutputStream cout = null;
             try {
-                cout = connection.getOutputStream();
+                try {
+                    cout = connection.getOutputStream();
+                } catch (ProtocolException pe) {
+                    Boolean b =  (Boolean)outMessage.get(HTTPURL_CONNECTION_METHOD_REFLECTION);
+                    cout = connectAndGetOutputStream(b); 
+                }
             } catch (SocketException e) {
                 if ("Socket Closed".equals(e.getMessage())) {
                     connection.connect();
-                    cout = connection.getOutputStream();
+                    cout = connectAndGetOutputStream((Boolean)outMessage.get(HTTPURL_CONNECTION_METHOD_REFLECTION)); 
                 } else {
                     throw e;
                 }
@@ -341,7 +368,8 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
 
         @Override
         protected void retransmitStream() throws IOException {
-            OutputStream out = connection.getOutputStream();
+            Boolean b =  (Boolean)outMessage.get(HTTPURL_CONNECTION_METHOD_REFLECTION);
+            OutputStream out = connectAndGetOutputStream(b); 
             cachedStream.writeCacheTo(out);
         }
     }
