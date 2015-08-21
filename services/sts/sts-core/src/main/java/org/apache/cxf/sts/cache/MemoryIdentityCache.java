@@ -158,6 +158,16 @@ public class MemoryIdentityCache implements IdentityCache, IdentityMapper, Manag
                 // User identity of target realm not cached yet
                 targetPrincipal = this.identityMapper.mapPrincipal(
                         sourceRealm, sourcePrincipal, targetRealm);
+                
+                if (targetPrincipal == null || targetPrincipal.getName() == null) {
+                    if (LOG.isLoggable(Level.FINE)) {
+                        LOG.fine("Failed to map user '" + sourcePrincipal.getName()
+                                    + "' [" + sourceRealm + "] to realm '"
+                                    + targetRealm + "'");
+                    }
+                    return null;
+                }
+                
                 // Add the identity for target realm to the cached entry 
                 identities.put(targetRealm, targetPrincipal.getName());
                 
