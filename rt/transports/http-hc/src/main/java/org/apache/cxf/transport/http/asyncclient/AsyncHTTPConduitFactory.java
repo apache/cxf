@@ -282,15 +282,19 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
 
 
     private void addListener(Bus b) {
-        b.getExtension(BusLifeCycleManager.class).registerLifeCycleListener(new BusLifeCycleListener() {
-            public void initComplete() {
-            }
-            public void preShutdown() {
-                shutdown();
-            }
-            public void postShutdown() {
-            }
-        });
+        BusLifeCycleManager manager = b.getExtension(BusLifeCycleManager.class);
+        if (manager != null) {
+            
+            manager.registerLifeCycleListener(new BusLifeCycleListener() {
+                public void initComplete() {
+                }
+                public void preShutdown() {
+                    shutdown();
+                }
+                public void postShutdown() {
+                }
+            });
+        }
     }
 
     public synchronized void setupNIOClient(HTTPClientPolicy clientPolicy) throws IOReactorException {
