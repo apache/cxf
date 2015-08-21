@@ -191,7 +191,7 @@ public class ClaimsManager {
                                     STSException.REQUEST_FAILED);
                         }
                         
-                        if (targetPrincipal == null) {
+                        if (targetPrincipal == null || targetPrincipal.getName() == null) {
                             LOG.log(Level.WARNING, "Null. Failed to map user '" + parameters.getPrincipal().getName()
                                     + "' [" + parameters.getRealm() + "] to realm '"
                                     + handlerRealmSupport.getHandlerRealm() + "'");
