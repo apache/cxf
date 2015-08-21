@@ -1808,7 +1808,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     @Test
     public void testEmptyResponseProxyNullable() {
         BookStore store = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class);
-        WebClient.getConfig(store).getInInterceptors().add(new ReplaceStatusInterceptor());
+        WebClient.getConfig(store).getInInterceptors().add(new BookServer.ReplaceStatusInterceptor());
         assertNull(store.getEmptyBookNullable());
     }
     
