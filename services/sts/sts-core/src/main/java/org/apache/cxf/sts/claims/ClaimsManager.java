@@ -196,8 +196,7 @@ public class ClaimsManager {
                             LOG.log(Level.WARNING, "Null. Failed to map user '" + parameters.getPrincipal().getName()
                                     + "' [" + parameters.getRealm() + "] to realm '"
                                     + handlerRealmSupport.getHandlerRealm() + "'");
-                            throw new STSException("Failed to map user for claims handler",
-                                    STSException.REQUEST_FAILED);
+                            continue;
                         }
                         if (LOG.isLoggable(Level.INFO)) {
                             LOG.info("Principal '" + targetPrincipal.getName()
