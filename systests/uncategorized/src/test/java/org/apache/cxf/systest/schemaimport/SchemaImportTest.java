@@ -55,6 +55,21 @@ public class SchemaImportTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
+    public void testImportSchema2() throws Exception {
+        String schemaURL = "http://localhost:" + PORT + "/schemaimport/sayHi2"
+                           + "?xsd=../sayhi/sayhi/sayhi-schema1.xsd";
+        URL url = new URL(schemaURL);
+        try {
+            InputStream ins = url.openStream();
+            String output = IOUtils.toString(ins);
+            assertTrue(output.indexOf("sayHiArray") > -1);
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail("Can not access the import schema");
+        }
+    }
+
+    @Test
     public void testImportWsdl() throws Exception {
         String wsdlURL = "http://localhost:" + PORT + "/schemaimport/sayHi"  + "?wsdl=sayhi/sayhi/a.wsdl";
         URL url = new URL(wsdlURL);
@@ -73,8 +88,22 @@ public class SchemaImportTest extends AbstractBusClientServerTestBase {
             }
         }
     }
-    
-    
+
+    @Test
+    public void testImportWsdl2() throws Exception {
+        String wsdlURL = "http://localhost:" + PORT + "/schemaimport/sayHi2" + "?wsdl=../sayhi/sayhi/a.wsdl";
+        URL url = new URL(wsdlURL);
+        try {
+            InputStream ins = url.openStream();
+            String output = IOUtils.toString(ins);
+            assertTrue(output.indexOf("sayHiArray") > -1);
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail("Can not access the import wsdl");
+
+        }
+    }
+
     @Test
     public void testAnotherSchemaImportl() throws Exception {
         String schemaURL = "http://localhost:" + PORT + "/schemaimport/service"  + "?xsd=schema1.xsd";
