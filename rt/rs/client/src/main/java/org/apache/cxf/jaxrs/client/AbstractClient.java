@@ -33,9 +33,11 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 
@@ -106,7 +108,9 @@ public abstract class AbstractClient implements Client {
     private static final String HEADER_SPLIT_PROPERTY =
         "org.apache.cxf.http.header.split";
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractClient.class);
-        
+    private static final Set<String> KNOWN_METHODS = new HashSet<String>(
+        Arrays.asList("GET", "POST", "HEAD", "OPTIONS", "PUT", "DELETE", "TRACE"));
+    
     protected ClientConfiguration cfg = new ClientConfiguration();
     private ClientState state;
     private AtomicBoolean closed = new AtomicBoolean(); 
@@ -905,7 +909,7 @@ public abstract class AbstractClient implements Client {
         m.put(Message.REQUESTOR_ROLE, Boolean.TRUE);
         m.put(Message.INBOUND_MESSAGE, Boolean.FALSE);
         
-        m.put(Message.HTTP_REQUEST_METHOD, httpMethod);
+        setRequestMethod(m, httpMethod);
         m.put(Message.PROTOCOL_HEADERS, headers);
         if (currentURI.isAbsolute() && currentURI.getScheme().startsWith(HTTP_SCHEME)) {
             m.put(Message.ENDPOINT_ADDRESS, currentURI.toString());
@@ -947,6 +951,19 @@ public abstract class AbstractClient implements Client {
         return m;
     }
     
+    private void setRequestMethod(Message m, String httpMethod) {
+        m.put(Message.HTTP_REQUEST_METHOD, httpMethod);
+        if (!KNOWN_METHODS.contains(httpMethod) && !m.containsKey("use.async.http.conduit")) {
+            // if the async conduit is loaded then let it handle this method without users 
+            // having to explicitly request it given that, without reflectively updating
+            // HTTPUrlConnection, it will not work without the async conduit anyway
+            m.put("use.async.http.conduit", true);
+        }
+        //TODO: consider setting "use.httpurlconnection.method.reflection" here too - 
+        // if the async conduit is not loaded then the only way for the custom HTTP verb 
+        // to be supported is to attempt to reflectively modify HTTPUrlConnection
+    }
+
     protected void setEmptyRequestPropertyIfNeeded(Message outMessage, Object body) {
         if (body == null) {
             outMessage.put("org.apache.cxf.empty.request", true);

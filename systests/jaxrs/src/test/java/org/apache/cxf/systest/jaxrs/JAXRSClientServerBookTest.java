@@ -114,6 +114,11 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         if (useReflection) {
             WebClient.getConfig(wc).getRequestContext().put("use.httpurlconnection.method.reflection", true);
         }
+        // CXF RS Client code will set this property to true if the http verb is unknown
+        // and this property is not already set. The async conduit is loaded in the tests module
+        // but we do want to test HTTPUrlConnection reflection hence we set this property to false
+        WebClient.getConfig(wc).getRequestContext().put("use.async.http.conduit", false);
+        
         return wc.invoke("RETRIEVE", new Book("Retrieve", 123L), Book.class);
     }
     
