@@ -19,6 +19,7 @@
 
 package org.apache.cxf.tools.util;
 
+import java.net.URISyntaxException;
 import java.net.URLDecoder;
 
 import org.apache.cxf.common.util.URIParserUtil;
@@ -102,5 +103,29 @@ public class URIParserUtilTest extends Assert {
         orig = "/foo" + orig + ".txt";
         String s = URIParserUtil.escapeChars(orig);
         assertEquals(orig, URLDecoder.decode(s, "UTF-8"));
+    }
+
+    @Test
+    public void testRelativize() throws URISyntaxException {
+        assertNull(URIParserUtil.relativize(null, "foo"));
+        assertNull(URIParserUtil.relativize("foo", null));
+        assertEquals("", URIParserUtil.relativize("", ""));
+        assertEquals("", URIParserUtil.relativize("fds", ""));
+        assertEquals("../", URIParserUtil.relativize("fds/", ""));
+        assertEquals("fdsfs", URIParserUtil.relativize("", "fdsfs"));
+        assertEquals("fdsfs/a", URIParserUtil.relativize("", "fdsfs/a"));
+        assertEquals("../de", URIParserUtil.relativize("ab/cd", "de"));
+        assertEquals("../de/fe/gh", URIParserUtil.relativize("ab/cd", "de/fe/gh"));
+        assertEquals("../../../de/fe/gh", URIParserUtil.relativize("/abc/def/", "de/fe/gh"));
+        assertNull(URIParserUtil.relativize("file:/c:/abc/def/", "de/fe/gh")); // null as the URI obtained by
+        // the 2 strings are not both
+        // absolute or not absolute
+        assertEquals("pippo2.xsd", URIParserUtil.relativize("/abc/def/pippo1.xsd", "/abc/def/pippo2.xsd"));
+        assertEquals("../default/pippo2.xsd",
+                URIParserUtil.relativize("/abc/def/pippo1.xsd", "/abc/default/pippo2.xsd"));
+        assertEquals("def/pippo2.xsd", URIParserUtil.relativize("/abc/def", "/abc/def/pippo2.xsd"));
+        assertEquals("hello_world_schema2.xsd",
+                URIParserUtil.relativize("jar:file:/home/a.jar!/wsdl/others/",
+                        "jar:file:/home/a.jar!/wsdl/others/hello_world_schema2.xsd"));
     }
 }

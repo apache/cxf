@@ -17,19 +17,8 @@ KIND, either express or implied. See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-<wsdl:definitions name="HelloWorld"
-          xmlns="http://schemas.xmlsoap.org/wsdl/"
-          xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-          xmlns:x2="http://apache.org/hello_world"
-          xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-          xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-          targetNamespace="http://apache.org/hello_world/bindings">
-
-
-    <wsdl:import
-    namespace="http://apache.org/hello_world"
-    location="testutils/others/hello_world_wsdl_import_catalog.wsdl"/>
-
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:x2="http://apache.org/hello_world" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="HelloWorld" targetNamespace="http://apache.org/hello_world/bindings">
+    <wsdl:import namespace="http://apache.org/hello_world" location="hello_world_wsdl_import_catalog.wsdl"/>
     <wsdl:binding name="SOAPBinding" type="x2:Greeter">
         <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
         <wsdl:operation name="sayHi">
