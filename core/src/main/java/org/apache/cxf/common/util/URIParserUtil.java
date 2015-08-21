@@ -290,4 +290,78 @@ public final class URIParserUtil {
             return normalize(arg);
         }
     }
+    
+    public static String relativize(String base, String toBeRelativized) throws URISyntaxException {
+        if (base == null || toBeRelativized == null) {
+            return null;
+        }
+        return relativize(new URI(base), new URI(toBeRelativized));
+    }
+
+    /**
+     * This is a custom implementation for doing what URI.relativize(URI uri) should be
+     * doing but is not actually doing when URI roots do not fully match.
+     * See http://bugs.java.com/bugdatabase/view_bug.do?bug_id=6226081
+     * 
+     * @param base              The base URI
+     * @param toBeRelativized   The URI to be realivized
+     * @return                  The string value of the URI you'd expect to get as result
+     *                          of calling baseURI.relativize(toBeRelativizedURI).
+     *                          null is returned if the parameters are null or are not
+     *                          both absolute or not absolute.
+     * @throws URISyntaxException
+     */
+    public static String relativize(URI baseURI, URI toBeRelativizedURI) throws URISyntaxException {
+        if (baseURI == null || toBeRelativizedURI == null) {
+            return null;
+        }
+        if (baseURI.isAbsolute() ^ toBeRelativizedURI.isAbsolute()) {
+            return null;
+        }
+        final String base = baseURI.getSchemeSpecificPart();
+        final String toBeRelativized = toBeRelativizedURI.getSchemeSpecificPart();
+        final int l1 = base.length();
+        final int l2 = toBeRelativized.length();
+        if (l1 == 0) {
+            return toBeRelativized;
+        }
+        int slashes = 0;
+        StringBuilder sb = new StringBuilder();
+        boolean differenceFound = false;
+        for (int i = 0; i < l1; i++) {
+            char c = base.charAt(i);
+            if (i < l2) {
+                if (!differenceFound && c == toBeRelativized.charAt(i)) {
+                    sb.append(c);
+                } else {
+                    differenceFound = true;
+                    if (c == '/') {
+                        slashes++;
+                    }
+                }
+            } else {
+                if (c == '/') {
+                    slashes++;
+                }
+            }
+        }
+        String rResolved = new URI(getRoot(sb.toString())).relativize(new URI(toBeRelativized)).toString();
+        StringBuilder relativizedPath = new StringBuilder();
+        for (int i = 0; i < slashes; i++) {
+            relativizedPath.append("../");
+        }
+        relativizedPath.append(rResolved);
+        return relativizedPath.toString();
+    }
+
+    private static String getRoot(String uri) {
+        int idx = uri.lastIndexOf('/');
+        if (idx == uri.length() - 1) {
+            return uri;
+        } else if (idx == -1) {
+            return "";
+        } else {
+            return uri.substring(0, idx + 1);
+        }
+    }
 }
