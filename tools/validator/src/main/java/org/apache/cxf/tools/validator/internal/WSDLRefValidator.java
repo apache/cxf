@@ -19,9 +19,7 @@
 
 package org.apache.cxf.tools.validator.internal;
 
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -155,13 +153,7 @@ public class WSDLRefValidator extends AbstractDefinitionValidator {
 
     
     private void checkTargetNamespace(String path) {
-        try {
-            if (new URL(path).getPath().indexOf(":") != -1) {
-                throw new ToolException(": is not a valid char in the targetNamespace");
-            }
-        } catch (MalformedURLException e) {
-            // do nothing
-        }
+        // no check as any namespace URI is already a valid target namespace string.
     }
 
     public void setSuppressWarnings(boolean s) {

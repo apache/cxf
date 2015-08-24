@@ -1349,15 +1349,29 @@ public class CodeGenTest extends AbstractCodeGenTest {
     }
 
     @Test
-    public void testWrongTNS() {
-        try {
-            env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/wrong_tns.wsdl"));
-            processor.setContext(env);
-            processor.execute();
-            fail("The targetNamespce is not valid");
-        } catch (Exception e) {
-            assertTrue(e.getMessage().indexOf(": is not a valid char in the targetNamespace") != -1);
-        }
+    public void testURLWithColonTNS() throws Exception {
+        env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/tns_url_with_colon.wsdl"));
+        processor.setContext(env);
+        processor.execute();
+        
+        Class<?> sei =  classLoader.loadClass("org.apache.cxf.w2j.hello_world_soap_http.tns.soap.Greeter");
+        assertNotNull("Greeter class from wsdl targetNamespace could not be found", sei);
+
+        Class<?> tc =  classLoader.loadClass("org.apache.cxf.w2j.hello_world_soap_http.tns.types.GreetMe");
+        assertNotNull("GreetMe class from schema targetNamespace could not be found", tc);
+    }
+
+    @Test
+    public void testURNTNS() throws Exception {
+        env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/tns_urn.wsdl"));
+        processor.setContext(env);
+        processor.execute();
+        
+        Class<?> sei =  classLoader.loadClass("apache.cxf.issue._6527.Greeter");
+        assertNotNull("Greeter class from wsdl targetNamespace could not be found", sei);
+
+        Class<?> tc =  classLoader.loadClass("apache.cxf.issue._6527.types.GreetMe");
+        assertNotNull("GreetMe class from schema targetNamespace could not be found", tc);
     }
 
     public void testW3CEPR() throws Exception {
