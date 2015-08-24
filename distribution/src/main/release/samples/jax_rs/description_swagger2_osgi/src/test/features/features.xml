@@ -32,6 +32,7 @@
         <bundle dependency="true">mvn:com.fasterxml.jackson.jaxrs/jackson-jaxrs-json-provider/2.4.6</bundle>
 
         <!-- swagger -->
+        <feature version='1.0.0'>demo-swagger-core</feature>
         <bundle dependency="true">mvn:io.swagger/swagger-jaxrs/1.5.4-SNAPSHOT</bundle>
     </feature>
 
@@ -39,7 +40,6 @@
     <!-- this is the feature definition for this cxf jaxrs swagger blueprint sample demo -->
     <feature name="demo-cxf-swagger-jaxrs-sample" version="1.0.0" resolver="(obr)">
         <feature version='[3.0,4)'>cxf-jaxrs</feature>
-        <feature version='1.0.0'>demo-swagger-core</feature>
         <feature version='1.0.0'>demo-swagger-jaxrs</feature>
 
         <bundle dependency="true">mvn:org.apache.cxf.samples/jax_rs_description_swagger2_osgi/3.0.7-SNAPSHOT</bundle>
