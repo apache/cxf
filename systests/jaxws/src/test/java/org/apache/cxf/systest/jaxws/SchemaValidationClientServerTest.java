@@ -123,6 +123,7 @@ public class SchemaValidationClientServerTest extends AbstractBusClientServerTes
             request.setRequest(requestId);
             header.setHeaderValue("AABBCCDDEEFFGGHHIIJJ");
             
+<<<<<<< HEAD
             //Check if incoming validation on server side works, turn off outgoing
             greeter.ckR(request, header);
             fail("should catch marshall exception as the invalid outgoing message per schema");
@@ -143,6 +144,53 @@ public class SchemaValidationClientServerTest extends AbstractBusClientServerTes
         } catch (Exception e) {
             assertTrue(e.getMessage().contains("Could not validate soapheader "));
             assertTrue(e.getMessage().contains("is not facet-valid with respect to maxLength"));
+=======
+            try {
+                requestId.setId("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeeez");
+                request.setRequest(requestId);
+                greeter.ckR(request, header);
+                fail("should catch marshall exception as the invalid outgoing message per schema");
+            } catch (Exception e) {
+                assertTrue(e.getMessage().contains("Marshalling Error"));
+                boolean english = "en".equals(java.util.Locale.getDefault().getLanguage());
+                if (english) {
+                    assertTrue(e.getMessage().contains("is not facet-valid with respect to pattern"));
+                }
+            }
+    
+            try {
+                requestId.setId("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee");
+                request.setRequest(requestId);
+                header.setHeaderValue("AABBCCDDEEFFGGHHIIJJ");
+                
+                //Check if incoming validation on server side works, turn off outgoing
+                greeter.ckR(request, header);
+                fail("should catch marshall exception as the invalid outgoing message per schema");
+            } catch (Exception e) {
+                assertTrue(e.getMessage().contains("Marshalling Error"));
+                boolean english = "en".equals(java.util.Locale.getDefault().getLanguage());
+                if (english) {
+                    assertTrue(e.getMessage().contains("is not facet-valid with respect to maxLength"));
+                }
+            }
+            
+            try {
+                requestId.setId("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee");
+                request.setRequest(requestId);
+                header.setHeaderValue("AABBCCDDEEFFGGHHIIJJ");
+                
+                //Check if incoming validation on server side works, turn off outgoing
+                greeter.getRequestContext().put(Message.SCHEMA_VALIDATION_ENABLED, Boolean.FALSE);
+                greeter.ckR(request, header);
+                fail("should catch marshall exception as the invalid outgoing message per schema");
+            } catch (Exception e) {
+                assertTrue(e.getMessage().contains("Could not validate soapheader "));
+                boolean english = "en".equals(java.util.Locale.getDefault().getLanguage());
+                if (english) {
+                    assertTrue(e.getMessage().contains("is not facet-valid with respect to maxLength"));
+                }
+            }
+>>>>>>> 673ca40... Fixing some test assertions with a non-english locale
         }
         
     }
