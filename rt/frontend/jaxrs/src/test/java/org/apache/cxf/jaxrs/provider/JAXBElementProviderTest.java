@@ -1353,7 +1353,10 @@ public class JAXBElementProviderTest extends Assert {
             fail("Validation exception expected");
         } catch (Exception ex) {
             Throwable cause = ex.getCause();
-            assertTrue(cause.getMessage().contains("Cannot find the declaration of element"));
+            boolean english = "en".equals(java.util.Locale.getDefault().getLanguage());
+            if (english) {
+                assertTrue(cause.getMessage().contains("Cannot find the declaration of element"));
+            }
         }
         
     }

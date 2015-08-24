@@ -113,7 +113,10 @@ public class SchemaValidationClientServerTest extends AbstractBusClientServerTes
                 fail("should catch marshall exception as the invalid outgoing message per schema");
             } catch (Exception e) {
                 assertTrue(e.getMessage().contains("Marshalling Error"));
-                assertTrue(e.getMessage().contains("is not facet-valid with respect to pattern"));
+                boolean english = "en".equals(java.util.Locale.getDefault().getLanguage());
+                if (english) {
+                    assertTrue(e.getMessage().contains("is not facet-valid with respect to pattern"));
+                }
             }
     
             try {
@@ -126,7 +129,10 @@ public class SchemaValidationClientServerTest extends AbstractBusClientServerTes
                 fail("should catch marshall exception as the invalid outgoing message per schema");
             } catch (Exception e) {
                 assertTrue(e.getMessage().contains("Marshalling Error"));
-                assertTrue(e.getMessage().contains("is not facet-valid with respect to maxLength"));
+                boolean english = "en".equals(java.util.Locale.getDefault().getLanguage());
+                if (english) {
+                    assertTrue(e.getMessage().contains("is not facet-valid with respect to maxLength"));
+                }
             }
             
             try {
@@ -140,7 +146,10 @@ public class SchemaValidationClientServerTest extends AbstractBusClientServerTes
                 fail("should catch marshall exception as the invalid outgoing message per schema");
             } catch (Exception e) {
                 assertTrue(e.getMessage().contains("Could not validate soapheader "));
-                assertTrue(e.getMessage().contains("is not facet-valid with respect to maxLength"));
+                boolean english = "en".equals(java.util.Locale.getDefault().getLanguage());
+                if (english) {
+                    assertTrue(e.getMessage().contains("is not facet-valid with respect to maxLength"));
+                }
             }
         }
         
