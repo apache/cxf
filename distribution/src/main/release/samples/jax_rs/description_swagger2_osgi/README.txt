@@ -35,11 +35,12 @@ Starting Karaf (refer to http://karaf.apache.org/manual/latest-3.0.x/quick-start
   Hit '<ctrl-d>' or type 'system:shutdown' or 'logout' to shutdown Karaf.
 
 
-Install this demo feature using the local features.xml file located at src/test/features, you
-can directly use this file or copy it to somewhere. Assuming you have this features.xml file at
+Install this demo feature using the local features.xml file that is located in
+samples/jax_rs/description_swagger2_osgi/src/test/features, you
+can directly use this file or copy it to somewhere. Assuming you have put this features.xml file at
 /Users/me/work/cxf/samples/features.xml
 
-You can add this local feature url by typeing
+You can add this local feature url by typing
 
   karaf@root()> feature:repo-add file:///Users/me/work/cxf/samples/features.xml
   Adding feature url file:///Users/me/work/cxf/samples/features.xml
