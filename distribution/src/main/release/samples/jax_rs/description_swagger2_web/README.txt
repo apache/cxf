@@ -15,8 +15,15 @@ located), the Maven pom.xml file can be used to build and run the demo.
 Using either UNIX or Windows:
 
   mvn install
-  mvn package tomcat7:run  (from one command line window)  
+  mvn package tomcat7:run
 
+To view the swagger document, use your Browser and open the page at
+
+  http://localhost:9000/?url=/app/swaggerSample/swagger.json
+
+or
+
+  http://localhost:9000/?url=/app/swaggerSample/swagger.yaml
 
 To remove the target dir, run mvn clean".
 
