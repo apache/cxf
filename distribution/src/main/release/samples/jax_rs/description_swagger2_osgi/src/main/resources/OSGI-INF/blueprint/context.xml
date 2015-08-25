@@ -32,6 +32,7 @@
     <!-- JAXRS providers -->
     <bean id="jsonProvider" class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider" />
     <bean id="multipartProvider" class="org.apache.cxf.jaxrs.provider.MultipartProvider" />
+    <bean id="originFilter" class="demo.jaxrs.swagger.server.ApiOriginFilter" />
 
     <!-- Application resources -->
     <bean id="sampleResource" class="demo.jaxrs.swagger.server.Sample" />
@@ -54,6 +55,7 @@
         <jaxrs:providers>
             <ref component-id="jsonProvider" />
             <ref component-id="multipartProvider" />
+            <ref component-id="originFilter" />
         </jaxrs:providers>
         <jaxrs:features>
             <ref component-id="swagger2Feature" />
