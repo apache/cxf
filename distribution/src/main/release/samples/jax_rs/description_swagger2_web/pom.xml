@@ -77,9 +77,6 @@ under the License.
                                 <resource>
                                     <directory>${project.build.directory}/swagger-ui/META-INF/resources/webjars/swagger-ui/2.1.0</directory>
                                     <filtering>true</filtering>
-                                    <excludes>
-                                        <exclude>index.html</exclude>
-                                    </excludes>
                                 </resource>
                             </resources>
                         </configuration>
