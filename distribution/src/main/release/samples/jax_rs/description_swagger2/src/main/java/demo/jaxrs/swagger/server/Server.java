@@ -21,7 +21,7 @@ package demo.jaxrs.swagger.server;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.jaxrs.provider.MultipartProvider;
 import org.apache.cxf.jaxrs.servlet.CXFNonSpringJaxrsServlet;
 import org.apache.cxf.jaxrs.swagger.Swagger2Feature;
