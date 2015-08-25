@@ -54,10 +54,11 @@ public class Server {
         servletHolder.setInitParameter("jaxrs.providers", StringUtils.join(
             new String[] {
                 MultipartProvider.class.getName(),
-                JacksonJsonProvider.class.getName()
+                JacksonJsonProvider.class.getName(),
+                ApiOriginFilter.class.getName()
             }, ",") 
-        );                
-                
+        );
+
         server.setHandler(context);
         server.start();
         server.join();
