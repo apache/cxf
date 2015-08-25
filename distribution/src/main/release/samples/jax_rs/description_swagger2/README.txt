@@ -17,6 +17,15 @@ Using either UNIX or Windows:
   mvn -Pserver  (from one command line window)  
     
 
+To view the swagger document, use your Browser to open the page at
+
+  http://localhost:9000/?url=/swagger.json
+
+or
+
+  http://localhost:9000/?url=/swagger.yaml
+
+
 To remove the target dir, run mvn clean".
 
 

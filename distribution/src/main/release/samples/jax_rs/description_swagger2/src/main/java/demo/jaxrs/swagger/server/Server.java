@@ -46,7 +46,7 @@ public class Server {
             getClass().getResource("/META-INF/resources/webjars/swagger-ui/2.1.0").toURI().toString());
         
         servletHolder.setInitParameter("redirects-list", 
-            "/ /index.html /.*[.]js /css/.* /images/.* lib/.* .*ico");
+            "/ /index.html /.*[.]js /css/.* /images/.* lib/.* .*ico /fonts/.*");
         servletHolder.setInitParameter("redirect-servlet-name", staticHolder.getName());
         servletHolder.setInitParameter("redirect-attributes", "javax.servlet.include.request_uri");
         servletHolder.setInitParameter("jaxrs.serviceClasses", Sample.class.getName());

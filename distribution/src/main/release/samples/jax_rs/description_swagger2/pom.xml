@@ -80,7 +80,6 @@
                                     <version>2.1.0</version>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>${project.build.directory}/classes</outputDirectory>
-                                    <excludes>**/index.html</excludes>                                    
                                 </artifactItem>                                
                             </artifactItems>
                         </configuration>
