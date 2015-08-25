@@ -47,7 +47,7 @@ public class JwsHeaders extends JoseHeaders {
     private void init(SignatureAlgorithm sigAlgo) {
         setSignatureAlgorithm(sigAlgo);
     }
-
+    
     public void setSignatureAlgorithm(SignatureAlgorithm algo) {
         super.setAlgorithm(algo.getJwaName());
     }
@@ -55,5 +55,11 @@ public class JwsHeaders extends JoseHeaders {
     public SignatureAlgorithm getSignatureAlgorithm() {
         String algo = super.getAlgorithm();
         return algo == null ? null : SignatureAlgorithm.getAlgorithm(algo);
+    }
+    public void setPayloadEncodingStatus(Boolean status) {
+        super.setProperty("b64", status);
+    }
+    public Boolean getPayloadEncodingStatus() {
+        return super.getBooleanProperty("b64");
     }
 }
