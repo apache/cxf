@@ -101,27 +101,11 @@ public abstract class AbstractSpnegoAuthSupplier {
                             Message message) throws GSSException, 
         LoginException {
         
-        GSSManager manager = GSSManager.getInstance();
-        GSSName serverName = manager.createName(spn, serviceNameType);
-
         GSSCredential delegatedCred = 
             (GSSCredential)message.getContextualProperty(GSSCredential.class.getName());
         
-        GSSContext context = manager
-                .createContext(serverName.canonicalize(oid), oid, delegatedCred, GSSContext.DEFAULT_LIFETIME);
-        
-        context.requestCredDeleg(isCredDelegationRequired(message));
-
-        // If the delegated cred is not null then we only need the context to
-        // immediately return a ticket based on this credential without attempting
-        // to log on again 
-        final byte[] token = new byte[0];
-        if (delegatedCred != null) {
-            return context.initSecContext(token, 0, token.length);
-        }
-        
         Subject subject = null;
-        if (authPolicy != null) {
+        if (authPolicy != null && delegatedCred == null) {
             String contextName = authPolicy.getAuthorization();
             if (contextName == null) {
                 contextName = "";
@@ -135,6 +119,22 @@ public abstract class AbstractSpnegoAuthSupplier {
                 lc.login();
                 subject = lc.getSubject();
             }
+        }
+        
+        GSSManager manager = GSSManager.getInstance();
+        GSSName serverName = manager.createName(spn, serviceNameType);
+        
+        GSSContext context = manager
+                .createContext(serverName.canonicalize(oid), oid, delegatedCred, GSSContext.DEFAULT_LIFETIME);
+        
+        context.requestCredDeleg(isCredDelegationRequired(message));
+
+        // If the delegated cred is not null then we only need the context to
+        // immediately return a ticket based on this credential without attempting
+        // to log on again 
+        final byte[] token = new byte[0];
+        if (delegatedCred != null) {
+            return context.initSecContext(token, 0, token.length);
         }
         
         try {
