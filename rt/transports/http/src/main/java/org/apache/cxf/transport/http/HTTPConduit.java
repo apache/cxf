@@ -1569,7 +1569,7 @@ public abstract class HTTPConduit
             boolean noExceptions = MessageUtils.isTrue(outMessage.getContextualProperty(
                 "org.apache.cxf.transport.no_io_exceptions"));
             
-            if (responseCode >= 400 && responseCode != 500 && !noExceptions) {
+            if (responseCode > 400 && responseCode != 500 && !noExceptions) {
                 
                 if (responseCode == 404 || responseCode == 503) {
                     exchange.put("org.apache.cxf.transport.service_not_available", true);
