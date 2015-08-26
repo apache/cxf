@@ -58,6 +58,10 @@ public class ResourceOwnerGrantHandler extends AbstractGrantHandler {
                                    subject,
                                    params);
     }
+    
+    public ResourceOwnerLoginHandler getLoginHandler() {
+        return this.loginHandler;
+    }
 
     public void setLoginHandler(ResourceOwnerLoginHandler loginHandler) {
         this.loginHandler = loginHandler;
