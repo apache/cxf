@@ -1545,28 +1545,39 @@ public abstract class HTTPConduit
             return false;
         }
 
-        protected void handleResponseInternal() throws IOException {
+        protected int doProcessResponseCode() throws IOException {
             Exchange exchange = outMessage.getExchange();
-            int responseCode = getResponseCode();
-            if (responseCode == -1) {
+            int rc = getResponseCode();
+            if (rc == -1) {
                 LOG.warning("HTTP Response code appears to be corrupted");
             }
             if (exchange != null) {
-                exchange.put(Message.RESPONSE_CODE, responseCode);
+                exchange.put(Message.RESPONSE_CODE, rc);
             }
                        
-            // This property should be set in case the exceptions should not be handled here
-            // For example jax rs uses this
-            boolean noExceptions = MessageUtils.isTrue(outMessage.getContextualProperty(
-                "org.apache.cxf.transport.no_io_exceptions"));
+            // "org.apache.cxf.transport.no_io_exceptions" property should be set in case the exceptions
+            // should not be handled here; for example jax rs uses this
             
-            if (responseCode >= 400 && responseCode != 500 && !noExceptions) {
-                
-                if (responseCode == 404 || responseCode == 503) {
+            // "org.apache.cxf.transport.process_fault_on_http_400" property should be set in case a
+            // soap fault because of a HTTP 400 should be returned back to the client (SOAP 1.2 spec)
+
+            if (rc >= 400 && rc != 500
+                && !MessageUtils.isTrue(outMessage.getContextualProperty("org.apache.cxf.transport.no_io_exceptions"))
+                && (rc > 400 || !MessageUtils.isTrue(outMessage
+                    .getContextualProperty("org.apache.cxf.transport.process_fault_on_http_400")))) {
+
+                if (rc == 404 || rc == 503) {
                     exchange.put("org.apache.cxf.transport.service_not_available", true);
                 }
-                throw new HTTPException(responseCode, getResponseMessage(), url.toURL());
+
+                throw new HTTPException(rc, getResponseMessage(), url.toURL());
             }
+            return rc;
+        }
+        
+        protected void handleResponseInternal() throws IOException {
+            Exchange exchange = outMessage.getExchange();
+            int responseCode = doProcessResponseCode();
 
             InputStream in = null;
             // oneway or decoupled twoway calls may expect HTTP 202 with no content
