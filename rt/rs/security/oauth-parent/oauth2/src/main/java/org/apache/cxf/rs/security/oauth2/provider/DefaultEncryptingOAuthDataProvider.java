@@ -30,6 +30,7 @@ import javax.crypto.SecretKey;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken;
+import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.ModelEncryptionSupport;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
 import org.apache.cxf.rt.security.crypto.KeyProperties;
@@ -80,7 +81,7 @@ public class DefaultEncryptingOAuthDataProvider extends AbstractOAuthDataProvide
         try {
             return ModelEncryptionSupport.decryptAccessToken(this, accessToken, key);
         } catch (SecurityException ex) {
-            throw new OAuthServiceException(ex);
+            throw new OAuthServiceException(OAuthConstants.ACCESS_DENIED, ex);
         }
     }
 
