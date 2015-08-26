@@ -109,7 +109,11 @@ public class DefaultEncryptingOAuthDataProvider extends AbstractOAuthDataProvide
     @Override
     protected RefreshToken revokeRefreshToken(Client client, String refreshTokenKey) {
         refreshTokens.remove(refreshTokenKey);
-        return ModelEncryptionSupport.decryptRefreshToken(this, refreshTokenKey, key);
+        try {
+            return ModelEncryptionSupport.decryptRefreshToken(this, refreshTokenKey, key);
+        } catch (SecurityException ex) {
+            throw new OAuthServiceException(OAuthConstants.ACCESS_DENIED, ex);
+        }
     }
 
     private void encryptAccessToken(ServerAccessToken token) {
