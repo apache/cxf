@@ -77,7 +77,11 @@ public class DefaultEncryptingOAuthDataProvider extends AbstractOAuthDataProvide
     
     @Override
     public ServerAccessToken getAccessToken(String accessToken) throws OAuthServiceException {
-        return ModelEncryptionSupport.decryptAccessToken(this, accessToken, key);
+        try {
+            return ModelEncryptionSupport.decryptAccessToken(this, accessToken, key);
+        } catch (SecurityException ex) {
+            throw new OAuthServiceException(ex);
+        }
     }
 
     @Override
