@@ -51,7 +51,10 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider {
     @Override
     public ServerAccessToken refreshAccessToken(Client client, String refreshTokenKey,
                                                 List<String> restrictedScopes) throws OAuthServiceException {
-        RefreshToken oldRefreshToken = revokeRefreshAndAccessTokens(client, refreshTokenKey); 
+        RefreshToken oldRefreshToken = revokeRefreshAndAccessTokens(client, refreshTokenKey);
+        if (oldRefreshToken == null) {
+            throw new OAuthServiceException(OAuthConstants.ACCESS_DENIED);
+        }
         return doRefreshAccessToken(client, oldRefreshToken, restrictedScopes);
         
     }
