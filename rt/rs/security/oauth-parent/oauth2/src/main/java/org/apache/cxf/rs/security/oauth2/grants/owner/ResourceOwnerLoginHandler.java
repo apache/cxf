@@ -21,5 +21,13 @@ package org.apache.cxf.rs.security.oauth2.grants.owner;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 
 public interface ResourceOwnerLoginHandler {
+    
+    /**
+     * Create a {@link UserSubject} for the name and password parameters, or return null if the name and password
+     * are invalid.
+     * @param name
+     * @param password
+     * @return A {@link UserSubject} representing the user, or null.
+     */
     UserSubject createSubject(String name, String password);
 }
