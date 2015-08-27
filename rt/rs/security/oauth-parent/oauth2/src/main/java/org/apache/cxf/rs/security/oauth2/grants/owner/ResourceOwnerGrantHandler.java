@@ -47,13 +47,17 @@ public class ResourceOwnerGrantHandler extends AbstractGrantHandler {
             throw new OAuthServiceException(
                  new OAuthError(OAuthConstants.INVALID_REQUEST));
         }
-        
-        UserSubject subject = loginHandler.createSubject(ownerName, ownerPassword);
-        
-        if (subject == null) {
-            throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
+        UserSubject subject = null;
+        try {
+            subject = loginHandler.createSubject(ownerName, ownerPassword);
+            if (subject == null) {
+                throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
+            }
+        } catch (OAuthServiceException ex) { 
+            throw ex;
+        } catch (Exception ex) { 
+            throw new OAuthServiceException(OAuthConstants.INVALID_GRANT, ex);
         }
-        
         return doCreateAccessToken(client, 
                                    subject,
                                    params);
