@@ -130,7 +130,7 @@ public class Java2WADLMojo extends AbstractMojo {
     private boolean useJson;
 
     /**
-     * @parameter default-value="false"
+     * @parameter default-value="true"
      */
     private boolean singleResourceMultipleMethods;
    
@@ -165,25 +165,16 @@ public class Java2WADLMojo extends AbstractMojo {
     private boolean ignoreOverloadedMethods;
 
     /**
-     * @parameter default-value="false"
+     * @parameter default-value="true"
      */
     private boolean useJaxbContextForQnames;
 
-    /**
-     * @parameter default-value="false"
-     */
-    private boolean ignoreMessageWriters;
     
     /**
      * @parameter default-value="true"
      */
     private boolean usePathParamsToCompareOperations;
     
-    /**
-     * @parameter default-value="false"
-     */
-    private boolean ignoreRequests;
-
     /**
      * @parameter default-value="true"
      */
@@ -257,9 +248,7 @@ public class Java2WADLMojo extends AbstractMojo {
         wg.setCheckAbsolutePathSlash(checkAbsolutePathSlash);
         wg.setIgnoreOverloadedMethods(ignoreOverloadedMethods);
         wg.setUseJaxbContextForQnames(useJaxbContextForQnames);
-        wg.setIgnoreMessageWriters(ignoreMessageWriters);
         wg.setUsePathParamsToCompareOperations(usePathParamsToCompareOperations);
-        wg.setIgnoreRequests(ignoreRequests);
         wg.setSupportCollections(supportCollections);
         wg.setSupportJaxbXmlType(supportJaxbXmlType);
         wg.setSupportJaxbSubstitutions(supportJaxbSubstitutions);
