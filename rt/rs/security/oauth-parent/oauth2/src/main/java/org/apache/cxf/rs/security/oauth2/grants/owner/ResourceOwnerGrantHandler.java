@@ -55,7 +55,7 @@ public class ResourceOwnerGrantHandler extends AbstractGrantHandler {
             }
         } catch (OAuthServiceException ex) { 
             throw ex;
-        } catch (Exception ex) { 
+        } catch (RuntimeException ex) { 
             throw new OAuthServiceException(OAuthConstants.INVALID_GRANT, ex);
         }
         return doCreateAccessToken(client, 
