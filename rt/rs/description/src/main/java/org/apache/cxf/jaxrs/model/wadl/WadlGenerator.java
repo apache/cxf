@@ -92,6 +92,7 @@ import org.apache.cxf.common.jaxb.JAXBContextProxy;
 import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.XmlSchemaPrimitiveUtils;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
@@ -134,6 +135,7 @@ public class WadlGenerator implements ContainerRequestFilter {
     public static final String WADL_NS = "http://wadl.dev.java.net/2009/02";
 
     private static final Logger LOG = LogUtils.getL7dLogger(WadlGenerator.class);
+    private static final String CONVERT_WADL_RESOURCES_TO_DOM = "convert.wadl.resources.to.dom";
     private static final String XLS_NS = "http://www.w3.org/1999/XSL/Transform";
     private static final String JAXB_DEFAULT_NAMESPACE = "##default";
     private static final String JAXB_DEFAULT_NAME = "##default";
@@ -1152,7 +1154,10 @@ public class WadlGenerator implements ContainerRequestFilter {
                 try {
                     InputStream is = ResourceUtils.getResourceStream(loc, (Bus)ep.get(Bus.class.getName()));
                     if (is != null) {
-                        if (!convertResourcesToDOM || isJson(mt)) {
+                        Object contextProp = m.getContextualProperty(CONVERT_WADL_RESOURCES_TO_DOM);
+                        boolean doConvertResourcesToDOM = contextProp == null 
+                            ? convertResourcesToDOM : PropertyUtils.isTrue(contextProp); 
+                        if (!doConvertResourcesToDOM || isJson(mt)) {
                             return Response.ok(is, mt).build();
                         }
                         Document wadlDoc = StaxUtils.read(is);
