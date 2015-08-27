@@ -205,7 +205,7 @@ public class ParseJavaDocMojo extends AbstractMojo {
                 f.set(mojo, dumpFileOutputDirectory);
             }
         
-            Method m = AbstractJavadocMojo.class.getMethod("executeReport", Locale.class);
+            Method m = AbstractJavadocMojo.class.getDeclaredMethod("executeReport", Locale.class);
             m.setAccessible(true);
             m.invoke(mojo, locale);
         } catch (Exception e) {
