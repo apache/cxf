@@ -37,17 +37,24 @@ import javax.ws.rs.ext.Providers;
 
 import org.apache.cxf.jaxrs.provider.AbstractConfigurableProvider;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.dom4j.io.OutputFormat;
+import org.dom4j.io.XMLWriter;
 
 @Produces({"application/xml", "application/*+xml", "text/xml", "application/json", "application/*+json" })
 @Consumes({"application/xml", "application/*+xml", "text/xml", "application/json", "application/*+json" })
 public class DOM4JProvider extends AbstractConfigurableProvider 
     implements MessageBodyReader<org.dom4j.Document>, MessageBodyWriter<org.dom4j.Document> {
-
+    public static final String SUPPRESS_XML_DECLARATION = "suppress.xml.declaration";
     private static final Class<org.w3c.dom.Document> DOM_DOC_CLS = 
         org.w3c.dom.Document.class;
 
     private Providers providers;
+
+    private boolean convertAlways;
 
     @Context
     public void setProviders(Providers providers) {
@@ -87,8 +94,16 @@ public class DOM4JProvider extends AbstractConfigurableProvider
                         Type type, Annotation[] anns, MediaType mt,
                         MultivaluedMap<String, Object> headers, OutputStream os)
         throws IOException, WebApplicationException {
-        if (mt.getSubtype().contains("xml")) {
-            org.dom4j.io.XMLWriter writer = new org.dom4j.io.XMLWriter(os);
+        if (!convertAlways && mt.getSubtype().contains("xml")) {
+            
+            XMLWriter writer;
+            if (MessageUtils.getContextualBoolean(getCurrentMessage(), SUPPRESS_XML_DECLARATION, false)) {
+                OutputFormat format = new org.dom4j.io.OutputFormat();
+                format.setSuppressDeclaration(true);
+                writer = new org.dom4j.io.XMLWriter(os, format);
+            } else {
+                writer = new org.dom4j.io.XMLWriter(os);
+            }
             writer.write(doc);
             writer.flush();
         } else {
@@ -103,6 +118,10 @@ public class DOM4JProvider extends AbstractConfigurableProvider
         }
     }
 
+    protected Message getCurrentMessage() {
+        return JAXRSUtils.getCurrentMessage();
+    }
+
     private org.w3c.dom.Document convertToDOM(org.dom4j.Document doc) {
         String xml = doc.asXML();
         try {
@@ -110,5 +129,9 @@ public class DOM4JProvider extends AbstractConfigurableProvider
         } catch (Exception ex) {
             throw ExceptionUtils.toInternalServerErrorException(ex, null);
         }
+    }
+
+    public void convertToDOMAlways(boolean convert) {
+        convertAlways = convert;
     }
 }
