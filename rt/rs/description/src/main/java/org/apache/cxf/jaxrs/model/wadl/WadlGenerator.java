@@ -151,11 +151,10 @@ public class WadlGenerator implements ContainerRequestFilter {
     }
     
     private String wadlNamespace;
-    private boolean ignoreMessageWriters = true;
+    
     private boolean singleResourceMultipleMethods = true;
     private boolean useSingleSlashResource;
     private boolean ignoreForwardSlash;
-    private boolean ignoreRequests;
     private boolean linkAnyMediaTypeToXmlSchema;
     private boolean useJaxbContextForQnames = true;
     private boolean supportCollections = true;
@@ -165,6 +164,11 @@ public class WadlGenerator implements ContainerRequestFilter {
     private boolean checkAbsolutePathSlash;
     private boolean keepRelativeDocLinks;
     private boolean usePathParamsToCompareOperations = true;
+    
+    
+    private boolean ignoreMessageWriters = true;
+    private boolean ignoreRequests;
+    private boolean convertResourcesToDOM = true;
     
     private List<String> externalSchemasCache;
     private List<URI> externalSchemaLinks;
@@ -183,6 +187,8 @@ public class WadlGenerator implements ContainerRequestFilter {
     private Bus bus;
     private List<DocumentationProvider> docProviders = new LinkedList<DocumentationProvider>();
     private ResourceIdGenerator idGenerator;     
+    
+    
     
     public WadlGenerator() {
     }
@@ -1147,7 +1153,7 @@ public class WadlGenerator implements ContainerRequestFilter {
                 try {
                     InputStream is = ResourceUtils.getResourceStream(loc, (Bus)ep.get(Bus.class.getName()));
                     if (is != null) {
-                        if (isJson(mt)) {
+                        if (!convertResourcesToDOM || isJson(mt)) {
                             return Response.ok(is, mt).build();
                         }
                         Document wadlDoc = StaxUtils.read(is);
@@ -2160,6 +2166,10 @@ public class WadlGenerator implements ContainerRequestFilter {
 
     public void setUsePathParamsToCompareOperations(boolean usePathParamsToCompareOperations) {
         this.usePathParamsToCompareOperations = usePathParamsToCompareOperations;
+    }
+
+    public void setConvertResourcesToDOM(boolean convertResourcesToDOM) {
+        this.convertResourcesToDOM = convertResourcesToDOM;
     }
 
     private static class SchemaConverter extends DelegatingXMLStreamWriter {
