@@ -40,17 +40,17 @@
     </bean>
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSymmetricSAML1Port" createdFromAPI="true">
         <jaxws:properties>
-            <entry key="ws-security.sts.client" value-ref="stsClient"/>
+            <entry key="security.sts.client" value-ref="stsClient"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSymmetricSAML2Port" createdFromAPI="true">
         <jaxws:properties>
-            <entry key="ws-security.sts.client" value-ref="stsClient"/>
+            <entry key="security.sts.client" value-ref="stsClient"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSymmetricSAML1EncryptedPort" createdFromAPI="true">
         <jaxws:properties>
-            <entry key="ws-security.sts.client">
+            <entry key="security.sts.client">
                 <bean class="org.apache.cxf.ws.security.trust.STSClient">
                     <constructor-arg ref="cxf"/>
                     <property name="wsdlLocation" value="http://localhost:8080/SecurityTokenService/UTEncrypted?wsdl"/>
@@ -71,7 +71,7 @@
     </jaxws:client>
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSymmetricSAML2SecureConversationPort" createdFromAPI="true">
         <jaxws:properties>
-            <entry key="ws-security.sts.client.sct" value-ref="stsClient"/>
+            <entry key="security.sts.client.sct" value-ref="stsClient"/>
         </jaxws:properties>
     </jaxws:client>
 </beans>

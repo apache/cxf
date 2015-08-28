@@ -32,20 +32,20 @@
             <map>
                 <entry key="security.username" value="alice"/>
                 <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
-                <entry key="ws-security.sts.token.username" value="myclientkey"/>
-                <entry key="ws-security.sts.token.properties" value="clientKeystore.properties"/>
-                <entry key="ws-security.sts.token.usecert" value="true"/>
+                <entry key="security.sts.token.username" value="myclientkey"/>
+                <entry key="security.sts.token.properties" value="clientKeystore.properties"/>
+                <entry key="security.sts.token.usecert" value="true"/>
             </map>
         </property>
     </bean>
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportSAML1Port" createdFromAPI="true">
         <jaxws:properties>
-            <entry key="ws-security.sts.client" value-ref="stsClient"/>
+            <entry key="security.sts.client" value-ref="stsClient"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportSAML2Port" createdFromAPI="true">
         <jaxws:properties>
-            <entry key="ws-security.sts.client">
+            <entry key="security.sts.client">
                 <bean class="org.apache.cxf.ws.security.trust.STSClient">
                     <constructor-arg ref="cxf"/>
                     <property name="wsdlLocation" value="https://localhost:8443/SecurityTokenService/Transport?wsdl"/>
@@ -55,9 +55,9 @@
                         <map>
                             <entry key="security.username" value="alice"/>
                             <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
-                            <entry key="ws-security.sts.token.username" value="myclientkey"/>
-                            <entry key="ws-security.sts.token.properties" value="clientKeystore.properties"/>
-                            <entry key="ws-security.sts.token.usecert" value="false"/>
+                            <entry key="security.sts.token.username" value="myclientkey"/>
+                            <entry key="security.sts.token.properties" value="clientKeystore.properties"/>
+                            <entry key="security.sts.token.usecert" value="false"/>
                         </map>
                     </property>
                 </bean>
@@ -69,7 +69,7 @@
             <entry key="security.username" value="myclientkey"/>
             <entry key="security.signature.properties" value="clientKeystore.properties"/>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
-            <entry key="ws-security.sts.client" value-ref="stsClient"/>
+            <entry key="security.sts.client" value-ref="stsClient"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportSAML2X509EndorsingPort" createdFromAPI="true">
@@ -77,7 +77,7 @@
             <entry key="security.username" value="myclientkey"/>
             <entry key="security.signature.properties" value="clientKeystore.properties"/>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
-            <entry key="ws-security.sts.client" value-ref="stsClient"/>
+            <entry key="security.sts.client" value-ref="stsClient"/>
         </jaxws:properties>
     </jaxws:client>
     <http:conduit name="https://localhost.*">

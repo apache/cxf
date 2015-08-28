@@ -102,7 +102,7 @@
             <entry key="security.signature.username" value="alice"/>
             <entry key="security.encryption.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="bob"/>
-            <entry key="ws-security.sts.client">
+            <entry key="security.sts.client">
                 <bean class="org.apache.cxf.ws.security.trust.STSClient">
                     <constructor-arg ref="cxf"/>
                     <property name="wsdlLocation" value="http://localhost:8080/SecurityTokenService/Symmetric?wsdl"/>

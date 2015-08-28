@@ -24,7 +24,7 @@
             <entry key="ws-security.saml2.validator">
                 <bean class="org.apache.cxf.ws.security.trust.STSTokenValidator"/>
             </entry>
-            <entry key="ws-security.sts.client">
+            <entry key="security.sts.client">
                 <bean class="org.apache.cxf.ws.security.trust.STSClient">
                     <constructor-arg ref="cxf"/>
                     <property name="wsdlLocation" value="https://localhost:${testutil.ports.realms.STSServer}/SecurityTokenService/realmB?wsdl"/>
@@ -34,9 +34,9 @@
                         <map>
                             <entry key="security.username" value="alice"/>
                             <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
-                            <entry key="ws-security.sts.token.username" value="myclientkey"/>
-                            <entry key="ws-security.sts.token.properties" value="clientKeystore.properties"/>
-                            <entry key="ws-security.sts.token.usecert" value="true"/>
+                            <entry key="security.sts.token.username" value="myclientkey"/>
+                            <entry key="security.sts.token.properties" value="clientKeystore.properties"/>
+                            <entry key="security.sts.token.usecert" value="true"/>
                         </map>
                     </property>
                 </bean>
@@ -48,7 +48,7 @@
             <entry key="ws-security.saml2.validator">
                 <bean class="org.apache.cxf.ws.security.trust.STSTokenValidator"/>
             </entry>
-            <entry key="ws-security.sts.client">
+            <entry key="security.sts.client">
                 <bean class="org.apache.cxf.ws.security.trust.STSClient">
                     <constructor-arg ref="cxf"/>
                     <property name="wsdlLocation" value="https://localhost:${testutil.ports.realms.STSServer}/SecurityTokenService/realmB?wsdl"/>
@@ -58,9 +58,9 @@
                         <map>
                             <entry key="security.username" value="alice"/>
                             <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
-                            <entry key="ws-security.sts.token.username" value="myclientkey"/>
-                            <entry key="ws-security.sts.token.properties" value="clientKeystore.properties"/>
-                            <entry key="ws-security.sts.token.usecert" value="true"/>
+                            <entry key="security.sts.token.username" value="myclientkey"/>
+                            <entry key="security.sts.token.properties" value="clientKeystore.properties"/>
+                            <entry key="security.sts.token.usecert" value="true"/>
                         </map>
                     </property>
                 </bean>
@@ -72,7 +72,7 @@
             <entry key="ws-security.saml2.validator">
                 <bean class="org.apache.cxf.ws.security.trust.STSTokenValidator"/>
             </entry>
-            <entry key="ws-security.sts.client">
+            <entry key="security.sts.client">
                 <bean class="org.apache.cxf.ws.security.trust.STSClient">
                     <constructor-arg ref="cxf"/>
                     <property name="wsdlLocation" value="https://localhost:${testutil.ports.realms.STSServer}/SecurityTokenService/realmB?wsdl"/>
@@ -82,9 +82,9 @@
                         <map>
                             <entry key="security.username" value="alice"/>
                             <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
-                            <entry key="ws-security.sts.token.username" value="myclientkey"/>
-                            <entry key="ws-security.sts.token.properties" value="clientKeystore.properties"/>
-                            <entry key="ws-security.sts.token.usecert" value="true"/>
+                            <entry key="security.sts.token.username" value="myclientkey"/>
+                            <entry key="security.sts.token.properties" value="clientKeystore.properties"/>
+                            <entry key="security.sts.token.usecert" value="true"/>
                         </map>
                     </property>
                 </bean>
@@ -96,7 +96,7 @@
             <entry key="ws-security.saml2.validator">
                 <bean class="org.apache.cxf.systest.sts.realms.DifferentRealmValidator"/>
             </entry>
-            <entry key="ws-security.sts.client">
+            <entry key="security.sts.client">
                 <bean class="org.apache.cxf.ws.security.trust.STSClient">
                     <constructor-arg ref="cxf"/>
                     <property name="wsdlLocation" value="https://localhost:${testutil.ports.realms.STSServer}/SecurityTokenService/realmB?wsdl"/>
@@ -106,9 +106,9 @@
                         <map>
                             <entry key="security.username" value="alice"/>
                             <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
-                            <entry key="ws-security.sts.token.username" value="myclientkey"/>
-                            <entry key="ws-security.sts.token.properties" value="clientKeystore.properties"/>
-                            <entry key="ws-security.sts.token.usecert" value="true"/>
+                            <entry key="security.sts.token.username" value="myclientkey"/>
+                            <entry key="security.sts.token.properties" value="clientKeystore.properties"/>
+                            <entry key="security.sts.token.usecert" value="true"/>
                         </map>
                     </property>
                     <property name="tokenType" value="http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLV2.0"/>

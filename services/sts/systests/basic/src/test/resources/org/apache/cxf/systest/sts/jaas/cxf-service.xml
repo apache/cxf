@@ -58,7 +58,7 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="doubleitut" implementor="org.apache.cxf.systest.sts.jaas.DoubleItPortTypeImpl" endpointName="s:DoubleItUTPort" serviceName="s:DoubleItService" depends-on="ClientAuthHttpsSettings" address="https://localhost:${testutil.ports.jaas.Server}/doubleit/services/doubleitut" wsdlLocation="org/apache/cxf/systest/sts/jaas/DoubleIt.wsdl">
         <jaxws:properties>
             <entry key="ws-security.validate.token" value="false"/>
-            <entry key="ws-security.sts.client" value-ref="stsClient"/>
+            <entry key="security.sts.client" value-ref="stsClient"/>
         </jaxws:properties>
         <jaxws:inInterceptors>
             <ref bean="authenticationInterceptor"/>
@@ -97,7 +97,7 @@
     <!-- JAX-RS service -->
     <jaxrs:server modelRef="classpath:org/apache/cxf/systest/sts/jaas/jaxrs.xml" depends-on="ClientAuthHttpsSettings" address="https://localhost:${testutil.ports.jaas.Server}/doubleit/services/doubleit-rs">
         <jaxrs:properties>
-            <entry key="ws-security.sts.client" value-ref="stsClient"/>
+            <entry key="security.sts.client" value-ref="stsClient"/>
         </jaxrs:properties>
         <jaxrs:inInterceptors>
             <ref bean="authenticationInterceptor"/>

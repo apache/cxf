@@ -29,7 +29,7 @@
             <ref bean="basicAuthValidator"/>
         </jaxws:inInterceptors>
         <jaxws:properties>
-            <entry key="ws-security.sts.client">
+            <entry key="security.sts.client">
                 <ref bean="stsclient"/>
             </entry>
         </jaxws:properties>
@@ -39,7 +39,7 @@
             <ref bean="basicAuthValidator"/>
         </jaxrs:inInterceptors>
         <jaxrs:properties>
-            <entry key="ws-security.sts.client">
+            <entry key="security.sts.client">
                 <ref bean="stsclient"/>
             </entry>
         </jaxrs:properties>

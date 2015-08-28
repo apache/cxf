@@ -40,19 +40,19 @@
     </bean>
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSymmetricSAML1Port" createdFromAPI="true">
         <jaxws:properties>
-            <entry key="ws-security.sts.client" value-ref="stsClient"/>
+            <entry key="security.sts.client" value-ref="stsClient"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSymmetricSAML2Port" createdFromAPI="true">
         <jaxws:properties>
-            <entry key="ws-security.sts.client" value-ref="stsClient"/>
+            <entry key="security.sts.client" value-ref="stsClient"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSymmetricSAML2EndorsingPort" createdFromAPI="true">
         <jaxws:properties>
             <entry key="security.encryption.properties" value="clientKeystore.properties"/>
             <entry key="security.encryption.username" value="myservicekey"/>
-            <entry key="ws-security.sts.client" value-ref="stsClient"/>
+            <entry key="security.sts.client" value-ref="stsClient"/>
         </jaxws:properties>
     </jaxws:client>
 </beans>

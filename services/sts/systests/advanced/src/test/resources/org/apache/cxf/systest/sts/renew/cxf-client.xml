@@ -30,7 +30,7 @@
             <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
             <entry key="security.signature.properties" value="clientKeystore.properties"/>
             <entry key="security.signature.username" value="myclientkey"/>
-            <entry key="ws-security.sts.client">
+            <entry key="security.sts.client">
                 <bean class="org.apache.cxf.ws.security.trust.STSClient">
                     <constructor-arg ref="cxf"/>
                     <property name="wsdlLocation" value="https://localhost:${testutil.ports.renew.STSServerPOP}/SecurityTokenService/Transport?wsdl"/>
@@ -41,9 +41,9 @@
                     <property name="allowRenewingAfterExpiry" value="true"/>
                     <property name="properties">
                         <map>
-                            <entry key="ws-security.sts.token.username" value="myclientkey"/>
-                            <entry key="ws-security.sts.token.properties" value="clientKeystore.properties"/>
-                            <entry key="ws-security.sts.token.usecert" value="true"/>
+                            <entry key="security.sts.token.username" value="myclientkey"/>
+                            <entry key="security.sts.token.properties" value="clientKeystore.properties"/>
+                            <entry key="security.sts.token.usecert" value="true"/>
                         </map>
                     </property>
                 </bean>
@@ -54,7 +54,7 @@
         <jaxws:properties>
             <entry key="security.username" value="alice"/>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
-            <entry key="ws-security.sts.client">
+            <entry key="security.sts.client">
                 <bean class="org.apache.cxf.ws.security.trust.STSClient">
                     <constructor-arg ref="cxf"/>
                     <property name="wsdlLocation" value="https://localhost:${testutil.ports.renew.STSServerPOP}/SecurityTokenService/Transport?wsdl"/>
@@ -79,9 +79,9 @@
         <property name="allowRenewingAfterExpiry" value="true"/>
         <property name="properties">
             <map>
-                <entry key="ws-security.sts.token.username" value="myclientkey"/>
-                <entry key="ws-security.sts.token.properties" value="clientKeystore.properties"/>
-                <entry key="ws-security.sts.token.usecert" value="true"/>
+                <entry key="security.sts.token.username" value="myclientkey"/>
+                <entry key="security.sts.token.properties" value="clientKeystore.properties"/>
+                <entry key="security.sts.token.usecert" value="true"/>
             </map>
         </property>
     </bean>
@@ -92,7 +92,7 @@
             <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
             <entry key="security.signature.properties" value="clientKeystore.properties"/>
             <entry key="security.signature.username" value="myclientkey"/>
-            <entry key="ws-security.sts.client" value-ref="saml2STSClient" />
+            <entry key="security.sts.client" value-ref="saml2STSClient" />
         </jaxws:properties>
     </jaxws:client>
     
@@ -106,9 +106,9 @@
         <property name="allowRenewingAfterExpiry" value="true"/>
         <property name="properties">
             <map>
-                <entry key="ws-security.sts.token.username" value="myclientkey"/>
-                <entry key="ws-security.sts.token.properties" value="clientKeystore.properties"/>
-                <entry key="ws-security.sts.token.usecert" value="true"/>
+                <entry key="security.sts.token.username" value="myclientkey"/>
+                <entry key="security.sts.token.properties" value="clientKeystore.properties"/>
+                <entry key="security.sts.token.usecert" value="true"/>
             </map>
         </property>
     </bean>
@@ -119,7 +119,7 @@
             <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
             <entry key="security.signature.properties" value="clientKeystore.properties"/>
             <entry key="security.signature.username" value="myclientkey"/>
-            <entry key="ws-security.sts.client" value-ref="saml2STSNoRenewClient" />
+            <entry key="security.sts.client" value-ref="saml2STSNoRenewClient" />
         </jaxws:properties>
     </jaxws:client>
     <http:conduit name="https://localhost:.*">

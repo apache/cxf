@@ -52,7 +52,7 @@
                     <constructor-arg value="true"/>
                 </bean>
             </entry>
-            <entry key="ws-security.sts.client">
+            <entry key="security.sts.client">
                 <ref bean="stsclient"/>
             </entry>
             <entry key="ws-security.enable.streaming" value="true"/>

@@ -26,7 +26,7 @@
             <entry key="ws-security.sct.validator">
                 <bean class="org.apache.cxf.systest.sts.distributed_caching.SCTTokenValidator"/>
             </entry>
-            <entry key="ws-security.sts.client">
+            <entry key="security.sts.client">
                 <bean class="org.apache.cxf.ws.security.trust.STSClient">
                     <constructor-arg ref="cxf"/>
                     <property name="wsdlLocation" value="https://localhost:${testutil.ports.distributed_caching.STSServer.2}/SecurityTokenService/Transport?wsdl"/>
@@ -45,7 +45,7 @@
                     <constructor-arg value="true"/>
                 </bean>
             </entry>
-            <entry key="ws-security.sts.client">
+            <entry key="security.sts.client">
                 <bean class="org.apache.cxf.ws.security.trust.STSClient">
                     <constructor-arg ref="cxf"/>
                     <property name="wsdlLocation" value="https://localhost:${testutil.ports.distributed_caching.STSServer.2}/SecurityTokenService/Transport?wsdl"/>
@@ -64,7 +64,7 @@
                     <constructor-arg value="true"/>
                 </bean>
             </entry>
-            <entry key="ws-security.sts.client">
+            <entry key="security.sts.client">
                 <bean class="org.apache.cxf.ws.security.trust.STSClient">
                     <constructor-arg ref="cxf"/>
                     <property name="wsdlLocation" value="https://localhost:${testutil.ports.distributed_caching.STSServer.2}/SecurityTokenService/Transport?wsdl"/>

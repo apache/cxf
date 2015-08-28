@@ -26,7 +26,7 @@
             <entry key="ws-security.bst.validator">
                 <bean class="org.apache.cxf.systest.sts.custom_onbehalfof.CustomBSTTokenValidator"/>
             </entry>
-            <entry key="ws-security.sts.client">
+            <entry key="security.sts.client">
                 <bean class="org.apache.cxf.ws.security.trust.STSClient">
                     <constructor-arg ref="cxf"/>
                     <property name="wsdlLocation" value="https://localhost:${testutil.ports.custom_onbehalfof.STSServer}/SecurityTokenService/Transport?wsdl"/>

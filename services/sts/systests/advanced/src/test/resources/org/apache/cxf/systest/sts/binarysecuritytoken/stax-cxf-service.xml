@@ -35,7 +35,7 @@
             <entry key="security.signature.properties" value="serviceKeystore.properties"/>
             <entry key="security.encryption.username" value="useReqSigCert"/>
             <entry key="ws-security.enable.streaming" value="true"/>
-            <entry key="ws-security.sts.client">
+            <entry key="security.sts.client">
                 <bean class="org.apache.cxf.ws.security.trust.STSClient">
                     <constructor-arg ref="cxf"/>
                     <property name="wsdlLocation" value="https://localhost:${testutil.ports.StaxSTSServer}/SecurityTokenService/Transport?wsdl"/>
