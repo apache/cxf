@@ -238,7 +238,11 @@ public abstract class AbstractSamlInHandler implements ContainerRequestFilter {
     protected void throwFault(String error, Exception ex) {
         // TODO: get bundle resource message once this filter is moved 
         // to rt/rs/security
-        LOG.warning(error + ": " + ExceptionUtils.getStackTrace(ex));
+        String errorMsg = error;
+        if (ex != null) {
+            errorMsg += ": " + ExceptionUtils.getStackTrace(ex);
+        }
+        LOG.warning(errorMsg);
         Response response = JAXRSUtils.toResponseBuilder(401).entity(error).build();
         throw ExceptionUtils.toNotAuthorizedException(null, response);
     }
