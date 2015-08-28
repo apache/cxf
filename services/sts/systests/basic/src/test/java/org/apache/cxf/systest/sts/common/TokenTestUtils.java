@@ -52,6 +52,9 @@ public final class TokenTestUtils {
         org.apache.cxf.ws.security.tokenstore.SecurityToken tok = store.getToken(id);
         assertNotNull(tok);
         STSClient sts = (STSClient)ep.get(SecurityConstants.STS_CLIENT);
+        if (sts == null) {
+            sts  = (STSClient)ep.get("ws-" + SecurityConstants.STS_CLIENT);
+        }
         
         List<SecurityToken> validTokens = sts.validateSecurityToken(tok);
         assertTrue(validTokens != null && !validTokens.isEmpty());
@@ -75,6 +78,9 @@ public final class TokenTestUtils {
     
     public static void updateSTSPort(BindingProvider p, String port) {
         STSClient stsClient = (STSClient)p.getRequestContext().get(SecurityConstants.STS_CLIENT);
+        if (stsClient == null) {
+            stsClient = (STSClient)p.getRequestContext().get("ws-" + SecurityConstants.STS_CLIENT);
+        }
         if (stsClient != null) {
             String location = stsClient.getWsdlLocation();
             if (location != null && location.contains("8080")) {
@@ -84,6 +90,9 @@ public final class TokenTestUtils {
             }
         }
         stsClient = (STSClient)p.getRequestContext().get(SecurityConstants.STS_CLIENT + ".sct");
+        if (stsClient == null) {
+            stsClient = (STSClient)p.getRequestContext().get("ws-" + SecurityConstants.STS_CLIENT + ".sct");
+        }
         if (stsClient != null) {
             String location = stsClient.getWsdlLocation();
             if (location.contains("8080")) {

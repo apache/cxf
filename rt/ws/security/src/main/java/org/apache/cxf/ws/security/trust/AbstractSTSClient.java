@@ -1554,9 +1554,6 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
 
     protected CallbackHandler createHandler() {
         Object o = getProperty(SecurityConstants.CALLBACK_HANDLER);
-        if (o == null) {
-            o = getProperty("ws-" + SecurityConstants.CALLBACK_HANDLER);
-        }
         try {
             return SecurityUtils.getCallbackHandler(o);
         } catch (Exception e) {
@@ -1565,19 +1562,36 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
     }
 
     protected Object getProperty(String s) {
-        Object o = ctx.get(s);
+        String key = s;
+        
+        Object o = ctx.get(key);
         if (o == null) {
-            o = client.getEndpoint().getEndpointInfo().getProperty(s);
+            o = client.getEndpoint().getEndpointInfo().getProperty(key);
         }
         if (o == null) {
-            o = client.getEndpoint().getEndpointInfo().getBinding().getProperty(s);
+            o = client.getEndpoint().getEndpointInfo().getBinding().getProperty(key);
         }
         if (o == null) {
-            o = client.getEndpoint().getService().get(s);
+            o = client.getEndpoint().getService().get(key);
         }
+        
+        key = "ws-" + s;
+        if (o == null) {
+            o = ctx.get(key);
+        }
+        if (o == null) {
+            o = client.getEndpoint().getEndpointInfo().getProperty(key);
+        }
+        if (o == null) {
+            o = client.getEndpoint().getEndpointInfo().getBinding().getProperty(key);
+        }
+        if (o == null) {
+            o = client.getEndpoint().getService().get(key);
+        }
+        
         return o;
     }
-
+    
     protected Crypto createCrypto(boolean decrypt) throws IOException, WSSecurityException {
         Crypto crypto = (Crypto)getProperty(SecurityConstants.STS_TOKEN_CRYPTO + (decrypt ? ".decrypt" : ""));
         if (crypto != null) {

@@ -205,6 +205,9 @@ public class AsymmetricBindingTest extends AbstractBusClientServerTestBase {
         BindingProvider bindingProvider = (BindingProvider)asymmetricSaml1EncryptedPort;
         STSClient stsClient = 
             (STSClient)bindingProvider.getRequestContext().get(SecurityConstants.STS_CLIENT);
+        if (stsClient == null) {
+            stsClient = (STSClient)bindingProvider.getRequestContext().get("ws-" + SecurityConstants.STS_CLIENT);
+        }
         Crypto crypto = CryptoFactory.getInstance("clientKeystore.properties");
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
         cryptoType.setAlias("myclientkey");

@@ -69,6 +69,9 @@ public class IntermediaryCachingPortTypeImpl extends AbstractBusClientServerTest
             if ("standalone".equals(System.getProperty("sts.deployment"))) {
                 Map<String, Object> context = ((BindingProvider)transportPort).getRequestContext();
                 STSClient stsClient = (STSClient)context.get(SecurityConstants.STS_CLIENT);
+                if (stsClient == null) {
+                    stsClient = (STSClient)context.get("ws-" + SecurityConstants.STS_CLIENT);
+                }
                 if (stsClient != null) {
                     String location = stsClient.getWsdlLocation();
                     if (location.contains("8080")) {

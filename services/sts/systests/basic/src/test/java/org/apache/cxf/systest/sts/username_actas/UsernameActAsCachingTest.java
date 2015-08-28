@@ -381,6 +381,9 @@ public class UsernameActAsCachingTest extends AbstractBusClientServerTestBase {
         // Disable appliesTo
         BindingProvider p = (BindingProvider)port;
         STSClient stsClient = (STSClient)p.getRequestContext().get(SecurityConstants.STS_CLIENT);
+        if (stsClient == null) {
+            stsClient = (STSClient)p.getRequestContext().get("ws-" + SecurityConstants.STS_CLIENT);
+        }
         stsClient.setEnableAppliesTo(false);
         doubleIt(port, 25);
         
@@ -407,6 +410,9 @@ public class UsernameActAsCachingTest extends AbstractBusClientServerTestBase {
     
     private void clearSTSClient(BindingProvider p) throws BusException, EndpointException {
         STSClient stsClient = (STSClient)p.getRequestContext().get(SecurityConstants.STS_CLIENT);
+        if (stsClient == null) {
+            stsClient = (STSClient)p.getRequestContext().get("ws-" + SecurityConstants.STS_CLIENT);
+        }
         stsClient.getClient().destroy();
         stsClient.setWsdlLocation(null);
         stsClient.setLocation(null);
