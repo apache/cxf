@@ -63,6 +63,7 @@ import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 
 public final class ServerProviderFactory extends ProviderFactory {
     private static final Set<Class<?>> SERVER_FILTER_INTERCEPTOR_CLASSES = 
@@ -72,6 +73,7 @@ public final class ServerProviderFactory extends ProviderFactory {
                                                       WriterInterceptor.class));
     
     private static final String WADL_PROVIDER_NAME = "org.apache.cxf.jaxrs.model.wadl.WadlGenerator";
+    private static final String MAKE_DEFAULT_WAE_LEAST_SPECIFIC = "make.default.wae.least.specific";
     private List<ProviderInfo<ExceptionMapper<?>>> exceptionMappers = 
         new ArrayList<ProviderInfo<ExceptionMapper<?>>>(1);
     
@@ -176,7 +178,10 @@ public final class ServerProviderFactory extends ProviderFactory {
         if (candidates.size() == 0) {
             return null;
         }
-        Collections.sort(candidates, new ProviderInfoClassComparator(exceptionType));
+        boolean makeDefaultWaeLeastSpecific = 
+            MessageUtils.getContextualBoolean(m, MAKE_DEFAULT_WAE_LEAST_SPECIFIC, false);
+        Collections.sort(candidates, new ExceptionProviderInfoComparator(exceptionType,
+                                                                         makeDefaultWaeLeastSpecific));
         return (ExceptionMapper<T>) candidates.get(0).getProvider();
     }
     
@@ -603,6 +608,25 @@ public final class ServerProviderFactory extends ProviderFactory {
                 }
             }
             return Priorities.USER;
+        }
+    }
+    public static class ExceptionProviderInfoComparator extends ProviderInfoClassComparator {
+        private boolean makeDefaultWaeLeastSpecific;
+        public ExceptionProviderInfoComparator(Class<?> expectedCls, boolean makeDefaultWaeLeastSpecific) {
+            super(expectedCls);
+            this.makeDefaultWaeLeastSpecific = makeDefaultWaeLeastSpecific;
+        }
+        public int compare(ProviderInfo<?> p1, ProviderInfo<?> p2) {
+            if (makeDefaultWaeLeastSpecific) {
+                if (p1.getProvider() instanceof WebApplicationExceptionMapper
+                    && !p1.isCustom()) {
+                    return 1;
+                } else if (p2.getProvider() instanceof WebApplicationExceptionMapper
+                    && !p2.isCustom()) {
+                    return -1;
+                } 
+            }
+            return super.compare(p1, p2);
         }
     }
     

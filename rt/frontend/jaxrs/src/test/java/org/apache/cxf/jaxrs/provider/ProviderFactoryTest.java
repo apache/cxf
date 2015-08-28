@@ -373,6 +373,42 @@ public class ProviderFactoryTest extends Assert {
     }
     
     @Test
+    public void testExceptionMappersHierarchy3() throws Exception {
+        Message m = new MessageImpl();
+        m.put("make.default.wae.least.specific", true);
+        ServerProviderFactory pf = ServerProviderFactory.getInstance();
+        
+        TestRuntimeExceptionMapper rm = new TestRuntimeExceptionMapper(); 
+        pf.registerUserProvider(rm);
+        ExceptionMapper<WebApplicationException> em = 
+            pf.createExceptionMapper(WebApplicationException.class, m);
+        assertSame(rm, em);
+        assertSame(rm, pf.createExceptionMapper(RuntimeException.class, m));
+        
+        WebApplicationExceptionMapper wm = new WebApplicationExceptionMapper(); 
+        pf.registerUserProvider(wm);
+        assertSame(wm, pf.createExceptionMapper(WebApplicationException.class, m));
+        assertSame(rm, pf.createExceptionMapper(RuntimeException.class, m));
+    }
+    @Test
+    public void testExceptionMappersHierarchy4() throws Exception {
+        Message m = new MessageImpl();
+        m.put("make.default.wae.least.specific", true);
+        ServerProviderFactory pf = ServerProviderFactory.getInstance();
+        ExceptionMapper<WebApplicationException> em = 
+            pf.createExceptionMapper(WebApplicationException.class, m);
+        assertTrue(em instanceof WebApplicationExceptionMapper);
+    }
+    @Test
+    public void testExceptionMappersHierarchy5() throws Exception {
+        Message m = new MessageImpl();
+        ServerProviderFactory pf = ServerProviderFactory.getInstance();
+        ExceptionMapper<WebApplicationException> em = 
+            pf.createExceptionMapper(WebApplicationException.class, m);
+        assertTrue(em instanceof WebApplicationExceptionMapper);
+    }
+    
+    @Test
     public void testExceptionMappersHierarchyWithGenerics() throws Exception {
         ServerProviderFactory pf = ServerProviderFactory.getInstance();
         RuntimeExceptionMapper1 exMapper1 = new RuntimeExceptionMapper1(); 
