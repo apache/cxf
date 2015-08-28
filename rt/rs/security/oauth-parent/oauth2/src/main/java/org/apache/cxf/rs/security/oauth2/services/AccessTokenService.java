@@ -28,6 +28,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -99,8 +100,8 @@ public class AccessTokenService extends AbstractTokenService {
             checkAudience(params);
         } catch (OAuthServiceException ex) {
             return super.createErrorResponseFromBean(ex.getError());
-        }
-        
+        } 
+                
         // Find the grant handler
         AccessTokenGrantHandler handler = findGrantHandler(params);
         if (handler == null) {
@@ -111,8 +112,14 @@ public class AccessTokenService extends AbstractTokenService {
         ServerAccessToken serverToken = null;
         try {
             serverToken = handler.createAccessToken(client, params);
-        } catch (OAuthServiceException ex) {
-            return handleException(ex, OAuthConstants.INVALID_GRANT);
+        } catch (WebApplicationException ex) {
+            throw ex;
+        } catch (RuntimeException ex) {
+            // This is done to bypass a Check-Style 
+            // restriction on a number of return statements 
+            OAuthServiceException oauthEx = ex instanceof OAuthServiceException 
+                ? (OAuthServiceException)ex : new OAuthServiceException(ex);
+            return handleException(oauthEx, OAuthConstants.INVALID_GRANT);
         }
         if (serverToken == null) {
             return createErrorResponse(params, OAuthConstants.INVALID_GRANT);
