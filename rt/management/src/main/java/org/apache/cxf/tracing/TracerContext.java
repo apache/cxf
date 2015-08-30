@@ -21,6 +21,8 @@ package org.apache.cxf.tracing;
 import java.util.concurrent.Callable;
 
 public interface TracerContext {
+    <T> T continueSpan(final Traceable<T> traceable) throws Exception;
+    
     <T> T startSpan(final String desription);
     <T> Callable<T> wrap(final String desription, final Traceable<T> traceable);
     

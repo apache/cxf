@@ -28,6 +28,7 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.tracing.AbstractTracingProvider;
 import org.apache.htrace.Sampler;
+import org.apache.htrace.Span;
 import org.apache.htrace.Trace;
 import org.apache.htrace.TraceInfo;
 import org.apache.htrace.TraceScope;
@@ -69,12 +70,12 @@ public abstract class AbstractHTraceProvider extends AbstractTracingProvider {
         // If the service resource is using asynchronous processing mode, the trace
         // scope will be closed in another thread and as such should be detached.
         if (isAsyncResponse()) {
-            traceScope.detach();
+            propagateContinuationSpan(traceScope.detach());
         }
         
         return traceScope;
     }
-    
+
     protected void stopTraceSpan(final Map<String, List<String>> requestHeaders,
                                  final Map<String, List<Object>> responseHeaders,
                                  final TraceScope span) {
@@ -98,6 +99,10 @@ public abstract class AbstractHTraceProvider extends AbstractTracingProvider {
                 span.close();
             }
         }
+    }
+    
+    private void propagateContinuationSpan(final Span continuationSpan) {
+        JAXRSUtils.getCurrentMessage().put(Span.class, continuationSpan);
     }
     
     protected boolean isAsyncResponse() {

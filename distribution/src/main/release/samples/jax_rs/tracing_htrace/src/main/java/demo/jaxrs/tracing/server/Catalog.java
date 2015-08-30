@@ -22,7 +22,6 @@ package demo.jaxrs.tracing.server;
 
 import java.io.IOException;
 import java.util.UUID;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -48,9 +47,6 @@ import org.apache.cxf.tracing.Traceable;
 import org.apache.cxf.tracing.TracerContext;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
-import org.apache.hadoop.hbase.trace.SpanReceiverHost;
-
-import demo.jaxrs.tracing.conf.TracingConfiguration;
 
 @Path("/catalog")
 public class Catalog {
@@ -61,7 +57,6 @@ public class Catalog {
         final Configuration configuration = HBaseConfiguration.create();
         configuration.set("hbase.zookeeper.quorum", "hbase");
         configuration.set("hbase.zookeeper.property.clientPort", "2181");
-        configuration.set(SpanReceiverHost.SPAN_RECEIVERS_CONF_KEY, TracingConfiguration.SPAN_RECEIVER.getName());
         store = new CatalogStore(configuration, "catalog");
     }
     
@@ -99,11 +94,19 @@ public class Catalog {
     
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public void getBooks(@Suspended final AsyncResponse response) throws IOException {
-        executor.submit(new Callable<Void>() {
+    public void getBooks(@Suspended final AsyncResponse response, 
+            @Context final TracerContext tracing) throws Exception {
+        tracing.continueSpan(new Traceable<Void>() {
             @Override
-            public Void call() throws Exception {
-                response.resume(store.scan());
+            public Void call(final TracerContext context) throws Exception {
+                executor.submit(tracing.wrap("Looking for books", new Traceable<Void>() {
+                    @Override
+                    public Void call(final TracerContext context) throws Exception {
+                        response.resume(store.scan());
+                        return null;
+                    }
+                }));
+                
                 return null;
             }
         });

@@ -168,8 +168,24 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
             .get();
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
         
-        assertThat(TestSpanReceiver.getAllSpans().size(), equalTo(1));
+        assertThat(TestSpanReceiver.getAllSpans().size(), equalTo(2));
         assertThat(TestSpanReceiver.getAllSpans().get(0).getDescription(), equalTo("bookstore/books/async"));
+        assertThat(TestSpanReceiver.getAllSpans().get(1).getDescription(), equalTo("Processing books"));
+        
+        assertThat((String)r.getHeaders().getFirst(TracerHeaders.DEFAULT_HEADER_TRACE_ID), equalTo("10"));
+        assertThat((String)r.getHeaders().getFirst(TracerHeaders.DEFAULT_HEADER_SPAN_ID), equalTo("20"));
+    }
+    
+    @Test
+    public void testThatOuterSpanIsCreatedUsingAsyncInvocation() {
+        final Response r = createWebClient("/bookstore/books/async/notrace")
+            .header(TracerHeaders.DEFAULT_HEADER_TRACE_ID, 10L)
+            .header(TracerHeaders.DEFAULT_HEADER_SPAN_ID, 20L)
+            .get();
+        assertEquals(Status.OK.getStatusCode(), r.getStatus());
+        
+        assertThat(TestSpanReceiver.getAllSpans().size(), equalTo(1));
+        assertThat(TestSpanReceiver.getAllSpans().get(0).getDescription(), equalTo("bookstore/books/async/notrace"));
         
         assertThat((String)r.getHeaders().getFirst(TracerHeaders.DEFAULT_HEADER_TRACE_ID), equalTo("10"));
         assertThat((String)r.getHeaders().getFirst(TracerHeaders.DEFAULT_HEADER_SPAN_ID), equalTo("20"));
@@ -180,8 +196,9 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
         final Response r = createWebClient("/bookstore/books/async").get();
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
         
-        assertThat(TestSpanReceiver.getAllSpans().size(), equalTo(1));
+        assertThat(TestSpanReceiver.getAllSpans().size(), equalTo(2));
         assertThat(TestSpanReceiver.getAllSpans().get(0).getDescription(), equalTo("bookstore/books/async"));
+        assertThat(TestSpanReceiver.getAllSpans().get(1).getDescription(), equalTo("Processing books"));
     }
     
     protected WebClient createWebClient(final String url, final Object ... providers) {

@@ -21,6 +21,7 @@ package org.apache.cxf.systest.jaxrs.tracing;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.UUID;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -59,13 +60,44 @@ public class BookStore {
     @GET
     @Path("/books/async")
     @Produces(MediaType.APPLICATION_JSON)
-    public void getBooksAsync(@Suspended final AsyncResponse response) {
+    public void getBooksAsync(@Suspended final AsyncResponse response) throws Exception {
+        tracer.continueSpan(new Traceable<Void>() {
+            @Override
+            public Void call(final TracerContext context) throws Exception {
+                executor.submit(
+                    tracer.wrap("Processing books", new Traceable<Void>() {
+                        @Override
+                        public Void call(final TracerContext context) throws Exception {
+                            // Simulate some running job 
+                            Thread.sleep(200);
+                            
+                            response.resume(
+                                Arrays.asList(
+                                    new Book("Apache CXF in Action", UUID.randomUUID().toString()),
+                                    new Book("Mastering Apache CXF", UUID.randomUUID().toString())
+                                )
+                            );
+                            
+                            return null;
+                        }
+                    }
+                ));
+                
+                return null;
+            }
+        });
+    }
+    
+    @GET
+    @Path("/books/async/notrace")
+    @Produces(MediaType.APPLICATION_JSON)
+    public void getBooksAsyncNoTrace(@Suspended final AsyncResponse response) throws Exception {
         executor.submit(
-            tracer.wrap("Processing books", new Traceable<Void>() {
+            new Callable<Void>() {
                 @Override
-                public Void call(final TracerContext context) throws Exception {
+                public Void call() throws Exception {
                     // Simulate some running job 
-                    Thread.sleep(100);
+                    Thread.sleep(200);
                     
                     response.resume(
                         Arrays.asList(
@@ -76,7 +108,7 @@ public class BookStore {
                     
                     return null;
                 }
-            })
+            }
         );
     }
     

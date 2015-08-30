@@ -25,6 +25,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.tracing.TracerContext;
 import org.apache.cxf.tracing.htrace.HTraceTracerContext;
 import org.apache.htrace.Sampler;
+import org.apache.htrace.Span;
 import org.apache.htrace.impl.NeverSampler;
 
 @Provider
@@ -37,6 +38,15 @@ public class HTraceContextProvider implements ContextProvider< TracerContext > {
 
     @Override
     public TracerContext createContext(final Message message) {
+        // Check if there is a trace scope passed along with the message
+        final Span continuationSpan = message.get(Span.class);
+        
+        // If trace scope is already present, let us check if it is detached 
+        // (asynchronous invocation)
+        if (continuationSpan != null) {
+            return new HTraceTracerContext(sampler, continuationSpan);
+        }
+        
         return new HTraceTracerContext(sampler);
     }
 }
