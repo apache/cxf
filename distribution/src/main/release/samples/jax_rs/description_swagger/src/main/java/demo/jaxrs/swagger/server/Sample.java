@@ -19,7 +19,6 @@
 
 package demo.jaxrs.swagger.server;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
