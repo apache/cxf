@@ -97,8 +97,8 @@ public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBus
             final Response r = client.get();
             assertEquals(Status.OK.getStatusCode(), r.getStatus());
             JSONAssert.assertEquals(
-                IOUtils.readStringFromStream((InputStream)r.getEntity()), 
                 getExpectedValue("swagger2-json.txt", getPort()),
+                IOUtils.readStringFromStream((InputStream)r.getEntity()),
                 false);
         } finally {
             client.close();
