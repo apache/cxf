@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.systest.jaxrs.description;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 
@@ -61,7 +62,6 @@ public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBus
                 new SingletonResourceProvider(new BookStoreSwagger2()));
             sf.setProvider(new JacksonJsonProvider());
             final Swagger2Feature feature = new Swagger2Feature();
-            feature.setIgnoreHostPort(true);
             feature.setRunAsFilter(runAsFilter);
             sf.setFeatures(Arrays.asList(feature));
             sf.setAddress("http://localhost:" + port + "/");
@@ -98,7 +98,7 @@ public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBus
             assertEquals(Status.OK.getStatusCode(), r.getStatus());
             JSONAssert.assertEquals(
                 IOUtils.readStringFromStream((InputStream)r.getEntity()), 
-                IOUtils.readStringFromStream(getClass().getResourceAsStream("swagger2-json.txt")),
+                getExpectedValue("swagger2-json.txt", getPort()),
                 false);
         } finally {
             client.close();
@@ -113,7 +113,7 @@ public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBus
             final Response r = client.get();
             assertEquals(Status.OK.getStatusCode(), r.getStatus());
             Yaml yaml = new Yaml();
-            assertEquals(yaml.load(getClass().getResourceAsStream("swagger2-yaml.txt")),
+            assertEquals(yaml.load(getExpectedValue("swagger2-yaml.txt", getPort())),
                          yaml.load(IOUtils.readStringFromStream((InputStream)r.getEntity())));
         } finally {
             client.close();
@@ -125,5 +125,10 @@ public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBus
             .create("http://localhost:" + getPort() + url, 
                 Arrays.< Object >asList(new JacksonJsonProvider()))
             .accept(MediaType.APPLICATION_JSON).accept("application/yaml");
+    }
+
+    private static String getExpectedValue(String name, Object... args) throws IOException {
+        return String.format(IOUtils.readStringFromStream(
+            AbstractSwagger2ServiceDescriptionTest.class.getResourceAsStream(name)), args);
     }
 }

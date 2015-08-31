@@ -43,7 +43,6 @@ import io.swagger.jaxrs.listing.SwaggerSerializers;
 
 public class Swagger2Feature extends AbstractSwaggerFeature {
     private String host;
-    private boolean ignoreHostPort;
 
     @Override
     protected void addSwaggerResource(Server server) {
@@ -94,20 +93,12 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
             // get the path part
             URI u = URI.create(address); 
             setBasePath(u.getPath());
-            setHost(u.getPort() < 0 || isIgnoreHostPort() 
-                    ? u.getHost() : u.getHost() + ":" + u.getPort());
+            setHost(u.getPort() < 0 ? u.getHost() : u.getHost() + ":" + u.getPort());
         } else {
             setBasePath(address);
         }
     }
 
-    public boolean isIgnoreHostPort() {
-        return ignoreHostPort;
-    }
-
-    public void setIgnoreHostPort(boolean ignoreHostPort) {
-        this.ignoreHostPort = ignoreHostPort;
-    }
 
     @PreMatching
     private static class SwaggerContainerRequestFilter extends ApiListingResource implements ContainerRequestFilter {
