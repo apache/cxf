@@ -375,7 +375,7 @@ public class ProviderFactoryTest extends Assert {
     @Test
     public void testExceptionMappersHierarchy3() throws Exception {
         Message m = new MessageImpl();
-        m.put("make.default.wae.least.specific", true);
+        m.put("default.wae.mapper.least.specific", true);
         ServerProviderFactory pf = ServerProviderFactory.getInstance();
         
         TestRuntimeExceptionMapper rm = new TestRuntimeExceptionMapper(); 
@@ -393,7 +393,7 @@ public class ProviderFactoryTest extends Assert {
     @Test
     public void testExceptionMappersHierarchy4() throws Exception {
         Message m = new MessageImpl();
-        m.put("make.default.wae.least.specific", true);
+        m.put("default.wae.mapper.least.specific", true);
         ServerProviderFactory pf = ServerProviderFactory.getInstance();
         ExceptionMapper<WebApplicationException> em = 
             pf.createExceptionMapper(WebApplicationException.class, m);
