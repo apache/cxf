@@ -73,7 +73,7 @@ public final class ServerProviderFactory extends ProviderFactory {
                                                       WriterInterceptor.class));
     
     private static final String WADL_PROVIDER_NAME = "org.apache.cxf.jaxrs.model.wadl.WadlGenerator";
-    private static final String MAKE_DEFAULT_WAE_LEAST_SPECIFIC = "make.default.wae.least.specific";
+    private static final String MAKE_DEFAULT_WAE_LEAST_SPECIFIC = "default.wae.mapper.least.specific";
     private List<ProviderInfo<ExceptionMapper<?>>> exceptionMappers = 
         new ArrayList<ProviderInfo<ExceptionMapper<?>>>(1);
     
