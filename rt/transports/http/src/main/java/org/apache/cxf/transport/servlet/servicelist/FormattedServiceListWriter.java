@@ -53,7 +53,7 @@ public class FormattedServiceListWriter implements ServiceListWriter {
                      + "\"http://www.w3.org/TR/html4/loose.dtd\">");
         writer.write("<HTML><HEAD>");
         writer.write("<LINK type=\"text/css\" rel=\"stylesheet\" href=\"" + styleSheetPath + "\">");
-        writer.write("<meta http-equiv=content-type content=\"text/html; charset=UTF-8\">");
+        writer.write("<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\">");
         if (title != null) {
             writer.write("<title>" + title + "</title>");
         } else {
