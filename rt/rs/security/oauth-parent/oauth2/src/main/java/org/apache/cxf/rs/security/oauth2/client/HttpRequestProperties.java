@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.rs.security.oauth2.client;
 
+import java.net.MalformedURLException;
 import java.net.URI;
 
 import org.apache.cxf.jaxrs.client.WebClient;
@@ -35,7 +36,7 @@ public class HttpRequestProperties {
     }
     
     public HttpRequestProperties(URI uri, String httpMethod) {
-        this(uri.getHost(), uri.getPort(), httpMethod,
+        this(uri.getHost(), getPortFromURI(uri), httpMethod,
              uri.getRawPath(), uri.getRawQuery());
     }
     
@@ -49,6 +50,18 @@ public class HttpRequestProperties {
         this.hostName = hostName;
         this.port = port;
         this.httpMethod = httpMethod;
+    }
+    
+    private static int getPortFromURI(URI uri) {
+        int port = uri.getPort();
+        if (port == -1) {
+            try {
+                port = uri.toURL().getDefaultPort();
+            } catch (MalformedURLException ex) {
+                // ignore
+            }
+        }
+        return port;
     }
     
     public String getRequestPath() {
