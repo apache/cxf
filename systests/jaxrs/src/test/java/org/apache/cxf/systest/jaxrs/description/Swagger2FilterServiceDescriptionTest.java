@@ -42,4 +42,14 @@ public class Swagger2FilterServiceDescriptionTest extends AbstractSwagger2Servic
     protected String getPort() {
         return PORT;
     }
+
+    @Override
+    protected String getExpectedFileJson() {
+        return "swagger2-json.txt";
+    }
+
+    @Override
+    protected String getExpectedFileYaml() {
+        return "swagger2-yaml.txt";
+    }
 }

@@ -21,7 +21,9 @@ package org.apache.cxf.jaxrs.swagger;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
@@ -30,6 +32,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServiceFactoryBean;
 import org.apache.cxf.jaxrs.ext.MessageContext;
@@ -38,11 +41,15 @@ import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 
 import io.swagger.jaxrs.config.BeanConfig;
+import io.swagger.jaxrs.config.DefaultReaderConfig;
+import io.swagger.jaxrs.config.ReaderConfig;
 import io.swagger.jaxrs.listing.ApiListingResource;
 import io.swagger.jaxrs.listing.SwaggerSerializers;
 
 public class Swagger2Feature extends AbstractSwaggerFeature {
     private String host;
+    private boolean scanAllResources;
+    private String ignoreRoutes;
 
     @Override
     protected void addSwaggerResource(Server server) {
@@ -64,6 +71,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
             providers.add(new SwaggerContainerRequestFilter());
         }
         providers.add(new SwaggerSerializers());
+        providers.add(new ReaderConfigFilter());
         ((ServerProviderFactory)server.getEndpoint().get(
                 ServerProviderFactory.class.getName())).setUserProviders(providers);
         
@@ -85,6 +93,22 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
     }
     public void setHost(String host) {
         this.host = host;
+    }
+
+    public boolean isScanAllResources() {
+        return scanAllResources;
+    }
+
+    public void setScanAllResources(boolean scanAllResources) {
+        this.scanAllResources = scanAllResources;
+    }
+
+    public String getIgnoreRoutes() {
+        return ignoreRoutes;
+    }
+
+    public void setIgnoreRoutes(String ignoreRoutes) {
+        this.ignoreRoutes = ignoreRoutes;
     }
 
     @Override
@@ -118,6 +142,36 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
                 Response r = getListingYaml(null, mc.getServletConfig(), mc.getHttpHeaders(), ui); 
                 requestContext.abortWith(r);
             }
+        }
+    }
+
+    private class ReaderConfigFilter implements ContainerRequestFilter {
+        @Context
+        private MessageContext mc;
+
+        @Override
+        public void filter(ContainerRequestContext requestContext) throws IOException {
+            if (mc.getServletContext().getAttribute(ReaderConfig.class.getName()) == null) {
+                if (mc.getServletConfig() != null
+                    && Boolean.valueOf(mc.getServletConfig().getInitParameter("scan.all.resources"))) {
+                    addReaderConfig(mc.getServletConfig().getInitParameter("ignore.routes"));
+                } else if (isScanAllResources()) {
+                    addReaderConfig(getIgnoreRoutes());
+                }
+            }
+        }
+
+        private void addReaderConfig(String ignoreRoutesParam) {
+            DefaultReaderConfig rc = new DefaultReaderConfig();
+            rc.setScanAllResources(true);
+            if (ignoreRoutesParam != null) {
+                Set<String> routes = new LinkedHashSet<String>();
+                for (String route : StringUtils.split(ignoreRoutesParam, ",")) {
+                    routes.add(route.trim());
+                }
+                rc.setIgnoredRoutes(routes);
+            }
+            mc.getServletContext().setAttribute(ReaderConfig.class.getName(), rc);
         }
     }
 }
