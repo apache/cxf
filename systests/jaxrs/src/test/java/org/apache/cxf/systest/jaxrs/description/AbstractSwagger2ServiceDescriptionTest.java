@@ -47,8 +47,8 @@ public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBus
     
     @Ignore
     public abstract static class Server extends AbstractBusTestServerBase {
-        private final String port;
-        private final boolean runAsFilter;
+        protected final String port;
+        protected final boolean runAsFilter;
         
         Server(final String port, final boolean runAsFilter) {
             this.port = port;
@@ -88,16 +88,19 @@ public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBus
     }
 
     protected abstract String getPort();
+
+    protected abstract String getExpectedFileJson();
+
+    protected abstract String getExpectedFileYaml();
     
     @Test
     public void testApiListingIsProperlyReturnedJSON() throws Exception {
         final WebClient client = createWebClient("/swagger.json");
-        
         try {
             final Response r = client.get();
             assertEquals(Status.OK.getStatusCode(), r.getStatus());
             JSONAssert.assertEquals(
-                getExpectedValue("swagger2-json.txt", getPort()),
+                getExpectedValue(getExpectedFileJson(), getPort()),
                 IOUtils.readStringFromStream((InputStream)r.getEntity()),
                 false);
         } finally {
@@ -112,9 +115,14 @@ public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBus
         try {
             final Response r = client.get();
             assertEquals(Status.OK.getStatusCode(), r.getStatus());
+            //REVISIT find a better way of reliably comparing two yaml instances.
+            // I noticed that yaml.load instantiates a Map and
+            // for an integer valued key, an Integer or a String is arbitrarily instantiated, 
+            // which leads to the assertion error. So, we serilialize the yamls and compare the re-serialized texts.
             Yaml yaml = new Yaml();
-            assertEquals(yaml.load(getExpectedValue("swagger2-yaml.txt", getPort())),
-                         yaml.load(IOUtils.readStringFromStream((InputStream)r.getEntity())));
+            assertEquals(yaml.load(getExpectedValue(getExpectedFileYaml(), getPort())).toString(),
+                         yaml.load(IOUtils.readStringFromStream((InputStream)r.getEntity())).toString());
+            
         } finally {
             client.close();
         }
