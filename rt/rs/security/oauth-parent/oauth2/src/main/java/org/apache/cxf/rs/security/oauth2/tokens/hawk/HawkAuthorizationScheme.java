@@ -32,6 +32,7 @@ import org.apache.cxf.rt.security.crypto.HmacUtils;
 // https://github.com/hueniverse/hawk/blob/master/README.md
 public class HawkAuthorizationScheme {
     private static final String SEPARATOR = "\n";
+    private static final String HAWK_1_HEADER = "hawk.1.header";
     
     private HttpRequestProperties props;
     private String macKey;
@@ -98,7 +99,8 @@ public class HawkAuthorizationScheme {
         }
         
         
-        String value = timestamp + SEPARATOR 
+        String value = HAWK_1_HEADER + SEPARATOR 
+            + timestamp + SEPARATOR 
             + nonce + SEPARATOR
             + props.getHttpMethod().toUpperCase() + SEPARATOR
             + requestURI + SEPARATOR 
