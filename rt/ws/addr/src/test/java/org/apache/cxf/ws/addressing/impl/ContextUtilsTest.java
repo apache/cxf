@@ -23,9 +23,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
+import javax.xml.ws.WebFault;
 
 import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.binding.soap.SoapFault;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.BindingOperationInfo;
@@ -194,6 +196,25 @@ public class ContextUtilsTest extends Assert {
         action = InternalContextUtils.getAction(msg);
         assertNotNull(action);
         assertEquals(Names.WSA_DEFAULT_FAULT_ACTION, action.getValue());
+        control.reset();
 
+        // test 7 : retrieve the action for a fault matching the fault class with the WebFault annotation
+        fault = new SoapFault("faulty service", new TestFault(), Fault.FAULT_CODE_SERVER);
+        faultInfo.addMessagePart(new MessagePartInfo(new QName("http://foo.com:7", "faultInfo"), null));
+        faultInfo.getMessagePart(0).setTypeClass(Object.class);
+        faultInfo.getMessagePart(0).setConcreteName(new QName("urn:foo:test:7", "testFault"));
+        faultInfo.addExtensionAttribute(Names.WSAW_ACTION_QNAME, "urn:foo:test:7");
+        EasyMock.expect(msg.getExchange()).andReturn(exchange).anyTimes();
+        EasyMock.expect(msg.getContent(Exception.class)).andReturn(fault).anyTimes();
+        EasyMock.expect(exchange.get(BindingOperationInfo.class)).andReturn(boi);
+        control.replay();
+        
+        action = InternalContextUtils.getAction(msg);
+        assertNotNull(action);
+        assertEquals("urn:foo:test:7", action.getValue());
+    }
+    
+    @WebFault(name = "testFault", targetNamespace = "urn:foo:test:7")
+    public class TestFault extends Exception {
     }
 }
