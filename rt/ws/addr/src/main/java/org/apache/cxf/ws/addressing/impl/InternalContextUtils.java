@@ -53,6 +53,7 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.Extensible;
 import org.apache.cxf.service.model.FaultInfo;
 import org.apache.cxf.service.model.MessageInfo;
+import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.ConduitInitiator;
 import org.apache.cxf.transport.ConduitInitiatorManager;
@@ -477,12 +478,13 @@ final class InternalContextUtils {
     private static boolean matchFault(Throwable t, FaultInfo fi) {
         //REVISIT not sure if this class-based comparison works in general as the fault class defined
         // in the service interface has no direct relationship to the message body's type.
-        Class<?> fiTypeClass = fi.getFirstMessagePart().getTypeClass();
+        MessagePartInfo fmpi = fi.getFirstMessagePart();
+        Class<?> fiTypeClass = fmpi.getTypeClass();
         if (fiTypeClass != null && t.getClass().isAssignableFrom(fiTypeClass)) {
             return true;
         }
         // CXF-6575
-        QName fiName = fi.getFirstMessagePart().getConcreteName();
+        QName fiName = fmpi.getConcreteName();
         WebFault wf = t.getClass().getAnnotation(WebFault.class);
         return wf != null  && fiName != null
             && wf.targetNamespace() != null && wf.targetNamespace().equals(fiName.getNamespaceURI())
