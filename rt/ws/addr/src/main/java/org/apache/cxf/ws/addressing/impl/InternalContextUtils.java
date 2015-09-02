@@ -28,6 +28,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
+import javax.xml.ws.WebFault;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.SoapBindingConstants;
@@ -447,10 +448,7 @@ final class InternalContextUtils {
                     if (fi.size() == 0) {
                         continue;
                     }
-                    Class<?> fiTypeClass = fi.getFirstMessagePart().getTypeClass();
-                    if (t != null 
-                            && fiTypeClass != null
-                            && t.getClass().isAssignableFrom(fiTypeClass)) {
+                    if (t != null && matchFault(t, fi)) {
                         if (fi.getExtensionAttributes() == null) {
                             continue;
                         }
@@ -474,6 +472,21 @@ final class InternalContextUtils {
             LOG.fine("action determined from service model: " + action);
         }
         return action;
+    }
+
+    private static boolean matchFault(Throwable t, FaultInfo fi) {
+        //REVISIT not sure if this class-based comparison works in general as the fault class defined
+        // in the service interface has no direct relationship to the message body's type.
+        Class<?> fiTypeClass = fi.getFirstMessagePart().getTypeClass();
+        if (fiTypeClass != null && t.getClass().isAssignableFrom(fiTypeClass)) {
+            return true;
+        }
+        // CXF-6575
+        QName fiName = fi.getFirstMessagePart().getConcreteName();
+        WebFault wf = t.getClass().getAnnotation(WebFault.class);
+        return wf != null  && fiName != null
+            && wf.targetNamespace() != null && wf.targetNamespace().equals(fiName.getNamespaceURI())
+            && wf.name() != null && wf.name().equals(fiName.getLocalPart());
     }
 
     public static SoapOperationInfo getSoapOperationInfo(BindingOperationInfo bindingOpInfo) {
