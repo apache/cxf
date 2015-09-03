@@ -125,7 +125,6 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         return customStatus == null ? defaultValue : (Integer)customStatus;
     }
     
-    @SuppressWarnings("unchecked")
     private void serializeMessage(ServerProviderFactory providerFactory,
                                   Message message, 
                                   Response theResponse, 
@@ -163,22 +162,8 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         response.setEntity(entity, annotations);
         
         // Prepare the headers
-        MultivaluedMap<String, Object> responseHeaders = response.getMetadata();
-        Map<String, List<Object>> userHeaders = 
-            (Map<String, List<Object>>)message.get(Message.PROTOCOL_HEADERS);
-        if (firstTry && userHeaders != null) {
-            responseHeaders.putAll(userHeaders);
-        }
-        if (entity != null) {
-            String initialResponseContentType = (String)message.get(Message.CONTENT_TYPE);
-            if (initialResponseContentType != null && !responseHeaders.containsKey(HttpHeaders.CONTENT_TYPE)) {
-                responseHeaders.putSingle(HttpHeaders.CONTENT_TYPE, initialResponseContentType);
-            }
-        }
-        
-        message.put(Message.PROTOCOL_HEADERS, responseHeaders);
-        
-        setResponseDate(responseHeaders, firstTry);
+        MultivaluedMap<String, Object> responseHeaders = 
+            prepareResponseHeaders(message, response, entity, firstTry);
                
         // Run the filters
         try {
@@ -273,6 +258,32 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         }
     }
     
+    private MultivaluedMap<String, Object> prepareResponseHeaders(Message message, 
+                                                                  ResponseImpl response,
+                                                                  Object entity,
+                                                                  boolean firstTry) {
+        MultivaluedMap<String, Object> responseHeaders = response.getMetadata();
+        @SuppressWarnings("unchecked")
+        Map<String, List<Object>> userHeaders = (Map<String, List<Object>>)message.get(Message.PROTOCOL_HEADERS);
+        if (firstTry && userHeaders != null) {
+            responseHeaders.putAll(userHeaders);
+        }
+        if (entity != null) {
+            Object customContentType = responseHeaders.getFirst(HttpHeaders.CONTENT_TYPE);
+            if (customContentType == null) {
+                String initialResponseContentType = (String)message.get(Message.CONTENT_TYPE);
+                if (initialResponseContentType != null) {
+                    responseHeaders.putSingle(HttpHeaders.CONTENT_TYPE, initialResponseContentType);
+                }
+            } else {
+                message.put(Message.CONTENT_TYPE, customContentType.toString());
+            }
+        }
+        message.put(Message.PROTOCOL_HEADERS, responseHeaders);
+        setResponseDate(responseHeaders, firstTry);
+        return responseHeaders;
+    }
+
     private MediaType getResponseMediaType(Object mediaTypeHeader) {
         MediaType responseMediaType;
         if (mediaTypeHeader instanceof MediaType) {

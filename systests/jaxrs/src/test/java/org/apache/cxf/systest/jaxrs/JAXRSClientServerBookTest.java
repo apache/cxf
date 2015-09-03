@@ -1432,7 +1432,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         wc.accept("text/xml");
         Response r = wc.get();
         assertEquals(503, r.getStatus());
-        assertEquals("text/plain", r.getMediaType().toString());
+        assertEquals("text/custom+plain", r.getMediaType().toString());
         assertEquals("CustomValue", r.getHeaderString("CustomHeader"));
         assertEquals("Response is not available", r.readEntity(String.class));
         
