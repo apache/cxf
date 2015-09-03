@@ -61,6 +61,29 @@ public class MessageContextImplTest extends Assert {
         assertEquals("b", mc.get("a"));
         assertNull(mc.get("b"));
     }
+    @Test
+    public void testGetPropertyFromExchange() {
+        Message m = new MessageImpl();
+        Exchange ex = new ExchangeImpl();
+        ex.put("a", "b");
+        ex.setInMessage(m);
+        MessageContext mc = new MessageContextImpl(m);
+        assertEquals("b", mc.get("a"));
+        assertNull(mc.get("b"));
+    }
+    @Test
+    public void testGetPropertyFromOtherMessage() {
+        Message m1 = new MessageImpl();
+        Message m2 = new MessageImpl();
+        m2.put("a", "b");
+        
+        Exchange ex = new ExchangeImpl();
+        ex.setInMessage(m1);
+        ex.setOutMessage(m2);
+        MessageContext mc = new MessageContextImpl(m1);
+        assertEquals("b", mc.get("a"));
+        assertNull(mc.get("b"));
+    }
     
     @Test
     public void testGetUriInfo() {

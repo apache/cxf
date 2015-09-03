@@ -1218,8 +1218,8 @@ public class BookStore {
     @GET
     @Path("/books/statusFromStream")
     @Produces("text/xml")
-    public StreamingOutput statusFromStream() {
-        return new ResponseStreamingOutputImpl();
+    public Response statusFromStream() {
+        return Response.ok(new ResponseStreamingOutputImpl()).type("text/plain").build();
     }
     
     @SuppressWarnings("rawtypes")
@@ -1712,9 +1712,12 @@ public class BookStore {
     }
     private class ResponseStreamingOutputImpl implements StreamingOutput {
         public void write(OutputStream output) throws IOException, WebApplicationException {
+            if (!"text/plain".equals(BookStore.this.messageContext.get("Content-Type"))) {
+                throw new RuntimeException();
+            }
             BookStore.this.messageContext.put(Message.RESPONSE_CODE, 503);
             MultivaluedMap<String, String> headers = new MetadataMap<String, String>();
-            headers.putSingle("Content-Type", "text/plain");
+            headers.putSingle("Content-Type", "text/custom+plain");
             headers.putSingle("CustomHeader", "CustomValue");
             BookStore.this.messageContext.put(Message.PROTOCOL_HEADERS, headers);
             
