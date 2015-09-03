@@ -74,7 +74,11 @@ public class DigestAuthSupplier implements HttpAuthSupplier {
                 /* Preemptive authentication is only possible if we have a cached
                  * challenge
                  */
-                return di.generateAuth(currentURI.getPath(), 
+                String authURI = currentURI.getPath();
+                if (currentURI.getQuery() != null) {
+                    authURI += '?' + currentURI.getQuery();
+                }
+                return di.generateAuth(authURI, 
                                        authPolicy.getUserName(),
                                        authPolicy.getPassword());            
             } else {
