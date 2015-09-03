@@ -22,6 +22,7 @@ import java.util.UUID;
 
 import org.apache.cxf.ext.logging.event.LogEvent;
 import org.apache.cxf.ext.logging.event.LogEventSender;
+import org.apache.cxf.ext.logging.event.PrettyLoggingFilter;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
@@ -55,6 +56,12 @@ abstract class AbstractLoggingInterceptor extends AbstractPhaseInterceptor<Messa
         return threshold;
     }
 
+    public void setPrettyLogging(boolean prettyLogging) {
+        if (sender instanceof PrettyLoggingFilter) {
+            ((PrettyLoggingFilter)this.sender).setPrettyLogging(prettyLogging);
+        }
+    }
+    
     public void createExchangeId(Message message) {
         Exchange exchange = message.getExchange();
         String exchangeId = (String)exchange.get(LogEvent.KEY_EXCHANGE_ID);
