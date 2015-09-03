@@ -1416,6 +1416,7 @@ public abstract class HTTPConduit
             case 307:
                 return redirectRetransmit();
             case HttpURLConnection.HTTP_UNAUTHORIZED:
+            case HttpURLConnection.HTTP_PROXY_AUTH:
                 return authorizationRetransmit();
             default:
                 break;
