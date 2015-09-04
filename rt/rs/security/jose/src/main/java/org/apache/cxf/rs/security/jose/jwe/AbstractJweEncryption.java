@@ -226,7 +226,7 @@ public abstract class AbstractJweEncryption implements JweEncryptionProvider {
         return state;
     }
     private boolean compressionRequired(JweHeaders theHeaders) {
-        return JoseConstants.DEFLATE_ZIP_ALGORITHM.equals(theHeaders.getZipAlgorithm());
+        return JoseConstants.JWE_DEFLATE_ZIP_ALGORITHM.equals(theHeaders.getZipAlgorithm());
     }
     protected KeyEncryptionProvider getKeyEncryptionAlgo() {
         return keyEncryptionAlgo;

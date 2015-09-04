@@ -26,14 +26,13 @@ import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.provider.json.JsonMapObjectReaderWriter;
 import org.apache.cxf.rs.security.jose.JoseConstants;
-import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.JoseUtils;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 
 
 public class JwsJsonSignatureEntry {
     protected static final Logger LOG = LogUtils.getL7dLogger(JwsJsonSignatureEntry.class);
-    private String encodedJwsPayload;
+    private String jwsPayload;
     private String encodedProtectedHeader;
     private String encodedSignature;
     private JwsHeaders protectedHeader;
@@ -41,7 +40,7 @@ public class JwsJsonSignatureEntry {
     private JwsHeaders unionHeaders;
     private JsonMapObjectReaderWriter writer = new JsonMapObjectReaderWriter();
       
-    public JwsJsonSignatureEntry(String encodedJwsPayload,
+    public JwsJsonSignatureEntry(String jwsPayload,
                                  String encodedProtectedHeader,
                                  String encodedSignature,
                                  JwsHeaders unprotectedHeader) {
@@ -50,7 +49,7 @@ public class JwsJsonSignatureEntry {
             throw new JwsException(JwsException.Error.INVALID_JSON_JWS);
         }
         
-        this.encodedJwsPayload = encodedJwsPayload;
+        this.jwsPayload = jwsPayload;
         this.encodedProtectedHeader = encodedProtectedHeader;
         this.encodedSignature = encodedSignature;
         this.unprotectedHeader = unprotectedHeader;
@@ -74,11 +73,16 @@ public class JwsJsonSignatureEntry {
             unionHeaders.asMap().putAll(unprotectedHeader.asMap());
         }
     }
-    public String getEncodedJwsPayload() {
-        return encodedJwsPayload;
+    public String getJwsPayload() {
+        return jwsPayload;
     }
     public String getDecodedJwsPayload() {
-        return JoseUtils.decodeToString(encodedJwsPayload);
+        if (protectedHeader == null 
+            || protectedHeader.getPayloadEncodingStatus() != Boolean.FALSE) {
+            return JoseUtils.decodeToString(jwsPayload);
+        } else {
+            return jwsPayload;
+        }
     }
     public byte[] getDecodedJwsPayloadBytes() {
         return StringUtils.toBytesUTF8(getDecodedJwsPayload());
@@ -86,10 +90,10 @@ public class JwsJsonSignatureEntry {
     public String getEncodedProtectedHeader() {
         return encodedProtectedHeader;
     }
-    public JoseHeaders getProtectedHeader() {
+    public JwsHeaders getProtectedHeader() {
         return protectedHeader;
     }
-    public JoseHeaders getUnprotectedHeader() {
+    public JwsHeaders getUnprotectedHeader() {
         return unprotectedHeader;
     }
     public JwsHeaders getUnionHeader() {
@@ -101,11 +105,11 @@ public class JwsJsonSignatureEntry {
     public byte[] getDecodedSignature() {
         return JoseUtils.decode(getEncodedSignature());
     }
-    public String getUnsignedEncodedSequence() {
+    public String getUnsignedSequence() {
         if (getEncodedProtectedHeader() != null) {
-            return getEncodedProtectedHeader() + "." + getEncodedJwsPayload();
+            return getEncodedProtectedHeader() + "." + getJwsPayload();
         } else {
-            return "." + getEncodedJwsPayload();
+            return "." + getJwsPayload();
         }
     }
     public String getKeyId() {
@@ -114,7 +118,7 @@ public class JwsJsonSignatureEntry {
     public boolean verifySignatureWith(JwsSignatureVerifier validator) {
         try {
             if (validator.verify(getUnionHeader(),
-                                 getUnsignedEncodedSequence(),
+                                 getUnsignedSequence(),
                                  getDecodedSignature())) {
                 return true;
             }

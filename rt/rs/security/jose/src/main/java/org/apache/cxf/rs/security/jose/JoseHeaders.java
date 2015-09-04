@@ -172,4 +172,8 @@ public abstract class JoseHeaders extends JsonMapObject {
         return getLongProperty(name);
     }
     
+    public boolean containsHeader(String name) {
+        return containsProperty(name);
+    }
+    
 }

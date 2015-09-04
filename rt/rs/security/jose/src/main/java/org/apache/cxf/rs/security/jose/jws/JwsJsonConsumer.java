@@ -39,9 +39,9 @@ import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 public class JwsJsonConsumer {
     protected static final Logger LOG = LogUtils.getL7dLogger(JwsJsonConsumer.class);
     private String jwsSignedDocument;
-    private String encodedJwsPayload;
-    private List<JwsJsonSignatureEntry> signatureEntries = new LinkedList<JwsJsonSignatureEntry>();
-    
+    private String jwsPayload;
+    private List<JwsJsonSignatureEntry> signatures = new LinkedList<JwsJsonSignatureEntry>();
+    private boolean detached;
     /**
      * @param jwsSignedDocument
      *            signed JWS Document
@@ -49,28 +49,28 @@ public class JwsJsonConsumer {
     public JwsJsonConsumer(String jwsSignedDocument) {
         this(jwsSignedDocument, null);
     }
-    public JwsJsonConsumer(String jwsSignedDocument, String encodedDetachedPayload) {
+    public JwsJsonConsumer(String jwsSignedDocument, String detachedPayload) {
         this.jwsSignedDocument = jwsSignedDocument;
-        prepare(encodedDetachedPayload);
+        prepare(detachedPayload);
     }
 
-    private void prepare(String encodedDetachedPayload) {
+    private void prepare(String detachedPayload) {
         JsonMapObject jsonObject = new JsonMapObject();
         new JsonMapObjectReaderWriter().fromJson(jsonObject, jwsSignedDocument);
         
         Map<String, Object> jsonObjectMap = jsonObject.asMap(); 
-        encodedJwsPayload = (String)jsonObjectMap.get("payload");
-        if (encodedJwsPayload == null) {
-            encodedJwsPayload = encodedDetachedPayload;
-        } else if (encodedDetachedPayload != null) {
+        jwsPayload = (String)jsonObjectMap.get("payload");
+        if (jwsPayload == null) {
+            jwsPayload = detachedPayload;
+        } else if (detachedPayload != null) {
             LOG.warning("JSON JWS includes a payload expected to be detached");
             throw new JwsException(JwsException.Error.INVALID_JSON_JWS);
         }
-        if (encodedJwsPayload == null) {
+        if (jwsPayload == null) {
             LOG.warning("JSON JWS has no payload");
             throw new JwsException(JwsException.Error.INVALID_JSON_JWS);
         }
-        
+        detached = detachedPayload != null;
         List<Map<String, Object>> signatureArray = CastUtils.cast((List<?>)jsonObjectMap.get("signatures"));
         if (signatureArray != null) {
             if (jsonObjectMap.containsKey("signature")) {
@@ -78,22 +78,33 @@ public class JwsJsonConsumer {
                 throw new JwsException(JwsException.Error.INVALID_JSON_JWS);
             }
             for (Map<String, Object> signatureEntry : signatureArray) {
-                this.signatureEntries.add(getSignatureObject(signatureEntry));
+                this.signatures.add(getSignatureObject(signatureEntry));
             }
         } else {
-            this.signatureEntries.add(getSignatureObject(jsonObjectMap));
+            this.signatures.add(getSignatureObject(jsonObjectMap));
         }
-        if (signatureEntries.isEmpty()) {
+        if (signatures.isEmpty()) {
             LOG.warning("JSON JWS has no signatures");
             throw new JwsException(JwsException.Error.INVALID_JSON_JWS);
         }
+        validateB64Status();
+        
+        
+    }
+    private Boolean validateB64Status() {
+        if (!detached) {
+            return JwsJsonProducer.validateb64Status(signatures);    
+        } else {
+            return Boolean.TRUE;
+        }
+        
     }
     protected JwsJsonSignatureEntry getSignatureObject(Map<String, Object> signatureEntry) {
         String protectedHeader = (String)signatureEntry.get("protected");
         Map<String, Object> header = CastUtils.cast((Map<?, ?>)signatureEntry.get("header"));
         String signature = (String)signatureEntry.get("signature");
         return 
-            new JwsJsonSignatureEntry(encodedJwsPayload, 
+            new JwsJsonSignatureEntry(jwsPayload, 
                                       protectedHeader, 
                                       signature, 
                                       header != null ? new JwsHeaders(header) : null);
@@ -101,20 +112,24 @@ public class JwsJsonConsumer {
     public String getSignedDocument() {
         return this.jwsSignedDocument;
     }
-    public String getEncodedJwsPayload() {
-        return this.encodedJwsPayload;
+    public String getJwsPayload() {
+        return this.jwsPayload;
     }
     public String getDecodedJwsPayload() {
-        return JoseUtils.decodeToString(encodedJwsPayload);
+        if (validateB64Status()) {
+            return JoseUtils.decodeToString(jwsPayload);
+        } else {
+            return jwsPayload;
+        }
     }
     public byte[] getDecodedJwsPayloadBytes() {
         return StringUtils.toBytesUTF8(getDecodedJwsPayload());
     }
     public List<JwsJsonSignatureEntry> getSignatureEntries() {
-        return Collections.unmodifiableList(signatureEntries);
+        return Collections.unmodifiableList(signatures);
     }
     public MultivaluedMap<SignatureAlgorithm, JwsJsonSignatureEntry> getSignatureEntryMap() {
-        return JwsUtils.getJwsJsonSignatureMap(signatureEntries);
+        return JwsUtils.getJwsJsonSignatureMap(signatures);
     }
     public boolean verifySignatureWith(JwsSignatureVerifier validator) {
         List<JwsJsonSignatureEntry> theSignatureEntries = 
@@ -161,7 +176,7 @@ public class JwsJsonConsumer {
             }
         }
         List<JwsJsonSignatureEntry> nonValidatedSignatures = new LinkedList<JwsJsonSignatureEntry>();
-        for (JwsJsonSignatureEntry sigEntry : signatureEntries) {
+        for (JwsJsonSignatureEntry sigEntry : signatures) {
             if (!validatedSignatures.contains(sigEntry)) {        
                 nonValidatedSignatures.add(sigEntry);
             }
@@ -177,7 +192,7 @@ public class JwsJsonConsumer {
     }
     public JwsJsonProducer toProducer() {
         JwsJsonProducer p = new JwsJsonProducer(getDecodedJwsPayload());
-        p.getSignatureEntries().addAll(signatureEntries);
+        p.getSignatureEntries().addAll(signatures);
         return p;
     }
 }

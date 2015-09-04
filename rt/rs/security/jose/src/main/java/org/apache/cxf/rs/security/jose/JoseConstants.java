@@ -36,7 +36,9 @@ public final class JoseConstants {
     public static final String JWE_HEADER_KEY_ENC_ALGORITHM = HEADER_ALGORITHM;
     public static final String JWE_HEADER_CONTENT_ENC_ALGORITHM = "enc";
     public static final String JWE_HEADER_ZIP_ALGORITHM = "zip";
-    public static final String DEFLATE_ZIP_ALGORITHM = "DEF";
+    public static final String JWE_DEFLATE_ZIP_ALGORITHM = "DEF";
+    
+    public static final String JWS_HEADER_B64_STATUS_HEADER = "b64";
     
     public static final String TYPE_JWT = "JWT";
     public static final String TYPE_JOSE = "JOSE";

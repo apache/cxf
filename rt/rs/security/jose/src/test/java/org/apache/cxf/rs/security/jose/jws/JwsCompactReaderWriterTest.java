@@ -42,9 +42,14 @@ import org.apache.cxf.rt.security.crypto.CryptoUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class JwsCompactReaderWriterTest extends Assert {
+    
+    public static final String TOKEN_WITH_DETACHED_UNENCODED_PAYLOAD =
+        "eyJhbGciOiJIUzI1NiJ9..GsyM6AQJbQHY8aQKCbZSPJHzMRWo3HKIlcDuXof7nqs";
+    public static final String UNSIGNED_PLAIN_DOCUMENT = "$.02";
     
     public static final String ENCODED_TOKEN_SIGNED_BY_MAC = 
         "eyJ0eXAiOiJKV1QiLA0KICJhbGciOiJIUzI1NiJ9"
@@ -103,9 +108,14 @@ public class JwsCompactReaderWriterTest extends Assert {
         jws.signWith(new HmacJwsSignatureProvider(ENCODED_MAC_KEY, SignatureAlgorithm.HS256));
         
         assertEquals(ENCODED_TOKEN_SIGNED_BY_MAC, jws.getSignedEncodedJws());
-        
     }
-    
+    @Test
+    @Ignore
+    public void testWriteReadJwsUnencodedPayload() throws Exception {
+        JwsHeaders headers = new JwsHeaders(SignatureAlgorithm.HS256);
+        headers.setPayloadEncodingStatus(false);
+        //JwsCompactProducer producer = new JwsCompactProducer(UNSIGNED_PLAIN_DOCUMENT);
+    }
     @Test
     public void testWriteReadJwsUnsigned() throws Exception {
         JwsHeaders headers = new JwsHeaders(JoseType.JWT);
