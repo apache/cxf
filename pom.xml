@@ -42,15 +42,9 @@
     </prerequisites>
     <properties>
         <cxf.compiler.fork>false</cxf.compiler.fork>
-<<<<<<< HEAD
         <cxf.build-utils.version>3.0.0</cxf.build-utils.version>
-        <cxf.xjc-utils.version>3.0.4</cxf.xjc-utils.version>
-        <cxf.jdk.version>1.6</cxf.jdk.version>
-=======
-        <cxf.build-utils.version>3.1.0</cxf.build-utils.version>
         <cxf.xjc-utils.version>3.0.5</cxf.xjc-utils.version>
-        <cxf.jdk.version>1.7</cxf.jdk.version>
->>>>>>> 2fc62cf... Updating XJC
+        <cxf.jdk.version>1.6</cxf.jdk.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <site.deploy.url>scp://people.apache.org/www/cxf.apache.org/maven-site</site.deploy.url>
     </properties>
