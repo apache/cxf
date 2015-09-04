@@ -21,6 +21,7 @@ package org.apache.cxf.rs.security.jose.jws;
 import java.io.InputStream;
 import java.util.List;
 
+import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKeys;
 import org.apache.cxf.rs.security.jose.jwk.JwkUtils;
@@ -50,6 +51,16 @@ public class JwsJsonConsumerTest extends Assert {
     
     private static final String KID_OF_THE_FIRST_SIGNER = "2010-12-29";
     private static final String KID_OF_THE_SECOND_SIGNER = "e9bc097a-ce51-4036-9562-d2ade882db0d";
+    
+    @Test
+    public void testVerifySignedWithProtectedHeaderOnlyUnencodedPayload() {
+        JwsJsonConsumer consumer = 
+            new JwsJsonConsumer(JwsJsonProducerTest.SIGNED_JWS_JSON_FLAT_UNENCODED_DOCUMENT);
+        assertEquals(JwsJsonProducerTest.UNSIGNED_PLAIN_DOCUMENT, consumer.getJwsPayload());
+        assertEquals(JwsJsonProducerTest.UNSIGNED_PLAIN_DOCUMENT, consumer.getDecodedJwsPayload());
+        assertTrue(consumer.verifySignatureWith(
+            new HmacJwsSignatureVerifier(JwsJsonProducerTest.ENCODED_MAC_KEY_1, SignatureAlgorithm.HS256)));
+    }
     
     @Test
     public void testVerifyDualSignedDocument() throws Exception {

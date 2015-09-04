@@ -46,6 +46,10 @@ public class JsonMapObject {
         values.put(name, value);
     }
     
+    public boolean containsProperty(String name) {
+        return values.containsKey(name);
+    }
+    
     public Object getProperty(String name) {
         return values.get(name);
     }

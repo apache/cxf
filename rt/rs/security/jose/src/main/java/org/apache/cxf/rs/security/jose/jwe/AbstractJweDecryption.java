@@ -61,7 +61,7 @@ public abstract class AbstractJweDecryption implements JweDecryptionProvider {
         AlgorithmParameterSpec spec = getContentEncryptionCipherSpec(jweDecryptionInput);
         keyProperties.setAlgoSpec(spec);
         boolean compressionSupported = 
-            JoseConstants.DEFLATE_ZIP_ALGORITHM.equals(jweDecryptionInput.getJweHeaders().getZipAlgorithm());
+            JoseConstants.JWE_DEFLATE_ZIP_ALGORITHM.equals(jweDecryptionInput.getJweHeaders().getZipAlgorithm());
         keyProperties.setCompressionSupported(compressionSupported);
         byte[] actualCek = getActualCek(cek, 
                                jweDecryptionInput.getJweHeaders().getContentEncryptionAlgorithm().getJwaName());

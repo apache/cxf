@@ -65,7 +65,7 @@ public class JweHeaders extends JoseHeaders {
         }
         setContentEncryptionAlgorithm(ctEncAlgo);
         if (deflate) {
-            setZipAlgorithm(JoseConstants.DEFLATE_ZIP_ALGORITHM);
+            setZipAlgorithm(JoseConstants.JWE_DEFLATE_ZIP_ALGORITHM);
         }
     }
     

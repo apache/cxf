@@ -20,7 +20,6 @@ package org.apache.cxf.rs.security.jose.jws;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class JwsJsonProducerTest extends Assert {
@@ -53,7 +52,7 @@ public class JwsJsonProducerTest extends Assert {
         + "\",\"protected\":\"eyJhbGciOiJIUzI1NiJ9\",\"signature\":"
         + "\"NNksREOsFCI1nUQEqzCe6XZFa-bRAge2XXMMAU2Jj2I\"}";
        
-    public static final String SIGNED_JWS_JSON_FLAT_DOCUMENT_2 = "{"
+    public static final String SIGNED_JWS_JSON_FLAT_UNENCODED_DOCUMENT = "{"
         + "\"payload\":\"" + UNSIGNED_PLAIN_DOCUMENT + "\","
         + "\"protected\":\"eyJhbGciOiJIUzI1NiIsImI2NCI6ZmFsc2V9\","
         + "\"signature\":" + "\"GsyM6AQJbQHY8aQKCbZSPJHzMRWo3HKIlcDuXof7nqs\"}";
@@ -87,7 +86,6 @@ public class JwsJsonProducerTest extends Assert {
                      producer.getJwsJsonSignedDocument());
     }
     @Test
-    @Ignore
     public void testSignWithProtectedHeaderOnlyUnencodedPayload() {
         JwsJsonProducer producer = new JwsJsonProducer(UNSIGNED_PLAIN_DOCUMENT, true);
         JwsHeaders headers = new JwsHeaders();
@@ -97,7 +95,7 @@ public class JwsJsonProducerTest extends Assert {
                
         producer.signWith(new HmacJwsSignatureProvider(ENCODED_MAC_KEY_1, SignatureAlgorithm.HS256),
                           headers);
-        assertEquals(SIGNED_JWS_JSON_FLAT_DOCUMENT_2,
+        assertEquals(SIGNED_JWS_JSON_FLAT_UNENCODED_DOCUMENT,
                      producer.getJwsJsonSignedDocument());
     }
     @Test

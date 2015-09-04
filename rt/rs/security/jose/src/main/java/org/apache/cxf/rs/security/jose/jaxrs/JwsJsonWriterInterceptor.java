@@ -48,6 +48,7 @@ public class JwsJsonWriterInterceptor extends AbstractJwsJsonWriterProvider impl
     private JsonMapObjectReaderWriter writer = new JsonMapObjectReaderWriter();
     private boolean contentTypeRequired = true;
     private boolean useJwsOutputStream;
+    private boolean encodePayload = true;
     @Override
     public void aroundWriteTo(WriterInterceptorContext ctx) throws IOException, WebApplicationException {
         if (ctx.getEntity() == null) {
@@ -71,10 +72,18 @@ public class JwsJsonWriterInterceptor extends AbstractJwsJsonWriterProvider impl
             ctx.setMediaType(JAXRSUtils.toMediaType(JoseConstants.MEDIA_TYPE_JOSE_JSON));
             actualOs.write(StringUtils.toBytesUTF8("{\"payload\":\""));
             JwsJsonOutputStream jwsStream = new JwsJsonOutputStream(actualOs, protectedHeaders, signatures);
-            Base64UrlOutputStream base64Stream = new Base64UrlOutputStream(jwsStream);
-            ctx.setOutputStream(base64Stream);
+            
+            Base64UrlOutputStream base64Stream = null;
+            if (encodePayload) {
+                base64Stream = new Base64UrlOutputStream(jwsStream);
+                ctx.setOutputStream(base64Stream);
+            } else {
+                ctx.setOutputStream(jwsStream);
+            }
             ctx.proceed();
-            base64Stream.flush();
+            if (encodePayload) {
+                base64Stream.flush();
+            }
             jwsStream.flush();
         } else {
             CachedOutputStream cos = new CachedOutputStream(); 
@@ -96,6 +105,9 @@ public class JwsJsonWriterInterceptor extends AbstractJwsJsonWriterProvider impl
         JwsHeaders headers = new JwsHeaders();
         headers.setSignatureAlgorithm(signer.getAlgorithm());
         setContentTypeIfNeeded(headers, ctx);
+        if (!encodePayload) {
+            headers.setPayloadEncodingStatus(false);
+        }
         return headers;
     }
     
@@ -118,4 +130,9 @@ public class JwsJsonWriterInterceptor extends AbstractJwsJsonWriterProvider impl
             }
         }
     }
+
+    public void setEncodePayload(boolean encodePayload) {
+        this.encodePayload = encodePayload;
+    }
+    
 }
