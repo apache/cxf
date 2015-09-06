@@ -508,20 +508,20 @@ public class JwsJoseCookBookTest {
     }
     @Test
     public void testDetachedHMACSignature() throws Exception {
-        JwsCompactProducer compactProducer = new JwsCompactProducer(PAYLOAD);
+        JwsCompactProducer compactProducer = new JwsCompactProducer(PAYLOAD, true);
         compactProducer.getJwsHeaders().setSignatureAlgorithm(SignatureAlgorithm.HS256);
         compactProducer.getJwsHeaders().setKeyId(HMAC_KID_VALUE);
         JsonMapObjectReaderWriter reader = new JsonMapObjectReaderWriter();
         assertEquals(reader.toJson(compactProducer.getJwsHeaders().asMap()), HMAC_SIGNATURE_PROTECTED_HEADER_JSON);
         assertEquals(compactProducer.getUnsignedEncodedJws(),
-                HMAC_SIGNATURE_PROTECTED_HEADER + "." + ENCODED_PAYLOAD);
+                HMAC_SIGNATURE_PROTECTED_HEADER + ".");
         JsonWebKeys jwks = readKeySet("cookbookSecretSet.txt");
         List<JsonWebKey> keys = jwks.getKeys();
         JsonWebKey key = keys.get(0);
         compactProducer.signWith(key);
-        assertEquals(compactProducer.getSignedEncodedJws(true), DETACHED_HMAC_JWS);
+        assertEquals(compactProducer.getSignedEncodedJws(), DETACHED_HMAC_JWS);
         JwsCompactConsumer compactConsumer =
-                new JwsCompactConsumer(compactProducer.getSignedEncodedJws(true), ENCODED_PAYLOAD);
+                new JwsCompactConsumer(compactProducer.getSignedEncodedJws(), ENCODED_PAYLOAD);
         assertTrue(compactConsumer.verifySignatureWith(key, SignatureAlgorithm.HS256));
 
         JwsJsonProducer jsonProducer = new JwsJsonProducer(PAYLOAD);

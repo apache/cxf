@@ -36,14 +36,17 @@ public class JwsCompactConsumer {
     private String encodedSequence;
     private String encodedSignature;
     private String headersJson;
+    private String jwsPayload;
     private String decodedJwsPayload;
+    private JwsHeaders jwsHeaders;
+    private boolean detached;
     public JwsCompactConsumer(String encodedJws) {
         this(encodedJws, null, null);
     }
-    public JwsCompactConsumer(String encodedJws, String encodedDetachedPayload) {
-        this(encodedJws, encodedDetachedPayload, null);
+    public JwsCompactConsumer(String encodedJws, String detachedPayload) {
+        this(encodedJws, detachedPayload, null);
     }
-    protected JwsCompactConsumer(String encodedJws, String encodedDetachedPayload, JsonMapObjectReaderWriter r) {
+    protected JwsCompactConsumer(String encodedJws, String detachedPayload, JsonMapObjectReaderWriter r) {
         if (r != null) {
             this.reader = r;
         }
@@ -58,17 +61,17 @@ public class JwsCompactConsumer {
         } else {
             encodedSignature = parts[2];
         }
-        String encodedJwsPayload = parts[1];
-        if (encodedDetachedPayload != null) {
-            if (!StringUtils.isEmpty(encodedJwsPayload)) {
+        jwsPayload = parts[1];
+        if (detachedPayload != null) {
+            if (!StringUtils.isEmpty(jwsPayload)) {
                 LOG.warning("Compact JWS includes a payload expected to be detached");
                 throw new JwsException(JwsException.Error.INVALID_COMPACT_JWS);
             }
-            encodedJwsPayload = encodedDetachedPayload;
+            detached = true;
+            jwsPayload = detachedPayload;
         }
-        encodedSequence = parts[0] + "." + encodedJwsPayload;
+        encodedSequence = parts[0] + "." + jwsPayload;
         headersJson = JoseUtils.decodeToString(parts[0]);
-        decodedJwsPayload = JoseUtils.decodeToString(encodedJwsPayload);
     }
     public String getUnsignedEncodedSequence() {
         return encodedSequence;
@@ -80,21 +83,35 @@ public class JwsCompactConsumer {
         return headersJson;
     }
     public String getDecodedJwsPayload() {
+        if (decodedJwsPayload == null) {
+            if (JwsUtils.isPayloadUnencoded(jwsHeaders)) {
+                decodedJwsPayload = jwsPayload;
+            } else {
+                decodedJwsPayload = JoseUtils.decodeToString(jwsPayload);
+            }
+        }
         return decodedJwsPayload;
     }
     public byte[] getDecodedJwsPayloadBytes() {
-        return StringUtils.toBytesUTF8(decodedJwsPayload);
+        return StringUtils.toBytesUTF8(getDecodedJwsPayload());
     }
     public byte[] getDecodedSignature() {
         return encodedSignature.isEmpty() ? new byte[]{} : JoseUtils.decode(encodedSignature);
     }
     public JwsHeaders getJwsHeaders() {
-        JsonMapObject joseHeaders = reader.fromJsonToJsonObject(headersJson);
-        if (joseHeaders.getUpdateCount() != null) {
-            LOG.warning("Duplicate headers have been detected");
-            throw new JwsException(JwsException.Error.INVALID_COMPACT_JWS);
+        if (jwsHeaders == null) {
+            JsonMapObject joseHeaders = reader.fromJsonToJsonObject(headersJson);
+            if (joseHeaders.getUpdateCount() != null) {
+                LOG.warning("Duplicate headers have been detected");
+                throw new JwsException(JwsException.Error.INVALID_COMPACT_JWS);
+            }
+            jwsHeaders = new JwsHeaders(joseHeaders.asMap());
+            if (JwsUtils.isPayloadUnencoded(jwsHeaders) && !detached) {
+                LOG.warning("Only detached payload can be unencoded");
+                throw new JwsException(JwsException.Error.INVALID_COMPACT_JWS);
+            }
         }
-        return new JwsHeaders(joseHeaders.asMap());
+        return jwsHeaders;
     }
     public boolean verifySignatureWith(JwsSignatureVerifier validator) {
         try {

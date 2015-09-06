@@ -77,8 +77,7 @@ public class JwsJsonSignatureEntry {
         return jwsPayload;
     }
     public String getDecodedJwsPayload() {
-        if (protectedHeader == null 
-            || protectedHeader.getPayloadEncodingStatus() != Boolean.FALSE) {
+        if (protectedHeader == null || !JwsUtils.isPayloadUnencoded(protectedHeader)) {
             return JoseUtils.decodeToString(jwsPayload);
         } else {
             return jwsPayload;
