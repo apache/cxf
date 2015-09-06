@@ -18,8 +18,11 @@
  */
 package org.apache.cxf.rs.security.saml;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.zip.DataFormatException;
+import java.util.zip.Inflater;
+import java.util.zip.InflaterInputStream;
 
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.helpers.IOUtils;
@@ -62,5 +65,21 @@ public class DeflateEncoderDecoderTest extends Assert {
         assertNotNull(is);
         assertEquals("valid_grant", IOUtils.readStringFromStream(is));
     }
-    
+    @Test
+    public void testInflateDeflateWithTokenDuplication() throws Exception {
+        String token = "valid_grant valid_grant valid_grant valid_grant valid_grant valid_grant";
+
+        DeflateEncoderDecoder deflateEncoderDecoder = new DeflateEncoderDecoder();
+        byte[] deflatedToken = deflateEncoderDecoder.deflateToken(token.getBytes(), 0, true);
+
+        String cxfInflatedToken = IOUtils
+                .toString(deflateEncoderDecoder.inflateToken(deflatedToken));
+
+        String streamInflatedToken = IOUtils.toString(
+                new InflaterInputStream(new ByteArrayInputStream(deflatedToken),
+                        new Inflater(true)));
+
+        assertEquals(streamInflatedToken, token);
+        assertEquals(cxfInflatedToken, token);
+    }
 }
