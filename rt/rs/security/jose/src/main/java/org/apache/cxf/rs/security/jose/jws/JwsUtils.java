@@ -390,4 +390,7 @@ public final class JwsUtils {
                                                                   RSSEC_SIGNATURE_IN_PROPS, RSSEC_SIGNATURE_PROPS);
         KeyManagementUtils.validateCertificateChain(props, certs);
     }
+    public static boolean isPayloadUnencoded(JwsHeaders jwsHeaders) {
+        return jwsHeaders.getPayloadEncodingStatus() == Boolean.FALSE;
+    }
 }
