@@ -24,6 +24,9 @@ import java.io.SequenceInputStream;
 import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
+import org.apache.cxf.common.util.PropertyUtils;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 
 public class DeflateEncoderDecoder {
     public InputStream inflateToken(byte[] deflatedToken) 
@@ -61,7 +64,17 @@ public class DeflateEncoderDecoder {
     }
     
     public byte[] deflateToken(byte[] tokenBytes) {
-        Deflater compresser = new Deflater(Deflater.DEFLATED, true);
+        return deflateToken(tokenBytes, true);
+    }
+    
+    public byte[] deflateToken(byte[] tokenBytes, boolean nowrap) {
+        
+        return deflateToken(tokenBytes, getDeflateLevel(), nowrap);
+    }
+    
+    public byte[] deflateToken(byte[] tokenBytes, int level, boolean nowrap) {
+        
+        Deflater compresser = new Deflater(level, nowrap);
         
         compresser.setInput(tokenBytes);
         compresser.finish();
@@ -73,5 +86,18 @@ public class DeflateEncoderDecoder {
         byte[] result = new byte[compressedDataLength];
         System.arraycopy(output, 0, result, 0, compressedDataLength);
         return result;
+    }
+    
+    private static int getDeflateLevel() {
+        Integer level = null;
+        
+        Message m = PhaseInterceptorChain.getCurrentMessage();
+        if (m != null) {
+            level = PropertyUtils.getInteger(m, "deflate.level");
+        }
+        if (level == null) {
+            level = Deflater.DEFLATED;
+        }
+        return level;
     }
 }
