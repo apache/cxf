@@ -72,7 +72,11 @@ public final class CompressionUtils {
     }
     
     public static byte[] deflate(byte[] tokenBytes, boolean nowrap) {
-        Deflater compresser = new Deflater(Deflater.DEFLATED, nowrap);
+        return deflate(tokenBytes, Deflater.DEFLATED, nowrap);
+    }
+    
+    public static byte[] deflate(byte[] tokenBytes, int level, boolean nowrap) {
+        Deflater compresser = new Deflater(level, nowrap);
         
         compresser.setInput(tokenBytes);
         compresser.finish();
