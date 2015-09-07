@@ -168,6 +168,7 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
                                                      policy);
                 }
                 
+<<<<<<< HEAD
                 if (transport != null) {
                     WSSecHeader secHeader = new WSSecHeader(actor, mustUnderstand);
                     Element el = null;
@@ -197,6 +198,13 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
                     if (asymSignatureAlgorithm != null && transport.getAlgorithmSuite() != null) {
                         transport.getAlgorithmSuite().setAsymmetricSignature(asymSignatureAlgorithm);
                     }
+=======
+                String symSignatureAlgorithm = 
+                    (String)message.getContextualProperty(SecurityConstants.SYMMETRIC_SIGNATURE_ALGORITHM);
+                if (symSignatureAlgorithm != null && binding.getAlgorithmSuite() != null) {
+                    binding.getAlgorithmSuite().setSymmetricSignature(symSignatureAlgorithm);
+                }
+>>>>>>> 5fbe7b4... [CXF-6582] - Support newer symmetric signature algorithms with WS-SecurityPolicy
 
                     if (transport instanceof TransportBinding) {
                         new TransportBindingHandler(config, (TransportBinding)transport, saaj,

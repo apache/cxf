@@ -112,6 +112,11 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
         if (asymSignatureAlgorithm != null && sbinding.getAlgorithmSuite() != null) {
             sbinding.getAlgorithmSuite().setAsymmetricSignature(asymSignatureAlgorithm);
         }
+        String symSignatureAlgorithm = 
+            (String)getMessage().getContextualProperty(SecurityConstants.SYMMETRIC_SIGNATURE_ALGORITHM);
+        if (symSignatureAlgorithm != null && sbinding.getAlgorithmSuite() != null) {
+            sbinding.getAlgorithmSuite().setSymmetricSignature(symSignatureAlgorithm);
+        }
         
         // Set up CallbackHandler which wraps the configured Handler
         WSSSecurityProperties properties = getProperties();

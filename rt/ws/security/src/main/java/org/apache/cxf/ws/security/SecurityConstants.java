@@ -382,6 +382,14 @@ public final class SecurityConstants {
      */
     public static final String ASYMMETRIC_SIGNATURE_ALGORITHM = 
         "ws-security.asymmetric.signature.algorithm";
+    
+    /**
+     * This configuration tag allows the user to override the default Symmetric Signature 
+     * algorithm (HMAC-SHA1) for use in WS-SecurityPolicy, as the WS-SecurityPolicy specification
+     * does not allow the use of other algorithms at present.
+     */
+    public static final String SYMMETRIC_SIGNATURE_ALGORITHM = 
+        "ws-security.symmetric.signature.algorithm";
 
     /**
      * This holds a reference to a PasswordEncryptor instance, which is used to encrypt or 
@@ -663,11 +671,18 @@ public final class SecurityConstants {
             TOKEN, TOKEN_ID, SUBJECT_ROLE_CLASSIFIER, SUBJECT_ROLE_CLASSIFIER_TYPE, MUST_UNDERSTAND,
             ASYMMETRIC_SIGNATURE_ALGORITHM, PASSWORD_ENCRYPTOR_INSTANCE, ENABLE_SAML_ONE_TIME_USE_CACHE,
             SAML_ONE_TIME_USE_CACHE_INSTANCE, ENABLE_STREAMING_SECURITY, RETURN_SECURITY_ERROR,
+<<<<<<< HEAD
             CACHE_IDENTIFIER, CACHE_ISSUED_TOKEN_IN_ENDPOINT, PREFER_WSMEX_OVER_STS_CLIENT_CONFIG,
             DELEGATED_CREDENTIAL, KERBEROS_USE_CREDENTIAL_DELEGATION, 
             KERBEROS_IS_USERNAME_IN_SERVICENAME_FORM, STS_TOKEN_IMMINENT_EXPIRY_VALUE,
             KERBEROS_REQUEST_CREDENTIAL_DELEGATION, ENABLE_UNSIGNED_SAML_ASSERTION_PRINCIPAL,
             AUDIENCE_RESTRICTION_VALIDATION, STORE_BYTES_IN_ATTACHMENT, USE_ATTACHMENT_ENCRYPTION_CONTENT_ONLY_TRANSFORM
+=======
+            CACHE_IDENTIFIER, DELEGATED_CREDENTIAL, KERBEROS_USE_CREDENTIAL_DELEGATION, 
+            KERBEROS_IS_USERNAME_IN_SERVICENAME_FORM, KERBEROS_REQUEST_CREDENTIAL_DELEGATION, 
+            POLICY_VALIDATOR_MAP, STORE_BYTES_IN_ATTACHMENT, USE_ATTACHMENT_ENCRYPTION_CONTENT_ONLY_TRANSFORM,
+            SYMMETRIC_SIGNATURE_ALGORITHM
+>>>>>>> 5fbe7b4... [CXF-6582] - Support newer symmetric signature algorithms with WS-SecurityPolicy
         }));
         ALL_PROPERTIES = Collections.unmodifiableSet(s);
     }

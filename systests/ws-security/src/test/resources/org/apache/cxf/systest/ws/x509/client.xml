@@ -96,6 +96,13 @@
             <entry key="ws-security.encryption.username" value="bob"/>
         </jaxws:properties>
     </jaxws:client>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSymmetric256Port" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="security.encryption.properties" value="bob.properties"/>
+            <entry key="security.encryption.username" value="bob"/>
+            <entry key="ws-security.symmetric.signature.algorithm" value="http://www.w3.org/2001/04/xmldsig-more#hmac-sha256"/>
+        </jaxws:properties>
+    </jaxws:client>
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricIssuerSerialPort" createdFromAPI="true">
         <jaxws:properties>
             <entry key="ws-security.encryption.properties" value="bob.properties"/>

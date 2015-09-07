@@ -94,6 +94,11 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
                 if (asymSignatureAlgorithm != null && tbinding.getAlgorithmSuite() != null) {
                     tbinding.getAlgorithmSuite().setAsymmetricSignature(asymSignatureAlgorithm);
                 }
+                String symSignatureAlgorithm = 
+                    (String)getMessage().getContextualProperty(SecurityConstants.SYMMETRIC_SIGNATURE_ALGORITHM);
+                if (symSignatureAlgorithm != null && tbinding.getAlgorithmSuite() != null) {
+                    tbinding.getAlgorithmSuite().setSymmetricSignature(symSignatureAlgorithm);
+                }
                 
                 TransportToken token = tbinding.getTransportToken();
                 if (token.getToken() instanceof IssuedToken) {
