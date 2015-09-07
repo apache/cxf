@@ -2015,6 +2015,8 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         sig.setCustomTokenId(sigTokId);
         sig.setSecretKey(tok.getSecret());
         sig.setSignatureAlgorithm(binding.getAlgorithmSuite().getSymmetricSignature());
+        AlgorithmSuiteType algType = binding.getAlgorithmSuite().getAlgorithmSuiteType();
+        sig.setDigestAlgo(algType.getDigest());
         sig.setSigCanonicalization(binding.getAlgorithmSuite().getC14n().getValue());
         sig.prepare(doc, getSignatureCrypto(), secHeader);
 
