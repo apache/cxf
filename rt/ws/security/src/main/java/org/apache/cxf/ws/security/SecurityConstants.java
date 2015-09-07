@@ -239,6 +239,14 @@ public final class SecurityConstants extends org.apache.cxf.rt.security.Security
      */
     public static final String ASYMMETRIC_SIGNATURE_ALGORITHM = 
         "ws-security.asymmetric.signature.algorithm";
+    
+    /**
+     * This configuration tag allows the user to override the default Symmetric Signature 
+     * algorithm (HMAC-SHA1) for use in WS-SecurityPolicy, as the WS-SecurityPolicy specification
+     * does not allow the use of other algorithms at present.
+     */
+    public static final String SYMMETRIC_SIGNATURE_ALGORITHM = 
+        "ws-security.symmetric.signature.algorithm";
 
     /**
      * This holds a reference to a PasswordEncryptor instance, which is used to encrypt or 
@@ -381,7 +389,8 @@ public final class SecurityConstants extends org.apache.cxf.rt.security.Security
             SAML_ONE_TIME_USE_CACHE_INSTANCE, ENABLE_STREAMING_SECURITY, RETURN_SECURITY_ERROR,
             CACHE_IDENTIFIER, DELEGATED_CREDENTIAL, KERBEROS_USE_CREDENTIAL_DELEGATION, 
             KERBEROS_IS_USERNAME_IN_SERVICENAME_FORM, KERBEROS_REQUEST_CREDENTIAL_DELEGATION, 
-            POLICY_VALIDATOR_MAP, STORE_BYTES_IN_ATTACHMENT, USE_ATTACHMENT_ENCRYPTION_CONTENT_ONLY_TRANSFORM
+            POLICY_VALIDATOR_MAP, STORE_BYTES_IN_ATTACHMENT, USE_ATTACHMENT_ENCRYPTION_CONTENT_ONLY_TRANSFORM,
+            SYMMETRIC_SIGNATURE_ALGORITHM
         }));
         for (String commonProperty : COMMON_PROPERTIES) {
             s.add(commonProperty);

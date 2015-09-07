@@ -172,6 +172,12 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
                 if (asymSignatureAlgorithm != null && binding.getAlgorithmSuite() != null) {
                     binding.getAlgorithmSuite().setAsymmetricSignature(asymSignatureAlgorithm);
                 }
+                
+                String symSignatureAlgorithm = 
+                    (String)message.getContextualProperty(SecurityConstants.SYMMETRIC_SIGNATURE_ALGORITHM);
+                if (symSignatureAlgorithm != null && binding.getAlgorithmSuite() != null) {
+                    binding.getAlgorithmSuite().setSymmetricSignature(symSignatureAlgorithm);
+                }
 
                 try {
                     if (binding instanceof TransportBinding) {

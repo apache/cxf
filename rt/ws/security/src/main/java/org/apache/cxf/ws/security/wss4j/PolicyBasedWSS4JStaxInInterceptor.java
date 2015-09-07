@@ -257,16 +257,23 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
         checkSymmetricBinding(aim, msg, securityProperties);
         checkTransportBinding(aim, msg, securityProperties);
         
-        // Allow for setting non-standard asymmetric signature algorithms
+        // Allow for setting non-standard signature algorithms
         String asymSignatureAlgorithm = 
             (String)msg.getContextualProperty(SecurityConstants.ASYMMETRIC_SIGNATURE_ALGORITHM);
-        if (asymSignatureAlgorithm != null) {
+        String symSignatureAlgorithm = 
+            (String)msg.getContextualProperty(SecurityConstants.SYMMETRIC_SIGNATURE_ALGORITHM);
+        if (asymSignatureAlgorithm != null || symSignatureAlgorithm != null) {
             Collection<AssertionInfo> algorithmSuites = 
                 aim.get(SP12Constants.ALGORITHM_SUITE);
             if (algorithmSuites != null && !algorithmSuites.isEmpty()) {
                 for (AssertionInfo algorithmSuite : algorithmSuites) {
                     AlgorithmSuite algSuite = (AlgorithmSuite)algorithmSuite.getAssertion();
-                    algSuite.setAsymmetricSignature(asymSignatureAlgorithm);
+                    if (asymSignatureAlgorithm != null) {
+                        algSuite.setAsymmetricSignature(asymSignatureAlgorithm);
+                    }
+                    if (symSignatureAlgorithm != null) {
+                        algSuite.setSymmetricSignature(symSignatureAlgorithm);
+                    }
                 }
             }
         }

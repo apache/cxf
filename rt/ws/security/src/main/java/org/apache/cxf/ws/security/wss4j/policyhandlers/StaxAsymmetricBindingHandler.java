@@ -90,6 +90,11 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
         if (asymSignatureAlgorithm != null && abinding.getAlgorithmSuite() != null) {
             abinding.getAlgorithmSuite().setAsymmetricSignature(asymSignatureAlgorithm);
         }
+        String symSignatureAlgorithm = 
+            (String)getMessage().getContextualProperty(SecurityConstants.SYMMETRIC_SIGNATURE_ALGORITHM);
+        if (symSignatureAlgorithm != null && abinding.getAlgorithmSuite() != null) {
+            abinding.getAlgorithmSuite().setSymmetricSignature(symSignatureAlgorithm);
+        }
         
         if (abinding.getProtectionOrder() 
             == AbstractSymmetricAsymmetricBinding.ProtectionOrder.EncryptBeforeSigning) {

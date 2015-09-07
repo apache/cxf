@@ -361,12 +361,23 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         AlgorithmSuiteTranslater translater = new AlgorithmSuiteTranslater();
         translater.translateAlgorithmSuites(message.get(AssertionInfoMap.class), data);
         
-        // Allow for setting non-standard asymmetric signature algorithms
+        // Allow for setting non-standard signature algorithms
+        boolean asymmAlgSet = false;
         String asymSignatureAlgorithm = 
             (String)message.getContextualProperty(SecurityConstants.ASYMMETRIC_SIGNATURE_ALGORITHM);
         if (asymSignatureAlgorithm != null && data.getAlgorithmSuite() != null) {
             data.getAlgorithmSuite().getSignatureMethods().clear();
             data.getAlgorithmSuite().getSignatureMethods().add(asymSignatureAlgorithm);
+            asymmAlgSet = true;
+        }
+        
+        String symSignatureAlgorithm = 
+            (String)message.getContextualProperty(SecurityConstants.SYMMETRIC_SIGNATURE_ALGORITHM);
+        if (symSignatureAlgorithm != null && data.getAlgorithmSuite() != null) {
+            if (!asymmAlgSet) {
+                data.getAlgorithmSuite().getSignatureMethods().clear();
+            }
+            data.getAlgorithmSuite().getSignatureMethods().add(symSignatureAlgorithm);
         }
     }
 
@@ -389,13 +400,20 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             // Allow for setting non-standard asymmetric signature algorithms
             String asymSignatureAlgorithm = 
                 (String)message.getContextualProperty(SecurityConstants.ASYMMETRIC_SIGNATURE_ALGORITHM);
-            if (asymSignatureAlgorithm != null) {
+            String symSignatureAlgorithm = 
+                (String)message.getContextualProperty(SecurityConstants.SYMMETRIC_SIGNATURE_ALGORITHM);
+            if (asymSignatureAlgorithm != null || symSignatureAlgorithm != null) {
                 Collection<AssertionInfo> algorithmSuites = 
                     aim.get(SP12Constants.ALGORITHM_SUITE);
                 if (algorithmSuites != null && !algorithmSuites.isEmpty()) {
                     for (AssertionInfo algorithmSuite : algorithmSuites) {
                         AlgorithmSuite algSuite = (AlgorithmSuite)algorithmSuite.getAssertion();
-                        algSuite.setAsymmetricSignature(asymSignatureAlgorithm);
+                        if (asymSignatureAlgorithm != null) {
+                            algSuite.setAsymmetricSignature(asymSignatureAlgorithm);
+                        }
+                        if (symSignatureAlgorithm != null) {
+                            algSuite.setSymmetricSignature(symSignatureAlgorithm);
+                        }
                     }
                 }
             }
