@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.transport.http.auth;
 
+import java.net.InetAddress;
 import java.net.URI;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
@@ -62,6 +63,7 @@ public abstract class AbstractSpnegoAuthSupplier {
     private boolean credDelegation;
     private Configuration loginConfig;
     private Oid serviceNameType;
+    private boolean useCanonicalHostname;
     
     public String getAuthorization(AuthorizationPolicy authPolicy,
                                    URI currentURI,
@@ -154,8 +156,17 @@ public abstract class AbstractSpnegoAuthSupplier {
     }
 
     protected String getCompleteServicePrincipalName(URI currentURI) {
-        String name = servicePrincipalName == null 
-            ? "HTTP/" + currentURI.getHost() : servicePrincipalName;
+        String name;
+
+        if (servicePrincipalName == null) {
+            String host = currentURI.getHost();
+            if (useCanonicalHostname) {
+                host = getCanonicalHostname(host);
+            }
+            name = "HTTP/" + host;
+        } else {
+            name = servicePrincipalName;
+        }
         if (realm != null) {            
             name += "@" + realm;
         }
@@ -163,10 +174,20 @@ public abstract class AbstractSpnegoAuthSupplier {
             LOG.fine("Service Principal Name is " + name);
         }
         return name;
-            
-            
     }
-    
+
+    private String getCanonicalHostname(String hostname) {
+        String canonicalHostname = hostname;
+        try {
+            InetAddress in = InetAddress.getByName(hostname);
+            canonicalHostname = in.getCanonicalHostName();
+            LOG.fine("resolved hostname=" + hostname + " to canonicalHostname=" + canonicalHostname);
+        } catch (Exception e) {
+            LOG.log(Level.WARNING, "unable to resolve canonical hostname", e);
+        }
+        return canonicalHostname;
+    }
+
     public void setServicePrincipalName(String servicePrincipalName) {
         this.servicePrincipalName = servicePrincipalName;
     }
@@ -211,6 +232,14 @@ public abstract class AbstractSpnegoAuthSupplier {
 
     public void setServiceNameType(Oid serviceNameType) {
         this.serviceNameType = serviceNameType;
+    }
+
+    public boolean isUseCanonicalHostname() {
+        return useCanonicalHostname;
+    }
+
+    public void setUseCanonicalHostname(boolean useCanonicalHostname) {
+        this.useCanonicalHostname = useCanonicalHostname;
     }
 
 }
