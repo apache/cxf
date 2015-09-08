@@ -216,5 +216,7 @@ public class ContextUtilsTest extends Assert {
     
     @WebFault(name = "testFault", targetNamespace = "urn:foo:test:7")
     public class TestFault extends Exception {
+
+        private static final long serialVersionUID = 1L;
     }
 }

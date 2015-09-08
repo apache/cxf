@@ -238,12 +238,18 @@ public class SoapFaultSerializerTest extends Assert {
         ex = new Exception("fault-two");
         fault = new Fault(ex, Fault.FAULT_CODE_CLIENT);
         verifyFaultToSoapFault(fault, "fault-two", true, Soap11.getInstance());
+        
+        fault = new Fault(ex, new QName("http://cxf.apache.org", "myFaultCode"));
+        SoapFault f = verifyFaultToSoapFault(fault, "fault-two", false, Soap12.getInstance());
+        assertEquals("myFaultCode", f.getSubCodes().get(0).getLocalPart());
+
     }
     
-    private void verifyFaultToSoapFault(Fault fault, String msg, boolean sender, SoapVersion v) {
+    private SoapFault verifyFaultToSoapFault(Fault fault, String msg, boolean sender, SoapVersion v) {
         SoapFault sf = SoapFault.createFault(fault, v);
         assertEquals(sender ? v.getSender() : v.getReceiver(), sf.getFaultCode());
         assertEquals(msg, sf.getMessage());
+        return sf;
     }
 
     @Test

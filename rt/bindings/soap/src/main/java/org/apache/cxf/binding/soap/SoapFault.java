@@ -204,6 +204,31 @@ public class SoapFault extends Fault {
         this.namespaces = namespaces;
     }
 
+    private static void updateSoap12FaultCodes(SoapFault f) {
+        //per Soap 1.2 spec, the fault code MUST be one of the 5 values specified in the spec.
+        //Soap 1.1 allows the soap fault code to be arbitrary (recommends the 4 values in the spec, but
+        //explicitely mentions that it can be extended to include additional codes).   Soap 1.2 however
+        //requires the use of one of the 5 defined codes.  Additional detail or more specific information
+        //can be transferred via the SubCodes.
+        QName fc = f.getFaultCode();
+        SoapVersion v = Soap12.getInstance();
+        if (fc.getNamespaceURI().equals(Soap12.SOAP_NAMESPACE)
+            && (fc.equals(v.getReceiver())
+                || fc.equals(v.getSender())
+                || fc.equals(v.getMustUnderstand())
+                || fc.equals(v.getDateEncodingUnknown())
+                || fc.equals(v.getVersionMismatch()))) {
+            //valid fault codes, don't change anything
+            return;
+        }
+        f.setFaultCode(Soap12.getInstance().getReceiver());
+        
+        if (f.getSubCodes() == null) {
+            f.setRootSubCode(fc);
+        } else if (!f.getSubCodes().contains(fc)) {
+            f.getSubCodes().add(fc);
+        }
+    }
     public static SoapFault createFault(Fault f, SoapVersion v) {
         if (f instanceof SoapFault) {
             //make sure the fault code is per spec
@@ -217,6 +242,9 @@ public class SoapFault extends Fault {
                 }
                 f.setFaultCode(fc);
             }
+            if (v == Soap12.getInstance()) {
+                updateSoap12FaultCodes((SoapFault)f);
+            }
             return (SoapFault)f;
         }
 
@@ -229,7 +257,9 @@ public class SoapFault extends Fault {
         SoapFault soapFault = new SoapFault(new Message(f.getMessage(), (ResourceBundle)null),
                                             f.getCause(),
                                             fc);
-        
+        if (v == Soap12.getInstance()) {
+            updateSoap12FaultCodes(soapFault);
+        }
         soapFault.setDetail(f.getDetail());
         return soapFault;
     }
