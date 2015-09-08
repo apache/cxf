@@ -119,7 +119,7 @@ public class MessageListenerTest {
         assertNumMessagesInQueue("Should succeed on second try", connection, dest, 0, 2000);
 
         sendMessage(connection, dest, FAIL);
-        assertNumMessagesInQueue("Should be rolled back", connection, dlq, 1, 1000);
+        assertNumMessagesInQueue("Should be rolled back", connection, dlq, 1, 2500);
     }
 
     private Connection createConnection(String name) throws JMSException {
