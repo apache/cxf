@@ -70,7 +70,7 @@ public class DeflateEncoderDecoderTest extends Assert {
         String token = "valid_grant valid_grant valid_grant valid_grant valid_grant valid_grant";
 
         DeflateEncoderDecoder deflateEncoderDecoder = new DeflateEncoderDecoder();
-        byte[] deflatedToken = deflateEncoderDecoder.deflateToken(token.getBytes(), 0, true);
+        byte[] deflatedToken = deflateEncoderDecoder.deflateToken(token.getBytes());
 
         String cxfInflatedToken = IOUtils
                 .toString(deflateEncoderDecoder.inflateToken(deflatedToken));
