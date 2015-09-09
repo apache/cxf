@@ -49,8 +49,11 @@ public class DeflateEncoderDecoder {
                         break;
                     }
                 }
-                
+                byte[] lastInflatedToken = inflatedToken;
                 inflatedToken = new byte[input.length + inflatedLen];
+                if (lastInflatedToken != input) {
+                    System.arraycopy(lastInflatedToken, 0, inflatedToken, 0, inflatedLen);
+                }
                 System.arraycopy(input, 0, inflatedToken, inflatedLen, inputLen);
                 inflatedLen += inputLen;
             }
