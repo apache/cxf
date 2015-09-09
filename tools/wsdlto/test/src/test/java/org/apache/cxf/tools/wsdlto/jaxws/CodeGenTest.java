@@ -1589,6 +1589,19 @@ public class CodeGenTest extends AbstractCodeGenTest {
         assertEquals(Exception.class, fault.getSuperclass());
     }
     @Test
+    public void testNoTargetNamespaceSchema() throws Exception {
+        env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/cxf6580/hello_import.wsdl"));
+        env.put(ToolConstants.CFG_CATALOG, getLocation("/wsdl2java_wsdl/cxf6580/catalog.xml"));
+
+        processor.setContext(env);
+        processor.execute();
+
+        File helloFile = new File(output, "org/apache/hello_soap_http/types/Hello.java");
+        assertTrue(helloFile.exists());
+        helloFile = new File(output, "org/apache/hello_soap_http/types/HelloResponse.java");
+        assertTrue(helloFile.exists());
+    }
+    @Test
     public void testExceptionSuper() throws Exception {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/hello_world.wsdl"));
         env.put(ToolConstants.CFG_EXCEPTION_SUPER, "java.lang.RuntimeException");
