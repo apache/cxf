@@ -206,10 +206,8 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
     
     private static void setCryptoProperties(EndpointInfo ei, String sigProps, String encProps) {
         ei.setProperty(SecurityConstants.CALLBACK_HANDLER, new KeystorePasswordCallback());
-        ei.setProperty(SecurityConstants.SIGNATURE_PROPERTIES, 
-                       SecurityPolicyTest.class.getResource(sigProps).toString());
-        ei.setProperty(SecurityConstants.ENCRYPT_PROPERTIES, 
-                       SecurityPolicyTest.class.getResource(encProps).toString());
+        ei.setProperty(SecurityConstants.SIGNATURE_PROPERTIES, sigProps);
+        ei.setProperty(SecurityConstants.ENCRYPT_PROPERTIES, encProps);
     }
     
     @Test
@@ -233,9 +231,9 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.CALLBACK_HANDLER, 
                                                       new KeystorePasswordCallback());
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.SIGNATURE_PROPERTIES,
-                                                      getClass().getResource("alice.properties"));
+                                                      "alice.properties");
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.ENCRYPT_PROPERTIES, 
-                                                      getClass().getResource("bob.properties"));
+                                                      "bob.properties");
         assertEquals(10, pt.doubleIt(5));
         ((java.io.Closeable)pt).close();
         
@@ -245,9 +243,9 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.CALLBACK_HANDLER, 
                                                       new KeystorePasswordCallback());
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.SIGNATURE_PROPERTIES,
-                                                      getClass().getResource("alice.properties"));
+                                                      "alice.properties");
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.ENCRYPT_PROPERTIES, 
-                                                      getClass().getResource("bob.properties"));
+                                                      "bob.properties");
         
         // DOM
         pt.doubleIt(5);
@@ -264,9 +262,9 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.CALLBACK_HANDLER, 
                                                       new KeystorePasswordCallback());
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.SIGNATURE_PROPERTIES,
-                                                      getClass().getResource("alice.properties"));
+                                                      "alice.properties");
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.ENCRYPT_PROPERTIES, 
-                                                      getClass().getResource("bob.properties"));
+                                                      "bob.properties");
         // DOM
         pt.doubleIt(5);
         
@@ -282,9 +280,9 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.CALLBACK_HANDLER, 
                                                       new KeystorePasswordCallback());
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.SIGNATURE_PROPERTIES,
-                                                      getClass().getResource("alice.properties"));
+                                                      "alice.properties");
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.ENCRYPT_PROPERTIES, 
-                                                      getClass().getResource("bob.properties"));
+                                                      "bob.properties");
         
         // DOM
         pt.doubleIt(5);
@@ -356,9 +354,9 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.CALLBACK_HANDLER, 
                                                       new KeystorePasswordCallback());
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.SIGNATURE_PROPERTIES,
-                                                      getClass().getResource("alice.properties"));
+                                                      "alice.properties");
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.ENCRYPT_PROPERTIES, 
-                                                      getClass().getResource("bob.properties"));
+                                                      "bob.properties");
         //This should work as it should be properly signed.
         
         // DOM
@@ -415,9 +413,9 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         disp.getRequestContext().put(SecurityConstants.CALLBACK_HANDLER, 
                                      new KeystorePasswordCallback());
         disp.getRequestContext().put(SecurityConstants.SIGNATURE_PROPERTIES,
-                                     getClass().getResource("alice.properties"));
+                                     "alice.properties");
         disp.getRequestContext().put(SecurityConstants.ENCRYPT_PROPERTIES, 
-                                     getClass().getResource("bob.properties"));
+                                     "bob.properties");
         updateAddressPort(disp, PORT);
 
         String req = "<ns2:DoubleIt xmlns:ns2=\"http://www.example.org/schema/DoubleIt\">"
@@ -490,9 +488,9 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.CALLBACK_HANDLER, 
                                                       new KeystorePasswordCallback());
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.SIGNATURE_PROPERTIES,
-                                                      getClass().getResource("alice.properties"));
+                                                      "alice.properties");
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.ENCRYPT_PROPERTIES, 
-                                                      getClass().getResource("bob.properties"));
+                                                      "bob.properties");
         
         // DOM
         assertEquals(10, pt.doubleIt(5));
@@ -525,9 +523,9 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.CALLBACK_HANDLER, 
                                                       new KeystorePasswordCallback());
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.SIGNATURE_PROPERTIES,
-                                                      getClass().getResource("alice.properties"));
+                                                      "alice.properties");
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.ENCRYPT_PROPERTIES, 
-                                                      getClass().getResource("alice.properties"));
+                                                      "alice.properties");
 
         // DOM
         assertEquals(10, pt.doubleIt(5));
@@ -560,9 +558,9 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.CALLBACK_HANDLER, 
                                                       new KeystorePasswordCallback());
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.SIGNATURE_PROPERTIES,
-                                                      getClass().getResource("alice.properties"));
+                                                      "alice.properties");
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.ENCRYPT_PROPERTIES, 
-                                                      getClass().getResource("alice.properties"));
+                                                      "alice.properties");
         
         DoubleIt di = new DoubleIt();
         di.setNumberToDouble(5);
@@ -592,9 +590,9 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.CALLBACK_HANDLER, 
                                                       new KeystorePasswordCallback());
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.SIGNATURE_PROPERTIES,
-                                                      getClass().getResource("alice.properties"));
+                                                      "alice.properties");
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.ENCRYPT_PROPERTIES, 
-                                                      getClass().getResource("revocation.properties"));
+                                                      "revocation.properties");
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.ENABLE_REVOCATION, 
                                                       "true");
         
@@ -640,9 +638,9 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.CALLBACK_HANDLER,
                                                       new KeystorePasswordCallback());
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.SIGNATURE_PROPERTIES,
-                                                      getClass().getResource("revocation.properties"));
+                                                      "revocation.properties");
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.ENCRYPT_PROPERTIES,
-                                                      getClass().getResource("bob.properties"));
+                                                      "bob.properties");
         // DOM
         try {
             pt.doubleIt(5);
