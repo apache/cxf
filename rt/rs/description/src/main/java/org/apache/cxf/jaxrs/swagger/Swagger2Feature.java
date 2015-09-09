@@ -89,7 +89,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         beanConfig.setContact(getContact());
         beanConfig.setLicense(getLicense());
         beanConfig.setLicenseUrl(getLicenseUrl());
-        beanConfig.setTermsOfServiceUrl(getTermOfServiceUrl());
+        beanConfig.setTermsOfServiceUrl(getTermsOfServiceUrl());
         beanConfig.setScan(isScan());
         beanConfig.setPrettyPrint(isPrettyPrint());
         beanConfig.setFilterClass(getFilterClass());
