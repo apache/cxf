@@ -123,6 +123,7 @@ public abstract class AbstractCommonBindingHandler {
             return;
         }
         assertPolicy(tokenWrapper.getName());
+        assertToken(tokenWrapper.getToken());
     }
     
     protected void assertToken(AbstractToken token) {

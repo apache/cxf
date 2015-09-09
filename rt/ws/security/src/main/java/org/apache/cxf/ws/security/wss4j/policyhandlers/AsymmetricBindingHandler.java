@@ -136,8 +136,6 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                         policyNotAsserted(initiatorToken, "Security token is not found or expired");
                         return;
                     } else {
-                        assertPolicy(initiatorToken);
-                        
                         if (isTokenRequired(initiatorToken.getIncludeTokenType())) {
                             Element el = secToken.getToken();
                             this.addEncryptedKeyElement(cloneElement(el));
@@ -146,12 +144,9 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                     }
                 } else if (initiatorToken instanceof SamlToken && isRequestor()) {
                     SamlAssertionWrapper assertionWrapper = addSamlToken((SamlToken)initiatorToken);
-                    if (assertionWrapper != null) {
-                        if (isTokenRequired(initiatorToken.getIncludeTokenType())) {
-                            addSupportingElement(assertionWrapper.toDOM(saaj.getSOAPPart()));
-                            storeAssertionAsSecurityToken(assertionWrapper);
-                        }
-                        assertPolicy(initiatorToken);
+                    if (assertionWrapper != null && isTokenRequired(initiatorToken.getIncludeTokenType())) {
+                        addSupportingElement(assertionWrapper.toDOM(saaj.getSOAPPart()));
+                        storeAssertionAsSecurityToken(assertionWrapper);
                     }
                 } else if (initiatorToken instanceof SamlToken) {
                     String tokenId = getSAMLToken();
@@ -276,24 +271,17 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                 if (secToken == null) {
                     policyNotAsserted(initiatorToken, "Security token is not found or expired");
                     return;
-                } else {
-                    assertPolicy(initiatorToken);
-                    
-                    if (isTokenRequired(initiatorToken.getIncludeTokenType())) {
-                        Element el = secToken.getToken();
-                        this.addEncryptedKeyElement(cloneElement(el));
-                        attached = true;
-                    } 
+                } else if (isTokenRequired(initiatorToken.getIncludeTokenType())) {
+                    Element el = secToken.getToken();
+                    this.addEncryptedKeyElement(cloneElement(el));
+                    attached = true;
                 }
             } else if (initiatorToken instanceof SamlToken && isRequestor()) {
                 try {
                     SamlAssertionWrapper assertionWrapper = addSamlToken((SamlToken)initiatorToken);
-                    if (assertionWrapper != null) {
-                        if (isTokenRequired(initiatorToken.getIncludeTokenType())) {
-                            addSupportingElement(assertionWrapper.toDOM(saaj.getSOAPPart()));
-                            storeAssertionAsSecurityToken(assertionWrapper);
-                        }
-                        assertPolicy(initiatorToken);
+                    if (assertionWrapper != null && isTokenRequired(initiatorToken.getIncludeTokenType())) {
+                        addSupportingElement(assertionWrapper.toDOM(saaj.getSOAPPart()));
+                        storeAssertionAsSecurityToken(assertionWrapper);
                     }
                 } catch (Exception e) {
                     String reason = e.getMessage();
@@ -308,7 +296,6 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                     return;
                 }
             }
-            assertToken(initiatorToken);
         }
         
         List<WSEncryptionPart> sigParts = new ArrayList<WSEncryptionPart>();
@@ -808,7 +795,6 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
         throws WSSecurityException {
         //Set up the encrypted key to use
         encrKey = this.getEncryptedKeyBuilder(token);
-        assertPolicy(wrapper);
         Element bstElem = encrKey.getBinarySecurityTokenElement();
         if (bstElem != null) {
             // If a BST is available then use it
