@@ -36,7 +36,7 @@ public abstract class AbstractSwaggerFeature extends AbstractFeature {
     private String contact = "users@cxf.apache.org";
     private String license = "Apache 2.0 License";
     private String licenseUrl = "http://www.apache.org/licenses/LICENSE-2.0.html";
-    private String termOfServiceUrl;
+    private String termsOfServiceUrl;
     private String filterClass;
     
     @Override
@@ -118,11 +118,11 @@ public abstract class AbstractSwaggerFeature extends AbstractFeature {
     public void setLicenseUrl(String licenseUrl) {
         this.licenseUrl = licenseUrl;
     }
-    public String getTermOfServiceUrl() {
-        return termOfServiceUrl;
+    public String getTermsOfServiceUrl() {
+        return termsOfServiceUrl;
     }
-    public void setTermOfServiceUrl(String termOfServiceUrl) {
-        this.termOfServiceUrl = termOfServiceUrl;
+    public void setTermsOfServiceUrl(String termsOfServiceUrl) {
+        this.termsOfServiceUrl = termsOfServiceUrl;
     }
     public boolean isScan() {
         return scan;
