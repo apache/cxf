@@ -674,8 +674,8 @@ public class JAXBDataBinding implements DataBindingProfile {
                 continue;
             }
             String key = schema.getSourceURI();
-            String tns = schema.getTargetNamespace();
-            if (ids.contains(key) || tns == null) {
+            // accepting also a null tns (e.g., reported by apache.ws.xmlschema for no-namespace)
+            if (ids.contains(key)) {
                 continue;
             }
             if (key.startsWith("file:") || key.startsWith("jar:")) {
