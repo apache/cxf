@@ -44,8 +44,8 @@
                 <entry key="action" value="Timestamp Signature Encrypt"/>
                 <!-- <entry key="action" value="Timestamp Signature"/> -->
                 <entry key="user" value="alice"/>
-                <entry key="signaturePropFile" value="org/apache/cxf/systest/ws/security/alice.properties"/>
-                <entry key="encryptionPropFile" value="org/apache/cxf/systest/ws/security/bob.properties"/>
+                <entry key="signaturePropFile" value="alice.properties"/>
+                <entry key="encryptionPropFile" value="bob.properties"/>
                 <entry key="encryptionUser" value="Bob"/>
                 <entry key="signatureKeyIdentifier" value="DirectReference"/>
                 <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
@@ -67,8 +67,8 @@
         <constructor-arg>
             <map>
                 <entry key="action" value="Timestamp Signature Encrypt"/>
-                <entry key="signaturePropFile" value="org/apache/cxf/systest/ws/security/bob.properties"/>
-                <entry key="decryptionPropFile" value="org/apache/cxf/systest/ws/security/alice.properties"/>
+                <entry key="signaturePropFile" value="bob.properties"/>
+                <entry key="decryptionPropFile" value="alice.properties"/>
                 <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             </map>
         </constructor-arg>

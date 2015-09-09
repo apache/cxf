@@ -77,8 +77,8 @@
                 <!-- Use this action spec for WCF clients 
                 <entry key="action" value="Signature Encrypt Timestamp"/>
                 -->
-                <entry key="signaturePropFile" value="org/apache/cxf/systest/ws/security/alice.properties"/>
-                <entry key="decryptionPropFile" value="org/apache/cxf/systest/ws/security/bob.properties"/>
+                <entry key="signaturePropFile" value="alice.properties"/>
+                <entry key="decryptionPropFile" value="bob.properties"/>
                 <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             </map>
         </constructor-arg>
@@ -91,8 +91,8 @@
             <map>
                 <entry key="action" value="Timestamp Signature Encrypt"/>
                 <entry key="user" value="bob"/>
-                <entry key="signaturePropFile" value="org/apache/cxf/systest/ws/security/bob.properties"/>
-                <entry key="encryptionPropFile" value="org/apache/cxf/systest/ws/security/alice.properties"/>
+                <entry key="signaturePropFile" value="bob.properties"/>
+                <entry key="encryptionPropFile" value="alice.properties"/>
                 <entry key="encryptionUser" value="Alice"/>
                 <entry key="signatureKeyIdentifier" value="DirectReference"/>
                 <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>

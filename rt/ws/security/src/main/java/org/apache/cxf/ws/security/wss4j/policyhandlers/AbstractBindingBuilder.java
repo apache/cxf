@@ -369,9 +369,11 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                                    SPConstants.LAYOUT_LAX_TIMESTAMP_FIRST));
                 }
             } else if (timestampEl != null) {
-                ai.setAsserted(true);
+                if (ai != null) {
+                    ai.setAsserted(true);
+                }
                 addTopDownElement(timestampEl.getElement());
-            } else {
+            } else if (ai != null) {
                 ai.setAsserted(true);
             }
             
