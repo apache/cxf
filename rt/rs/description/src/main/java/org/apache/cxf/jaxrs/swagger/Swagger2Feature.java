@@ -48,6 +48,9 @@ import io.swagger.jaxrs.listing.SwaggerSerializers;
 
 public class Swagger2Feature extends AbstractSwaggerFeature {
     private String host;
+    private String[] schemes;
+    private boolean prettyPrint;
+
     private boolean scanAllResources;
     private String ignoreRoutes;
 
@@ -80,12 +83,16 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         beanConfig.setVersion(getVersion());
         beanConfig.setBasePath(getBasePath());
         beanConfig.setHost(getHost());
+        beanConfig.setSchemes(getSchemes());
         beanConfig.setTitle(getTitle());
         beanConfig.setDescription(getDescription());
         beanConfig.setContact(getContact());
         beanConfig.setLicense(getLicense());
         beanConfig.setLicenseUrl(getLicenseUrl());
+        beanConfig.setTermsOfServiceUrl(getTermOfServiceUrl());
         beanConfig.setScan(isScan());
+        beanConfig.setPrettyPrint(isPrettyPrint());
+        beanConfig.setFilterClass(getFilterClass());
     }
 
     public String getHost() {
@@ -93,6 +100,22 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
     }
     public void setHost(String host) {
         this.host = host;
+    }
+
+    public String[] getSchemes() {
+        return schemes;
+    }
+
+    public void setSchemes(String[] schemes) {
+        this.schemes = schemes;
+    }
+
+    public boolean isPrettyPrint() {
+        return prettyPrint;
+    }
+
+    public void setPrettyPrint(boolean prettyPrint) {
+        this.prettyPrint = prettyPrint;
     }
 
     public boolean isScanAllResources() {

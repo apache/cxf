@@ -70,7 +70,9 @@ public class SwaggerFeature extends AbstractSwaggerFeature {
         beanConfig.setContact(getContact());
         beanConfig.setLicense(getLicense());
         beanConfig.setLicenseUrl(getLicenseUrl());
+        beanConfig.setTermsOfServiceUrl(getTermOfServiceUrl());
         beanConfig.setScan(isScan());
+        beanConfig.setFilterClass(getFilterClass());
     }    
 
     @Override
