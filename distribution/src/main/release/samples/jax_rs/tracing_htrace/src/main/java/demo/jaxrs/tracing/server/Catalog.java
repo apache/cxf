@@ -47,6 +47,9 @@ import org.apache.cxf.tracing.Traceable;
 import org.apache.cxf.tracing.TracerContext;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
+import org.apache.hadoop.hbase.trace.SpanReceiverHost;
+
+import demo.jaxrs.tracing.conf.TracingConfiguration;
 
 @Path("/catalog")
 public class Catalog {
@@ -57,6 +60,7 @@ public class Catalog {
         final Configuration configuration = HBaseConfiguration.create();
         configuration.set("hbase.zookeeper.quorum", "hbase");
         configuration.set("hbase.zookeeper.property.clientPort", "2181");
+        configuration.set(SpanReceiverHost.SPAN_RECEIVERS_CONF_KEY, TracingConfiguration.SPAN_RECEIVER.getName());
         store = new CatalogStore(configuration, "catalog");
     }
     
