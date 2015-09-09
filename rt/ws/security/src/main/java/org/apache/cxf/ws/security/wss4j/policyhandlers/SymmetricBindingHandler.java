@@ -166,7 +166,6 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                         tokenId = getUTDerivedKey();
                     }
                 }
-                assertToken(encryptionToken);
                 if (tok == null) {
                     //if (tokenId == null || tokenId.length() == 0) {
                         //REVISIT - no tokenId?   Exception?
@@ -297,7 +296,6 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                         sigTokId = getUTDerivedKey();
                     }
                 }
-                assertToken(sigToken);
             } else {
                 unassertPolicy(sbinding, "No signature token");
                 return;
@@ -848,10 +846,11 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                 }
             }
                       
-            if (included && sbinding.isProtectTokens()) {
-                sigs.add(new WSEncryptionPart(sigTokId));
-                assertPolicy(
-                    new QName(sbinding.getName().getNamespaceURI(), SPConstants.PROTECT_TOKENS));
+            if (sbinding.isProtectTokens()) {
+                assertPolicy(new QName(sbinding.getName().getNamespaceURI(), SPConstants.PROTECT_TOKENS));
+                if (included) {
+                    sigs.add(new WSEncryptionPart(sigTokId));
+                }
             }
             
             sig.setCustomTokenId(sigTokId);
@@ -886,7 +885,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
 
     private String setupEncryptedKey(AbstractTokenWrapper wrapper, AbstractToken sigToken) throws WSSecurityException {
         WSSecEncryptedKey encrKey = this.getEncryptedKeyBuilder(sigToken);
-        assertPolicy(wrapper);
+        assertTokenWrapper(wrapper);
         String id = encrKey.getId();
         byte[] secret = encrKey.getEphemeralKey();
 
