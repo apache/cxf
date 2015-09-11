@@ -470,7 +470,7 @@ public final class InjectionUtils {
         T result = null;
         if (message != null) {
             ServerProviderFactory pf = ServerProviderFactory.getInstance(message);
-            ParamConverter<T> pm = pf.createParameterHandler(pClass, genericType, anns);
+            ParamConverter<T> pm = pf.createParameterHandler(pClass, genericType, anns, message);
             if (pm != null) {
                 result = pm.fromString(value);
             }

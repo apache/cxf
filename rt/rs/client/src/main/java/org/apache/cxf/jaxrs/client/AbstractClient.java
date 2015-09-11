@@ -84,6 +84,7 @@ import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
+import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
@@ -740,13 +741,26 @@ public abstract class AbstractClient implements Client {
         }
         ProviderFactory pf = ClientProviderFactory.getInstance(cfg.getEndpoint());
         if (pf != null) {
+            Message m = null;
+            if (pf.isParamConverterContextsAvailable()) {
+                m = new MessageImpl();
+                m.put(Message.REQUESTOR_ROLE, Boolean.TRUE);
+                m.setExchange(new ExchangeImpl());
+                m.getExchange().setOutMessage(m);
+                m.getExchange().put(Endpoint.class, cfg.getEndpoint());
+            }
             Class<?> pClass = pValue.getClass();
-            
             @SuppressWarnings("unchecked")
             ParamConverter<Object> prov = 
-                (ParamConverter<Object>)pf.createParameterHandler(pClass, pClass, anns);
+                (ParamConverter<Object>)pf.createParameterHandler(pClass, pClass, anns, m);
             if (prov != null) {
-                return prov.toString(pValue);
+                try {
+                    return prov.toString(pValue);
+                } finally {
+                    if (m != null) {
+                        pf.clearThreadLocalProxies();
+                    }
+                }
             }
         }
         return pValue.toString();

@@ -1065,7 +1065,7 @@ public final class JAXRSUtils {
     public static <T> T createContextValue(Message m, Type genericType, Class<T> clazz) {
  
         Message contextMessage = m.getExchange() != null ? m.getExchange().getInMessage() : m;
-        if (contextMessage == null && Boolean.FALSE.equals(m.get(Message.INBOUND_MESSAGE))) {
+        if (contextMessage == null && !PropertyUtils.isTrue(m.get(Message.INBOUND_MESSAGE))) {
             contextMessage = m;
         }
         Object o = null;
