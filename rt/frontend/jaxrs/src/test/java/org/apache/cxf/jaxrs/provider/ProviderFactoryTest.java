@@ -512,7 +512,8 @@ public class ProviderFactoryTest extends Assert {
         ProviderFactory pf = ServerProviderFactory.getInstance();
         ParamConverterProvider h = new CustomerParameterHandler();
         pf.registerUserProvider(h);
-        ParamConverter<Customer> h2 = pf.createParameterHandler(Customer.class, Customer.class, null);
+        ParamConverter<Customer> h2 = pf.createParameterHandler(Customer.class, Customer.class, null, 
+                                                                new MessageImpl());
         assertSame(h2, h);
     }
     

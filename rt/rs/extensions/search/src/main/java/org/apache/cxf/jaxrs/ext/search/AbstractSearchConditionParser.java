@@ -233,10 +233,7 @@ public abstract class AbstractSearchConditionParser<T> implements SearchConditio
     private boolean paramConverterAvailable(Class<?> pClass) {
         Message m = JAXRSUtils.getCurrentMessage();
         ServerProviderFactory pf = m == null ? null : ServerProviderFactory.getInstance(m);
-        if (pf != null && pf.createParameterHandler(pClass, pClass, EMPTY_ANNOTTAIONS) != null) {
-            return true;
-        }
-        return false;
+        return pf != null && pf.createParameterHandler(pClass, pClass, EMPTY_ANNOTTAIONS, m) != null;
     }
 
     private CollectionCheck getCollectionCheck(String propName, boolean isCollection, Class<?> actualCls) {

@@ -32,7 +32,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -107,8 +106,9 @@ public abstract class ProviderFactory {
     private List<ProviderInfo<ContextProvider<?>>> contextProviders = 
         new ArrayList<ProviderInfo<ContextProvider<?>>>(1);
     
-    private Set<ParamConverterProvider> newParamConverters;
-    
+    private List<ProviderInfo<ParamConverterProvider>> paramConverters =
+        new ArrayList<ProviderInfo<ParamConverterProvider>>(1);
+    private boolean paramConverterContextsAvailable;
     // List of injected providers
     private Collection<ProviderInfo<?>> injectedProviders = 
         new LinkedList<ProviderInfo<?>>();
@@ -250,17 +250,19 @@ public abstract class ProviderFactory {
     
     public <T> ParamConverter<T> createParameterHandler(Class<T> paramType, 
                                                         Type genericType,
-                                                        Annotation[] anns) {
+                                                        Annotation[] anns,
+                                                        Message m) {
         
-        if (newParamConverters != null) {
-            anns = anns != null ? anns : new Annotation[]{};
-            for (ParamConverterProvider newParamConverter : newParamConverters) {
-                ParamConverter<T> converter = newParamConverter.getConverter(paramType, genericType, anns);
-                if (converter != null) {
-                    return converter;
-                }
+        anns = anns != null ? anns : new Annotation[]{};
+        for (ProviderInfo<ParamConverterProvider> pi : paramConverters) {
+            injectContextValues(pi, m);
+            ParamConverter<T> converter = pi.getProvider().getConverter(paramType, genericType, anns);
+            if (converter != null) {
+                return converter;
+            } else {
+                pi.clearThreadLocalProxies();
             }
-        } 
+        }
         return null;
     }
     
@@ -349,7 +351,7 @@ public abstract class ProviderFactory {
                 List<ProviderInfo<ReaderInterceptor>> readers =
                     getBoundFilters(readerInterceptors, names);
                 for (ProviderInfo<ReaderInterceptor> p : readers) {
-                    InjectionUtils.injectContexts(p.getProvider(), p, m);
+                    injectContextValues(p, m);
                     interceptors.add(p.getProvider());
                 }
                 interceptors.add(mbrReader);
@@ -388,7 +390,7 @@ public abstract class ProviderFactory {
                 List<ProviderInfo<WriterInterceptor>> writers =
                     getBoundFilters(writerInterceptors, names);
                 for (ProviderInfo<WriterInterceptor> p : writers) {
-                    InjectionUtils.injectContexts(p.getProvider(), p, m);
+                    injectContextValues(p, m);
                     interceptors.add(p.getProvider());
                 }
                 interceptors.add(mbwWriter);
@@ -501,12 +503,7 @@ public abstract class ProviderFactory {
             }
             
             if (ParamConverterProvider.class.isAssignableFrom(providerCls)) {
-                //TODO: review the possibility of ParamConverterProvider needing to have Contexts injected
-                Object converter = provider.getProvider();
-                if (newParamConverters == null) {
-                    newParamConverters = new LinkedHashSet<ParamConverterProvider>();
-                }
-                newParamConverters.add((ParamConverterProvider)converter);
+                paramConverters.add((ProviderInfo<ParamConverterProvider>)provider);
             }
         }
         sortReaders();
@@ -516,9 +513,24 @@ public abstract class ProviderFactory {
         mapInterceptorFilters(readerInterceptors, readInts, ReaderInterceptor.class, true);
         mapInterceptorFilters(writerInterceptors, writeInts, WriterInterceptor.class, true);
         
-        injectContextProxies(messageReaders, messageWriters, contextResolvers, 
+        injectContextProxies(messageReaders, messageWriters, contextResolvers, paramConverters,
             readerInterceptors.values(), writerInterceptors.values());
+        checkParamConverterContexts();
     }
+    
+    private void checkParamConverterContexts() {
+        for (ProviderInfo<ParamConverterProvider> pi : paramConverters) {
+            if (pi.contextsAvailable()) {
+                paramConverterContextsAvailable = true;
+            }
+        }
+        
+    }
+    public boolean isParamConverterContextsAvailable() {
+        return paramConverterContextsAvailable;
+    }
+    
+    
     
     protected void injectContextValues(ProviderInfo<?> pi, Message m) {
         if (m != null) {
@@ -790,6 +802,7 @@ public abstract class ProviderFactory {
         contextProviders.clear();
         readerInterceptors.clear();
         writerInterceptors.clear();
+        paramConverters.clear();
     }
     
     public void setBus(Bus bus) {

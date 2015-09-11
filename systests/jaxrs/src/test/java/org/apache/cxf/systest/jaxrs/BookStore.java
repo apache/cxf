@@ -304,6 +304,13 @@ public class BookStore {
     }
     
     @POST
+    @Path("/echoxmlbookquery")
+    @Produces("application/xml")
+    public Book echoXmlBookQuery(@QueryParam("book") Book book) {
+        return book;
+    }
+    
+    @POST
     @Path("/emptyform")
     @Produces("text/plain")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)

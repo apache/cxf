@@ -19,13 +19,18 @@
 
 package org.apache.cxf.systest.jaxrs;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.client.ClientRequestContext;
 import javax.ws.rs.client.ClientResponseContext;
 import javax.ws.rs.client.ClientResponseFilter;
@@ -34,8 +39,15 @@ import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.container.PreMatching;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.MessageBodyReader;
+import javax.ws.rs.ext.MessageBodyWriter;
+import javax.ws.rs.ext.ParamConverter;
+import javax.ws.rs.ext.ParamConverterProvider;
+import javax.ws.rs.ext.Providers;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -50,6 +62,7 @@ import org.apache.cxf.jaxrs.ext.search.QueryContextProvider;
 import org.apache.cxf.jaxrs.ext.search.SearchBean;
 import org.apache.cxf.jaxrs.ext.search.SearchContextProvider;
 import org.apache.cxf.jaxrs.ext.search.sql.SQLPrinterVisitor;
+import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.provider.BinaryDataProvider;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
@@ -111,6 +124,7 @@ public class BookServer extends AbstractBusTestServerBase {
         providers.add(new BlockingRequestFilter());
         providers.add(new FaultyResponseFilter());
         providers.add(new BlockedExceptionMapper());
+        providers.add(new XmlBookParamConverter());
         sf.setProviders(providers);
         List<Interceptor<? extends Message>> inInts = new ArrayList<Interceptor<? extends Message>>();
         inInts.add(new CustomInFaultyInterceptor());
@@ -255,5 +269,62 @@ public class BookServer extends AbstractBusTestServerBase {
             
         }
         
+    }
+    public static class XmlBookParamConverter implements ParamConverterProvider {
+
+        @Context
+        private Providers providers;
+        @SuppressWarnings("unchecked")
+        @Override
+        public <T> ParamConverter<T> getConverter(Class<T> rawType, Type genericType,
+                                                  Annotation[] annotations) {
+            if (rawType != Book.class) {
+                return null;
+            }
+            MessageBodyReader<Book> mbr = providers.getMessageBodyReader(Book.class, 
+                                                                         Book.class, 
+                                                                         annotations, 
+                                                                         MediaType.APPLICATION_XML_TYPE);
+            MessageBodyWriter<Book> mbw = providers.getMessageBodyWriter(Book.class, 
+                                                                         Book.class, 
+                                                                         annotations, 
+                                                                         MediaType.APPLICATION_XML_TYPE);
+            return (ParamConverter<T>)new XmlParamConverter(mbr, mbw);
+            
+        }
+        private static class XmlParamConverter implements ParamConverter<Book> {
+            private MessageBodyReader<Book> mbr;
+            private MessageBodyWriter<Book> mbw;
+            public XmlParamConverter(MessageBodyReader<Book> mbr, MessageBodyWriter<Book> mbw) {  
+                this.mbr = mbr;
+                this.mbw = mbw;
+            }
+            @Override
+            public Book fromString(String value) {
+                try {
+                    return mbr.readFrom(Book.class, Book.class, 
+                                        new Annotation[]{}, 
+                                        MediaType.APPLICATION_XML_TYPE, 
+                                        new MetadataMap<String, String>(), 
+                                        new ByteArrayInputStream(value.getBytes()));
+                } catch (IOException ex) {
+                    throw new BadRequestException(ex);
+                }
+            }
+            @Override
+            public String toString(Book value) {
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                try {
+                    mbw.writeTo(value, Book.class, Book.class, 
+                                new Annotation[]{}, 
+                                MediaType.APPLICATION_XML_TYPE, 
+                                new MetadataMap<String, Object>(),
+                                bos);
+                } catch (IOException ex) {
+                    throw new BadRequestException(ex);
+                }
+                return bos.toString();
+            }
+        }
     }
 }
