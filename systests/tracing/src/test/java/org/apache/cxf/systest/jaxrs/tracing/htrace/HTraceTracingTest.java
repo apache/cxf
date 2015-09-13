@@ -107,7 +107,7 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
         
         assertThat(TestSpanReceiver.getAllSpans().size(), equalTo(2));
         assertThat(TestSpanReceiver.getAllSpans().get(0).getDescription(), equalTo("Get Books"));
-        assertThat(TestSpanReceiver.getAllSpans().get(1).getDescription(), equalTo("bookstore/books"));
+        assertThat(TestSpanReceiver.getAllSpans().get(1).getDescription(), equalTo("GET bookstore/books"));
         
         assertThat((String)r.getHeaders().getFirst(TracerHeaders.DEFAULT_HEADER_TRACE_ID), equalTo("10"));
         assertThat((String)r.getHeaders().getFirst(TracerHeaders.DEFAULT_HEADER_SPAN_ID), equalTo("20"));
@@ -122,7 +122,7 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
         
         assertThat(TestSpanReceiver.getAllSpans().size(), equalTo(1));
-        assertThat(TestSpanReceiver.getAllSpans().get(0).getDescription(), equalTo("bookstore/book/1"));
+        assertThat(TestSpanReceiver.getAllSpans().get(0).getDescription(), equalTo("GET bookstore/book/1"));
         assertThat(TestSpanReceiver.getAllSpans().get(0).getKVAnnotations().size(), equalTo(1));
         
         assertThat((String)r.getHeaders().getFirst(TracerHeaders.DEFAULT_HEADER_TRACE_ID), equalTo("10"));
@@ -138,7 +138,7 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
         
         assertThat(TestSpanReceiver.getAllSpans().size(), equalTo(2));
-        assertThat(TestSpanReceiver.getAllSpans().get(0).getDescription(), equalTo("bookstore/process"));
+        assertThat(TestSpanReceiver.getAllSpans().get(0).getDescription(), equalTo("PUT bookstore/process"));
         assertThat(TestSpanReceiver.getAllSpans().get(0).getTimelineAnnotations().size(), equalTo(0));
         assertThat(TestSpanReceiver.getAllSpans().get(1).getDescription(), equalTo("Processing books"));
         assertThat(TestSpanReceiver.getAllSpans().get(1).getTimelineAnnotations().size(), equalTo(1));
@@ -169,7 +169,7 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
         
         assertThat(TestSpanReceiver.getAllSpans().size(), equalTo(2));
-        assertThat(TestSpanReceiver.getAllSpans().get(0).getDescription(), equalTo("bookstore/books/async"));
+        assertThat(TestSpanReceiver.getAllSpans().get(0).getDescription(), equalTo("GET bookstore/books/async"));
         assertThat(TestSpanReceiver.getAllSpans().get(1).getDescription(), equalTo("Processing books"));
         
         assertThat((String)r.getHeaders().getFirst(TracerHeaders.DEFAULT_HEADER_TRACE_ID), equalTo("10"));
@@ -185,7 +185,8 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
         
         assertThat(TestSpanReceiver.getAllSpans().size(), equalTo(1));
-        assertThat(TestSpanReceiver.getAllSpans().get(0).getDescription(), equalTo("bookstore/books/async/notrace"));
+        assertThat(TestSpanReceiver.getAllSpans().get(0).getDescription(), 
+            equalTo("GET bookstore/books/async/notrace"));
         
         assertThat((String)r.getHeaders().getFirst(TracerHeaders.DEFAULT_HEADER_TRACE_ID), equalTo("10"));
         assertThat((String)r.getHeaders().getFirst(TracerHeaders.DEFAULT_HEADER_SPAN_ID), equalTo("20"));
@@ -197,7 +198,7 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
         
         assertThat(TestSpanReceiver.getAllSpans().size(), equalTo(2));
-        assertThat(TestSpanReceiver.getAllSpans().get(0).getDescription(), equalTo("bookstore/books/async"));
+        assertThat(TestSpanReceiver.getAllSpans().get(0).getDescription(), equalTo("GET bookstore/books/async"));
         assertThat(TestSpanReceiver.getAllSpans().get(1).getDescription(), equalTo("Processing books"));
     }
     

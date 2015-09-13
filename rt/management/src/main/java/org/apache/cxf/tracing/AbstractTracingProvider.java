@@ -50,4 +50,12 @@ public abstract class AbstractTracingProvider {
         
         return fallback;
     }
+    
+    protected String buildSpanDescription(final String path, final String method) {
+        if (StringUtils.isEmpty(method)) {
+            return path;
+        } else {
+            return method + " " + path;
+        }
+    }
 }

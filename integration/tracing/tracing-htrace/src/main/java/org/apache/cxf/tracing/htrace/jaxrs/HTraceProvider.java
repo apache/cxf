@@ -51,7 +51,8 @@ public class HTraceProvider extends AbstractHTraceProvider
     @Override
     public void filter(final ContainerRequestContext requestContext) throws IOException {
         TraceScope scope = super.startTraceSpan(requestContext.getHeaders(), 
-                                                requestContext.getUriInfo().getPath());
+                                                requestContext.getUriInfo().getPath(),
+                                                requestContext.getMethod());
         
         if (scope != null) {
             requestContext.setProperty(TRACE_SPAN, scope);

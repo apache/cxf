@@ -46,7 +46,7 @@ public abstract class AbstractHTraceProvider extends AbstractTracingProvider {
     }
 
     @SuppressWarnings("unchecked")
-    protected TraceScope startTraceSpan(final Map<String, List<String>> requestHeaders, String path) {
+    protected TraceScope startTraceSpan(final Map<String, List<String>> requestHeaders, String path, String method) {
         
         // Try to extract the Trace Id value from the request header
         final long traceId = getFirstValueOrDefault(requestHeaders, getTraceIdHeader(), 
@@ -58,9 +58,9 @@ public abstract class AbstractHTraceProvider extends AbstractTracingProvider {
         
         TraceScope traceScope = null;
         if (traceId == Tracer.DONT_TRACE.traceId || spanId == Tracer.DONT_TRACE.spanId) {
-            traceScope = Trace.startSpan(path, (Sampler< TraceInfo >)sampler);
+            traceScope = Trace.startSpan(buildSpanDescription(path, method), (Sampler< TraceInfo >)sampler);
         } else {
-            traceScope = Trace.startSpan(path, new MilliSpan
+            traceScope = Trace.startSpan(buildSpanDescription(path, method), new MilliSpan
                 .Builder()
                 .spanId(spanId)
                 .traceId(traceId)

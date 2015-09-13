@@ -54,7 +54,8 @@ public class HTraceClientProvider extends AbstractTracingProvider
         Span span = Trace.currentSpan();
         
         if (span == null) {
-            final TraceScope scope = Trace.startSpan(requestContext.getUri().toString(), sampler);
+            final TraceScope scope = Trace.startSpan(buildSpanDescription(requestContext.getUri().toString(), 
+                requestContext.getMethod()), sampler);
             span = scope.getSpan();
             
             if (span != null) {

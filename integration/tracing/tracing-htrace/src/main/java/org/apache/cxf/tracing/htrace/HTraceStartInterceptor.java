@@ -35,7 +35,8 @@ public class HTraceStartInterceptor extends AbstractHTraceInterceptor {
     @Override
     public void handleMessage(Message message) throws Fault {
         Map<String, List<String>> headers = CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS)); 
-        TraceScope scope = super.startTraceSpan(headers, (String)message.get(Message.REQUEST_URI));
+        TraceScope scope = super.startTraceSpan(headers, (String)message.get(Message.REQUEST_URI), 
+            (String)message.get(Message.HTTP_REQUEST_METHOD));
         message.getExchange().put(TRACE_SPAN, scope);
     }
     
