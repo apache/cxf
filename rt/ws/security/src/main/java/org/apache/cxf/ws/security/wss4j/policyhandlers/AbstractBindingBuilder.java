@@ -1995,7 +1995,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         dkSign.computeSignature(referenceList, false, null);
         
         if (isSigProtect) {
-            WSEncryptionPart part = new WSEncryptionPart(dkSign.getId(), "Element");
+            WSEncryptionPart part = new WSEncryptionPart(dkSign.getSignatureId(), "Element");
             encryptedTokensList.add(part);
         }
         
