@@ -252,10 +252,10 @@ public class WadlGenerator implements ContainerRequestFilter {
     private boolean isJson(MediaType mt) {
         return mt == MediaType.APPLICATION_JSON_TYPE;
     }
-    private String getStylesheetInstructionData(Message m, UriInfo ui) {
+    private String getStylesheetInstructionData(String baseURI) {
         String theStylesheetReference = stylesheetReference;
         if (!keepRelativeDocLinks) {
-            theStylesheetReference = UriBuilder.fromUri(getBaseURI(m, ui))
+            theStylesheetReference = UriBuilder.fromUri(baseURI)
                 .path(theStylesheetReference).build().toString();
         }
         return "type=\"text/xsl\" href=\"" + theStylesheetReference + "\"";
@@ -267,7 +267,7 @@ public class WadlGenerator implements ContainerRequestFilter {
                                        UriInfo ui) {
         StringBuilder sbMain = new StringBuilder();
         if (!isJson && stylesheetReference != null && !applyStylesheetLocally) {
-            sbMain.append("<?xml-stylesheet " + getStylesheetInstructionData(m, ui) + "?>");
+            sbMain.append("<?xml-stylesheet " + getStylesheetInstructionData(baseURI) + "?>");
         }
         sbMain.append("<application");
         if (!isJson) {
@@ -1199,7 +1199,7 @@ public class WadlGenerator implements ContainerRequestFilter {
         if (stylesheetReference != null) {
             if (!applyStylesheetLocally) {
                 ProcessingInstruction pi = wadlDoc.createProcessingInstruction("xml-stylesheet", 
-                                              getStylesheetInstructionData(m, ui));
+                                              getStylesheetInstructionData(getBaseURI(m, ui)));
                 wadlDoc.insertBefore(pi, wadlDoc.getDocumentElement());
                 entity = copyDOMToString(wadlDoc);
             } else {
