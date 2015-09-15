@@ -67,10 +67,12 @@ public class JwsJsonProducer {
         if (signatures.isEmpty()) { 
             return null;
         }
+        
+        Boolean b64Status = validateB64Status(signatures);
         StringBuilder sb = new StringBuilder();
         sb.append("{");
         if (!detached) {
-            sb.append("\"payload\":\"" + getActualPayload() + "\"");
+            sb.append("\"payload\":\"" + getActualPayload(b64Status) + "\"");
             sb.append(",");
         }
         if (!supportFlattened || signatures.size() > 1) {
@@ -88,9 +90,6 @@ public class JwsJsonProducer {
         }
         sb.append("}");
         return sb.toString();
-    }
-    private String getActualPayload() {
-        return getActualPayload(validateb64Status(signatures));
     }
     public List<JwsJsonSignatureEntry> getSignatureEntries() {
         return signatures;
@@ -192,7 +191,7 @@ public class JwsJsonProducer {
             }
         }
     }
-    static Boolean validateb64Status(List<JwsJsonSignatureEntry> signatures) {
+    static Boolean validateB64Status(List<JwsJsonSignatureEntry> signatures) {
         Set<Boolean> b64Set = new LinkedHashSet<Boolean>();
         for (JwsJsonSignatureEntry entry : signatures) {
             JwsHeaders headers = entry.getProtectedHeader();
