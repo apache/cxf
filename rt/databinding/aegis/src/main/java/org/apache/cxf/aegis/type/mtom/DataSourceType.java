@@ -21,7 +21,6 @@ package org.apache.cxf.aegis.type.mtom;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -69,8 +68,7 @@ public class DataSourceType extends AbstractXOPType {
         DataSource dataSource = (DataSource) object;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
-            InputStream stream = dataSource.getInputStream();
-            IOUtils.copy(stream, baos);
+            IOUtils.copyAndCloseInput(dataSource.getInputStream(), baos);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
