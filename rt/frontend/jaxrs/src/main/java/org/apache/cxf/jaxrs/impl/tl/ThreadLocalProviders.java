@@ -29,6 +29,10 @@ import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Providers;
 
+import org.apache.cxf.jaxrs.impl.ProvidersImpl;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.message.Message;
+
 public class ThreadLocalProviders extends AbstractThreadLocalProxy<Providers>
        implements Providers {
 
@@ -36,22 +40,34 @@ public class ThreadLocalProviders extends AbstractThreadLocalProxy<Providers>
                                                          Type genericType, 
                                                          Annotation[] annotations,
                                                          MediaType mediaType) {
-        return get().getMessageBodyReader(type, genericType, annotations, mediaType);
+        Providers p = getCurrentProviders();
+        return p != null ? p.getMessageBodyReader(type, genericType, annotations, mediaType) : null;
     }
 
     public <T> MessageBodyWriter<T> getMessageBodyWriter(Class<T> type, 
                                                          Type genericType, 
                                                          Annotation[] annotations,
                                                          MediaType mediaType) {
-        return get().getMessageBodyWriter(type, genericType, annotations, mediaType);
+        Providers p = getCurrentProviders();
+        return p != null ? p.getMessageBodyWriter(type, genericType, annotations, mediaType) : null;
     }
 
     public <T> ContextResolver<T> getContextResolver(Class<T> contextType, MediaType mediaType) {
-        return get().getContextResolver(contextType, mediaType);
+        Providers p = getCurrentProviders();
+        return p != null ? p.getContextResolver(contextType, mediaType) : null;
     }
 
     public <T extends Throwable> ExceptionMapper<T> getExceptionMapper(Class<T> type) {
-        return get().getExceptionMapper(type);
+        Providers p = getCurrentProviders();
+        return p != null ? p.getExceptionMapper(type) : null;
     }
 
+    private Providers getCurrentProviders() {
+        Providers p = get();
+        return p != null ? p : getProvidersImpl();
+    }
+    private Providers getProvidersImpl() {
+        Message m = JAXRSUtils.getCurrentMessage();
+        return m != null ? new ProvidersImpl(JAXRSUtils.getContextMessage(m)) : null;
+    }
 }

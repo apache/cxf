@@ -1062,12 +1062,18 @@ public final class JAXRSUtils {
         return instance;
     }
     
-    public static <T> T createContextValue(Message m, Type genericType, Class<T> clazz) {
- 
+    public static Message getContextMessage(Message m) {
+        
         Message contextMessage = m.getExchange() != null ? m.getExchange().getInMessage() : m;
         if (contextMessage == null && !PropertyUtils.isTrue(m.get(Message.INBOUND_MESSAGE))) {
             contextMessage = m;
         }
+        return contextMessage;
+    }
+    
+    public static <T> T createContextValue(Message m, Type genericType, Class<T> clazz) {
+ 
+        Message contextMessage = getContextMessage(m);
         Object o = null;
         if (UriInfo.class.isAssignableFrom(clazz)) {
             o = createUriInfo(contextMessage);
