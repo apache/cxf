@@ -46,12 +46,6 @@ public interface TracerContext {
      */
     <T> Callable<T> wrap(final String desription, final Traceable<T> traceable);
     
-    /**
-     * Adds a key/value pair to the currently active span.
-     * @param key key to add
-     * @param value value to add
-     */
-    void annotate(byte[] key, byte[] value);
     
     /**
      * Adds a key/value pair to the currently active span.

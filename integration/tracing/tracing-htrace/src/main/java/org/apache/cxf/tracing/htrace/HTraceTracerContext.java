@@ -82,15 +82,10 @@ public class HTraceTracerContext implements TracerContext {
             return callable;
         }
     }
-
-    @Override
-    public void annotate(byte[] key, byte[] value) {
-        Trace.addKVAnnotation(key, value);
-    }
     
     @Override
     public void annotate(String key, String value) {
-        annotate(key.getBytes(StandardCharsets.UTF_8), 
+        Trace.addKVAnnotation(key.getBytes(StandardCharsets.UTF_8), 
             value.getBytes(StandardCharsets.UTF_8));
     }
     
