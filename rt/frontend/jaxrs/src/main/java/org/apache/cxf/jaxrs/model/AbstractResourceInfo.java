@@ -203,7 +203,7 @@ public abstract class AbstractResourceInfo {
     }
     
     @SuppressWarnings("unchecked")
-    private <T> Map<Class<?>, Map<T, ThreadLocalProxy<?>>> getProxyMap(Class<T> keyCls, String prop, boolean create) {
+    private <T> Map<Class<?>, Map<T, ThreadLocalProxy<?>>> getProxyMap(String prop, boolean create) {
         Object property = null;
         synchronized (bus) {
             property = bus.getProperty(prop);
@@ -238,11 +238,11 @@ public abstract class AbstractResourceInfo {
     }
     
     private Map<Class<?>, Map<Field, ThreadLocalProxy<?>>> getFieldProxyMap(boolean create) {
-        return getProxyMap(Field.class, FIELD_PROXY_MAP, create);
+        return getProxyMap(FIELD_PROXY_MAP, create);
     }
     
     private Map<Class<?>, Map<Method, ThreadLocalProxy<?>>> getSetterProxyMap(boolean create) {
-        return getProxyMap(Method.class, SETTER_PROXY_MAP, create);
+        return getProxyMap(SETTER_PROXY_MAP, create);
     }
     
     private void findContextSetterMethods(Class<?> cls, Object provider) {
