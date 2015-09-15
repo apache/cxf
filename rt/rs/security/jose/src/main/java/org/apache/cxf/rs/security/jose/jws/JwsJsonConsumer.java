@@ -41,7 +41,6 @@ public class JwsJsonConsumer {
     private String jwsSignedDocument;
     private String jwsPayload;
     private List<JwsJsonSignatureEntry> signatures = new LinkedList<JwsJsonSignatureEntry>();
-    private boolean detached;
     /**
      * @param jwsSignedDocument
      *            signed JWS Document
@@ -70,7 +69,6 @@ public class JwsJsonConsumer {
             LOG.warning("JSON JWS has no payload");
             throw new JwsException(JwsException.Error.INVALID_JSON_JWS);
         }
-        detached = detachedPayload != null;
         List<Map<String, Object>> signatureArray = CastUtils.cast((List<?>)jsonObjectMap.get("signatures"));
         if (signatureArray != null) {
             if (jsonObjectMap.containsKey("signature")) {
@@ -92,12 +90,7 @@ public class JwsJsonConsumer {
         
     }
     private Boolean validateB64Status() {
-        if (!detached) {
-            return JwsJsonProducer.validateb64Status(signatures);    
-        } else {
-            return Boolean.TRUE;
-        }
-        
+        return JwsJsonProducer.validateB64Status(signatures);    
     }
     protected JwsJsonSignatureEntry getSignatureObject(Map<String, Object> signatureEntry) {
         String protectedHeader = (String)signatureEntry.get("protected");
