@@ -195,4 +195,30 @@
         </jaxws:properties>
     </jaxws:endpoint>
     
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Encryption" address="http://localhost:${testutil.ports.action.Server}/DoubleItEncryption" serviceName="s:DoubleItService" endpointName="s:DoubleItEncryptionPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/action/DoubleItAction.wsdl">
+        <jaxws:outInterceptors>
+            <bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
+                <constructor-arg>
+                    <map>
+                        <entry key="action" value="Encrypt"/>
+                        <entry key="encryptionUser" value="alice"/>
+                        <entry key="encryptionPropFile" value="alice.properties"/>
+                    </map>
+                </constructor-arg>
+            </bean>
+        </jaxws:outInterceptors>
+        <jaxws:inInterceptors>
+            <bean class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
+                <constructor-arg>
+                    <map>
+                        <entry key="action" value="Encrypt"/>
+                        <entry key="decryptionPropFile" value="bob.properties"/>
+                        <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+                        <entry key="allowRSA15KeyTransportAlgorithm" value="true"/>
+                    </map>
+                </constructor-arg>
+            </bean>
+        </jaxws:inInterceptors>
+    </jaxws:endpoint>
+    
 </beans>

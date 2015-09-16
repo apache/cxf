@@ -204,4 +204,31 @@
             </bean>
         </jaxws:inInterceptors>
     </jaxws:client>
+    
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItEncryptionPort" createdFromAPI="true">
+        <jaxws:outInterceptors>
+            <bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
+                <constructor-arg>
+                    <map>
+                        <entry key="action" value="Encrypt"/>
+                        <entry key="encryptionUser" value="bob"/>
+                        <entry key="encryptionPropFile" value="bob.properties"/>
+                        <entry key="encryptionKeyTransportAlgorithm" value="http://www.w3.org/2001/04/xmlenc#rsa-1_5" />
+                    </map>
+                </constructor-arg>
+            </bean>
+        </jaxws:outInterceptors>
+        <jaxws:inInterceptors>
+            <bean class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
+                <constructor-arg>
+                    <map>
+                        <entry key="action" value="Encrypt"/>
+                        <entry key="decryptionPropFile" value="alice.properties"/>
+                        <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+                    </map>
+                </constructor-arg>
+            </bean>
+        </jaxws:inInterceptors>
+    </jaxws:client>
+    
 </beans>
