@@ -17,7 +17,16 @@ Using either UNIX or Windows:
   mvn install
   mvn package tomcat7:run
 
-To view the swagger document, use your Browser and open the page at
+
+After the service is started, the Swagger API documents in JSON and YAML
+are available at
+
+  http://localhost:9000/app/swaggerSample/swagger.json
+  http://localhost:9000/app/swaggerSample/swagger.yaml
+
+
+To view the Swagger document using Swagger-UI, use your Browser to 
+open the Swagger-UI page at
 
   http://localhost:9000/?url=/app/swaggerSample/swagger.json
 
