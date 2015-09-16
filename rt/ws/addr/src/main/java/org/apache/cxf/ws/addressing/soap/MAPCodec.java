@@ -842,14 +842,25 @@ public class MAPCodec extends AbstractSoapInterceptor {
                     }
                 }
             }
-        } else if (maps == null && isRequestor(message)) {
-            Message m = message.getExchange().getOutMessage();
-            maps = ContextUtils.retrieveMAPs(m, false, true, false);
-            if (maps != null) {
-                Exchange ex = uncorrelatedExchanges.get(maps.getMessageID().getValue());
-                if (ex == message.getExchange()) {
+        } else if (isRequestor(message)) {
+            if (maps == null) {
+                Message m = message.getExchange().getOutMessage();
+                maps = ContextUtils.retrieveMAPs(m, false, true, false);
+                if (maps != null) {
+                    Exchange ex = uncorrelatedExchanges.get(maps.getMessageID().getValue());
+                    if (ex == message.getExchange()) {
+                        uncorrelatedExchanges.remove(maps.getMessageID().getValue());
+                        LOG.log(Level.WARNING, "RESPONSE_NOT_USING_WSADDRESSING");
+                    }
+                }
+            } else if (maps.getRelatesTo() == null
+                && maps.getAction() != null
+                && Names.WSA_DEFAULT_FAULT_ACTION.equals(maps.getAction().getValue())) {
+                //there is an Action header that points to a fault and no relatesTo.  Use the out map for the ID
+                Message m = message.getExchange().getOutMessage();
+                maps = ContextUtils.retrieveMAPs(m, false, true, false);
+                if (maps != null) {
                     uncorrelatedExchanges.remove(maps.getMessageID().getValue());
-                    LOG.log(Level.WARNING, "RESPONSE_NOT_USING_WSADDRESSING");
                 }
             }
         }
