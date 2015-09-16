@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.0.0" name="demo-cxf-swagger-sample-1.0.0">
-    <repository>mvn:org.apache.cxf.karaf/apache-cxf/3.1.3-SNAPSHOT/xml/features</repository>
+    <repository>mvn:org.apache.cxf.karaf/apache-cxf/3.1.3/xml/features</repository>
 
     <!-- Note demo-swagger-core and demo-swagger-jaxrs features may be published by swagger as
          features swagger-core and swagger-jaxrs, respectively -->
@@ -25,7 +25,7 @@
 
         <bundle dependency="true">mvn:com.google.guava/guava/18.0</bundle>
         <bundle dependency="true">mvn:org.javassist/javassist/3.19.0-GA</bundle>
-        <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.reflections/0.9.9_2-SNAPSHOT</bundle>
+        <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.reflections/0.9.9_2</bundle>
 
         <!-- jackson -->
         <bundle dependency="true">mvn:com.fasterxml.jackson.jaxrs/jackson-jaxrs-base/2.4.6</bundle>
@@ -42,6 +42,6 @@
         <feature version='[3.0,4)'>cxf-jaxrs</feature>
         <feature version='1.0.0'>demo-swagger-jaxrs</feature>
 
-        <bundle dependency="true">mvn:org.apache.cxf.samples/jax_rs_description_swagger2_osgi/3.1.3-SNAPSHOT</bundle>
+        <bundle dependency="true">mvn:org.apache.cxf.samples/jax_rs_description_swagger2_osgi/3.1.3</bundle>
     </feature>
 </features>

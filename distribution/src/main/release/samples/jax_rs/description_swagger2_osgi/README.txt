@@ -75,7 +75,7 @@ You can verify if the CXF JAX-RS Swagger2 Blueprint Demo is installed and starte
   115 | Active |  80 | 1.5.4.SNAPSHOT   | swagger-core                               
   116 | Active |  80 | 18.0.0           | Guava: Google Core Libraries for Java      
   117 | Active |  80 | 3.19.0.GA        | Javassist                                  
-  118 | Active |  80 | 0.9.9.2-SNAPSHOT | Apache ServiceMix :: Bundles :: reflections
+  118 | Active |  80 | 0.9.9.2          | Apache ServiceMix :: Bundles :: reflections
   119 | Active |  80 | 2.4.6            | Jackson-JAXRS-base                         
   120 | Active |  80 | 2.4.6            | Jackson-JAXRS-JSON                         
   121 | Active |  80 | 1.5.4.SNAPSHOT   | swagger-jaxrs                              
