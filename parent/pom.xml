@@ -66,7 +66,7 @@
         <cxf.osgi.javax.xml.ws.version>[0.0,3)</cxf.osgi.javax.xml.ws.version>
         <!-- please maintain alphabetical order here -->
         <cxf.abdera.version>1.1.3</cxf.abdera.version>
-        <cxf.activemq.version>5.11.1</cxf.activemq.version>
+        <cxf.activemq.version>5.11.2</cxf.activemq.version>
         <cxf.ahc.version>1.9.8</cxf.ahc.version>
         <cxf.apacheds.version>2.0.0-M20</cxf.apacheds.version>
         <cxf.atmosphere.version>2.3.2</cxf.atmosphere.version>
