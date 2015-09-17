@@ -27,6 +27,7 @@ import javax.ws.rs.client.ClientResponseFilter;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
 
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.tracing.AbstractTracingProvider;
 import org.apache.htrace.Sampler;
 import org.apache.htrace.Span;
@@ -52,9 +53,10 @@ public class HTraceClientProvider extends AbstractTracingProvider
     @Override
     public void filter(final ClientRequestContext requestContext) throws IOException {
         Span span = Trace.currentSpan();
+        TraceScope scope = null;
         
         if (span == null) {
-            final TraceScope scope = Trace.startSpan(buildSpanDescription(requestContext.getUri().toString(), 
+            scope = Trace.startSpan(buildSpanDescription(requestContext.getUri().toString(), 
                 requestContext.getMethod()), sampler);
             span = scope.getSpan();
             
@@ -73,6 +75,12 @@ public class HTraceClientProvider extends AbstractTracingProvider
             requestHeaders.putSingle(traceIdHeader, Long.toString(span.getTraceId()));
             requestHeaders.putSingle(spanIdHeader, Long.toString(span.getSpanId()));
         }
+        
+        // In case of asynchronous client invocation, the span should be detached as JAX-RS 
+        // client request / response filters are going to be executed in different threads.
+        if (isAsyncInvocation() && scope != null) {
+            scope.detach();
+        }
     }
     
     @Override
@@ -81,7 +89,18 @@ public class HTraceClientProvider extends AbstractTracingProvider
         
         final TraceScope scope = (TraceScope)requestContext.getProperty(TRACE_SPAN);
         if (scope != null) {
-            scope.close();
+            // If the client invocation was asynchronous , the trace scope has been created 
+            // in another thread and should be re-attached to the current one.
+            if (scope.isDetached()) {
+                final TraceScope continueSpan = Trace.continueSpan(scope.getSpan()); 
+                continueSpan.close();
+            } else {            
+                scope.close();
+            }
         }
+    }
+    
+    private boolean isAsyncInvocation() {
+        return !JAXRSUtils.getCurrentMessage().getExchange().isSynchronous();
     }
 }

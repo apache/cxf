@@ -21,6 +21,8 @@ package org.apache.cxf.systest.jaxrs.tracing.htrace;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -92,6 +94,7 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
         
         assertThat(TestSpanReceiver.getAllSpans().size(), equalTo(2));
         assertThat(TestSpanReceiver.getAllSpans().get(0).getDescription(), equalTo("Get Books"));
+        assertThat(TestSpanReceiver.getAllSpans().get(1).getDescription(), equalTo("GET bookstore/books"));
         
         assertFalse(r.getHeaders().containsKey(TracerHeaders.DEFAULT_HEADER_TRACE_ID));
         assertFalse(r.getHeaders().containsKey(TracerHeaders.DEFAULT_HEADER_SPAN_ID));
@@ -200,6 +203,23 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
         assertThat(TestSpanReceiver.getAllSpans().size(), equalTo(2));
         assertThat(TestSpanReceiver.getAllSpans().get(0).getDescription(), equalTo("GET bookstore/books/async"));
         assertThat(TestSpanReceiver.getAllSpans().get(1).getDescription(), equalTo("Processing books"));
+    }
+    
+    @Test
+    public void testThatNewSpanIsCreatedWhenNotProvidedUsingAsyncClient() throws Exception {
+        final WebClient client = createWebClient("/bookstore/books", htraceClientProvider);
+        final Future<Response> f = client.async().get();
+        
+        final Response r = f.get(1, TimeUnit.SECONDS);
+        assertEquals(Status.OK.getStatusCode(), r.getStatus());
+        
+        assertThat(TestSpanReceiver.getAllSpans().size(), equalTo(3));
+        assertThat(TestSpanReceiver.getAllSpans().get(0).getDescription(), equalTo("Get Books"));
+        assertThat(TestSpanReceiver.getAllSpans().get(1).getDescription(), equalTo("GET bookstore/books"));
+        assertThat(TestSpanReceiver.getAllSpans().get(2).getDescription(), equalTo("GET " + client.getCurrentURI()));
+        
+        assertTrue(r.getHeaders().containsKey(TracerHeaders.DEFAULT_HEADER_TRACE_ID));
+        assertTrue(r.getHeaders().containsKey(TracerHeaders.DEFAULT_HEADER_SPAN_ID));
     }
     
     protected WebClient createWebClient(final String url, final Object ... providers) {
