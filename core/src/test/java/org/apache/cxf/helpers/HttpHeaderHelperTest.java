@@ -43,6 +43,7 @@ public class HttpHeaderHelperTest {
     @Test
     public void testFindCharsetDoesNotCrashOnEmptyCharset() {
         HttpHeaderHelper.findCharset("foo/bar; charset=");
+        HttpHeaderHelper.findCharset("foo/bar; charset=;");
     }
 
 }
