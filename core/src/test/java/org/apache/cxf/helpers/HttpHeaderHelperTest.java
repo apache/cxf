@@ -40,4 +40,9 @@ public class HttpHeaderHelperTest {
         assertEquals(Charset.forName("utf-8").name(), cs);
     }
 
+    @Test
+    public void testFindCharsetDoesNotCrashOnEmptyCharset() {
+        HttpHeaderHelper.findCharset("foo/bar; charset=");
+    }
+
 }

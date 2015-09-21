@@ -84,6 +84,9 @@ public final class HttpHeaderHelper {
         int idx = contentType.indexOf("charset=");
         if (idx != -1) {
             String charset = contentType.substring(idx + 8);
+            if (charset.isEmpty()) {
+                return null;
+            }
             if (charset.indexOf(";") != -1) {
                 charset = charset.substring(0, charset.indexOf(";")).trim();
             }
