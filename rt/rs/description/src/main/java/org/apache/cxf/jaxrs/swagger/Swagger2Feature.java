@@ -25,6 +25,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.servlet.ServletContext;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
@@ -174,7 +175,8 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
 
         @Override
         public void filter(ContainerRequestContext requestContext) throws IOException {
-            if (mc.getServletContext().getAttribute(ReaderConfig.class.getName()) == null) {
+            ServletContext servletContext = mc.getServletContext();
+            if (servletContext != null && servletContext.getAttribute(ReaderConfig.class.getName()) == null) {
                 if (mc.getServletConfig() != null
                     && Boolean.valueOf(mc.getServletConfig().getInitParameter("scan.all.resources"))) {
                     addReaderConfig(mc.getServletConfig().getInitParameter("ignore.routes"));
