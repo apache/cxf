@@ -642,6 +642,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             dkSign.setSignatureAlgorithm(abinding.getAlgorithmSuite().getSymmetricSignature());
             dkSign.setSigCanonicalization(abinding.getAlgorithmSuite().getC14n().getValue());
             AlgorithmSuiteType algType = abinding.getAlgorithmSuite().getAlgorithmSuiteType();
+            dkSign.setDigestAlgorithm(algType.getDigest());
             dkSign.setDerivedKeyLength(algType.getSignatureDerivedKeyLength() / 8);
             dkSign.setCustomValueType(WSConstants.SOAPMESSAGE_NS11 + "#"
                     + WSConstants.ENC_KEY_VALUE_TYPE);
