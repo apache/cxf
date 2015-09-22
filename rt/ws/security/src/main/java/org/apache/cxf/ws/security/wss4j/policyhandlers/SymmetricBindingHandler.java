@@ -687,6 +687,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
         dkSign.setSignatureAlgorithm(sbinding.getAlgorithmSuite().getSymmetricSignature());
         dkSign.setSigCanonicalization(sbinding.getAlgorithmSuite().getC14n().getValue());
         AlgorithmSuiteType algType = sbinding.getAlgorithmSuite().getAlgorithmSuiteType();
+        dkSign.setDigestAlgorithm(algType.getDigest());
         dkSign.setDerivedKeyLength(algType.getSignatureDerivedKeyLength() / 8);
         if (tok.getSHA1() != null) {
             //Set the value type of the reference
