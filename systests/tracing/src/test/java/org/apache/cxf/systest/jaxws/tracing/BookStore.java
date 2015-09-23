@@ -16,37 +16,28 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.jaxrs.tracing;
+package org.apache.cxf.systest.jaxws.tracing;
 
-public class Book {
-    private String title;
-    private String id;
-    
-    public Book() {
-    }
-    
-    public Book(String id) {
-        this.id = id;
-    }
-    
-    public Book(String title, String id) {
-        this.title = title;
-        this.id = id;
-    }
-    
-    public String getTitle() {
-        return title;
-    }
-    
-    public void setTitle(String title) {
-        this.title = title;
-    }
-    
-    public void setId(String i) {
-        id = i;
-    }
- 
-    public String getId() {
-        return id;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.UUID;
+
+import javax.jws.WebMethod;
+import javax.jws.WebService;
+
+import org.apache.cxf.systest.Book;
+import org.apache.htrace.Trace;
+import org.apache.htrace.TraceScope;
+
+@WebService(endpointInterface = "org.apache.cxf.systest.jaxws.tracing.BookStoreService", serviceName = "BookStore")
+public class BookStore implements BookStoreService {
+    @WebMethod
+    public Collection< Book > getBooks() {
+        try (final TraceScope span =  Trace.startSpan("Get Books")) {
+            return Arrays.asList(
+                new Book("Apache CXF in Action", UUID.randomUUID().toString()),
+                new Book("Mastering Apache CXF", UUID.randomUUID().toString())
+            );
+        }
     }
 }

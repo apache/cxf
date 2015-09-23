@@ -26,14 +26,20 @@ import java.util.List;
 import org.apache.htrace.HTraceConfiguration;
 import org.apache.htrace.Span;
 import org.apache.htrace.SpanReceiver;
+import org.apache.htrace.Trace;
 
 /**
  * Test HTrace Span receiver
  */
 public class TestSpanReceiver implements SpanReceiver {
     private static List<Span> spans = new ArrayList<Span>();
+    private static TestSpanReceiver instance;
 
     public TestSpanReceiver(final HTraceConfiguration conf) {
+        if (instance != null) {
+            Trace.removeReceiver(instance);
+        }
+        instance = this;
     }
 
     public Collection<Span> getSpans() {
