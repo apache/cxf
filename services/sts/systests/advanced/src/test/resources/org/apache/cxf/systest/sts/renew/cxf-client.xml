@@ -96,7 +96,7 @@
         </jaxws:properties>
     </jaxws:client>
     
-     <bean id="saml2STSNoRenewClient" class="org.apache.cxf.ws.security.trust.STSClient">
+    <bean id="saml2STSNoRenewClient" class="org.apache.cxf.ws.security.trust.STSClient">
         <constructor-arg ref="cxf"/>
         <property name="wsdlLocation" value="https://localhost:${testutil.ports.renew.STSServerPOP}/SecurityTokenService/TransportSoap12?wsdl"/>
         <property name="serviceName" value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService"/>
@@ -122,6 +122,38 @@
             <entry key="ws-security.sts.client" value-ref="saml2STSNoRenewClient" />
         </jaxws:properties>
     </jaxws:client>
+    
+    <bean id="delegationCallbackHandler" class="org.apache.cxf.ws.security.trust.delegation.WSSUsernameCallbackHandler"/>
+    
+    <bean id="saml2STSIntermediaryClient" class="org.apache.cxf.ws.security.trust.STSClient">
+        <constructor-arg ref="cxf"/>
+        <property name="wsdlLocation" value="https://localhost:${testutil.ports.renew.STSServerPOP}/SecurityTokenService/Transport?wsdl"/>
+        <property name="serviceName" value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService"/>
+        <property name="endpointName" value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Port"/>
+        <property name="ttl" value="8"/>
+        <property name="enableLifetime" value="true"/>
+        <property name="allowRenewingAfterExpiry" value="true"/>
+        <property name="onBehalfOf" ref="delegationCallbackHandler"/>
+        <property name="properties">
+            <map>
+                <entry key="security.sts.token.username" value="myclientkey"/>
+                <entry key="security.sts.token.properties" value="clientKeystore.properties"/>
+                <entry key="security.sts.token.usecert" value="true"/>
+            </map>
+        </property>
+    </bean>
+    
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportSaml2IntermediaryPort" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="security.username" value="alice"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+            <entry key="security.signature.properties" value="clientKeystore.properties"/>
+            <entry key="security.signature.username" value="myclientkey"/>
+            <entry key="security.sts.client" value-ref="saml2STSIntermediaryClient" />
+            <entry key="ws-security.cache.issued.token.in.endpoint" value="false"/>
+        </jaxws:properties>
+    </jaxws:client>
+    
     <http:conduit name="https://localhost:.*">
         <http:tlsClientParameters disableCNCheck="true">
             <sec:trustManagers>

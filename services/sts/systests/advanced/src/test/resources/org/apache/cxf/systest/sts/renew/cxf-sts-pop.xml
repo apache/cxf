@@ -24,6 +24,12 @@
             <cxf:logging/>
         </cxf:features>
     </cxf:bus>
+    
+    <bean id="utDelegationHandler" class="org.apache.cxf.sts.token.delegation.UsernameTokenDelegationHandler"/>
+    <util:list id="delegationHandlers">
+        <ref bean="utDelegationHandler"/>
+    </util:list>
+    
     <bean id="transportSTSProviderBean" class="org.apache.cxf.ws.security.sts.provider.SecurityTokenServiceProvider">
         <property name="issueOperation" ref="transportIssueDelegate"/>
         <property name="validateOperation" ref="transportValidateDelegate"/>
@@ -35,6 +41,8 @@
         <property name="stsProperties" ref="transportSTSProperties"/>
         <property name="claimsManager" ref="claimsManager"/>
         <property name="tokenStore" ref="defaultTokenStore"/>
+        <property name="delegationHandlers" ref="delegationHandlers"/>
+        <property name="tokenValidators" ref="transportTokenValidators"/>
     </bean>
     <bean id="transportValidateDelegate" class="org.apache.cxf.sts.operation.TokenValidateOperation">
         <property name="tokenProviders" ref="transportTokenProviders"/>
@@ -55,6 +63,7 @@
     </util:list>
     <util:list id="transportTokenValidators">
         <ref bean="transportSamlTokenValidator"/>
+        <bean class="org.apache.cxf.systest.sts.renew.UsernameTokenValidator"/>
     </util:list>
     <util:list id="transportTokenRenewers">
         <ref bean="transportSamlTokenRenewer"/>

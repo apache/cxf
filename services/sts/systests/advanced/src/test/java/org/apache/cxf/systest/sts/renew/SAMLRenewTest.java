@@ -105,11 +105,21 @@ public class SAMLRenewTest extends AbstractBusClientServerTestBase {
             service.getPort(saml2NoRenewPortQName, DoubleItPortType.class);
         updateAddressPort(saml2NoRenewPort, PORT);
         
+        QName saml2IntermediaryPortQName = new QName(NAMESPACE, "DoubleItTransportSaml2IntermediaryPort");
+        DoubleItPortType saml2IntermediaryPort = 
+            service.getPort(saml2IntermediaryPortQName, DoubleItPortType.class);
+        updateAddressPort(saml2IntermediaryPort, PORT);
+        
+        ((BindingProvider)saml2IntermediaryPort).getRequestContext().put(
+            "security.username", "alice"
+        );
+        
         // Make initial successful invocation(s)
         doubleIt(saml1Port, 25);
         doubleIt(saml1BearerPort, 30);
         doubleIt(saml2Port, 35);
         doubleIt(saml2NoRenewPort, 35);
+        doubleIt(saml2IntermediaryPort, 40);
         
         // Now sleep to expire the token(s)
         Thread.sleep(8 * 1000);
@@ -138,9 +148,12 @@ public class SAMLRenewTest extends AbstractBusClientServerTestBase {
         // Renew should fail here, but it should fall back to issue
         doubleIt(saml2NoRenewPort, 35);
         
+        doubleIt(saml2IntermediaryPort, 40);
+        
         ((java.io.Closeable)saml1Port).close();
         ((java.io.Closeable)saml1BearerPort).close();
         ((java.io.Closeable)saml2Port).close();
+        ((java.io.Closeable)saml2IntermediaryPort).close();
         bus.shutdown(true);
     }
     
