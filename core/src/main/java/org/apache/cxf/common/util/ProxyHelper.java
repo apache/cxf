@@ -78,9 +78,14 @@ public class ProxyHelper {
                 //will try to create methods for all of this even if they aren't used
                 //by the client and not available in the clients classloader
                 for (Method m : ifClass.getMethods()) {
-                    Class.forName(m.getReturnType().getName(), true, loader);
+                    Class<?> returnType = m.getReturnType();
+                    if (!returnType.isPrimitive()) {
+                        Class.forName(returnType.getName(), true, loader);
+                    }
                     for (Class<?> p : m.getParameterTypes()) {
-                        Class.forName(p.getName(), true, loader);
+                        if (!returnType.isPrimitive()) {
+                            Class.forName(p.getName(), true, loader);
+                        }
                     }
                 }
             } catch (NoClassDefFoundError e) {
