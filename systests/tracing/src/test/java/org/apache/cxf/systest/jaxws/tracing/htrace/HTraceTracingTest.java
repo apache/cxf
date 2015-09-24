@@ -26,6 +26,7 @@ import java.util.Map;
 
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
@@ -49,6 +50,8 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.hasItems;
+import static org.hamcrest.CoreMatchers.nullValue;
 
 public class HTraceTracingTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(HTraceTracingTest.class);
@@ -64,7 +67,7 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
             sf.setServiceClass(BookStore.class);
             sf.setAddress("http://localhost:" + PORT);
             sf.getInInterceptors().add(new HTraceStartInterceptor(Phase.PRE_INVOKE, new AlwaysSampler(conf)));
-            sf.getOutInterceptors().add(new HTraceStopInterceptor(Phase.POST_MARSHAL));
+            sf.getOutInterceptors().add(new HTraceStopInterceptor(Phase.PRE_MARSHAL));
             sf.create();
         }
     }
@@ -89,6 +92,10 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
         assertThat(TestSpanReceiver.getAllSpans().size(), equalTo(2));
         assertThat(TestSpanReceiver.getAllSpans().get(0).getDescription(), equalTo("Get Books"));
         assertThat(TestSpanReceiver.getAllSpans().get(1).getDescription(), equalTo("POST /BookStore"));
+        
+        final Map<String, List<String>> response = getResponseHeaders(service);
+        assertThat(response.get(TracerHeaders.DEFAULT_HEADER_TRACE_ID), nullValue());
+        assertThat(response.get(TracerHeaders.DEFAULT_HEADER_SPAN_ID), nullValue());
     }
     
     @Test
@@ -97,22 +104,40 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
         final Client proxy = ClientProxy.getClient(service);
         
         final Map<String, List<String>> headers = new HashMap<String, List<String>>();
-        headers.put(TracerHeaders.DEFAULT_HEADER_TRACE_ID, Arrays.asList("10L"));
-        headers.put(TracerHeaders.DEFAULT_HEADER_SPAN_ID, Arrays.asList("20L"));        
+        headers.put(TracerHeaders.DEFAULT_HEADER_TRACE_ID, Arrays.asList("10"));
+        headers.put(TracerHeaders.DEFAULT_HEADER_SPAN_ID, Arrays.asList("20"));
         proxy.getRequestContext().put(Message.PROTOCOL_HEADERS, headers);
         assertThat(service.getBooks().size(), equalTo(2));
         
         assertThat(TestSpanReceiver.getAllSpans().size(), equalTo(2));
         assertThat(TestSpanReceiver.getAllSpans().get(0).getDescription(), equalTo("Get Books"));
         assertThat(TestSpanReceiver.getAllSpans().get(1).getDescription(), equalTo("POST /BookStore"));
+        
+        final Map<String, List<String>> response = getResponseHeaders(service);
+        assertThat(response.get(TracerHeaders.DEFAULT_HEADER_TRACE_ID), hasItems("10"));
+        assertThat(response.get(TracerHeaders.DEFAULT_HEADER_SPAN_ID), hasItems("20"));
     }
     
-    protected BookStoreService createJaxWsService() throws MalformedURLException {
+    private BookStoreService createJaxWsService() throws MalformedURLException {
+        return createJaxWsService(new HashMap<String, List<String>>());
+    }
+    
+    private BookStoreService createJaxWsService(final Map<String, List<String>> headers) throws MalformedURLException {
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
         factory.getOutInterceptors().add(new LoggingOutInterceptor());
         factory.getInInterceptors().add(new LoggingInInterceptor());
         factory.setServiceClass(BookStoreService.class);
         factory.setAddress("http://localhost:" + PORT + "/BookStore");
+        
+        final BookStoreService service = (BookStoreService) factory.create();
+        final Client proxy = ClientProxy.getClient(service);
+        proxy.getRequestContext().put(Message.PROTOCOL_HEADERS, headers);
+        
         return (BookStoreService) factory.create();
     }
+    
+    private Map<String, List<String>> getResponseHeaders(final BookStoreService service) {
+        final Client proxy = ClientProxy.getClient(service);
+        return CastUtils.cast((Map<?, ?>)proxy.getResponseContext().get(Message.PROTOCOL_HEADERS));
+    }    
 }
