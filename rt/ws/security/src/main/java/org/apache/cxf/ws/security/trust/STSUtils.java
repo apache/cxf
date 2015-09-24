@@ -111,18 +111,14 @@ public final class STSUtils {
         }
         
         boolean preferWSMex = 
-            SecurityUtils.getSecurityPropertyBoolean(SecurityConstants.PREFER_WSMEX_OVER_STS_CLIENT_CONFIG,
-                                                     message, 
-                                                     false);
+            MessageUtils.getContextualBoolean(message,
+                                              SecurityConstants.PREFER_WSMEX_OVER_STS_CLIENT_CONFIG,
+                                              false);
         
         // Find out if we have an EPR to get the STS Address (possibly via WS-MEX)
-<<<<<<< HEAD
-        if (itok != null && itok.getIssuer() != null && message != null) {
-=======
         // Only parse the EPR if we really have to
-        if (issuer != null
+        if (itok != null && itok.getIssuer() != null && message != null
             && (preferWSMex || client.getLocation() == null && client.getWsdlLocation() == null)) {
->>>>>>> 9dc7a39... [CXF-6600] - Sudden repeating NPE on token request by STSClient
             EndpointReferenceType epr = null;
             try {
                 epr = VersionTransformer.parseEndpointReference(itok.getIssuer());
@@ -130,16 +126,7 @@ public final class STSUtils {
                 throw new IllegalArgumentException(e);
             }
             
-<<<<<<< HEAD
-            String mexLocation = findMEXLocation(epr);
-            // Configure via WS-MEX
-            if (mexLocation != null
-                && MessageUtils.getContextualBoolean(message, 
-                                                     SecurityConstants.PREFER_WSMEX_OVER_STS_CLIENT_CONFIG,
-                                                     false)) {
-=======
             if (preferWSMex && findMEXLocation(epr) != null) {
->>>>>>> 9dc7a39... [CXF-6600] - Sudden repeating NPE on token request by STSClient
                 // WS-MEX call. So now either get the WS-MEX specific STSClient or else create one
                 STSClient wsMexClient = (STSClient)message
                     .getContextualProperty(SecurityConstants.STS_CLIENT + ".wsmex");
