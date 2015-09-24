@@ -252,13 +252,13 @@ public abstract class HTTPConduit
      * Implements the authentication handling when talking to a server. If it is not set
      * it will be created from the authorizationPolicy.authType
      */
-    protected HttpAuthSupplier authSupplier;
+    protected volatile HttpAuthSupplier authSupplier;
     
     /**
      * Implements the proxy authentication handling. If it is not set
      * it will be created from the proxyAuthorizationPolicy.authType
      */
-    protected HttpAuthSupplier proxyAuthSupplier;
+    protected volatile HttpAuthSupplier proxyAuthSupplier;
 
     protected Cookies cookies;
     
