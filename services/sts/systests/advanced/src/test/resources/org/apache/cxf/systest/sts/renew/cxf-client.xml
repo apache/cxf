@@ -136,20 +136,20 @@
         <property name="onBehalfOf" ref="delegationCallbackHandler"/>
         <property name="properties">
             <map>
-                <entry key="security.sts.token.username" value="myclientkey"/>
-                <entry key="security.sts.token.properties" value="clientKeystore.properties"/>
-                <entry key="security.sts.token.usecert" value="true"/>
+                <entry key="ws-security.sts.token.username" value="myclientkey"/>
+                <entry key="ws-security.sts.token.properties" value="clientKeystore.properties"/>
+                <entry key="ws-security.sts.token.usecert" value="true"/>
             </map>
         </property>
     </bean>
     
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportSaml2IntermediaryPort" createdFromAPI="true">
         <jaxws:properties>
-            <entry key="security.username" value="alice"/>
-            <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
-            <entry key="security.signature.properties" value="clientKeystore.properties"/>
-            <entry key="security.signature.username" value="myclientkey"/>
-            <entry key="security.sts.client" value-ref="saml2STSIntermediaryClient" />
+            <entry key="ws-security.username" value="alice"/>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+            <entry key="ws-security.signature.properties" value="clientKeystore.properties"/>
+            <entry key="ws-security.signature.username" value="myclientkey"/>
+            <entry key="ws-security.sts.client" value-ref="saml2STSIntermediaryClient" />
             <entry key="ws-security.cache.issued.token.in.endpoint" value="false"/>
         </jaxws:properties>
     </jaxws:client>

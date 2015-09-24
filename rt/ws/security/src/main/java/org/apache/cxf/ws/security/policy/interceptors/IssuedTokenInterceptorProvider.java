@@ -524,7 +524,10 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                         handleDelegation(
                             message, onBehalfOfToken, actAsToken, appliesTo, enableAppliesTo
                         );
-                    if (secToken == null) {
+                    if (secToken != null) {
+                        // Check to see whether the delegated token needs to be renewed
+                        secToken = renewToken(message, aim, itok, secToken);
+                    } else {
                         secToken = getTokenFromSTS(message, client, aim, maps, itok, appliesTo);
                     }
                     storeDelegationTokens(
