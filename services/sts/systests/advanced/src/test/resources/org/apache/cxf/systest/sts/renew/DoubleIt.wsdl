@@ -77,6 +77,9 @@
         <wsdl:port name="DoubleItTransportSaml2NoRenewPort" binding="tns:DoubleItTransportSaml2Binding">
             <soap:address location="https://localhost:8081/doubleit/services/doubleittransportsaml2norenew"/>
         </wsdl:port>
+        <wsdl:port name="DoubleItTransportSaml2IntermediaryPort" binding="tns:DoubleItTransportSaml2Binding">
+            <soap:address location="https://localhost:8081/doubleit/services/doubleittransportsaml2intermediary"/>
+        </wsdl:port>
     </wsdl:service>
     <wsp:Policy wsu:Id="DoubleItBindingTransportSaml1Policy">
         <wsp:ExactlyOne>

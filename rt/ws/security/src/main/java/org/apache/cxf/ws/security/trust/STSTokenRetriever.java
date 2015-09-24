@@ -150,7 +150,10 @@ public final class STSTokenRetriever {
                                      message, onBehalfOfToken, actAsToken, appliesTo,
                                      enableAppliesTo
                     );
-                if (secToken == null) {
+                if (secToken != null) {
+                    // Check to see whether the delegated token needs to be renewed
+                    secToken = renewToken(message, secToken, params);
+                } else {
                     secToken = getTokenFromSTS(message, client, maps, appliesTo, params);
                 }
                 storeDelegationTokens(
