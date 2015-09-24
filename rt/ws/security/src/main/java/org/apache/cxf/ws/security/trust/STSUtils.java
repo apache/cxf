@@ -118,9 +118,15 @@ public final class STSUtils {
             }
         }
         
+        boolean preferWSMex = 
+            SecurityUtils.getSecurityPropertyBoolean(SecurityConstants.PREFER_WSMEX_OVER_STS_CLIENT_CONFIG,
+                                                     message, 
+                                                     false);
         
         // Find out if we have an EPR to get the STS Address (possibly via WS-MEX)
-        if (issuer != null) {
+        // Only parse the EPR if we really have to
+        if (issuer != null
+            && (preferWSMex || client.getLocation() == null && client.getWsdlLocation() == null)) {
             EndpointReferenceType epr = null;
             try {
                 epr = VersionTransformer.parseEndpointReference(issuer);
@@ -128,13 +134,7 @@ public final class STSUtils {
                 throw new IllegalArgumentException(e);
             }
             
-            String mexLocation = findMEXLocation(epr);
-            // Configure via WS-MEX
-            
-            if (mexLocation != null
-                && SecurityUtils.getSecurityPropertyBoolean(SecurityConstants.PREFER_WSMEX_OVER_STS_CLIENT_CONFIG,
-                                                     message, 
-                                                     false)) {
+            if (preferWSMex && findMEXLocation(epr) != null) {
                 // WS-MEX call. So now either get the WS-MEX specific STSClient or else create one
                 STSClient wsMexClient = 
                     (STSClient)SecurityUtils.getSecurityPropertyValue(SecurityConstants.STS_CLIENT + ".wsmex", 
