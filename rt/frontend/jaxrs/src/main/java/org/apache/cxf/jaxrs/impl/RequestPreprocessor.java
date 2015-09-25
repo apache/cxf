@@ -92,7 +92,7 @@ public class RequestPreprocessor {
         if (languageMappings.isEmpty()) {
             return;
         }
-        PathSegmentImpl ps = new PathSegmentImpl(uriInfo.getPath(false));
+        PathSegmentImpl ps = new PathSegmentImpl(uriInfo.getPath(false), false);
         String path = ps.getPath();
         for (Map.Entry<?, ?> entry : languageMappings.entrySet()) {
             if (path.endsWith("." + entry.getKey())) {
@@ -107,7 +107,7 @@ public class RequestPreprocessor {
         if (extensionMappings.isEmpty()) {
             return;
         }
-        PathSegmentImpl ps = new PathSegmentImpl(uriInfo.getPath(false));
+        PathSegmentImpl ps = new PathSegmentImpl(uriInfo.getPath(false), false);
         String path = ps.getPath();
         for (Map.Entry<?, ?> entry : extensionMappings.entrySet()) {
             String key = entry.getKey().toString();
