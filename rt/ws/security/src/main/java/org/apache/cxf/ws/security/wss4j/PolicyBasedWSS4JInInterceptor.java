@@ -658,7 +658,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                 (String)message.getContextualProperty(SecurityConstants.SYMMETRIC_SIGNATURE_ALGORITHM);
             if (asymSignatureAlgorithm != null || symSignatureAlgorithm != null) {
                 Collection<AssertionInfo> algorithmSuites = 
-                    aim.get(SP12Constants.ALGORITHM_SUITE);
+                    PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.ALGORITHM_SUITE);
                 if (algorithmSuites != null && !algorithmSuites.isEmpty()) {
                     for (AssertionInfo algorithmSuite : algorithmSuites) {
                         AlgorithmSuite algSuite = (AlgorithmSuite)algorithmSuite.getAssertion();
