@@ -135,12 +135,10 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                     if (secToken == null) {
                         policyNotAsserted(initiatorToken, "Security token is not found or expired");
                         return;
-                    } else {
-                        if (isTokenRequired(initiatorToken.getIncludeTokenType())) {
-                            Element el = secToken.getToken();
-                            this.addEncryptedKeyElement(cloneElement(el));
-                            attached = true;
-                        } 
+                    } else if (isTokenRequired(initiatorToken.getIncludeTokenType())) {
+                        Element el = secToken.getToken();
+                        this.addEncryptedKeyElement(cloneElement(el));
+                        attached = true;
                     }
                 } else if (initiatorToken instanceof SamlToken && isRequestor()) {
                     SamlAssertionWrapper assertionWrapper = addSamlToken((SamlToken)initiatorToken);
