@@ -115,8 +115,8 @@ public class DefaultProtocolInterceptor extends AtmosphereInterceptorAdapter {
                     return Action.CANCELLED;
                 }
                 
-                if (LOG.isLoggable(Level.INFO)) {
-                    LOG.log(Level.INFO, "inspecting data {0}", new String(data));
+                if (LOG.isLoggable(Level.FINE)) {
+                    LOG.log(Level.FINE, "inspecting data {0}", new String(data));
                 }
                 try {
                     AtmosphereRequest ar = createAtmosphereRequest(request, data);
@@ -247,8 +247,8 @@ public class DefaultProtocolInterceptor extends AtmosphereInterceptorAdapter {
         @Override
         public byte[] transformPayload(AtmosphereResponse response, byte[] responseDraft, byte[] data) 
             throws IOException {
-            if (LOG.isLoggable(Level.INFO)) {
-                LOG.log(Level.INFO, "transformPayload with draft={0}", new String(responseDraft));
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.log(Level.FINE, "transformPayload with draft={0}", new String(responseDraft));
             }
             AtmosphereRequest request = response.request();
             if (request.attributes().get(RESPONSE_PARENT) == null) {
@@ -261,8 +261,8 @@ public class DefaultProtocolInterceptor extends AtmosphereInterceptorAdapter {
 
         @Override
         public byte[] error(AtmosphereResponse response, int statusCode, String reasonPhrase) {
-            if (LOG.isLoggable(Level.INFO)) {
-                LOG.log(Level.INFO, "status={0}", statusCode);
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.log(Level.FINE, "status={0}", statusCode);
             }
             response.setStatus(statusCode, reasonPhrase);
             return createResponse(response, null, true);
