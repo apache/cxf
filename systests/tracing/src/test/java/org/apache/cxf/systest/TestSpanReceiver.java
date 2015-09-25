@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.jaxrs.tracing.htrace;
+package org.apache.cxf.systest;
 
 import java.io.IOException;
 import java.util.ArrayList;

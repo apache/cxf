@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.systest.jaxrs.tracing.htrace;
 
+import java.net.MalformedURLException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,6 +35,7 @@ import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
+import org.apache.cxf.systest.TestSpanReceiver;
 import org.apache.cxf.systest.jaxrs.tracing.BookStore;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
@@ -41,6 +43,8 @@ import org.apache.cxf.tracing.TracerHeaders;
 import org.apache.cxf.tracing.htrace.jaxrs.HTraceClientProvider;
 import org.apache.cxf.tracing.htrace.jaxrs.HTraceFeature;
 import org.apache.htrace.HTraceConfiguration;
+import org.apache.htrace.Trace;
+import org.apache.htrace.TraceScope;
 import org.apache.htrace.impl.AlwaysSampler;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -220,6 +224,54 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
         
         assertTrue(r.getHeaders().containsKey(TracerHeaders.DEFAULT_HEADER_TRACE_ID));
         assertTrue(r.getHeaders().containsKey(TracerHeaders.DEFAULT_HEADER_SPAN_ID));
+    }
+    
+    @Test
+    public void testThatProvidedSpanIsNotClosedWhenActive() throws MalformedURLException {
+        final Map<String, String> properties = new HashMap<String, String>();
+        final HTraceConfiguration conf = HTraceConfiguration.fromMap(properties);        
+        final AlwaysSampler sampler = new AlwaysSampler(conf);
+        
+        try (final TraceScope scope = Trace.startSpan("test span", sampler)) {
+            final Response r = createWebClient("/bookstore/books", htraceClientProvider).get();
+            assertEquals(Status.OK.getStatusCode(), r.getStatus());
+            
+            assertThat(TestSpanReceiver.getAllSpans().size(), equalTo(2));
+            assertThat(TestSpanReceiver.getAllSpans().get(0).getDescription(), equalTo("Get Books"));
+            assertThat(TestSpanReceiver.getAllSpans().get(0).getParents().length, equalTo(1));
+            assertThat(TestSpanReceiver.getAllSpans().get(1).getDescription(), equalTo("GET bookstore/books"));
+            
+            assertTrue(r.getHeaders().containsKey(TracerHeaders.DEFAULT_HEADER_TRACE_ID));
+            assertTrue(r.getHeaders().containsKey(TracerHeaders.DEFAULT_HEADER_SPAN_ID));
+        }
+        
+        assertThat(TestSpanReceiver.getAllSpans().size(), equalTo(3));
+        assertThat(TestSpanReceiver.getAllSpans().get(2).getDescription(), equalTo("test span"));
+    }
+    
+    @Test
+    public void testThatProvidedSpanIsNotDetachedWhenActiveUsingAsyncClient() throws Exception {
+        final Map<String, String> properties = new HashMap<String, String>();
+        final HTraceConfiguration conf = HTraceConfiguration.fromMap(properties);        
+        final AlwaysSampler sampler = new AlwaysSampler(conf);
+
+        final WebClient client = createWebClient("/bookstore/books", htraceClientProvider);
+        try (final TraceScope scope = Trace.startSpan("test span", sampler)) {
+            final Future<Response> f = client.async().get();
+        
+            final Response r = f.get(1, TimeUnit.SECONDS);
+            assertEquals(Status.OK.getStatusCode(), r.getStatus());
+            assertThat(scope.isDetached(), equalTo(false));
+            
+            assertThat(TestSpanReceiver.getAllSpans().size(), equalTo(2));
+            assertThat(TestSpanReceiver.getAllSpans().get(0).getDescription(), equalTo("Get Books"));
+            assertThat(TestSpanReceiver.getAllSpans().get(1).getDescription(), equalTo("GET bookstore/books"));
+            
+            assertTrue(r.getHeaders().containsKey(TracerHeaders.DEFAULT_HEADER_TRACE_ID));
+            assertTrue(r.getHeaders().containsKey(TracerHeaders.DEFAULT_HEADER_SPAN_ID));
+        }
+        
+        assertThat(TestSpanReceiver.getAllSpans().get(2).getDescription(), equalTo("test span"));
     }
     
     protected WebClient createWebClient(final String url, final Object ... providers) {

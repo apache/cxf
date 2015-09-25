@@ -24,83 +24,40 @@ import javax.ws.rs.client.ClientRequestContext;
 import javax.ws.rs.client.ClientRequestFilter;
 import javax.ws.rs.client.ClientResponseContext;
 import javax.ws.rs.client.ClientResponseFilter;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
 
-import org.apache.cxf.jaxrs.utils.JAXRSUtils;
-import org.apache.cxf.tracing.AbstractTracingProvider;
+import org.apache.cxf.tracing.htrace.AbstractHTraceClientProvider;
 import org.apache.htrace.Sampler;
-import org.apache.htrace.Span;
-import org.apache.htrace.Trace;
 import org.apache.htrace.TraceScope;
 import org.apache.htrace.impl.NeverSampler;
 
 @Provider
-public class HTraceClientProvider extends AbstractTracingProvider 
+public class HTraceClientProvider extends AbstractHTraceClientProvider 
         implements ClientRequestFilter, ClientResponseFilter {
     private static final String TRACE_SPAN = "org.apache.cxf.tracing.client.htrace.span";
-    
-    private final Sampler< ? > sampler;
     
     public HTraceClientProvider() {
         this(NeverSampler.INSTANCE);
     }
 
     public HTraceClientProvider(final Sampler< ? > sampler) {
-        this.sampler = sampler;
+        super(sampler);
     }
 
     @Override
     public void filter(final ClientRequestContext requestContext) throws IOException {
-        Span span = Trace.currentSpan();
-        TraceScope scope = null;
-        
-        if (span == null) {
-            scope = Trace.startSpan(buildSpanDescription(requestContext.getUri().toString(), 
-                requestContext.getMethod()), sampler);
-            span = scope.getSpan();
-            
-            if (span != null) {
-                requestContext.setProperty(TRACE_SPAN, scope);
-            }
-        }
-        
-        if (span != null) {
-            final MultivaluedMap<String, Object> requestHeaders = requestContext.getHeaders();
-            
-            final String traceIdHeader = getTraceIdHeader();
-            final String spanIdHeader = getSpanIdHeader();
-            
-            // Transfer tracing headers into the response headers
-            requestHeaders.putSingle(traceIdHeader, Long.toString(span.getTraceId()));
-            requestHeaders.putSingle(spanIdHeader, Long.toString(span.getSpanId()));
-        }
-        
-        // In case of asynchronous client invocation, the span should be detached as JAX-RS 
-        // client request / response filters are going to be executed in different threads.
-        if (isAsyncInvocation() && scope != null) {
-            scope.detach();
+        final TraceScope scope = super.startTraceSpan(requestContext.getStringHeaders(), 
+            requestContext.getUri().toString(), requestContext.getMethod());
+
+        if (scope != null) {
+            requestContext.setProperty(TRACE_SPAN, scope);
         }
     }
     
     @Override
     public void filter(final ClientRequestContext requestContext,
             final ClientResponseContext responseContext) throws IOException {
-        
         final TraceScope scope = (TraceScope)requestContext.getProperty(TRACE_SPAN);
-        if (scope != null) {
-            // If the client invocation was asynchronous , the trace scope has been created 
-            // in another thread and should be re-attached to the current one.
-            if (scope.isDetached()) {
-                final TraceScope continueSpan = Trace.continueSpan(scope.getSpan()); 
-                continueSpan.close();
-            } else {            
-                scope.close();
-            }
-        }
-    }
-    
-    private boolean isAsyncInvocation() {
-        return !JAXRSUtils.getCurrentMessage().getExchange().isSynchronous();
+        super.stopTraceSpan(scope);
     }
 }

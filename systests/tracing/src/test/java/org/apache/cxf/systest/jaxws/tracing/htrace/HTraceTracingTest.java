@@ -33,16 +33,19 @@ import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
-import org.apache.cxf.systest.jaxrs.tracing.htrace.TestSpanReceiver;
+import org.apache.cxf.systest.TestSpanReceiver;
 import org.apache.cxf.systest.jaxws.tracing.BookStore;
 import org.apache.cxf.systest.jaxws.tracing.BookStoreService;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.tracing.TracerHeaders;
+import org.apache.cxf.tracing.htrace.HTraceClientStartInterceptor;
+import org.apache.cxf.tracing.htrace.HTraceClientStopInterceptor;
 import org.apache.cxf.tracing.htrace.HTraceStartInterceptor;
 import org.apache.cxf.tracing.htrace.HTraceStopInterceptor;
 import org.apache.htrace.HTraceConfiguration;
 import org.apache.htrace.Trace;
+import org.apache.htrace.TraceScope;
 import org.apache.htrace.impl.AlwaysSampler;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -51,6 +54,7 @@ import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItems;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 
 public class HTraceTracingTest extends AbstractBusClientServerTestBase {
@@ -70,6 +74,10 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
             sf.getOutInterceptors().add(new HTraceStopInterceptor(Phase.PRE_MARSHAL));
             sf.create();
         }
+    }
+    
+    private interface Configurator {
+        void configure(final JaxWsProxyFactoryBean factory);
     }
     
     @BeforeClass
@@ -100,13 +108,11 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testThatNewInnerSpanIsCreated() throws MalformedURLException {
-        final BookStoreService service = createJaxWsService();
-        final Client proxy = ClientProxy.getClient(service);
-        
         final Map<String, List<String>> headers = new HashMap<String, List<String>>();
         headers.put(TracerHeaders.DEFAULT_HEADER_TRACE_ID, Arrays.asList("10"));
         headers.put(TracerHeaders.DEFAULT_HEADER_SPAN_ID, Arrays.asList("20"));
-        proxy.getRequestContext().put(Message.PROTOCOL_HEADERS, headers);
+
+        final BookStoreService service = createJaxWsService(headers);
         assertThat(service.getBooks().size(), equalTo(2));
         
         assertThat(TestSpanReceiver.getAllSpans().size(), equalTo(2));
@@ -118,22 +124,93 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
         assertThat(response.get(TracerHeaders.DEFAULT_HEADER_SPAN_ID), hasItems("20"));
     }
     
+    @Test
+    public void testThatNewChildSpanIsCreatedWhenParentIsProvided() throws MalformedURLException {
+        final Map<String, String> properties = new HashMap<String, String>();
+        final HTraceConfiguration conf = HTraceConfiguration.fromMap(properties);
+    
+        final BookStoreService service = createJaxWsService(new Configurator() {
+            @Override
+            public void configure(final JaxWsProxyFactoryBean factory) {
+                factory.getOutInterceptors().add(new HTraceClientStartInterceptor(new AlwaysSampler(conf)));
+                factory.getInInterceptors().add(new HTraceClientStopInterceptor());
+            }
+        });
+        assertThat(service.getBooks().size(), equalTo(2));
+        
+        assertThat(TestSpanReceiver.getAllSpans().size(), equalTo(3));
+        assertThat(TestSpanReceiver.getAllSpans().get(0).getDescription(), equalTo("Get Books"));
+        assertThat(TestSpanReceiver.getAllSpans().get(0).getParents().length, equalTo(1));
+        
+        final Map<String, List<String>> response = getResponseHeaders(service);
+        assertThat(response.get(TracerHeaders.DEFAULT_HEADER_TRACE_ID), not(nullValue()));
+        assertThat(response.get(TracerHeaders.DEFAULT_HEADER_SPAN_ID), not(nullValue()));
+    }
+    
+    @Test
+    public void testThatProvidedSpanIsNotClosedWhenActive() throws MalformedURLException {
+        final Map<String, String> properties = new HashMap<String, String>();
+        final HTraceConfiguration conf = HTraceConfiguration.fromMap(properties);
+    
+        final AlwaysSampler sampler = new AlwaysSampler(conf);
+        final BookStoreService service = createJaxWsService(new Configurator() {
+            @Override
+            public void configure(final JaxWsProxyFactoryBean factory) {
+                
+                factory.getOutInterceptors().add(new HTraceClientStartInterceptor(sampler));
+                factory.getInInterceptors().add(new HTraceClientStopInterceptor());
+            }
+        });
+        
+        try (final TraceScope scope = Trace.startSpan("test span", sampler)) {
+            assertThat(service.getBooks().size(), equalTo(2));
+            assertThat(Trace.isTracing(), equalTo(true));
+            
+            assertThat(TestSpanReceiver.getAllSpans().size(), equalTo(2));
+            assertThat(TestSpanReceiver.getAllSpans().get(0).getDescription(), equalTo("Get Books"));
+            assertThat(TestSpanReceiver.getAllSpans().get(0).getParents().length, equalTo(1));
+            assertThat(TestSpanReceiver.getAllSpans().get(1).getDescription(), equalTo("POST /BookStore"));        
+        }
+        
+        assertThat(TestSpanReceiver.getAllSpans().size(), equalTo(3));
+        assertThat(TestSpanReceiver.getAllSpans().get(2).getDescription(), equalTo("test span"));
+        
+        final Map<String, List<String>> response = getResponseHeaders(service);
+        assertThat(response.get(TracerHeaders.DEFAULT_HEADER_TRACE_ID), not(nullValue()));
+        assertThat(response.get(TracerHeaders.DEFAULT_HEADER_SPAN_ID), not(nullValue()));
+    }
+    
+    
     private BookStoreService createJaxWsService() throws MalformedURLException {
         return createJaxWsService(new HashMap<String, List<String>>());
     }
     
     private BookStoreService createJaxWsService(final Map<String, List<String>> headers) throws MalformedURLException {
+        return createJaxWsService(headers, null);
+    }
+    
+    private BookStoreService createJaxWsService(final Configurator configurator) throws MalformedURLException {
+        return createJaxWsService(new HashMap<String, List<String>>(), configurator);
+    }
+
+    private BookStoreService createJaxWsService(final Map<String, List<String>> headers, 
+            final Configurator configurator) throws MalformedURLException {
+
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
         factory.getOutInterceptors().add(new LoggingOutInterceptor());
         factory.getInInterceptors().add(new LoggingInInterceptor());
         factory.setServiceClass(BookStoreService.class);
         factory.setAddress("http://localhost:" + PORT + "/BookStore");
         
+        if (configurator != null) {
+            configurator.configure(factory);
+        }
+        
         final BookStoreService service = (BookStoreService) factory.create();
         final Client proxy = ClientProxy.getClient(service);
         proxy.getRequestContext().put(Message.PROTOCOL_HEADERS, headers);
         
-        return (BookStoreService) factory.create();
+        return service;
     }
     
     private Map<String, List<String>> getResponseHeaders(final BookStoreService service) {
