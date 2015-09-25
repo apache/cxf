@@ -338,12 +338,8 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
     
     private void configureAudienceRestriction(SoapMessage msg, RequestData reqData) {
         // Add Audience Restrictions for SAML
-        boolean enableAudienceRestriction = true;
-        String audRestrValStr = 
-            (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.AUDIENCE_RESTRICTION_VALIDATION, msg);
-        if (audRestrValStr != null) {
-            enableAudienceRestriction = Boolean.parseBoolean(audRestrValStr);
-        }
+        boolean enableAudienceRestriction = 
+            SecurityUtils.getSecurityPropertyBoolean(SecurityConstants.AUDIENCE_RESTRICTION_VALIDATION, msg, true);
         if (enableAudienceRestriction) {
             List<String> audiences = new ArrayList<>();
             if (msg.getContextualProperty(org.apache.cxf.message.Message.REQUEST_URL) != null) {
