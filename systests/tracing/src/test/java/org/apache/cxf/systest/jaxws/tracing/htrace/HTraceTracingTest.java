@@ -141,6 +141,9 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
         assertThat(TestSpanReceiver.getAllSpans().size(), equalTo(3));
         assertThat(TestSpanReceiver.getAllSpans().get(0).getDescription(), equalTo("Get Books"));
         assertThat(TestSpanReceiver.getAllSpans().get(0).getParents().length, equalTo(1));
+        assertThat(TestSpanReceiver.getAllSpans().get(1).getDescription(), equalTo("POST /BookStore"));
+        assertThat(TestSpanReceiver.getAllSpans().get(2).getDescription(), 
+            equalTo("POST http://localhost:" + PORT + "/BookStore"));
         
         final Map<String, List<String>> response = getResponseHeaders(service);
         assertThat(response.get(TracerHeaders.DEFAULT_HEADER_TRACE_ID), not(nullValue()));
@@ -156,7 +159,6 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
         final BookStoreService service = createJaxWsService(new Configurator() {
             @Override
             public void configure(final JaxWsProxyFactoryBean factory) {
-                
                 factory.getOutInterceptors().add(new HTraceClientStartInterceptor(sampler));
                 factory.getInInterceptors().add(new HTraceClientStopInterceptor());
             }
@@ -169,7 +171,7 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
             assertThat(TestSpanReceiver.getAllSpans().size(), equalTo(2));
             assertThat(TestSpanReceiver.getAllSpans().get(0).getDescription(), equalTo("Get Books"));
             assertThat(TestSpanReceiver.getAllSpans().get(0).getParents().length, equalTo(1));
-            assertThat(TestSpanReceiver.getAllSpans().get(1).getDescription(), equalTo("POST /BookStore"));        
+            assertThat(TestSpanReceiver.getAllSpans().get(1).getDescription(), equalTo("POST /BookStore"));
         }
         
         assertThat(TestSpanReceiver.getAllSpans().size(), equalTo(3));
