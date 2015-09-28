@@ -83,7 +83,7 @@ public class ProxyHelper {
                         Class.forName(returnType.getName(), true, loader);
                     }
                     for (Class<?> p : m.getParameterTypes()) {
-                        if (!returnType.isPrimitive()) {
+                        if (!p.isPrimitive()) {
                             Class.forName(p.getName(), true, loader);
                         }
                     }
