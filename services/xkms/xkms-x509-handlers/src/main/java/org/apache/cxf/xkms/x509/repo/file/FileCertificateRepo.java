@@ -50,6 +50,7 @@ public class FileCertificateRepo implements CertificateRepo {
     private static final String TRUSTED_CAS_PATH = "trusted_cas";
     private static final String CRLS_PATH = "crls";
     private static final String CAS_PATH = "cas";
+    private static final String SPLIT_REGEX = "\\s*,\\s*";
     private final File storageDir;
     private final CertificateFactory certFactory;
 
@@ -279,6 +280,8 @@ public class FileCertificateRepo implements CertificateRepo {
     public X509Certificate findBySubjectDn(String subjectDn) {
         List<X509Certificate> result = new ArrayList<>();
         File[] list = getX509Files();
+        String[] sDnArray = subjectDn.split(SPLIT_REGEX);
+        Arrays.sort(sDnArray);
         for (File certFile : list) {
             try {
                 if (certFile.isDirectory()) {
@@ -287,8 +290,12 @@ public class FileCertificateRepo implements CertificateRepo {
                 X509Certificate cert = readCertificate(certFile);
                 LOG.debug("Searching for " + subjectDn + ". Checking cert " 
                     + cert.getSubjectDN().getName() + ", " + cert.getSubjectX500Principal().getName());
-                if (subjectDn.equalsIgnoreCase(cert.getSubjectDN().getName())
-                    || subjectDn.equalsIgnoreCase(cert.getSubjectX500Principal().getName())) {
+                String[] csDnArray = cert.getSubjectDN().getName().split(SPLIT_REGEX);
+                Arrays.sort(csDnArray);
+                String[] csX500Array = cert.getSubjectX500Principal().getName().split(SPLIT_REGEX);
+                Arrays.sort(csX500Array);
+                if (arraysEqualsIgnoreCaseIgnoreWhiteSpace(sDnArray, csDnArray)
+                    || arraysEqualsIgnoreCaseIgnoreWhiteSpace(sDnArray, csX500Array)) {
                     result.add(cert);
                 }
             } catch (Exception e) {
@@ -301,6 +308,19 @@ public class FileCertificateRepo implements CertificateRepo {
             return result.get(0);
         }
         return null;
+    }
+    
+      
+    private boolean arraysEqualsIgnoreCaseIgnoreWhiteSpace(String[] s1, String[] s2) {
+        if (s1 == null || s2 == null || s1.length != s2.length) {
+            return false;
+        }
+        for (int i = 0; i < s1.length; i++) {
+            if (!s1[i].trim().equalsIgnoreCase(s2[i].trim())) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
