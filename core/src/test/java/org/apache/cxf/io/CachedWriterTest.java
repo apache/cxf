@@ -63,6 +63,7 @@ public class CachedWriterTest extends CachedStreamTestBase {
         CachedWriter cos = (CachedWriter)cache;
         cos.write(result);
         cos.flush();
+        cos.getOut().close();
         return cos.getTempFile();
     }
 

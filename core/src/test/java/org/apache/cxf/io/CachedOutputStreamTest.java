@@ -64,6 +64,7 @@ public class CachedOutputStreamTest extends CachedStreamTestBase {
         CachedOutputStream cos = (CachedOutputStream)cache;
         cos.write(result.getBytes("utf-8"));
         cos.flush();
+        cos.getOut().close();
         return cos.getTempFile();
     }
 
