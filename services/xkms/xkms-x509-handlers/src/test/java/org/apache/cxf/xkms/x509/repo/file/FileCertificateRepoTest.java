@@ -26,6 +26,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URISyntaxException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -42,7 +43,7 @@ public class FileCertificateRepoTest {
     private static final String EXPECTED_CERT_FILE_NAME = "CN-www.issuer.com_L-CGN_ST-NRW_C-DE_O-Issuer.cer";
 
     @Test
-    public void testSaveAndFind() throws CertificateException, IOException {
+    public void testSaveAndFind() throws CertificateException, IOException, URISyntaxException {
         File storageDir = new File("target/teststore1");
         storageDir.mkdirs();
         FileCertificateRepo fileRegisterHandler = new FileCertificateRepo("target/teststore1");
@@ -56,7 +57,7 @@ public class FileCertificateRepoTest {
         key.setIdentifier(EXAMPLE_SUBJECT_DN);
         fileRegisterHandler.saveCertificate(cert, key);
 
-        File certFile = new File(storageDir, EXPECTED_CERT_FILE_NAME);
+        File certFile = new File(storageDir, fileRegisterHandler.getCertPath(cert, key));
         Assert.assertTrue("Cert file " + certFile + " should exist", certFile.exists());
         FileInputStream fis = new FileInputStream(certFile);
         X509Certificate outCert = loadTestCert(fis);
