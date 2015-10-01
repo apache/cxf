@@ -60,6 +60,7 @@ import org.apache.cxf.catalog.OASISCatalogManagerHelper;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.URIParserUtil;
+import org.apache.cxf.common.util.UrlUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.message.Message;
@@ -356,7 +357,8 @@ public class WSDLGetUtils {
                                     Map<String, Definition> done,
                                     Map<String, SchemaReference> doneSchemas,
                                     String base,
-                                    String docBase) {
+                                    String docBase,
+                                    String parentResolvedLocation) {
         OASISCatalogManager catalogs = OASISCatalogManager.getCatalogManager(bus);
 
         Collection<List<?>> imports = CastUtils.cast((Collection<?>)def.getImports().values());
@@ -364,7 +366,7 @@ public class WSDLGetUtils {
             List<Import> impLst = CastUtils.cast(lst);
             for (Import imp : impLst) {
                 String start = imp.getLocationURI();
-                String decodedStart = null;
+                String decodedStart;
                 // Always use the URL decoded version to ensure that we have a
                 // canonical representation of the import URL for lookup.
 
@@ -391,13 +393,20 @@ public class WSDLGetUtils {
                             //ignore
                         }
                         if (done.put(decodedStart, imp.getDefinition()) == null) {
-                            updateDefinition(bus, imp.getDefinition(), done, doneSchemas, base, start);
+                            if (imp.getDefinition() != null && imp.getDefinition().getDocumentBaseURI() != null) {
+                                done.put(imp.getDefinition().getDocumentBaseURI(), imp.getDefinition());
+                            }
+                            updateDefinition(bus, imp.getDefinition(), done, doneSchemas, base, start, null);
                         }
                     }
                 } else {
                     if (done.put(decodedStart, imp.getDefinition()) == null) {
                         done.put(resolvedSchemaLocation, imp.getDefinition());
-                        updateDefinition(bus, imp.getDefinition(), done, doneSchemas, base, start);
+                        if (imp.getDefinition() != null && imp.getDefinition().getDocumentBaseURI() != null) {
+                            done.put(imp.getDefinition().getDocumentBaseURI(), imp.getDefinition());
+                        }
+                        updateDefinition(bus, imp.getDefinition(), done, doneSchemas, base, start,
+                                resolvedSchemaLocation);
                     }
                 }
             }
@@ -412,7 +421,7 @@ public class WSDLGetUtils {
             for (ExtensibilityElement el
                 : CastUtils.cast(types.getExtensibilityElements(), ExtensibilityElement.class)) {
                 if (el instanceof Schema) {
-                    updateSchemaImports(bus, (Schema)el, docBase, doneSchemas, base);
+                    updateSchemaImports(bus, (Schema)el, docBase, doneSchemas, base, parentResolvedLocation);
                 }
             }
         }
@@ -468,138 +477,84 @@ public class WSDLGetUtils {
                                        Schema schema,
                                        String docBase,
                                        Map<String, SchemaReference> doneSchemas,
-                                       String base) {
-        OASISCatalogManager catalogs = OASISCatalogManager.getCatalogManager(bus);
+                                       String base,
+                                       String parentResolved) {
         Collection<List<?>>  imports = CastUtils.cast((Collection<?>)schema.getImports().values());
         for (List<?> lst : imports) {
             List<SchemaImport> impLst = CastUtils.cast(lst);
             for (SchemaImport imp : impLst) {
-                String start = findSchemaLocation(doneSchemas, imp, docBase);
-
-                if (start != null) {
-                    String decodedStart = null;
-                    // Always use the URL decoded version to ensure that we have a
-                    // canonical representation of the import URL for lookup.
-                    try {
-                        decodedStart = URLDecoder.decode(start, "utf-8");
-                    } catch (UnsupportedEncodingException e) {
-                        throw new WSDLQueryException(
-                            new org.apache.cxf.common.i18n.Message("COULD_NOT_PROVIDE_WSDL",
-                                LOG,
-                                start), e);
-                    }
-
-                    if (!doneSchemas.containsKey(decodedStart)) {
-                        String resolvedSchemaLocation = resolveWithCatalogs(catalogs, start, base);
-                        if (resolvedSchemaLocation == null) {
-                            resolvedSchemaLocation = resolveWithCatalogs(catalogs, imp.getSchemaLocationURI(), base);
-                        }
-                        if (resolvedSchemaLocation == null) {
-                            try {
-                                //check to see if it's already in a URL format.  If so, leave it.
-                                new URL(start);
-                            } catch (MalformedURLException e) {
-                                if (doneSchemas.put(decodedStart, imp) == null) {
-                                    putResolvedSchemaLocationIfRelative(doneSchemas, decodedStart, imp);
-                                    updateSchemaImports(bus, imp.getReferencedSchema(), start, doneSchemas, base);
-                                }
-                            }
-                        } else {
-                            if (doneSchemas.put(decodedStart, imp) == null) {
-                                doneSchemas.put(resolvedSchemaLocation, imp);
-                                String p = getAndSaveRelativeSchemaLocationIfCatalogResolved(doneSchemas,
-                                                                                             resolvedSchemaLocation,
-                                                                                             schema,
-                                                                                             imp);
-                                updateSchemaImports(bus, imp.getReferencedSchema(), p, doneSchemas, base);
-                            }
-                        }
-                    }
-                }
+                processSchemaReference(imp, bus, schema, docBase, doneSchemas, base, parentResolved);
             }
         }
 
         List<SchemaReference> includes = CastUtils.cast(schema.getIncludes());
         for (SchemaReference included : includes) {
-            String start = findSchemaLocation(doneSchemas, included, docBase);
-
-            if (start != null) {
-                String decodedStart = null;
-                // Always use the URL decoded version to ensure that we have a
-                // canonical representation of the import URL for lookup.
-                try {
-                    decodedStart = URLDecoder.decode(start, "utf-8");
-                } catch (UnsupportedEncodingException e) {
-                    throw new WSDLQueryException(
-                        new org.apache.cxf.common.i18n.Message("COULD_NOT_PROVIDE_WSDL",
-                            LOG,
-                            start), e);
-                }
-
-                String resolvedSchemaLocation = resolveWithCatalogs(catalogs, start, base);
-                if (resolvedSchemaLocation == null) {
-                    if (!doneSchemas.containsKey(decodedStart)) {
-                        try {
-                            //check to see if it's aleady in a URL format.  If so, leave it.
-                            new URL(start);
-                        } catch (MalformedURLException e) {
-                            if (doneSchemas.put(decodedStart, included) == null) {
-                                putResolvedSchemaLocationIfRelative(doneSchemas, decodedStart, included);
-                                updateSchemaImports(bus, included.getReferencedSchema(), start, doneSchemas, base);
-                            }
-                        }
-                    }
-                } else if (!doneSchemas.containsKey(decodedStart)
-                    || !doneSchemas.containsKey(resolvedSchemaLocation)) {
-                    doneSchemas.put(decodedStart, included);
-                    doneSchemas.put(resolvedSchemaLocation, included);
-                    String p = getAndSaveRelativeSchemaLocationIfCatalogResolved(doneSchemas,
-                                                                                 resolvedSchemaLocation,
-                                                                                 schema,
-                                                                                 included);
-                    updateSchemaImports(bus, included.getReferencedSchema(), p, doneSchemas, base);
-                }
-            }
+            processSchemaReference(included, bus, schema, docBase, doneSchemas, base, parentResolved);
         }
         List<SchemaReference> redefines = CastUtils.cast(schema.getRedefines());
         for (SchemaReference included : redefines) {
-            String start = findSchemaLocation(doneSchemas, included, docBase);
+            processSchemaReference(included, bus, schema, docBase, doneSchemas, base, parentResolved);
+        }
+    }
 
-            if (start != null) {
-                String decodedStart = null;
-                // Always use the URL decoded version to ensure that we have a
-                // canonical representation of the import URL for lookup.
-                try {
-                    decodedStart = URLDecoder.decode(start, "utf-8");
-                } catch (UnsupportedEncodingException e) {
-                    throw new WSDLQueryException(
+    private void processSchemaReference(SchemaReference schemaReference,
+                                        Bus bus,
+                                        Schema schema,
+                                        String docBase,
+                                        Map<String, SchemaReference> doneSchemas,
+                                        String base,
+                                        String parentResolved) {
+        OASISCatalogManager catalogs = OASISCatalogManager.getCatalogManager(bus);
+        String start = findSchemaLocation(doneSchemas, schemaReference, docBase);
+        String origLocation = schemaReference.getSchemaLocationURI();
+
+        if (start != null) {
+            String decodedStart;
+            String decodedOrigLocation;
+            // Always use the URL decoded version to ensure that we have a
+            // canonical representation of the import URL for lookup.
+            try {
+                decodedStart = URLDecoder.decode(start, "utf-8");
+                decodedOrigLocation = URLDecoder.decode(origLocation, "utf-8");
+            } catch (UnsupportedEncodingException e) {
+                throw new WSDLQueryException(
                         new org.apache.cxf.common.i18n.Message("COULD_NOT_PROVIDE_WSDL",
-                            LOG,
-                            start), e);
-                }
+                                LOG,
+                                start), e);
+            }
 
+            if (!doneSchemas.containsKey(decodedStart)) {
                 String resolvedSchemaLocation = resolveWithCatalogs(catalogs, start, base);
                 if (resolvedSchemaLocation == null) {
-                    if (!doneSchemas.containsKey(decodedStart)) {
+                    resolvedSchemaLocation =
+                            resolveWithCatalogs(catalogs, schemaReference.getSchemaLocationURI(), base);
+                }
+                if (resolvedSchemaLocation == null) {
+                    try {
+                        //check to see if it's already in a URL format.  If so, leave it.
+                        new URL(start);
+                    } catch (MalformedURLException e) {
+                        doneSchemas.put(decodedStart, schemaReference);
+                        doneSchemas.put(schemaReference.getReferencedSchema().getDocumentBaseURI(), schemaReference);
                         try {
-                            //check to see if it's aleady in a URL format.  If so, leave it.
-                            new URL(start);
-                        } catch (MalformedURLException e) {
-                            if (doneSchemas.put(decodedStart, included) == null) {
-                                putResolvedSchemaLocationIfRelative(doneSchemas, decodedStart, included);
-                                updateSchemaImports(bus, included.getReferencedSchema(), start, doneSchemas, base);
+                            if (!(new URI(origLocation).isAbsolute()) && parentResolved != null) {
+                                resolvedSchemaLocation = resolveRelativePath(parentResolved, decodedOrigLocation);
+                                doneSchemas.put(resolvedSchemaLocation, schemaReference);
                             }
+                        } catch (URISyntaxException e1) {
+                            // ignore
                         }
+                        updateSchemaImports(bus, schemaReference.getReferencedSchema(), start, doneSchemas, base,
+                                resolvedSchemaLocation);
                     }
-                } else if (!doneSchemas.containsKey(decodedStart)
-                    || !doneSchemas.containsKey(resolvedSchemaLocation)) {
-                    doneSchemas.put(decodedStart, included);
-                    doneSchemas.put(resolvedSchemaLocation, included);
+                } else if (doneSchemas.put(decodedStart, schemaReference) == null) {
+                    doneSchemas.put(resolvedSchemaLocation, schemaReference);
                     String p = getAndSaveRelativeSchemaLocationIfCatalogResolved(doneSchemas,
-                                                                                 resolvedSchemaLocation,
-                                                                                 schema,
-                                                                                 included);
-                    updateSchemaImports(bus, included.getReferencedSchema(), p, doneSchemas, base);
+                            resolvedSchemaLocation,
+                            schema,
+                            schemaReference);
+                    updateSchemaImports(bus, schemaReference.getReferencedSchema(), p, doneSchemas, base,
+                            resolvedSchemaLocation);
                 }
             }
         }
@@ -649,25 +604,6 @@ public class WSDLGetUtils {
         return path;
     }
 
-    /**
-     * If given decodedStart is relative path, resolves a real location of given schema and puts it into schema map.
-     *
-     * @param doneSchemas schema map
-     * @param decodedStart path referencing schema
-     * @param schemaReference referenced schema
-     */
-    private void putResolvedSchemaLocationIfRelative(Map<String, SchemaReference> doneSchemas, String decodedStart,
-                                                     SchemaReference schemaReference) {
-        try {
-            if (!(new URI(decodedStart).isAbsolute())) {
-                String resolved = schemaReference.getReferencedSchema().getDocumentBaseURI();
-                doneSchemas.put(resolved, schemaReference);
-            }
-        } catch (URISyntaxException ex) {
-            // ignore
-        }
-    }
-
     private String findSchemaLocation(Map<String, SchemaReference> doneSchemas,
                                       SchemaReference imp,
                                       String docBase) {
@@ -694,6 +630,12 @@ public class WSDLGetUtils {
         return schemaLocationURI;
     }
 
+    private String resolveRelativePath(String parentUri, String relativePath) {
+        // can not use `new URI(uri).resolve(path)`, because that doesn't work with "jar:file:x!y" kind of URIs
+        String base = UrlUtils.getStem(parentUri);
+        return base + '/' + relativePath;
+    }
+
     /**
      * Write the contents of a wsdl Definition object to a file.
      *
@@ -713,7 +655,7 @@ public class WSDLGetUtils {
                                       String base,
                                       EndpointInfo endpointInfo) throws WSDLException {
 
-        Document doc = null;
+        Document doc;
         Bus bus = message.getExchange().getBus();
         Definition def = lookupDefinition(bus, mp, wsdl, base);
         String epurl = base;
@@ -821,7 +763,7 @@ public class WSDLGetUtils {
             Definition def = builder.build(new HashMap<String, SchemaInfo>());
 
             mp.put("", def);
-            updateDefinition(bus, def, mp, smp, base, "");
+            updateDefinition(bus, def, mp, smp, base, "", "");
         }
 
     }
