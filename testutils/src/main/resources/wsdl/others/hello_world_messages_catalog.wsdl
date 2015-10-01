@@ -22,6 +22,16 @@
         <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://apache.org/hello_world/types/schema" elementFormDefault="qualified">
             <xsd:import namespace="http://apache.org/hello_world/types" schemaLocation="hello_world_schema.xsd"/>
         </schema>
+        <schema targetNamespace="http://apache.org/hello_world/schemas-in-separate-dir"
+                xmlns="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+            <xsd:import namespace="http://apache.org/hello_world/schemas-in-separate-dir"
+                        schemaLocation="http://apache.org/hello_world/schemas-in-separate-dir/schema.xsd"/>
+        </schema>
+        <schema targetNamespace="http://apache.org/hello_world/schemas-in-separate-dir"
+                xmlns="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+            <xsd:import namespace="http://apache.org/hello_world/schemas-in-separate-dir"
+                        schemaLocation="http://apache.org/hello_world/schemas-in-separate-dir-non-cp/another-schema.xsd"/>
+        </schema>
     </wsdl:types>
     <wsdl:message name="sayHiRequest">
         <wsdl:part name="in" element="x1:sayHi"/>
