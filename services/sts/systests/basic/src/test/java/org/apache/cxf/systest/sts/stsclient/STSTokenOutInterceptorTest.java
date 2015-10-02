@@ -284,6 +284,11 @@ public class STSTokenOutInterceptorTest extends AbstractBusClientServerTestBase 
         SSLContext sc = SSLContext.getInstance("SSL");
         sc.init(null, trustManagers, new java.security.SecureRandom());
         HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+        
+        // Needed to prevent test failure using IBM JDK 
+        if ("IBM Corporation".equals(System.getProperty("java.vendor"))) {
+            System.setProperty("https.protocols", "TLSv1");
+        }
     }
 
     private TLSClientParameters prepareTLSParams() throws KeyStoreException, IOException,
