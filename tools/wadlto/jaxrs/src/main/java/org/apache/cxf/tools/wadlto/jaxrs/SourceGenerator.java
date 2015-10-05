@@ -692,7 +692,8 @@ public class SourceGenerator {
         boolean duplicatesAvailable = 
             getRepsWithElements(allRequestReps, requestRepsWithElements, info.getGrammarInfo());
         
-        final String methodNameLowerCase = methodEl.getAttribute("name").toLowerCase();
+        String methodName = methodEl.getAttribute("name");
+        final String methodNameLowerCase = methodName.toLowerCase();
         String id = methodEl.getAttribute("id");
         if (id.length() == 0) {
             id = methodNameLowerCase;
@@ -737,7 +738,7 @@ public class SourceGenerator {
                         writeAnnotation(sbCode, imports, 
                                         HTTP_METHOD_ANNOTATIONS.get(methodNameLowerCase), null, true, true);
                     } else {
-                        // TODO : write a custom annotation class name based on HttpMethod    
+                        writeCustomHttpMethod(info, classPackage, methodName, sbCode, imports);    
                     }
                     writeFormatAnnotations(requestReps, sbCode, imports, true, null);
                     writeFormatAnnotations(getWadlElements(getOKResponse(responseEls), "representation"),
@@ -800,6 +801,45 @@ public class SourceGenerator {
         }
     }
     
+    private void writeCustomHttpMethod(ContextInfo info, 
+                                       String classPackage,
+                                       String methodName, 
+                                       StringBuilder mainCode,
+                                       Set<String> mainImports) {
+        
+        mainCode.append("@").append(methodName);
+        mainCode.append(getLineSep());
+        mainCode.append(TAB);
+        
+        final String className = methodName;
+        if (info.getResourceClassNames().contains(className)) {
+            return;
+        }
+        info.getResourceClassNames().add(className);
+        
+        
+        StringBuilder sbMethodClassImports = new StringBuilder();
+        sbMethodClassImports.append(getClassComment()).append(getLineSep());
+        sbMethodClassImports.append("package " + classPackage)
+            .append(";").append(getLineSep()).append(getLineSep());
+        
+        sbMethodClassImports.append("import java.lang.annotation.ElementType;").append(getLineSep());
+        sbMethodClassImports.append("import java.lang.annotation.Retention;").append(getLineSep());
+        sbMethodClassImports.append("import java.lang.annotation.RetentionPolicy;").append(getLineSep());
+        sbMethodClassImports.append("import java.lang.annotation.Target;").append(getLineSep());
+        sbMethodClassImports.append("import javax.ws.rs.HttpMethod;").append(getLineSep());
+        
+        StringBuilder sbMethodClassCode = new StringBuilder();
+        sbMethodClassCode.append("@Target({ElementType.METHOD })").append(getLineSep());
+        sbMethodClassCode.append("@Retention(RetentionPolicy.RUNTIME)").append(getLineSep());
+        sbMethodClassCode.append("@HttpMethod(\"" + methodName + "\")").append(getLineSep());
+        sbMethodClassCode.append("public @interface " + methodName);    
+        sbMethodClassCode.append(" {" + getLineSep() + getLineSep());
+        sbMethodClassCode.append("}");
+        createJavaSourceFile(info.getSrcDir(), new QName(classPackage, className), 
+                             sbMethodClassCode, sbMethodClassImports, true);
+    }
+
     private void writeSubresourceMethod(Element resourceEl,
                                         Set<String> imports,
                                         StringBuilder sbCode,

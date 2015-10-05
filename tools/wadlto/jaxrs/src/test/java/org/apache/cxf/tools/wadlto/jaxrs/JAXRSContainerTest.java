@@ -240,8 +240,9 @@ public class JAXRSContainerTest extends ProcessorTestBase {
             assertNotNull(output.list());
             
             List<File> files = FileUtils.getFilesRecurse(output, ".+\\." + "class" + "$");
-            assertEquals(7, files.size());
+            assertEquals(8, files.size());
             assertTrue(checkContains(files, "org.apache.cxf.jaxrs.model.wadl" + ".BookStore.class"));
+            assertTrue(checkContains(files, "org.apache.cxf.jaxrs.model.wadl" + ".PATCH.class"));
             assertTrue(checkContains(files, "superbooks" + ".Book.class"));
             assertTrue(checkContains(files, "superbooks" + ".ObjectFactory.class"));
             assertTrue(checkContains(files, "superbooks" + ".package-info.class"));
