@@ -48,6 +48,14 @@
                         <representation mediaType="application/xml" element="prefix1:thebook"/>
                     </request>
                 </method>
+                <method name="PATCH" id="patchName">
+                  <request>
+                    <representation mediaType="text/plain">
+                        <param name="request" style="plain" type="xs:string"/>
+                    </representation>
+                  </request>
+                  <response status="204"/>
+                </method>
             </resource>
         </resource>
     </resources>
