@@ -195,8 +195,8 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
                 reqData.setAttachmentCallbackHandler(new AttachmentCallbackHandler(mc));
                 
                 if (AttachmentUtil.isMtomEnabled(mc) && hasAttachments(mc)) {
-                    LOG.warning("MTOM is enabled with WS-Security. Please note that if an attachment is"
-                        + "referenced in the SOAP Body, only the reference will be signed and not the"
+                    LOG.warning("MTOM is enabled with WS-Security. Please note that if an attachment is "
+                        + "referenced in the SOAP Body, only the reference will be signed and not the "
                         + "SOAP Body!");
                 }
                 
