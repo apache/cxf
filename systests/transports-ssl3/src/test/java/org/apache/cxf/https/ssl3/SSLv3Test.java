@@ -104,6 +104,11 @@ public class SSLv3Test extends AbstractBusClientServerTestBase {
     
     @org.junit.Test
     public void testSSLv3ServerAllowed() throws Exception {
+        
+        // Doesn't work with IBM JDK 
+        if ("IBM Corporation".equals(System.getProperty("java.vendor"))) {
+            return;
+        }
 
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = SSLv3Test.class.getResource("sslv3-client.xml");
@@ -198,6 +203,11 @@ public class SSLv3Test extends AbstractBusClientServerTestBase {
     
     @org.junit.Test
     public void testClientSSL3Allowed() throws Exception {
+        // Doesn't work with IBM JDK 
+        if ("IBM Corporation".equals(System.getProperty("java.vendor"))) {
+            return;
+        }
+        
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = SSLv3Test.class.getResource("sslv3-client-allow.xml");
 
@@ -221,6 +231,11 @@ public class SSLv3Test extends AbstractBusClientServerTestBase {
     
     @org.junit.Test
     public void testAsyncClientSSL3Allowed() throws Exception {
+        // Doesn't work with IBM JDK 
+        if ("IBM Corporation".equals(System.getProperty("java.vendor"))) {
+            return;
+        }
+        
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = SSLv3Test.class.getResource("sslv3-client-allow.xml");
 
@@ -247,6 +262,11 @@ public class SSLv3Test extends AbstractBusClientServerTestBase {
  
     @org.junit.Test
     public void testTLSClientToEndpointWithSSL3Allowed() throws Exception {
+        // Doesn't work with IBM JDK 
+        if ("IBM Corporation".equals(System.getProperty("java.vendor"))) {
+            return;
+        }
+        
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = SSLv3Test.class.getResource("sslv3-client.xml");
 
@@ -270,6 +290,11 @@ public class SSLv3Test extends AbstractBusClientServerTestBase {
     
     @org.junit.Test
     public void testSSL3ClientToEndpointWithSSL3Allowed() throws Exception {
+        // Doesn't work with IBM JDK 
+        if ("IBM Corporation".equals(System.getProperty("java.vendor"))) {
+            return;
+        }
+        
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = SSLv3Test.class.getResource("sslv3-client-allow.xml");
 
