@@ -189,4 +189,34 @@ public class MTOMSecurityTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
+    
+    // The difference between this test + the testAsymmetricBytesInAttachment test above is that
+    // the SOAP Body already contains BASE-64 encoded content.
+    @org.junit.Test
+    @org.junit.Ignore
+    public void testAsymmetricBinaryBytesInAttachment() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = MTOMSecurityTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        URL wsdl = MTOMSecurityTest.class.getResource("DoubleItMtom.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricBinaryPort");
+        DoubleItMtomPortType port = 
+                service.getPort(portQName, DoubleItMtomPortType.class);
+        updateAddressPort(port, PORT);
+        
+        DataSource source = new FileDataSource(new File("src/test/resources/java.jpg"));
+        DoubleIt4 doubleIt = new DoubleIt4();
+        doubleIt.setNumberToDouble(25);
+        port.doubleIt4(25, new DataHandler(source));
+        
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+    
 }

@@ -34,6 +34,24 @@
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
+    <wsdl:binding name="DoubleItAsymmetricBinaryBinding" type="tns:DoubleItMtomPortType">
+        <wsp:PolicyReference URI="#DoubleItAsymmetricPolicy"/>
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="DoubleIt4">
+            <soap:operation soapAction=""/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Input_Policy"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy"/>
+            </wsdl:output>
+            <wsdl:fault name="DoubleItFault">
+                <soap:body use="literal" name="DoubleItFault"/>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
     <wsdl:binding name="DoubleItAsymmetricBinding" type="tns:DoubleItPortType">
         <wsp:PolicyReference URI="#DoubleItAsymmetricPolicy"/>
         <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
@@ -101,6 +119,9 @@
         </wsdl:port>
         <wsdl:port name="DoubleItActionPort" binding="tns:DoubleItActionBinding">
             <soap:address location="http://localhost:9001/DoubleItX509Action"/>
+        </wsdl:port>
+        <wsdl:port name="DoubleItAsymmetricBinaryPort" binding="tns:DoubleItAsymmetricBinaryBinding">
+            <soap:address location="http://localhost:9001/DoubleItX509AsymmetricBinary"/>
         </wsdl:port>
     </wsdl:service>
     
