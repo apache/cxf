@@ -27,8 +27,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import javax.security.auth.kerberos.KerberosPrincipal;
 import javax.security.auth.x500.X500Principal;
 
+import org.apache.wss4j.common.principal.UsernameTokenPrincipal;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.apache.cxf.common.logging.LogUtils;
@@ -60,11 +62,11 @@ import org.apache.wss4j.dom.message.WSSecEncryptedKey;
  * attached to the Subject.
  */
 public class DefaultSubjectProvider implements SubjectProvider {
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(DefaultSubjectProvider.class);
     private String subjectNameQualifier = "http://cxf.apache.org/sts";
-    private String subjectNameIDFormat = SAML2Constants.NAMEID_FORMAT_UNSPECIFIED;
-    
+    private String subjectNameIDFormat;
+
     /**
      * Set the SubjectNameQualifier.
      */
@@ -72,7 +74,7 @@ public class DefaultSubjectProvider implements SubjectProvider {
         this.subjectNameQualifier = subjectNameQualifier;
         LOG.fine("Setting Subject Name Qualifier: " + subjectNameQualifier);
     }
-    
+
     /**
      * Set the SubjectNameIDFormat.
      */
@@ -85,24 +87,24 @@ public class DefaultSubjectProvider implements SubjectProvider {
      * Get a SubjectBean object.
      */
     public SubjectBean getSubject(SubjectProviderParameters subjectProviderParameters) {
-        
+
         // 1. Get the principal
         Principal principal = getPrincipal(subjectProviderParameters);
         if (principal == null) {
             LOG.fine("Error in getting principal");
             throw new STSException("Error in getting principal", STSException.REQUEST_FAILED);
         }
-        
+
         // 2. Create the SubjectBean using the principal
         SubjectBean subjectBean = createSubjectBean(principal, subjectProviderParameters);
-        
+
         // 3. Create the KeyInfoBean and set it on the SubjectBean
         KeyInfoBean keyInfo = createKeyInfo(subjectProviderParameters);
         subjectBean.setKeyInfo(keyInfo);
-        
+
         return subjectBean;
     }
-    
+
     /**
      * Get the Principal (which is used as the Subject). By default, we check the following (in order):
      *  - A valid OnBehalfOf principal
@@ -113,12 +115,12 @@ public class DefaultSubjectProvider implements SubjectProvider {
      */
     protected Principal getPrincipal(SubjectProviderParameters subjectProviderParameters) {
         TokenProviderParameters providerParameters = subjectProviderParameters.getProviderParameters();
-        
+
         Principal principal = null;
         //TokenValidator in IssueOperation has validated the ReceivedToken
         //if validation was successful, the principal was set in ReceivedToken 
         if (providerParameters.getTokenRequirements().getOnBehalfOf() != null) {
-            ReceivedToken receivedToken = providerParameters.getTokenRequirements().getOnBehalfOf();    
+            ReceivedToken receivedToken = providerParameters.getTokenRequirements().getOnBehalfOf();
             if (receivedToken.getState().equals(STATE.VALID)) {
                 principal = receivedToken.getPrincipal();
             }
@@ -135,10 +137,10 @@ public class DefaultSubjectProvider implements SubjectProvider {
         } else {
             principal = providerParameters.getPrincipal();
         }
-        
+
         return principal;
     }
-    
+
     /**
      * Create the SubjectBean using the specified principal.
      */
@@ -152,7 +154,7 @@ public class DefaultSubjectProvider implements SubjectProvider {
         String tokenType = tokenRequirements.getTokenType();
         String keyType = keyRequirements.getKeyType();
         String confirmationMethod = getSubjectConfirmationMethod(tokenType, keyType);
-        
+
         String subjectName = principal.getName();
         if (SAML2Constants.NAMEID_FORMAT_UNSPECIFIED.equals(subjectNameIDFormat)
             && principal instanceof X500Principal) {
@@ -167,31 +169,49 @@ public class DefaultSubjectProvider implements SubjectProvider {
                 //Ignore, not X500 compliant thus use the whole string as the value
             }
         }
-        
-        SubjectBean subjectBean = 
+        else {
+            if (!SAML2Constants.NAMEID_FORMAT_UNSPECIFIED.equals(subjectNameIDFormat)) {
+                /* Set subjectNameIDFormat correctly based on type of principal
+                unless already set to some value other than unspecified */
+                if (principal instanceof UsernameTokenPrincipal) {
+                    subjectNameIDFormat = SAML2Constants.NAMEID_FORMAT_PERSISTENT;
+                }
+                else if (principal instanceof X500Principal) {
+                    subjectNameIDFormat = SAML2Constants.NAMEID_FORMAT_X509_SUBJECT_NAME;
+                }
+                else if (principal instanceof KerberosPrincipal) {
+                    subjectNameIDFormat = SAML2Constants.NAMEID_FORMAT_KERBEROS;
+                }
+                else {
+                    subjectNameIDFormat = SAML2Constants.NAMEID_FORMAT_UNSPECIFIED;
+                }
+            }
+        }
+
+        SubjectBean subjectBean =
             new SubjectBean(subjectName, subjectNameQualifier, confirmationMethod);
         LOG.fine("Creating new subject with principal name: " + principal.getName());
         if (subjectNameIDFormat != null && subjectNameIDFormat.length() > 0) {
             subjectBean.setSubjectNameIDFormat(subjectNameIDFormat);
         }
-        
+
         return subjectBean;
     }
-        
+
     /**
      * Get the SubjectConfirmation method given a tokenType and keyType
      */
     protected String getSubjectConfirmationMethod(String tokenType, String keyType) {
         if (WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)
             || WSConstants.SAML_NS.equals(tokenType)) {
-            if (STSConstants.SYMMETRIC_KEY_KEYTYPE.equals(keyType) 
+            if (STSConstants.SYMMETRIC_KEY_KEYTYPE.equals(keyType)
                 || STSConstants.PUBLIC_KEY_KEYTYPE.equals(keyType)) {
                 return SAML1Constants.CONF_HOLDER_KEY;
             } else {
                 return SAML1Constants.CONF_BEARER;
             }
         } else {
-            if (STSConstants.SYMMETRIC_KEY_KEYTYPE.equals(keyType) 
+            if (STSConstants.SYMMETRIC_KEY_KEYTYPE.equals(keyType)
                 || STSConstants.PUBLIC_KEY_KEYTYPE.equals(keyType)) {
                 return SAML2Constants.CONF_HOLDER_KEY;
             } else {
@@ -199,7 +219,7 @@ public class DefaultSubjectProvider implements SubjectProvider {
             }
         }
     }
-    
+
     /**
      * Create and return the KeyInfoBean to be inserted into the SubjectBean
      */
@@ -209,7 +229,7 @@ public class DefaultSubjectProvider implements SubjectProvider {
         STSPropertiesMBean stsProperties = providerParameters.getStsProperties();
 
         String keyType = keyRequirements.getKeyType();
-        
+
         if (STSConstants.SYMMETRIC_KEY_KEYTYPE.equals(keyType)) {
             Crypto crypto = stsProperties.getEncryptionCrypto();
 
@@ -223,7 +243,7 @@ public class DefaultSubjectProvider implements SubjectProvider {
                 LOG.fine("No encryption Name is configured for Symmetric KeyType");
                 throw new STSException("No Encryption Name is configured", STSException.REQUEST_FAILED);
             }
-            
+
             CryptoType cryptoType = null;
 
             // Check for using of service endpoint (AppliesTo) as certificate identifier
@@ -246,7 +266,7 @@ public class DefaultSubjectProvider implements SubjectProvider {
                 }
                 Document doc = subjectProviderParameters.getDoc();
                 byte[] secret = subjectProviderParameters.getSecret();
-                KeyInfoBean keyInfo = 
+                KeyInfoBean keyInfo =
                     createEncryptedKeyKeyInfo(certs[0], secret, doc, encryptionProperties, crypto);
                 return keyInfo;
             } catch (WSSecurityException ex) {
@@ -255,7 +275,7 @@ public class DefaultSubjectProvider implements SubjectProvider {
             }
         } else if (STSConstants.PUBLIC_KEY_KEYTYPE.equals(keyType)) {
             ReceivedKey receivedKey = keyRequirements.getReceivedKey();
-            
+
             // Validate UseKey trust
             if (stsProperties.isValidateUseKey() && stsProperties.getSignatureCrypto() != null) {
                 if (receivedKey.getX509Cert() != null) {
@@ -277,10 +297,10 @@ public class DefaultSubjectProvider implements SubjectProvider {
                     }
                 }
             }
-            
+
             return createPublicKeyKeyInfo(receivedKey.getX509Cert(), receivedKey.getPublicKey());
         }
-        
+
         return null;
     }
 
@@ -305,7 +325,7 @@ public class DefaultSubjectProvider implements SubjectProvider {
      * Create an EncryptedKey KeyInfo.
      */
     protected static KeyInfoBean createEncryptedKeyKeyInfo(
-        X509Certificate certificate, 
+        X509Certificate certificate,
         byte[] secret,
         Document doc,
         EncryptionProperties encryptionProperties,
@@ -324,7 +344,7 @@ public class DefaultSubjectProvider implements SubjectProvider {
         Element encryptedKeyElement = encrKey.getEncryptedKeyElement();
 
         // Append the EncryptedKey to a KeyInfo element
-        Element keyInfoElement = 
+        Element keyInfoElement =
             doc.createElementNS(
                 WSConstants.SIG_NS, WSConstants.SIG_PREFIX + ":" + WSConstants.KEYINFO_LN
             );
