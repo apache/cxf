@@ -87,6 +87,9 @@ public final class HttpHeaderHelper {
             if (charset.indexOf(";") != -1) {
                 charset = charset.substring(0, charset.indexOf(";")).trim();
             }
+            if (charset.isEmpty()) {
+                return null;
+            }
             if (charset.charAt(0) == '\"') {
                 charset = charset.substring(1, charset.length() - 1);
             }
