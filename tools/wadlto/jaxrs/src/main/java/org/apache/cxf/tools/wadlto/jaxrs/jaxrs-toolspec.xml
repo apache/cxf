@@ -247,6 +247,10 @@ Examples:
                 </annotation>
                 <switch>validate</switch>
             </option>
+            <option id="javaDocs" maxOccurs="1">
+                <annotation>Convert WADL doc elements to JavaDocs</annotation>
+                <switch>javaDocs</switch>
+            </option>
         </optionGroup>
         <optionGroup id="common_options">
             <option id="help" maxOccurs="1">
