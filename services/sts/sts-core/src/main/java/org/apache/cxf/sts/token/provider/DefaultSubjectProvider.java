@@ -30,9 +30,9 @@ import java.util.regex.Pattern;
 import javax.security.auth.kerberos.KerberosPrincipal;
 import javax.security.auth.x500.X500Principal;
 
-import org.apache.wss4j.common.principal.UsernameTokenPrincipal;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.STSPropertiesMBean;
@@ -46,6 +46,7 @@ import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.principal.UsernameTokenPrincipal;
 import org.apache.wss4j.common.saml.bean.KeyInfoBean;
 import org.apache.wss4j.common.saml.bean.KeyInfoBean.CERT_IDENTIFIER;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
@@ -152,7 +153,8 @@ public class DefaultSubjectProvider implements SubjectProvider {
         String confirmationMethod = getSubjectConfirmationMethod(tokenType, keyType);
 
         String subjectName = principal.getName();
-        if (SAML2Constants.NAMEID_FORMAT_UNSPECIFIED.equals(subjectNameIDFormat)
+        String localSubjectNameIDFormat = subjectNameIDFormat;
+        if (SAML2Constants.NAMEID_FORMAT_UNSPECIFIED.equals(localSubjectNameIDFormat)
             && principal instanceof X500Principal) {
             // Just use the "cn" instead of the entire DN
             try {
@@ -164,32 +166,24 @@ public class DefaultSubjectProvider implements SubjectProvider {
                 subjectName = principal.getName();
                 //Ignore, not X500 compliant thus use the whole string as the value
             }
-        }
-        else {
-            if (!SAML2Constants.NAMEID_FORMAT_UNSPECIFIED.equals(subjectNameIDFormat)) {
-                /* Set subjectNameIDFormat correctly based on type of principal
+        } else if (!SAML2Constants.NAMEID_FORMAT_UNSPECIFIED.equals(localSubjectNameIDFormat)) {
+            /* Set subjectNameIDFormat correctly based on type of principal
                 unless already set to some value other than unspecified */
-                if (principal instanceof UsernameTokenPrincipal) {
-                    subjectNameIDFormat = SAML2Constants.NAMEID_FORMAT_PERSISTENT;
-                }
-                else if (principal instanceof X500Principal) {
-                    subjectNameIDFormat = SAML2Constants.NAMEID_FORMAT_X509_SUBJECT_NAME;
-                }
-                else if (principal instanceof KerberosPrincipal) {
-                    subjectNameIDFormat = SAML2Constants.NAMEID_FORMAT_KERBEROS;
-                }
-                else {
-                    subjectNameIDFormat = SAML2Constants.NAMEID_FORMAT_UNSPECIFIED;
-                }
+            if (principal instanceof UsernameTokenPrincipal) {
+                localSubjectNameIDFormat = SAML2Constants.NAMEID_FORMAT_PERSISTENT;
+            } else if (principal instanceof X500Principal) {
+                localSubjectNameIDFormat = SAML2Constants.NAMEID_FORMAT_X509_SUBJECT_NAME;
+            } else if (principal instanceof KerberosPrincipal) {
+                localSubjectNameIDFormat = SAML2Constants.NAMEID_FORMAT_KERBEROS;
+            } else if (localSubjectNameIDFormat == null) {
+                localSubjectNameIDFormat = SAML2Constants.NAMEID_FORMAT_UNSPECIFIED;
             }
         }
 
         SubjectBean subjectBean =
             new SubjectBean(subjectName, subjectNameQualifier, confirmationMethod);
         LOG.fine("Creating new subject with principal name: " + principal.getName());
-        if (subjectNameIDFormat != null && subjectNameIDFormat.length() > 0) {
-            subjectBean.setSubjectNameIDFormat(subjectNameIDFormat);
-        }
+        subjectBean.setSubjectNameIDFormat(localSubjectNameIDFormat);
 
         return subjectBean;
     }
