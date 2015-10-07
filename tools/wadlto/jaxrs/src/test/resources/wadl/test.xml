@@ -2,9 +2,22 @@
 	<grammars />
 	<resources>
 		<resource id="Test" path="/repository">
-            <param name="top" style="template" type="xs:string"/>
+		    <doc>
+		        Repository Resource
+		    </doc>
+            <param name="top" style="template" type="xs:string">
+                <doc>
+			     Repository Index
+			    </doc>
+            </param>
 			<method name="GET" id="listRepositories">
+			    <doc>
+			      List Repositories
+			    </doc>   
 				<response>
+				    <doc>
+			          JSON Repository Representation
+			        </doc>
 					<representation mediaType="application/json" />
 				</response>
 			</method>
@@ -24,6 +37,9 @@
                 <method name="POST">
 	                <request>
 	                    <representation mediaType="text/plain">
+	                        <doc>
+	                          Text Plain representation
+	                        </doc>
 	                        <param name="id" style="plain" type="xsd:anyType"/>
 	                    </representation>
 	                </request>

@@ -102,7 +102,7 @@ public class JAXRSContainerTest extends ProcessorTestBase {
                         "{http://www.w3.org/2001/XMLSchema}anyType=" 
                         + "java.io.InputStream");
             context.put(WadlToolConstants.CFG_INHERIT_PARAMS, "last");
-            
+            context.put(WadlToolConstants.CFG_CREATE_JAVA_DOCS, "true");
             container.setContext(context);
             container.execute();
 
