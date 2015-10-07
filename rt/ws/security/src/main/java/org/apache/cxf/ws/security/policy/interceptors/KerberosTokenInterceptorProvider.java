@@ -53,6 +53,7 @@ import org.apache.cxf.ws.security.wss4j.StaxSecurityContextInInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.PolicyValidatorParameters;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.SecurityPolicyValidator;
+import org.apache.cxf.ws.security.wss4j.policyvalidators.ValidatorUtils;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
@@ -201,7 +202,7 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
             
             QName qName = ais.iterator().next().getAssertion().getName();
             Map<QName, SecurityPolicyValidator> validators = 
-                PolicyUtils.getSecurityPolicyValidators(message);
+                ValidatorUtils.getSecurityPolicyValidators(message);
             if (validators.containsKey(qName)) {
                 validators.get(qName).validatePolicies(parameters, ais);
             }

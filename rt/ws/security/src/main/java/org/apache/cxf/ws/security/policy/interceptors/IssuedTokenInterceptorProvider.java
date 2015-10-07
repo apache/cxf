@@ -47,6 +47,7 @@ import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JStaxOutInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.PolicyValidatorParameters;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.SecurityPolicyValidator;
+import org.apache.cxf.ws.security.wss4j.policyvalidators.ValidatorUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
@@ -207,7 +208,7 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
             
             QName qName = issuedAis.iterator().next().getAssertion().getName();
             Map<QName, SecurityPolicyValidator> validators = 
-                PolicyUtils.getSecurityPolicyValidators(message);
+                ValidatorUtils.getSecurityPolicyValidators(message);
             if (validators.containsKey(qName)) {
                 validators.get(qName).validatePolicies(parameters, issuedAis);
             }

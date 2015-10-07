@@ -41,6 +41,7 @@ import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.PolicyValidatorParameters;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.SecurityPolicyValidator;
+import org.apache.cxf.ws.security.wss4j.policyvalidators.ValidatorUtils;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.PasswordEncryptor;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -571,7 +572,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         parameters.setTimestampElement(timestamp);
         
         // Validate security policies
-        Map<QName, SecurityPolicyValidator> validators = PolicyUtils.getSecurityPolicyValidators(msg);
+        Map<QName, SecurityPolicyValidator> validators = ValidatorUtils.getSecurityPolicyValidators(msg);
         for (Map.Entry<QName, Collection<AssertionInfo>> entry : aim.entrySet()) {
             // Check to see if we have a security policy + if we can validate it
             if (validators.containsKey(entry.getKey())) {
