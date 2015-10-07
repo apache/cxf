@@ -65,7 +65,7 @@ public class DefaultSubjectProvider implements SubjectProvider {
 
     private static final Logger LOG = LogUtils.getL7dLogger(DefaultSubjectProvider.class);
     private String subjectNameQualifier = "http://cxf.apache.org/sts";
-    private String subjectNameIDFormat;
+    private String subjectNameIDFormat = SAML2Constants.NAMEID_FORMAT_UNSPECIFIED;
 
     /**
      * Set the SubjectNameQualifier.
@@ -86,14 +86,9 @@ public class DefaultSubjectProvider implements SubjectProvider {
     /**
      * Get a SubjectBean object.
      */
-<<<<<<< HEAD
     public SubjectBean getSubject(
         TokenProviderParameters providerParameters, Document doc, byte[] secret
     ) {
-=======
-    public SubjectBean getSubject(SubjectProviderParameters subjectProviderParameters) {
-
->>>>>>> 1c0dad1... Fix subjectNameIDFormat to not always assume unspecified and sets it based on the principal's token
         // 1. Get the principal
         Principal principal = getPrincipal(providerParameters);
         if (principal == null) {
@@ -102,13 +97,8 @@ public class DefaultSubjectProvider implements SubjectProvider {
         }
 
         // 2. Create the SubjectBean using the principal
-<<<<<<< HEAD
         SubjectBean subjectBean = createSubjectBean(principal, providerParameters);
         
-=======
-        SubjectBean subjectBean = createSubjectBean(principal, subjectProviderParameters);
-
->>>>>>> 1c0dad1... Fix subjectNameIDFormat to not always assume unspecified and sets it based on the principal's token
         // 3. Create the KeyInfoBean and set it on the SubjectBean
         KeyInfoBean keyInfo = createKeyInfo(providerParameters, doc, secret);
         subjectBean.setKeyInfo(keyInfo);
@@ -124,13 +114,7 @@ public class DefaultSubjectProvider implements SubjectProvider {
      *  - The principal associated with the request. We don't need to check to see if it is "valid" here, as it
      *    is not parsed by the STS (but rather the WS-Security layer).
      */
-<<<<<<< HEAD
     protected Principal getPrincipal(TokenProviderParameters providerParameters) {
-=======
-    protected Principal getPrincipal(SubjectProviderParameters subjectProviderParameters) {
-        TokenProviderParameters providerParameters = subjectProviderParameters.getProviderParameters();
-
->>>>>>> 1c0dad1... Fix subjectNameIDFormat to not always assume unspecified and sets it based on the principal's token
         Principal principal = null;
         //TokenValidator in IssueOperation has validated the ReceivedToken
         //if validation was successful, the principal was set in ReceivedToken 
@@ -211,31 +195,6 @@ public class DefaultSubjectProvider implements SubjectProvider {
     }
 
     /**
-<<<<<<< HEAD
-=======
-     * Get the SubjectConfirmation method given a tokenType and keyType
-     */
-    protected String getSubjectConfirmationMethod(String tokenType, String keyType) {
-        if (WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)
-            || WSConstants.SAML_NS.equals(tokenType)) {
-            if (STSConstants.SYMMETRIC_KEY_KEYTYPE.equals(keyType)
-                || STSConstants.PUBLIC_KEY_KEYTYPE.equals(keyType)) {
-                return SAML1Constants.CONF_HOLDER_KEY;
-            } else {
-                return SAML1Constants.CONF_BEARER;
-            }
-        } else {
-            if (STSConstants.SYMMETRIC_KEY_KEYTYPE.equals(keyType)
-                || STSConstants.PUBLIC_KEY_KEYTYPE.equals(keyType)) {
-                return SAML2Constants.CONF_HOLDER_KEY;
-            } else {
-                return SAML2Constants.CONF_BEARER;
-            }
-        }
-    }
-
-    /**
->>>>>>> 1c0dad1... Fix subjectNameIDFormat to not always assume unspecified and sets it based on the principal's token
      * Create and return the KeyInfoBean to be inserted into the SubjectBean
      */
     protected KeyInfoBean createKeyInfo(
@@ -280,13 +239,7 @@ public class DefaultSubjectProvider implements SubjectProvider {
                 if ((certs == null) || (certs.length == 0)) {
                     throw new STSException("Encryption certificate is not found for alias: " + encryptionName);
                 }
-<<<<<<< HEAD
                 KeyInfoBean keyInfo = 
-=======
-                Document doc = subjectProviderParameters.getDoc();
-                byte[] secret = subjectProviderParameters.getSecret();
-                KeyInfoBean keyInfo =
->>>>>>> 1c0dad1... Fix subjectNameIDFormat to not always assume unspecified and sets it based on the principal's token
                     createEncryptedKeyKeyInfo(certs[0], secret, doc, encryptionProperties, crypto);
                 return keyInfo;
             } catch (WSSecurityException ex) {
