@@ -73,7 +73,7 @@ public class JavaDocProvider implements DocumentationProvider {
     
     public String getClassDoc(ClassResourceInfo cri) {
         try {
-            ClassDocs doc = getClassDocInternal(cri);
+            ClassDocs doc = getClassDocInternal(cri.getServiceClass());
             if (doc == null) {
                 return null;
             }
@@ -123,7 +123,7 @@ public class JavaDocProvider implements DocumentationProvider {
                 return null;
             }
         } catch (Exception ex) {
-            // ignore    
+            // ignore  
         }
         return null;
     }
@@ -132,7 +132,7 @@ public class JavaDocProvider implements DocumentationProvider {
         if (cls.getAnnotation(Path.class) != null) { 
             return cls;
         }
-        if (cls.getSuperclass().getAnnotation(Path.class) != null) {
+        if (cls.getSuperclass() != null && cls.getSuperclass().getAnnotation(Path.class) != null) {
             return cls.getSuperclass();
         }
         for (Class<?> i : cls.getInterfaces()) {
@@ -143,8 +143,8 @@ public class JavaDocProvider implements DocumentationProvider {
         return cls;
     }
     
-    private ClassDocs getClassDocInternal(ClassResourceInfo cri) throws Exception {
-        Class<?> annotatedClass = getPathAnnotatedClass(cri.getServiceClass());
+    private ClassDocs getClassDocInternal(Class<?> cls) throws Exception {
+        Class<?> annotatedClass = getPathAnnotatedClass(cls);
         String resource = annotatedClass.getName().replace(".", "/") + ".html";
         ClassDocs classDocs = docs.get(resource);
         if (classDocs == null) {
@@ -169,12 +169,13 @@ public class JavaDocProvider implements DocumentationProvider {
     
     
     private MethodDocs getOperationDocInternal(OperationResourceInfo ori) throws Exception {
-        ClassDocs classDoc = getClassDocInternal(ori.getClassResourceInfo());
+        Method method = ori.getAnnotatedMethod() == null
+                ? ori.getMethodToInvoke()
+                : ori.getAnnotatedMethod();
+        ClassDocs classDoc = getClassDocInternal(method.getDeclaringClass());
         if (classDoc == null) {
             return null;
         }
-        Method method = ori.getAnnotatedMethod() == null ? ori.getMethodToInvoke() 
-            : ori.getAnnotatedMethod(); 
         MethodDocs mDocs = classDoc.getMethodDocs(method);
         if (mDocs == null) {
             String operLink = getOperLink();
