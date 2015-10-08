@@ -349,7 +349,7 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
         }
         String name = beanNames.get(bean.getClass().getName());
         if (name != null) {
-            return null;
+            return name;
         } 
         Class<?> resourceClass = bean.getClass();
         if (useClassNames && doGetClassResourceName(resourceClass) == null) {
