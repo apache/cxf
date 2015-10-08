@@ -39,12 +39,14 @@ public abstract class AbstractJoseJwtProducer extends AbstractJoseProducer {
             throw new JwtException("Unable to secure JWT");
         }
         String data = null;
-        if (theEncProvider == null) {
+        
+        if (isJweRequired() && theEncProvider == null) {
             theEncProvider = getInitializedEncryptionProvider();
+            if (theEncProvider == null) {
+                throw new JwtException("Unable to encrypt JWT");
+            }
         }
-        if (theEncProvider == null && isJweRequired()) {
-            throw new JwtException("Unable to encrypt JWT");
-        }
+        
         if (isJwsRequired()) {
             if (theSigProvider == null) {
                 theSigProvider = getInitializedSignatureProvider();
