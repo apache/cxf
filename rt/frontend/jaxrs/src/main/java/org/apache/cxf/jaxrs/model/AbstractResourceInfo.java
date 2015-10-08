@@ -29,7 +29,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.WeakHashMap;
 import java.util.logging.Logger;
 
 import javax.ws.rs.core.Application;
@@ -209,7 +208,7 @@ public abstract class AbstractResourceInfo {
             property = bus.getProperty(prop);
             if (property == null && create) {
                 Map<Class<?>, Map<T, ThreadLocalProxy<?>>> map
-                    = Collections.synchronizedMap(new WeakHashMap<Class<?>, Map<T, ThreadLocalProxy<?>>>(2));
+                    = Collections.synchronizedMap(new HashMap<Class<?>, Map<T, ThreadLocalProxy<?>>>(2));
                 bus.setProperty(prop, map);
                 property = map;
             }
@@ -230,7 +229,7 @@ public abstract class AbstractResourceInfo {
         Object property = bus.getProperty(CONSTRUCTOR_PROXY_MAP);
         if (property == null) {
             Map<Class<?>, Map<Class<?>, ThreadLocalProxy<?>>> map
-                = Collections.synchronizedMap(new WeakHashMap<Class<?>, Map<Class<?>, ThreadLocalProxy<?>>>(2));
+                = Collections.synchronizedMap(new HashMap<Class<?>, Map<Class<?>, ThreadLocalProxy<?>>>(2));
             bus.setProperty(CONSTRUCTOR_PROXY_MAP, map);
             property = map;
         }
@@ -380,7 +379,7 @@ public abstract class AbstractResourceInfo {
                                  V proxy) {
         Map<T, V> proxies = proxyMap.get(serviceClass);
         if (proxies == null) {
-            proxies = Collections.synchronizedMap(new WeakHashMap<T, V>());
+            proxies = Collections.synchronizedMap(new HashMap<T, V>());
             proxyMap.put(serviceClass, proxies);
         }
         if (!proxies.containsKey(f)) {
