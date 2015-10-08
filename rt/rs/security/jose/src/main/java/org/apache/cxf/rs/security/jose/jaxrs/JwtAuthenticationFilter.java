@@ -43,17 +43,23 @@ import org.apache.cxf.security.SecurityContext;
 public class JwtAuthenticationFilter extends AbstractJoseJwtConsumer implements ContainerRequestFilter {
     protected static final Logger LOG = LogUtils.getL7dLogger(JwtAuthenticationFilter.class);
     
+    private static final String DEFAULT_AUTH_SCHEME = "JWT";
+    private String expectedAuthScheme = DEFAULT_AUTH_SCHEME;
+    
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
         String auth = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
         String[] parts = auth == null ? null : auth.split(" ");
-        if (parts == null || !"JWT".equals(parts[0]) || parts.length != 2) {
-            throw new JoseException("JWT scheme is expected");
+        if (parts == null || !expectedAuthScheme.equals(parts[0]) || parts.length != 2) {
+            throw new JoseException(expectedAuthScheme + " scheme is expected");
         }
         JwtToken jwt = super.getJwtToken(parts[1]);
         JoseUtils.setMessageContextProperty(jwt.getHeaders());
         JAXRSUtils.getCurrentMessage().put(SecurityContext.class, 
               new SimpleSecurityContext(new JwtPrincipal(jwt)));
+    }
+    public void setExpectedAuthScheme(String expectedAuthScheme) {
+        this.expectedAuthScheme = expectedAuthScheme;
     }
     public static class JwtPrincipal extends SimplePrincipal {
         private static final long serialVersionUID = 1L;

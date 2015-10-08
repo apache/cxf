@@ -42,6 +42,8 @@ import org.apache.cxf.rt.security.crypto.CryptoUtils;
 public class JwtAuthenticationClientFilter extends AbstractJoseJwtProducer 
     implements ClientRequestFilter {
 
+    private static final String DEFAULT_AUTH_SCHEME = "JWT";
+    private String authScheme = DEFAULT_AUTH_SCHEME;
     @Override
     public void filter(ClientRequestContext requestContext) throws IOException {
         JwtToken jwt = getJwtToken(requestContext);
@@ -63,7 +65,7 @@ public class JwtAuthenticationClientFilter extends AbstractJoseJwtProducer
                                                 getContextPropertyValue());
         String data = super.processJwt(jwt);
         requestContext.getHeaders().putSingle(HttpHeaders.AUTHORIZATION, 
-                                              "JWT " + data);
+                                              authScheme + " " + data);
     }
     protected JwtToken getJwtToken(ClientRequestContext requestContext) {
         return (JwtToken)requestContext.getProperty("jwt.token");
@@ -71,5 +73,11 @@ public class JwtAuthenticationClientFilter extends AbstractJoseJwtProducer
     protected String getContextPropertyValue() {
         return Base64UrlUtility.encode(CryptoUtils.generateSecureRandomBytes(16));
     }
+    
+    public void setAuthScheme(String authScheme) {
+        this.authScheme = authScheme;
+    }
+    
+    
     
 }
