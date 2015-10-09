@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.jaxrs.model.wadl;
+package org.apache.cxf.jaxrs.model.doc;
 
 import java.io.InputStream;
 import java.lang.reflect.Method;
