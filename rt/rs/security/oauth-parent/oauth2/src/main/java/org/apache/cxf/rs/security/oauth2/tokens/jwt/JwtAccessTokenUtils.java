@@ -110,9 +110,20 @@ public final class JwtAccessTokenUtils {
             throw new SecurityException();
         }
     }
-    public static void validateJwtClaims(JwtClaims claims, Client c) {
+    public static void validateJwtClaims(JwtClaims claims, int ttl, int futureTTL, Client c) {
         validateJwtSubjectAndAudience(claims, c);
-        JwtUtils.validateJwtTimeClaims(claims);
+        
+        // If we have no issued time then we need to have an expiry
+        boolean expiredRequired = claims.getIssuedAt() == null;
+        JwtUtils.validateJwtExpiry(claims, expiredRequired);
+        
+        JwtUtils.validateJwtNotBefore(claims, futureTTL, false);
+        
+        // If we have no expiry then we must have an issued at
+        boolean issuedAtRequired = claims.getExpiryTime() == null;
+        if (issuedAtRequired) {
+            JwtUtils.validateJwtTTL(claims, ttl, issuedAtRequired);
+        }
     }
     
     private static void validateJwtSubjectAndAudience(JwtClaims claims, Client c) {
