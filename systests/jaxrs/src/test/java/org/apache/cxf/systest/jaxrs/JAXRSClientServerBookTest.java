@@ -389,6 +389,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         wc.path("100");
         wc.query("id_2", "20");
         wc.query("id3", "3");
+        wc.query("id4", "123");
         Book book = wc.get(Book.class);
         assertEquals(123L, book.getId());
     }
@@ -452,9 +453,13 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     @Test
     public void testProxyBeanParam() throws Exception {
         BookStore store = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class);
+        WebClient.getConfig(store).getHttpConduit().getClient().setReceiveTimeout(10000000L);
         BookStore.BookBean bean = new BookStore.BookBean();
         bean.setId(100L);
         bean.setId2(23L);
+        BookStore.BookBeanNested nested = new BookStore.BookBeanNested();
+        nested.setId4(123);
+        bean.setNested(nested);
                 
         Book book = store.getBeanParamBook(bean);
         assertEquals(123L, book.getId());

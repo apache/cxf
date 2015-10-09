@@ -258,7 +258,7 @@ public final class JAXRSUtils {
                                                      m.getParameterTypes()[0]);
             Object o;
             
-            if (p.getType() == ParameterType.BEAN && bri instanceof ClassResourceInfo) {
+            if (p.getType() == ParameterType.BEAN) {
                 o = createBeanParamValue(message, m.getParameterTypes()[0], ori);    
             } else {
                 o = createHttpParameterValue(p, 
@@ -277,7 +277,7 @@ public final class JAXRSUtils {
                                                      f.getType());
             Object o = null;
             
-            if (p.getType() == ParameterType.BEAN && bri instanceof ClassResourceInfo) {
+            if (p.getType() == ParameterType.BEAN) {
                 o = createBeanParamValue(message, f.getType(), ori);    
             } else {
                 o = createHttpParameterValue(p, 
