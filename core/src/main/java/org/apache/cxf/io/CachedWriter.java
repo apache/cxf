@@ -628,6 +628,7 @@ public class CachedWriter extends Writer {
                     ciphers = new CipherPair(cipherTransformation);
                 }
             } catch (GeneralSecurityException e) {
+                out.close();
                 throw new IOException(e.getMessage(), e);
             }
             out = new CipherOutputStream(out, ciphers.getEncryptor()) {
