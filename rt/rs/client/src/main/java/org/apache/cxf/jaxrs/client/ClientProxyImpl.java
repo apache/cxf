@@ -39,6 +39,7 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
+import javax.ws.rs.BeanParam;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.HeaderParam;
@@ -485,18 +486,29 @@ public class ClientProxyImpl extends AbstractClient implements
     
     private Map<String, BeanPair> getValuesFromBeanParam(Object bean, Class<? extends Annotation> annClass) {
         Map<String, BeanPair> values = new HashMap<String, BeanPair>();
-        
+        getValuesFromBeanParam(bean, annClass, values);
+        return values;
+    }
+    
+    private Map<String, BeanPair> getValuesFromBeanParam(Object bean, 
+                                                         Class<? extends Annotation> annClass,
+                                                         Map<String, BeanPair> values) {
         for (Method m : bean.getClass().getMethods()) {
             if (m.getName().startsWith("set")) {
                 try {
                     String propertyName = m.getName().substring(3);
                     Annotation annotation = m.getAnnotation(annClass);
-                    if (annotation != null) {
+                    boolean beanParam = m.getAnnotation(BeanParam.class) != null;
+                    if (annotation != null || beanParam) {
                         Method getter = bean.getClass().getMethod("get" + propertyName, new Class[]{});
                         Object value = getter.invoke(bean, new Object[]{});
                         if (value != null) {
-                            String annotationValue = AnnotationUtils.getAnnotationValue(annotation);
-                            values.put(annotationValue, new BeanPair(value, m.getParameterAnnotations()[0]));
+                            if (annotation != null) {
+                                String annotationValue = AnnotationUtils.getAnnotationValue(annotation);
+                                values.put(annotationValue, new BeanPair(value, m.getParameterAnnotations()[0]));
+                            } else {
+                                getValuesFromBeanParam(value, annClass, values);
+                            }
                         }
                     } else {
                         String fieldName = StringUtils.uncapitalize(propertyName);
@@ -511,6 +523,11 @@ public class ClientProxyImpl extends AbstractClient implements
                                 String annotationValue = AnnotationUtils.getAnnotationValue(annotation);
                                 values.put(annotationValue, new BeanPair(value, f.getAnnotations()));
                             }    
+                        } else if (f.getAnnotation(BeanParam.class) != null) {
+                            Object value = ReflectionUtil.accessDeclaredField(f, bean, Object.class);
+                            if (value != null) {
+                                getValuesFromBeanParam(value, annClass, values);
+                            }
                         }
                     }
                 } catch (Throwable t) {

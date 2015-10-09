@@ -335,6 +335,10 @@ public class BookStore {
     public Book getBeanParamBook(@BeanParam BookBean bean) {
         
         long id = bean.getId() + bean.getId2() + bean.getId3(); 
+        if (bean.getNested().getId4() != id) {
+            throw new RuntimeException();
+        }
+        
         
         return books.get(id);
     }
@@ -1751,6 +1755,7 @@ public class BookStore {
         @QueryParam("id_2")
         private long id2;
         private long id3;
+        private BookBeanNested nested;
 
         public long getId() {
             return id;
@@ -1781,6 +1786,28 @@ public class BookStore {
             return id3;
         }
 
+        public BookBeanNested getNested() {
+            return nested;
+        }
+
+        @BeanParam
+        public void setNested(BookBeanNested nested) {
+            this.nested = nested;
+        }
+
+        
+    }
+    
+    public static class BookBeanNested {
+        private long id4;
+
+        public long getId4() {
+            return id4;
+        }
+        @QueryParam("id4")
+        public void setId4(long id4) {
+            this.id4 = id4;
+        }
         
     }
     
