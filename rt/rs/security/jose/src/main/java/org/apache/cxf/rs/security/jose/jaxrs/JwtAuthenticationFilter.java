@@ -34,6 +34,7 @@ import org.apache.cxf.rs.security.jose.JoseException;
 import org.apache.cxf.rs.security.jose.JoseUtils;
 import org.apache.cxf.rs.security.jose.jwt.AbstractJoseJwtConsumer;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
+import org.apache.cxf.rs.security.jose.jwt.JwtUtils;
 import org.apache.cxf.security.SecurityContext;
 
 @PreMatching
@@ -43,6 +44,8 @@ public class JwtAuthenticationFilter extends AbstractJoseJwtConsumer implements 
     
     private static final String DEFAULT_AUTH_SCHEME = "JWT";
     private String expectedAuthScheme = DEFAULT_AUTH_SCHEME;
+    private int ttl = 300;
+    private int futureTTL = 0;
     
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
@@ -60,4 +63,32 @@ public class JwtAuthenticationFilter extends AbstractJoseJwtConsumer implements 
         this.expectedAuthScheme = expectedAuthScheme;
     }
     
+    @Override
+    protected void validateToken(JwtToken jwt) {
+        // If we have no issued time then we need to have an expiry
+        boolean expiredRequired = jwt.getClaims().getIssuedAt() == null;
+        JwtUtils.validateJwtExpiry(jwt.getClaims(), expiredRequired);
+        
+        JwtUtils.validateJwtNotBefore(jwt.getClaims(), futureTTL, false);
+        
+        // If we have no expiry then we must have an issued at
+        boolean issuedAtRequired = jwt.getClaims().getExpiryTime() == null;
+        JwtUtils.validateJwtTTL(jwt.getClaims(), ttl, issuedAtRequired);
+    }
+
+    public int getTtl() {
+        return ttl;
+    }
+
+    public void setTtl(int ttl) {
+        this.ttl = ttl;
+    }
+
+    public int getFutureTTL() {
+        return futureTTL;
+    }
+
+    public void setFutureTTL(int futureTTL) {
+        this.futureTTL = futureTTL;
+    }
 }
