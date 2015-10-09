@@ -38,29 +38,37 @@ public abstract class AbstractJoseJwtConsumer extends AbstractJoseConsumer {
         if (!isJwsRequired() && !isJweRequired()) {
             throw new JwtException("Unable to process JWT");
         }
-        if (jweDecryptor == null) {
-            jweDecryptor = getInitializedDecryptionProvider();
-        }
-        if (jweDecryptor != null) {
+        
+        if (isJweRequired()) {
+            if (jweDecryptor == null) {
+                jweDecryptor = getInitializedDecryptionProvider();
+            }
+            if (jweDecryptor == null) {
+                throw new JwtException("Unable to decrypt JWT");
+            }
+            
             if (!isJwsRequired()) {
                 return new JweJwtCompactConsumer(wrappedJwtToken).decryptWith(jweDecryptor);    
             }
             wrappedJwtToken = jweDecryptor.decrypt(wrappedJwtToken).getContentText();
-        } else if (isJweRequired()) {
-            throw new JwtException("Unable to decrypt JWT");
         }
+        
 
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(wrappedJwtToken);
         JwtToken jwt = jwtConsumer.getJwtToken();
-        if (theSigVerifier == null) {
-            theSigVerifier = getInitializedSignatureVerifier(jwt);
+        if (isJwsRequired()) {
+            if (theSigVerifier == null) {
+                theSigVerifier = getInitializedSignatureVerifier(jwt);
+            }
+            if (theSigVerifier == null) {
+                throw new JwtException("Unable to validate JWT");
+            }
+            
+            if (!jwtConsumer.verifySignatureWith(theSigVerifier)) {
+                throw new JwtException("Invalid Signature");
+            }
         }
-        if (theSigVerifier == null && isJwsRequired()) {
-            throw new JwtException("Unable to validate JWT");
-        }
-        if (!jwtConsumer.verifySignatureWith(theSigVerifier)) {
-            throw new JwtException("Invalid Signature");
-        }
+        
         validateToken(jwt);
         return jwt; 
     }
