@@ -103,7 +103,9 @@ public class SCTProvider implements TokenProvider {
      */
     public TokenProviderResponse createToken(TokenProviderParameters tokenParameters) {
         TokenRequirements tokenRequirements = tokenParameters.getTokenRequirements();
-        LOG.fine("Handling token of type: " + tokenRequirements.getTokenType());
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("Handling token of type: " + tokenRequirements.getTokenType());
+        }
         
         if (tokenParameters.getTokenStore() == null) {
             LOG.log(Level.FINE, "A cache must be configured to use the SCTProvider");

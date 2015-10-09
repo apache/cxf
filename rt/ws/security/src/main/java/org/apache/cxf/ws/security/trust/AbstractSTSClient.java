@@ -31,6 +31,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.security.auth.callback.Callback;
@@ -488,7 +489,9 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
         if (location != null) {
             location = location.trim();
         }
-        LOG.fine("EPR address: " + location);
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("EPR address: " + location);
+        }
         
         final QName sName = EndpointReferenceUtils.getServiceName(ref, bus);
         if (sName != null) {
@@ -497,7 +500,9 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
             if (epName != null) {
                 endpointName = epName;
             }
-            LOG.fine("EPR endpoint: " + serviceName + " " + endpointName);
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.fine("EPR endpoint: " + serviceName + " " + endpointName);
+            }
         }
         final String wsdlLoc = EndpointReferenceUtils.getWSDLLocation(ref);
         if (wsdlLoc != null) {
@@ -505,7 +510,9 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
         }
         
         String mexLoc = findMEXLocation(ref, useEPRWSAAddrAsMEXLocation);
-        LOG.fine("WS-MEX location: " + mexLoc);
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("WS-MEX location: " + mexLoc);
+        }
         if (mexLoc != null) {
             try {
                 JaxWsProxyFactoryBean proxyFac = new JaxWsProxyFactoryBean();

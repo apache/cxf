@@ -76,7 +76,9 @@ public abstract class AbstractCommonBindingHandler {
         if (assertion == null) {
             return;
         }
-        LOG.log(Level.FINE, "Not asserting " + assertion.getName() + ": " + reason);
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.log(Level.FINE, "Not asserting " + assertion.getName() + ": " + reason);
+        }
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
         Collection<AssertionInfo> ais = aim.get(assertion.getName());
         if (ais != null) {

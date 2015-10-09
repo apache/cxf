@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.commons.jexl2.JexlContext;
@@ -93,7 +94,9 @@ public class JexlClaimsMapper implements ClaimsMapper {
         URL resource = ClassLoaderUtils.getResource(scriptLocation, this.getClass());
         if (resource != null) {
             scriptLocation = resource.getPath();
-            LOG.fine("Script found within Classpath: " + scriptLocation);
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.fine("Script found within Classpath: " + scriptLocation);
+            }
         }
         File scriptFile = new File(scriptLocation);
         if (scriptFile.exists()) {

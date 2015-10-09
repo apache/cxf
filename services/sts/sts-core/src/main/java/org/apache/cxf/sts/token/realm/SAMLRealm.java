@@ -20,6 +20,7 @@
 package org.apache.cxf.sts.token.realm;
 
 import java.util.Properties;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -95,7 +96,9 @@ public class SAMLRealm {
      */
     public void setSignaturePropertiesFile(String signaturePropertiesFile) {
         this.signaturePropertiesFile = signaturePropertiesFile;
-        LOG.fine("Setting signature properties: " + signaturePropertiesFile);
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("Setting signature properties: " + signaturePropertiesFile);
+        }
     }
     
     /**
@@ -144,7 +147,9 @@ public class SAMLRealm {
      */
     public void setCallbackHandler(CallbackHandler callbackHandler) {
         this.callbackHandler = callbackHandler;
-        LOG.fine("Setting callbackHandler: " + callbackHandler);
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("Setting callbackHandler: " + callbackHandler);
+        }
     }
     
     /**
@@ -153,7 +158,9 @@ public class SAMLRealm {
      */
     public void setCallbackHandlerClass(String callbackHandlerClass) {
         this.callbackHandlerClass = callbackHandlerClass;
-        LOG.fine("Setting callbackHandlerClass: " + callbackHandlerClass);
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("Setting callbackHandlerClass: " + callbackHandlerClass);
+        }
     }
     
     /**

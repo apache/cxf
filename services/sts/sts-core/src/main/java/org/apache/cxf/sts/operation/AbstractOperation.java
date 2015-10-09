@@ -299,9 +299,11 @@ public abstract class AbstractOperation {
 
         XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
         created.setValue(fmt.format(creationTime));
-        LOG.fine("Token lifetime creation: " + created.getValue());
         expires.setValue(fmt.format(expirationTime));
-        LOG.fine("Token lifetime expiration: " + expires.getValue());
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("Token lifetime creation: " + created.getValue());
+            LOG.fine("Token lifetime expiration: " + expires.getValue());
+        }
         
         LifetimeType lifetimeType = QNameConstants.WS_TRUST_FACTORY.createLifetimeType();
         lifetimeType.setCreated(created);
@@ -338,7 +340,9 @@ public abstract class AbstractOperation {
                 encryptionProperties.getAcceptedEncryptionAlgorithms();
             if (!supportedAlgorithms.contains(encryptionAlgorithm)) {
                 encryptionAlgorithm = encryptionProperties.getEncryptionAlgorithm();
-                LOG.fine("EncryptionAlgorithm not supported, defaulting to: " + encryptionAlgorithm);
+                if (LOG.isLoggable(Level.FINE)) {
+                    LOG.fine("EncryptionAlgorithm not supported, defaulting to: " + encryptionAlgorithm);
+                }
             }
         }
         // Get the key-wrap algorithm to use
@@ -351,7 +355,9 @@ public abstract class AbstractOperation {
                 encryptionProperties.getAcceptedKeyWrapAlgorithms();
             if (!supportedAlgorithms.contains(keyWrapAlgorithm)) {
                 keyWrapAlgorithm = encryptionProperties.getKeyWrapAlgorithm();
-                LOG.fine("KeyWrapAlgorithm not supported, defaulting to: " + keyWrapAlgorithm);
+                if (LOG.isLoggable(Level.FINE)) {
+                    LOG.fine("KeyWrapAlgorithm not supported, defaulting to: " + keyWrapAlgorithm);
+                }
             }
         }
         
@@ -405,7 +411,9 @@ public abstract class AbstractOperation {
                 encryptionProperties.getAcceptedKeyWrapAlgorithms();
             if (!supportedAlgorithms.contains(keyWrapAlgorithm)) {
                 keyWrapAlgorithm = encryptionProperties.getKeyWrapAlgorithm();
-                LOG.fine("KeyWrapAlgorithm not supported, defaulting to: " + keyWrapAlgorithm);
+                if (LOG.isLoggable(Level.FINE)) {
+                    LOG.fine("KeyWrapAlgorithm not supported, defaulting to: " + keyWrapAlgorithm);
+                }
             }
         }
         
@@ -475,7 +483,9 @@ public abstract class AbstractOperation {
         
         // Extract AppliesTo
         String address = extractAddressFromAppliesTo(tokenRequirements.getAppliesTo());
-        LOG.fine("The AppliesTo address that has been received is: " + address);
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("The AppliesTo address that has been received is: " + address);
+        }
         providerParameters.setAppliesToAddress(address);
         
         // Get the realm of the request

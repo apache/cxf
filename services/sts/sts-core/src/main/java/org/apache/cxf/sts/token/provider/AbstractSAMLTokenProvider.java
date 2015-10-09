@@ -20,6 +20,7 @@
 package org.apache.cxf.sts.token.provider;
 
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -77,7 +78,9 @@ public abstract class AbstractSAMLTokenProvider {
                 signatureProperties.getAcceptedSignatureAlgorithms();
             if (!supportedAlgorithms.contains(signatureAlgorithm)) {
                 signatureAlgorithm = signatureProperties.getSignatureAlgorithm();
-                LOG.fine("SignatureAlgorithm not supported, defaulting to: " + signatureAlgorithm);
+                if (LOG.isLoggable(Level.FINE)) {
+                    LOG.fine("SignatureAlgorithm not supported, defaulting to: " + signatureAlgorithm);
+                }
             }
         }
 
@@ -91,14 +94,18 @@ public abstract class AbstractSAMLTokenProvider {
                 signatureProperties.getAcceptedC14nAlgorithms();
             if (!supportedAlgorithms.contains(c14nAlgorithm)) {
                 c14nAlgorithm = signatureProperties.getC14nAlgorithm();
-                LOG.fine("C14nAlgorithm not supported, defaulting to: " + c14nAlgorithm);
+                if (LOG.isLoggable(Level.FINE)) {
+                    LOG.fine("C14nAlgorithm not supported, defaulting to: " + c14nAlgorithm);
+                }
             }
         }
 
         // If alias not defined, get the default of the SignatureCrypto
         if ((alias == null || "".equals(alias)) && (signatureCrypto != null)) {
             alias = signatureCrypto.getDefaultX509Identifier();
-            LOG.fine("Signature alias is null so using default alias: " + alias);
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.fine("Signature alias is null so using default alias: " + alias);
+            }
         }
         // Get the password
         WSPasswordCallback[] cb = {new WSPasswordCallback(alias, WSPasswordCallback.SIGNATURE)};

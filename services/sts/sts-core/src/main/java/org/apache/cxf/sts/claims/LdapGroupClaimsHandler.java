@@ -217,7 +217,9 @@ public class LdapGroupClaimsHandler implements ClaimsHandler, RealmSupport {
                                              this.getUserNameAttribute(), user);
             if (dn != null) {
                 user = dn.toString();
-                LOG.fine("DN for (" + this.getUserNameAttribute() + "=" + user + ") found: " + user);
+                if (LOG.isLoggable(Level.FINE)) {
+                    LOG.fine("DN for (" + this.getUserNameAttribute() + "=" + user + ") found: " + user);
+                }
             } else {
                 LOG.warning("DN not found for user '" + user + "'");
                 return new ProcessedClaimCollection();
@@ -293,7 +295,7 @@ public class LdapGroupClaimsHandler implements ClaimsHandler, RealmSupport {
                         role = parseRole(group, this.groupNameGlobalFilter);
                     }
                     filteredGroups.add(role);
-                } else {
+                } else if (LOG.isLoggable(Level.FINER)) {
                     LOG.finer("Group '" + group + "' doesn't match scoped and global group filter");
                 }
             }

@@ -188,7 +188,9 @@ public class SAMLTokenValidator implements TokenValidator {
                 }
             }
             if (secToken != null && secToken.isExpired()) {
-                LOG.fine("Token: " + secToken.getId() + " is in the cache but expired - revalidating");
+                if (LOG.isLoggable(Level.FINE)) {
+                    LOG.fine("Token: " + secToken.getId() + " is in the cache but expired - revalidating");
+                }
                 secToken = null;
             }
             

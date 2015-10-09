@@ -21,6 +21,7 @@ package org.apache.cxf.sts;
 import java.net.URL;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -131,7 +132,9 @@ public class StaticSTSProperties implements STSPropertiesMBean {
      */
     public void setCallbackHandler(CallbackHandler callbackHandler) {
         this.callbackHandler = callbackHandler;
-        LOG.fine("Setting callbackHandler: " + callbackHandler);
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("Setting callbackHandler: " + callbackHandler);
+        }
     }
     
     /**
@@ -140,7 +143,9 @@ public class StaticSTSProperties implements STSPropertiesMBean {
      */
     public void setCallbackHandlerClass(String callbackHandlerClass) {
         this.callbackHandlerClass = callbackHandlerClass;
-        LOG.fine("Setting callbackHandlerClass: " + callbackHandlerClass);
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("Setting callbackHandlerClass: " + callbackHandlerClass);
+        }
     }
     
     /**
@@ -175,7 +180,9 @@ public class StaticSTSProperties implements STSPropertiesMBean {
      */
     public void setSignatureCryptoProperties(Object signatureCryptoProperties) {
         this.signatureCryptoProperties = signatureCryptoProperties;
-        LOG.fine("Setting signature crypto properties: " + signatureCryptoProperties);
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("Setting signature crypto properties: " + signatureCryptoProperties);
+        }
     }
     
     /**
@@ -192,7 +199,9 @@ public class StaticSTSProperties implements STSPropertiesMBean {
      */
     public void setSignatureUsername(String signatureUsername) {
         this.signatureUsername = signatureUsername;
-        LOG.fine("Setting signatureUsername: " + signatureUsername);
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("Setting signatureUsername: " + signatureUsername);
+        }
     }
     
     /**
@@ -227,7 +236,9 @@ public class StaticSTSProperties implements STSPropertiesMBean {
      */
     public void setEncryptionCryptoProperties(Object encryptionCryptoProperties) {
         this.encryptionCryptoProperties = encryptionCryptoProperties;
-        LOG.fine("Setting encryptionProperties: " + encryptionCryptoProperties);
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("Setting encryptionProperties: " + encryptionCryptoProperties);
+        }
     }
     
     /**
@@ -245,7 +256,9 @@ public class StaticSTSProperties implements STSPropertiesMBean {
      */
     public void setEncryptionUsername(String encryptionUsername) {
         this.encryptionUsername = encryptionUsername;
-        LOG.fine("Setting encryptionUsername: " + encryptionUsername);
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("Setting encryptionUsername: " + encryptionUsername);
+        }
     }
     
     /**
@@ -279,7 +292,9 @@ public class StaticSTSProperties implements STSPropertiesMBean {
      */
     public void setIssuer(String issuer) {
         this.issuer = issuer;
-        LOG.fine("Setting issuer: " + issuer);
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("Setting issuer: " + issuer);
+        }
     }
     
     /**

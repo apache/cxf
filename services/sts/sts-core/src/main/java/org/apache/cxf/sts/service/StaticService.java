@@ -22,6 +22,7 @@ package org.apache.cxf.sts.service;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -56,7 +57,9 @@ public class StaticService implements ServiceMBean {
         for (Pattern endpointPattern : endpointPatterns) {
             final Matcher matcher = endpointPattern.matcher(addressToMatch);
             if (matcher.matches()) {
-                LOG.fine("Address " + address + " matches with pattern " + endpointPattern);
+                if (LOG.isLoggable(Level.FINE)) {
+                    LOG.fine("Address " + address + " matches with pattern " + endpointPattern);
+                }
                 return true;
             }
         }
@@ -75,7 +78,9 @@ public class StaticService implements ServiceMBean {
      */
     public void setTokenType(String tokenType) {
         this.tokenType = tokenType;
-        LOG.fine("Setting Token Type: " + tokenType);
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("Setting Token Type: " + tokenType);
+        }
     }
     
     /**
@@ -90,7 +95,9 @@ public class StaticService implements ServiceMBean {
      */
     public void setKeyType(String keyType) {
         this.keyType = keyType;
-        LOG.fine("Setting Key Type: " + keyType);
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("Setting Key Type: " + keyType);
+        }
     }
     
     /**

@@ -73,7 +73,9 @@ public class DefaultSubjectProvider implements SubjectProvider {
      */
     public void setSubjectNameQualifier(String subjectNameQualifier) {
         this.subjectNameQualifier = subjectNameQualifier;
-        LOG.fine("Setting Subject Name Qualifier: " + subjectNameQualifier);
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("Setting Subject Name Qualifier: " + subjectNameQualifier);
+        }
     }
 
     /**
@@ -81,7 +83,9 @@ public class DefaultSubjectProvider implements SubjectProvider {
      */
     public void setSubjectNameIDFormat(String subjectNameIDFormat) {
         this.subjectNameIDFormat = subjectNameIDFormat;
-        LOG.fine("Setting Subject Name format: " + subjectNameIDFormat);
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("Setting Subject Name format: " + subjectNameIDFormat);
+        }
     }
 
     /**
@@ -186,7 +190,9 @@ public class DefaultSubjectProvider implements SubjectProvider {
 
         SubjectBean subjectBean =
             new SubjectBean(subjectName, subjectNameQualifier, confirmationMethod);
-        LOG.fine("Creating new subject with principal name: " + principal.getName());
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("Creating new subject with principal name: " + principal.getName());
+        }
         subjectBean.setSubjectNameIDFormat(localSubjectNameIDFormat);
 
         return subjectBean;

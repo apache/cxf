@@ -22,6 +22,7 @@ package org.apache.cxf.sts.token.realm;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -81,7 +82,9 @@ public class CertConstraintsParser {
             for (Pattern subjectDNPattern : subjectDNPatterns) {
                 final Matcher matcher = subjectDNPattern.matcher(subjectName);
                 if (matcher.matches()) {
-                    LOG.fine("Subject DN " + subjectName + " matches with pattern " + subjectDNPattern);
+                    if (LOG.isLoggable(Level.FINE)) {
+                        LOG.fine("Subject DN " + subjectName + " matches with pattern " + subjectDNPattern);
+                    }
                     subjectMatch = true;
                     break;
                 }

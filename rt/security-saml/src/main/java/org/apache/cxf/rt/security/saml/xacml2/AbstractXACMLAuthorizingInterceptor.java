@@ -143,7 +143,9 @@ public abstract class AbstractXACMLAuthorizingInterceptor extends AbstractPhaseI
                 code = status.getStatusCode() != null ? status.getStatusCode().getValue() : "";
                 statusMessage = status.getStatusMessage() != null ? status.getStatusMessage().getValue() : "";
             }
-            LOG.fine("XACML authorization result: " + decision + ", code: " + code + ", message: " + statusMessage);
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.fine("XACML authorization result: " + decision + ", code: " + code + ", message: " + statusMessage);
+            }
             return decision == DECISION.Permit;
         }
         

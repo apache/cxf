@@ -20,6 +20,7 @@ package org.apache.cxf.sts.request;
 
 import java.security.Principal;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBElement;
@@ -68,7 +69,9 @@ public class ReceivedToken {
             }
             token = ((JAXBElement<?>)receivedToken).getValue();
         } else if (receivedToken instanceof Element) {
-            LOG.fine("Found ValidateTarget element: " + ((Element)receivedToken).getLocalName());
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.fine("Found ValidateTarget element: " + ((Element)receivedToken).getLocalName());
+            }
             this.token = receivedToken;
             isDOMElement = true;
         } else {

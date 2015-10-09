@@ -109,6 +109,9 @@ public class RequestParser {
             // JAXB types
             if (requestObject instanceof JAXBElement<?>) {
                 JAXBElement<?> jaxbElement = (JAXBElement<?>) requestObject;
+                if (jaxbElement != null && LOG.isLoggable(Level.FINE)) {
+                    LOG.fine("Found " + jaxbElement.getName() + ": " + jaxbElement.getValue());
+                }
                 try {
                     boolean found = 
                         parseTokenRequirements(jaxbElement, tokenRequirements, wsContext, claimsParsers);
@@ -161,7 +164,9 @@ public class RequestParser {
         }
         String context = request.getContext();
         tokenRequirements.setContext(context);
-        LOG.fine("Received Context attribute: " + context);
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("Received Context attribute: " + context);
+        }
         
         RequestRequirements requestRequirements = new RequestRequirements();
         requestRequirements.setKeyRequirements(keyRequirements);
@@ -180,35 +185,27 @@ public class RequestParser {
         if (QNameConstants.AUTHENTICATION_TYPE.equals(jaxbElement.getName())) {
             String authenticationType = (String)jaxbElement.getValue();
             keyRequirements.setAuthenticationType(authenticationType);
-            LOG.fine("Found AuthenticationType: " + authenticationType);
         } else if (QNameConstants.KEY_TYPE.equals(jaxbElement.getName())) {
             String keyType = (String)jaxbElement.getValue();
             keyRequirements.setKeyType(keyType);
-            LOG.fine("Found KeyType: " + keyType);
         } else if (QNameConstants.KEY_SIZE.equals(jaxbElement.getName())) {
             long keySize = ((Long)jaxbElement.getValue()).longValue();
             keyRequirements.setKeySize(keySize);
-            LOG.fine("Found KeySize: " + keySize);
         } else if (QNameConstants.SIGNATURE_ALGORITHM.equals(jaxbElement.getName())) {
             String signatureAlgorithm = (String)jaxbElement.getValue();
             keyRequirements.setSignatureAlgorithm(signatureAlgorithm);
-            LOG.fine("Found Signature Algorithm: " + signatureAlgorithm);
         } else if (QNameConstants.ENCRYPTION_ALGORITHM.equals(jaxbElement.getName())) {
             String encryptionAlgorithm = (String)jaxbElement.getValue();
             keyRequirements.setEncryptionAlgorithm(encryptionAlgorithm);
-            LOG.fine("Found Encryption Algorithm: " + encryptionAlgorithm);
         } else if (QNameConstants.C14N_ALGORITHM.equals(jaxbElement.getName())) {
             String c14nAlgorithm = (String)jaxbElement.getValue();
             keyRequirements.setC14nAlgorithm(c14nAlgorithm);
-            LOG.fine("Found C14n Algorithm: " + c14nAlgorithm);
         } else if (QNameConstants.COMPUTED_KEY_ALGORITHM.equals(jaxbElement.getName())) {
             String computedKeyAlgorithm = (String)jaxbElement.getValue();
             keyRequirements.setComputedKeyAlgorithm(computedKeyAlgorithm);
-            LOG.fine("Found ComputedKeyAlgorithm: " + computedKeyAlgorithm);
         } else if (QNameConstants.KEYWRAP_ALGORITHM.equals(jaxbElement.getName())) {
             String keywrapAlgorithm = (String)jaxbElement.getValue();
             keyRequirements.setKeywrapAlgorithm(keywrapAlgorithm);
-            LOG.fine("Found KeyWrapAlgorithm: " + keywrapAlgorithm);
         } else if (QNameConstants.USE_KEY.equals(jaxbElement.getName())) {
             UseKeyType useKey = (UseKeyType)jaxbElement.getValue();
             ReceivedKey receivedKey = parseUseKey(useKey, wsContext);
@@ -220,11 +217,9 @@ public class RequestParser {
         } else if (QNameConstants.SIGN_WITH.equals(jaxbElement.getName())) {
             String signWith = (String)jaxbElement.getValue();
             keyRequirements.setSignWith(signWith);
-            LOG.fine("Found SignWith: " + signWith);
         } else if (QNameConstants.ENCRYPT_WITH.equals(jaxbElement.getName())) {
             String encryptWith = (String)jaxbElement.getValue();
             keyRequirements.setEncryptWith(encryptWith);
-            LOG.fine("Found EncryptWith: " + encryptWith);
         } else if (QNameConstants.REQUEST_TYPE.equals(jaxbElement.getName())) { //NOPMD
             // Skip the request type.
         } else {
@@ -245,17 +240,14 @@ public class RequestParser {
         if (QNameConstants.TOKEN_TYPE.equals(jaxbElement.getName())) {
             String tokenType = (String)jaxbElement.getValue();
             tokenRequirements.setTokenType(tokenType);
-            LOG.fine("Found TokenType: " + tokenType);
         } else if (QNameConstants.ON_BEHALF_OF.equals(jaxbElement.getName())) {
             OnBehalfOfType onBehalfOfType = (OnBehalfOfType)jaxbElement.getValue();
             ReceivedToken onBehalfOf = new ReceivedToken(onBehalfOfType.getAny());
             tokenRequirements.setOnBehalfOf(onBehalfOf);
-            LOG.fine("Found OnBehalfOf token");
         } else if (QNameConstants.ACT_AS.equals(jaxbElement.getName())) {
             ActAsType actAsType = (ActAsType)jaxbElement.getValue();
             ReceivedToken actAs = new ReceivedToken(actAsType.getAny());
             tokenRequirements.setActAs(actAs);
-            LOG.fine("Found ActAs token");
         } else if (QNameConstants.LIFETIME.equals(jaxbElement.getName())) {
             LifetimeType lifetimeType = (LifetimeType)jaxbElement.getValue();
             Lifetime lifetime = new Lifetime();
@@ -266,7 +258,6 @@ public class RequestParser {
                 lifetime.setExpires(lifetimeType.getExpires().getValue());
             }
             tokenRequirements.setLifetime(lifetime);
-            LOG.fine("Found Lifetime element");
         } else if (QNameConstants.VALIDATE_TARGET.equals(jaxbElement.getName())) {
             ValidateTargetType validateTargetType = (ValidateTargetType)jaxbElement.getValue();
             ReceivedToken validateTarget = new ReceivedToken(validateTargetType.getAny());
@@ -275,7 +266,6 @@ public class RequestParser {
                 validateTarget = new ReceivedToken(target);
             }  
             tokenRequirements.setValidateTarget(validateTarget);
-            LOG.fine("Found ValidateTarget token");
         } else if (QNameConstants.CANCEL_TARGET.equals(jaxbElement.getName())) {
             CancelTargetType cancelTargetType = (CancelTargetType)jaxbElement.getValue();
             ReceivedToken cancelTarget = new ReceivedToken(cancelTargetType.getAny());
@@ -284,7 +274,6 @@ public class RequestParser {
                 cancelTarget = new ReceivedToken(target);
             }          
             tokenRequirements.setCancelTarget(cancelTarget);
-            LOG.fine("Found CancelTarget token");
         } else if (QNameConstants.RENEW_TARGET.equals(jaxbElement.getName())) {
             RenewTargetType renewTargetType = (RenewTargetType)jaxbElement.getValue();
             ReceivedToken renewTarget = new ReceivedToken(renewTargetType.getAny());
@@ -293,12 +282,10 @@ public class RequestParser {
                 renewTarget = new ReceivedToken(target);
             }          
             tokenRequirements.setRenewTarget(renewTarget);
-            LOG.fine("Found CancelTarget token");
         } else if (QNameConstants.CLAIMS.equals(jaxbElement.getName())) {
             ClaimsType claimsType = (ClaimsType)jaxbElement.getValue();
             ClaimCollection requestedClaims = parseClaims(claimsType, claimsParsers);
             tokenRequirements.setPrimaryClaims(requestedClaims);
-            LOG.fine("Found Primary Claims token");
         } else if (QNameConstants.RENEWING.equals(jaxbElement.getName())) {
             RenewingType renewingType = (RenewingType)jaxbElement.getValue();
             Renewing renewing = new Renewing();
@@ -309,13 +296,11 @@ public class RequestParser {
                 renewing.setAllowRenewingAfterExpiry(renewingType.isOK());
             }
             tokenRequirements.setRenewing(renewing);
-            LOG.fine("Found Renewing token");
         } else if (QNameConstants.PARTICIPANTS.equals(jaxbElement.getName())) {
             ParticipantsType participantsType = (ParticipantsType)jaxbElement.getValue();
             
             Participants participants = parseParticipants(participantsType);
             tokenRequirements.setParticipants(participants);
-            LOG.fine("Found Participants");
         } else {
             return false;
         }
@@ -519,7 +504,7 @@ public class RequestParser {
                     binarySecret.setBinarySecretValue(binarySecretType.getValue());
                     entropy.setBinarySecret(binarySecret);
                     return entropy;
-                } else {
+                } else if (LOG.isLoggable(Level.FINE)) {
                     LOG.fine("Unsupported Entropy type: " + entropyObjectJaxb.getName());
                 }
             } else if (entropyObject instanceof Element
@@ -564,23 +549,23 @@ public class RequestParser {
         while (child != null) {
             String localName = child.getLocalName();
             String namespace = child.getNamespaceURI();
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.fine("Found " + localName + ": " + child.getTextContent().trim());
+            }
+            
             if (keyRequirements.getKeySize() == 0 && "KeySize".equals(localName) 
                 && STSConstants.WST_NS_05_12.equals(namespace)) {
                 long keySize = Integer.parseInt(child.getTextContent().trim());
                 keyRequirements.setKeySize(keySize);
-                LOG.fine("Found KeySize: " + keySize);
             } else if (tokenRequirements.getTokenType() == null 
                 && "TokenType".equals(localName) && STSConstants.WST_NS_05_12.equals(namespace)) {
                 String tokenType = child.getTextContent().trim();
                 tokenRequirements.setTokenType(tokenType);
-                LOG.fine("Found TokenType: " + tokenType);
             } else if (keyRequirements.getKeyType() == null 
                 && "KeyType".equals(localName) && STSConstants.WST_NS_05_12.equals(namespace)) {
                 String keyType = child.getTextContent().trim();
-                LOG.fine("Found KeyType: " + keyType);
                 keyRequirements.setKeyType(keyType);
             } else if ("Claims".equals(localName) && STSConstants.WST_NS_05_12.equals(namespace)) {
-                LOG.fine("Found Secondary Claims element");
                 ClaimCollection requestedClaims = parseClaims(child, claimsParsers);
                 tokenRequirements.setSecondaryClaims(requestedClaims);
             } else {
@@ -725,7 +710,9 @@ public class RequestParser {
             }
         }
         
-        LOG.fine("Reference URI found " + referenceURI);
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("Reference URI found " + referenceURI);
+        }
         if (referenceURI == null) {
             LOG.log(Level.WARNING, "No Reference URI was received");
             throw new STSException(

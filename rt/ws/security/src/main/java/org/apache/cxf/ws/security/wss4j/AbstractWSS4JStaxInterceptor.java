@@ -344,7 +344,7 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
                     cryptos.put(refId, crypto);
                 }
             }
-            if (crypto == null) {
+            if (crypto == null && LOG.isLoggable(Level.INFO)) {
                 LOG.info("The Crypto reference " + refId + " specified by "
                     + cryptoPropertyRefId + " could not be loaded"
                 );
@@ -362,7 +362,7 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
                     crypto = loadCryptoFromPropertiesFile(soapMessage, propFile, securityProperties);
                     cryptos.put(propFile, crypto);
                 }
-                if (crypto == null) {
+                if (crypto == null && LOG.isLoggable(Level.INFO)) {
                     LOG.info(
                          "The Crypto properties file " + propFile + " specified by "
                          + cryptoPropertyFile + " could not be loaded or found"
