@@ -21,6 +21,7 @@ package org.apache.cxf.jaxrs.swagger;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -33,11 +34,14 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServiceFactoryBean;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
+import org.apache.cxf.jaxrs.model.doc.DocumentationProvider;
+import org.apache.cxf.jaxrs.model.doc.JavaDocProvider;
 import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 
@@ -45,40 +49,51 @@ import io.swagger.jaxrs.config.BeanConfig;
 import io.swagger.jaxrs.config.DefaultReaderConfig;
 import io.swagger.jaxrs.config.ReaderConfig;
 import io.swagger.jaxrs.listing.ApiListingResource;
-import io.swagger.jaxrs.listing.SwaggerSerializers;
 
 public class Swagger2Feature extends AbstractSwaggerFeature {
+
     private String host;
+
     private String[] schemes;
+
     private boolean prettyPrint;
 
     private boolean scanAllResources;
+
     private String ignoreRoutes;
+
+    private boolean dynamicBasePath;
+
+    private boolean replaceTags;
+
+    private DocumentationProvider javadocProvider;
 
     @Override
     protected void addSwaggerResource(Server server) {
+        List<ClassResourceInfo> cris = Collections.emptyList();
         if (!runAsFilter) {
-            List<Object> serviceBeans = new ArrayList<Object>();
+            List<Object> serviceBeans = new ArrayList<>();
             ApiListingResource apiListingResource = new ApiListingResource();
             serviceBeans.add(apiListingResource);
-            JAXRSServiceFactoryBean sfb = 
-                (JAXRSServiceFactoryBean)server.getEndpoint().get(JAXRSServiceFactoryBean.class.getName());
+            JAXRSServiceFactoryBean sfb =
+                    (JAXRSServiceFactoryBean) server.getEndpoint().get(JAXRSServiceFactoryBean.class.getName());
             sfb.setResourceClassesFromBeans(serviceBeans);
-            for (ClassResourceInfo cri : sfb.getClassResourceInfo()) {
+            cris = sfb.getClassResourceInfo();
+            for (ClassResourceInfo cri : cris) {
                 if (ApiListingResource.class == cri.getResourceClass()) {
                     InjectionUtils.injectContextProxiesAndApplication(cri, apiListingResource, null);
                 }
             }
         }
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         if (runAsFilter) {
             providers.add(new SwaggerContainerRequestFilter());
         }
-        providers.add(new SwaggerSerializers());
+        providers.add(new Swagger2Serializers(dynamicBasePath, replaceTags, javadocProvider, cris));
         providers.add(new ReaderConfigFilter());
-        ((ServerProviderFactory)server.getEndpoint().get(
+        ((ServerProviderFactory) server.getEndpoint().get(
                 ServerProviderFactory.class.getName())).setUserProviders(providers);
-        
+
         BeanConfig beanConfig = new BeanConfig();
         beanConfig.setResourcePackage(getResourcePackage());
         beanConfig.setVersion(getVersion());
@@ -99,6 +114,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
     public String getHost() {
         return host;
     }
+
     public void setHost(String host) {
         this.host = host;
     }
@@ -135,11 +151,23 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         this.ignoreRoutes = ignoreRoutes;
     }
 
+    public void setDynamicBasePath(final boolean dynamicBasePath) {
+        this.dynamicBasePath = dynamicBasePath;
+    }
+
+    public void setReplaceTags(final boolean replaceTags) {
+        this.replaceTags = replaceTags;
+    }
+
+    public void setJavaDocPath(final String javaDocPath) throws Exception {
+        this.javadocProvider = new JavaDocProvider(BusFactory.getDefaultBus(), javaDocPath);
+    }
+
     @Override
     protected void setBasePathByAddress(String address) {
         if (!address.startsWith("/")) {
             // get the path part
-            URI u = URI.create(address); 
+            URI u = URI.create(address);
             setBasePath(u.getPath());
             setHost(u.getPort() < 0 ? u.getHost() : u.getHost() + ":" + u.getPort());
         } else {
@@ -147,12 +175,13 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         }
     }
 
-
     @PreMatching
     private static class SwaggerContainerRequestFilter extends ApiListingResource implements ContainerRequestFilter {
+
         private static final String APIDOCS_LISTING_PATH_JSON = "swagger.json";
+
         private static final String APIDOCS_LISTING_PATH_YAML = "swagger.yaml";
-        
+
         @Context
         private MessageContext mc;
 
@@ -163,13 +192,14 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
                 Response r = getListingJson(null, mc.getServletConfig(), mc.getHttpHeaders(), ui);
                 requestContext.abortWith(r);
             } else if (ui.getPath().endsWith(APIDOCS_LISTING_PATH_YAML)) {
-                Response r = getListingYaml(null, mc.getServletConfig(), mc.getHttpHeaders(), ui); 
+                Response r = getListingYaml(null, mc.getServletConfig(), mc.getHttpHeaders(), ui);
                 requestContext.abortWith(r);
             }
         }
     }
 
     private class ReaderConfigFilter implements ContainerRequestFilter {
+
         @Context
         private MessageContext mc;
 
@@ -178,7 +208,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
             ServletContext servletContext = mc.getServletContext();
             if (servletContext != null && servletContext.getAttribute(ReaderConfig.class.getName()) == null) {
                 if (mc.getServletConfig() != null
-                    && Boolean.valueOf(mc.getServletConfig().getInitParameter("scan.all.resources"))) {
+                        && Boolean.valueOf(mc.getServletConfig().getInitParameter("scan.all.resources"))) {
                     addReaderConfig(mc.getServletConfig().getInitParameter("ignore.routes"));
                 } else if (isScanAllResources()) {
                     addReaderConfig(getIgnoreRoutes());
@@ -190,7 +220,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
             DefaultReaderConfig rc = new DefaultReaderConfig();
             rc.setScanAllResources(true);
             if (ignoreRoutesParam != null) {
-                Set<String> routes = new LinkedHashSet<String>();
+                Set<String> routes = new LinkedHashSet<>();
                 for (String route : StringUtils.split(ignoreRoutesParam, ",")) {
                     routes.add(route.trim());
                 }
