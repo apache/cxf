@@ -38,7 +38,7 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.util.ClasspathScanner;
 import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
-import org.apache.cxf.jaxrs.model.wadl.DocumentationProvider;
+import org.apache.cxf.jaxrs.model.doc.DocumentationProvider;
 import org.apache.cxf.jaxrs.model.wadl.WadlGenerator;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;

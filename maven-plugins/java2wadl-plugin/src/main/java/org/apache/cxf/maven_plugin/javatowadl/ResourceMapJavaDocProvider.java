@@ -28,7 +28,7 @@ import javax.ws.rs.Path;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
-import org.apache.cxf.jaxrs.model.wadl.DocumentationProvider;
+import org.apache.cxf.jaxrs.model.doc.DocumentationProvider;
 
 public class ResourceMapJavaDocProvider implements DocumentationProvider {
     
