@@ -45,7 +45,7 @@ public class JwtAuthenticationFilter extends AbstractJoseJwtConsumer implements 
     private static final String DEFAULT_AUTH_SCHEME = "JWT";
     private String expectedAuthScheme = DEFAULT_AUTH_SCHEME;
     private int ttl = 300;
-    private int futureTTL = 0;
+    private int futureTTL;
     
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
@@ -73,7 +73,9 @@ public class JwtAuthenticationFilter extends AbstractJoseJwtConsumer implements 
         
         // If we have no expiry then we must have an issued at
         boolean issuedAtRequired = jwt.getClaims().getExpiryTime() == null;
-        JwtUtils.validateJwtTTL(jwt.getClaims(), ttl, issuedAtRequired);
+        if (issuedAtRequired) {
+            JwtUtils.validateJwtTTL(jwt.getClaims(), ttl, issuedAtRequired);
+        }
     }
 
     public int getTtl() {
