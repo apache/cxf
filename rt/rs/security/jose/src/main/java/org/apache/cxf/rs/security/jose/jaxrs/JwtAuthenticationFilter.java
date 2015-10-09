@@ -29,8 +29,6 @@ import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.core.HttpHeaders;
 
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.common.security.SimplePrincipal;
-import org.apache.cxf.common.security.SimpleSecurityContext;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.rs.security.jose.JoseException;
 import org.apache.cxf.rs.security.jose.JoseUtils;
@@ -53,23 +51,13 @@ public class JwtAuthenticationFilter extends AbstractJoseJwtConsumer implements 
         if (parts == null || !expectedAuthScheme.equals(parts[0]) || parts.length != 2) {
             throw new JoseException(expectedAuthScheme + " scheme is expected");
         }
-        JwtToken jwt = super.getJwtToken(parts[1]);
-        JoseUtils.setMessageContextProperty(jwt.getHeaders());
-        JAXRSUtils.getCurrentMessage().put(SecurityContext.class, 
-              new SimpleSecurityContext(new JwtPrincipal(jwt)));
+        JwtToken token = super.getJwtToken(parts[1]);
+        JoseUtils.setMessageContextProperty(token.getHeaders());
+        JAXRSUtils.getCurrentMessage().put(SecurityContext.class, new JwtTokenSecurityContext(token));
     }
+    
     public void setExpectedAuthScheme(String expectedAuthScheme) {
         this.expectedAuthScheme = expectedAuthScheme;
     }
-    public static class JwtPrincipal extends SimplePrincipal {
-        private static final long serialVersionUID = 1L;
-        private JwtToken jwt;
-        public JwtPrincipal(JwtToken jwt) {
-            super(jwt.getClaims().getSubject());
-            this.jwt = jwt;
-        }
-        public JwtToken getJwt() {
-            return jwt;
-        }
-    }
+    
 }
