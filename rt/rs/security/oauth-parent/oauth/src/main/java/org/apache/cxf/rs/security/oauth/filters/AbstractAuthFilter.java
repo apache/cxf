@@ -280,7 +280,7 @@ public class AbstractAuthFilter {
     }
 
     private class CustomHttpServletWrapper extends HttpServletRequestWrapper {
-        public CustomHttpServletWrapper(HttpServletRequest req) {
+        CustomHttpServletWrapper(HttpServletRequest req) {
             super(req);
         }
         

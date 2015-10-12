@@ -265,7 +265,7 @@ public class JsonMapObjectReaderWriter {
     }
     private static class JsonObjectSettable implements Settable {
         private JsonMapObject obj;
-        public JsonObjectSettable(JsonMapObject obj) {
+        JsonObjectSettable(JsonMapObject obj) {
             this.obj = obj;
         }
         public void put(String key, Object value) {
@@ -277,7 +277,7 @@ public class JsonMapObjectReaderWriter {
     }
     private class StringBuilderOutput implements Output {
         private StringBuilder sb;
-        public StringBuilderOutput(StringBuilder sb) {
+        StringBuilderOutput(StringBuilder sb) {
             this.sb = sb;
         }
         @Override
@@ -289,7 +289,7 @@ public class JsonMapObjectReaderWriter {
     }
     private class StreamOutput implements Output {
         private OutputStream os;
-        public StreamOutput(OutputStream os) {
+        StreamOutput(OutputStream os) {
             this.os = os;
         }
         @Override

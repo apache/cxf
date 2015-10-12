@@ -35,8 +35,8 @@ import org.eclipse.jetty.websocket.servlet.WebSocketServletFactory;
 class JettyWebSocketHandler extends JettyHTTPHandler { 
     final WebSocketServletFactory webSocketFactory;
     
-    public JettyWebSocketHandler(JettyHTTPDestination jhd, boolean cmExact, 
-                                 WebSocketServletFactory webSocketFactory) {
+    JettyWebSocketHandler(JettyHTTPDestination jhd, boolean cmExact, 
+                          WebSocketServletFactory webSocketFactory) {
         super(jhd, cmExact);
         this.webSocketFactory = webSocketFactory;
     }

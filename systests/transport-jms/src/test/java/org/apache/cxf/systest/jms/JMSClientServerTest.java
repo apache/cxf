@@ -186,7 +186,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         class TestAsyncHandler implements AsyncHandler<String> {
             String expected;
             
-            public TestAsyncHandler(String x) {
+            TestAsyncHandler(String x) {
                 expected = x;
             }
             

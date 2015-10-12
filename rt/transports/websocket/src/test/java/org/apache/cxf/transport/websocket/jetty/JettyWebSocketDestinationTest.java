@@ -74,9 +74,9 @@ public class JettyWebSocketDestinationTest extends Assert {
     }
     
     private static class TestJettyWebSocketDestination extends JettyWebSocketDestination {
-        public TestJettyWebSocketDestination(Bus bus, DestinationRegistry registry, EndpointInfo ei,
-                                             JettyHTTPServerEngineFactory serverEngineFactory, 
-                                             JettyHTTPServerEngine engine) throws IOException {
+        TestJettyWebSocketDestination(Bus bus, DestinationRegistry registry, EndpointInfo ei,
+                                      JettyHTTPServerEngineFactory serverEngineFactory, 
+                                      JettyHTTPServerEngine engine) throws IOException {
             super(bus, registry, ei, serverEngineFactory);
             this.engine = engine;
         }

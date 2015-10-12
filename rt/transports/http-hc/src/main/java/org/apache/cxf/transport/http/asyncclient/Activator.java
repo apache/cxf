@@ -63,7 +63,7 @@ public class Activator implements BundleActivator {
         private BundleContext context;
         private ServiceRegistration reg;
         
-        public ConduitConfigurer(BundleContext context, ServiceTracker busTracker) {
+        ConduitConfigurer(BundleContext context, ServiceTracker busTracker) {
             this.context = context;
             this.busTracker = busTracker;
         }

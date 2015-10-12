@@ -112,7 +112,7 @@ public class AtmosphereWebSocketJettyDestination extends JettyHTTPDestination im
     }
 
     private class AtmosphereJettyWebSocketHandler extends JettyHTTPHandler {
-        public AtmosphereJettyWebSocketHandler(JettyHTTPDestination jhd, boolean cmExact) {
+        AtmosphereJettyWebSocketHandler(JettyHTTPDestination jhd, boolean cmExact) {
             super(jhd, cmExact);
         }
         

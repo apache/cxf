@@ -54,7 +54,7 @@ class ParamReader extends ClassReader {
      * @param c
      * @throws IOException
      */
-    public ParamReader(Class<?> c) throws IOException {
+    ParamReader(Class<?> c) throws IOException {
         this(getBytes(c));
     }
 
@@ -64,7 +64,7 @@ class ParamReader extends ClassReader {
      * @param b
      * @throws IOException
      */
-    public ParamReader(byte[] b) throws IOException {
+    ParamReader(byte[] b) throws IOException {
         super(b, findAttributeReaders(ParamReader.class));
 
         // check the magic number
@@ -111,7 +111,7 @@ class ParamReader extends ClassReader {
      * Retrieve a list of function parameter names from a method Returns null if
      * unable to read parameter names (i.e. bytecode not built with debug).
      */
-    public static String[] getParameterNamesFromDebugInfo(Method method) {
+    static String[] getParameterNamesFromDebugInfo(Method method) {
         // Don't worry about it if there are no params.
         int numParams = method.getParameterTypes().length;
         if (numParams == 0) {

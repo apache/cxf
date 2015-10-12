@@ -55,7 +55,7 @@ public class JMSBrokerSetup {
         Exception exception;
         
         
-        public JMSEmbeddedBroker(String url) {
+        JMSEmbeddedBroker(String url) {
             brokerUrl = url;
         }
         

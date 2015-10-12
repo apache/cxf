@@ -135,7 +135,7 @@ public class JettyWebSocketDestination extends JettyHTTPDestination implements
         private WebSocketServletHolder webSocketHolder;
 //        private String protocol;
 
-        public JettyWebSocket(HttpServletRequest request, String protocol) {
+        JettyWebSocket(HttpServletRequest request, String protocol) {
 //            this.protocol = protocol;
             this.webSocketHolder = new JettyWebSocketServletHolder(this, request);
         }
@@ -260,7 +260,7 @@ public class JettyWebSocketDestination extends JettyHTTPDestination implements
         private Map<String, Object> requestProperties;
         private Map<String, Object> requestAttributes;
         
-        public JettyWebSocketServletHolder(JettyWebSocket webSocket, HttpServletRequest request) {
+        JettyWebSocketServletHolder(JettyWebSocket webSocket, HttpServletRequest request) {
             this.webSocket = webSocket;
             this.requestProperties = readProperties(request);
             this.requestAttributes = new TreeMap<String, Object>(String.CASE_INSENSITIVE_ORDER);

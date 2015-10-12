@@ -70,11 +70,11 @@ public class JMSSharedQueueTest extends AbstractVmJMSTest {
         private String prefix;
         private volatile Throwable ex;
 
-        public ClientRunnable(HelloWorldPortType port) {
+        ClientRunnable(HelloWorldPortType port) {
             this.port = port;
         }
 
-        public ClientRunnable(HelloWorldPortType port, String prefix) {
+        ClientRunnable(HelloWorldPortType port, String prefix) {
             this.port = port;
             this.prefix = prefix;
         }

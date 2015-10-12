@@ -113,7 +113,7 @@ public class JettyHTTPDestinationTest extends Assert {
     private class EasyMockJettyHTTPDestination
         extends JettyHTTPDestination {
 
-        public EasyMockJettyHTTPDestination(Bus bus,
+        EasyMockJettyHTTPDestination(Bus bus,
                                             DestinationRegistry registry,
                                             EndpointInfo endpointInfo,
                                             JettyHTTPServerEngineFactory serverEngineFactory,
@@ -891,7 +891,7 @@ public class JettyHTTPDestinationTest extends Assert {
     }
     
     private static class TestJettyDestination extends JettyHTTPDestination {
-        public TestJettyDestination(Bus bus,
+        TestJettyDestination(Bus bus,
                                     DestinationRegistry registry,
                                     EndpointInfo endpointInfo,
                                     JettyHTTPServerEngineFactory serverEngineFactory) throws IOException {

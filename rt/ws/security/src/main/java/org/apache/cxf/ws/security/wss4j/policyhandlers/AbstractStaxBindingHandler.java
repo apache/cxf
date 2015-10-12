@@ -179,7 +179,7 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
         private final String username;
         private final String password;
         
-        public UTCallbackHandler(String username, String password) {
+        UTCallbackHandler(String username, String password) {
             this.username = username;
             this.password = password;
         }

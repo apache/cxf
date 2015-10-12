@@ -98,7 +98,7 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
     }
     
     static class KerberosTokenOutInterceptor extends AbstractPhaseInterceptor<Message> {
-        public KerberosTokenOutInterceptor() {
+        KerberosTokenOutInterceptor() {
             super(Phase.PREPARE_SEND);
         }
         public void handleMessage(Message message) throws Fault {
@@ -152,7 +152,7 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
     }
     
     static class KerberosTokenDOMInInterceptor extends AbstractPhaseInterceptor<Message> {
-        public KerberosTokenDOMInInterceptor() {
+        KerberosTokenDOMInInterceptor() {
             super(Phase.PRE_PROTOCOL);
             addAfter(WSS4JInInterceptor.class.getName());
             addAfter(PolicyBasedWSS4JInInterceptor.class.getName());
@@ -215,7 +215,7 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
         private static final Logger LOG = 
             LogUtils.getL7dLogger(KerberosTokenStaxInInterceptor.class);
         
-        public KerberosTokenStaxInInterceptor() {
+        KerberosTokenStaxInInterceptor() {
             super(Phase.PRE_PROTOCOL);
             getBefore().add(StaxSecurityContextInInterceptor.class.getName());
         }

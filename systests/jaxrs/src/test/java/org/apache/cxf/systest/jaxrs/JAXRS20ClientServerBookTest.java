@@ -484,7 +484,7 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
     
     private static class CustomInvocationCallback implements InvocationCallback<List<Book>> {
         private Holder<List<Book>> holder;
-        public CustomInvocationCallback(Holder<List<Book>> holder) {
+        CustomInvocationCallback(Holder<List<Book>> holder) {
             this.holder = holder;
         }
         
@@ -503,7 +503,7 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
     }
     private static class GenericInvocationCallback<T> implements InvocationCallback<T> {
         private Holder<T> holder;
-        public GenericInvocationCallback(Holder<T> holder) {
+        GenericInvocationCallback(Holder<T> holder) {
             this.holder = holder;
         }
         

@@ -235,11 +235,11 @@ public class JAXRSLocalTransportTest extends AbstractBusClientServerTestBase {
     }
     
     private static class TestFaultInInterceptor extends AbstractPhaseInterceptor<Message> {
-        public TestFaultInInterceptor() {
+        TestFaultInInterceptor() {
             this(Phase.PRE_STREAM);
         }
 
-        public TestFaultInInterceptor(String s) {
+        TestFaultInInterceptor(String s) {
             super(Phase.PRE_STREAM);
             
         } 

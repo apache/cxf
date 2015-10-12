@@ -179,7 +179,7 @@ public abstract class AbstractJAXRSContinuationsTest extends AbstractBusClientSe
         private CountDownLatch startSignal;
         private CountDownLatch doneSignal;
         private Exception error;
-        public BookWorker(String address,
+        BookWorker(String address,
                           String id,
                           String expected,
                            CountDownLatch startSignal,

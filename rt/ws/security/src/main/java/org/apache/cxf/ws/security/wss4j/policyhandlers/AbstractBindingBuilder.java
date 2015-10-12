@@ -2260,7 +2260,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         private final Object tokenImplementation;
         private final List<WSEncryptionPart> signedParts;
         
-        public SupportingToken(AbstractToken token, Object tokenImplementation,
+        SupportingToken(AbstractToken token, Object tokenImplementation,
                                List<WSEncryptionPart> signedParts) {
             this.token = token;
             this.tokenImplementation = tokenImplementation;

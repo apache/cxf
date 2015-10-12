@@ -147,7 +147,7 @@ public class AesCbcHmacJweEncryption extends JweEncryption {
     }
     
     private static class AesCbcContentEncryptionAlgorithm extends AbstractContentEncryptionAlgorithm {
-        public AesCbcContentEncryptionAlgorithm(byte[] cek, byte[] iv, ContentAlgorithm algo) { 
+        AesCbcContentEncryptionAlgorithm(byte[] cek, byte[] iv, ContentAlgorithm algo) { 
             super(cek, iv, algo);    
         }
         @Override

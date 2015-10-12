@@ -402,7 +402,7 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
         private String pathInfo;
         private String servletPath;
         
-        public HttpServletRequestRedirectFilter(HttpServletRequest request, 
+        HttpServletRequestRedirectFilter(HttpServletRequest request, 
                                         String pathInfo,
                                         String servletPath,
                                         boolean customServletPath) {

@@ -96,7 +96,7 @@ public class JAXRSCxfContinuationsTest extends AbstractBusClientServerTestBase {
         private String expected;
         private CountDownLatch startSignal;
         private CountDownLatch doneSignal;
-        public BookWorker(String address,
+        BookWorker(String address,
                           String id,
                           String expected,
                            CountDownLatch startSignal,

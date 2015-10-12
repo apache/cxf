@@ -421,10 +421,10 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
     
     private static class PrivateKeyPasswordProviderImpl implements PrivateKeyPasswordProvider {
         private String password = "password";
-        public PrivateKeyPasswordProviderImpl() {
+        PrivateKeyPasswordProviderImpl() {
             
         }
-        public PrivateKeyPasswordProviderImpl(String password) {
+        PrivateKeyPasswordProviderImpl(String password) {
             this.password = password;
         }
         @Override
