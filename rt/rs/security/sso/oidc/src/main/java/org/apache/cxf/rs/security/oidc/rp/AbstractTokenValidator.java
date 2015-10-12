@@ -34,8 +34,8 @@ import org.apache.cxf.rs.security.oauth2.provider.AbstractOAuthJoseJwtConsumer;
 public abstract class AbstractTokenValidator extends AbstractOAuthJoseJwtConsumer {
     private static final String SELF_ISSUED_ISSUER = "https://self-issued.me";
     private String issuerId;
-    private int issuedAtRange;
-    private int clockOffset;
+    private int ttl = 300;
+    private int futureTTL;
     private WebClient jwkSetClient;
     private boolean supportSelfIssuedProvider;
     private ConcurrentHashMap<String, JsonWebKey> keyMap = new ConcurrentHashMap<String, JsonWebKey>(); 
@@ -63,7 +63,17 @@ public abstract class AbstractTokenValidator extends AbstractOAuthJoseJwtConsume
                 throw new SecurityException("Invalid audience");
             }
     
-            JwtUtils.validateJwtTimeClaims(claims, clockOffset, issuedAtRange, validateClaimsAlways);
+            // If we have no issued time then we need to have an expiry
+            boolean expiredRequired = claims.getIssuedAt() == null;
+            JwtUtils.validateJwtExpiry(claims, expiredRequired);
+            
+            JwtUtils.validateJwtNotBefore(claims, futureTTL, false);
+            
+            // If we have no expiry then we must have an issued at
+            boolean issuedAtRequired = claims.getExpiryTime() == null;
+            if (issuedAtRequired) {
+                JwtUtils.validateJwtTTL(claims, ttl, issuedAtRequired);
+            }
         }
     }
     
@@ -73,10 +83,6 @@ public abstract class AbstractTokenValidator extends AbstractOAuthJoseJwtConsume
 
     public void setJwkSetClient(WebClient jwkSetClient) {
         this.jwkSetClient = jwkSetClient;
-    }
-
-    public void setIssuedAtRange(int issuedAtRange) {
-        this.issuedAtRange = issuedAtRange;
     }
 
     @Override
@@ -120,13 +126,23 @@ public abstract class AbstractTokenValidator extends AbstractOAuthJoseJwtConsume
         return theJwsVerifier;
     }
 
-    public void setClockOffset(int clockOffset) {
-        this.clockOffset = clockOffset;
-    }
-
     public void setSupportSelfIssuedProvider(boolean supportSelfIssuedProvider) {
         this.supportSelfIssuedProvider = supportSelfIssuedProvider;
     }
 
-    
+    public int getTtl() {
+        return ttl;
+    }
+
+    public void setTtl(int ttl) {
+        this.ttl = ttl;
+    }
+
+    public int getFutureTTL() {
+        return futureTTL;
+    }
+
+    public void setFutureTTL(int futureTTL) {
+        this.futureTTL = futureTTL;
+    }
 }
