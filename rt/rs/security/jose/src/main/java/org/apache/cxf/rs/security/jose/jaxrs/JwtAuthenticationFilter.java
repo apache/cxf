@@ -45,6 +45,7 @@ public class JwtAuthenticationFilter extends AbstractJoseJwtConsumer implements 
     private static final String DEFAULT_AUTH_SCHEME = "JWT";
     private String expectedAuthScheme = DEFAULT_AUTH_SCHEME;
     private int clockOffset;
+    private String roleClaim;
     
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
@@ -55,8 +56,18 @@ public class JwtAuthenticationFilter extends AbstractJoseJwtConsumer implements 
         }
         JwtToken token = super.getJwtToken(parts[1]);
         JoseUtils.setMessageContextProperty(token.getHeaders());
-        JAXRSUtils.getCurrentMessage().put(SecurityContext.class, new JwtTokenSecurityContext(token));
+        
+        SecurityContext securityContext = configureSecurityContext(token);
+        if (securityContext != null) {
+            JAXRSUtils.getCurrentMessage().put(SecurityContext.class, securityContext);
+        }
+
     }
+    
+    protected SecurityContext configureSecurityContext(JwtToken jwt) {
+        return new JwtTokenSecurityContext(jwt, roleClaim);
+    }
+
     
     public void setExpectedAuthScheme(String expectedAuthScheme) {
         this.expectedAuthScheme = expectedAuthScheme;
@@ -81,5 +92,13 @@ public class JwtAuthenticationFilter extends AbstractJoseJwtConsumer implements 
 
     public void setClockOffset(int clockOffset) {
         this.clockOffset = clockOffset;
+    }
+    
+    public String getRoleClaim() {
+        return roleClaim;
+    }
+
+    public void setRoleClaim(String roleClaim) {
+        this.roleClaim = roleClaim;
     }
 }
