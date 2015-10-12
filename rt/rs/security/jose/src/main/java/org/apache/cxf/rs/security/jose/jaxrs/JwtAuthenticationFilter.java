@@ -45,6 +45,7 @@ public class JwtAuthenticationFilter extends AbstractJoseJwtConsumer implements 
     private static final String DEFAULT_AUTH_SCHEME = "JWT";
     private String expectedAuthScheme = DEFAULT_AUTH_SCHEME;
     private int clockOffset;
+    private int ttl;
     
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
@@ -72,7 +73,7 @@ public class JwtAuthenticationFilter extends AbstractJoseJwtConsumer implements 
         
         // If we have no expiry then we must have an issued at
         boolean issuedAtRequired = jwt.getClaims().getExpiryTime() == null;
-        JwtUtils.validateJwtIssuedAt(jwt.getClaims(), clockOffset, issuedAtRequired);
+        JwtUtils.validateJwtIssuedAt(jwt.getClaims(), ttl, clockOffset, issuedAtRequired);
     }
 
     public int getClockOffset() {
@@ -81,5 +82,13 @@ public class JwtAuthenticationFilter extends AbstractJoseJwtConsumer implements 
 
     public void setClockOffset(int clockOffset) {
         this.clockOffset = clockOffset;
+    }
+
+    public int getTtl() {
+        return ttl;
+    }
+
+    public void setTtl(int ttl) {
+        this.ttl = ttl;
     }
 }

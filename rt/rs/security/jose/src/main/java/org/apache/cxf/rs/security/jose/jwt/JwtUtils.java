@@ -77,7 +77,7 @@ public final class JwtUtils {
         }
     }
     
-    public static void validateJwtIssuedAt(JwtClaims claims, int clockOffset, boolean claimRequired) {
+    public static void validateJwtIssuedAt(JwtClaims claims, int timeToLive, int clockOffset, boolean claimRequired) {
         Long issuedAtInSecs = claims.getIssuedAt();
         if (issuedAtInSecs == null) {
             if (claimRequired) {
@@ -92,9 +92,14 @@ public final class JwtUtils {
             createdDate.setTime(createdDate.getTime() - (long)clockOffset * 1000L);
         }
         
-        Date rightNow = new Date();
-
-        if (createdDate.after(rightNow)) {
+        Date validCreation = new Date();
+        if (timeToLive != 0) {
+            long currentTime = validCreation.getTime();
+            currentTime -= (long)timeToLive * 1000L;
+            validCreation.setTime(currentTime);
+        }
+        
+        if (createdDate.after(validCreation)) {
             throw new JwtException("Invalid issuedAt");
         }
     }
