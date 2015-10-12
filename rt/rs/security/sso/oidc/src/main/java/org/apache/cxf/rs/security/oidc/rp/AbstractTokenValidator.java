@@ -35,6 +35,7 @@ public abstract class AbstractTokenValidator extends AbstractOAuthJoseJwtConsume
     private static final String SELF_ISSUED_ISSUER = "https://self-issued.me";
     private String issuerId;
     private int clockOffset;
+    private int ttl;
     private WebClient jwkSetClient;
     private boolean supportSelfIssuedProvider;
     private boolean strictTimeValidation;
@@ -80,7 +81,7 @@ public abstract class AbstractTokenValidator extends AbstractOAuthJoseJwtConsume
             // Otherwise: validate only if issuedAt claim is set
             boolean issuedAtRequired = 
                 validateClaimsAlways || strictTimeValidation && claims.getExpiryTime() == null;
-            JwtUtils.validateJwtIssuedAt(claims, clockOffset, issuedAtRequired);
+            JwtUtils.validateJwtIssuedAt(claims, ttl, clockOffset, issuedAtRequired);
             
             if (strictTimeValidation) {
                 JwtUtils.validateJwtNotBefore(claims, clockOffset, strictTimeValidation);
@@ -151,5 +152,13 @@ public abstract class AbstractTokenValidator extends AbstractOAuthJoseJwtConsume
 
     public void setStrictTimeValidation(boolean strictTimeValidation) {
         this.strictTimeValidation = strictTimeValidation;
+    }
+
+    public int getTtl() {
+        return ttl;
+    }
+
+    public void setTtl(int ttl) {
+        this.ttl = ttl;
     }
 }
