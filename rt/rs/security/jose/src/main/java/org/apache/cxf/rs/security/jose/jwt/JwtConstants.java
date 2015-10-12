@@ -29,6 +29,8 @@ public final class JwtConstants {
     public static final String CLAIM_ISSUED_AT = "iat";
     public static final String CLAIM_JWT_ID = "jti";
     
+    public static final String JWT_TOKEN = "jwt.token";
+    
         
     private JwtConstants() {
         

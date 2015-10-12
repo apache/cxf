@@ -34,6 +34,7 @@ import org.apache.cxf.rs.security.jose.JoseUtils;
 import org.apache.cxf.rs.security.jose.jwe.JweHeaders;
 import org.apache.cxf.rs.security.jose.jwt.AbstractJoseJwtProducer;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
+import org.apache.cxf.rs.security.jose.jwt.JwtConstants;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
 
@@ -67,7 +68,7 @@ public class JwtAuthenticationClientFilter extends AbstractJoseJwtProducer
                                               authScheme + " " + data);
     }
     protected JwtToken getJwtToken(ClientRequestContext requestContext) {
-        return (JwtToken)requestContext.getProperty("jwt.token");
+        return (JwtToken)requestContext.getProperty(JwtConstants.JWT_TOKEN);
     }
     protected String getContextPropertyValue() {
         return Base64UrlUtility.encode(CryptoUtils.generateSecureRandomBytes(16));
