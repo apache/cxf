@@ -45,11 +45,8 @@ public class JwtAuthenticationFilter extends AbstractJoseJwtConsumer implements 
     private static final String DEFAULT_AUTH_SCHEME = "JWT";
     private String expectedAuthScheme = DEFAULT_AUTH_SCHEME;
     private int clockOffset;
-<<<<<<< HEAD
     private int ttl;
-=======
     private String roleClaim;
->>>>>>> d2d8f6d... Allow role processing from JWT tokens
     
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
@@ -97,7 +94,6 @@ public class JwtAuthenticationFilter extends AbstractJoseJwtConsumer implements 
     public void setClockOffset(int clockOffset) {
         this.clockOffset = clockOffset;
     }
-<<<<<<< HEAD
 
     public int getTtl() {
         return ttl;
@@ -105,7 +101,7 @@ public class JwtAuthenticationFilter extends AbstractJoseJwtConsumer implements 
 
     public void setTtl(int ttl) {
         this.ttl = ttl;
-=======
+    }
     
     public String getRoleClaim() {
         return roleClaim;
@@ -113,6 +109,5 @@ public class JwtAuthenticationFilter extends AbstractJoseJwtConsumer implements 
 
     public void setRoleClaim(String roleClaim) {
         this.roleClaim = roleClaim;
->>>>>>> d2d8f6d... Allow role processing from JWT tokens
     }
 }
