@@ -19,29 +19,25 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>cxf-rt</artifactId>
+    <artifactId>cxf-rt-transports</artifactId>
     <packaging>pom</packaging>
-    <name>Apache CXF Runtime</name>
-    <description>Apache CXF Runtime</description>
+    <name>Apache CXF Transports Runtime</name>
+    <description>Apache CXF Transports Runtime</description>
     <url>http://cxf.apache.org</url>
     <parent>
         <groupId>org.apache.cxf</groupId>
-        <artifactId>cxf</artifactId>
+        <artifactId>cxf-rt</artifactId>
         <version>3.1.4-SNAPSHOT</version>
     </parent>
     <modules>
-        <module>wsdl</module>
-        <module>transports</module>
-        <module>databinding</module>
-        <module>bindings</module>
-        <module>features</module>
-        <module>frontend</module>
-        <module>ws</module>
-        <module>rs</module>
-        <module>management</module>
-        <module>management-web</module>
-        <module>javascript</module>
-        <module>security</module>
-        <module>security-saml</module>
+        <module>local</module>
+        <module>http</module>
+        <module>http-jetty</module>
+        <module>http-hc</module>
+        <module>http-netty/netty-server</module>
+        <module>http-netty/netty-client</module>
+        <module>jms</module>
+        <module>udp</module>
+        <module>websocket</module>
     </modules>
 </project>
