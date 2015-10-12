@@ -344,7 +344,7 @@ public class SpringBeansTest extends Assert {
         JaxWsProxyFactoryBean factory = (JaxWsProxyFactoryBean)ctx.getBean("wsdlLocation.proxyFactory");
         assertNotNull(factory);
         String wsdlLocation = factory.getWsdlLocation();
-        assertEquals("We should get the right wsdl location" , wsdlLocation, "wsdl/hello_world.wsdl");
+        assertEquals("We should get the right wsdl location", wsdlLocation, "wsdl/hello_world.wsdl");
 
         factory = (JaxWsProxyFactoryBean)ctx.getBean("inlineSoapBinding.proxyFactory");
         assertNotNull(factory);

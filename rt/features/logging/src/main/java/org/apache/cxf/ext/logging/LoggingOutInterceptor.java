@@ -81,7 +81,7 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
         final int lim;
         private LogEventSender sender;
 
-        public LogEventSendingWriter(LogEventSender sender, Message message, Writer writer, int limit) {
+        LogEventSendingWriter(LogEventSender sender, Message message, Writer writer, int limit) {
             super(writer);
             this.sender = sender;
             this.message = message;

@@ -71,7 +71,7 @@ public class ClientServerJibxTest extends AbstractBusClientServerTestBase {
         Bus bus = factory.createBus("org/apache/cxf/systest/jibx/cxf.xml");
         BusFactory.setDefaultBus(bus);
         URL wsdl = this.getClass().getResource("/wsdl_systest_databinding/jibx/doc_lit_bare.wsdl");
-        assertNotNull("We should have found the WSDL here. " , wsdl);      
+        assertNotNull("We should have found the WSDL here. ", wsdl);      
         
         org.apache.cxf.jibx.doc_lit_bare.SOAPService ss = 
             new org.apache.cxf.jibx.doc_lit_bare.SOAPService(wsdl, DOC_LIT_BARE_SERVICE);
@@ -108,7 +108,7 @@ public class ClientServerJibxTest extends AbstractBusClientServerTestBase {
         Bus bus = factory.createBus("org/apache/cxf/systest/jibx/cxf.xml");
         BusFactory.setDefaultBus(bus);
         URL wsdl = this.getClass().getResource("/wsdl_systest_databinding/jibx/hello_world.wsdl");
-        assertNotNull("We should have found the WSDL here. " , wsdl);      
+        assertNotNull("We should have found the WSDL here. ", wsdl);      
         
         SOAPService ss = new SOAPService(wsdl, SERVICE_NAME);
         Greeter port = ss.getSoapPort();

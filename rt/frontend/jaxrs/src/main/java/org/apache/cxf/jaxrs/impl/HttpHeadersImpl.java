@@ -270,7 +270,7 @@ public class HttpHeadersImpl implements HttpHeaders {
     private static class AcceptLanguageComparator implements Comparator<Locale> {
         private Map<Locale, Float> prefs;
         
-        public AcceptLanguageComparator(Map<Locale, Float> prefs) {
+        AcceptLanguageComparator(Map<Locale, Float> prefs) {
             this.prefs = prefs;
         }
 

@@ -440,7 +440,7 @@ public class SoapArrayType extends AegisType {
         private final Object array;
         private final int index;
 
-        public SetArrayAction(Object array, int index) {
+        SetArrayAction(Object array, int index) {
             this.array = array;
             this.index = index;
         }

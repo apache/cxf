@@ -136,8 +136,8 @@ public class NettyHttpServletPipelineFactory extends ChannelInitializer<Channel>
         SslHandler sslHandler = configureServerSSLOnDemand();
         if (sslHandler != null) {
             LOG.log(Level.FINE, 
-                    "Server SSL handler configured and added as an interceptor against the ChannelPipeline: {}"
-                    , sslHandler);
+                    "Server SSL handler configured and added as an interceptor against the ChannelPipeline: {}",
+                    sslHandler);
             pipeline.addLast("ssl", sslHandler);
         }
 

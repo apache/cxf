@@ -233,7 +233,7 @@ interface ISetterTarget extends Target {
 class ProxyClass implements InvocationHandler {
     Object obj;
 
-    public ProxyClass(Object o) {
+    ProxyClass(Object o) {
         obj = o;
     }
 

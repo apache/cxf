@@ -89,7 +89,7 @@ public class RolePrefixSecurityContextImplTest extends Assert {
     
     private static class RolePrincipal implements Principal {
         private String roleName; 
-        public RolePrincipal(String roleName) {
+        RolePrincipal(String roleName) {
             this.roleName = roleName;
         }
         public String getName() {

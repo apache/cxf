@@ -86,7 +86,7 @@ public class MessageListenerContainer extends AbstractMessageListenerContainer {
         private MessageListener listenerHandler;
         private Session session;
         
-        public LocalTransactionalMessageListener(Session session, MessageListener listenerHandler) {
+        LocalTransactionalMessageListener(Session session, MessageListener listenerHandler) {
             this.session = session;
             this.listenerHandler = listenerHandler;
         }
@@ -104,7 +104,7 @@ public class MessageListenerContainer extends AbstractMessageListenerContainer {
         }
         
         private void safeRollback(Throwable t) {
-            LOG.log(Level.WARNING, "Exception while processing jms message in cxf. Rolling back" , t);
+            LOG.log(Level.WARNING, "Exception while processing jms message in cxf. Rolling back", t);
             try {
                 if (session.getTransacted()) {
                     session.rollback();

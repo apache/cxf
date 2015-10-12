@@ -463,7 +463,7 @@ public class AttachmentDeserializerTest extends Assert {
         byte b[] = new byte[100];
         int i = ins.read(b);
         while (i > 0) {
-            bout.write(b, 0 , i);
+            bout.write(b, 0, i);
             i = ins.read(b);
         }
         if (i == 0) {

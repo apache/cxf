@@ -25,7 +25,7 @@ public enum JoseType {
     JWT(JoseConstants.TYPE_JWT);
     
     private final String type;
-    private JoseType(String type) {
+    JoseType(String type) {
         this.type = type;
     }
     public static JoseType getType(String type) {

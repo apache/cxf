@@ -261,7 +261,7 @@ public class ConfigurerImplTest extends Assert {
         private Short unsignedByteAttr = new Short((short)11);
  
         
-        public SimpleBean(String bn) {
+        SimpleBean(String bn) {
             beanName = bn;
         }
          
@@ -404,7 +404,7 @@ public class ConfigurerImplTest extends Assert {
     
     class ChildBean extends SimpleBean {
 
-        public ChildBean(String bn) {
+        ChildBean(String bn) {
             super(bn);
         }
         

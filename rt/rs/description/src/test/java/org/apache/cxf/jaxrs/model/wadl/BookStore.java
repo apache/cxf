@@ -260,7 +260,7 @@ public class BookStore extends AbstractStore<Book> implements BookDescription {
         }
     }
     
-    public static enum TestEnum {
+    public enum TestEnum {
         A;        
     }
 }

@@ -71,7 +71,7 @@ public class ChainInitiationObserverTest extends Assert {
         
         private boolean invoked;
         
-        public TestChain(SortedSet<Phase> ps) {
+        TestChain(SortedSet<Phase> ps) {
             super(ps);
         }
         

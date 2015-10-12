@@ -34,7 +34,7 @@ public class Activator implements BundleActivator {
                 return new SimpleBPNamespaceHandler();
             }
         };
-        NamespaceHandlerRegisterer.register(context, factory , "http://cxf.apache.org/blueprint/simple");
+        NamespaceHandlerRegisterer.register(context, factory, "http://cxf.apache.org/blueprint/simple");
         
     }
 

@@ -123,7 +123,7 @@ public class BootstrapStorage {
                 StaticFile staticFile = new StaticFile(url, acceptsGzip(mc), mime);
                 
                 Response.ResponseBuilder builder = Response.ok(staticFile);
-                builder.variant(new Variant(mime , (Locale)null, staticFile.isGzipEnabled() ? "gzip" : null));
+                builder.variant(new Variant(mime, (Locale)null, staticFile.isGzipEnabled() ? "gzip" : null));
 
                 return builder.build();
             }

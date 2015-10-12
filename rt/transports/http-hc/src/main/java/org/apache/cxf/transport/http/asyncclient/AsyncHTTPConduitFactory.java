@@ -88,7 +88,7 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
     public static final String USE_POLICY = "org.apache.cxf.transport.http.async.usePolicy";
     
     
-    public static enum UseAsyncPolicy {
+    public enum UseAsyncPolicy {
         ALWAYS, ASYNC_ONLY, NEVER;
         
         public static UseAsyncPolicy getPolicy(Object st) {

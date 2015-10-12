@@ -25,7 +25,7 @@ import org.apache.cxf.interceptor.InterceptorProvider;
 
 @NoJSR250Annotations
 public class WSAddressingFeature extends AbstractFeature {
-    public static enum AddressingResponses {
+    public enum AddressingResponses {
         ALL,
         NON_ANONYMOUS,
         ANONYMOUS,

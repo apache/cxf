@@ -224,7 +224,7 @@ public class MustUnderstandInterceptor extends AbstractSoapInterceptor {
      */
     private class UltimateReceiverMustUnderstandInterceptor extends AbstractSoapInterceptor {
         Set<QName> knownHeaders;
-        public UltimateReceiverMustUnderstandInterceptor(Set<QName> knownHeaders) {
+        UltimateReceiverMustUnderstandInterceptor(Set<QName> knownHeaders) {
             super(Phase.INVOKE);
             this.knownHeaders = knownHeaders;
         }

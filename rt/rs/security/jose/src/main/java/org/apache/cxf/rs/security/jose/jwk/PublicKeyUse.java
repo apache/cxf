@@ -24,7 +24,7 @@ public enum PublicKeyUse {
     ENCRYPT(JsonWebKey.PUBLIC_KEY_USE_ENCRYPT);
     
     private final String use;
-    private PublicKeyUse(String use) {
+    PublicKeyUse(String use) {
         this.use = use;
     }
     public static PublicKeyUse getPublicKeyUse(String use) {

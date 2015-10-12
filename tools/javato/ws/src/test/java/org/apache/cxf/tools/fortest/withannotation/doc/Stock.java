@@ -28,9 +28,9 @@ import javax.xml.ws.ResponseWrapper;
 
 public interface Stock {
     @WebMethod
-    @RequestWrapper(localName = "xXx" ,
+    @RequestWrapper(localName = "xXx",
                     className = "org.apache.cxf.tools.fortest.withannotation.doc.jaxws.GetPrice")
-    @ResponseWrapper(localName = "zZz" ,
+    @ResponseWrapper(localName = "zZz",
                      className = "org.apache.cxf.tools.fortest.withannotation.doc.jaxws.GetPriceResponse")
     float getPrice(String tickerSymbol);
 }

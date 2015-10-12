@@ -33,11 +33,11 @@ public class CertificateRepoProxyFactory {
 
     public CertificateRepoProxyFactory(Class<?> serviceInterface, String filterSt, BundleContext context) {
         Filter filter = createFilter(filterSt, context);
-        this.tracker = new ServiceTracker(context, filter , null);
+        this.tracker = new ServiceTracker(context, filter, null);
         this.tracker.open();
         Class<?>[] interfaces = new Class<?>[]{serviceInterface};
         InvocationHandler handler = new NamedServiceProxy(tracker, filterSt);
-        proxy = (CertificateRepo)Proxy.newProxyInstance(serviceInterface.getClassLoader(), interfaces , handler);
+        proxy = (CertificateRepo)Proxy.newProxyInstance(serviceInterface.getClassLoader(), interfaces, handler);
     }
 
     private Filter createFilter(String filterSt, BundleContext context) {

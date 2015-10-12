@@ -95,7 +95,7 @@ public interface RpcLitCodeFirstService {
     @WebMethod
     List<Foo[]> listObjectArrayOutput();
 
-    static class Foo  {
+    class Foo  {
         String name;
         
         public Foo() {

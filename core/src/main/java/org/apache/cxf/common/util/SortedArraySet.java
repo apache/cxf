@@ -207,7 +207,7 @@ public final class SortedArraySet<T> implements SortedSet<T> {
         final X[] data;
         int idx;
         
-        public SASIterator(X[] d) {
+        SASIterator(X[] d) {
             data = d;
         }
         

@@ -60,8 +60,8 @@ public class PersistOutInterceptor extends AbstractPhaseInterceptor<Message> {
         private final OutputStream origStream;
         private final ExchangeData exchange;
 
-        public PersistOutInterceptorCallback(final Message msg, final OutputStream os,
-                                             final ExchangeData ex) {
+        PersistOutInterceptorCallback(final Message msg, final OutputStream os,
+                                      final ExchangeData ex) {
             this.message = msg;
             this.origStream = os;
             this.exchange = ex;

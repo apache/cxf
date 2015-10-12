@@ -68,7 +68,7 @@ public class BookReview {
         this.authors = authors;
     }
 
-    public static enum Review {
+    public enum Review {
         GOOD,
         BAD
     }

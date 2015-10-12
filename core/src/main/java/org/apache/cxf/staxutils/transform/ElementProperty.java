@@ -29,7 +29,7 @@ class ElementProperty {
     private String text;
     private boolean child;
     
-    public ElementProperty(QName name, String text, boolean child) {
+    ElementProperty(QName name, String text, boolean child) {
         this.name = name;
         this.text = text;
         this.child = child;

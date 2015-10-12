@@ -856,7 +856,7 @@ public class ClientProxyImpl extends AbstractClient implements
     private static class BeanPair {
         private Object value;
         private Annotation[] anns;
-        public BeanPair(Object value, Annotation[] anns) {
+        BeanPair(Object value, Annotation[] anns) {
             this.value = value;
             this.anns = anns;
         }

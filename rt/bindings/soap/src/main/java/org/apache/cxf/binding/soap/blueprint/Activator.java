@@ -34,7 +34,7 @@ public class Activator implements BundleActivator {
                 return new SoapBindingBPHandler();
             }
         };
-        NamespaceHandlerRegisterer.register(context, factory ,
+        NamespaceHandlerRegisterer.register(context, factory,
                                             "http://cxf.apache.org/blueprint/bindings/soap");
     }
 

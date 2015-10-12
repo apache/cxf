@@ -327,7 +327,7 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
         private Node parent;
         private QName lastStartElementQName;
 
-        public HeadersProcessor(SoapVersion version) {
+        HeadersProcessor(SoapVersion version) {
             this.header = version.getHeader().getLocalPart();
             this.ns = version.getEnvelope().getNamespaceURI();
             this.envelope = version.getEnvelope().getLocalPart();

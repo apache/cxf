@@ -128,7 +128,7 @@ public class RespectBindingFeatureClientServerTest extends AbstractBusClientServ
         GreeterRPCLit greeter = service.getPort(portName, GreeterRPCLit.class,
                                                 new RespectBindingFeature(false));
         updateAddressPort(greeter, PORT);
-        assertEquals("Bonjour" , greeter.sayHi());
+        assertEquals("Bonjour", greeter.sayHi());
     }
 
 }

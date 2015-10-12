@@ -170,7 +170,7 @@ public class SettingsFacade {
         @Nonnull
         private final RemoteStorageProxy remoteStorage;
 
-        public RemoteStorageLayer(@Nonnull final RemoteStorageProxy remoteStorage,
+        RemoteStorageLayer(@Nonnull final RemoteStorageProxy remoteStorage,
                                   @Nonnull final StorageLayer parent) {
             this.parent = parent;
             this.remoteStorage = remoteStorage;

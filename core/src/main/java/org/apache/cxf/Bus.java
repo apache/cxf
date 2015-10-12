@@ -32,7 +32,7 @@ import org.apache.cxf.interceptor.InterceptorProvider;
  * of the Bus it may also be responsible for wiring up the CXF internals.
  */
 public interface Bus extends InterceptorProvider {
-    public enum BusState {
+    enum BusState {
         INITIAL, INITIALIZING, RUNNING, SHUTTING_DOWN, SHUTDOWN;
     }
     

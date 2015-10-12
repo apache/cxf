@@ -94,7 +94,7 @@ public class AbstractProtocolHandlerInterceptorTest extends Assert {
     }
 
     class IIOPMessage extends AbstractWrappedMessage {
-        public IIOPMessage(Message m) {
+        IIOPMessage(Message m) {
             super(m);
         }
     }

@@ -74,7 +74,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
     private Set<Class<?>> globalAdapters = new HashSet<Class<?>>();
     private Map<String, Object> unmarshallerProperties;
 
-    public JAXBContextInitializer(ServiceInfo serviceInfo,
+    JAXBContextInitializer(ServiceInfo serviceInfo,
                                   Set<Class<?>> classes,
                                   Collection<Object> typeReferences, 
                                   Map<String, Object> unmarshallerProperties) {

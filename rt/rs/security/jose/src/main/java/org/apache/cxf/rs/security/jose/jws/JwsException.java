@@ -34,7 +34,7 @@ public class JwsException extends JoseException {
     public Error getError() {
         return status;
     }
-    public static enum Error {
+    public enum Error {
         NO_PROVIDER,
         NO_VERIFIER,
         NO_INIT_PROPERTIES,

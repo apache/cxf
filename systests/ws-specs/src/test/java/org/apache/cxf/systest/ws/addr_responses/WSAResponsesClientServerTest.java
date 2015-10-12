@@ -54,7 +54,7 @@ public class WSAResponsesClientServerTest extends AbstractWSATestBase {
         } catch (Exception e) {
             String expectedDetail = "A header representing a Message Addressing Property is not valid";
             if (e instanceof SOAPFaultException) {
-                assertTrue("Expect fault deail : " + expectedDetail ,
+                assertTrue("Expect fault deail : " + expectedDetail,
                            e.getMessage().indexOf(expectedDetail) > -1);
             } else {
                 throw e;

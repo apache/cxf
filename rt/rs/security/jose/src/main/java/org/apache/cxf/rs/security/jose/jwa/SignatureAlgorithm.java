@@ -46,7 +46,7 @@ public enum SignatureAlgorithm {
     private final String javaName;
     private final int keySizeBits;
     
-    private SignatureAlgorithm(String jwaName, String javaName, int keySizeBits) {
+    SignatureAlgorithm(String jwaName, String javaName, int keySizeBits) {
         this.jwaName = jwaName;
         this.javaName = javaName;
         this.keySizeBits = keySizeBits;

@@ -49,8 +49,8 @@ public class FileWriterUtilTest extends Assert {
         try {
             targetDir.mkdirs();
             fileWriter = new FileWriterUtil(targetDir.getAbsolutePath(), null);
-            fileWriter.getWriter("com.iona.test" , "A.java");
-            String packPath = "/com/iona/test/A.java".replace('/' , File.separatorChar);
+            fileWriter.getWriter("com.iona.test", "A.java");
+            String packPath = "/com/iona/test/A.java".replace('/', File.separatorChar);
             String path = targetDir.getAbsolutePath() + packPath;
             assertNotNull(new File(path).getName());           
         } catch (IOException e) {
@@ -71,7 +71,7 @@ public class FileWriterUtilTest extends Assert {
         try {
             targetDir.mkdirs();
             fileWriter = new FileWriterUtil(targetDir.getAbsolutePath(), null); 
-            assertNotNull(fileWriter.getWriter("com.iona.test.SAMPLE" , "A.java"));  
+            assertNotNull(fileWriter.getWriter("com.iona.test.SAMPLE", "A.java"));  
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

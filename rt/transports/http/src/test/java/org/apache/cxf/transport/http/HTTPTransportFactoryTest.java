@@ -39,8 +39,8 @@ public class HTTPTransportFactoryTest extends Assert {
                 factory.getDestination(ei, bus);
                 fail("Expect exception here.");
             } catch (IOException ex) {
-                assertTrue("We should find some exception related to the HttpDestination"
-                       , ex.getMessage().indexOf("HttpDestinationFactory") > 0);
+                assertTrue("We should find some exception related to the HttpDestination",
+                       ex.getMessage().indexOf("HttpDestinationFactory") > 0);
             }
         }
     }

@@ -50,7 +50,7 @@ public enum Applications {
 
     private String uri;
 
-    private Applications(String uri) {
+    Applications(String uri) {
         this.uri = uri;
     }
 

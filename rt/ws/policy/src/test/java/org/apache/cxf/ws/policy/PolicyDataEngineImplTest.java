@@ -105,7 +105,7 @@ public class PolicyDataEngineImplTest extends Assert {
         EasyMock.expect(message.get(TestPolicy.class)).andReturn(confPol);
         EasyMock.expect(message.get(AssertionInfoMap.class)).andReturn(assertionInfoMap);
         control.replay();
-        pde.assertMessage(message , confPol , policyCalculator);
+        pde.assertMessage(message, confPol, policyCalculator);
         control.verify();
     }
 }

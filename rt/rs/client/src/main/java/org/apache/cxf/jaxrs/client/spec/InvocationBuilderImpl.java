@@ -319,11 +319,11 @@ public class InvocationBuilderImpl implements Invocation.Builder {
         private String httpMethod;
         private Entity<?> entity;
         
-        public InvocationImpl(String httpMethod) {
+        InvocationImpl(String httpMethod) {
             this(httpMethod, null);
         }
         
-        public InvocationImpl(String httpMethod, Entity<?> entity) {
+        InvocationImpl(String httpMethod, Entity<?> entity) {
             this.invBuilder = InvocationBuilderImpl.this;
             this.httpMethod = httpMethod;
             this.entity = entity;

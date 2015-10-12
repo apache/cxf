@@ -27,7 +27,7 @@ import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 
-abstract class AbstractLoggingInterceptor extends AbstractPhaseInterceptor<Message> {
+public abstract class AbstractLoggingInterceptor extends AbstractPhaseInterceptor<Message> {
     public static final int DEFAULT_LIMIT = 48 * 1024;
 
     protected int limit = DEFAULT_LIMIT;

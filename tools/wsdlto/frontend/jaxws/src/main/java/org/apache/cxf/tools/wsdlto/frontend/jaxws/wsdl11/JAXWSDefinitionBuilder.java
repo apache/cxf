@@ -137,8 +137,8 @@ public class JAXWSDefinitionBuilder extends AbstractWSDLBuilder {
     private void checkSupported(Definition def) throws ToolException {
         if (isRPCEncoded(def)) {
             org.apache.cxf.common.i18n.Message msg =
-                new org.apache.cxf.common.i18n.Message("UNSUPPORTED_RPC_ENCODED"
-                                                       , LOG);
+                new org.apache.cxf.common.i18n.Message("UNSUPPORTED_RPC_ENCODED",
+                                                       LOG);
             throw new ToolException(msg);
         }
     }

@@ -402,7 +402,7 @@ class HttpServletRequestAdapter implements HttpServletRequest {
         
         private InputStream delegate;
         
-        public ServletInputStreamAdapter(InputStream delegate) {
+        ServletInputStreamAdapter(InputStream delegate) {
             this.delegate = delegate;
         }
 

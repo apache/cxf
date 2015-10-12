@@ -418,8 +418,7 @@ public class WSDLGetUtils {
         }
     }
 
-    public void updateWSDLPublishedEndpointAddress(Definition def, EndpointInfo endpointInfo)
-    {
+    public void updateWSDLPublishedEndpointAddress(Definition def, EndpointInfo endpointInfo) {
         synchronized (def) {
             //writing a def is not threadsafe.  Sync on it to make sure
             //we don't get any ConcurrentModificationExceptions

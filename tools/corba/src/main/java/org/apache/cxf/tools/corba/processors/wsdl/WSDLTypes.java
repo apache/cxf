@@ -156,9 +156,9 @@ public final class WSDLTypes {
                 boundedString = false;
             }
         } catch (NumberFormatException ex) {
-            throw new Exception("illegal number" , ex);
+            throw new Exception("illegal number", ex);
         } catch (Exception e) {
-            throw new Exception("illegal number" , e);
+            throw new Exception("illegal number", e);
         }
 
         if (boundedString) {

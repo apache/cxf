@@ -145,6 +145,6 @@ public class FaultGenerator extends AbstractJAXWSGenerator {
     }
 
     public void register(final ClassCollector collector, String packageName, String fileName) {
-        collector.addExceptionClassName(packageName , fileName , packageName + "." + fileName);
+        collector.addExceptionClassName(packageName, fileName, packageName + "." + fileName);
     }
 }

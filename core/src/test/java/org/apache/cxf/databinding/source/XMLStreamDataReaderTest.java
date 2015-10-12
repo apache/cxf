@@ -64,7 +64,7 @@ public class XMLStreamDataReaderTest extends Assert {
     private static class TestInputStream extends ByteArrayInputStream {
         private boolean closed;
         
-        public TestInputStream(byte[] buf) {
+        TestInputStream(byte[] buf) {
             super(buf);
         }
 

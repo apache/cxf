@@ -294,7 +294,7 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
             if (expectRandom) {
                 assertTrue(currEndpoint.equals(activeReplica1) || currEndpoint.equals(activeReplica2));
             } else {
-                assertEquals(activeReplica1 , currEndpoint);
+                assertEquals(activeReplica1, currEndpoint);
             }
             if (expectServerException) {
                 assertNotNull(ex);

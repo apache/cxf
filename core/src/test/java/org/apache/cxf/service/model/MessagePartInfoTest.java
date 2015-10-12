@@ -46,13 +46,13 @@ public class MessagePartInfoTest extends Assert {
     @Test
     public void testName() throws Exception {
         assertEquals(messagePartInfo.getName().getLocalPart(), "testMessagePart");
-        assertEquals(messagePartInfo.getName().getNamespaceURI()
-                     , "http://apache.org/hello_world_soap_http");
+        assertEquals(messagePartInfo.getName().getNamespaceURI(),
+                     "http://apache.org/hello_world_soap_http");
         messagePartInfo.setName(new QName(
             "http://apache.org/hello_world_soap_http1", "testMessagePart1"));
         assertEquals(messagePartInfo.getName().getLocalPart(), "testMessagePart1");
-        assertEquals(messagePartInfo.getName().getNamespaceURI()
-                     , "http://apache.org/hello_world_soap_http1");
+        assertEquals(messagePartInfo.getName().getNamespaceURI(),
+                     "http://apache.org/hello_world_soap_http1");
         
     }
 

@@ -38,8 +38,7 @@ public class EJBInvoker extends AbstractInvoker {
     public EJBInvoker(EJBHome home) {
         this.home = home;
         try {
-            if (!home.getEJBMetaData().isSession() || !home.getEJBMetaData().isStatelessSession())
-            {
+            if (!home.getEJBMetaData().isSession() || !home.getEJBMetaData().isStatelessSession()) {
                 throw new IllegalArgumentException("home must be for a stateless session bean");
             }
             createMethod = home.getClass().getMethod("create", new Class[0]);

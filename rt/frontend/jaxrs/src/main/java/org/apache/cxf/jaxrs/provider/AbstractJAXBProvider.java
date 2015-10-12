@@ -395,7 +395,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
     }
     
     private static QName getQNameFromNamespaceAndName(String ns, String localName, Class<?> cls, boolean plural) {
-        String name = getLocalName(localName, cls.getSimpleName() , plural);
+        String name = getLocalName(localName, cls.getSimpleName(), plural);
         String namespace = getNamespace(ns);
         if ("".equals(namespace)) {
             namespace = getPackageNamespace(cls);

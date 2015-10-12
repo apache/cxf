@@ -30,7 +30,7 @@ public interface GenericsService2<T, P> {
     
     Value<P> convert2(Value<T> in);
     
-    public static class Value<V> {
+    class Value<V> {
         V val;
         
         public Value() {

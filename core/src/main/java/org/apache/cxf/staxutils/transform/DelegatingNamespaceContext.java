@@ -28,7 +28,7 @@ import java.util.Map;
 import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
 
-class DelegatingNamespaceContext implements NamespaceContext {
+public class DelegatingNamespaceContext implements NamespaceContext {
     private NamespaceContext nc;
     private Map<String, String> nsMap;
     private Deque<Map<String, String>> namespaces;

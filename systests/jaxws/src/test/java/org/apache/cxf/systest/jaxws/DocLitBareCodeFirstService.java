@@ -63,7 +63,7 @@ public interface DocLitBareCodeFirstService {
              propOrder = { "name" }) 
     @XmlRootElement(namespace = "http://cxf.apache.org/test/request/bare",
                     name = "SayTestObject") 
-    static class SayTestRequest  {
+    class SayTestRequest  {
         String name;
         
         public SayTestRequest() {
@@ -85,7 +85,7 @@ public interface DocLitBareCodeFirstService {
              propOrder = { "name" }) 
     @XmlRootElement(namespace = "http://cxf.apache.org/test/request/bare",
                     name = "GreetMeObject") 
-    static class GreetMeRequest  {
+    class GreetMeRequest  {
         String name;
         
         public GreetMeRequest() {
@@ -105,7 +105,7 @@ public interface DocLitBareCodeFirstService {
              propOrder = { "name" }) 
     @XmlRootElement(namespace = "http://cxf.apache.org/test/request/bare",
                     name = "GreetMeResponseObject")    
-    static class GreetMeResponse  {
+    class GreetMeResponse  {
         String name;
         
         public GreetMeResponse() {

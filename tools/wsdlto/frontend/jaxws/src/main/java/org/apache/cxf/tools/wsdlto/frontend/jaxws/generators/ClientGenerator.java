@@ -109,6 +109,6 @@ public class ClientGenerator extends AbstractJAXWSGenerator {
     }
 
     public void register(final ClassCollector collector, String packageName, String fileName) {
-        collector.addClientClassName(packageName , fileName , packageName + "." + fileName);
+        collector.addClientClassName(packageName, fileName, packageName + "." + fileName);
     }
 }

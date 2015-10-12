@@ -30,7 +30,7 @@ public class Handler extends URLStreamHandler {
     }
 
     class HandlerUrlConnection extends URLConnection {
-        public HandlerUrlConnection(URL someUrl) {
+        HandlerUrlConnection(URL someUrl) {
             super(someUrl);
         }
 

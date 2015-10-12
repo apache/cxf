@@ -1099,7 +1099,7 @@ public abstract class AbstractClient implements Client {
         
     }
     private static class ConnectionFaultInterceptor extends AbstractPhaseInterceptor<Message> {
-        public ConnectionFaultInterceptor() {
+        ConnectionFaultInterceptor() {
             super(Phase.PRE_STREAM);
         } 
 

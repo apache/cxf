@@ -30,9 +30,9 @@ import javax.xml.ws.soap.SOAPBinding;
 @BindingType (value = SOAPBinding.SOAP12HTTP_BINDING)
 public class Stock12Impl implements Stock {
     @WebMethod
-    @RequestWrapper(localName = "xXx" ,
+    @RequestWrapper(localName = "xXx",
                     className = "org.apache.cxf.tools.fortest.withannotation.doc.jaxws.GetPrice")
-    @ResponseWrapper(localName = "zZz" ,
+    @ResponseWrapper(localName = "zZz",
                      className = "org.apache.cxf.tools.fortest.withannotation.doc.jaxws.GetPriceResponse")
     public float getPrice(String tickerSymbol) {
         return 0;

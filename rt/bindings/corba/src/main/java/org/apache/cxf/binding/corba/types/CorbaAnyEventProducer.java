@@ -148,7 +148,7 @@ public class CorbaAnyEventProducer extends AbstractStartEndEventProducer {
         int[] states = {XMLStreamReader.CHARACTERS};
         String value;
 
-        public CorbaSimpleAnyContainedTypeEventProducer(String text) {
+        CorbaSimpleAnyContainedTypeEventProducer(String text) {
             value = text;
             state = 0;
         }

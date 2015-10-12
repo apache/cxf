@@ -33,7 +33,7 @@ public class Activator implements BundleActivator {
                 return new ClusteringBPNamespaceHandler();
             }
         };
-        NamespaceHandlerRegisterer.register(context, factory ,
+        NamespaceHandlerRegisterer.register(context, factory,
                                             "http://cxf.apache.org/clustering");
 
     }

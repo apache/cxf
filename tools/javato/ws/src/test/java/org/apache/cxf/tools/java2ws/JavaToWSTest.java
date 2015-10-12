@@ -99,10 +99,10 @@ public class JavaToWSTest extends ToolTestBase {
         JavaToWS.main(args);
         File wrapper = outputFile("org/apache/cxf/tools/fortest/cxf2941/jaxws/HelloStringResponse.java");
         String str = FileUtils.getStringFromFile(wrapper);
-        assertTrue("namespace value in annoataion @XmlElement is not correct"
-                   , str.indexOf("hello/name") > -1);
-        assertTrue("name value in annoataion @XmlElement is not correct"
-                   , str.indexOf("\"name\"") > -1);
+        assertTrue("namespace value in annoataion @XmlElement is not correct",
+                   str.indexOf("hello/name") > -1);
+        assertTrue("name value in annoataion @XmlElement is not correct",
+                   str.indexOf("\"name\"") > -1);
     }
     
     

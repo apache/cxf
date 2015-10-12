@@ -311,7 +311,7 @@ public class ASMHelper {
     }
     
     
-    public Class<?> loadClass(String className, Class<?> clz , byte[] bytes) {
+    public Class<?> loadClass(String className, Class<?> clz, byte[] bytes) {
         TypeHelperClassLoader loader = getTypeHelperClassLoader(clz);
         synchronized (loader) {
             Class<?> cls = loader.lookupDefinedClass(className);
@@ -321,7 +321,7 @@ public class ASMHelper {
             return cls;
         }
     }
-    public Class<?> loadClass(String className, ClassLoader l , byte[] bytes) {
+    public Class<?> loadClass(String className, ClassLoader l, byte[] bytes) {
         TypeHelperClassLoader loader = getTypeHelperClassLoader(l);
         synchronized (loader) {
             Class<?> cls = loader.lookupDefinedClass(className);

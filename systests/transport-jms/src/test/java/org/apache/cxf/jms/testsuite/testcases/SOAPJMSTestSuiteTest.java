@@ -636,7 +636,7 @@ public class SOAPJMSTestSuiteTest extends AbstractBusClientServerTestBase {
         
         EndpointInfo endpointInfo = new EndpointInfo();
         endpointInfo.setAddress(JMSTestUtil.getFullAddress(address, broker.getBrokerURL()));
-        JMSConfiguration jmsConfig = JMSConfigFactory.createFromEndpointInfo(staticBus, endpointInfo , null);
+        JMSConfiguration jmsConfig = JMSConfigFactory.createFromEndpointInfo(staticBus, endpointInfo, null);
         
         ResourceCloser closer = new ResourceCloser();
         try {

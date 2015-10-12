@@ -85,14 +85,14 @@ public class STSTokenOutInterceptor extends AbstractPhaseInterceptor<Message> {
         return stsClient;
     }
     
-    public static enum AuthMode {
+    public enum AuthMode {
         X509(X509_ENDPOINT, KEY_TYPE_X509), 
         TRANSPORT(TRANSPORT_ENDPOINT, null);
         
         private final QName endpointName;
         private final String keyType;
         
-        private AuthMode(QName endpointName, String keyType) {
+        AuthMode(QName endpointName, String keyType) {
             this.endpointName = endpointName;
             this.keyType = keyType;
         }

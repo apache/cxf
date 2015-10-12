@@ -36,9 +36,9 @@ class JaxrsClientCallback<T> extends ClientCallback {
     private final Type outType;
     private final Class<?> responseClass;
     
-    public JaxrsClientCallback(final InvocationCallback<T> handler, 
-                               Class<?> responseClass, 
-                               Type outGenericType) {
+    JaxrsClientCallback(final InvocationCallback<T> handler, 
+                        Class<?> responseClass, 
+                        Type outGenericType) {
         this.handler = handler;
         this.outType = outGenericType;
         this.responseClass = responseClass;
@@ -99,7 +99,7 @@ class JaxrsClientCallback<T> extends ClientCallback {
     
     static class JaxrsResponseCallback<T> implements Future<T> {
         JaxrsClientCallback<T> callback;
-        public JaxrsResponseCallback(JaxrsClientCallback<T> cb) {
+        JaxrsResponseCallback(JaxrsClientCallback<T> cb) {
             callback = cb;
         }
         

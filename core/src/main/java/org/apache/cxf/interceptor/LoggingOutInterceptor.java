@@ -144,7 +144,7 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
         Message message;
         final int lim;
         
-        public LogWriter(Logger logger, Message message, Writer writer) {
+        LogWriter(Logger logger, Message message, Writer writer) {
             super(writer);
             this.logger = logger;
             this.message = message;
@@ -206,7 +206,7 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
         private final Logger logger; //NOPMD
         private final int lim;
         
-        public LoggingCallback(final Logger logger, final Message msg, final OutputStream os) {
+        LoggingCallback(final Logger logger, final Message msg, final OutputStream os) {
             this.logger = logger;
             this.message = msg;
             this.origStream = os;

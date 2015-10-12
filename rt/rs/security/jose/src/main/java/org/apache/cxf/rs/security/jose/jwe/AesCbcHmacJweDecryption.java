@@ -64,7 +64,7 @@ public class AesCbcHmacJweDecryption extends JweDecryption {
     }
     private static class AesCbcContentDecryptionAlgorithm extends AbstractContentEncryptionCipherProperties
         implements ContentDecryptionProvider {
-        public AesCbcContentDecryptionAlgorithm(ContentAlgorithm supportedAlgo) {
+        AesCbcContentDecryptionAlgorithm(ContentAlgorithm supportedAlgo) {
             super(supportedAlgo);
         }
         @Override

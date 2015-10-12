@@ -30,7 +30,7 @@ public enum KeyOperation {
     DERIVEBITS(JsonWebKey.KEY_OPER_DERIVE_BITS);
     
     private final String oper;
-    private KeyOperation(String oper) {
+    KeyOperation(String oper) {
         this.oper = oper;
     }
     public static KeyOperation getKeyOperation(String oper) {

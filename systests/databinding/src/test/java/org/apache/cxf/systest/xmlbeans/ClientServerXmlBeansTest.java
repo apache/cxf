@@ -85,7 +85,7 @@ public class ClientServerXmlBeansTest extends AbstractBusClientServerTestBase {
         Bus bus = factory.createBus("org/apache/cxf/systest/xmlbeans/cxf.xml");
         BusFactory.setDefaultBus(bus);
         URL wsdl = this.getClass().getResource("/wsdl_systest_databinding/xmlbeans/doc_lit_bare.wsdl");
-        assertNotNull("We should have found the WSDL here. " , wsdl);      
+        assertNotNull("We should have found the WSDL here. ", wsdl);      
         
         org.apache.cxf.xmlbeans.doc_lit_bare.SOAPService ss = 
             new org.apache.cxf.xmlbeans.doc_lit_bare.SOAPService(wsdl, DOC_LIT_BARE_SERVICE);
@@ -124,7 +124,7 @@ public class ClientServerXmlBeansTest extends AbstractBusClientServerTestBase {
         Bus bus = factory.createBus("org/apache/cxf/systest/xmlbeans/cxf.xml");
         BusFactory.setDefaultBus(bus);
         URL wsdl = this.getClass().getResource("/wsdl_systest_databinding/xmlbeans/hello_world.wsdl");
-        assertNotNull("We should have found the WSDL here. " , wsdl);      
+        assertNotNull("We should have found the WSDL here. ", wsdl);      
         
         SOAPService ss = new SOAPService(wsdl, SERVICE_NAME);
         Greeter port = ss.getSoapPort();
@@ -181,7 +181,7 @@ public class ClientServerXmlBeansTest extends AbstractBusClientServerTestBase {
         Bus bus = factory.createBus("org/apache/cxf/systest/xmlbeans/cxf_no_wsdl.xml");
         BusFactory.setDefaultBus(bus);
         URL wsdl = this.getClass().getResource("/wsdl_systest_databinding/xmlbeans/hello_world.wsdl");
-        assertNotNull("We should have found the WSDL here. " , wsdl);      
+        assertNotNull("We should have found the WSDL here. ", wsdl);      
         
         SOAPService ss = new SOAPService(wsdl, SERVICE_NAME);
         QName soapPort = new QName("http://apache.org/hello_world_soap_http_xmlbeans/xmlbeans", "SoapPort");
@@ -230,7 +230,7 @@ public class ClientServerXmlBeansTest extends AbstractBusClientServerTestBase {
         Bus bus = factory.createBus("org/apache/cxf/systest/xmlbeans/cxf_no_wsdl.xml");
         BusFactory.setDefaultBus(bus);
         URL wsdl = this.getClass().getResource("/wsdl_systest_databinding/xmlbeans/hello_world.wsdl");
-        assertNotNull("We should have found the WSDL here. " , wsdl);      
+        assertNotNull("We should have found the WSDL here. ", wsdl);      
         
         SOAPService ss = new SOAPService(wsdl, SERVICE_NAME);
         QName soapPort = new QName("http://apache.org/hello_world_soap_http_xmlbeans/xmlbeans", "SoapPort");

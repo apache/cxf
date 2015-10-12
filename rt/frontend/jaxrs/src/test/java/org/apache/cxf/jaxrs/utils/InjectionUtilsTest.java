@@ -294,7 +294,7 @@ public class InjectionUtilsTest extends Assert {
     
     }
     
-    public static enum CarType {
+    public enum CarType {
 
         AUDI("Audi"),
         GOLF("Golf"),

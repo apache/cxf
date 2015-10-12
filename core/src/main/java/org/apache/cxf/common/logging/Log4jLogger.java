@@ -150,7 +150,7 @@ public class Log4jLogger extends AbstractDelegatingLogger {
     private class HandlerWrapper extends AppenderSkeleton {
         Handler handler;
         
-        public HandlerWrapper(Handler h) {
+        HandlerWrapper(Handler h) {
             handler = h;
             name = "HandlerWrapper-" + h.hashCode(); 
         }

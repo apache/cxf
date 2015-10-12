@@ -34,7 +34,7 @@ public class Activator implements BundleActivator {
                 return new JAXWSBPNamespaceHandler();
             }
         };
-        NamespaceHandlerRegisterer.register(context, factory , "http://cxf.apache.org/blueprint/jaxws");
+        NamespaceHandlerRegisterer.register(context, factory, "http://cxf.apache.org/blueprint/jaxws");
     }
 
     @Override

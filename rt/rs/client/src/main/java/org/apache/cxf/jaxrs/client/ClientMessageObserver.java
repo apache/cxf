@@ -32,7 +32,7 @@ class ClientMessageObserver implements MessageObserver {
     private ClientConfiguration cfg;
     private ClassLoader loader;
     
-    public ClientMessageObserver(ClientConfiguration cfg) {
+    ClientMessageObserver(ClientConfiguration cfg) {
         this.cfg = cfg;
         loader = cfg.getBus().getExtension(ClassLoader.class);
     }

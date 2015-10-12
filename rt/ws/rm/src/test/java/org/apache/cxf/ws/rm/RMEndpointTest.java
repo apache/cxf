@@ -139,7 +139,7 @@ public class RMEndpointTest extends Assert {
         Method m3 = RMEndpoint.class.getDeclaredMethod("setPolicies", new Class[] {Message.class});
 
         rme = EasyMock.createMockBuilder(RMEndpoint.class)
-            .addMockedMethods(m1, m2 , m3).createMock(control);
+            .addMockedMethods(m1, m2, m3).createMock(control);
         rme.createServices();
         EasyMock.expectLastCall();
         rme.createEndpoints(null);

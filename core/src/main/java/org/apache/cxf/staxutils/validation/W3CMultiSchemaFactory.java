@@ -63,7 +63,7 @@ public class W3CMultiSchemaFactory extends BaseSchemaFactory {
     
     static class RecursiveAllowedXMLSchemaReader extends XMLSchemaReader {
         Set<String> sysIds = new TreeSet<String>();
-        public RecursiveAllowedXMLSchemaReader(GrammarReaderController controller,
+        RecursiveAllowedXMLSchemaReader(GrammarReaderController controller,
                         SAXParserFactory parserFactory) {
             super(controller, parserFactory, new StateFactory() {
                 public State schemaHead(String expectedNamespace) {

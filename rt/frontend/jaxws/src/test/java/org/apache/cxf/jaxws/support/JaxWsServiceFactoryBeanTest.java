@@ -247,22 +247,22 @@ public class JaxWsServiceFactoryBeanTest extends AbstractJaxWsTest {
         
 
         assertValid("/wsdl:definitions/wsdl:message[@name='setMessage']" 
-                    + "/wsdl:part[@name = 'parameters'][@element='ns1:setMessage']" , wsdl);
+                    + "/wsdl:part[@name = 'parameters'][@element='ns1:setMessage']", wsdl);
 
         assertValid("/wsdl:definitions/wsdl:message[@name='echoCharResponse']" 
-                    + "/wsdl:part[@name = 'y'][@element='ns1:charEl_y']" , wsdl);
+                    + "/wsdl:part[@name = 'y'][@element='ns1:charEl_y']", wsdl);
         
         assertValid("/wsdl:definitions/wsdl:message[@name='echoCharResponse']" 
-                    + "/wsdl:part[@name = 'return'][@element='ns1:charEl_return']" , wsdl);
+                    + "/wsdl:part[@name = 'return'][@element='ns1:charEl_return']", wsdl);
 
         assertValid("/wsdl:definitions/wsdl:message[@name='echoCharResponse']" 
-                    + "/wsdl:part[@name = 'z'][@element='ns1:charEl_z']" , wsdl);
+                    + "/wsdl:part[@name = 'z'][@element='ns1:charEl_z']", wsdl);
         
         assertValid("/wsdl:definitions/wsdl:message[@name='echoChar']" 
-                    + "/wsdl:part[@name = 'x'][@element='ns1:charEl_x']" , wsdl);
+                    + "/wsdl:part[@name = 'x'][@element='ns1:charEl_x']", wsdl);
         
         assertValid("/wsdl:definitions/wsdl:message[@name='echoChar']" 
-                    + "/wsdl:part[@name = 'y'][@element='ns1:charEl_y']" , wsdl);
+                    + "/wsdl:part[@name = 'y'][@element='ns1:charEl_y']", wsdl);
     }
     
     @Test

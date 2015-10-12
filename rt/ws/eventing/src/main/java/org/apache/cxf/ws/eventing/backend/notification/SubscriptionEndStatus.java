@@ -29,7 +29,7 @@ public enum SubscriptionEndStatus {
 
     private String namespace;
 
-    private SubscriptionEndStatus(String namespace) {
+    SubscriptionEndStatus(String namespace) {
         this.namespace = namespace;
     }
 

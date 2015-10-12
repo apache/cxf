@@ -36,7 +36,7 @@ public enum ContentAlgorithm {
     private final String javaName;
     private final int keySizeBits;
     
-    private ContentAlgorithm(String jwaName, String javaName, int keySizeBits) {
+    ContentAlgorithm(String jwaName, String javaName, int keySizeBits) {
         this.jwaName = jwaName;
         this.javaName = javaName;
         this.keySizeBits = keySizeBits;

@@ -22,7 +22,7 @@ public class JAXWSClass {
     private String className;
     private String comments;
 
-    public JAXWSClass(String clzName , String comment) {
+    public JAXWSClass(String clzName, String comment) {
         className = clzName;
         comments  = comment;
     }

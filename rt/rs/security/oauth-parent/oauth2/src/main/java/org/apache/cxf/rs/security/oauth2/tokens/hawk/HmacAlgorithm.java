@@ -28,7 +28,7 @@ public enum HmacAlgorithm {
 
     private final String oauthName;
 
-    private HmacAlgorithm(String oauthName) {
+    HmacAlgorithm(String oauthName) {
         this.oauthName = oauthName;
     }
 

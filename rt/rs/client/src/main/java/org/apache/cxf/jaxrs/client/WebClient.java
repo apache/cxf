@@ -1291,7 +1291,7 @@ public class WebClient extends AbstractClient {
     }
     
     class ClientAsyncResponseInterceptor extends AbstractPhaseInterceptor<Message> {
-        public ClientAsyncResponseInterceptor() {
+        ClientAsyncResponseInterceptor() {
             super(Phase.UNMARSHAL);
         }
 

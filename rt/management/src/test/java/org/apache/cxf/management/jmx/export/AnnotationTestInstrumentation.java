@@ -32,8 +32,8 @@ import org.apache.cxf.management.annotation.ManagedOperationParameters;
 import org.apache.cxf.management.annotation.ManagedResource;
 
 @ManagedResource(componentName = "AnnotationTest", description = "My Managed Bean",
-                 persistPolicy = "OnUpdate", currencyTimeLimit = 15 , 
-                 log = false ,
+                 persistPolicy = "OnUpdate", currencyTimeLimit = 15, 
+                 log = false,
                  logFile = "jmx.log", persistPeriod = 200,
                  persistLocation = "/local/work", persistName = "bar.jmx")
 @ManagedNotifications({@ManagedNotification(name = "My Notification",

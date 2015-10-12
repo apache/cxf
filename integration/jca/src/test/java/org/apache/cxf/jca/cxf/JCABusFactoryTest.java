@@ -92,7 +92,7 @@ public class JCABusFactoryTest extends AbstractCXFTest {
 
 
 class DummyClassLoader extends ClassLoader {
-    public DummyClassLoader() {
+    DummyClassLoader() {
         super();
     }
 }

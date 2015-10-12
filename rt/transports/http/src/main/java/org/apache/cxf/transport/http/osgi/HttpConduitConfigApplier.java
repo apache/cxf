@@ -47,7 +47,7 @@ import org.apache.cxf.transports.http.configuration.ProxyServerType;
 class HttpConduitConfigApplier {
     private static final String SECURE_HTTP_PREFIX = "https";
 
-    public HttpConduitConfigApplier() {
+    HttpConduitConfigApplier() {
     }
     
     void apply(Dictionary<String, String> d, HTTPConduit c, String address) {

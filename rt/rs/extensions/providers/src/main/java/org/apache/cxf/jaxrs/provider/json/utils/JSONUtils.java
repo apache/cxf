@@ -164,7 +164,7 @@ public final class JSONUtils {
     
     private static class JettisonMappedReaderFactory extends MappedXMLInputFactory {
         private DocumentDepthProperties depthProps;
-        public JettisonMappedReaderFactory(Configuration conf, DocumentDepthProperties depthProps) {
+        JettisonMappedReaderFactory(Configuration conf, DocumentDepthProperties depthProps) {
             super(conf);
             this.depthProps = depthProps;
         }
@@ -175,7 +175,7 @@ public final class JSONUtils {
 
     private static class JettisonReader extends DepthXMLStreamReader {
         private Map<String, String> namespaceMap;
-        public JettisonReader(Map<String, String> nsMap,
+        JettisonReader(Map<String, String> nsMap,
                                       XMLStreamReader reader) {
             super(reader);
             this.namespaceMap = nsMap;

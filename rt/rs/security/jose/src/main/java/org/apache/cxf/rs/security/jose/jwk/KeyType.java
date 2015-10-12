@@ -25,7 +25,7 @@ public enum KeyType {
     OCTET(JsonWebKey.KEY_TYPE_OCTET);
     
     private final String type;
-    private KeyType(String type) {
+    KeyType(String type) {
         this.type = type;
     }
     public static KeyType getKeyType(String type) {

@@ -34,7 +34,7 @@ import java.lang.annotation.Target;
 @Target({ ElementType.TYPE, ElementType.METHOD })
 @Inherited
 public @interface SchemaValidation {
-    public enum SchemaValidationType {
+    enum SchemaValidationType {
         IN, REQUEST, OUT, RESPONSE, BOTH, NONE
     }
     /**

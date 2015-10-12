@@ -119,7 +119,7 @@ public class StaxUtilsTest extends Assert {
         int n = 0;
         n = inputStreamReader.read(buffer);
         while (n > 0) {
-            stringWriter.write(buffer, 0 , n);
+            stringWriter.write(buffer, 0, n);
             n = inputStreamReader.read(buffer);
         }
         String input = stringWriter.toString();

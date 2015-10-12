@@ -103,7 +103,7 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
         throws IOException {
         URL url = address.getURL();
         URI uri = address.getURI();
-        Proxy proxy = proxyFactory.createProxy(csPolicy , uri);
+        Proxy proxy = proxyFactory.createProxy(csPolicy, uri);
         message.put("http.scheme", uri.getScheme());
         // check tlsClientParameters from message header
         TLSClientParameters clientParameters = message.get(TLSClientParameters.class);

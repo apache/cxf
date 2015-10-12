@@ -300,7 +300,7 @@ public abstract class AbstractConduitSelector implements ConduitSelector, Closea
         private Boolean value;
         private final Message message;
         
-        public ContextualBooleanGetter(Message message) {
+        ContextualBooleanGetter(Message message) {
             this.message = message;
         }
         

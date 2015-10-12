@@ -210,11 +210,11 @@ public final class CorbaObjectReferenceEventProducer extends AbstractStartEndEve
         CorbaInterfaceNameEventProducer intfProducer;
         List<Attribute> metaAttrs;
 
-        public CorbaMetaDataEventProducer(CorbaServiceNameEventProducer svc) {
+        CorbaMetaDataEventProducer(CorbaServiceNameEventProducer svc) {
             this(null, svc, null);
         }
         
-        public CorbaMetaDataEventProducer(String location,
+        CorbaMetaDataEventProducer(String location,
                                           CorbaServiceNameEventProducer svc,
                                           CorbaInterfaceNameEventProducer intf) {
             name = new QName(CorbaObjectReferenceHelper.ADDRESSING_NAMESPACE_URI, "Metadata");
@@ -259,7 +259,7 @@ public final class CorbaObjectReferenceEventProducer extends AbstractStartEndEve
         List<Attribute> attributes;
         List<Namespace> namespaces;
 
-        public CorbaServiceNameEventProducer(QName svc, String ep) {
+        CorbaServiceNameEventProducer(QName svc, String ep) {
             serviceName = svc;
 
             name = new QName(CorbaObjectReferenceHelper.ADDRESSING_WSDL_NAMESPACE_URI,

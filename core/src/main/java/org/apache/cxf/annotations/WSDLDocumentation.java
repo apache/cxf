@@ -84,5 +84,5 @@ public @interface WSDLDocumentation {
     };
     
 
-    static final class DEFAULT { }
+    final class DEFAULT { }
 }

@@ -578,7 +578,7 @@ public class ParameterProcessor extends AbstractProcessor {
         }
 
         String jpname = ProcessorUtil.mangleNameToVariableName(simpleJavaName);
-        JavaReturn returnType = new JavaReturn(jpname, fullJavaName , targetNamespace);
+        JavaReturn returnType = new JavaReturn(jpname, fullJavaName, targetNamespace);
 
         returnType.setDefaultValueWriter(
             ProcessorUtil.getDefaultValueWriterForWrappedElement(part, context, element));

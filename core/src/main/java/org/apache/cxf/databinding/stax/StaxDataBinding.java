@@ -71,7 +71,7 @@ public class StaxDataBinding extends AbstractInterceptorProvidingDataBinding {
     static class RemoveStaxInEndingInterceptor extends AbstractPhaseInterceptor<Message> {
         static final RemoveStaxInEndingInterceptor INSTANCE = new RemoveStaxInEndingInterceptor();
         
-        public RemoveStaxInEndingInterceptor() {
+        RemoveStaxInEndingInterceptor() {
             super(Phase.PRE_INVOKE);
             addBefore(StaxInEndingInterceptor.class.getName());
         }

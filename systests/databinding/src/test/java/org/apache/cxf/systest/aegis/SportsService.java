@@ -35,11 +35,11 @@ public interface SportsService {
 
     BeanWithCharacter getCharBean();
 
-    public class CustomerMap extends HashMap<String, Map<Integer, Integer>> {
+    class CustomerMap extends HashMap<String, Map<Integer, Integer>> {
         private static final long serialVersionUID = 6235169270166551322L;
     }
     
-    public static class Pair<T1, T2> {
+    class Pair<T1, T2> {
         private T1 first;
         private T2 second;
 
@@ -74,7 +74,7 @@ public interface SportsService {
     }
 
 
-    public class SimpleMapResult extends HashMap<String, Integer> {
+    class SimpleMapResult extends HashMap<String, Integer> {
 
         private static final long serialVersionUID = -5599483363035948690L;
     }

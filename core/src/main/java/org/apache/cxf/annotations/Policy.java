@@ -75,6 +75,6 @@ public @interface Policy {
         SERVICE_PORT,
     };
     
-    static final class DEFAULT { }
+    final class DEFAULT { }
 }
 

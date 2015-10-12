@@ -104,7 +104,7 @@ public final class RetryingDeliverer implements Deliverer {
     private static class ConstantPause implements PauseCalculator {
         private int pause;
 
-        public ConstantPause(int pause) {
+        ConstantPause(int pause) {
             this.pause = pause;
         }
 
@@ -120,7 +120,7 @@ public final class RetryingDeliverer implements Deliverer {
         private int pause;
         private int current;
 
-        public ExponentialPause(int pause) {
+        ExponentialPause(int pause) {
             this.pause = pause;
             current = pause;
         }

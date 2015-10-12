@@ -181,7 +181,7 @@ public class ReflectionInvokationHandler implements InvocationHandler {
     private static class WrapperIterator implements Iterator<Object> {
         Class<?> cls;
         Iterator<?> internal;
-        public WrapperIterator(Class<?> c, Iterator<?> it) {
+        WrapperIterator(Class<?> c, Iterator<?> it) {
             internal = it;
             cls = c;
         }

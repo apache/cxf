@@ -73,7 +73,7 @@ public class WorkQueueManagerImpl implements WorkQueueManager {
                 try {
                     imanager.register(new WorkQueueManagerImplMBeanWrapper(this));
                 } catch (JMException jmex) {
-                    LOG.log(Level.WARNING , jmex.getMessage(), jmex);
+                    LOG.log(Level.WARNING, jmex.getMessage(), jmex);
                 }
             }
             ConfiguredBeanLocator locator = bus.getExtension(ConfiguredBeanLocator.class);
@@ -121,7 +121,7 @@ public class WorkQueueManagerImpl implements WorkQueueManager {
                             try {
                                 imanager.unregister(new WorkQueueImplMBeanWrapper(impl, this));
                             } catch (JMException jmex) {
-                                LOG.log(Level.WARNING , jmex.getMessage(), jmex);
+                                LOG.log(Level.WARNING, jmex.getMessage(), jmex);
                             }
                         }
                     }
@@ -178,7 +178,7 @@ public class WorkQueueManagerImpl implements WorkQueueManager {
                         try {
                             imanager.register(new WorkQueueImplMBeanWrapper((AutomaticWorkQueueImpl)q, this));
                         } catch (JMException jmex) {
-                            LOG.log(Level.WARNING , jmex.getMessage(), jmex);
+                            LOG.log(Level.WARNING, jmex.getMessage(), jmex);
                         }
                     }
                     impl.addSharedUser();
@@ -187,7 +187,7 @@ public class WorkQueueManagerImpl implements WorkQueueManager {
                 try {
                     imanager.register(new WorkQueueImplMBeanWrapper((AutomaticWorkQueueImpl)q, this));
                 } catch (JMException jmex) {
-                    LOG.log(Level.WARNING , jmex.getMessage(), jmex);
+                    LOG.log(Level.WARNING, jmex.getMessage(), jmex);
                 }
             }
         }

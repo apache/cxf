@@ -37,7 +37,7 @@ public interface DuplicateArrayService {
     Foo<String> doFoo(Foo<Integer> foo);
     
     
-    static class Foo<T> {
+    class Foo<T> {
         List<T> list;
         
         public void setList(List<T> l) {

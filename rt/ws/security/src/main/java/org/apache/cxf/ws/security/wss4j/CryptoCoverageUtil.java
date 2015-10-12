@@ -395,7 +395,7 @@ public final class CryptoCoverageUtil {
     /**
      * Differentiates which type of cryptographic coverage to check for.
      */
-    public static enum CoverageType {
+    public enum CoverageType {
         /**
          * Checks for encryption of the matching elements.
          */
@@ -409,7 +409,7 @@ public final class CryptoCoverageUtil {
     /**
      * Differentiates which part of an element to check for cryptographic coverage.
      */
-    public static enum CoverageScope {
+    public enum CoverageScope {
         /**
          * Checks for encryption of the matching elements.
          */

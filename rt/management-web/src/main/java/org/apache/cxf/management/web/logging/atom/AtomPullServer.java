@@ -583,7 +583,7 @@ public class AtomPullServer extends AbstractAtomBean {
     
     private class CustomFeedConverter extends StandardConverter {
         private int page;
-        public CustomFeedConverter(int page) {
+        CustomFeedConverter(int page) {
             super(Output.FEED, Multiplicity.MANY, Format.CONTENT);
             this.page = page;
         }
@@ -604,7 +604,7 @@ public class AtomPullServer extends AbstractAtomBean {
     private class CustomEntryConverter extends StandardConverter {
         private String selfFragment;
         private String altFragment;
-        public CustomEntryConverter(int index) {
+        CustomEntryConverter(int index) {
             super(Output.ENTRY, Multiplicity.ONE, Format.CONTENT);
             this.selfFragment = "logs/entry/" + index;
             this.altFragment = "logs/alternate/entry/" + index;

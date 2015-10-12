@@ -64,7 +64,7 @@ public class GZIPOutInterceptor extends AbstractPhaseInterceptor<Message> {
      * Enum giving the possible values for whether we should gzip a particular
      * message.
      */
-    public static enum UseGzip {
+    enum UseGzip {
         NO, YES, FORCE
     }
     
@@ -269,7 +269,7 @@ public class GZIPOutInterceptor extends AbstractPhaseInterceptor<Message> {
     static class GZipThresholdOutputStream extends AbstractThresholdOutputStream {
         Message message;
         
-        public GZipThresholdOutputStream(int t, OutputStream orig,
+        GZipThresholdOutputStream(int t, OutputStream orig,
                                          boolean force, Message msg) {
             super(t);
             super.wrappedStream = orig;

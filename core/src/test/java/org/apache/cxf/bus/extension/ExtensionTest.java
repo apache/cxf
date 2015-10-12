@@ -92,7 +92,7 @@ public class ExtensionTest extends Assert {
         assertNotNull(cls);
     }
     
-    static class MyServiceConstructorThrowsException {
+    public static class MyServiceConstructorThrowsException {
         public MyServiceConstructorThrowsException() {
             throw new IllegalArgumentException();
         }

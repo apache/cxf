@@ -1128,7 +1128,7 @@ public class JAXBDataBinding implements DataBindingProfile {
                             writer.write("\n");
                             writer.write(indent);
                             writeDefaultValue(writer, indent, path + "/" + varName + "Val",
-                                              varName + "Val" + cnt , cl);
+                                              varName + "Val" + cnt, cl);
                             writer.write("\n");
                             writer.write(indent);
                             writer.write(varName);

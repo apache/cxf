@@ -70,7 +70,7 @@ public class SSLNettyClientTest extends AbstractBusClientServerTestBase {
         Bus b = createStaticBus("/org/apache/cxf/transport/http/netty/client/integration/ServerConfig.xml");
         BusFactory.setThreadDefaultBus(b);
         address = "https://localhost:" + PORT + "/SoapContext/SoapPort";
-        ep = Endpoint.publish(address ,
+        ep = Endpoint.publish(address,
                 new org.apache.hello_world_soap_http.GreeterImpl());
         
         URL wsdl = SSLNettyClientTest.class.getResource("/wsdl/hello_world.wsdl");

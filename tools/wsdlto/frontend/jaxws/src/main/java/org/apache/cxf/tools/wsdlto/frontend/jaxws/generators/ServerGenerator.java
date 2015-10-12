@@ -130,6 +130,6 @@ public class ServerGenerator extends AbstractJAXWSGenerator {
     }
 
     public void register(final ClassCollector collector, String packageName, String fileName) {
-        collector.addServerClassName(packageName , fileName , packageName + "." + fileName);
+        collector.addServerClassName(packageName, fileName, packageName + "." + fileName);
     }
 }

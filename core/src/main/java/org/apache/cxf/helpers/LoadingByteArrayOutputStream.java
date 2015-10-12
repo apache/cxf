@@ -51,7 +51,7 @@ public class LoadingByteArrayOutputStream extends ByteArrayOutputStream {
     }
     
     private static class LoadedByteArrayInputStream extends ByteArrayInputStream implements Transferable {
-        public LoadedByteArrayInputStream(byte[] buf, int length) {
+        LoadedByteArrayInputStream(byte[] buf, int length) {
             super(buf, 0, length);
         }
         public String toString() {

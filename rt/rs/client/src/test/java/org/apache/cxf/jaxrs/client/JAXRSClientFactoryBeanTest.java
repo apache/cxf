@@ -211,11 +211,11 @@ public class JAXRSClientFactoryBeanTest extends Assert {
     private class TestInterceptor extends AbstractPhaseInterceptor<Message> {
         private boolean isInitialized;
 
-        public TestInterceptor() {
+        TestInterceptor() {
             this(Phase.PRE_STREAM);
         }
 
-        public TestInterceptor(String s) {
+        TestInterceptor(String s) {
             super(Phase.PRE_STREAM);
             isInitialized = true;
         } 

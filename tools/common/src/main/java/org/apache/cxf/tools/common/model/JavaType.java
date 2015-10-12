@@ -28,7 +28,7 @@ import javax.xml.namespace.QName;
 
 public class JavaType {
     
-    public static enum Style { IN, OUT, INOUT }
+    public enum Style { IN, OUT, INOUT }
     private static Map<String, String> typeMapping = new HashMap<String, String>();
 
     static {

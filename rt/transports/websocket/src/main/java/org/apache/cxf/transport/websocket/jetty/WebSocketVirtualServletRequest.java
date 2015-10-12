@@ -91,7 +91,7 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
     @Override
     public Object getAttribute(String name) {
         if (LOG.isLoggable(Level.FINE)) {
-            LOG.log(Level.FINE, "getAttribute({0}) -> {1}", new Object[] {name , attributes.get(name)});
+            LOG.log(Level.FINE, "getAttribute({0}) -> {1}", new Object[] {name, attributes.get(name)});
         }
         return attributes.get(name);
     }

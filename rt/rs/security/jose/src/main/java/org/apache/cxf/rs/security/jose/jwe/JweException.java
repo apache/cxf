@@ -34,7 +34,7 @@ public class JweException extends JoseException {
     public Error getError() {
         return status;
     }
-    public static enum Error {
+    public enum Error {
         NO_ENCRYPTOR,
         NO_DECRYPTOR,
         NO_INIT_PROPERTIES,

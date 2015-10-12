@@ -228,7 +228,7 @@ class HttpServletResponseAdapter implements HttpServletResponse {
 
         private OutputStream delegate;
 
-        public ServletOutputStreamAdapter(OutputStream delegate) {
+        ServletOutputStreamAdapter(OutputStream delegate) {
             this.delegate = delegate;
         }
 

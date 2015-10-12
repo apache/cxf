@@ -197,7 +197,7 @@ public class DispatchTest extends AbstractJaxWsTest {
     
     private static class BindingOperationVerifier extends AbstractSoapInterceptor {
         BindingOperationInfo boi;
-        public BindingOperationVerifier() {
+        BindingOperationVerifier() {
             super(Phase.POST_LOGICAL);
         }
         

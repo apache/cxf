@@ -44,7 +44,7 @@ public enum KeyAlgorithm {
     private final String javaName;
     private final int keySizeBits;
     
-    private KeyAlgorithm(String jwaName, String javaName, int keySizeBits) {
+    KeyAlgorithm(String jwaName, String javaName, int keySizeBits) {
         this.jwaName = jwaName;
         this.javaName = javaName;
         this.keySizeBits = keySizeBits;

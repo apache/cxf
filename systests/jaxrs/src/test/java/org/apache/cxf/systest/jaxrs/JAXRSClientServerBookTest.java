@@ -2431,8 +2431,8 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
             "http://localhost:" + PORT + "/bookstore/booksplain"; 
 
         PostMethod post = new PostMethod(endpointAddress);
-        post.addRequestHeader("Content-Type" , "text/plain");
-        post.addRequestHeader("Accept" , "text/plain");
+        post.addRequestHeader("Content-Type", "text/plain");
+        post.addRequestHeader("Accept", "text/plain");
         post.setRequestBody("12345");
         HttpClient httpclient = new HttpClient();
         
@@ -2487,7 +2487,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
             "http://localhost:" + PORT + "/bookstore/cds"; 
 
         GetMethod get = new GetMethod(endpointAddress);
-        get.addRequestHeader("Accept" , "application/json");
+        get.addRequestHeader("Accept", "application/json");
 
         HttpClient httpclient = new HttpClient();
         

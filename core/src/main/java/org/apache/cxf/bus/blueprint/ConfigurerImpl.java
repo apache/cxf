@@ -51,7 +51,7 @@ public class ConfigurerImpl implements Configurer {
     static class MatcherHolder implements Comparable<MatcherHolder> {
         Matcher matcher;
         String wildCardId;
-        public MatcherHolder(String orig, Matcher matcher) {
+        MatcherHolder(String orig, Matcher matcher) {
             wildCardId = orig;
             this.matcher = matcher;
         }

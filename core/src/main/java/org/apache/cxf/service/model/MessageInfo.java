@@ -34,7 +34,7 @@ import org.apache.cxf.common.util.StringUtils;
  */
 public class MessageInfo extends AbstractMessageContainer {
     
-    public static enum Type {
+    public enum Type {
         INPUT,
         OUTPUT;
     }

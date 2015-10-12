@@ -310,7 +310,7 @@ public class RetransmissionQueueImplTest extends Assert {
     @Test
     public void testIsEmpty() {
         ready(false);
-        assertTrue("queue is not empty" , queue.isEmpty());
+        assertTrue("queue is not empty", queue.isEmpty());
     }
 
     @Test

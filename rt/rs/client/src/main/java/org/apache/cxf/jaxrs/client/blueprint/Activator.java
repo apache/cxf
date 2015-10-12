@@ -37,7 +37,7 @@ public class Activator implements BundleActivator {
                 return new org.apache.cxf.jaxrs.client.blueprint.JAXRSBPNamespaceHandler();
             }
         };
-        NamespaceHandlerRegisterer.register(context, factory ,
+        NamespaceHandlerRegisterer.register(context, factory,
                                             "http://cxf.apache.org/blueprint/jaxrs-client");
     }
 

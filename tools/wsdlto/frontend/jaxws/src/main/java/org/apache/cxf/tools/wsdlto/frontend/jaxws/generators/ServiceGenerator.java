@@ -170,6 +170,6 @@ public class ServiceGenerator extends AbstractJAXWSGenerator {
     }
     
     public void register(final ClassCollector collector, String packageName, String fileName) {
-        collector.addServiceClassName(packageName , fileName , packageName + "." + fileName);
+        collector.addServiceClassName(packageName, fileName, packageName + "." + fileName);
     }
 }

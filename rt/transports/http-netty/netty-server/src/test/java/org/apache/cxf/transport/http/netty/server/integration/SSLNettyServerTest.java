@@ -75,7 +75,7 @@ public class SSLNettyServerTest extends AbstractBusClientServerTestBase {
         BusFactory.setThreadDefaultBus(b);
         
         address = "https://localhost:" + PORT + "/SoapContext/SoapPort";
-        ep = Endpoint.publish(address ,
+        ep = Endpoint.publish(address,
                 new org.apache.hello_world_soap_http.GreeterImpl());
         
         URL wsdl = NettyServerTest.class.getResource("/wsdl/hello_world.wsdl");

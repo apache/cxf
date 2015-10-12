@@ -72,7 +72,7 @@ public class ClientServerSourceTest extends AbstractBusClientServerTestBase {
         Bus bus = factory.createBus("org/apache/cxf/systest/source/cxf.xml");
         BusFactory.setDefaultBus(bus);
         URL wsdl = this.getClass().getResource("/wsdl_systest_databinding/source/hello_world.wsdl");
-        assertNotNull("We should have found the WSDL here. " , wsdl);      
+        assertNotNull("We should have found the WSDL here. ", wsdl);      
         
         SOAPService ss = new SOAPService(wsdl, SERVICE_NAME);
         Greeter port = ss.getSoapPort();

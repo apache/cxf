@@ -32,7 +32,7 @@ public enum ProtocolVariation {
     private final EncoderDecoder codec;
     private final RMConstants constants;
     
-    private ProtocolVariation(EncoderDecoder ed, RMConstants rmc) {
+    ProtocolVariation(EncoderDecoder ed, RMConstants rmc) {
         codec = ed;
         constants = rmc;
     }

@@ -54,7 +54,7 @@ public abstract class CachedStreamTestBase extends Assert {
         String result = initTestData(16);
         Object cache = createCache();
         String test = getResetOutValue(result, cache);
-        assertEquals("The test stream content isn't same ", test , result);
+        assertEquals("The test stream content isn't same ", test, result);
         close(cache);
     }
     

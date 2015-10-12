@@ -59,7 +59,7 @@ public @interface FactoryType {
         PerRequest
     };
     
-    static final class DEFAULT implements Factory {
+    final class DEFAULT implements Factory {
         public Object create(Exchange e) throws Throwable {
             return null;
         }

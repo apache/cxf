@@ -90,7 +90,7 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
     private static class MtomValidationHandler implements ValidationEventHandler {
         ValidationEventHandler origHandler;
         JAXBAttachmentMarshaller marshaller;
-        public MtomValidationHandler(ValidationEventHandler v,
+        MtomValidationHandler(ValidationEventHandler v,
                                      JAXBAttachmentMarshaller m) {
             origHandler = v;
             marshaller = m;

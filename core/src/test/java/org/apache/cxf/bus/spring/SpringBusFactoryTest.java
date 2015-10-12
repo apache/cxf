@@ -191,7 +191,7 @@ public class SpringBusFactoryTest extends Assert {
 
         private String name;
         
-        public TestInterceptor() {            
+        TestInterceptor() {            
         }
         
         public void setName(String n) {
@@ -219,7 +219,7 @@ public class SpringBusFactoryTest extends Assert {
         boolean postConstructMethodCalled;
         boolean preDestroyMethodCalled;
 
-        public TestExtension(Bus bus) {
+        TestExtension(Bus bus) {
             bus.setExtension(this, TestExtension.class);
         }
  
@@ -236,7 +236,7 @@ public class SpringBusFactoryTest extends Assert {
      
     static class TestFeature extends AbstractFeature {
         boolean initialised;
-        public TestFeature() {
+        TestFeature() {
             //nothing
         }
 

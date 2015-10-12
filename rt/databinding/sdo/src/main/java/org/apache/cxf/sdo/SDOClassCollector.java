@@ -32,7 +32,7 @@ import org.apache.cxf.service.model.ServiceInfo;
 class SDOClassCollector extends ServiceModelVisitor { 
     Set<Class<?>> classes = new HashSet<Class<?>>();
     
-    public SDOClassCollector(ServiceInfo serviceInfo) {
+    SDOClassCollector(ServiceInfo serviceInfo) {
         super(serviceInfo);
     }
     

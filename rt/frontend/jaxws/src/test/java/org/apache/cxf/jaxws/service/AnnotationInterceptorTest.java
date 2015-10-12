@@ -216,7 +216,7 @@ public class AnnotationInterceptorTest extends AbstractJaxWsTest {
     }
     
     @InInterceptors(classes = org.apache.cxf.jaxws.service.TestInterceptor.class)
-    @OutFaultInterceptors (classes = {org.apache.cxf.jaxws.service.TestInterceptor.class , 
+    @OutFaultInterceptors (classes = {org.apache.cxf.jaxws.service.TestInterceptor.class, 
                                       org.apache.cxf.jaxws.service.Test2Interceptor.class })
     @Features (classes = org.apache.cxf.jaxws.service.AnnotationFeature.class)
     public class HelloServiceImpl implements HelloService {

@@ -46,7 +46,7 @@ public class RequestDispatcherProviderTest extends Assert {
         assertEquals("/test.jsp", p.getResourcePath(TestEnum.ONE.getClass(), TestEnum.ONE));
     }
     
-    private static enum TestEnum {
+    private enum TestEnum {
         ONE,
         TWO
     }

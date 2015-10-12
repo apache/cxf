@@ -37,7 +37,7 @@ abstract class CXFInvocationHandlerBase implements CXFInvocationHandler {
     private CXFInvocationHandler next;
     private CXFInvocationHandlerData data;
 
-    public CXFInvocationHandlerBase(CXFInvocationHandlerData cihd) {
+    CXFInvocationHandlerBase(CXFInvocationHandlerData cihd) {
         this.data = cihd;
     }
 

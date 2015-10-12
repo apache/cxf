@@ -264,7 +264,7 @@ public final class AttachmentUtil {
     
     static class DHMap extends AbstractMap<String, DataHandler> {
         final Collection<Attachment> list;
-        public DHMap(Collection<Attachment> l) {
+        DHMap(Collection<Attachment> l) {
             list = l;
         }
         public Set<Map.Entry<String, DataHandler>> entrySet() {

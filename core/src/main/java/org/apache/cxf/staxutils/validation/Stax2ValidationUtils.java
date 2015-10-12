@@ -65,7 +65,7 @@ class Stax2ValidationUtils {
         HAS_WOODSTOX = hasw;
     }
     
-    public Stax2ValidationUtils() {
+    Stax2ValidationUtils() {
         if (!HAS_WOODSTOX) {
             throw new RuntimeException("Could not load woodstox");
         }

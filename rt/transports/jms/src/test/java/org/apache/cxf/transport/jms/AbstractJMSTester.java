@@ -196,7 +196,7 @@ public abstract class AbstractJMSTester extends Assert {
             char buffer[] = new char[5000];
             try {
                 int i = reader.read(buffer);
-                response = new String(buffer, 0 , i);
+                response = new String(buffer, 0, i);
             } catch (IOException e) {
                 assertFalse("Read the Destination recieved Message error ", false);
                 e.printStackTrace();

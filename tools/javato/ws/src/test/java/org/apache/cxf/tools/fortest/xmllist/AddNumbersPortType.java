@@ -60,7 +60,7 @@ public interface AddNumbersPortType {
         @WebParam(name = "fileName") String fileName);
     
     
-    static class UserObject {
+    class UserObject {
         String myData;
         
         public void setMyData(String s) {

@@ -26,7 +26,7 @@ class QNamesMap {
     private QName[] values;
     private int index;
     
-    public QNamesMap(int size) {
+    QNamesMap(int size) {
         keys = new QName[size];
         values = new QName[size];
     }

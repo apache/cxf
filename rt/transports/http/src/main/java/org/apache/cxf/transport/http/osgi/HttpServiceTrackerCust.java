@@ -62,7 +62,7 @@ final class HttpServiceTrackerCust implements ServiceTrackerCustomizer {
     @Override
     public Object addingService(ServiceReference reference) {
         HttpService httpService = (HttpService)context.getService(reference);
-        Servlet servlet = new CXFNonSpringServlet(destinationRegistry , false);
+        Servlet servlet = new CXFNonSpringServlet(destinationRegistry, false);
         servletExporter = new ServletExporter(servlet, httpService);
         Properties servProps = new Properties();
         servProps.put(Constants.SERVICE_PID,  CXF_CONFIG_PID);

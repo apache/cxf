@@ -54,8 +54,8 @@ public class GreeterImpl11 {
         } else if (me.startsWith("E")) {
             throw new Fault("invalid", LOG);
         } else if (me.startsWith("newline")) {
-            Exception cause = new IllegalArgumentException("Get a wrong name <greetMe>"
-                                                           , new NullPointerException("Test \n cause."));
+            Exception cause = new IllegalArgumentException("Get a wrong name <greetMe>",
+                                                           new NullPointerException("Test \n cause."));
             cause.fillInStackTrace();
             throw new Fault("greetMeFault", LOG, cause);
         } else {
@@ -65,8 +65,8 @@ public class GreeterImpl11 {
 
     public String sayHi() {
         // throw the exception out with some cause
-        Exception cause = new IllegalArgumentException("Get a wrong name <sayHi>"
-                                                       , new NullPointerException("Test cause."));
+        Exception cause = new IllegalArgumentException("Get a wrong name <sayHi>",
+                                                       new NullPointerException("Test cause."));
         cause.fillInStackTrace();
         throw new Fault("sayHiFault", LOG, cause);
     }

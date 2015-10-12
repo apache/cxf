@@ -154,10 +154,10 @@ class DummyManagedConnectionFactoryImpl extends AbstractManagedConnectionFactory
 
     private static final long serialVersionUID = -218445259745278972L;
 
-    public DummyManagedConnectionFactoryImpl() {
+    DummyManagedConnectionFactoryImpl() {
     }
 
-    public DummyManagedConnectionFactoryImpl(Properties p) {
+    DummyManagedConnectionFactoryImpl(Properties p) {
         super(p);
     }
 

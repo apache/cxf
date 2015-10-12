@@ -110,7 +110,7 @@ public class NettyHttpServletHandler extends ChannelInboundHandlerAdapter {
             handleHttpServletRequest(ctx, request, nettyHttpContextHandler);
         } else {
             throw new RuntimeException(
-                    new Fault(new Message("NO_NETTY_SERVLET_HANDLER_FOUND", LOG , request.getUri())));
+                    new Fault(new Message("NO_NETTY_SERVLET_HANDLER_FOUND", LOG, request.getUri())));
         }
     }
 

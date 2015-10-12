@@ -91,8 +91,7 @@ public class CryptoCoverageChecker extends AbstractSoapInterceptor {
      * @param xPaths
      *            a list of XPath expressions
      */
-    public CryptoCoverageChecker(Map<String, String> prefixes, List<XPathExpression> xPaths)
-    {
+    public CryptoCoverageChecker(Map<String, String> prefixes, List<XPathExpression> xPaths) {
         super(Phase.PRE_PROTOCOL);
         this.addAfter(WSS4JInInterceptor.class.getName());
         this.setPrefixes(prefixes);

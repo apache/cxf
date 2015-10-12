@@ -53,7 +53,7 @@ public interface AddNumbersPortType {
                            @WebParam(name = "userObjectList") List<UserObject> objectList,
                            @WebParam(name = "fileName") String fileName);
 
-    static class UserObject {
+    class UserObject {
         String myData;
 
         public void setMyData(String s) {

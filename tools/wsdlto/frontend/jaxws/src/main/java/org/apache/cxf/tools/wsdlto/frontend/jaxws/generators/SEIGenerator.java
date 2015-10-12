@@ -139,6 +139,6 @@ public class SEIGenerator extends AbstractJAXWSGenerator {
     }
     
     public void register(final ClassCollector collector, String packageName, String fileName) {
-        collector.addSeiClassName(packageName , fileName , packageName + "." + fileName);
+        collector.addSeiClassName(packageName, fileName, packageName + "." + fileName);
     }
 }

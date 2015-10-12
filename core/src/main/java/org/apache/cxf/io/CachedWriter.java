@@ -100,7 +100,7 @@ public class CachedWriter extends Writer {
 
     
     static class LoadingCharArrayWriter extends CharArrayWriter {
-        public LoadingCharArrayWriter() {
+        LoadingCharArrayWriter() {
             super(1024);
         }
         public char[] rawCharArray() {

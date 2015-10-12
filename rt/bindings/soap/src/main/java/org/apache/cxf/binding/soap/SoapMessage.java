@@ -83,7 +83,7 @@ public class SoapMessage extends MessageImpl {
     }
     
     public Map<String, String> getEnvelopeNs() {
-        return CastUtils.cast((Map<? , ?>)getContextualProperty("soap.env.ns.map"));
+        return CastUtils.cast((Map<?, ?>)getContextualProperty("soap.env.ns.map"));
     }
     
     public boolean hasAdditionalEnvNs() {

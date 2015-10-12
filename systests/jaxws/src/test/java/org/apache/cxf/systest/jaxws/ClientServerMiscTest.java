@@ -570,7 +570,7 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
         assertEquals(2, foos2.get(0).length);
         assertEquals(2, foos2.get(1).length);
         
-        int ints[] = port.echoIntArray(new int[] {1, 2 , 3}, null);
+        int ints[] = port.echoIntArray(new int[] {1, 2, 3}, null);
         assertEquals(3, ints.length);
         assertEquals(1, ints[0]);
 
@@ -673,7 +673,7 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
 
     private void runRpcLitTest(RpcLitCodeFirstService port) throws Exception {
        
-        String ret[] = port.convertToString(new int[] {1, 2 , 3});
+        String ret[] = port.convertToString(new int[] {1, 2, 3});
         assertEquals(3, ret.length);
 
         List<String> rev = new ArrayList<String>(Arrays.asList(RpcLitCodeFirstServiceImpl.DATA));

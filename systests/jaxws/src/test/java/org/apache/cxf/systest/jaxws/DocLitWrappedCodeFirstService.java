@@ -179,7 +179,7 @@ public interface DocLitWrappedCodeFirstService {
 
     Bar createBar(String val);
     
-    static class Foo  {
+    class Foo  {
         String name;
         
         public Foo() {

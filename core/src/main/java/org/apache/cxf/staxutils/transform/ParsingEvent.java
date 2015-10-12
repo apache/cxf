@@ -29,7 +29,7 @@ class ParsingEvent {
     private QName name;
     private String value;
         
-    public ParsingEvent(int event, QName name, String value) {
+    ParsingEvent(int event, QName name, String value) {
         this.event = event;
         this.name = name;
         this.value = value;

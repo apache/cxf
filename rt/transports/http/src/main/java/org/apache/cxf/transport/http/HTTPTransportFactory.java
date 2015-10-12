@@ -263,8 +263,8 @@ public class HTTPTransportFactory
                     String addr = endpointInfo.getAddress();
                     if (jettyFactory == null && addr != null && addr.startsWith("http")) {
                         String m = 
-                            new org.apache.cxf.common.i18n.Message("NO_HTTP_DESTINATION_FACTORY_FOUND"
-                                                                   , LOG).toString();
+                            new org.apache.cxf.common.i18n.Message("NO_HTTP_DESTINATION_FACTORY_FOUND",
+                                                                   LOG).toString();
                         LOG.log(Level.SEVERE, m);
                         throw new IOException(m);
                     }

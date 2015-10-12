@@ -57,7 +57,7 @@ public final class ManagementConsole {
     public void getManagedObjectAttributes(ObjectName name) throws Exception {
 
         if (mbsc == null) {
-            LOG.log(Level.SEVERE , "NO_MBEAN_SERVER");
+            LOG.log(Level.SEVERE, "NO_MBEAN_SERVER");
             return;
         }
         MBeanInfo info = mbsc.getMBeanInfo(name);
