@@ -39,7 +39,7 @@ public class JwtTokenSecurityContext implements LoginSecurityContext {
         principal = new SimplePrincipal(jwt.getClaims().getSubject());
         this.token = jwt;
         if (roleClaim != null && jwt.getClaims().containsProperty(roleClaim)) {
-            roles = new HashSet<>();
+            roles = new HashSet<Principal>();
             String role = jwt.getClaims().getStringProperty(roleClaim).trim();
             for (String r : role.split(",")) {
                 roles.add(new SimpleGroup(r));
