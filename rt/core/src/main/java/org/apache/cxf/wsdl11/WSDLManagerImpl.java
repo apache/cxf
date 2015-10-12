@@ -234,6 +234,13 @@ public class WSDLManagerImpl implements WSDLManager {
         reader.setFeature("javax.wsdl.verbose", false);
         reader.setFeature("javax.wsdl.importDocuments", true);
         reader.setExtensionRegistry(registry);
+        
+        //we'll create a new String here to make sure the passed in key is not referenced in the loading of
+        //the wsdl and thus would be held onto from the cached map from both the weak reference (key) and 
+        //from the strong reference (Definition).  For example, the Definition sometimes keeps the original
+        //string as the documentBaseLocation which would result in it being held onto strongly 
+        //from the definition.  With this, the String the definition holds onto would be unique 
+        url = new String(url);
         CatalogWSDLLocator catLocator = new CatalogWSDLLocator(url, bus);
         ResourceManagerWSDLLocator wsdlLocator = new ResourceManagerWSDLLocator(url,
                                                                                 catLocator,
