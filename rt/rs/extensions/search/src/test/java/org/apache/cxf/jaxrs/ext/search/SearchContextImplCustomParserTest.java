@@ -58,7 +58,7 @@ public class SearchContextImplCustomParserTest extends Assert {
 
     private static class Color {
         private String color;
-        public Color(String color) {
+        Color(String color) {
             this.color = color;
         }
 

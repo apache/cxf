@@ -305,7 +305,7 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
     }
     
     final class WSS4JStaxOutInterceptorInternal extends AbstractPhaseInterceptor<Message> {
-        public WSS4JStaxOutInterceptorInternal() {
+        WSS4JStaxOutInterceptorInternal() {
             super(Phase.PRE_STREAM_ENDING);
             getBefore().add(AttachmentOutInterceptor.AttachmentOutEndingInterceptor.class.getName());
         }

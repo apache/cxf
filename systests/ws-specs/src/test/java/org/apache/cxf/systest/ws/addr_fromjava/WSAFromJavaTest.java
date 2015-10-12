@@ -203,7 +203,7 @@ public class WSAFromJavaTest extends AbstractWSATestBase {
     }
     
     static class RemoveRelatesToHeaderInterceptor extends AbstractSoapInterceptor {
-        public RemoveRelatesToHeaderInterceptor() {
+        RemoveRelatesToHeaderInterceptor() {
             super(Phase.READ);
             addAfter(ReadHeadersInterceptor.class.getName());
         }

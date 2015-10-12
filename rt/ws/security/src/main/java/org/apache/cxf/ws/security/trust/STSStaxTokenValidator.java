@@ -402,7 +402,7 @@ public class STSStaxTokenValidator
          * Construct a new instance.
          * @param alwaysValidateToSts whether to always validate the token to the STS
          */
-        public STSStaxBSTValidator(boolean alwaysValidateToSts) {
+        STSStaxBSTValidator(boolean alwaysValidateToSts) {
             this.alwaysValidateToSts = alwaysValidateToSts;
         }
 

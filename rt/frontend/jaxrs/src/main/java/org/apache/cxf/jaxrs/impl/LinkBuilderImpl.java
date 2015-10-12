@@ -150,7 +150,7 @@ public class LinkBuilderImpl implements Builder {
         
         private URI uri;
         private Map<String, String> params;
-        public LinkImpl(URI uri, Map<String, String> params) {
+        LinkImpl(URI uri, Map<String, String> params) {
             this.uri = uri;
             this.params = params;
         }

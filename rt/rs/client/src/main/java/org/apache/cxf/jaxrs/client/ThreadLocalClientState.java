@@ -146,7 +146,7 @@ public class ThreadLocalClientState implements ClientState {
         private Thread thread;
         private long originalTime;
         
-        public CleanupThread(Thread thread, long originalTime) {
+        CleanupThread(Thread thread, long originalTime) {
             this.thread = thread;
             this.originalTime = originalTime;
         }

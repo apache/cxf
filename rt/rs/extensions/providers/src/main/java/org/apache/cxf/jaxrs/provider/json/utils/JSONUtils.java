@@ -281,7 +281,7 @@ public final class JSONUtils {
         boolean isMixed;
         List<Boolean> mixed = new LinkedList<Boolean>();
         
-        public IgnoreMixedContentWriter(XMLStreamWriter writer) {
+        IgnoreMixedContentWriter(XMLStreamWriter writer) {
             super(writer);
         }
 

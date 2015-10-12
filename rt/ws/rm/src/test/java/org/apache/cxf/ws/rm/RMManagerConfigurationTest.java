@@ -90,7 +90,7 @@ public class RMManagerConfigurationTest extends Assert {
         
         private String location;
         
-        public TestStore() {
+        TestStore() {
             // this(null);
         }
         

@@ -34,7 +34,7 @@ public class QueryContextProvider implements ContextProvider<QueryContext> {
         
         private SearchContext searchContext;
         private Message message;
-        public QueryContextImpl(Message message) {
+        QueryContextImpl(Message message) {
             this.searchContext = new SearchContextImpl(message);
             this.message = message;
         }

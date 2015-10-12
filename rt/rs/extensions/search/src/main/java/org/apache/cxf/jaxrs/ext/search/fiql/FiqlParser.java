@@ -348,7 +348,7 @@ public class FiqlParser<T> extends AbstractSearchConditionParser<T> {
         private String operator;
         private TypeInfoObject tvalue;
 
-        public Comparison(String name, String operator, TypeInfoObject value) {
+        Comparison(String name, String operator, TypeInfoObject value) {
             this.name = name;
             this.operator = operator;
             this.tvalue = value;

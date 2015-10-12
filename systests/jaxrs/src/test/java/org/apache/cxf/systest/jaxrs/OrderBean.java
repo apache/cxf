@@ -47,7 +47,7 @@ public class OrderBean {
         this.customerTitle = customerTitle;
     }
 
-    enum Title {
+    public enum Title {
         MR,
         MS;
     } 

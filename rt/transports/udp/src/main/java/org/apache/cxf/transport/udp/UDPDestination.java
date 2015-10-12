@@ -239,7 +239,7 @@ public class UDPDestination extends AbstractDestination {
         final OutputStream out;
         final InputStream in;
         
-        public UDPConnectionInfo(IoSession io, OutputStream o, InputStream i) {
+        UDPConnectionInfo(IoSession io, OutputStream o, InputStream i) {
             session = io;
             out = o;
             in = i;
@@ -323,7 +323,7 @@ public class UDPDestination extends AbstractDestination {
     private static class StreamIoException extends RuntimeException {
         private static final long serialVersionUID = 3976736960742503222L;
 
-        public StreamIoException(IOException cause) {
+        StreamIoException(IOException cause) {
             super(cause);
         }
     }

@@ -161,7 +161,7 @@ public class SourceProviderTest extends Assert {
         
         private Message m = new MessageImpl();
         
-        public TestSourceProvider() {
+        TestSourceProvider() {
         }
         
         public Message getMessage() {

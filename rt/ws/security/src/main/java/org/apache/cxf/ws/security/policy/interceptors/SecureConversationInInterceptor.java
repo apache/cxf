@@ -79,7 +79,7 @@ import org.apache.xml.security.utils.Base64;
 
 class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
     
-    public SecureConversationInInterceptor() {
+    SecureConversationInInterceptor() {
         super(Phase.PRE_STREAM);
         addBefore(WSS4JStaxInInterceptor.class.getName());
         addBefore(HttpsTokenInInterceptor.class.getName());
@@ -481,7 +481,7 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
     static class SecureConversationCancelInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
         static final SecureConversationCancelInterceptor INSTANCE = new SecureConversationCancelInterceptor();
         
-        public SecureConversationCancelInterceptor() {
+        SecureConversationCancelInterceptor() {
             super(Phase.POST_LOGICAL);
         }
         

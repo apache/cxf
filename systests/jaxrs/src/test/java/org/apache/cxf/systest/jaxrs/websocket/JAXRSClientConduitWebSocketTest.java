@@ -110,7 +110,7 @@ public class JAXRSClientConduitWebSocketTest extends AbstractBusClientServerTest
         private Long value;
         private boolean completed;
 
-        public EchoBookIdRunner(BookStoreWebSocket resource, long input) {
+        EchoBookIdRunner(BookStoreWebSocket resource, long input) {
             this.resource = resource;
             this.input = input;
         }

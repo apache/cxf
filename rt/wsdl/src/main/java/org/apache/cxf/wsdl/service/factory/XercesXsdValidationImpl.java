@@ -34,7 +34,7 @@ class XercesXsdValidationImpl  {
     private static final Logger LOG = LogUtils.getL7dLogger(XercesXsdValidationImpl.class);
     private XercesSchemaValidationUtils utils;
 
-    public XercesXsdValidationImpl() {
+    XercesXsdValidationImpl() {
         try {
             utils = new XercesSchemaValidationUtils();
         } catch (Throwable e) {

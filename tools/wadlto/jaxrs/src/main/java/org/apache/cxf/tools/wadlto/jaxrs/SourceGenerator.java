@@ -1977,13 +1977,13 @@ public class SourceGenerator {
         private Map<String, String> nsMap = new HashMap<String, String>();
         private Map<String, String> elementTypeMap = new HashMap<String, String>();
         private boolean noTargetNamespace;
-        public GrammarInfo() {
+        GrammarInfo() {
             
         }
         
-        public GrammarInfo(Map<String, String> nsMap, 
-                           Map<String, String> elementTypeMap,
-                           boolean noTargetNamespace) {
+        GrammarInfo(Map<String, String> nsMap, 
+                    Map<String, String> elementTypeMap,
+                    boolean noTargetNamespace) {
             this.nsMap = nsMap;
             this.elementTypeMap = elementTypeMap;
             this.noTargetNamespace = noTargetNamespace;
@@ -2042,7 +2042,7 @@ public class SourceGenerator {
     private class Application {
         private Element appElement;
         private String wadlPath;
-        public Application(Element appElement, String wadlPath) {
+        Application(Element appElement, String wadlPath) {
             this.appElement = appElement;
             this.wadlPath = wadlPath;
         }
@@ -2065,11 +2065,11 @@ public class SourceGenerator {
         private File srcDir;
         private List<Element> inheritedParams = new LinkedList<Element>();
         
-        public ContextInfo(Application rootApp,
-                           File srcDir,
-                           Set<String> typeClassNames, 
-                           GrammarInfo gInfo, 
-                           boolean interfaceIsGenerated) {
+        ContextInfo(Application rootApp,
+                    File srcDir,
+                    Set<String> typeClassNames, 
+                    GrammarInfo gInfo, 
+                    boolean interfaceIsGenerated) {
             this.interfaceIsGenerated = interfaceIsGenerated;
             this.typeClassNames = typeClassNames;
             this.gInfo = gInfo;

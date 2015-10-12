@@ -74,7 +74,7 @@ public class WSSecurity10Test extends AbstractBusClientServerTestBase {
         final boolean streaming;
         final String port;
         
-        public TestParam(String p, String port, boolean b) {
+        TestParam(String p, String port, boolean b) {
             prefix = p;
             this.port = port;
             streaming = b;

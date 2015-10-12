@@ -58,7 +58,7 @@ public class Soap12FaultOutInterceptor extends AbstractSoapInterceptor {
     static class Soap12FaultOutInterceptorInternal extends AbstractSoapInterceptor {
         static final Soap12FaultOutInterceptorInternal INSTANCE = new Soap12FaultOutInterceptorInternal();
         
-        public Soap12FaultOutInterceptorInternal() {
+        Soap12FaultOutInterceptorInternal() {
             super(Phase.MARSHAL);
         }
         public void handleMessage(SoapMessage message) throws Fault {

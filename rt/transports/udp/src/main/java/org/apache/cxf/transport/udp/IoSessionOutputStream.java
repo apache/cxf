@@ -31,7 +31,7 @@ class IoSessionOutputStream extends OutputStream {
 
     private WriteFuture lastWriteFuture;
 
-    public IoSessionOutputStream(IoSession session) {
+    IoSessionOutputStream(IoSession session) {
         this.session = session;
     }
 

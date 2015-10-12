@@ -1026,7 +1026,7 @@ public class MAPAggregatorTest extends Assert {
     private static class TestBindingOperationInfo extends BindingOperationInfo {
         private Map<QName, BindingFaultInfo> faults;
         
-        public TestBindingOperationInfo(OperationInfo oi) {
+        TestBindingOperationInfo(OperationInfo oi) {
             opInfo = oi;
             
             Collection<FaultInfo> of = opInfo.getFaults();

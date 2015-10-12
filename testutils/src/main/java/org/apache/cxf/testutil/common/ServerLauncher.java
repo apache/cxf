@@ -462,7 +462,7 @@ public class ServerLauncher {
     static class TimeoutCounter {
         private final long expectedEndTime;
 
-        public TimeoutCounter(long theExpectedTimeout) {
+        TimeoutCounter(long theExpectedTimeout) {
             expectedEndTime = System.currentTimeMillis() + theExpectedTimeout;
         }
 

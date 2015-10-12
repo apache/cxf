@@ -640,8 +640,8 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
     class DoubleAddInterceptorList implements List<Interceptor<? extends Message>> {
         List<Interceptor<? extends Message>> orig;
         List<Interceptor<? extends Message>> other;
-        public DoubleAddInterceptorList(List<Interceptor<? extends Message>> a1,
-                                        List<Interceptor<? extends Message>> a2) {
+        DoubleAddInterceptorList(List<Interceptor<? extends Message>> a1,
+                                 List<Interceptor<? extends Message>> a2) {
             orig = a1;
             other = a2;
         }

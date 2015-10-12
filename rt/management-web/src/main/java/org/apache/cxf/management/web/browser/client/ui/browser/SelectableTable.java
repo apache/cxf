@@ -251,7 +251,7 @@ public class SelectableTable<T> extends Composite {
     }
 
     private class ScrollMarker extends UIObject {
-        public ScrollMarker(Element element) {
+        ScrollMarker(Element element) {
             setElement(element);
         }
     }

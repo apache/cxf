@@ -226,7 +226,7 @@ public final class WebSocketUtils {
 
     private static class ByteArrayBuilder {
         private ByteArrayOutputStream baos;
-        public ByteArrayBuilder() {
+        ByteArrayBuilder() {
             baos = new ByteArrayOutputStream();
         }
 

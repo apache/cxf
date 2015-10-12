@@ -121,7 +121,7 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
     private static class DelayedDOMResult extends DOMResult {
         private final URL resource;
         private final String publicId;
-        public DelayedDOMResult(URL url, String sysId, String pId) {
+        DelayedDOMResult(URL url, String sysId, String pId) {
             super(null, sysId);
             resource = url;
             publicId = pId;

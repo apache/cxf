@@ -63,7 +63,7 @@ public class ThreadPoolTest extends AbstractClientServerTestBase {
         int i;
         long total;
         
-        public TestRunnable(int i) {
+        TestRunnable(int i) {
             this.i = i;
         }
         public void run() {

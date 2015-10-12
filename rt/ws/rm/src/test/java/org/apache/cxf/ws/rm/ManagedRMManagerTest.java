@@ -469,7 +469,7 @@ public class ManagedRMManagerTest extends Assert {
         private RetryStatus status = new TestRetransmissionStatus();
         private Map<String, List<Long>> numlists = new HashMap<String, List<Long>>();
         
-        public TestRetransmissionQueue() {
+        TestRetransmissionQueue() {
             numlists.put("seq1", new ArrayList<Long>());
             numlists.put("seq2", new ArrayList<Long>());
             Collections.addAll(numlists.get("seq1"), 2L, 4L);

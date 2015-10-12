@@ -47,7 +47,7 @@ public final class PropertyHolderFactory {
         private Message m;
         private Map<String, Object> props;
         
-        public MessagePropertyHolder(Message m) {
+        MessagePropertyHolder(Message m) {
             this.m = m;
             this.props = CastUtils.cast((Map<?, ?>)m.getExchange().get(PROPERTY_KEY));
         }

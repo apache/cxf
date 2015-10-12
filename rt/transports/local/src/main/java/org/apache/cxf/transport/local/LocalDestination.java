@@ -136,7 +136,7 @@ public class LocalDestination extends AbstractDestination {
 
         private LocalConduit conduit;
 
-        public SynchronousConduit(LocalConduit conduit) {
+        SynchronousConduit(LocalConduit conduit) {
             super(null);
             this.conduit = conduit;
         }

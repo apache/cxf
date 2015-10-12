@@ -235,7 +235,7 @@ public class JAXWSBindingParser {
     class ContextImpl implements NamespaceContext {
         private Node targetNode;
 
-        public ContextImpl(Node node) {
+        ContextImpl(Node node) {
             targetNode = node;
         }
 

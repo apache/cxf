@@ -1011,7 +1011,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
         String query;
         String fragment;
         
-        public UriParts(String path, String query, String fragment) {
+        UriParts(String path, String query, String fragment) {
             this.path = path;
             this.query = query;
             this.fragment = fragment;

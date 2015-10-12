@@ -367,7 +367,7 @@ public final class ServerProviderFactory extends ProviderFactory {
         private OperationResourceInfo ori;
         private String nameBinding;
         
-        public MethodFeatureContextImpl(OperationResourceInfo ori) {
+        MethodFeatureContextImpl(OperationResourceInfo ori) {
             this.ori = ori;
             configImpl = new MethodFeatureContextConfigurable(this);
             if (application != null) {
@@ -501,7 +501,7 @@ public final class ServerProviderFactory extends ProviderFactory {
     
     
     private class ServerConfigurationImpl implements Configuration {
-        public ServerConfigurationImpl() {
+        ServerConfigurationImpl() {
             
         }
         

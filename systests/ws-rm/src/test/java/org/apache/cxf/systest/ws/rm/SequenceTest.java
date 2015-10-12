@@ -749,7 +749,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         init(cfg);
         
         class MessageNumberInterceptor extends AbstractPhaseInterceptor<Message> {
-            public MessageNumberInterceptor() {
+            MessageNumberInterceptor() {
                 super(Phase.PRE_STREAM);
             }
             
@@ -816,7 +816,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         init("org/apache/cxf/systest/ws/rm/rminterceptors.xml");
         
         class SequenceIdInterceptor extends AbstractPhaseInterceptor<Message> {
-            public SequenceIdInterceptor() {
+            SequenceIdInterceptor() {
                 super(Phase.PRE_STREAM);
             }
             

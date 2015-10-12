@@ -249,7 +249,7 @@ public class STSTokenValidator implements Validator {
         
         private final Element tokenElement;
         
-        public ElementCallbackHandler(Element tokenElement) {
+        ElementCallbackHandler(Element tokenElement) {
             this.tokenElement = tokenElement;
         }
         

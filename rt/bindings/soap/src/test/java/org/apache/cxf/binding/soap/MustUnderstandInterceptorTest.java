@@ -168,7 +168,7 @@ public class MustUnderstandInterceptorTest extends TestBase {
         private Set<QName> understood = new HashSet<QName>();
 
 
-        public DummySoapInterceptor(String phase) {
+        DummySoapInterceptor(String phase) {
             super(phase);
         }
 

@@ -470,7 +470,7 @@ public class XmlSecOutInterceptor extends AbstractPhaseInterceptor<Message> {
     }
 
     final class XmlSecStaxOutInterceptorInternal extends AbstractPhaseInterceptor<Message> {
-        public XmlSecStaxOutInterceptorInternal() {
+        XmlSecStaxOutInterceptorInternal() {
             super(Phase.PRE_STREAM_ENDING);
         }
         

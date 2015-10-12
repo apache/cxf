@@ -1009,7 +1009,7 @@ public abstract class ProviderFactory {
     
     static class ContextResolverProxy<T> implements ContextResolver<T> {
         private List<ContextResolver<T>> candidates; 
-        public ContextResolverProxy(List<ContextResolver<T>> candidates) {
+        ContextResolverProxy(List<ContextResolver<T>> candidates) {
             this.candidates = candidates;
         }
         public T getContext(Class<?> cls) {

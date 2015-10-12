@@ -166,7 +166,7 @@ public class RobustServiceWithFaultTest extends AbstractBusClientServerTestBase 
     static class RobustOneWayPropertySetter extends AbstractPhaseInterceptor<Message> {
         private boolean robust;
 
-        public RobustOneWayPropertySetter() {
+        RobustOneWayPropertySetter() {
             super(Phase.RECEIVE);
         }
 

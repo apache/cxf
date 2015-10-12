@@ -43,7 +43,7 @@ final class NSManager {
     private final Map<String, String> cache = new HashMap<String, String>();
 
 
-    public NSManager() {
+    NSManager() {
         resolveConstants(JAXWSAConstants.class);
         resolveConstants(WSDLConstants.class);
     }

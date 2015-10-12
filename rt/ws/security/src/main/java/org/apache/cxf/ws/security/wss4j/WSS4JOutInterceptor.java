@@ -121,7 +121,7 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
     
     final class WSS4JOutInterceptorInternal 
         implements PhaseInterceptor<SoapMessage> {
-        public WSS4JOutInterceptorInternal() {
+        WSS4JOutInterceptorInternal() {
             super();
         }
         

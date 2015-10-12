@@ -426,7 +426,7 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
     class WSDiscoveryProvider implements Provider<Source> {
         
         JAXBContext context;
-        public WSDiscoveryProvider() {
+        WSDiscoveryProvider() {
             try {
                 context = JAXBContextCache.getCachedContextAndSchemas(ObjectFactory.class).getContext();
             } catch (JAXBException e) {

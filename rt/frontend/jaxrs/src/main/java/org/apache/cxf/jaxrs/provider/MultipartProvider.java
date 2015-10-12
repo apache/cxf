@@ -436,12 +436,12 @@ public class MultipartProvider extends AbstractConfigurableProvider
         private Type genericType;
         private Annotation[] anns;
         private MediaType contentType;
-        public MessageBodyWriterDataHandler(MessageBodyWriter<T> writer,
-                                            T obj,
-                                            Class<T> cls,
-                                            Type genericType,
-                                            Annotation[] anns,
-                                            MediaType contentType) {
+        MessageBodyWriterDataHandler(MessageBodyWriter<T> writer,
+                                     T obj,
+                                     Class<T> cls,
+                                     Type genericType,
+                                     Annotation[] anns,
+                                     MediaType contentType) {
             super(new ByteDataSource("1".getBytes()));
             this.writer = writer;
             this.obj = obj;

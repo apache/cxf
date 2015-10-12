@@ -30,7 +30,7 @@ import org.apache.cxf.endpoint.ClientCallback;
 
 class JaxwsResponseCallback<T> implements Response<T> {
     ClientCallback callback;
-    public JaxwsResponseCallback(ClientCallback cb) {
+    JaxwsResponseCallback(ClientCallback cb) {
         callback = cb;
     }
     

@@ -57,7 +57,7 @@ public class TestDispatchFeature extends AbstractFeature {
 
     static class TestInInterceptor extends AbstractPhaseInterceptor<Message> {
         private static int count;
-        public TestInInterceptor() {
+        TestInInterceptor() {
             super(Phase.RECEIVE);
         }
         public void handleMessage(Message message) throws Fault {
@@ -67,7 +67,7 @@ public class TestDispatchFeature extends AbstractFeature {
 
     static class TestOutInterceptor extends AbstractPhaseInterceptor<Message> {
         private static int count;
-        public TestOutInterceptor() {
+        TestOutInterceptor() {
             super(Phase.SEND);
         }
         public void handleMessage(Message message) throws Fault {

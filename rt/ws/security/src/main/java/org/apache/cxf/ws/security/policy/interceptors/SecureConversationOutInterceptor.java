@@ -51,7 +51,7 @@ class SecureConversationOutInterceptor extends AbstractPhaseInterceptor<SoapMess
     
     private static final Logger LOG = LogUtils.getL7dLogger(SecureConversationOutInterceptor.class);
     
-    public SecureConversationOutInterceptor() {
+    SecureConversationOutInterceptor() {
         super(Phase.PREPARE_SEND);
         addBefore(SpnegoContextTokenOutInterceptor.class.getName());
         addBefore(IssuedTokenOutInterceptor.class.getName());

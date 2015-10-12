@@ -544,7 +544,7 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
         private Map<String, Object> transformParameters = new HashMap<String, Object>();
         private Map<String, String> outProps = new HashMap<String, String>();
         
-        public TemplatesImpl(Templates templates, URIResolver resolver) {
+        TemplatesImpl(Templates templates, URIResolver resolver) {
             this.templates = templates;
             this.resolver = resolver;
         }

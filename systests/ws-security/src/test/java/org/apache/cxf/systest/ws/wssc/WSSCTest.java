@@ -73,13 +73,13 @@ public class WSSCTest extends AbstractBusClientServerTestBase {
         final String port;
         final boolean clearAction;
         
-        public TestParam(String p, String port, boolean b) {
+        TestParam(String p, String port, boolean b) {
             prefix = p;
             this.port = port;
             streaming = b;
             clearAction = false;
         }
-        public TestParam(String p, String port, boolean b, boolean a) {
+        TestParam(String p, String port, boolean b, boolean a) {
             prefix = p;
             this.port = port;
             streaming = b;

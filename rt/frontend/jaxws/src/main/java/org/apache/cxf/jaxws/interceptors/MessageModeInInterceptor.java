@@ -133,7 +133,7 @@ public class MessageModeInInterceptor extends AbstractPhaseInterceptor<Message> 
         boolean writingHeaders;
         Attachment att;
         
-        public MultiPartDataSource(Message message, DataSource root) {
+        MultiPartDataSource(Message message, DataSource root) {
             atts = message.getAttachments().iterator();
             String s = (String)message.get(Message.CONTENT_TYPE);
             boundary = findBoundary(s);

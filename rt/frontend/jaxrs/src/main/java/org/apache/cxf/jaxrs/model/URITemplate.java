@@ -511,7 +511,7 @@ public final class URITemplate {
         private List<String> tokens = new ArrayList<String>();
         private int tokenIdx;
 
-        public CurlyBraceTokenizer(String string) {
+        CurlyBraceTokenizer(String string) {
             boolean outside = true;
             int level = 0;
             int lastIdx = 0;

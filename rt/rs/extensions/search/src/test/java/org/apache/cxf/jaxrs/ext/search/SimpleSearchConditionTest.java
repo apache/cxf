@@ -336,7 +336,7 @@ public class SimpleSearchConditionTest {
     static class SingleAttr {
         private String foo;
 
-        public SingleAttr(String foo) {
+        SingleAttr(String foo) {
             this.foo = foo;
         }
 
@@ -355,7 +355,7 @@ public class SimpleSearchConditionTest {
         private String foo;
         private String bar;
 
-        public DoubleAttr(String foo, String bar) {
+        DoubleAttr(String foo, String bar) {
             this.foo = foo;
             this.bar = bar;
         }

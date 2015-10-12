@@ -193,9 +193,9 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
     
     class URLConnectionWrappedOutputStream extends WrappedOutputStream {
         HttpURLConnection connection;
-        public URLConnectionWrappedOutputStream(Message message, HttpURLConnection connection,
-                                                boolean needToCacheRequest, boolean isChunking,
-                                                int chunkThreshold, String conduitName) throws URISyntaxException {
+        URLConnectionWrappedOutputStream(Message message, HttpURLConnection connection,
+                                         boolean needToCacheRequest, boolean isChunking,
+                                         int chunkThreshold, String conduitName) throws URISyntaxException {
             super(message, needToCacheRequest, isChunking,
                   chunkThreshold, conduitName,
                   computeURI(message, connection));

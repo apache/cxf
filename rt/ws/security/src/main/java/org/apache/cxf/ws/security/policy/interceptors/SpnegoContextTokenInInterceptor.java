@@ -64,7 +64,7 @@ import org.apache.xml.security.utils.Base64;
 
 class SpnegoContextTokenInInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
     
-    public SpnegoContextTokenInInterceptor() {
+    SpnegoContextTokenInInterceptor() {
         super(Phase.PRE_STREAM);
         addBefore(WSS4JStaxInInterceptor.class.getName());
         addBefore(HttpsTokenInInterceptor.class.getName());

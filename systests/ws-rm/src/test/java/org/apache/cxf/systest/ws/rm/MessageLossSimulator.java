@@ -146,7 +146,7 @@ public class MessageLossSimulator extends AbstractPhaseInterceptor<Message> {
 
         private Message outMessage;
 
-        public WrappedOutputStream(Message m) {
+        WrappedOutputStream(Message m) {
             this.outMessage = m;
         }
 

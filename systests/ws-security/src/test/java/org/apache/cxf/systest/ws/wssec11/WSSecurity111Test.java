@@ -57,7 +57,7 @@ public class WSSecurity111Test extends WSSecurity11Common {
         final boolean streaming;
         final String port;
         
-        public TestParam(String p, String port, boolean b) {
+        TestParam(String p, String port, boolean b) {
             prefix = p;
             this.port = port;
             streaming = b;

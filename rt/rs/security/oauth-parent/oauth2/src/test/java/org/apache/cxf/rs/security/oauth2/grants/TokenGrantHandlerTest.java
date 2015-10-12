@@ -81,11 +81,11 @@ public class TokenGrantHandlerTest extends Assert {
     
     private static class SimpleGrantHandler extends AbstractGrantHandler {
 
-        public SimpleGrantHandler() {
+        SimpleGrantHandler() {
             super("a");
         }
         
-        public SimpleGrantHandler(List<String> grants) {
+        SimpleGrantHandler(List<String> grants) {
             super(grants);
         }
         
@@ -99,7 +99,7 @@ public class TokenGrantHandlerTest extends Assert {
     
     private static class ComplexGrantHandler extends AbstractGrantHandler {
 
-        public ComplexGrantHandler(List<String> grants) {
+        ComplexGrantHandler(List<String> grants) {
             super(grants);
         }
         

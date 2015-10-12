@@ -39,7 +39,7 @@ class ServletExporter implements ManagedService {
     private ServiceRegistration serviceRegistration;
     private HttpService httpService;
     
-    public ServletExporter(Servlet servlet, HttpService httpService) {
+    ServletExporter(Servlet servlet, HttpService httpService) {
         this.servlet = servlet;
         this.httpService = httpService;
     }

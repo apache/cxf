@@ -71,11 +71,11 @@ public class StreamingResponseProvider<T> implements
         private MultivaluedMap<String, Object> headers; 
         private OutputStream os;
                 
-        public StreamingResponseWriter(Class<?> entityCls,
-                                       Annotation[] anns,
-                                       MediaType mt,
-                                       MultivaluedMap<String, Object> headers, 
-                                       OutputStream os) {
+        StreamingResponseWriter(Class<?> entityCls,
+                                Annotation[] anns,
+                                MediaType mt,
+                                MultivaluedMap<String, Object> headers, 
+                                OutputStream os) {
             this.entityCls = entityCls;
             this.anns = anns;
             this.mt = mt;

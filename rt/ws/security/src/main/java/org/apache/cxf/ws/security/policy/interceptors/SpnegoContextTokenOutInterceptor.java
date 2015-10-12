@@ -45,7 +45,7 @@ import org.apache.wss4j.policy.model.Trust13;
 import org.apache.xml.security.utils.Base64;
 
 class SpnegoContextTokenOutInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
-    public SpnegoContextTokenOutInterceptor() {
+    SpnegoContextTokenOutInterceptor() {
         super(Phase.PREPARE_SEND);
     }
     public void handleMessage(SoapMessage message) throws Fault {

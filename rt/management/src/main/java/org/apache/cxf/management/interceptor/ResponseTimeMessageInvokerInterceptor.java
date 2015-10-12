@@ -60,7 +60,7 @@ public class ResponseTimeMessageInvokerInterceptor extends AbstractMessageRespon
     }
 
     class ResponseTimeMessageInvokerEndingInteceptor extends AbstractMessageResponseTimeInterceptor {
-        public ResponseTimeMessageInvokerEndingInteceptor() {
+        ResponseTimeMessageInvokerEndingInteceptor() {
             super(Phase.INVOKE);
             addAfter(ServiceInvokerInterceptor.class.getName());
         }

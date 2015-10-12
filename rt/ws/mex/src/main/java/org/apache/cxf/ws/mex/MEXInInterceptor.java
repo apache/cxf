@@ -84,7 +84,7 @@ public class MEXInInterceptor extends AbstractPhaseInterceptor<Message> {
     }
 
     private static class MEXJaxWsServerFactoryBean extends JaxWsServerFactoryBean {
-        public MEXJaxWsServerFactoryBean(Bus b) {
+        MEXJaxWsServerFactoryBean(Bus b) {
             setServiceClass(MEXEndpoint.class);
             setServiceName(new QName("http://mex.ws.cxf.apache.org/", "MEXEndpoint"));
             setBus(b);

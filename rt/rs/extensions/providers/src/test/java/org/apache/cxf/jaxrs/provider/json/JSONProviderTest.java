@@ -1854,7 +1854,7 @@ public class JSONProviderTest extends Assert {
     
     private static class EmptyListWriter extends DelegatingXMLStreamWriter {
         private int count;
-        public EmptyListWriter(XMLStreamWriter writer) {
+        EmptyListWriter(XMLStreamWriter writer) {
             super(writer);
         }
 

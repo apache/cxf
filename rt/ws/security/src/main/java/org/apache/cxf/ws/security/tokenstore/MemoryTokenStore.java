@@ -106,7 +106,7 @@ public class MemoryTokenStore implements TokenStore {
         private final SecurityToken securityToken;
         private final Date expires;
         
-        public CacheEntry(SecurityToken securityToken, Date expires) {
+        CacheEntry(SecurityToken securityToken, Date expires) {
             this.securityToken = securityToken;
             this.expires = expires;
         }

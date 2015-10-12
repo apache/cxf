@@ -209,7 +209,7 @@ public class RMCaptureOutInterceptor extends AbstractRMInterceptor<Message>  {
     }    
     
     private class CaptureStart extends AbstractPhaseInterceptor<Message> {
-        public CaptureStart() {
+        CaptureStart() {
             super(Phase.PRE_PROTOCOL);
         }
 
@@ -224,7 +224,7 @@ public class RMCaptureOutInterceptor extends AbstractRMInterceptor<Message>  {
         }
     }
     private class CaptureEnd extends AbstractPhaseInterceptor<Message> {
-        public CaptureEnd() {
+        CaptureEnd() {
             super(Phase.WRITE_ENDING);
             addAfter(SoapOutInterceptor.SoapOutEndingInterceptor.class.getName());
         }

@@ -42,7 +42,7 @@ class SSLSocketFactoryWrapper extends SSLSocketFactory {
     private String[] ciphers;
     private String protocol;
     
-    public SSLSocketFactoryWrapper(
+    SSLSocketFactoryWrapper(
         SSLSocketFactory sslSocketFactoryParam,
         String[]         ciphersParam,
         String           protocolParam

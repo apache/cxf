@@ -404,7 +404,7 @@ public class MessageCallbackOnewayTest extends AbstractBusClientServerTestBase {
         private final boolean accept;
         private final long msgNumber;
         
-        public Callback(boolean acc, long msgNum) {
+        Callback(boolean acc, long msgNum) {
             accept = acc;
             msgNumber = msgNum;
         }
