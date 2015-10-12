@@ -72,7 +72,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
     protected void addSwaggerResource(Server server) {
         List<ClassResourceInfo> cris = Collections.emptyList();
         if (!runAsFilter) {
-            List<Object> serviceBeans = new ArrayList<>();
+            List<Object> serviceBeans = new ArrayList<Object>();
             ApiListingResource apiListingResource = new ApiListingResource();
             serviceBeans.add(apiListingResource);
             JAXRSServiceFactoryBean sfb =
@@ -85,7 +85,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
                 }
             }
         }
-        List<Object> providers = new ArrayList<>();
+        List<Object> providers = new ArrayList<Object>();
         if (runAsFilter) {
             providers.add(new SwaggerContainerRequestFilter());
         }
@@ -220,7 +220,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
             DefaultReaderConfig rc = new DefaultReaderConfig();
             rc.setScanAllResources(true);
             if (ignoreRoutesParam != null) {
-                Set<String> routes = new LinkedHashSet<>();
+                Set<String> routes = new LinkedHashSet<String>();
                 for (String route : StringUtils.split(ignoreRoutesParam, ",")) {
                     routes.add(route.trim());
                 }

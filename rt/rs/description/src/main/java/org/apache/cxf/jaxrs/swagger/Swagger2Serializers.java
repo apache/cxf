@@ -88,8 +88,9 @@ public class Swagger2Serializers extends SwaggerSerializers {
         }
 
         if (replaceTags || javadocProvider != null) {
-            Map<String, ClassResourceInfo> operations = new HashMap<>();
-            Map<Pair<String, String>, OperationResourceInfo> methods = new HashMap<>();
+            Map<String, ClassResourceInfo> operations = new HashMap<String, ClassResourceInfo>();
+            Map<Pair<String, String>, OperationResourceInfo> methods = 
+                new HashMap<Pair<String, String>, OperationResourceInfo>();
             for (ClassResourceInfo cri : cris) {
                 for (OperationResourceInfo ori : cri.getMethodDispatcher().getOperationResourceInfos()) {
                     StringBuilder fullPath = new StringBuilder().
