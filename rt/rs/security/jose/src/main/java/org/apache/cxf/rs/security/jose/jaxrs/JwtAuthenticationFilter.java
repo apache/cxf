@@ -44,8 +44,7 @@ public class JwtAuthenticationFilter extends AbstractJoseJwtConsumer implements 
     
     private static final String DEFAULT_AUTH_SCHEME = "JWT";
     private String expectedAuthScheme = DEFAULT_AUTH_SCHEME;
-    private int ttl = 300;
-    private int futureTTL;
+    private int clockOffset;
     
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
@@ -67,30 +66,20 @@ public class JwtAuthenticationFilter extends AbstractJoseJwtConsumer implements 
     protected void validateToken(JwtToken jwt) {
         // If we have no issued time then we need to have an expiry
         boolean expiredRequired = jwt.getClaims().getIssuedAt() == null;
-        JwtUtils.validateJwtExpiry(jwt.getClaims(), expiredRequired);
+        JwtUtils.validateJwtExpiry(jwt.getClaims(), clockOffset, expiredRequired);
         
-        JwtUtils.validateJwtNotBefore(jwt.getClaims(), futureTTL, false);
+        JwtUtils.validateJwtNotBefore(jwt.getClaims(), clockOffset, false);
         
         // If we have no expiry then we must have an issued at
         boolean issuedAtRequired = jwt.getClaims().getExpiryTime() == null;
-        if (issuedAtRequired) {
-            JwtUtils.validateJwtTTL(jwt.getClaims(), ttl, issuedAtRequired);
-        }
+        JwtUtils.validateJwtIssuedAt(jwt.getClaims(), clockOffset, issuedAtRequired);
     }
 
-    public int getTtl() {
-        return ttl;
+    public int getClockOffset() {
+        return clockOffset;
     }
 
-    public void setTtl(int ttl) {
-        this.ttl = ttl;
-    }
-
-    public int getFutureTTL() {
-        return futureTTL;
-    }
-
-    public void setFutureTTL(int futureTTL) {
-        this.futureTTL = futureTTL;
+    public void setClockOffset(int clockOffset) {
+        this.clockOffset = clockOffset;
     }
 }

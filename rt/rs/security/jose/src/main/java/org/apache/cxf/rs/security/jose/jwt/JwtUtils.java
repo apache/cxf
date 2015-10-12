@@ -37,7 +37,7 @@ public final class JwtUtils {
         return new JwtTokenReaderWriter().fromJsonClaims(json);
     }
     
-    public static void validateJwtExpiry(JwtClaims claims, boolean claimRequired) {
+    public static void validateJwtExpiry(JwtClaims claims, int clockOffset, boolean claimRequired) {
         Long expiryTime = claims.getExpiryTime();
         if (expiryTime == null) {
             if (claimRequired) {
@@ -45,40 +45,39 @@ public final class JwtUtils {
             }
             return;
         }
-        
         Date rightNow = new Date();
         Date expiresDate = new Date(expiryTime * 1000L);
+        if (clockOffset != 0) {
+            expiresDate.setTime(expiresDate.getTime() + (long)clockOffset * 1000L);
+        }
         if (expiresDate.before(rightNow)) {
             throw new JwtException("The token has expired");
         }
     }
     
-    public static void validateJwtNotBefore(JwtClaims claims, int futureTimeToLive, boolean claimRequired) {
+    public static void validateJwtNotBefore(JwtClaims claims, int clockOffset, boolean claimRequired) {
         Long notBeforeTime = claims.getNotBefore();
-        
-        // If no NotBefore then just use the IssueAt if it exists
-        if (notBeforeTime == null && claims.getIssuedAt() != null) {
-            notBeforeTime = claims.getIssuedAt();
-        }
-        
-        if (notBeforeTime == null && claimRequired) {
-            throw new JwtException("The token cannot be accepted yet");
+        if (notBeforeTime == null) {
+            if (claimRequired) {
+                throw new JwtException("The token cannot be accepted yet");
+            }
+            return;
         }
         
         Date validCreation = new Date();
         long currentTime = validCreation.getTime();
-        if (futureTimeToLive > 0) {
-            validCreation.setTime(currentTime + (long)futureTimeToLive * 1000L);
+        if (clockOffset != 0) {
+            validCreation.setTime(currentTime + (long)clockOffset * 1000L);
         }
-        Date createdDate = new Date(notBeforeTime * 1000L);
+        Date notBeforeDate = new Date(notBeforeTime * 1000L);
 
         // Check to see if the not before time is in the future
-        if (createdDate.after(validCreation)) {
+        if (notBeforeDate.after(validCreation)) {
             throw new JwtException("The token cannot be accepted yet");
         }
     }
     
-    public static void validateJwtTTL(JwtClaims claims, int timeToLive, boolean claimRequired) {
+    public static void validateJwtIssuedAt(JwtClaims claims, int clockOffset, boolean claimRequired) {
         Long issuedAtInSecs = claims.getIssuedAt();
         if (issuedAtInSecs == null) {
             if (claimRequired) {
@@ -87,21 +86,15 @@ public final class JwtUtils {
             return;
         }
         
-        Date validCreation = new Date();
         Date createdDate = new Date(issuedAtInSecs * 1000L);
-        
-        int ttl = timeToLive;
-        if (ttl <= 0) {
-            ttl = 300;
+        if (clockOffset != 0) {
+            // Calculate the time that is allowed for the message to travel
+            createdDate.setTime(createdDate.getTime() - (long)clockOffset * 1000L);
         }
         
-        // Calculate the time that is allowed for the message to travel
-        long currentTime = validCreation.getTime();
-        currentTime -= (long)ttl * 1000L;
-        validCreation.setTime(currentTime);
+        Date rightNow = new Date();
 
-        // Validate the time it took the message to travel
-        if (createdDate.before(validCreation)) {
+        if (createdDate.after(rightNow)) {
             throw new JwtException("Invalid issuedAt");
         }
     }
