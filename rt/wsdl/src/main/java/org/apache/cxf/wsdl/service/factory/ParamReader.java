@@ -219,7 +219,7 @@ class ParamReader extends ClassReader {
     private static class MethodInfo {
         String[] names;
 
-        public MethodInfo(int maxLocals) {
+        MethodInfo(int maxLocals) {
             names = new String[maxLocals];
         }
     }

@@ -87,7 +87,7 @@ public class AuthPolicyValidatingInterceptorTest extends Assert {
         
         private boolean validated; 
         
-        public TestSTSTokenValidator() {
+        TestSTSTokenValidator() {
             super(true);
         }
         

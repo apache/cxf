@@ -613,8 +613,7 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
     
     private static class NoOpX509TrustManager implements X509TrustManager {
 
-        public NoOpX509TrustManager() {
-
+        NoOpX509TrustManager() {
         }
 
         @Override

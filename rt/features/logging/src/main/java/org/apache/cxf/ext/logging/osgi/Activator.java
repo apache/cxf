@@ -53,7 +53,7 @@ public class Activator implements BundleActivator {
         private ServiceRegistration serviceReg;
         private LoggingFeature logging;
 
-        public ConfigUpdater(BundleContext bundleContext) {
+        ConfigUpdater(BundleContext bundleContext) {
             this.logging = new LoggingFeature();
             this.bundleContext = bundleContext;
         }

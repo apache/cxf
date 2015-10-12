@@ -593,7 +593,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
 
     private static class ApplicationImpl extends Application {
         private Set<Object> applicationSingletons;
-        public ApplicationImpl(Set<Object> applicationSingletons) {
+        ApplicationImpl(Set<Object> applicationSingletons) {
             this.applicationSingletons = applicationSingletons;
         }
         public Set<Object> getSingletons() {

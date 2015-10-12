@@ -318,7 +318,7 @@ public class XMLSource {
         
         private Map<String, String> namespaces;
         
-        public NamespaceContextImpl(Map<String, String> namespaces) {
+        NamespaceContextImpl(Map<String, String> namespaces) {
             this.namespaces = namespaces;    
         }
 

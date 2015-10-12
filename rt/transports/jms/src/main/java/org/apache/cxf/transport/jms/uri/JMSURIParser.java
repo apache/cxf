@@ -42,7 +42,7 @@ final class JMSURIParser {
     private String destination;
     private String query;
     
-    public JMSURIParser(String uri) {
+    JMSURIParser(String uri) {
         this.uri = UnsafeUriCharactersEncoder.encode(uri);
         this.scheme = parseUntil(":");
         this.variant = parseUntil(":");

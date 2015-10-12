@@ -89,7 +89,7 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
     }
 
     static class HttpsTokenOutInterceptor extends AbstractPhaseInterceptor<Message> {
-        public HttpsTokenOutInterceptor() {
+        HttpsTokenOutInterceptor() {
             super(Phase.PRE_STREAM);
         }
         public void handleMessage(Message message) throws Fault {
@@ -178,7 +178,7 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
     }
     
     static class HttpsTokenInInterceptor extends AbstractPhaseInterceptor<Message> {
-        public HttpsTokenInInterceptor() {
+        HttpsTokenInInterceptor() {
             super(Phase.PRE_STREAM);
             addBefore(WSS4JStaxInInterceptor.class.getName());
         }

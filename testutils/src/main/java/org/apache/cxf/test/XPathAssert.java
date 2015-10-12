@@ -221,7 +221,7 @@ public final class XPathAssert {
     static class MapNamespaceContext implements NamespaceContext {
         private Map<String, String> namespaces;
 
-        public MapNamespaceContext(Map<String, String> namespaces) {
+        MapNamespaceContext(Map<String, String> namespaces) {
             super();
             this.namespaces = namespaces;
         }

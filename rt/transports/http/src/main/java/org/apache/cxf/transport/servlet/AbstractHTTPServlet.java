@@ -451,9 +451,9 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
         private String originalProto;
         private String originalClientIp;
         
-        public HttpServletRequestXForwardedFilter(HttpServletRequest request, 
-                                                  String originalProto, 
-                                                  String originalIp) {
+        HttpServletRequestXForwardedFilter(HttpServletRequest request, 
+                                           String originalProto, 
+                                           String originalIp) {
             super(request);
             this.originalProto = originalProto;
             if (originalIp != null) {

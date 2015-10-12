@@ -646,7 +646,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         final String port;
         final boolean streaming;
         
-        public TestParam(String p, boolean b) {
+        TestParam(String p, boolean b) {
             port = p;
             streaming = b;
         }

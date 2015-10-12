@@ -79,7 +79,7 @@ public class EHCacheTokenStore implements TokenStore, Closeable, BusLifeCycleLis
     
     private static class RefCountCache extends Cache {
         AtomicInteger count = new AtomicInteger();
-        public RefCountCache(CacheConfiguration cc) {
+        RefCountCache(CacheConfiguration cc) {
             super(cc);
         }
         public int incrementAndGet() {

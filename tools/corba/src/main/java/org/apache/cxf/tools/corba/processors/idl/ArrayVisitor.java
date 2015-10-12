@@ -259,13 +259,13 @@ public class ArrayVisitor extends VisitorBase {
         private CorbaType corbaType;
         private Scope fullyQualifiedName;
 
-        public Types() {
+        Types() {
             schemaType = null;
             corbaType = null;
         }
 
-        public Types(XmlSchemaType stype, CorbaType ctype,
-                     Scope fqName) {
+        Types(XmlSchemaType stype, CorbaType ctype,
+              Scope fqName) {
             schemaType = stype;
             corbaType = ctype;
             fullyQualifiedName = fqName;

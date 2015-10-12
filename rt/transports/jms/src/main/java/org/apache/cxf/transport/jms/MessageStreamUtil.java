@@ -71,7 +71,7 @@ final class MessageStreamUtil {
         private final JMSExchangeSender sender;
         private Exchange exchange;
 
-        public SendingOutputStream(JMSExchangeSender sender, Exchange exchange) {
+        SendingOutputStream(JMSExchangeSender sender, Exchange exchange) {
             this.sender = sender;
             this.exchange = exchange;
         }

@@ -33,7 +33,7 @@ class JaxwsClientCallback<T> extends ClientCallback {
     final AsyncHandler<T> handler;
     final Object proxy;
     
-    public JaxwsClientCallback(final AsyncHandler<T> handler, Object p) {
+    JaxwsClientCallback(final AsyncHandler<T> handler, Object p) {
         this.handler = handler;
         this.proxy = p;
     }

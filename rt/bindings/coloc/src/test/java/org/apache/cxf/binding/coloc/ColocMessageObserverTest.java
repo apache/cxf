@@ -138,7 +138,7 @@ public class ColocMessageObserverTest extends Assert {
     }
     
     class TestColocMessageObserver extends ColocMessageObserver {
-        public TestColocMessageObserver(Endpoint endpoint, Bus bus) {
+        TestColocMessageObserver(Endpoint endpoint, Bus bus) {
             super(endpoint, bus);
         }
         

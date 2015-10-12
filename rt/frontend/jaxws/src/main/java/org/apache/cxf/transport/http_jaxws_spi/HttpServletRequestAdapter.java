@@ -65,7 +65,7 @@ class HttpServletRequestAdapter implements HttpServletRequest {
     private ServletInputStreamAdapter servletInputStreamAdapter;
     private BufferedReader reader;
 
-    public HttpServletRequestAdapter(HttpExchange exchange) {
+    HttpServletRequestAdapter(HttpExchange exchange) {
         this.exchange = exchange;
         this.context = exchange.getHttpContext();
     }

@@ -104,7 +104,7 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
     }
     
     static class IssuedTokenOutInterceptor extends AbstractPhaseInterceptor<Message> {
-        public IssuedTokenOutInterceptor() {
+        IssuedTokenOutInterceptor() {
             super(Phase.PREPARE_SEND);
         }    
         public void handleMessage(Message message) throws Fault {
@@ -151,7 +151,7 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
     }
     
     static class IssuedTokenInInterceptor extends AbstractPhaseInterceptor<Message> {
-        public IssuedTokenInInterceptor() {
+        IssuedTokenInInterceptor() {
             super(Phase.PRE_PROTOCOL);
             addAfter(WSS4JInInterceptor.class.getName());
             addAfter(PolicyBasedWSS4JInInterceptor.class.getName());

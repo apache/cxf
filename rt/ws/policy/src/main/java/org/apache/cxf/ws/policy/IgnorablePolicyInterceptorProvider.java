@@ -64,7 +64,7 @@ public class IgnorablePolicyInterceptorProvider extends AbstractPolicyIntercepto
     private class IgnorableAssertionsInterceptor 
         extends AbstractPhaseInterceptor<Message> {
 
-        public IgnorableAssertionsInterceptor() {
+        IgnorableAssertionsInterceptor() {
             // somewhat irrelevant 
             super(Phase.POST_LOGICAL);
         }

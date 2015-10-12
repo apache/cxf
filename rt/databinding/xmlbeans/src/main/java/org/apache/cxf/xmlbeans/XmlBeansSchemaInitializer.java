@@ -102,9 +102,9 @@ class XmlBeansSchemaInitializer extends ServiceModelVisitor {
         CLASS_MAP.put(byte[].class, org.apache.xmlbeans.XmlBase64Binary.class);
     }
     
-    public XmlBeansSchemaInitializer(ServiceInfo serviceInfo,
-                                     SchemaCollection col,
-                                     XmlBeansDataBinding db) {
+    XmlBeansSchemaInitializer(ServiceInfo serviceInfo,
+                              SchemaCollection col,
+                              XmlBeansDataBinding db) {
         super(serviceInfo);
         schemas = col;
         dataBinding = db;
@@ -113,7 +113,7 @@ class XmlBeansSchemaInitializer extends ServiceModelVisitor {
     
     public class XMLSchemaResolver implements URIResolver {
         final SchemaTypeSystem sts;
-        public XMLSchemaResolver(SchemaTypeSystem sts) {
+        XMLSchemaResolver(SchemaTypeSystem sts) {
             this.sts = sts;
         }
         

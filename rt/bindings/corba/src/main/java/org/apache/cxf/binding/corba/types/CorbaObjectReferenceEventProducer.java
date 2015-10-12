@@ -169,7 +169,7 @@ public final class CorbaObjectReferenceEventProducer extends AbstractStartEndEve
                         XMLStreamReader.END_ELEMENT};
         final String address;
 
-        public CorbaAddressEventProducer(String value) {
+        CorbaAddressEventProducer(String value) {
             address = value;
         }
 
@@ -313,7 +313,7 @@ public final class CorbaObjectReferenceEventProducer extends AbstractStartEndEve
         QName name;
         List<Namespace> namespaces;
 
-        public CorbaInterfaceNameEventProducer(QName intf) {
+        CorbaInterfaceNameEventProducer(QName intf) {
             interfaceName = intf;
 
             name = new QName(CorbaObjectReferenceHelper.ADDRESSING_WSDL_NAMESPACE_URI,

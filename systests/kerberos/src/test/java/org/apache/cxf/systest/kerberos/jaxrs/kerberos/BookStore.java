@@ -65,14 +65,13 @@ public interface BookStore {
     @Produces("application/json;qs=0.9")
     Book getBookAsJSON() throws BookNotFoundFault;
     
-    public static class BookNotReturnedException extends RuntimeException {
+    class BookNotReturnedException extends RuntimeException {
 
         private static final long serialVersionUID = 4935423670510083220L;
 
         public BookNotReturnedException(String errorMessage) {
             super(errorMessage);
         }
-        
     }
     
 }

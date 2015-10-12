@@ -316,7 +316,7 @@ public class JavaDocProvider implements DocumentationProvider {
         private String classDoc;
         private String classInfo;
         private ConcurrentHashMap<Method, MethodDocs> mdocs = new ConcurrentHashMap<Method, MethodDocs>(); 
-        public ClassDocs(String classDoc, String classInfo) {
+        ClassDocs(String classDoc, String classInfo) {
             this.classDoc = classDoc;
             this.classInfo = classInfo;
         }
@@ -342,7 +342,7 @@ public class JavaDocProvider implements DocumentationProvider {
         private String methodInfo;
         private List<String> paramInfo = new LinkedList<String>();
         private String responseInfo;
-        public MethodDocs(String methodInfo, List<String> paramInfo, String responseInfo) {
+        MethodDocs(String methodInfo, List<String> paramInfo, String responseInfo) {
             this.methodInfo = methodInfo;
             this.paramInfo = paramInfo;
             this.responseInfo = responseInfo;

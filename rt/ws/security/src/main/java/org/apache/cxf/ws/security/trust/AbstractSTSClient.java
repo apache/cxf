@@ -1223,7 +1223,7 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
             secureConversationToken.setOptional(true);
             
             class InternalProtectionToken extends ProtectionToken {
-                public InternalProtectionToken(SPVersion version, Policy nestedPolicy) {
+                InternalProtectionToken(SPVersion version, Policy nestedPolicy) {
                     super(version, nestedPolicy);
                     super.setToken(secureConversationToken);
                 }

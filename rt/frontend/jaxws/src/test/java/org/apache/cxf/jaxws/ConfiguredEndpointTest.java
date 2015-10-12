@@ -366,7 +366,7 @@ public class ConfiguredEndpointTest extends Assert {
     
     
     static final class TestInterceptor extends AbstractPhaseInterceptor<Message> {
-        public TestInterceptor(String name) {
+        TestInterceptor(String name) {
             super(name, "");
         }
     

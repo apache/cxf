@@ -79,7 +79,7 @@ public class JMSSharedQueueTest extends AbstractVmJMSTest {
             this.prefix = prefix;
         }
 
-        public ClientRunnable(HelloWorldPortType port, CorrelationIDFactory factory) {
+        ClientRunnable(HelloWorldPortType port, CorrelationIDFactory factory) {
             this.port = port;
             this.corrFactory = factory;
         }

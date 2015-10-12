@@ -69,7 +69,7 @@ public class ClientServerTest extends AbstractSimpleFrontendSpringTest {
     private class TestInterceptor extends AbstractPhaseInterceptor<Message> {
         boolean called;
         
-        public TestInterceptor() {
+        TestInterceptor() {
             super(Phase.USER_LOGICAL);
         }
         

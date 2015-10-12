@@ -153,12 +153,12 @@ public class JAXRSMultithreadedClientTest extends AbstractBusClientServerTestBas
         private CountDownLatch doneSignal;
         private boolean stateCanBeChanged;
         
-        public WebClientWorker(WebClient client,
-                               String bookName,
-                               String bookHeader,
-                               CountDownLatch startSignal,
-                               CountDownLatch doneSignal,
-                               boolean stateCanBeChanged) {
+        WebClientWorker(WebClient client,
+                        String bookName,
+                        String bookHeader,
+                        CountDownLatch startSignal,
+                        CountDownLatch doneSignal,
+                        boolean stateCanBeChanged) {
             this.client = client;
             this.bookName = bookName;
             this.bookHeader = bookHeader;
@@ -226,12 +226,12 @@ public class JAXRSMultithreadedClientTest extends AbstractBusClientServerTestBas
         private CountDownLatch doneSignal;
         private boolean stateCanBeChanged;
         
-        public RootProxyWorker(BookStore proxy,
-                               String bookName,
-                               String bookHeader,
-                               CountDownLatch startSignal,
-                               CountDownLatch doneSignal,
-                               boolean stateCanBeChanged) {
+        RootProxyWorker(BookStore proxy,
+                        String bookName,
+                        String bookHeader,
+                        CountDownLatch startSignal,
+                        CountDownLatch doneSignal,
+                        boolean stateCanBeChanged) {
             this.proxy = proxy;
             this.bookName = bookName;
             this.bookHeader = bookHeader;

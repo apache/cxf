@@ -86,7 +86,7 @@ public class LogicalHandlerFaultOutInterceptor
     private class LogicalHandlerFaultOutEndingInterceptor 
         extends AbstractJAXWSHandlerInterceptor<Message> {
     
-        public LogicalHandlerFaultOutEndingInterceptor(Binding binding) {
+        LogicalHandlerFaultOutEndingInterceptor(Binding binding) {
             super(binding, Phase.POST_MARSHAL);
         }
     

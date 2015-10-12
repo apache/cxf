@@ -113,11 +113,11 @@ public class NettyHttpDestinationTest extends Assert {
     private class EasyMockJettyHTTPDestination
         extends NettyHttpDestination {
 
-        public EasyMockJettyHTTPDestination(Bus bus,
-                                            DestinationRegistry registry,
-                                            EndpointInfo endpointInfo,
-                                            NettyHttpServerEngineFactory serverEngineFactory,
-                                            NettyHttpServerEngine easyMockEngine) throws IOException {
+        EasyMockJettyHTTPDestination(Bus bus,
+                                     DestinationRegistry registry,
+                                     EndpointInfo endpointInfo,
+                                     NettyHttpServerEngineFactory serverEngineFactory,
+                                     NettyHttpServerEngine easyMockEngine) throws IOException {
             super(bus, registry, endpointInfo, serverEngineFactory);
             engine = easyMockEngine;
         }
@@ -885,10 +885,10 @@ public class NettyHttpDestinationTest extends Assert {
     }
     
     private static class TestJettyDestination extends NettyHttpDestination {
-        public TestJettyDestination(Bus bus,
-                                    DestinationRegistry registry,
-                                    EndpointInfo endpointInfo,
-                                    NettyHttpServerEngineFactory serverEngineFactory) throws IOException {
+        TestJettyDestination(Bus bus,
+                             DestinationRegistry registry,
+                             EndpointInfo endpointInfo,
+                             NettyHttpServerEngineFactory serverEngineFactory) throws IOException {
             super(bus, registry, endpointInfo, serverEngineFactory);
         }
         

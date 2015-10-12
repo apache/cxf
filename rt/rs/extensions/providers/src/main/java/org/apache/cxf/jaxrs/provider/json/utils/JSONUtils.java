@@ -234,8 +234,8 @@ public final class JSONUtils {
         private boolean rootDropped;
         private int index; 
                 
-        public IgnoreContentJettisonWriter(XMLStreamWriter writer, boolean writeXsiType, 
-                                           boolean dropRootElement) {
+        IgnoreContentJettisonWriter(XMLStreamWriter writer, boolean writeXsiType, 
+                                    boolean dropRootElement) {
             super(writer);
             this.writeXsiType = writeXsiType;
             this.dropRootElement = dropRootElement;

@@ -823,27 +823,27 @@ public class WadlGeneratorTest extends Assert {
         private String defaultValue = "";
         private boolean repeating;
         private Set<String> options;
-        public Param(String name, String type, String schemaType) {
+        Param(String name, String type, String schemaType) {
             this(name, type, schemaType, false);
         }
         
-        public Param(String name, String type, String schemaType, Set<String> opts) {
+        Param(String name, String type, String schemaType, Set<String> opts) {
             this.name = name;
             this.type = type;
             this.schemaType = schemaType;
             this.options = opts;
         }
         
-        public Param(String name, String type, String schemaType, boolean repeating) {
+        Param(String name, String type, String schemaType, boolean repeating) {
             this(name, type, schemaType, repeating, null);
         }
         
-        public Param(String name, String type, String schemaType, String docs) {
+        Param(String name, String type, String schemaType, String docs) {
             this(name, type, schemaType, false, null);
         }
         
         
-        public Param(String name, String type, String schemaType, boolean repeating, String docs) {
+        Param(String name, String type, String schemaType, boolean repeating, String docs) {
             this.name = name;
             this.type = type;
             this.schemaType = schemaType;
@@ -851,8 +851,8 @@ public class WadlGeneratorTest extends Assert {
             this.repeating = repeating;
         }
         
-        public Param(String name, String type, String schemaType, boolean repeating, String docs,
-                     String defaultValue) {
+        Param(String name, String type, String schemaType, boolean repeating, String docs,
+              String defaultValue) {
             this(name, type, schemaType, repeating, docs);
             this.defaultValue = defaultValue;
         }

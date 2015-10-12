@@ -225,7 +225,7 @@ public class BookContinuationStore {
         private String id;
         private AtomicInteger timeoutExtendedCounter = new AtomicInteger();
         
-        public TimeoutHandlerImpl(String id, boolean resumeOnly) {
+        TimeoutHandlerImpl(String id, boolean resumeOnly) {
             this.id = id;
             this.resumeOnly = resumeOnly;
         }

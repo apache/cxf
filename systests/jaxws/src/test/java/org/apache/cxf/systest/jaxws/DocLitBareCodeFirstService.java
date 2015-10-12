@@ -128,7 +128,7 @@ public interface DocLitBareCodeFirstService {
     
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "GMonthTest", propOrder = { "value" })
-    public class GMonthTest {
+    class GMonthTest {
         @XmlElement(required = true, nillable = true)
         @XmlSchemaType(name = "gMonth")
         protected XMLGregorianCalendar value;

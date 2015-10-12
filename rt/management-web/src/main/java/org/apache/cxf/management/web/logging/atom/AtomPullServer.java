@@ -532,7 +532,7 @@ public class AtomPullServer extends AbstractAtomBean {
     private static class SearchConditionImpl implements SearchCondition<LogRecord> {
         private LogRecord template;
         
-        public SearchConditionImpl(LogRecord l) {
+        SearchConditionImpl(LogRecord l) {
             this.template = l;
         }
 

@@ -40,7 +40,7 @@ class WrappedAttachments implements Set<Attachment> {
     private Map<String, DataHandler> attachments;
     private Map<String, Attachment> cache;
         
-    public WrappedAttachments(Map<String, DataHandler> attachments) {
+    WrappedAttachments(Map<String, DataHandler> attachments) {
         this.attachments = attachments;
         this.cache = new HashMap<String, Attachment>();
     }
@@ -173,7 +173,7 @@ class WrappedAttachments implements Set<Attachment> {
         private Iterator<Map.Entry<String, DataHandler>> iterator;
         private String key;
         
-        public WrappedAttachmentsIterator(Iterator<Map.Entry<String, DataHandler>> iterator) { 
+        WrappedAttachmentsIterator(Iterator<Map.Entry<String, DataHandler>> iterator) { 
             this.iterator = iterator;
         }
             

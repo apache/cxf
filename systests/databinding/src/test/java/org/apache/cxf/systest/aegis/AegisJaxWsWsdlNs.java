@@ -41,7 +41,7 @@ public interface AegisJaxWsWsdlNs {
 
 
     @XmlType(name = "VOX", namespace = "http://wo.rtf2pdf.doc.ws.daisy.marbes.cz")
-    public class VO {
+    class VO {
 
         private String str;
 

@@ -222,7 +222,7 @@ public class Jetty9WebSocketDestination extends JettyHTTPDestination implements
     
     class Jetty9WebSocketHolder implements WebSocketServletHolder {
         final Session session;
-        public Jetty9WebSocketHolder(Session s) {
+        Jetty9WebSocketHolder(Session s) {
             session = s;
         }
         public String getAuthType() {

@@ -214,7 +214,7 @@ public interface DocLitWrappedCodeFirstService {
     
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "doFooList", propOrder = { "dbReves" })
-    public static class DoFooListRequest {
+    class DoFooListRequest {
         @XmlElement(name = "dbRef", required = true)
         protected List<Foo> dbReves = new ArrayList<Foo>();
 
@@ -225,7 +225,7 @@ public interface DocLitWrappedCodeFirstService {
     
     CXF2411Result<CXF2411SubClass> doCXF2411();
     
-    public class CXF2411Result<T extends CXF2411Base> {
+    class CXF2411Result<T extends CXF2411Base> {
         private T[] content;
         public T[] getContent() {
             return content;
@@ -235,9 +235,9 @@ public interface DocLitWrappedCodeFirstService {
         }
     }
 
-    public class CXF2411Base {
+    class CXF2411Base {
     }
 
-    public class CXF2411SubClass extends CXF2411Base {
+    class CXF2411SubClass extends CXF2411Base {
     }
 }

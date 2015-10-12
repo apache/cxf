@@ -431,7 +431,7 @@ class ClassReader extends ByteArrayInputStream {
         String name;
         String type;
 
-        public NameAndType(String name, String type) {
+        NameAndType(String name, String type) {
             this.name = name;
             this.type = type;
         }

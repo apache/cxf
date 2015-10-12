@@ -160,7 +160,7 @@ public class Entry {
         @Nonnull
         private final Node entryNode;
 
-        public LazyXmlParser(@Nonnull final Node entryNode) {
+        LazyXmlParser(@Nonnull final Node entryNode) {
             assert "entry".equals(entryNode.getNodeName());
             assert entryNode.getNodeType() == ELEMENT_NODE;
 

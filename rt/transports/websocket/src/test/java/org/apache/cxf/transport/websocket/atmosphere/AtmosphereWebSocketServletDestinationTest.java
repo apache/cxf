@@ -135,8 +135,8 @@ public class AtmosphereWebSocketServletDestinationTest extends Assert {
     private static class TestAtmosphereWebSocketServletDestination extends AtmosphereWebSocketServletDestination {
 
 
-        public TestAtmosphereWebSocketServletDestination(Bus bus, DestinationRegistry registry,
-                                                         EndpointInfo ei, String path) throws IOException {
+        TestAtmosphereWebSocketServletDestination(Bus bus, DestinationRegistry registry,
+                                                  EndpointInfo ei, String path) throws IOException {
             super(bus, registry, ei, path);
         }
 

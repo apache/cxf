@@ -1879,7 +1879,7 @@ public class JSONProviderTest extends Assert {
     }
     
     private static class NullWriter extends DelegatingXMLStreamWriter {
-        public NullWriter(XMLStreamWriter writer) {
+        NullWriter(XMLStreamWriter writer) {
             super(writer);
         }
 

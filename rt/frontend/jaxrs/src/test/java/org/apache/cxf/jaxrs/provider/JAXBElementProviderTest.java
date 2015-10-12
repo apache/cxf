@@ -1442,7 +1442,7 @@ public class JAXBElementProviderTest extends Assert {
 
         private Map<String, Object> props = new HashMap<String, Object>();
         
-        public TestMarshaller() {
+        TestMarshaller() {
             
         }
         

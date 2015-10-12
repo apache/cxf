@@ -177,7 +177,7 @@ public abstract class AbstractJAXWSMethodInvoker extends FactoryInvoker {
         Continuation continuation;
         boolean done;
         
-        public JaxwsServerHandler(Continuation c) {
+        JaxwsServerHandler(Continuation c) {
             continuation = c;
         }
         

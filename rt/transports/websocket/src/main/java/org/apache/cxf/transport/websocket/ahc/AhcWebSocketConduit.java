@@ -375,7 +375,7 @@ public class AhcWebSocketConduit extends URLConnectionHTTPConduit {
         private String id;
         private Object entity;
 
-        public Response(String idKey, Object data) {
+        Response(String idKey, Object data) {
             this.data = data;
             String line;
             boolean first = true;
@@ -470,7 +470,7 @@ public class AhcWebSocketConduit extends URLConnectionHTTPConduit {
     static class RequestResponse {
         private AhcWebSocketConduitRequest request;
         private Response response;
-        public RequestResponse(AhcWebSocketConduitRequest request) {
+        RequestResponse(AhcWebSocketConduitRequest request) {
             this.request = request;
         }
         public AhcWebSocketConduitRequest getRequest() {

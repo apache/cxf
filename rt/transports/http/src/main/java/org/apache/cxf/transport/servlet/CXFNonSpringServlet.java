@@ -206,7 +206,7 @@ public class CXFNonSpringServlet extends AbstractHTTPServlet {
         private String filterName;
         private String servletPath;
         private String pathInfo;
-        public HttpServletRequestFilter(HttpServletRequest request, String filterName) {
+        HttpServletRequestFilter(HttpServletRequest request, String filterName) {
             super(request);
             this.filterName = filterName;
         }

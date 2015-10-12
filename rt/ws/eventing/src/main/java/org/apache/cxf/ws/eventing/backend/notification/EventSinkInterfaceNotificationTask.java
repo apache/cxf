@@ -49,7 +49,7 @@ class EventSinkInterfaceNotificationTask implements Runnable {
     Object event;
     Class<?> endpointInterface;
 
-    public EventSinkInterfaceNotificationTask(SubscriptionTicket ticket, Object event, Class<?> endpointInterface) {
+    EventSinkInterfaceNotificationTask(SubscriptionTicket ticket, Object event, Class<?> endpointInterface) {
         this.target = ticket;
         this.event = event;
         this.endpointInterface = endpointInterface;

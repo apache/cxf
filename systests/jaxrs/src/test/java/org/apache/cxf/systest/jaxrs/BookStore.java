@@ -1631,11 +1631,11 @@ public class BookStore {
         private String name;
         private long id;
         
-        public BookInfo() {
+        BookInfo() {
             
         }
         
-        public BookInfo(Book b) {
+        BookInfo(Book b) {
             this.name = b.getName();
             this.id = b.getId();
             if (id == 0) {
@@ -1660,11 +1660,11 @@ public class BookStore {
     }
     
     static class BookInfo2 extends BookInfo implements BookInfoInterface {
-        public BookInfo2() {
+        BookInfo2() {
             
         }
         
-        public BookInfo2(Book b) {
+        BookInfo2(Book b) {
             super(b);
         }
     }
@@ -1696,7 +1696,7 @@ public class BookStore {
     }
     
     static class BadBook {
-        public BadBook(String s) {
+        BadBook(String s) {
             throw new RuntimeException("The bad book");
         }
     }
@@ -1705,7 +1705,7 @@ public class BookStore {
 
         private boolean failEarly;
         
-        public StreamingOutputImpl(boolean failEarly) {
+        StreamingOutputImpl(boolean failEarly) {
             this.failEarly = failEarly;
         }
         

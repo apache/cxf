@@ -295,7 +295,7 @@ public class BookServer extends AbstractBusTestServerBase {
         private static class XmlParamConverter implements ParamConverter<Book> {
             private MessageBodyReader<Book> mbr;
             private MessageBodyWriter<Book> mbw;
-            public XmlParamConverter(MessageBodyReader<Book> mbr, MessageBodyWriter<Book> mbw) {  
+            XmlParamConverter(MessageBodyReader<Book> mbr, MessageBodyWriter<Book> mbw) {  
                 this.mbr = mbr;
                 this.mbw = mbw;
             }

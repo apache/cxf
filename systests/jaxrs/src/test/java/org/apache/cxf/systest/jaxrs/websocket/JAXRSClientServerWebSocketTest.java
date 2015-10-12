@@ -422,7 +422,7 @@ public class JAXRSClientServerWebSocketTest extends AbstractBusClientServerTestB
         private String[] values = new String[3];
         private boolean completed;
 
-        public EventCreatorRunner(WebSocketTestClient wsclient, String key, long delay1, long delay2) {
+        EventCreatorRunner(WebSocketTestClient wsclient, String key, long delay1, long delay2) {
             this.wsclient = wsclient;
             this.key = key;
             this.delay1 = delay1;

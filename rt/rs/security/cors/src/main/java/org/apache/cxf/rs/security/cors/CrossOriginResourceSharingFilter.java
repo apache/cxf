@@ -627,7 +627,7 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
 
     private class CorsInInterceptor extends AbstractPhaseInterceptor<Message> {
 
-        public CorsInInterceptor() {
+        CorsInInterceptor() {
             super(Phase.PRE_INVOKE);
         }
 
