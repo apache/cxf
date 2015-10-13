@@ -20,7 +20,7 @@ package org.apache.cxf.rs.security.jose.jwe;
 
 import java.security.interfaces.ECPrivateKey;
 
-import org.apache.cxf.rs.security.jose.JoseUtils;
+import org.apache.cxf.rs.security.jose.common.JoseUtils;
 import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 import org.apache.cxf.rs.security.jose.jwk.JwkUtils;

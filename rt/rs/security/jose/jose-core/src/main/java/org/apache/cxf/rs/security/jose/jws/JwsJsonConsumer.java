@@ -30,7 +30,7 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.provider.json.JsonMapObject;
 import org.apache.cxf.jaxrs.provider.json.JsonMapObjectReaderWriter;
-import org.apache.cxf.rs.security.jose.JoseUtils;
+import org.apache.cxf.rs.security.jose.common.JoseUtils;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 

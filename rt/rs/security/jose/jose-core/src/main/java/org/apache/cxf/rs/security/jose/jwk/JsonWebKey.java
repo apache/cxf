@@ -24,7 +24,7 @@ import java.util.Map;
 
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.provider.json.JsonMapObject;
-import org.apache.cxf.rs.security.jose.JoseConstants;
+import org.apache.cxf.rs.security.jose.common.JoseConstants;
 
 
 public class JsonWebKey extends JsonMapObject {

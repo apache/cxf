@@ -19,7 +19,7 @@
 package org.apache.cxf.rs.security.jose.jwt;
 
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.rs.security.jose.AbstractJoseProducer;
+import org.apache.cxf.rs.security.jose.common.AbstractJoseProducer;
 import org.apache.cxf.rs.security.jose.jwe.JweEncryptionProvider;
 import org.apache.cxf.rs.security.jose.jwe.JweJwtCompactProducer;
 import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactProducer;

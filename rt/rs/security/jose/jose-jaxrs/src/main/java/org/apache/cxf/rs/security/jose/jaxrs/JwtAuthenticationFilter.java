@@ -30,8 +30,8 @@ import javax.ws.rs.core.HttpHeaders;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
-import org.apache.cxf.rs.security.jose.JoseException;
-import org.apache.cxf.rs.security.jose.JoseUtils;
+import org.apache.cxf.rs.security.jose.common.JoseException;
+import org.apache.cxf.rs.security.jose.common.JoseUtils;
 import org.apache.cxf.rs.security.jose.jwt.AbstractJoseJwtConsumer;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rs.security.jose.jwt.JwtUtils;

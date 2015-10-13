@@ -28,9 +28,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.cxf.rs.security.jose.JoseConstants;
-import org.apache.cxf.rs.security.jose.JoseHeaders;
-import org.apache.cxf.rs.security.jose.JoseType;
+import org.apache.cxf.rs.security.jose.common.JoseConstants;
+import org.apache.cxf.rs.security.jose.common.JoseHeaders;
+import org.apache.cxf.rs.security.jose.common.JoseType;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 import org.apache.cxf.rs.security.jose.jwk.KeyOperation;

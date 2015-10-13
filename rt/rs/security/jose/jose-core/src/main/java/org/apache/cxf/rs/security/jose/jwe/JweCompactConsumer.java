@@ -27,8 +27,8 @@ import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.jaxrs.provider.json.JsonMapObject;
 import org.apache.cxf.jaxrs.provider.json.JsonMapObjectReaderWriter;
-import org.apache.cxf.rs.security.jose.JoseException;
-import org.apache.cxf.rs.security.jose.JoseUtils;
+import org.apache.cxf.rs.security.jose.common.JoseException;
+import org.apache.cxf.rs.security.jose.common.JoseUtils;
 
 
 public class JweCompactConsumer {

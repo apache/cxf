@@ -47,8 +47,6 @@ import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
-import org.apache.cxf.rs.security.jose.JoseException;
-import org.apache.cxf.rs.security.jose.JoseUtils;
 import org.apache.cxf.rs.security.jose.jwk.KeyOperation;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
 import org.apache.cxf.security.SecurityContext;

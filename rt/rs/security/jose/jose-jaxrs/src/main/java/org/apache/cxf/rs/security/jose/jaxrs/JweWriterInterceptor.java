@@ -35,7 +35,7 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
-import org.apache.cxf.rs.security.jose.JoseConstants;
+import org.apache.cxf.rs.security.jose.common.JoseConstants;
 import org.apache.cxf.rs.security.jose.jwe.JweCompactProducer;
 import org.apache.cxf.rs.security.jose.jwe.JweEncryptionInput;
 import org.apache.cxf.rs.security.jose.jwe.JweEncryptionOutput;

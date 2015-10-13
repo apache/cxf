@@ -26,7 +26,7 @@ import javax.ws.rs.client.ClientRequestContext;
 import javax.ws.rs.client.ClientResponseContext;
 import javax.ws.rs.client.ClientResponseFilter;
 
-import org.apache.cxf.rs.security.jose.JoseUtils;
+import org.apache.cxf.rs.security.jose.common.JoseUtils;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionOutput;
 
 @Priority(Priorities.JWE_CLIENT_READ_PRIORITY)

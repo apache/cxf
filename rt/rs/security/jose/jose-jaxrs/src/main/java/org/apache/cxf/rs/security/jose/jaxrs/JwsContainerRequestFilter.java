@@ -29,7 +29,7 @@ import javax.ws.rs.container.PreMatching;
 
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
-import org.apache.cxf.rs.security.jose.JoseUtils;
+import org.apache.cxf.rs.security.jose.common.JoseUtils;
 import org.apache.cxf.rs.security.jose.jws.JwsCompactConsumer;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 
