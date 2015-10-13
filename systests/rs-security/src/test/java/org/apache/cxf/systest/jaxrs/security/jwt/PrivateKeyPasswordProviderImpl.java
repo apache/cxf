@@ -20,7 +20,7 @@ package org.apache.cxf.systest.jaxrs.security.jwt;
 
 import java.util.Properties;
 
-import org.apache.cxf.rs.security.jose.jaxrs.PrivateKeyPasswordProvider;
+import org.apache.cxf.rs.security.jose.common.PrivateKeyPasswordProvider;
 
 public class PrivateKeyPasswordProviderImpl implements PrivateKeyPasswordProvider {
 

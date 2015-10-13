@@ -44,7 +44,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-rs-security-jose</artifactId>
+            <artifactId>cxf-rt-rs-security-jose-core</artifactId>
             <version>${project.version}</version>
         </dependency> 
         <dependency>
