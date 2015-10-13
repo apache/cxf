@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.rs.security.jose.jwe;
 
-import org.apache.cxf.rs.security.jose.JoseException;
+import org.apache.cxf.rs.security.jose.common.JoseException;
 
 public class JweException extends JoseException {
 

@@ -20,7 +20,7 @@ package org.apache.cxf.rs.security.jose.jwe;
 
 import java.io.UnsupportedEncodingException;
 
-import org.apache.cxf.rs.security.jose.JoseException;
+import org.apache.cxf.rs.security.jose.common.JoseException;
 
 public class JweDecryptionOutput {
     private JweHeaders headers;

@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.jose;
+package org.apache.cxf.rs.security.jose.common;
 
 public class JoseException extends RuntimeException {
 

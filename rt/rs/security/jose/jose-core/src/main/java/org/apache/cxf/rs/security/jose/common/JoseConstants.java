@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.rs.security.jose;
+package org.apache.cxf.rs.security.jose.common;
 
 public final class JoseConstants {
     public static final String HEADER_TYPE = "typ";

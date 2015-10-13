@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.rs.security.jose.jwt;
 
-import org.apache.cxf.rs.security.jose.AbstractJoseConsumer;
+import org.apache.cxf.rs.security.jose.common.AbstractJoseConsumer;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionProvider;
 import org.apache.cxf.rs.security.jose.jwe.JweJwtCompactConsumer;
 import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactConsumer;

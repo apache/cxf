@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.rs.security.jose;
+package org.apache.cxf.rs.security.jose.common;
 
 import java.util.List;
 import java.util.Map;

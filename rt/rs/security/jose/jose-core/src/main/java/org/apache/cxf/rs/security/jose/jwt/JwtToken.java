@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.rs.security.jose.jwt;
 
-import org.apache.cxf.rs.security.jose.JoseHeaders;
+import org.apache.cxf.rs.security.jose.common.JoseHeaders;
 
 
 

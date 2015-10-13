@@ -19,7 +19,7 @@
 package org.apache.cxf.rs.security.jose.jwe;
 
 import org.apache.cxf.common.util.Base64UrlUtility;
-import org.apache.cxf.rs.security.jose.JoseException;
+import org.apache.cxf.rs.security.jose.common.JoseException;
 import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 
