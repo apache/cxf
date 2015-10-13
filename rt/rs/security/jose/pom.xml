@@ -26,14 +26,9 @@
     <url>http://cxf.apache.org</url>
     <parent>
         <groupId>org.apache.cxf</groupId>
-<<<<<<< HEAD
         <artifactId>cxf-parent</artifactId>
         <version>3.0.7-SNAPSHOT</version>
         <relativePath>../../../../parent/pom.xml</relativePath>
-=======
-        <artifactId>cxf-rt-rs-security</artifactId>
-        <version>3.1.4-SNAPSHOT</version>
->>>>>>> 66a8177... Splitting current jose module into jose-core + jose-jaxrs
     </parent>
     <modules>
         <module>jose-core</module>

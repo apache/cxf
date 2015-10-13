@@ -174,12 +174,13 @@ public final class JwsUtils {
     
     public static Map<SignatureAlgorithm, List<JwsJsonSignatureEntry>> getJwsJsonSignatureMap(
         List<JwsJsonSignatureEntry> signatures) {
-        Map<SignatureAlgorithm, List<JwsJsonSignatureEntry>> map = new HashMap<>();
+        Map<SignatureAlgorithm, List<JwsJsonSignatureEntry>> map =
+            new HashMap<SignatureAlgorithm, List<JwsJsonSignatureEntry>>();
         for (JwsJsonSignatureEntry entry : signatures) {
             SignatureAlgorithm sigAlgorithm = entry.getUnionHeader().getSignatureAlgorithm();
             List<JwsJsonSignatureEntry> entries = map.get(sigAlgorithm);
             if (entries == null) {
-                entries = new ArrayList<>();
+                entries = new ArrayList<JwsJsonSignatureEntry>();
             }
             entries.add(entry);
             map.put(sigAlgorithm, entries);
