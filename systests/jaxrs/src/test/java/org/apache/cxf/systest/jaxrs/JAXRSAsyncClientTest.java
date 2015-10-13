@@ -19,6 +19,7 @@
 
 package org.apache.cxf.systest.jaxrs;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -67,6 +68,20 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         WebClient.getConfig(wc).getRequestContext().put("use.async.http.conduit", true);
         Book book = wc.invoke("RETRIEVE", new Book("Retrieve", 123L), Book.class);
         assertEquals("Retrieve", book.getName());
+    }
+    
+    @Test
+    public void testPatchBookInputStream() throws Exception {
+        String address = "http://localhost:" + PORT + "/bookstore/patch";
+        WebClient wc = WebClient.create(address);
+        wc.type("application/xml");
+        WebClient.getConfig(wc).getRequestContext().put("use.async.http.conduit", true);
+        Book book = wc.invoke("PATCH", 
+                              new ByteArrayInputStream(
+                                  "<Book><name>Patch</name><id>123</id></Book>".getBytes()), 
+                              Book.class);
+        assertEquals("Patch", book.getName());
+        wc.close();
     }
     
     @Test
