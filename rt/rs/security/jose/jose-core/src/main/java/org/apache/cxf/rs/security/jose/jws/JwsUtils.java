@@ -56,6 +56,8 @@ public final class JwsUtils {
     private static final String RSSEC_SIGNATURE_PROPS = "rs.security.signature.properties";
     private static final String RSSEC_REPORT_KEY_PROP = "rs.security.jws.report.public.key";
     private static final String RSSEC_REPORT_KEY_ID_PROP = "rs.security.jws.report.public.key.id";
+    private static final String RSSEC_SIGNATURE_ALLOW_NONE_SIGNATURE = "rs.security.jws.allow.none.signature";
+    
     private JwsUtils() {
         
     }
@@ -209,6 +211,12 @@ public final class JwsUtils {
     }
     public static JwsSignatureVerifier loadSignatureVerifier(JwsHeaders headers, boolean required) {
         Message m = PhaseInterceptorChain.getCurrentMessage();
+        boolean allowNoneSignature = 
+            MessageUtils.getContextualBoolean(m, RSSEC_SIGNATURE_ALLOW_NONE_SIGNATURE, false);
+        if (allowNoneSignature && SignatureAlgorithm.NONE.getJwaName().equals(headers.getAlgorithm())) {
+            return new NoneJwsSignatureVerifier();
+        }
+            
         Properties props = KeyManagementUtils.loadStoreProperties(m, required, 
                                                                   RSSEC_SIGNATURE_IN_PROPS, RSSEC_SIGNATURE_PROPS);
         if (props == null) {
