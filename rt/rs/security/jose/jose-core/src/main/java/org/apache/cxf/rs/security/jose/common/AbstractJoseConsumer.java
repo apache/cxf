@@ -30,9 +30,17 @@ public abstract class AbstractJoseConsumer {
     public void setJweDecryptor(JweDecryptionProvider jweDecryptor) {
         this.jweDecryptor = jweDecryptor;
     }
+    
+    public JweDecryptionProvider getJweDecryptor() {
+        return jweDecryptor;
+    }
 
     public void setJwsVerifier(JwsSignatureVerifier theJwsVerifier) {
         this.jwsVerifier = theJwsVerifier;
+    }
+    
+    public JwsSignatureVerifier getJwsVerifier() {
+        return jwsVerifier;
     }
 
     protected JweDecryptionProvider getInitializedDecryptionProvider() {
@@ -44,7 +52,8 @@ public abstract class AbstractJoseConsumer {
     protected JwsSignatureVerifier getInitializedSignatureVerifier() {
         if (jwsVerifier != null) {
             return jwsVerifier;    
-        } 
+        }
+        
         return JwsUtils.loadSignatureVerifier(false);
     }
 

@@ -114,6 +114,10 @@ public class JwsCompactProducer {
         return getSignedEncodedJws();
     }
     
+    public boolean isPlainText() {
+        return SignatureAlgorithm.NONE == getAlgorithm();
+    }
+    
     public String setSignatureBytes(byte[] signatureOctets) {
         setEncodedSignature(Base64UrlUtility.encode(signatureOctets));
         return getSignedEncodedJws();
@@ -121,9 +125,6 @@ public class JwsCompactProducer {
     
     private void setEncodedSignature(String sig) {
         this.signature = sig;
-    }
-    private boolean isPlainText() {
-        return SignatureAlgorithm.NONE == getAlgorithm();
     }
     private SignatureAlgorithm getAlgorithm() {
         return getJwsHeaders().getSignatureAlgorithm();

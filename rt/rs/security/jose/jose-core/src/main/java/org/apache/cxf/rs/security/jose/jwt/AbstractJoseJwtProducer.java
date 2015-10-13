@@ -48,14 +48,20 @@ public abstract class AbstractJoseJwtProducer extends AbstractJoseProducer {
         }
         
         if (isJwsRequired()) {
-            if (theSigProvider == null) {
-                theSigProvider = getInitializedSignatureProvider();
+            JwsJwtCompactProducer jws = new JwsJwtCompactProducer(jwt);
+            if (jws.isPlainText()) {
+                data = jws.getSignedEncodedJws();
+            } else {
+                if (theSigProvider == null) {
+                    theSigProvider = getInitializedSignatureProvider();
+                }
+                
+                if (theSigProvider == null) {
+                    throw new JwtException("Unable to sign JWT");
+                }
+                
+                data = jws.signWith(theSigProvider);
             }
-            if (theSigProvider == null) {
-                throw new JwtException("Unable to sign JWT");
-            }
-            JwsJwtCompactProducer jws = new JwsJwtCompactProducer(jwt); 
-            data = jws.signWith(theSigProvider);
             if (theEncProvider != null) {
                 data = theEncProvider.encrypt(StringUtils.toBytesUTF8(data), null);
             }

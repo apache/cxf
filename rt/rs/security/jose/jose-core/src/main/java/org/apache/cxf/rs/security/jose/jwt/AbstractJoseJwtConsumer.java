@@ -21,8 +21,10 @@ package org.apache.cxf.rs.security.jose.jwt;
 import org.apache.cxf.rs.security.jose.common.AbstractJoseConsumer;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionProvider;
 import org.apache.cxf.rs.security.jose.jwe.JweJwtCompactConsumer;
+import org.apache.cxf.rs.security.jose.jws.JwsHeaders;
 import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactConsumer;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
+import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 
 public abstract class AbstractJoseJwtConsumer extends AbstractJoseConsumer {
     private boolean jwsRequired = true;
@@ -73,6 +75,14 @@ public abstract class AbstractJoseJwtConsumer extends AbstractJoseConsumer {
         return jwt; 
     }
     protected JwsSignatureVerifier getInitializedSignatureVerifier(JwtToken jwt) {
+        if (super.getJwsVerifier() != null) {
+            return super.getJwsVerifier();    
+        }
+        
+        if (jwt.getHeaders() instanceof JwsHeaders) {
+            return JwsUtils.loadSignatureVerifier((JwsHeaders)jwt.getHeaders(), false);
+        }
+        
         return super.getInitializedSignatureVerifier();
     }
     protected void validateToken(JwtToken jwt) {
