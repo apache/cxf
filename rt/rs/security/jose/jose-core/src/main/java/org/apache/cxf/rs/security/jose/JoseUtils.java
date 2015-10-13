@@ -18,19 +18,29 @@
  */
 package org.apache.cxf.rs.security.jose;
 
+import java.io.File;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.PhaseInterceptorChain;
+import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
 
 public final class JoseUtils {
     private static final Logger LOG = LogUtils.getL7dLogger(JoseUtils.class);
+    private static final String CLASSPATH_PREFIX = "classpath:";
+    
     private JoseUtils() {
         
     }
@@ -41,23 +51,27 @@ public final class JoseUtils {
         return StringUtils.split(compactContent, "\\.");    
     }
     public static void setJoseContextProperty(JoseHeaders headers) {    
-        String context = (String)JAXRSUtils.getCurrentMessage().get(JoseConstants.JOSE_CONTEXT_PROPERTY);
+        Message message = PhaseInterceptorChain.getCurrentMessage();
+        String context = (String)message.get(JoseConstants.JOSE_CONTEXT_PROPERTY);
         if (context != null) {
             headers.setHeader(JoseConstants.JOSE_CONTEXT_PROPERTY, context);
         }
     }
     public static void setJoseMessageContextProperty(JoseHeaders headers, String value) {    
         headers.setHeader(JoseConstants.JOSE_CONTEXT_PROPERTY, value);
-        JAXRSUtils.getCurrentMessage().put(JoseConstants.JOSE_CONTEXT_PROPERTY, value);
+        Message message = PhaseInterceptorChain.getCurrentMessage();
+        message.put(JoseConstants.JOSE_CONTEXT_PROPERTY, value);
     }
     public static void setMessageContextProperty(JoseHeaders headers) {    
         String context = (String)headers.getHeader(JoseConstants.JOSE_CONTEXT_PROPERTY);
         if (context != null) {
-            JAXRSUtils.getCurrentMessage().put(JoseConstants.JOSE_CONTEXT_PROPERTY, context);
+            Message message = PhaseInterceptorChain.getCurrentMessage();
+            message.put(JoseConstants.JOSE_CONTEXT_PROPERTY, context);
         }
     }
     public static void validateRequestContextProperty(JoseHeaders headers) {
-        Object requestContext = JAXRSUtils.getCurrentMessage().get(JoseConstants.JOSE_CONTEXT_PROPERTY);
+        Message message = PhaseInterceptorChain.getCurrentMessage();
+        Object requestContext = message.get(JoseConstants.JOSE_CONTEXT_PROPERTY);
         Object headerContext = headers.getHeader(JoseConstants.JOSE_CONTEXT_PROPERTY);
         if (requestContext == null && headerContext == null) {
             return;
@@ -122,4 +136,65 @@ public final class JoseUtils {
         Set<Object> inputSet = new HashSet<Object>(list);
         return list.size() > inputSet.size();
     }
+    
+    //
+    // <Start> Copied from JAX-RS RT FRONTEND ResourceUtils
+    //
+    
+    public static InputStream getResourceStream(String loc, Bus bus) throws Exception {
+        URL url = getResourceURL(loc, bus);
+        return url == null ? null : url.openStream();
+    }
+    
+    public static URL getResourceURL(String loc, Bus bus) throws Exception {
+        URL url = null;
+        if (loc.startsWith(CLASSPATH_PREFIX)) {
+            String path = loc.substring(CLASSPATH_PREFIX.length());
+            url = JoseUtils.getClasspathResourceURL(path, JoseUtils.class, bus);
+        } else {
+            try {
+                url = new URL(loc);
+            } catch (Exception ex) {
+                // it can be either a classpath or file resource without a scheme
+                url = JoseUtils.getClasspathResourceURL(loc, JoseUtils.class, bus);
+                if (url == null) {
+                    File file = new File(loc);
+                    if (file.exists()) {
+                        url = file.toURI().toURL();
+                    }
+                }
+            }
+        }
+        if (url == null) {
+            LOG.warning("No resource " + loc + " is available");
+        }
+        return url;
+    }
+    
+    public static URL getClasspathResourceURL(String path, Class<?> callingClass, Bus bus) {
+        URL url = ClassLoaderUtils.getResource(path, callingClass);
+        return url == null ? getResource(path, URL.class, bus) : url;
+    }
+    
+    public static <T> T getResource(String path, Class<T> resourceClass, Bus bus) {
+        if (bus != null) {
+            ResourceManager rm = bus.getExtension(ResourceManager.class);
+            if (rm != null) {
+                return rm.resolveResource(path, resourceClass);
+            }
+        }
+        return null;
+    }
+    
+    public static Properties loadProperties(String propertiesLocation, Bus bus) throws Exception {
+        Properties props = new Properties();
+        InputStream is = getResourceStream(propertiesLocation, bus);
+        props.load(is);
+        return props;
+    }
+    
+    //
+    // <End> Copied from JAX-RS RT FRONTEND ResourceUtils
+    //
+    
 }

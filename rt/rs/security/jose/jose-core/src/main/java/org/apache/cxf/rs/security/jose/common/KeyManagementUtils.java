@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.rs.security.jose.jaxrs;
+package org.apache.cxf.rs.security.jose.common;
 
 import java.io.InputStream;
 import java.security.KeyStore;
@@ -44,11 +44,11 @@ import java.util.logging.Logger;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PropertyUtils;
-import org.apache.cxf.jaxrs.utils.JAXRSUtils;
-import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.rs.security.jose.JoseException;
+import org.apache.cxf.rs.security.jose.JoseUtils;
 import org.apache.cxf.rs.security.jose.jwk.KeyOperation;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
 import org.apache.cxf.security.SecurityContext;
@@ -110,7 +110,7 @@ public final class KeyManagementUtils {
         String keyStoreLoc = getMessageProperty(m, keyStoreLocPropPreferred, keyStoreLocPropDefault);
         Bus bus = m.getExchange().getBus();
         try {
-            Properties props = ResourceUtils.loadProperties(keyStoreLoc, bus);
+            Properties props = JoseUtils.loadProperties(keyStoreLoc, bus);
             return KeyManagementUtils.loadPublicKey(m, props);
         } catch (Exception ex) {
             LOG.warning("Public key can not be loaded");
@@ -150,7 +150,7 @@ public final class KeyManagementUtils {
         String keyStoreLoc = getMessageProperty(m, keyStoreLocPropPreferred, keyStoreLocPropDefault);
         Bus bus = m.getExchange().getBus();
         try {
-            Properties props = ResourceUtils.loadProperties(keyStoreLoc, bus);
+            Properties props = JoseUtils.loadProperties(keyStoreLoc, bus);
             return loadPrivateKey(m, props, keyOper);
         } catch (Exception ex) {
             throw new SecurityException(ex);
@@ -238,7 +238,7 @@ public final class KeyManagementUtils {
             throw new JoseException("No keystore password was defined");
         }
         try {
-            InputStream is = ResourceUtils.getResourceStream(keyStoreLoc, bus);
+            InputStream is = JoseUtils.getResourceStream(keyStoreLoc, bus);
             return CryptoUtils.loadKeyStore(is, keyStorePswd.toCharArray(), keyStoreType);
         } catch (Exception ex) {
             LOG.warning("Key store can not be loaded");
@@ -278,7 +278,8 @@ public final class KeyManagementUtils {
     }
     //TODO: enhance the certificate validation code
     public static void validateCertificateChain(Properties storeProperties, List<X509Certificate> inCerts) {
-        KeyStore ks = loadPersistKeyStore(JAXRSUtils.getCurrentMessage(), storeProperties);
+        Message message = PhaseInterceptorChain.getCurrentMessage();
+        KeyStore ks = loadPersistKeyStore(message, storeProperties);
         validateCertificateChain(ks, inCerts);
     }
     public static void validateCertificateChain(KeyStore ks, List<X509Certificate> inCerts) {
@@ -327,7 +328,7 @@ public final class KeyManagementUtils {
             (String)MessageUtils.getContextualProperty(m, storeProp1, storeProp2);
         if (propLoc != null) {
             try {
-                props = ResourceUtils.loadProperties(propLoc, m.getExchange().getBus());
+                props = JoseUtils.loadProperties(propLoc, m.getExchange().getBus());
             } catch (Exception ex) {
                 LOG.warning("Properties resource is not identified");
                 throw new JoseException(ex);

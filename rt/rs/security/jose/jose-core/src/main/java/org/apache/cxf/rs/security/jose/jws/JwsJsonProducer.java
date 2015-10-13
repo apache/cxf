@@ -26,8 +26,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import javax.ws.rs.core.MultivaluedMap;
-
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.StringUtils;
@@ -36,6 +34,7 @@ import org.apache.cxf.rs.security.jose.JoseConstants;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
+
 public class JwsJsonProducer {
     protected static final Logger LOG = LogUtils.getL7dLogger(JwsJsonProducer.class);
     private boolean supportFlattened;
@@ -95,9 +94,12 @@ public class JwsJsonProducer {
         return signatures;
     }
     
+    /*
+     * TODO
     public MultivaluedMap<SignatureAlgorithm, JwsJsonSignatureEntry> getSignatureEntryMap() {
         return JwsUtils.getJwsJsonSignatureMap(signatures);
     }
+    */
     public String signWith(List<JwsSignatureProvider> signers) {
         for (JwsSignatureProvider signer : signers) {
             signWith(signer);    

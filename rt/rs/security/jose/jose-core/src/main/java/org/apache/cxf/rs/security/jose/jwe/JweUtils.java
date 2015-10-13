@@ -37,13 +37,13 @@ import javax.crypto.SecretKey;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.rs.security.jose.JoseConstants;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.JoseUtils;
-import org.apache.cxf.rs.security.jose.jaxrs.KeyManagementUtils;
+import org.apache.cxf.rs.security.jose.common.KeyManagementUtils;
 import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
 import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
@@ -274,7 +274,7 @@ public final class JweUtils {
         return loadEncryptionProvider(null, required);
     }
     public static JweEncryptionProvider loadEncryptionProvider(JweHeaders headers, boolean required) {
-        Message m = JAXRSUtils.getCurrentMessage();        
+        Message m = PhaseInterceptorChain.getCurrentMessage();
         Properties props = KeyManagementUtils.loadStoreProperties(m, required, 
                                                                   RSSEC_ENCRYPTION_OUT_PROPS, RSSEC_ENCRYPTION_PROPS);
         if (props == null) {
@@ -327,7 +327,7 @@ public final class JweUtils {
         return loadDecryptionProvider(null, required);
     }
     public static JweDecryptionProvider loadDecryptionProvider(JweHeaders inHeaders, boolean required) {
-        Message m = JAXRSUtils.getCurrentMessage();
+        Message m = PhaseInterceptorChain.getCurrentMessage();
         Properties props = KeyManagementUtils.loadStoreProperties(m, required, 
                                                                   RSSEC_ENCRYPTION_IN_PROPS, RSSEC_ENCRYPTION_PROPS);
         if (props == null) {
@@ -624,8 +624,7 @@ public final class JweUtils {
         return new JweHeaders(Collections.<String, Object>singletonMap(JoseConstants.HEADER_CONTENT_TYPE, ct));
     }
     public static void validateJweCertificateChain(List<X509Certificate> certs) {
-        
-        Message m = JAXRSUtils.getCurrentMessage();        
+        Message m = PhaseInterceptorChain.getCurrentMessage();
         Properties props = KeyManagementUtils.loadStoreProperties(m, true, 
                                                                   RSSEC_ENCRYPTION_IN_PROPS, RSSEC_ENCRYPTION_PROPS);
         KeyManagementUtils.validateCertificateChain(props, certs);

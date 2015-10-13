@@ -25,8 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import javax.ws.rs.core.MultivaluedMap;
-
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
@@ -121,7 +119,7 @@ public class JwsJsonConsumer {
     public List<JwsJsonSignatureEntry> getSignatureEntries() {
         return Collections.unmodifiableList(signatures);
     }
-    public MultivaluedMap<SignatureAlgorithm, JwsJsonSignatureEntry> getSignatureEntryMap() {
+    public Map<SignatureAlgorithm, List<JwsJsonSignatureEntry>> getSignatureEntryMap() {
         return JwsUtils.getJwsJsonSignatureMap(signatures);
     }
     public boolean verifySignatureWith(JwsSignatureVerifier validator) {
