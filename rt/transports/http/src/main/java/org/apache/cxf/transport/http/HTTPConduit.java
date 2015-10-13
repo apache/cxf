@@ -175,7 +175,7 @@ public abstract class HTTPConduit
     private static final String AUTO_REDIRECT_MAX_SAME_URI_COUNT = "http.redirect.max.same.uri.count";
     
     private static final String HTTP_POST_METHOD = "POST";
-    private static final String HTTP_PUT_METHOD = "PUT";
+    private static final String HTTP_GET_METHOD = "GET";
     private static final Set<String> KNOWN_HTTP_VERBS_WITH_NO_CONTENT = 
         new HashSet<String>(Arrays.asList(new String[]{"GET", "HEAD", "OPTIONS", "TRACE"}));
     /**
@@ -547,8 +547,7 @@ public abstract class HTTPConduit
     protected boolean isChunkingSupported(Message message, String httpMethod) {
         if (HTTP_POST_METHOD.equals(httpMethod)) { 
             return true;
-        }
-        if (HTTP_PUT_METHOD.equals(httpMethod)) {
+        } else if (!HTTP_GET_METHOD.equals(httpMethod)) {
             MessageContentsList objs = MessageContentsList.getContentsList(message);
             if (objs != null && objs.size() > 0) {
                 Object obj = objs.get(0);
