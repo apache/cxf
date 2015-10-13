@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.jose.jaxrs;
+package org.apache.cxf.rs.security.jose.common;
 
 import java.util.Properties;
 

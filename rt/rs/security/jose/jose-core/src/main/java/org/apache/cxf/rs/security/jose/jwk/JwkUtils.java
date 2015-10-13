@@ -44,14 +44,13 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.provider.json.JsonMapObjectReaderWriter;
-import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.rs.security.jose.JoseConstants;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.JoseUtils;
-import org.apache.cxf.rs.security.jose.jaxrs.KeyManagementUtils;
-import org.apache.cxf.rs.security.jose.jaxrs.PrivateKeyPasswordProvider;
+import org.apache.cxf.rs.security.jose.common.KeyManagementUtils;
+import org.apache.cxf.rs.security.jose.common.PrivateKeyPasswordProvider;
 import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
 import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
@@ -276,7 +275,7 @@ public final class JwkUtils {
         String keyStoreLoc = props.getProperty(KeyManagementUtils.RSSEC_KEY_STORE_FILE);
         if (keyStoreLoc != null) {
             try {
-                InputStream is = ResourceUtils.getResourceStream(keyStoreLoc, bus);
+                InputStream is = JoseUtils.getResourceStream(keyStoreLoc, bus);
                 if (is == null) {
                     throw new JwkException("Error in loading keystore location: " + keyStoreLoc);
                 }

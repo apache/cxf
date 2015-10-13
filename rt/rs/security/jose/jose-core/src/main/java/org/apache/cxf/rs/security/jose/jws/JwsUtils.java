@@ -27,22 +27,20 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import javax.ws.rs.core.MultivaluedMap;
-
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.jaxrs.impl.MetadataMap;
-import org.apache.cxf.jaxrs.utils.JAXRSUtils;
-import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.rs.security.jose.JoseConstants;
 import org.apache.cxf.rs.security.jose.JoseHeaders;
 import org.apache.cxf.rs.security.jose.JoseUtils;
-import org.apache.cxf.rs.security.jose.jaxrs.KeyManagementUtils;
+import org.apache.cxf.rs.security.jose.common.KeyManagementUtils;
 import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
@@ -173,20 +171,27 @@ public final class JwsUtils {
         }
         return null;
     }
-    public static MultivaluedMap<SignatureAlgorithm, JwsJsonSignatureEntry> getJwsJsonSignatureMap(
+    
+    public static Map<SignatureAlgorithm, List<JwsJsonSignatureEntry>> getJwsJsonSignatureMap(
         List<JwsJsonSignatureEntry> signatures) {
-        MultivaluedMap<SignatureAlgorithm, JwsJsonSignatureEntry> map = 
-            new MetadataMap<SignatureAlgorithm, JwsJsonSignatureEntry>();
+        Map<SignatureAlgorithm, List<JwsJsonSignatureEntry>> map = new HashMap<>();
         for (JwsJsonSignatureEntry entry : signatures) {
-            map.add(entry.getUnionHeader().getSignatureAlgorithm(), entry);
+            SignatureAlgorithm sigAlgorithm = entry.getUnionHeader().getSignatureAlgorithm();
+            List<JwsJsonSignatureEntry> entries = map.get(sigAlgorithm);
+            if (entries == null) {
+                entries = new ArrayList<>();
+            }
+            entries.add(entry);
+            map.put(sigAlgorithm, entries);
         }
         return map;
     }
+    
     public static JwsSignatureProvider loadSignatureProvider(boolean required) {
         return loadSignatureProvider(null, required);    
     }
     public static JwsSignatureProvider loadSignatureProvider(JwsHeaders headers, boolean required) {
-        Message m = JAXRSUtils.getCurrentMessage();
+        Message m = PhaseInterceptorChain.getCurrentMessage();
         Properties props = KeyManagementUtils.loadStoreProperties(m, required, 
                                                                   RSSEC_SIGNATURE_OUT_PROPS, RSSEC_SIGNATURE_PROPS);
         if (props == null) {
@@ -202,7 +207,7 @@ public final class JwsUtils {
         return loadSignatureVerifier(null, required);
     }
     public static JwsSignatureVerifier loadSignatureVerifier(JwsHeaders headers, boolean required) {
-        Message m = JAXRSUtils.getCurrentMessage();
+        Message m = PhaseInterceptorChain.getCurrentMessage();
         Properties props = KeyManagementUtils.loadStoreProperties(m, required, 
                                                                   RSSEC_SIGNATURE_IN_PROPS, RSSEC_SIGNATURE_PROPS);
         if (props == null) {
@@ -342,7 +347,7 @@ public final class JwsUtils {
     }
     private static Properties loadJwsProperties(Message m, String propLoc) {
         try {
-            return ResourceUtils.loadProperties(propLoc, m.getExchange().getBus());
+            return JoseUtils.loadProperties(propLoc, m.getExchange().getBus());
         } catch (Exception ex) {
             LOG.warning("JWS init properties are not available");
             throw new JwsException(JwsException.Error.NO_INIT_PROPERTIES);
@@ -385,7 +390,7 @@ public final class JwsUtils {
     }
     public static void validateJwsCertificateChain(List<X509Certificate> certs) {
         
-        Message m = JAXRSUtils.getCurrentMessage();        
+        Message m = PhaseInterceptorChain.getCurrentMessage();
         Properties props = KeyManagementUtils.loadStoreProperties(m, true, 
                                                                   RSSEC_SIGNATURE_IN_PROPS, RSSEC_SIGNATURE_PROPS);
         KeyManagementUtils.validateCertificateChain(props, certs);

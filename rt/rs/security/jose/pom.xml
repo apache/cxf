@@ -7,9 +7,9 @@
   to you under the Apache License, Version 2.0 (the
   "License"); you may not use this file except in compliance
   with the License. You may obtain a copy of the License at
-
+ 
   http://www.apache.org/licenses/LICENSE-2.0
-
+ 
   Unless required by applicable law or agreed to in writing,
   software distributed under the License is distributed on an
   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -20,49 +20,23 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cxf-rt-rs-security-jose</artifactId>
-    <packaging>bundle</packaging>
-    <name>Apache CXF Runtime JOSE</name>
-    <description>Apache CXF Runtime JOSE</description>
+    <packaging>pom</packaging>
+    <name>Apache CXF JOSE Security</name>
+    <description>Apache CXF JOSE Security</description>
     <url>http://cxf.apache.org</url>
     <parent>
         <groupId>org.apache.cxf</groupId>
+<<<<<<< HEAD
         <artifactId>cxf-parent</artifactId>
         <version>3.0.7-SNAPSHOT</version>
         <relativePath>../../../../parent/pom.xml</relativePath>
+=======
+        <artifactId>cxf-rt-rs-security</artifactId>
+        <version>3.1.4-SNAPSHOT</version>
+>>>>>>> 66a8177... Splitting current jose module into jose-core + jose-jaxrs
     </parent>
-    <dependencies>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-core</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-security</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-frontend-jaxrs</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-rs-extension-providers</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-ext-jdk15on</artifactId>
-            <version>${cxf.bcprov.version}</version>
-            <scope>provided</scope>
-            <optional>true</optional> 
-        </dependency>
-        <!--test dependencies-->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
+    <modules>
+        <module>jose-core</module>
+        <module>jose-jaxrs</module>
+    </modules>
 </project>
