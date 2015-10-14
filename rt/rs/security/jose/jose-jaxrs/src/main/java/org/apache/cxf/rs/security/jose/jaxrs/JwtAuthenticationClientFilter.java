@@ -32,8 +32,12 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.rs.security.jose.common.JoseException;
+import org.apache.cxf.rs.security.jose.common.JoseType;
 import org.apache.cxf.rs.security.jose.common.JoseUtils;
+import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
+import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jwe.JweHeaders;
+import org.apache.cxf.rs.security.jose.jws.JwsHeaders;
 import org.apache.cxf.rs.security.jose.jwt.AbstractJoseJwtProducer;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 import org.apache.cxf.rs.security.jose.jwt.JwtConstants;
@@ -56,7 +60,7 @@ public class JwtAuthenticationClientFilter extends AbstractJoseJwtProducer
                 JwtClaims claims = new JwtClaims();
                 claims.setSubject(ap.getUserName());
                 claims.setClaim("password", ap.getPassword());
-                claims.setIssuedAt(System.currentTimeMillis() / 1000);
+                claims.setIssuedAt(System.currentTimeMillis() / 1000L);
                 jwt = new JwtToken(new JweHeaders(), claims);
             }
         }
@@ -69,16 +73,49 @@ public class JwtAuthenticationClientFilter extends AbstractJoseJwtProducer
         requestContext.getHeaders().putSingle(HttpHeaders.AUTHORIZATION, 
                                               authScheme + " " + data);
     }
+    
     protected JwtToken getJwtToken(ClientRequestContext requestContext) {
         // Try the filter properties first, then the message properties
         JwtToken token = (JwtToken)requestContext.getProperty(JwtConstants.JWT_TOKEN);
+        if (token == null) {
+            Message m = PhaseInterceptorChain.getCurrentMessage();
+            token = (JwtToken)m.getContextualProperty(JwtConstants.JWT_TOKEN);
+        }
+        
         if (token != null) {
             return token;
         }
         
-        Message m = PhaseInterceptorChain.getCurrentMessage();
-        return (JwtToken)m.getContextualProperty(JwtConstants.JWT_TOKEN);
+        // Otherwise check to see if we have some claims + construct the header ourselves
+        JwtClaims claims = (JwtClaims)requestContext.getProperty(JwtConstants.JWT_CLAIMS);
+        if (claims == null) {
+            Message m = PhaseInterceptorChain.getCurrentMessage();
+            claims = (JwtClaims)m.getContextualProperty(JwtConstants.JWT_CLAIMS);
+        }
+        
+        if (claims != null) {
+            if (super.isJwsRequired()) {
+                JwsHeaders headers = new JwsHeaders();
+                headers.setType(JoseType.JWT);
+                
+                Message m = PhaseInterceptorChain.getCurrentMessage();
+                // TODO revisit this constant
+                String signatureAlgorithm = 
+                    (String)m.getContextualProperty("rs.security.jws.content.signature.algorithm");
+                if (signatureAlgorithm == null) {
+                    signatureAlgorithm = AlgorithmUtils.RS_SHA_256_ALGO;
+                }
+                headers.setSignatureAlgorithm(SignatureAlgorithm.getAlgorithm(signatureAlgorithm));
+                
+                token = new JwtToken(headers, claims);
+            } else {
+                // TODO
+            }
+        }
+        
+        return token;
     }
+    
     protected String getContextPropertyValue() {
         return Base64UrlUtility.encode(CryptoUtils.generateSecureRandomBytes(16));
     }
