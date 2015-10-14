@@ -30,6 +30,8 @@ import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.rs.security.jose.common.JoseException;
 import org.apache.cxf.rs.security.jose.common.JoseUtils;
 import org.apache.cxf.rs.security.jose.jwe.JweHeaders;
@@ -69,7 +71,14 @@ public class JwtAuthenticationClientFilter extends AbstractJoseJwtProducer
                                               authScheme + " " + data);
     }
     protected JwtToken getJwtToken(ClientRequestContext requestContext) {
-        return (JwtToken)requestContext.getProperty(JwtConstants.JWT_TOKEN);
+        // Try the filter properties first, then the message properties
+        JwtToken token = (JwtToken)requestContext.getProperty(JwtConstants.JWT_TOKEN);
+        if (token != null) {
+            return token;
+        }
+        
+        Message m = PhaseInterceptorChain.getCurrentMessage();
+        return (JwtToken)m.getContextualProperty(JwtConstants.JWT_TOKEN);
     }
     protected String getContextPropertyValue() {
         return Base64UrlUtility.encode(CryptoUtils.generateSecureRandomBytes(16));
