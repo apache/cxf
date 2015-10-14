@@ -17,7 +17,7 @@
  * under the License.
  */
 package org.apache.cxf.rs.security.jose.jwe;
-import java.security.interfaces.RSAPublicKey;
+import java.security.PublicKey;
 
 import javax.crypto.SecretKey;
 
@@ -46,7 +46,7 @@ public class JweJwtCompactProducer  {
         JweEncryptionProvider jwe = JweUtils.createJweEncryptionProvider(key, headers);
         return encryptWith(jwe);
     }
-    public String encryptWith(RSAPublicKey key) {
+    public String encryptWith(PublicKey key) {
         JweEncryptionProvider jwe = JweUtils.createJweEncryptionProvider(key, headers);
         return encryptWith(jwe);
     }

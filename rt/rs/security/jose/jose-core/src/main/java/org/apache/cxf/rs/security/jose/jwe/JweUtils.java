@@ -142,11 +142,13 @@ public final class JweUtils {
         return keyEncryptionProvider;
     }
     public static KeyEncryptionProvider getPublicKeyEncryptionProvider(PublicKey key, KeyAlgorithm algo) {
-        if (key instanceof PublicKey) {
+        if (key instanceof RSAPublicKey) {
             return new RSAKeyEncryptionAlgorithm((RSAPublicKey)key, algo);
-        } else {
+        } else if (key instanceof ECPublicKey) {
             return new EcdhAesWrapKeyEncryptionAlgorithm((ECPublicKey)key, algo);
         }
+        
+        return null;
     }
     public static KeyEncryptionProvider getSecretKeyEncryptionAlgorithm(SecretKey key, KeyAlgorithm algo) {
         if (AlgorithmUtils.isAesKeyWrap(algo.getJwaName())) {
@@ -180,9 +182,11 @@ public final class JweUtils {
     public static KeyDecryptionProvider getPrivateKeyDecryptionProvider(PrivateKey key, KeyAlgorithm algo) {
         if (key instanceof RSAPrivateKey) {
             return new RSAKeyDecryptionAlgorithm((RSAPrivateKey)key, algo);
-        } else {
+        } else if (key instanceof ECPrivateKey) {
             return new EcdhAesWrapKeyDecryptionAlgorithm((ECPrivateKey)key, algo);
         }
+        
+        return null;
     }
     public static KeyDecryptionProvider getSecretKeyDecryptionProvider(SecretKey key, KeyAlgorithm algo) {
         if (AlgorithmUtils.isAesKeyWrap(algo.getJwaName())) {
