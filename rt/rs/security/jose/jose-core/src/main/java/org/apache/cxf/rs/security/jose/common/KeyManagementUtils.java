@@ -21,7 +21,6 @@ package org.apache.cxf.rs.security.jose.common;
 
 import java.io.InputStream;
 import java.security.KeyStore;
-import java.security.Principal;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.CertPath;
@@ -49,27 +48,11 @@ import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.rs.security.jose.jwk.KeyOperation;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
-import org.apache.cxf.security.SecurityContext;
-
 
 /**
  * Encryption helpers
  */
 public final class KeyManagementUtils {
-    public static final String RSSEC_KEY_STORE_TYPE = "rs.security.keystore.type";
-    public static final String RSSEC_KEY_STORE_PSWD = "rs.security.keystore.password";
-    public static final String RSSEC_KEY_PSWD = "rs.security.key.password";
-    public static final String RSSEC_KEY_STORE_ALIAS = "rs.security.keystore.alias";
-    public static final String RSSEC_KEY_STORE_ALIASES = "rs.security.keystore.aliases";
-    public static final String RSSEC_KEY_STORE_FILE = "rs.security.keystore.file";
-    public static final String RSSEC_PRINCIPAL_NAME = "rs.security.principal.name";
-    public static final String RSSEC_KEY_PSWD_PROVIDER = "rs.security.key.password.provider";
-    public static final String RSSEC_SIG_KEY_PSWD_PROVIDER = "rs.security.signature.key.password.provider";
-    public static final String RSSEC_DECRYPT_KEY_PSWD_PROVIDER = "rs.security.decryption.key.password.provider";
-    public static final String RSSEC_DEFAULT_ALGORITHMS = "rs.security.default.algorithms";
-    public static final String RSSEC_REPORT_KEY_PROP = "rs.security.report.public.key";
-    public static final String RSSEC_REPORT_KEY_ID_PROP = "rs.security.report.public.key.id";
-    public static final String RSSEC_ACCEPT_PUBLIC_KEY_PROP = "rs.security.accept.public.key.properties";
     private static final Logger LOG = LogUtils.getL7dLogger(KeyManagementUtils.class);
     
     private KeyManagementUtils() {
@@ -80,7 +63,7 @@ public final class KeyManagementUtils {
     }
     public static X509Certificate[] loadX509CertificateOrChain(Message m, Properties props) {
         KeyStore keyStore = KeyManagementUtils.loadPersistKeyStore(m, props);
-        String alias = props.getProperty(RSSEC_KEY_STORE_ALIAS);
+        String alias = props.getProperty(JoseConstants.RSSEC_KEY_STORE_ALIAS);
         return loadX509CertificateOrChain(keyStore, alias);
     }
     private static X509Certificate[] loadX509CertificateOrChain(KeyStore keyStore, String alias) {
@@ -99,7 +82,7 @@ public final class KeyManagementUtils {
     
     public static PublicKey loadPublicKey(Message m, Properties props) {
         KeyStore keyStore = KeyManagementUtils.loadPersistKeyStore(m, props);
-        return CryptoUtils.loadPublicKey(keyStore, props.getProperty(RSSEC_KEY_STORE_ALIAS));
+        return CryptoUtils.loadPublicKey(keyStore, props.getProperty(JoseConstants.RSSEC_KEY_STORE_ALIAS));
     }
     public static PublicKey loadPublicKey(Message m, String keyStoreLocProp) {
         return loadPublicKey(m, keyStoreLocProp, null);
@@ -133,8 +116,8 @@ public final class KeyManagementUtils {
                                             KeyOperation keyOper,
                                             String alias) {
         
-        String keyPswd = props.getProperty(RSSEC_KEY_PSWD);
-        String theAlias = alias != null ? alias : getKeyId(m, props, RSSEC_KEY_STORE_ALIAS, keyOper);
+        String keyPswd = props.getProperty(JoseConstants.RSSEC_KEY_PSWD);
+        String theAlias = alias != null ? alias : getKeyId(m, props, JoseConstants.RSSEC_KEY_STORE_ALIAS, keyOper);
         char[] keyPswdChars = provider != null ? provider.getPassword(props) 
             : keyPswd != null ? keyPswd.toCharArray() : null;    
         return CryptoUtils.loadPrivateKey(keyStore, keyPswdChars, theAlias);
@@ -184,11 +167,11 @@ public final class KeyManagementUtils {
     }
     public static PrivateKeyPasswordProvider loadPasswordProvider(Message m, Properties props, KeyOperation keyOper) {
         PrivateKeyPasswordProvider cb = 
-            (PrivateKeyPasswordProvider)m.getContextualProperty(RSSEC_KEY_PSWD_PROVIDER);
+            (PrivateKeyPasswordProvider)m.getContextualProperty(JoseConstants.RSSEC_KEY_PSWD_PROVIDER);
         if (cb == null && keyOper != null) {
-            String propName = keyOper == KeyOperation.SIGN ? RSSEC_SIG_KEY_PSWD_PROVIDER
+            String propName = keyOper == KeyOperation.SIGN ? JoseConstants.RSSEC_SIG_KEY_PSWD_PROVIDER
                 : keyOper == KeyOperation.DECRYPT 
-                ? RSSEC_DECRYPT_KEY_PSWD_PROVIDER : null;
+                ? JoseConstants.RSSEC_DECRYPT_KEY_PSWD_PROVIDER : null;
             if (propName != null) {
                 cb = (PrivateKeyPasswordProvider)m.getContextualProperty(propName);
             }
@@ -204,33 +187,24 @@ public final class KeyManagementUtils {
                                                 String alias) {
         Bus bus = m.getExchange().getBus();
         PrivateKeyPasswordProvider cb = loadPasswordProvider(m, props, keyOper);
-        if (cb != null && m.getExchange().getInMessage() != null) {
-            SecurityContext sc = m.getExchange().getInMessage().get(SecurityContext.class);
-            if (sc != null) {
-                Principal p = sc.getUserPrincipal();
-                if (p != null) {
-                    props.setProperty(RSSEC_PRINCIPAL_NAME, p.getName());
-                }
-            }
-        }
         return loadPrivateKey(keyStore, m, props, bus, cb, keyOper, alias);
     }
     public static KeyStore loadPersistKeyStore(Message m, Properties props) {
-        if (!props.containsKey(RSSEC_KEY_STORE_FILE)) {
+        if (!props.containsKey(JoseConstants.RSSEC_KEY_STORE_FILE)) {
             LOG.warning("No keystore file has been configured");
             throw new JoseException("No keystore file has been configured");
         }
-        KeyStore keyStore = (KeyStore)m.getExchange().get(props.get(RSSEC_KEY_STORE_FILE));
+        KeyStore keyStore = (KeyStore)m.getExchange().get(props.get(JoseConstants.RSSEC_KEY_STORE_FILE));
         if (keyStore == null) {
             keyStore = loadKeyStore(props, m.getExchange().getBus());
-            m.getExchange().put((String)props.get(RSSEC_KEY_STORE_FILE), keyStore);
+            m.getExchange().put((String)props.get(JoseConstants.RSSEC_KEY_STORE_FILE), keyStore);
         }
         return keyStore;
     }
     public static KeyStore loadKeyStore(Properties props, Bus bus) {
-        String keyStoreType = props.getProperty(RSSEC_KEY_STORE_TYPE);
-        String keyStoreLoc = props.getProperty(RSSEC_KEY_STORE_FILE);
-        String keyStorePswd = props.getProperty(RSSEC_KEY_STORE_PSWD);
+        String keyStoreType = props.getProperty(JoseConstants.RSSEC_KEY_STORE_TYPE);
+        String keyStoreLoc = props.getProperty(JoseConstants.RSSEC_KEY_STORE_FILE);
+        String keyStorePswd = props.getProperty(JoseConstants.RSSEC_KEY_STORE_PSWD);
         
         if (keyStorePswd == null) {
             throw new JoseException("No keystore password was defined");
@@ -307,7 +281,7 @@ public final class KeyManagementUtils {
         if (algo == null) {
             algo = (String)m.getContextualProperty(propName);
         }
-        if (algo == null && PropertyUtils.isTrue(m.getContextualProperty(RSSEC_DEFAULT_ALGORITHMS))) {
+        if (algo == null && PropertyUtils.isTrue(m.getContextualProperty(JoseConstants.RSSEC_DEFAULT_ALGORITHMS))) {
             algo = defaultAlg;
         }
         return algo;
@@ -332,26 +306,26 @@ public final class KeyManagementUtils {
                 throw new JoseException(ex);
             }
         } else {
-            String keyFile = (String)m.getContextualProperty(RSSEC_KEY_STORE_FILE);
+            String keyFile = (String)m.getContextualProperty(JoseConstants.RSSEC_KEY_STORE_FILE);
             if (keyFile != null) {
                 props = new Properties();
-                props.setProperty(RSSEC_KEY_STORE_FILE, keyFile);
-                String type = (String)m.getContextualProperty(RSSEC_KEY_STORE_TYPE);
+                props.setProperty(JoseConstants.RSSEC_KEY_STORE_FILE, keyFile);
+                String type = (String)m.getContextualProperty(JoseConstants.RSSEC_KEY_STORE_TYPE);
                 if (type == null) {
                     type = "jwk";
                 }
-                props.setProperty(RSSEC_KEY_STORE_TYPE, type);
-                String alias = (String)m.getContextualProperty(RSSEC_KEY_STORE_ALIAS);
+                props.setProperty(JoseConstants.RSSEC_KEY_STORE_TYPE, type);
+                String alias = (String)m.getContextualProperty(JoseConstants.RSSEC_KEY_STORE_ALIAS);
                 if (alias != null) {
-                    props.setProperty(RSSEC_KEY_STORE_ALIAS, alias);
+                    props.setProperty(JoseConstants.RSSEC_KEY_STORE_ALIAS, alias);
                 }
-                String keystorePassword = (String)m.getContextualProperty(RSSEC_KEY_STORE_PSWD);
+                String keystorePassword = (String)m.getContextualProperty(JoseConstants.RSSEC_KEY_STORE_PSWD);
                 if (keystorePassword != null) {
-                    props.setProperty(RSSEC_KEY_STORE_PSWD, keystorePassword);
+                    props.setProperty(JoseConstants.RSSEC_KEY_STORE_PSWD, keystorePassword);
                 }
-                String keyPassword = (String)m.getContextualProperty(RSSEC_KEY_PSWD);
+                String keyPassword = (String)m.getContextualProperty(JoseConstants.RSSEC_KEY_PSWD);
                 if (keyPassword != null) {
-                    props.setProperty(RSSEC_KEY_PSWD, keyPassword);
+                    props.setProperty(JoseConstants.RSSEC_KEY_PSWD, keyPassword);
                 }
             }
         }

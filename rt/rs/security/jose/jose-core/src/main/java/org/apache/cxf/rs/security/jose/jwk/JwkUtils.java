@@ -70,9 +70,6 @@ import org.apache.cxf.rt.security.crypto.CryptoUtils;
 import org.apache.cxf.rt.security.crypto.MessageDigestUtils;
 
 public final class JwkUtils {
-    public static final String JWK_KEY_STORE_TYPE = "jwk";
-    public static final String RSSEC_KEY_STORE_JWKSET = "rs.security.keystore.jwkset";
-    public static final String RSSEC_KEY_STORE_JWKKEY = "rs.security.keystore.jwkkey";
     private static final Map<KeyType, List<String>> JWK_REQUIRED_FIELDS_MAP;
     static {
         JWK_REQUIRED_FIELDS_MAP = new HashMap<KeyType, List<String>>();
@@ -251,7 +248,7 @@ public final class JwkUtils {
     }
     public static JsonWebKeys loadJwkSet(Message m, Properties props, PrivateKeyPasswordProvider cb, 
                                          JwkReaderWriter reader) {
-        String key = (String)props.get(KeyManagementUtils.RSSEC_KEY_STORE_FILE);
+        String key = (String)props.get(JoseConstants.RSSEC_KEY_STORE_FILE);
         JsonWebKeys jwkSet = key != null ? (JsonWebKeys)m.getExchange().get(key) : null;
         if (jwkSet == null) {
             jwkSet = loadJwkSet(props, m.getExchange().getBus(), cb, reader);
@@ -272,7 +269,7 @@ public final class JwkUtils {
     }
     public static JsonWebKeys loadJwkSet(Properties props, Bus bus, JweDecryptionProvider jwe, JwkReaderWriter reader) {
         String keyContent = null;
-        String keyStoreLoc = props.getProperty(KeyManagementUtils.RSSEC_KEY_STORE_FILE);
+        String keyStoreLoc = props.getProperty(JoseConstants.RSSEC_KEY_STORE_FILE);
         if (keyStoreLoc != null) {
             try {
                 InputStream is = JoseUtils.getResourceStream(keyStoreLoc, bus);
@@ -284,15 +281,15 @@ public final class JwkUtils {
                 throw new JwkException(ex);
             }
         } else {
-            keyContent = props.getProperty(RSSEC_KEY_STORE_JWKSET);
+            keyContent = props.getProperty(JoseConstants.RSSEC_KEY_STORE_JWKSET);
             if (keyContent == null) {
-                keyContent = props.getProperty(RSSEC_KEY_STORE_JWKKEY);
+                keyContent = props.getProperty(JoseConstants.RSSEC_KEY_STORE_JWKKEY);
             }
         }
         if (jwe != null) {
             keyContent = jwe.decrypt(keyContent).getContentText();
         }
-        if (props.getProperty(RSSEC_KEY_STORE_JWKKEY) == null) {
+        if (props.getProperty(JoseConstants.RSSEC_KEY_STORE_JWKKEY) == null) {
             return reader.jsonToJwkSet(keyContent);
         } else {
             JsonWebKey key = reader.jsonToJwk(keyContent);
@@ -313,10 +310,10 @@ public final class JwkUtils {
         JsonWebKeys jwkSet = loadJwkSet(m, props, cb, reader);
         String kid = null;
         if (inHeaderKid != null 
-            && MessageUtils.getContextualBoolean(m, KeyManagementUtils.RSSEC_ACCEPT_PUBLIC_KEY_PROP, true)) {
+            && MessageUtils.getContextualBoolean(m, JoseConstants.RSSEC_ACCEPT_PUBLIC_KEY_PROP, true)) {
             kid = inHeaderKid;
         } else {
-            kid = KeyManagementUtils.getKeyId(m, props, KeyManagementUtils.RSSEC_KEY_STORE_ALIAS, keyOper);
+            kid = KeyManagementUtils.getKeyId(m, props, JoseConstants.RSSEC_KEY_STORE_ALIAS, keyOper);
         }
         if (kid != null) {
             return jwkSet.getKey(kid);
@@ -337,11 +334,11 @@ public final class JwkUtils {
                                                    JwkReaderWriter reader) {
         PrivateKeyPasswordProvider cb = KeyManagementUtils.loadPasswordProvider(m, props, keyOper);
         JsonWebKeys jwkSet = loadJwkSet(m, props, cb, reader);
-        String kid = KeyManagementUtils.getKeyId(m, props, KeyManagementUtils.RSSEC_KEY_STORE_ALIAS, keyOper);
+        String kid = KeyManagementUtils.getKeyId(m, props, JoseConstants.RSSEC_KEY_STORE_ALIAS, keyOper);
         if (kid != null) {
             return Collections.singletonList(jwkSet.getKey(kid));
         }
-        String kids = KeyManagementUtils.getKeyId(m, props, KeyManagementUtils.RSSEC_KEY_STORE_ALIASES, keyOper);
+        String kids = KeyManagementUtils.getKeyId(m, props, JoseConstants.RSSEC_KEY_STORE_ALIASES, keyOper);
         if (kids != null) {
             String[] values = kids.split(",");
             List<JsonWebKey> keys = new ArrayList<JsonWebKey>(values.length);
