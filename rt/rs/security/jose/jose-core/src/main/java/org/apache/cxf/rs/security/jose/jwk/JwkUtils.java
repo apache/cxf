@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.net.URI;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
@@ -145,12 +147,12 @@ public final class JwkUtils {
         return jwe.encrypt(StringUtils.toBytesUTF8(writer.jwkSetToJson(jwkSet)), 
                            toJweHeaders("jwk-set+json"));
     }
-    public static String encryptJwkSet(JsonWebKeys jwkSet, RSAPublicKey key, KeyAlgorithm keyAlgo, 
+    public static String encryptJwkSet(JsonWebKeys jwkSet, PublicKey key, KeyAlgorithm keyAlgo, 
                                        ContentAlgorithm contentAlgo) {
         return JweUtils.encrypt(key, keyAlgo, contentAlgo, StringUtils.toBytesUTF8(jwkSetToJson(jwkSet)),
                                 "jwk-set+json");
     }
-    public static String signJwkSet(JsonWebKeys jwkSet, RSAPrivateKey key, SignatureAlgorithm algo) {
+    public static String signJwkSet(JsonWebKeys jwkSet, PrivateKey key, SignatureAlgorithm algo) {
         return JwsUtils.sign(key, algo, jwkSetToJson(jwkSet), "jwk-set+json");
     }
     public static String encryptJwkSet(JsonWebKeys jwkSet, SecretKey key, KeyAlgorithm keyAlgo, 
@@ -167,11 +169,11 @@ public final class JwkUtils {
     public static JsonWebKeys decryptJwkSet(String jsonJwkSet, JweDecryptionProvider jwe, JwkReaderWriter reader) {
         return reader.jsonToJwkSet(jwe.decrypt(jsonJwkSet).getContentText());
     }
-    public static JsonWebKeys decryptJwkSet(RSAPrivateKey key, KeyAlgorithm keyAlgo, ContentAlgorithm ctAlgo,
+    public static JsonWebKeys decryptJwkSet(PrivateKey key, KeyAlgorithm keyAlgo, ContentAlgorithm ctAlgo,
                                             String jsonJwkSet) {
         return readJwkSet(toString(JweUtils.decrypt(key, keyAlgo, ctAlgo, jsonJwkSet)));
     }
-    public static JsonWebKeys verifyJwkSet(RSAPublicKey key, SignatureAlgorithm keyAlgo, String jsonJwk) {
+    public static JsonWebKeys verifyJwkSet(PublicKey key, SignatureAlgorithm keyAlgo, String jsonJwk) {
         return readJwkSet(JwsUtils.verify(key, keyAlgo, jsonJwk));
     }
     public static JsonWebKeys decryptJwkSet(SecretKey key, KeyAlgorithm keyAlgo, ContentAlgorithm ctAlgo, 
@@ -199,7 +201,7 @@ public final class JwkUtils {
         return jwe.encrypt(StringUtils.toBytesUTF8(writer.jwkToJson(jwkKey)), 
                            toJweHeaders("jwk+json"));
     }
-    public static String encryptJwkKey(JsonWebKey jwkKey, RSAPublicKey key, KeyAlgorithm keyAlgo, 
+    public static String encryptJwkKey(JsonWebKey jwkKey, PublicKey key, KeyAlgorithm keyAlgo, 
                                        ContentAlgorithm contentAlgo) {
         return JweUtils.encrypt(key, keyAlgo, contentAlgo, StringUtils.toBytesUTF8(jwkKeyToJson(jwkKey)),
                                 "jwk+json");
@@ -209,7 +211,7 @@ public final class JwkUtils {
         return JweUtils.encrypt(key, keyAlgo, contentAlgo, StringUtils.toBytesUTF8(jwkKeyToJson(jwkKey)),
                                 "jwk+json");
     }
-    public static String signJwkKey(JsonWebKey jwkKey, RSAPrivateKey key, SignatureAlgorithm algo) {
+    public static String signJwkKey(JsonWebKey jwkKey, PrivateKey key, SignatureAlgorithm algo) {
         return JwsUtils.sign(key, algo, jwkKeyToJson(jwkKey), "jwk+json");
     }
     public static JsonWebKey decryptJwkKey(String jsonJwkKey, char[] password) {
@@ -218,11 +220,11 @@ public final class JwkUtils {
     public static JsonWebKey decryptJwkKey(String jsonJwkKey, char[] password, JwkReaderWriter reader) {
         return decryptJwkKey(jsonJwkKey, createDefaultDecryption(password), reader);
     }
-    public static JsonWebKey decryptJwkKey(RSAPrivateKey key, KeyAlgorithm keyAlgo, ContentAlgorithm ctAlgo, 
+    public static JsonWebKey decryptJwkKey(PrivateKey key, KeyAlgorithm keyAlgo, ContentAlgorithm ctAlgo, 
                                            String jsonJwk) {
         return readJwkKey(toString(JweUtils.decrypt(key, keyAlgo, ctAlgo, jsonJwk)));
     }
-    public static JsonWebKey verifyJwkKey(RSAPublicKey key, SignatureAlgorithm keyAlgo, String jsonJwk) {
+    public static JsonWebKey verifyJwkKey(PublicKey key, SignatureAlgorithm keyAlgo, String jsonJwk) {
         return readJwkKey(JwsUtils.verify(key, keyAlgo, jsonJwk));
     }
     public static JsonWebKey decryptJwkKey(SecretKey key, KeyAlgorithm keyAlgo, ContentAlgorithm ctAlgo, 
