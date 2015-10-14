@@ -55,14 +55,6 @@ import org.apache.cxf.rt.security.crypto.MessageDigestUtils;
 
 public final class JweUtils {
     private static final Logger LOG = LogUtils.getL7dLogger(JweUtils.class);
-    private static final String JSON_WEB_ENCRYPTION_CEK_ALGO_PROP = "rs.security.jwe.content.encryption.algorithm";
-    private static final String JSON_WEB_ENCRYPTION_KEY_ALGO_PROP = "rs.security.jwe.key.encryption.algorithm";
-    private static final String JSON_WEB_ENCRYPTION_ZIP_ALGO_PROP = "rs.security.jwe.zip.algorithm";
-    private static final String RSSEC_ENCRYPTION_OUT_PROPS = "rs.security.encryption.out.properties";
-    private static final String RSSEC_ENCRYPTION_IN_PROPS = "rs.security.encryption.in.properties";
-    private static final String RSSEC_ENCRYPTION_PROPS = "rs.security.encryption.properties";
-    private static final String RSSEC_ENCRYPTION_REPORT_KEY_PROP = "rs.security.jwe.report.public.key";
-    private static final String RSSEC_ENCRYPTION_REPORT_KEY_ID_PROP = "rs.security.jwe.report.public.key.id";
     
     private JweUtils() {
         
@@ -273,29 +265,31 @@ public final class JweUtils {
     public static JweEncryptionProvider loadEncryptionProvider(boolean required) {
         return loadEncryptionProvider(null, required);
     }
+    @SuppressWarnings("deprecation")
     public static JweEncryptionProvider loadEncryptionProvider(JweHeaders headers, boolean required) {
         Message m = PhaseInterceptorChain.getCurrentMessage();
         Properties props = KeyManagementUtils.loadStoreProperties(m, required, 
-                                                                  RSSEC_ENCRYPTION_OUT_PROPS, RSSEC_ENCRYPTION_PROPS);
+                                                                  JoseConstants.RSSEC_ENCRYPTION_OUT_PROPS, 
+                                                                  JoseConstants.RSSEC_ENCRYPTION_PROPS);
         if (props == null) {
             return null;
         }
         
         boolean reportPublicKey = 
             headers != null && MessageUtils.isTrue(
-                MessageUtils.getContextualProperty(m, RSSEC_ENCRYPTION_REPORT_KEY_PROP, 
-                                                   KeyManagementUtils.RSSEC_REPORT_KEY_PROP));
+                MessageUtils.getContextualProperty(m, JoseConstants.RSSEC_ENCRYPTION_REPORT_KEY_PROP, 
+                                                   JoseConstants.RSSEC_REPORT_KEY_PROP));
         boolean reportPublicKeyId = 
             headers != null && MessageUtils.isTrue(
-                MessageUtils.getContextualProperty(m, RSSEC_ENCRYPTION_REPORT_KEY_ID_PROP, 
-                                                   KeyManagementUtils.RSSEC_REPORT_KEY_ID_PROP));
+                MessageUtils.getContextualProperty(m, JoseConstants.RSSEC_ENCRYPTION_REPORT_KEY_ID_PROP, 
+                                                   JoseConstants.RSSEC_REPORT_KEY_ID_PROP));
         
         KeyEncryptionProvider keyEncryptionProvider = null;
         String keyEncryptionAlgo = getKeyEncryptionAlgo(m, props, null, null);
         KeyAlgorithm keyAlgo = KeyAlgorithm.getAlgorithm(keyEncryptionAlgo); 
         String contentEncryptionAlgo = getContentEncryptionAlgo(m, props, null);
         ContentEncryptionProvider ctEncryptionProvider = null;
-        if (JwkUtils.JWK_KEY_STORE_TYPE.equals(props.get(KeyManagementUtils.RSSEC_KEY_STORE_TYPE))) {
+        if (JoseConstants.HEADER_JSON_WEB_KEY.equals(props.get(JoseConstants.RSSEC_KEY_STORE_TYPE))) {
             JsonWebKey jwk = JwkUtils.loadJsonWebKey(m, props, KeyOperation.ENCRYPT);
             if ("direct".equals(keyEncryptionAlgo)) {
                 contentEncryptionAlgo = getContentEncryptionAlgo(m, props, jwk.getAlgorithm());
@@ -318,10 +312,15 @@ public final class JweUtils {
             }
             
         }
+        
+        String compression = props.getProperty(JoseConstants.RSSEC_ENCRYPTION_ZIP_ALGORITHM);
+        if (compression == null) {
+            compression = props.getProperty(JoseConstants.DEPR_RSSEC_ENCRYPTION_ZIP_ALGORITHM);
+        }
         return createJweEncryptionProvider(keyEncryptionProvider, 
                                     ctEncryptionProvider, 
                                     contentEncryptionAlgo,
-                                    props.getProperty(JSON_WEB_ENCRYPTION_ZIP_ALGO_PROP));
+                                    compression);
     }
     public static JweDecryptionProvider loadDecryptionProvider(boolean required) {
         return loadDecryptionProvider(null, required);
@@ -329,7 +328,8 @@ public final class JweUtils {
     public static JweDecryptionProvider loadDecryptionProvider(JweHeaders inHeaders, boolean required) {
         Message m = PhaseInterceptorChain.getCurrentMessage();
         Properties props = KeyManagementUtils.loadStoreProperties(m, required, 
-                                                                  RSSEC_ENCRYPTION_IN_PROPS, RSSEC_ENCRYPTION_PROPS);
+                                                                  JoseConstants.RSSEC_ENCRYPTION_IN_PROPS, 
+                                                                  JoseConstants.RSSEC_ENCRYPTION_PROPS);
         if (props == null) {
             return null;
         }    
@@ -350,7 +350,7 @@ public final class JweUtils {
             keyDecryptionProvider = getPrivateKeyDecryptionProvider(privateKey, 
                                                                  inHeaders.getKeyEncryptionAlgorithm());
         } else {
-            if (JwkUtils.JWK_KEY_STORE_TYPE.equals(props.get(KeyManagementUtils.RSSEC_KEY_STORE_TYPE))) {
+            if (JoseConstants.HEADER_JSON_WEB_KEY.equals(props.get(JoseConstants.RSSEC_KEY_STORE_TYPE))) {
                 JsonWebKey jwk = JwkUtils.loadJsonWebKey(m, props, KeyOperation.DECRYPT);
                 if ("direct".equals(keyEncryptionAlgo)) {
                     contentEncryptionAlgo = getContentEncryptionAlgo(m, props, jwk.getAlgorithm());
@@ -584,14 +584,26 @@ public final class JweUtils {
             return getDirectKeyJweDecryption(ctDecryptionKey, contentDecryptionAlgo);
         }
     }
+    @SuppressWarnings("deprecation")
     private static String getKeyEncryptionAlgo(Message m, Properties props, 
                                                String algo, String defaultAlgo) {
         if (algo == null) {
             if (defaultAlgo == null) {
                 defaultAlgo = AlgorithmUtils.RSA_OAEP_ALGO;
             }
+            
+            // Check for deprecated identifier first
+            String encAlgo = props.getProperty(JoseConstants.DEPR_RSSEC_ENCRYPTION_KEY_ALGORITHM);
+            if (encAlgo == null) {
+                encAlgo = (String)m.getContextualProperty(JoseConstants.DEPR_RSSEC_ENCRYPTION_KEY_ALGORITHM);
+            }
+            if (encAlgo != null) {
+                return encAlgo;
+            }
+            
+            // Otherwise check newer identifier
             return KeyManagementUtils.getKeyAlgorithm(m, props, 
-                JSON_WEB_ENCRYPTION_KEY_ALGO_PROP, defaultAlgo);
+                                                      JoseConstants.RSSEC_ENCRYPTION_KEY_ALGORITHM, defaultAlgo);
         }
         return algo;
     }
@@ -603,10 +615,22 @@ public final class JweUtils {
             return AlgorithmUtils.RSA_OAEP_ALGO;
         }
     }
+    @SuppressWarnings("deprecation")
     private static String getContentEncryptionAlgo(Message m, Properties props, String algo) {
         if (algo == null) {
+            // Check for deprecated identifier first
+            String encAlgo = props.getProperty(JoseConstants.DEPR_RSSEC_ENCRYPTION_CONTENT_ALGORITHM);
+            if (encAlgo == null) {
+                encAlgo = (String)m.getContextualProperty(JoseConstants.DEPR_RSSEC_ENCRYPTION_CONTENT_ALGORITHM);
+            }
+            if (encAlgo != null) {
+                return encAlgo;
+            }
+            
+            // Otherwise check newer identifier
             return KeyManagementUtils.getKeyAlgorithm(m, props, 
-                JSON_WEB_ENCRYPTION_CEK_ALGO_PROP, AlgorithmUtils.A128GCM_ALGO);
+                                                      JoseConstants.RSSEC_ENCRYPTION_CONTENT_ALGORITHM, 
+                                                      AlgorithmUtils.A128GCM_ALGO);
         }
         return algo;
     }
@@ -626,7 +650,8 @@ public final class JweUtils {
     public static void validateJweCertificateChain(List<X509Certificate> certs) {
         Message m = PhaseInterceptorChain.getCurrentMessage();
         Properties props = KeyManagementUtils.loadStoreProperties(m, true, 
-                                                                  RSSEC_ENCRYPTION_IN_PROPS, RSSEC_ENCRYPTION_PROPS);
+                                                                  JoseConstants.RSSEC_ENCRYPTION_IN_PROPS, 
+                                                                  JoseConstants.RSSEC_ENCRYPTION_PROPS);
         KeyManagementUtils.validateCertificateChain(props, certs);
     }
     
