@@ -53,7 +53,7 @@ public final class JoseConstants {
     //
     
     // 
-    // Keys/keystore configuration
+    // Shared Keys/keystore configuration
     //
     
     /**
@@ -92,18 +92,6 @@ public final class JoseConstants {
     public static final String RSSEC_KEY_PSWD_PROVIDER = "rs.security.key.password.provider";
     
     /**
-     * A reference to a PrivateKeyPasswordProvider instance used to retrieve passwords to access keys
-     * for signature.
-     */
-    public static final String RSSEC_SIG_KEY_PSWD_PROVIDER = "rs.security.signature.key.password.provider";
-    
-    /**
-     * A reference to a PrivateKeyPasswordProvider instance used to retrieve passwords to access keys
-     * for decryption.
-     */
-    public static final String RSSEC_DECRYPT_KEY_PSWD_PROVIDER = "rs.security.decryption.key.password.provider";
-    
-    /**
      * TODO documentation for these
      */
     public static final String RSSEC_DEFAULT_ALGORITHMS = "rs.security.default.algorithms";
@@ -116,6 +104,12 @@ public final class JoseConstants {
     //
     // JWS specific Configuration
     //
+    
+    /**
+     * A reference to a PrivateKeyPasswordProvider instance used to retrieve passwords to access keys
+     * for signature. If this is not specified it falls back to use the RSSEC_KEY_PSWD_PROVIDER.
+     */
+    public static final String RSSEC_SIGNATURE_KEY_PSWD_PROVIDER = "rs.security.signature.key.password.provider";
     
     /**
      * The signature algorithm to use. For example 'RS256'.
@@ -157,6 +151,12 @@ public final class JoseConstants {
     //
     // JWE specific Configuration
     //
+    
+    /**
+     * A reference to a PrivateKeyPasswordProvider instance used to retrieve passwords to access keys
+     * for decryption. If this is not specified it falls back to use the RSSEC_KEY_PSWD_PROVIDER.
+     */
+    public static final String RSSEC_DECRYPTION_KEY_PSWD_PROVIDER = "rs.security.decryption.key.password.provider";
     
     /**
      * The encryption content algorithm to use.
