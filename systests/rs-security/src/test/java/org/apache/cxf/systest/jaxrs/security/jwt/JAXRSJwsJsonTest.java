@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.crypto.Cipher;
+import javax.ws.rs.BadRequestException;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
@@ -136,10 +137,37 @@ public class JAXRSJwsJsonTest extends AbstractBusClientServerTestBase {
         List<String> properties = new ArrayList<String>();
         properties.add("org/apache/cxf/systest/jaxrs/security/secret.jwk.hmac2.properties");
         BookStore bs = createBookStore(address, properties, null);
-        Book book = bs.echoBook(new Book("book", 123L));
+        Book book = bs.echoBook2(new Book("book", 123L));
         assertEquals("book", book.getName());
         assertEquals(123L, book.getId());
     }
+    
+    // Test signing an XML payload
+    @Test
+    public void testJwsJsonPlainTextHmacXML() throws Exception {
+        String address = "https://localhost:" + PORT + "/jwsjsonhmac";
+        BookStore bs = createBookStore(address, 
+                                       "org/apache/cxf/systest/jaxrs/security/secret.jwk.properties",
+                                       null);
+        String text = bs.echoText("book");
+        assertEquals("book", text);
+    }
+    
+    // Test signing with a bad signature key
+    @Test
+    public void testJwsJsonPlaintextHMACBadKey() throws Exception {
+        String address = "https://localhost:" + PORT + "/jwsjsonhmac";
+        BookStore bs = createBookStore(address, 
+                                       "org/apache/cxf/systest/jaxrs/security/secret.jwk.bad.properties",
+                                       null);
+        try {
+            bs.echoText("book");
+            fail("Failure expected on a bad signature key");
+        } catch (BadRequestException ex) {
+            // expected
+        }
+    }
+    
     private BookStore createBookStore(String address, Object properties,
                                       List<?> extraProviders) throws Exception {
         return createBookStore(address, 

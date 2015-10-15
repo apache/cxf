@@ -449,6 +449,17 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         assertEquals("book", text);
     }
     
+    // Test signing and encrypting an XML payload
+    @Test
+    public void testJweRsaJwsRsaXML() throws Exception {
+        String address = "https://localhost:" + PORT + "/jwejwsrsa";
+        BookStore bs = createJweJwsBookStore(address, null, null);
+        Book book = new Book();
+        book.setName("book");
+        book = bs.echoBook2(book);
+        assertEquals("book", book.getName());
+    }
+    
     private static class PrivateKeyPasswordProviderImpl implements PrivateKeyPasswordProvider {
         private String password = "password";
         public PrivateKeyPasswordProviderImpl() {
