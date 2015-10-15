@@ -275,15 +275,24 @@ public final class HttpUtils {
         if (value == null) {
             return null;
         }
-        
-        String[] values = StringUtils.split(value, "-");
-        if (values.length == 0 || values.length > 2) {
+        String language = null;
+        String locale = null;
+        int index = value.indexOf('-');
+        if (index == 0 || index == value.length() - 1) {
             throw new IllegalArgumentException("Illegal locale value : " + value);
         }
-        if (values.length == 1) {
-            return new Locale(values[0]);
+        
+        if (index > 0) {
+            language = value.substring(0, index);
+            locale = value.substring(index + 1);
         } else {
-            return new Locale(values[0], values[1]);
+            language = value;
+        }
+        
+        if (locale == null) {
+            return new Locale(language);
+        } else {
+            return new Locale(language, locale);
         }
         
     }
