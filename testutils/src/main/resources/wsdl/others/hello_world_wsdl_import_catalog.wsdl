@@ -18,7 +18,7 @@
   under the License.
 -->
 <wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://apache.org/hello_world" xmlns:x1="http://apache.org/hello_world/messages" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="HelloWorldImport" targetNamespace="http://apache.org/hello_world">
-    <wsdl:import namespace="http://apache.org/hello_world/messages" location="testutils/others/hello_world_messages_catalog.wsdl"/>
+    <wsdl:import namespace="http://apache.org/hello_world/messages" location="hello_world_messages_catalog.wsdl"/>
     <wsdl:portType name="Greeter">
         <wsdl:operation name="sayHi">
             <wsdl:input message="x1:sayHiRequest"/>

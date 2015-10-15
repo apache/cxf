@@ -82,7 +82,7 @@ public class OASISCatalogTest extends Assert {
         assertTrue(result, result.contains("xsd=http://apache.org/hello_world/types2/hello_world_schema2.xsd"));
 
         result = readUrl("http://localhost:" + PORT + "/SoapContext/SoapPort"
-                + "?wsdl=testutils/others/hello_world_messages_catalog.wsdl");
+                + "?wsdl=hello_world_messages_catalog.wsdl");
         assertTrue(result, result.contains("xsd=hello_world_schema.xsd"));
 
         ep.stop();

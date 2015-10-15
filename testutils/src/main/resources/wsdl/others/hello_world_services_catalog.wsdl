@@ -18,7 +18,7 @@ specific language governing permissions and limitations
 under the License.
 -->
 <wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://apache.org/hello_world/services" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:x1="http://apache.org/hello_world/bindings" xmlns:x2="http://apache.org/hello_world" name="HelloWorld" targetNamespace="http://apache.org/hello_world/services">
-    <wsdl:import namespace="http://apache.org/hello_world/bindings" location="testutils/others/hello_world_bindings_catalog.wsdl"/>
+    <wsdl:import namespace="http://apache.org/hello_world/bindings" location="hello_world_bindings_catalog.wsdl"/>
     <wsdl:service name="SOAPService">
         <wsdl:port name="SoapPort" binding="x1:SOAPBinding">
             <soap:address location="http://localhost:9000/SoapContext/SoapPort"/>
