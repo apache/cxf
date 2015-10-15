@@ -49,6 +49,14 @@ public class BookStore {
         return book;
     }
     
+    @POST
+    @Path("/books")
+    @Produces("application/xml")
+    @Consumes("application/xml")
+    public Book echoBook2(Book book) {
+        return book;
+    }
+    
 }
 
 
