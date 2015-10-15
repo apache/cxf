@@ -166,15 +166,17 @@ public final class KeyManagementUtils {
         return kid;
     }
     public static PrivateKeyPasswordProvider loadPasswordProvider(Message m, Properties props, KeyOperation keyOper) {
-        PrivateKeyPasswordProvider cb = 
-            (PrivateKeyPasswordProvider)m.getContextualProperty(JoseConstants.RSSEC_KEY_PSWD_PROVIDER);
-        if (cb == null && keyOper != null) {
-            String propName = keyOper == KeyOperation.SIGN ? JoseConstants.RSSEC_SIG_KEY_PSWD_PROVIDER
+        PrivateKeyPasswordProvider cb = null;
+        if (keyOper != null) {
+            String propName = keyOper == KeyOperation.SIGN ? JoseConstants.RSSEC_SIGNATURE_KEY_PSWD_PROVIDER
                 : keyOper == KeyOperation.DECRYPT 
-                ? JoseConstants.RSSEC_DECRYPT_KEY_PSWD_PROVIDER : null;
+                ? JoseConstants.RSSEC_DECRYPTION_KEY_PSWD_PROVIDER : null;
             if (propName != null) {
                 cb = (PrivateKeyPasswordProvider)m.getContextualProperty(propName);
             }
+        }
+        if (cb == null) {
+            cb = (PrivateKeyPasswordProvider)m.getContextualProperty(JoseConstants.RSSEC_KEY_PSWD_PROVIDER);
         }
         return cb;
     }
