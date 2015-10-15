@@ -42,24 +42,31 @@ public class EcdhAesWrapKeyEncryptionAlgorithm implements KeyEncryptionProvider 
     
     public EcdhAesWrapKeyEncryptionAlgorithm(ECPublicKey peerPublicKey,
                                              KeyAlgorithm keyAlgo) {
-        //TODO: figure out the curve *name* given ECPublicKey
-        this(peerPublicKey, JsonWebKey.EC_CURVE_P256, null, null, keyAlgo);
+        this(peerPublicKey, JsonWebKey.EC_CURVE_P256, keyAlgo);
     }
     public EcdhAesWrapKeyEncryptionAlgorithm(ECPublicKey peerPublicKey,
                                              String curve,
                                              KeyAlgorithm keyAlgo) {
         
-        this(peerPublicKey, curve, null, null, keyAlgo);
+        this(peerPublicKey, curve, null, null, keyAlgo, ContentAlgorithm.A128GCM);
+    }
+    public EcdhAesWrapKeyEncryptionAlgorithm(ECPublicKey peerPublicKey,
+                                             String curve,
+                                             KeyAlgorithm keyAlgo,
+                                             ContentAlgorithm ctAlgo) {
+        
+        this(peerPublicKey, curve, null, null, keyAlgo, ctAlgo);
     }
     public EcdhAesWrapKeyEncryptionAlgorithm(ECPublicKey peerPublicKey,
                                              String curve,
                                              String apuString,
                                              String apvString,
-                                             KeyAlgorithm keyAlgo) {
+                                             KeyAlgorithm keyAlgo,
+                                             ContentAlgorithm ctAlgo) {
         
         this.keyAlgo = keyAlgo;
         helper = new EcdhHelper(peerPublicKey, curve, apuString, apvString, 
-                                ContentAlgorithm.A128GCM.getJwaName());
+                                ctAlgo.getJwaName());
     }
     
     @Override
