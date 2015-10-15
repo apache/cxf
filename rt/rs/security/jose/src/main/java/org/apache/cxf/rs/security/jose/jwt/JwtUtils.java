@@ -105,5 +105,28 @@ public final class JwtUtils {
             throw new JwtException("Invalid issuedAt");
         }
     }
-    
+
+    public static void validateJwtTimeClaims(JwtClaims claims, int clockOffset,
+                                             int issuedAtRange, boolean claimsRequired) {
+        Long currentTimeInSecs = System.currentTimeMillis() / 1000;
+        Long expiryTimeInSecs = claims.getExpiryTime();
+        if (expiryTimeInSecs == null && claimsRequired
+            || expiryTimeInSecs != null && currentTimeInSecs > expiryTimeInSecs) {
+            throw new JwtException("The token expired");
+        }
+        Long issuedAtInSecs = claims.getIssuedAt();
+        if (clockOffset <= 0) {
+            clockOffset = 0;
+        }
+        if (issuedAtInSecs == null && claimsRequired
+            || issuedAtInSecs != null && (issuedAtInSecs - clockOffset > currentTimeInSecs || issuedAtRange > 0
+            && issuedAtInSecs < currentTimeInSecs - issuedAtRange)) {
+            throw new JwtException("Invalid issuedAt");
+        }
+    }
+
+    public static void validateJwtTimeClaims(JwtClaims claims) {
+        validateJwtTimeClaims(claims, 0, 0, false);
+    }
+
 }
