@@ -21,7 +21,7 @@ package org.apache.cxf.tracing.htrace;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
-import org.apache.htrace.TraceScope;
+import org.apache.htrace.core.TraceScope;
 
 public class HTraceClientStopInterceptor extends AbstractHTraceClientInterceptor {
     public HTraceClientStopInterceptor() {
@@ -34,8 +34,9 @@ public class HTraceClientStopInterceptor extends AbstractHTraceClientInterceptor
 
     @Override
     public void handleMessage(Message message) throws Fault {
-        final TraceScope span = (TraceScope)message.getExchange().get(TRACE_SPAN);
-        super.stopTraceSpan(span);
+        @SuppressWarnings("unchecked")
+        final TraceScopeHolder<TraceScope> holder = 
+            (TraceScopeHolder<TraceScope>)message.getExchange().get(TRACE_SPAN);
+        super.stopTraceSpan(holder);
     }
-    
 }

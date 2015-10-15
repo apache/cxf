@@ -18,22 +18,39 @@
  */
 package org.apache.cxf.tracing;
 
+import java.io.Serializable;
+
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 
 import static org.apache.cxf.tracing.TracerHeaders.DEFAULT_HEADER_SPAN_ID;
-import static org.apache.cxf.tracing.TracerHeaders.DEFAULT_HEADER_TRACE_ID;
 
 public abstract class AbstractTracingProvider {
     protected static String getSpanIdHeader() {
         return getHeaderOrDefault(TracerHeaders.HEADER_SPAN_ID, DEFAULT_HEADER_SPAN_ID);
     }
     
-    protected static String getTraceIdHeader() {
-        return getHeaderOrDefault(TracerHeaders.HEADER_TRACE_ID, DEFAULT_HEADER_TRACE_ID);
-    }
+    protected static class TraceScopeHolder<T> implements Serializable {
+        private static final long serialVersionUID = -5985783659818936359L;
 
+        private final T scope;
+        private final boolean detached;
+        
+        public TraceScopeHolder(final T scope, final boolean detached) {
+            this.scope = scope;
+            this.detached = detached;
+        }
+        
+        public T getScope() {
+            return scope;
+        }
+        
+        public boolean isDetached() {
+            return detached;
+        }
+    }
+    
     private static String getHeaderOrDefault(final String property, final String fallback) {
         final Message message = PhaseInterceptorChain.getCurrentMessage();
         

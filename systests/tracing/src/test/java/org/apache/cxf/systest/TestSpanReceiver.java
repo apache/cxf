@@ -23,23 +23,17 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.htrace.HTraceConfiguration;
-import org.apache.htrace.Span;
-import org.apache.htrace.SpanReceiver;
-import org.apache.htrace.Trace;
+import org.apache.htrace.core.HTraceConfiguration;
+import org.apache.htrace.core.Span;
+import org.apache.htrace.core.SpanReceiver;
 
 /**
  * Test HTrace Span receiver
  */
-public class TestSpanReceiver implements SpanReceiver {
+public class TestSpanReceiver extends SpanReceiver {
     private static List<Span> spans = new ArrayList<Span>();
-    private static TestSpanReceiver instance;
 
     public TestSpanReceiver(final HTraceConfiguration conf) {
-        if (instance != null) {
-            Trace.removeReceiver(instance);
-        }
-        instance = this;
     }
 
     public Collection<Span> getSpans() {

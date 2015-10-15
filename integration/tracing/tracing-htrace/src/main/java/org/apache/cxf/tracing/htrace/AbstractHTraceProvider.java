@@ -27,94 +27,87 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.tracing.AbstractTracingProvider;
-import org.apache.htrace.Sampler;
-import org.apache.htrace.Span;
-import org.apache.htrace.Trace;
-import org.apache.htrace.TraceInfo;
-import org.apache.htrace.TraceScope;
-import org.apache.htrace.Tracer;
-import org.apache.htrace.impl.MilliSpan;
+import org.apache.htrace.core.SpanId;
+import org.apache.htrace.core.TraceScope;
+import org.apache.htrace.core.Tracer;
 
 public abstract class AbstractHTraceProvider extends AbstractTracingProvider { 
     protected static final Logger LOG = LogUtils.getL7dLogger(AbstractHTraceProvider.class);
     protected static final String TRACE_SPAN = "org.apache.cxf.tracing.htrace.span";
         
-    private final Sampler< ? > sampler;
+    private final Tracer tracer;
         
-    public AbstractHTraceProvider(final Sampler< ? > sampler) {
-        this.sampler = sampler;
+    public AbstractHTraceProvider(final Tracer tracer) {
+        this.tracer = tracer;
     }
 
-    @SuppressWarnings("unchecked")
-    protected TraceScope startTraceSpan(final Map<String, List<String>> requestHeaders, String path, String method) {
-        
-        // Try to extract the Trace Id value from the request header
-        final long traceId = getFirstValueOrDefault(requestHeaders, getTraceIdHeader(), 
-            Tracer.DONT_TRACE.traceId);
+    protected TraceScopeHolder<TraceScope> startTraceSpan(final Map<String, List<String>> requestHeaders, 
+            String path, String method) {
         
         // Try to extract the Span Id value from the request header
-        final long spanId = getFirstValueOrDefault(requestHeaders, getSpanIdHeader(), 
-            Tracer.DONT_TRACE.spanId); 
+        final SpanId spanId = getFirstValueOrDefault(requestHeaders, getSpanIdHeader(), SpanId.INVALID); 
         
         TraceScope traceScope = null;
-        if (traceId == Tracer.DONT_TRACE.traceId || spanId == Tracer.DONT_TRACE.spanId) {
-            traceScope = Trace.startSpan(buildSpanDescription(path, method), (Sampler< TraceInfo >)sampler);
+        if (spanId == SpanId.INVALID) {
+            traceScope = tracer.newScope(buildSpanDescription(path, method));
         } else {
-            traceScope = Trace.startSpan(buildSpanDescription(path, method), new MilliSpan
-                .Builder()
-                .spanId(spanId)
-                .traceId(traceId)
-                .build());
+            traceScope = tracer.newScope(buildSpanDescription(path, method), spanId);
         }
         
         // If the service resource is using asynchronous processing mode, the trace
         // scope will be closed in another thread and as such should be detached.
+        boolean detached = false;
         if (isAsyncResponse()) {
-            propagateContinuationSpan(traceScope.detach());
+            traceScope.detach();
+            propagateContinuationSpan(traceScope);
+            detached = true;
         }
         
-        return traceScope;
+        return new TraceScopeHolder<TraceScope>(traceScope, detached);
     }
 
     protected void stopTraceSpan(final Map<String, List<String>> requestHeaders,
                                  final Map<String, List<Object>> responseHeaders,
-                                 final TraceScope span) {
-        final String traceIdHeader = getTraceIdHeader();
+                                 final TraceScopeHolder<TraceScope> holder) {
         final String spanIdHeader = getSpanIdHeader();
 
         // Transfer tracing headers into the response headers
-        if (requestHeaders.containsKey(traceIdHeader) && requestHeaders.containsKey(spanIdHeader)) {
-            responseHeaders.put(traceIdHeader, CastUtils.cast(requestHeaders.get(traceIdHeader)));
+        if (requestHeaders.containsKey(spanIdHeader)) {
             responseHeaders.put(spanIdHeader, CastUtils.cast(requestHeaders.get(spanIdHeader)));
         }
         
+        if (holder == null) {
+            return;
+        }
+        
+        final TraceScope span = holder.getScope();
         if (span != null) {
             // If the service resource is using asynchronous processing mode, the trace
             // scope has been created in another thread and should be re-attached to the current 
             // one.
-            if (span.isDetached()) {
-                final TraceScope continueSpan = Trace.continueSpan(span.getSpan()); 
-                continueSpan.close();
+            if (holder.isDetached()) {
+                span.reattach(); 
+                span.close();
             } else {            
                 span.close();
             }
         }
     }
     
-    private void propagateContinuationSpan(final Span continuationSpan) {
-        JAXRSUtils.getCurrentMessage().put(Span.class, continuationSpan);
+    private void propagateContinuationSpan(final TraceScope continuationScope) {
+        JAXRSUtils.getCurrentMessage().put(TraceScope.class, continuationScope);
     }
     
     protected boolean isAsyncResponse() {
         return !JAXRSUtils.getCurrentMessage().getExchange().isSynchronous();
     }
     
-    private static Long getFirstValueOrDefault(final Map<String, List<String>> headers, 
-            final String header, final long defaultValue) {
+    private static SpanId getFirstValueOrDefault(final Map<String, List<String>> headers, 
+            final String header, final SpanId defaultValue) {
         List<String> value = headers.get(header);
         if (value != null && !value.isEmpty()) {
             try {
-                return Long.parseLong(value.get(0));
+                return SpanId.fromString(value.get(0));
             } catch (NumberFormatException ex) {
                 LOG.log(Level.FINE, String.format("Unable to parse '%s' header value to long number", header), ex);
             }

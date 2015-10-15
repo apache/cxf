@@ -39,7 +39,7 @@ import javax.ws.rs.core.Response;
 import org.apache.cxf.systest.Book;
 import org.apache.cxf.tracing.Traceable;
 import org.apache.cxf.tracing.TracerContext;
-import org.apache.htrace.TraceScope;
+import org.apache.htrace.core.TraceScope;
 
 @Path("/bookstore/")
 public class BookStore {

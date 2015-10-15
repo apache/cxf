@@ -26,7 +26,7 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
-import org.apache.htrace.TraceScope;
+import org.apache.htrace.core.TraceScope;
 
 public class HTraceStopInterceptor extends AbstractHTraceInterceptor {
     public HTraceStopInterceptor(final String phase) {
@@ -48,9 +48,11 @@ public class HTraceStopInterceptor extends AbstractHTraceInterceptor {
         Map<String, List<String>> requestHeaders =  
             CastUtils.cast((Map<?, ?>)requestMessage.get(Message.PROTOCOL_HEADERS));
         
-        TraceScope span = (TraceScope)message.getExchange().get(TRACE_SPAN);
+        @SuppressWarnings("unchecked")
+        final TraceScopeHolder<TraceScope> holder = 
+            (TraceScopeHolder<TraceScope>)message.getExchange().get(TRACE_SPAN);
         
-        super.stopTraceSpan(requestHeaders, responseHeaders, span);
+        super.stopTraceSpan(requestHeaders, responseHeaders, holder);
     }
     
 }

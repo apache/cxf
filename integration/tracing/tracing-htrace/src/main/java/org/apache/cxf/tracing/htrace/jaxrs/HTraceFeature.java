@@ -24,22 +24,20 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
-import org.apache.htrace.HTraceConfiguration;
-import org.apache.htrace.Sampler;
-import org.apache.htrace.SamplerBuilder;
-import org.apache.htrace.SpanReceiver;
-import org.apache.htrace.SpanReceiverBuilder;
-import org.apache.htrace.Trace;
+import org.apache.htrace.core.HTraceConfiguration;
+import org.apache.htrace.core.Tracer;
 
 public class HTraceFeature extends AbstractFeature {
     private HTraceConfiguration configuration;
+    private String name;
     
     public HTraceFeature() {
-        this(HTraceConfiguration.EMPTY);
+        this(HTraceConfiguration.EMPTY, "");
     }
 
-    public HTraceFeature(final HTraceConfiguration configuration) {
+    public HTraceFeature(final HTraceConfiguration configuration, final String name) {
         this.configuration = configuration;
+        this.name = name;
     }
 
     @Override
@@ -48,16 +46,14 @@ public class HTraceFeature extends AbstractFeature {
             .getEndpoint()
             .get(ServerProviderFactory.class.getName());
 
-        final Sampler< ? > sampler = new SamplerBuilder(configuration).build();
-        final SpanReceiver spanReceiver = new SpanReceiverBuilder(configuration).build();
+        final Tracer tracer = new Tracer.Builder()
+            .conf(configuration)
+            .name(name)
+            .build();
         
-        if (spanReceiver != null) {
-            Trace.addReceiver(spanReceiver);
-        }
-
         if (providerFactory != null) {
-            providerFactory.setUserProviders(Arrays.asList(new HTraceProvider(sampler), 
-                new HTraceContextProvider(sampler)));
+            providerFactory.setUserProviders(Arrays.asList(new HTraceProvider(tracer), 
+                new HTraceContextProvider(tracer)));
         }
     }
     
@@ -67,5 +63,13 @@ public class HTraceFeature extends AbstractFeature {
     
     public HTraceConfiguration getConfiguration() {
         return configuration;
+    }
+    
+    public void setName(String name) {
+        this.name = name;
+    }
+    
+    public String getName() {
+        return name;
     }
 }

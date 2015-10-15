@@ -26,14 +26,14 @@ import javax.jws.WebMethod;
 import javax.jws.WebService;
 
 import org.apache.cxf.systest.Book;
-import org.apache.htrace.Trace;
-import org.apache.htrace.TraceScope;
+import org.apache.htrace.core.TraceScope;
+import org.apache.htrace.core.Tracer;
 
 @WebService(endpointInterface = "org.apache.cxf.systest.jaxws.tracing.BookStoreService", serviceName = "BookStore")
 public class BookStore implements BookStoreService {
     @WebMethod
     public Collection< Book > getBooks() {
-        try (final TraceScope span =  Trace.startSpan("Get Books")) {
+        try (final TraceScope span = Tracer.curThreadTracer().newScope("Get Books")) {
             return Arrays.asList(
                 new Book("Apache CXF in Action", UUID.randomUUID().toString()),
                 new Book("Mastering Apache CXF", UUID.randomUUID().toString())

@@ -18,79 +18,75 @@
  */
 package org.apache.cxf.tracing.htrace;
 
-import java.nio.charset.StandardCharsets;
 import java.util.concurrent.Callable;
 
 import org.apache.cxf.tracing.Traceable;
 import org.apache.cxf.tracing.TracerContext;
-import org.apache.htrace.Sampler;
-import org.apache.htrace.Span;
-import org.apache.htrace.Trace;
-import org.apache.htrace.TraceScope;
-import org.apache.htrace.wrappers.TraceCallable;
+import org.apache.htrace.core.Span;
+import org.apache.htrace.core.TraceScope;
+import org.apache.htrace.core.Tracer;
 
 public class HTraceTracerContext implements TracerContext {
-    private final Sampler< ? > sampler;
-    private final Span continuationSpan;
+    private final Tracer tracer;
+    private final TraceScope continuationScope;
 
-    public HTraceTracerContext(final Sampler< ? > sampler) {
-        this(sampler, null);
+    public HTraceTracerContext(final Tracer tracer) {
+        this(tracer, null);
     }
 
-    public HTraceTracerContext(final Sampler< ? > sampler, final Span continuationSpan) {
-        this.sampler = sampler;
-        this.continuationSpan = continuationSpan;
+    public HTraceTracerContext(final Tracer tracer, final TraceScope continuationScope) {
+        this.tracer = tracer;
+        this.continuationScope = continuationScope;
     }
         
     @Override
     @SuppressWarnings("unchecked")
     public TraceScope startSpan(final String description) {
-        return Trace.startSpan(description, sampler);
+        return tracer.newScope(description);
     }
     
     @Override
     public <T> T continueSpan(final Traceable<T> traceable) throws Exception {
-        TraceScope continueSpan = null;
-        
-        if (!Trace.isTracing() && continuationSpan != null) {
-            continueSpan = Trace.continueSpan(continuationSpan);
+        if (!isTracing() && continuationScope != null) {
+            continuationScope.reattach();
         }
         
         try {
-            return traceable.call(new HTraceTracerContext(sampler));
+            return traceable.call(new HTraceTracerContext(tracer));
         } finally {
-            if (continueSpan != null) {
-                continueSpan.close();
-            }
+            continuationScope.detach();
         }
     }
     
     @Override
-    public <T> Callable<T> wrap(final String desription, final Traceable<T> traceable) {
+    public <T> Callable<T> wrap(final String description, final Traceable<T> traceable) {
         final Callable<T> callable = new Callable<T>() {
             @Override
             public T call() throws Exception {
-                return traceable.call(new HTraceTracerContext(sampler));
+                return traceable.call(new HTraceTracerContext(tracer));
             }
         };
         
-        // TODO: Replace with HTrace's wrap() method once the version with
-        // callable and description becomes available.
-        if (Trace.isTracing()) {
-            return new TraceCallable<T>(Trace.currentSpan(), callable, desription);
-        } else {
-            return callable;
-        }
+        return tracer.wrap(callable, description);
     }
     
     @Override
     public void annotate(String key, String value) {
-        Trace.addKVAnnotation(key.getBytes(StandardCharsets.UTF_8), 
-            value.getBytes(StandardCharsets.UTF_8));
+        final Span currentSpan = Tracer.getCurrentSpan();
+        if (currentSpan != null) {
+            currentSpan.addKVAnnotation(key, value);
+        }
     }
     
     @Override
     public void timeline(String message) {
-        Trace.addTimelineAnnotation(message);
+        final Span currentSpan = Tracer.getCurrentSpan();
+        if (currentSpan != null) {
+            currentSpan.addTimelineAnnotation(message);
+        }
+    }
+    
+    private boolean isTracing() {
+        return Tracer.getCurrentSpan() != null;
     }
 }

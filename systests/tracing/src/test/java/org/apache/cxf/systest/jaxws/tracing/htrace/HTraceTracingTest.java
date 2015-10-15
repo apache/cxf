@@ -43,10 +43,11 @@ import org.apache.cxf.tracing.htrace.HTraceClientStartInterceptor;
 import org.apache.cxf.tracing.htrace.HTraceClientStopInterceptor;
 import org.apache.cxf.tracing.htrace.HTraceStartInterceptor;
 import org.apache.cxf.tracing.htrace.HTraceStopInterceptor;
-import org.apache.htrace.HTraceConfiguration;
-import org.apache.htrace.Trace;
-import org.apache.htrace.TraceScope;
-import org.apache.htrace.impl.AlwaysSampler;
+import org.apache.htrace.core.AlwaysSampler;
+import org.apache.htrace.core.HTraceConfiguration;
+import org.apache.htrace.core.SpanId;
+import org.apache.htrace.core.TraceScope;
+import org.apache.htrace.core.Tracer;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -63,14 +64,11 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
     @Ignore
     public static class Server extends AbstractBusTestServerBase {
         protected void run() {
-            final Map<String, String> properties = new HashMap<String, String>();
-            final HTraceConfiguration conf = HTraceConfiguration.fromMap(properties);
-            Trace.addReceiver(new TestSpanReceiver(conf));
-            
+            final Tracer tracer = createTracer();
             final JaxWsServerFactoryBean sf = new JaxWsServerFactoryBean();
             sf.setServiceClass(BookStore.class);
             sf.setAddress("http://localhost:" + PORT);
-            sf.getInInterceptors().add(new HTraceStartInterceptor(Phase.PRE_INVOKE, new AlwaysSampler(conf)));
+            sf.getInInterceptors().add(new HTraceStartInterceptor(Phase.PRE_INVOKE, tracer));
             sf.getOutInterceptors().add(new HTraceStopInterceptor(Phase.PRE_MARSHAL));
             sf.create();
         }
@@ -102,15 +100,14 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
         assertThat(TestSpanReceiver.getAllSpans().get(1).getDescription(), equalTo("POST /BookStore"));
         
         final Map<String, List<String>> response = getResponseHeaders(service);
-        assertThat(response.get(TracerHeaders.DEFAULT_HEADER_TRACE_ID), nullValue());
         assertThat(response.get(TracerHeaders.DEFAULT_HEADER_SPAN_ID), nullValue());
     }
     
     @Test
     public void testThatNewInnerSpanIsCreated() throws MalformedURLException {
+        final SpanId spanId = SpanId.fromRandom();
         final Map<String, List<String>> headers = new HashMap<String, List<String>>();
-        headers.put(TracerHeaders.DEFAULT_HEADER_TRACE_ID, Arrays.asList("10"));
-        headers.put(TracerHeaders.DEFAULT_HEADER_SPAN_ID, Arrays.asList("20"));
+        headers.put(TracerHeaders.DEFAULT_HEADER_SPAN_ID, Arrays.asList(spanId.toString()));
 
         final BookStoreService service = createJaxWsService(headers);
         assertThat(service.getBooks().size(), equalTo(2));
@@ -120,19 +117,17 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
         assertThat(TestSpanReceiver.getAllSpans().get(1).getDescription(), equalTo("POST /BookStore"));
         
         final Map<String, List<String>> response = getResponseHeaders(service);
-        assertThat(response.get(TracerHeaders.DEFAULT_HEADER_TRACE_ID), hasItems("10"));
-        assertThat(response.get(TracerHeaders.DEFAULT_HEADER_SPAN_ID), hasItems("20"));
+        assertThat(response.get(TracerHeaders.DEFAULT_HEADER_SPAN_ID), hasItems(spanId.toString()));
     }
     
     @Test
     public void testThatNewChildSpanIsCreatedWhenParentIsProvided() throws MalformedURLException {
-        final Map<String, String> properties = new HashMap<String, String>();
-        final HTraceConfiguration conf = HTraceConfiguration.fromMap(properties);
+        final Tracer tracer = createTracer();
     
         final BookStoreService service = createJaxWsService(new Configurator() {
             @Override
             public void configure(final JaxWsProxyFactoryBean factory) {
-                factory.getOutInterceptors().add(new HTraceClientStartInterceptor(new AlwaysSampler(conf)));
+                factory.getOutInterceptors().add(new HTraceClientStartInterceptor(tracer));
                 factory.getInInterceptors().add(new HTraceClientStopInterceptor());
             }
         });
@@ -146,27 +141,24 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
             equalTo("POST http://localhost:" + PORT + "/BookStore"));
         
         final Map<String, List<String>> response = getResponseHeaders(service);
-        assertThat(response.get(TracerHeaders.DEFAULT_HEADER_TRACE_ID), not(nullValue()));
         assertThat(response.get(TracerHeaders.DEFAULT_HEADER_SPAN_ID), not(nullValue()));
     }
     
     @Test
     public void testThatProvidedSpanIsNotClosedWhenActive() throws MalformedURLException {
-        final Map<String, String> properties = new HashMap<String, String>();
-        final HTraceConfiguration conf = HTraceConfiguration.fromMap(properties);
+        final Tracer tracer = createTracer();
     
-        final AlwaysSampler sampler = new AlwaysSampler(conf);
         final BookStoreService service = createJaxWsService(new Configurator() {
             @Override
             public void configure(final JaxWsProxyFactoryBean factory) {
-                factory.getOutInterceptors().add(new HTraceClientStartInterceptor(sampler));
+                factory.getOutInterceptors().add(new HTraceClientStartInterceptor(tracer));
                 factory.getInInterceptors().add(new HTraceClientStopInterceptor());
             }
         });
         
-        try (final TraceScope scope = Trace.startSpan("test span", sampler)) {
+        try (final TraceScope scope = tracer.newScope("test span")) {
             assertThat(service.getBooks().size(), equalTo(2));
-            assertThat(Trace.isTracing(), equalTo(true));
+            assertThat(Tracer.getCurrentSpan(), not(nullValue()));
             
             assertThat(TestSpanReceiver.getAllSpans().size(), equalTo(2));
             assertThat(TestSpanReceiver.getAllSpans().get(0).getDescription(), equalTo("Get Books"));
@@ -178,7 +170,6 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
         assertThat(TestSpanReceiver.getAllSpans().get(2).getDescription(), equalTo("test span"));
         
         final Map<String, List<String>> response = getResponseHeaders(service);
-        assertThat(response.get(TracerHeaders.DEFAULT_HEADER_TRACE_ID), not(nullValue()));
         assertThat(response.get(TracerHeaders.DEFAULT_HEADER_SPAN_ID), not(nullValue()));
     }
     
@@ -218,5 +209,16 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
     private Map<String, List<String>> getResponseHeaders(final BookStoreService service) {
         final Client proxy = ClientProxy.getClient(service);
         return CastUtils.cast((Map<?, ?>)proxy.getResponseContext().get(Message.PROTOCOL_HEADERS));
-    }    
+    }
+    
+    private static Tracer createTracer() {
+        final Map<String, String> properties = new HashMap<String, String>();
+        properties.put(Tracer.SPAN_RECEIVER_CLASSES_KEY, TestSpanReceiver.class.getName());
+        properties.put(Tracer.SAMPLER_CLASSES_KEY, AlwaysSampler.class.getName());
+        
+        return new Tracer.Builder()
+            .name("tracer")
+            .conf(HTraceConfiguration.fromMap(properties))
+            .build();
+    }
 }

@@ -24,12 +24,12 @@ import java.util.Set;
 
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptor;
-import org.apache.htrace.Sampler;
+import org.apache.htrace.core.Tracer;
 
 public abstract class AbstractHTraceInterceptor extends AbstractHTraceProvider implements PhaseInterceptor<Message> {
     private String phase;
-    protected AbstractHTraceInterceptor(final String phase, final Sampler< ? > sampler) {
-        super(sampler);
+    protected AbstractHTraceInterceptor(final String phase, final Tracer tracer) {
+        super(tracer);
         this.phase = phase;
     }
     

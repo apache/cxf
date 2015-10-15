@@ -26,59 +26,64 @@ import java.util.logging.Logger;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.tracing.AbstractTracingProvider;
-import org.apache.htrace.Sampler;
-import org.apache.htrace.Span;
-import org.apache.htrace.Trace;
-import org.apache.htrace.TraceScope;
+import org.apache.htrace.core.Span;
+import org.apache.htrace.core.TraceScope;
+import org.apache.htrace.core.Tracer;
 
 public abstract class AbstractHTraceClientProvider extends AbstractTracingProvider { 
     protected static final Logger LOG = LogUtils.getL7dLogger(AbstractHTraceClientProvider.class);
     protected static final String TRACE_SPAN = "org.apache.cxf.tracing.htrace.span";
         
-    private final Sampler< ? > sampler;
+    private final Tracer tracer;
         
-    public AbstractHTraceClientProvider(final Sampler< ? > sampler) {
-        this.sampler = sampler;
+    public AbstractHTraceClientProvider(final Tracer tracer) {
+        this.tracer = tracer;
     }
 
-    protected TraceScope startTraceSpan(final Map<String, List<String>> requestHeaders, String path, String method) {
-        Span span = Trace.currentSpan();
-        TraceScope scope = null;
+    protected TraceScopeHolder<TraceScope> startTraceSpan(final Map<String, List<String>> requestHeaders, 
+            String path, String method) {
+
+        Span span = Tracer.getCurrentSpan();
+        TraceScope traceScope = null;
         
         if (span == null) {
-            scope = Trace.startSpan(buildSpanDescription(path, method), sampler);
-            span = scope.getSpan();
+            traceScope = tracer.newScope(buildSpanDescription(path, method));
+            span = traceScope.getSpan();
         }
         
         if (span != null) {
-            final String traceIdHeader = getTraceIdHeader();
             final String spanIdHeader = getSpanIdHeader();
-            
             // Transfer tracing headers into the response headers
-            requestHeaders.put(traceIdHeader, Collections.singletonList(Long.toString(span.getTraceId())));
-            requestHeaders.put(spanIdHeader, Collections.singletonList(Long.toString(span.getSpanId())));
+            requestHeaders.put(spanIdHeader, Collections.singletonList(span.getSpanId().toString()));
         }
         
         // In case of asynchronous client invocation, the span should be detached as JAX-RS 
         // client request / response filters are going to be executed in different threads.
-        if (isAsyncInvocation() && scope != null) {
-            scope.detach();
+        boolean detached = false;
+        if (isAsyncInvocation() && traceScope != null) {
+            traceScope.detach();
+            detached = true;
         }
         
-        return scope;
+        return new TraceScopeHolder<TraceScope>(traceScope, detached);
     }
     
     private boolean isAsyncInvocation() {
         return !JAXRSUtils.getCurrentMessage().getExchange().isSynchronous();
     }
 
-    protected void stopTraceSpan(final TraceScope scope) {
+    protected void stopTraceSpan(final TraceScopeHolder<TraceScope> holder) {
+        if (holder == null) {
+            return;
+        }
+        
+        final TraceScope scope = holder.getScope();
         if (scope != null) {
             // If the client invocation was asynchronous , the trace scope has been created 
             // in another thread and should be re-attached to the current one.
-            if (scope.isDetached()) {
-                final TraceScope continueSpan = Trace.continueSpan(scope.getSpan()); 
-                continueSpan.close();
+            if (holder.isDetached()) {
+                scope.reattach(); 
+                scope.close();
             } else {
                 scope.close();
             }

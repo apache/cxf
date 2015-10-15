@@ -19,8 +19,8 @@
 
 package demo.jaxrs.tracing.conf;
 
-import org.apache.htrace.SpanReceiver;
-import org.apache.htrace.impl.StandardOutSpanReceiver;
+import org.apache.htrace.core.SpanReceiver;
+import org.apache.htrace.core.StandardOutSpanReceiver;
 
 public final class TracingConfiguration {
     public static final Class<? extends SpanReceiver> SPAN_RECEIVER = StandardOutSpanReceiver.class;

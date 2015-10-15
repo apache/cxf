@@ -31,40 +31,37 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.ext.Provider;
 
 import org.apache.cxf.tracing.htrace.AbstractHTraceProvider;
-import org.apache.htrace.Sampler;
-import org.apache.htrace.TraceScope;
-import org.apache.htrace.impl.NeverSampler;
+import org.apache.htrace.core.TraceScope;
+import org.apache.htrace.core.Tracer;
 
 @Provider
 public class HTraceProvider extends AbstractHTraceProvider 
     implements ContainerRequestFilter, ContainerResponseFilter {
     @Context 
     private ResourceInfo resourceInfo;
-    public HTraceProvider() {
-        this(NeverSampler.INSTANCE);
-    }
-
-    public HTraceProvider(final Sampler< ? > sampler) {
-        super(sampler);
+    
+    public HTraceProvider(final Tracer tracer) {
+        super(tracer);
     }
 
     @Override
     public void filter(final ContainerRequestContext requestContext) throws IOException {
-        TraceScope scope = super.startTraceSpan(requestContext.getHeaders(), 
+        final TraceScopeHolder<TraceScope> holder = super.startTraceSpan(requestContext.getHeaders(), 
                                                 requestContext.getUriInfo().getPath(),
                                                 requestContext.getMethod());
         
-        if (scope != null) {
-            requestContext.setProperty(TRACE_SPAN, scope);
+        if (holder != null) {
+            requestContext.setProperty(TRACE_SPAN, holder);
         }
     }
     
+    @SuppressWarnings("unchecked")
     @Override
     public void filter(final ContainerRequestContext requestContext,
             final ContainerResponseContext responseContext) throws IOException {
         super.stopTraceSpan(requestContext.getHeaders(), 
                             responseContext.getHeaders(), 
-                            (TraceScope)requestContext.getProperty(TRACE_SPAN));
+                            (TraceScopeHolder<TraceScope>)requestContext.getProperty(TRACE_SPAN));
     }
     
     @Override

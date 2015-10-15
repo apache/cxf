@@ -25,24 +25,28 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
-import org.apache.htrace.Sampler;
-import org.apache.htrace.TraceScope;
+import org.apache.htrace.core.TraceScope;
+import org.apache.htrace.core.Tracer;
 
 public class HTraceClientStartInterceptor extends AbstractHTraceClientInterceptor {
-    public HTraceClientStartInterceptor(final Sampler< ? > sampler) {
-        this(Phase.PRE_STREAM, sampler);
+    public HTraceClientStartInterceptor(final Tracer tracer) {
+        this(Phase.PRE_STREAM, tracer);
     }
 
-    public HTraceClientStartInterceptor(final String phase, final Sampler< ? > sampler) {
-        super(phase, sampler);
+    public HTraceClientStartInterceptor(final String phase, final Tracer tracer) {
+        super(phase, tracer);
     }
 
     @Override
     public void handleMessage(Message message) throws Fault {
-        Map<String, List<String>> headers = CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS)); 
-        TraceScope scope = super.startTraceSpan(headers, (String)message.get(Message.ENDPOINT_ADDRESS), 
+        final Map<String, List<String>> headers = CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
+        final TraceScopeHolder<TraceScope> holder = super.startTraceSpan(headers, 
+            (String)message.get(Message.ENDPOINT_ADDRESS), 
             (String)message.get(Message.HTTP_REQUEST_METHOD));
-        message.getExchange().put(TRACE_SPAN, scope);
+        
+        if (holder != null) {
+            message.getExchange().put(TRACE_SPAN, holder);
+        }
     }
     
 }

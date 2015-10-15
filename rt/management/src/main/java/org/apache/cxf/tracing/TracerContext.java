@@ -33,18 +33,18 @@ public interface TracerContext {
     
     /**
      * Starts a new span in the current thread.
-     * @param desription span description
+     * @param description span description
      * @return span instance object
      */
-    <T> T startSpan(final String desription);
+    <T> T startSpan(final String description);
     
     /**
      * Wraps the traceable into a new span, preserving the current span as a parent.
-     * @param desription span description
+     * @param description span description
      * @param traceable  traceable implementation to be wrapped
      * @return callable to be executed (in current thread or any other thread pool)
      */
-    <T> Callable<T> wrap(final String desription, final Traceable<T> traceable);
+    <T> Callable<T> wrap(final String description, final Traceable<T> traceable);
     
     
     /**
