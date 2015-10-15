@@ -33,12 +33,8 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.rs.security.jose.common.JoseException;
-import org.apache.cxf.rs.security.jose.common.JoseType;
 import org.apache.cxf.rs.security.jose.common.JoseUtils;
-import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
-import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jwe.JweHeaders;
-import org.apache.cxf.rs.security.jose.jws.JwsHeaders;
 import org.apache.cxf.rs.security.jose.jwt.AbstractJoseJwtProducer;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 import org.apache.cxf.rs.security.jose.jwt.JwtConstants;
@@ -95,23 +91,7 @@ public class JwtAuthenticationClientFilter extends AbstractJoseJwtProducer
         }
         
         if (claims != null) {
-            if (super.isJwsRequired()) {
-                JwsHeaders headers = new JwsHeaders();
-                headers.setType(JoseType.JWT);
-                
-                Message m = PhaseInterceptorChain.getCurrentMessage();
-                // TODO revisit this constant
-                String signatureAlgorithm = 
-                    (String)m.getContextualProperty("rs.security.jws.content.signature.algorithm");
-                if (signatureAlgorithm == null) {
-                    signatureAlgorithm = AlgorithmUtils.RS_SHA_256_ALGO;
-                }
-                headers.setSignatureAlgorithm(SignatureAlgorithm.getAlgorithm(signatureAlgorithm));
-                
-                token = new JwtToken(headers, claims);
-            } else {
-                // TODO
-            }
+            token = new JwtToken(claims);
         }
         
         return token;
