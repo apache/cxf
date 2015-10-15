@@ -19,10 +19,15 @@
 package org.apache.cxf.rs.security.jose.jws;
 
 import java.security.PrivateKey;
+import java.util.Properties;
 
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.provider.json.JsonMapObjectReaderWriter;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.PhaseInterceptorChain;
+import org.apache.cxf.rs.security.jose.common.JoseConstants;
+import org.apache.cxf.rs.security.jose.common.KeyManagementUtils;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 
@@ -130,6 +135,17 @@ public class JwsCompactProducer {
         return getJwsHeaders().getSignatureAlgorithm();
     }
     private void checkAlgorithm() {
+        if (getAlgorithm() == null) {
+            Message m = PhaseInterceptorChain.getCurrentMessage();
+            Properties props = KeyManagementUtils.loadStoreProperties(m, false, 
+                                                                      JoseConstants.RSSEC_SIGNATURE_OUT_PROPS, 
+                                                                      JoseConstants.RSSEC_SIGNATURE_PROPS);
+            String signatureAlgo = JwsUtils.getSignatureAlgo(m, props, null, null);
+            if (signatureAlgo != null) {
+                getJwsHeaders().setSignatureAlgorithm(SignatureAlgorithm.getAlgorithm(signatureAlgo));
+            }
+        }
+        
         if (getAlgorithm() == null) {
             throw new JwsException(JwsException.Error.INVALID_ALGORITHM);
         }

@@ -358,7 +358,7 @@ public final class JwsUtils {
     }
     
     @SuppressWarnings("deprecation")
-    private static String getSignatureAlgo(Message m, Properties props, String algo, String defaultAlgo) {
+    public static String getSignatureAlgo(Message m, Properties props, String algo, String defaultAlgo) {
         if (algo == null) {
             if (defaultAlgo == null) {
                 defaultAlgo = AlgorithmUtils.RS_SHA_256_ALGO;
