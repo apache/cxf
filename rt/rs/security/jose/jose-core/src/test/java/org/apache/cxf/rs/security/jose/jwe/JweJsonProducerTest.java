@@ -156,7 +156,7 @@ public class JweJsonProducerTest extends Assert {
     }
     @AfterClass
     public static void unregisterBouncyCastleIfNeeded() throws Exception {
-        Security.removeProvider(BouncyCastleProvider.class.getName());    
+        Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);    
     }
     
     @Test

@@ -137,7 +137,7 @@ public class JsonWebKeyTest extends Assert {
             jwks = JwkUtils.decryptJwkSet(encryptedKeySet, password.toCharArray());
             validatePrivateSet(jwks);
         } finally {
-            Security.removeProvider(BouncyCastleProvider.class.getName());
+            Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);
         }
     }
     @Test
@@ -161,7 +161,7 @@ public class JsonWebKeyTest extends Assert {
             jwk = JwkUtils.decryptJwkKey(encryptedKey, password.toCharArray());
             validateSecretAesKey(jwk);
         } finally {
-            Security.removeProvider(BouncyCastleProvider.class.getName());
+            Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);
         }
     }
     

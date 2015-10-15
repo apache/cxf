@@ -434,7 +434,7 @@ public class JwsJoseCookBookTest {
         jsonConsumer = new JwsJsonConsumer(jsonProducer.getJwsJsonSignedDocument());
         assertTrue(jsonConsumer.verifySignatureWith(rsaPublicKey, SignatureAlgorithm.PS384));
 
-        Security.removeProvider(BouncyCastleProvider.class.getName());
+        Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);
     }
     @Test
     public void testECDSASignature() throws Exception {
@@ -468,7 +468,7 @@ public class JwsJoseCookBookTest {
             JsonWebKey ecPublicKey = publicKeys.get(0);
             assertTrue(compactConsumer.verifySignatureWith(ecPublicKey, SignatureAlgorithm.ES512));
         } finally {
-            Security.removeProvider(BouncyCastleProvider.class.getName());
+            Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);
         }
     }
     @Test
@@ -654,7 +654,7 @@ public class JwsJoseCookBookTest {
             assertTrue(jsonConsumer.verifySignatureWith(ecPublicKey, SignatureAlgorithm.ES512));
             assertTrue(jsonConsumer.verifySignatureWith(hmacKey, SignatureAlgorithm.HS256));
         } finally {
-            Security.removeProvider(BouncyCastleProvider.class.getName());
+            Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);
         }
     }
     public JsonWebKeys readKeySet(String fileName) throws Exception {
