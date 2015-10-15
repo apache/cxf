@@ -42,7 +42,7 @@ public class JwePbeHmacAesWrapTest extends Assert {
     }
     @After
     public void unregisterBouncyCastleIfNeeded() throws Exception {
-        Security.removeProvider(BouncyCastleProvider.class.getName());    
+        Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);    
     }
     @Test
     public void testEncryptDecryptPbesHmacAesWrapA128CBCHS256() throws Exception {

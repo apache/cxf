@@ -81,7 +81,7 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
     }
     @AfterClass
     public static void unregisterBouncyCastleIfNeeded() throws Exception {
-        Security.removeProvider(BouncyCastleProvider.class.getName());    
+        Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);    
     }
     @Test
     public void testJweJwkPlainTextRSA() throws Exception {

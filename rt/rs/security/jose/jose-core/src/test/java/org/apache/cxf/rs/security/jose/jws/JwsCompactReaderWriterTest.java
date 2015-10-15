@@ -250,7 +250,7 @@ public class JwsCompactReaderWriterTest extends Assert {
                          inHeaders.getSignatureAlgorithm());
             validateSpecClaim(token.getClaims());
         } finally {
-            Security.removeProvider(BouncyCastleProvider.class.getName());
+            Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);
         }
     }
     
