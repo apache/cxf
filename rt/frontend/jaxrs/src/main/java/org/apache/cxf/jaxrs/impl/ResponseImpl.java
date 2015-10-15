@@ -376,6 +376,11 @@ public final class ResponseImpl extends Response {
             } catch (Exception ex) {
                 autoClose(cls, true);
                 reportMessageHandlerProblem("MSG_READER_PROBLEM", cls, mediaType, ex);
+            } finally {
+                ProviderFactory pf = ProviderFactory.getInstance(outMessage);
+                if (pf != null) {
+                    pf.clearThreadLocalProxies();
+                }
             }
         } else if (entity != null && cls.isAssignableFrom(entity.getClass())) {
             lastEntity = entity;
