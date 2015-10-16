@@ -94,7 +94,6 @@ public final class JoseConstants {
     /**
      * TODO documentation for these
      */
-    public static final String RSSEC_DEFAULT_ALGORITHMS = "rs.security.default.algorithms";
     public static final String RSSEC_REPORT_KEY_PROP = "rs.security.report.public.key";
     public static final String RSSEC_REPORT_KEY_ID_PROP = "rs.security.report.public.key.id";
     public static final String RSSEC_ACCEPT_PUBLIC_KEY_PROP = "rs.security.accept.public.key.properties";

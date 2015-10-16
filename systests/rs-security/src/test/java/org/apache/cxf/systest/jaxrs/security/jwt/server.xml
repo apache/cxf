@@ -114,7 +114,6 @@ under the License.
             <entry key="rs.security.keystore.alias.jws.in" value="BobCert"/>
             <entry key="rs.security.signature.key.password.provider" value-ref="keyPasswordProvider"/>
             <entry key="rs.security.decryption.key.password.provider" value-ref="keyPasswordProvider"/>
-            <entry key="rs.security.default.algorithms" value="true"/>
         </jaxrs:properties>
     </jaxrs:server>
     <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jwt}/jwejwsrsaCertInHeaders">

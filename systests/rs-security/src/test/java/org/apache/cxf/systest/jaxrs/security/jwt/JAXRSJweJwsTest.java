@@ -211,7 +211,6 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         
         WebClient.getConfig(bs).getRequestContext().put("rs.security.keystore.alias.jwe.out", "AliceCert");
         WebClient.getConfig(bs).getRequestContext().put("rs.security.keystore.alias.jws.in", "AliceCert");
-        WebClient.getConfig(bs).getRequestContext().put("rs.security.default.algorithms", "true");
         String text = bs.echoText("book");
         assertEquals("book", text);
     }
