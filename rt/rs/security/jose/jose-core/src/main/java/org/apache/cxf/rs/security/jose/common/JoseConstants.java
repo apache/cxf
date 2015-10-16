@@ -122,12 +122,14 @@ public final class JoseConstants {
     public static final String DEPR_RSSEC_SIGNATURE_ALGORITHM = "rs.security.jws.content.signature.algorithm";
     
     /**
-     * The signature properties file for signature creation.
+     * The signature properties file for signature creation. If not specified then it falls back to 
+     * RSSEC_SIGNATURE_PROPS.
      */
     public static final String RSSEC_SIGNATURE_OUT_PROPS = "rs.security.signature.out.properties";
     
     /**
-     * The signature properties file for signature verification.
+     * The signature properties file for signature verification. If not specified then it falls back to 
+     * RSSEC_SIGNATURE_PROPS.
      */
     public static final String RSSEC_SIGNATURE_IN_PROPS = "rs.security.signature.in.properties";
     
@@ -192,12 +194,14 @@ public final class JoseConstants {
     public static final String DEPR_RSSEC_ENCRYPTION_ZIP_ALGORITHM = "rs.security.jwe.zip.algorithm";
     
     /**
-     * The encryption properties file
+     * The encryption properties file for encryption creation. If not specified then it falls back to 
+     * RSSEC_ENCRYPTION_PROPS.
      */
     public static final String RSSEC_ENCRYPTION_OUT_PROPS = "rs.security.encryption.out.properties";
     
     /**
-     * The decryption properties file
+     * The decryption properties file for decryption. If not specified then it falls back to 
+     * RSSEC_ENCRYPTION_PROPS.
      */
     public static final String RSSEC_ENCRYPTION_IN_PROPS = "rs.security.encryption.in.properties";
     
