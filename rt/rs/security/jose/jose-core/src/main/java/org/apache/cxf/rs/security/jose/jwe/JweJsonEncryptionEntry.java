@@ -21,7 +21,7 @@ package org.apache.cxf.rs.security.jose.jwe;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.apache.cxf.jaxrs.provider.json.JsonMapObjectReaderWriter;
+import org.apache.cxf.jaxrs.json.basic.JsonMapObjectReaderWriter;
 import org.apache.cxf.rs.security.jose.common.JoseUtils;
 
 public class JweJsonEncryptionEntry {

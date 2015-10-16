@@ -60,6 +60,7 @@
         <module>rs/client</module>
         <module>rs/http-sci</module>
         <module>rs/description</module>
+        <module>rs/extensions/json-basic</module>
         <module>rs/extensions/providers</module>
         <module>rs/extensions/search</module>
         <module>rs/security/xml</module>

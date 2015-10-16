@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.rs.security.jose.jwk;
 
-import org.apache.cxf.jaxrs.provider.json.JsonMapObjectReaderWriter;
+import org.apache.cxf.jaxrs.json.basic.JsonMapObjectReaderWriter;
 
 
 
