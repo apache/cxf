@@ -57,4 +57,20 @@ under the License.
        </jaxrs:properties>
    </jaxrs:server>
    
+   <jaxrs:server address="http://localhost:${testutil.ports.jaxrs-jwejws-algorithms}/jwsec">
+       <jaxrs:serviceBeans>
+          <ref bean="serviceBean"/>
+       </jaxrs:serviceBeans>
+       <jaxrs:providers>
+          <ref bean="jwsInFilter"/>
+       </jaxrs:providers>
+       <jaxrs:properties>
+            <entry key="rs.security.keystore.type" value="jwk"/>
+            <entry key="rs.security.keystore.alias" value="ECKey"/>
+            <entry key="rs.security.keystore.file" 
+                   value="org/apache/cxf/systest/jaxrs/security/certs/jwkPublicSet.txt"/>
+            <entry key="rs.security.signature.algorithm" value="ES256"/>
+       </jaxrs:properties>
+   </jaxrs:server>
+   
 </beans>
