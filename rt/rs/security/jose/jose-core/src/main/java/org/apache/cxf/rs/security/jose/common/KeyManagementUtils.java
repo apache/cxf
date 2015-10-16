@@ -42,7 +42,6 @@ import java.util.logging.Logger;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
@@ -283,7 +282,7 @@ public final class KeyManagementUtils {
         if (algo == null) {
             algo = (String)m.getContextualProperty(propName);
         }
-        if (algo == null && PropertyUtils.isTrue(m.getContextualProperty(JoseConstants.RSSEC_DEFAULT_ALGORITHMS))) {
+        if (algo == null) {
             algo = defaultAlg;
         }
         return algo;
