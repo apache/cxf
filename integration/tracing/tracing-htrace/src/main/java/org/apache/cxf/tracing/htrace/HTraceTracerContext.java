@@ -47,14 +47,18 @@ public class HTraceTracerContext implements TracerContext {
     
     @Override
     public <T> T continueSpan(final Traceable<T> traceable) throws Exception {
+        boolean attached = false;
         if (!isTracing() && continuationScope != null) {
             continuationScope.reattach();
+            attached = true;
         }
         
         try {
             return traceable.call(new HTraceTracerContext(tracer));
         } finally {
-            continuationScope.detach();
+            if (continuationScope != null && attached) {
+                continuationScope.detach();
+            }
         }
     }
     

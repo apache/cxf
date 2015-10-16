@@ -109,7 +109,7 @@ public abstract class AbstractHTraceProvider extends AbstractTracingProvider {
             try {
                 return SpanId.fromString(value.get(0));
             } catch (NumberFormatException ex) {
-                LOG.log(Level.FINE, String.format("Unable to parse '%s' header value to long number", header), ex);
+                LOG.log(Level.FINE, String.format("Unable to parse '%s' header value to Span Id", header), ex);
             }
         }
         return defaultValue;

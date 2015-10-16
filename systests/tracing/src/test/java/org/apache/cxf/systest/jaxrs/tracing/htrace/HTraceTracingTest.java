@@ -272,6 +272,22 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
         assertThat(TestSpanReceiver.getAllSpans().get(2).getDescription(), equalTo("test span"));
     }
     
+    @Test
+    public void testThatInnerSpanIsCreatedUsingPseudoAsyncInvocation() {
+        final SpanId spanId = SpanId.fromRandom();
+        
+        final Response r = createWebClient("/bookstore/books/pseudo-async")
+            .header(TracerHeaders.DEFAULT_HEADER_SPAN_ID, spanId.toString())
+            .get();
+        assertEquals(Status.OK.getStatusCode(), r.getStatus());
+        
+        assertThat(TestSpanReceiver.getAllSpans().size(), equalTo(2));
+        assertThat(TestSpanReceiver.getAllSpans().get(1).getDescription(), equalTo("GET bookstore/books/pseudo-async"));
+        assertThat(TestSpanReceiver.getAllSpans().get(0).getDescription(), equalTo("Processing books"));
+        
+        assertThat((String)r.getHeaders().getFirst(TracerHeaders.DEFAULT_HEADER_SPAN_ID), equalTo(spanId.toString()));
+    }
+    
     protected WebClient createWebClient(final String url, final Object ... providers) {
         return WebClient
             .create("http://localhost:" + PORT + url, Arrays.asList(providers))

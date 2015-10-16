@@ -114,6 +114,26 @@ public class BookStore {
     }
     
     @GET
+    @Path("/books/pseudo-async")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Collection<Book> getBooksPseudoAsync() throws Exception {
+        return tracer.continueSpan(new Traceable<Collection<Book>>() {
+            @Override
+            public Collection<Book> call(final TracerContext context) throws Exception {
+                return tracer.wrap("Processing books", new Traceable<Collection<Book>>() {
+                    @Override
+                    public Collection<Book> call(final TracerContext context) throws Exception {
+                        return Arrays.asList(
+                            new Book("Apache CXF in Action", UUID.randomUUID().toString()),
+                            new Book("Mastering Apache CXF", UUID.randomUUID().toString())
+                        );
+                    }
+                }).call();
+            }
+        });
+    }
+    
+    @GET
     @Path("/book/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Book getBook(@PathParam("id") final String id) {
