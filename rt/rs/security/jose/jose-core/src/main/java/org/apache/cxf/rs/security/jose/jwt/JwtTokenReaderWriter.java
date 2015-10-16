@@ -22,7 +22,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.cxf.jaxrs.provider.json.JsonMapObjectReaderWriter;
+import org.apache.cxf.jaxrs.json.basic.JsonMapObjectReaderWriter;
 
 
 

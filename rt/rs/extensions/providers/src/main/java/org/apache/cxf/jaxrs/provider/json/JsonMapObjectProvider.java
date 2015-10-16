@@ -34,6 +34,8 @@ import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.jaxrs.json.basic.JsonMapObject;
+import org.apache.cxf.jaxrs.json.basic.JsonMapObjectReaderWriter;
 
 @Produces({"application/json", "application/*+json" })
 @Consumes({"application/json", "application/*+json" })
@@ -67,19 +69,12 @@ public class JsonMapObjectProvider implements MessageBodyReader<JsonMapObject>, 
                                   MultivaluedMap<String, String> headers, InputStream is) throws IOException,
         WebApplicationException {
         String s = IOUtils.readStringFromStream(is);
-        JsonMapObject obj = new JsonMapObject(); 
-        handler.fromJson(obj, s);
-        if (cls == JsonMapObject.class) {
+        try {
+            JsonMapObject obj = cls == JsonMapObject.class ? new JsonMapObject() : (JsonMapObject)cls.newInstance(); 
+            handler.fromJson(obj, s);
             return obj;
-        } else {
-            try {
-                JsonMapObject actualObj = (JsonMapObject)cls.newInstance();
-                actualObj.values = obj.values;
-                actualObj.updateCount = obj.updateCount;
-                return actualObj;
-            } catch (Exception ex) {
-                throw new IOException(ex);
-            }
+        } catch (Exception ex) {
+            throw new IOException(ex);
         }
         
     }

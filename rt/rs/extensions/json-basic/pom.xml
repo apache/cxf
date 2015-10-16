@@ -19,16 +19,16 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>cxf-rt-rs-security-jose</artifactId>
+    <artifactId>cxf-rt-rs-json-basic</artifactId>
     <packaging>bundle</packaging>
-    <name>Apache CXF Runtime JOSE Core</name>
-    <description>Apache CXF Runtime JOSE Core</description>
+    <name>Apache CXF JAX-RS Extensions: JSON Basic</name>
+    <description>Apache CXF JAX-RS Extensions: JSON Basic</description>
     <url>http://cxf.apache.org</url>
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
         <version>3.1.4-SNAPSHOT</version>
-        <relativePath>../../../../../parent/pom.xml</relativePath>
+        <relativePath>../../../../parent/pom.xml</relativePath>
     </parent>
     <dependencies>
         <dependency>
@@ -37,27 +37,18 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-security</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-rs-json-basic</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-ext-jdk15on</artifactId>
-            <version>${cxf.bcprov.version}</version>
-            <scope>provided</scope>
-            <optional>true</optional> 
-        </dependency>
-        <!--test dependencies-->
-        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.easymock</groupId>
+            <artifactId>easymock</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
+    <build>
+        <plugins>
+        </plugins>
+    </build>
 </project>

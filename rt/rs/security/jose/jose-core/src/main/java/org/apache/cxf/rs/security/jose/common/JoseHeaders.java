@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.cxf.helpers.CastUtils;
-import org.apache.cxf.jaxrs.provider.json.JsonMapObject;
+import org.apache.cxf.jaxrs.json.basic.JsonMapObject;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 
 public abstract class JoseHeaders extends JsonMapObject {

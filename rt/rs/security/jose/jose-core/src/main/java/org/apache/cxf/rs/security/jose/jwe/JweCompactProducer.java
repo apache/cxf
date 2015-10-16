@@ -24,7 +24,7 @@ import java.io.OutputStream;
 
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.jaxrs.provider.json.JsonMapObjectReaderWriter;
+import org.apache.cxf.jaxrs.json.basic.JsonMapObjectReaderWriter;
 
 
 public class JweCompactProducer {

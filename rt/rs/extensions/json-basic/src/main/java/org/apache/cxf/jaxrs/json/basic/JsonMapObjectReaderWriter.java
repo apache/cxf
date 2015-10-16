@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.provider.json;
+package org.apache.cxf.jaxrs.json.basic;
 
 import java.io.IOException;
 import java.io.InputStream;

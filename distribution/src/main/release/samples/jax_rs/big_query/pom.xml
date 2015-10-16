@@ -44,7 +44,12 @@
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-rs-security-jose-jaxrs</artifactId>
+            <artifactId>cxf-rt-rs-security-jose</artifactId>
+            <version>3.1.4-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-rs-extension-providers</artifactId>
             <version>3.1.4-SNAPSHOT</version>
         </dependency>
         <dependency>

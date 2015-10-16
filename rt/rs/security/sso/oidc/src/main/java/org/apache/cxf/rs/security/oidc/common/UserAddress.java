@@ -20,7 +20,7 @@ package org.apache.cxf.rs.security.oidc.common;
 
 import java.util.Map;
 
-import org.apache.cxf.jaxrs.provider.json.JsonMapObject;
+import org.apache.cxf.jaxrs.json.basic.JsonMapObject;
 
 public class UserAddress extends JsonMapObject {
     public static final String STREET = "street_address";

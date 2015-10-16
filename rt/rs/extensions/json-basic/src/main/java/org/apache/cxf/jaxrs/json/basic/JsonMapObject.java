@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.jaxrs.provider.json;
+package org.apache.cxf.jaxrs.json.basic;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;

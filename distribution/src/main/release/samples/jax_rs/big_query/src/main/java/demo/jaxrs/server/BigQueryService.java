@@ -31,7 +31,7 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
-import org.apache.cxf.jaxrs.provider.json.JsonMapObject;
+import org.apache.cxf.jaxrs.json.basic.JsonMapObject;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oidc.rp.OidcClientTokenContext;
 

@@ -33,6 +33,7 @@
         <module>client</module>
         <module>http-sci</module>
         <module>description</module>
+        <module>extensions/json-basic</module>
         <module>extensions/providers</module>
         <module>extensions/search</module>
         <module>security</module>
