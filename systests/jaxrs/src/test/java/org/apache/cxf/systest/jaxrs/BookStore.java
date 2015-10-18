@@ -338,8 +338,19 @@ public class BookStore {
         if (bean.getNested().getId4() != id) {
             throw new RuntimeException();
         }
+        return books.get(id);
+    }
+    
+    @GET
+    @Path("/beanparam2/{id}")
+    @Produces("application/xml")
+    public Book getBeanParamBook2(@BeanParam BookBean2 bean1, 
+                                  @BeanParam BookBeanNested bean2) {
         
-        
+        long id = bean1.getId() + bean1.getId2() + bean1.getId3(); 
+        if (bean2.getId4() != id) {
+            throw new RuntimeException();
+        }
         return books.get(id);
     }
     
@@ -1809,6 +1820,41 @@ public class BookStore {
             this.id4 = id4;
         }
         
+    }
+    
+    public static class BookBean2 {
+        private long id;
+        @QueryParam("id_2")
+        private long id2;
+        private long id3;
+        public long getId() {
+            return id;
+        }
+
+        @PathParam("id")
+        public void setId(long id) {
+            this.id = id;
+        }
+        
+        public long getId2() {
+            return id2;
+        }
+
+        public void setId2(long id2) {
+            this.id2 = id2;
+        }
+        
+        @Context
+        public void setUriInfo(UriInfo ui) {
+            String id3Value = ui.getQueryParameters().getFirst("id3");
+            if (id3Value != null) {
+                this.id3 = Long.valueOf(id3Value);
+            }
+        }
+
+        public long getId3() {
+            return id3;
+        }
     }
     
     public static class BookNotReturnedException extends RuntimeException {
