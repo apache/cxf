@@ -342,10 +342,10 @@ public class BookStore {
     }
     
     @GET
-    @Path("/beanparam2/{id}")
+    @Path("/twoBeanParams/{id}")
     @Produces("application/xml")
-    public Book getBeanParamBook2(@BeanParam BookBean2 bean1, 
-                                  @BeanParam BookBeanNested bean2) {
+    public Book getTwoBeanParamsBook(@BeanParam BookBean2 bean1, 
+                                     @BeanParam BookBeanNested bean2) {
         
         long id = bean1.getId() + bean1.getId2() + bean1.getId3(); 
         if (bean2.getId4() != id) {

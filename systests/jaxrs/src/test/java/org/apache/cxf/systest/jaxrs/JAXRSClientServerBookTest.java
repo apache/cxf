@@ -473,7 +473,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         bean.setId2(23L);
         BookStore.BookBeanNested nested = new BookStore.BookBeanNested();
         nested.setId4(123);
-        Book book = store.getBeanParamBook2(bean, nested);
+        Book book = store.getTwoBeanParamsBook(bean, nested);
         assertEquals(123L, book.getId());
         
     }
