@@ -101,16 +101,10 @@ public class JAXRSJwsJsonTest extends AbstractBusClientServerTestBase {
     }
     @Test
     public void testJweCompactJwsJsonBookBeanHmac() throws Exception {
-<<<<<<< HEAD
-        if (SKIP_AES_GCM_TESTS) {
-            return;
-        }
-=======
-        if (!SecurityTestUtil.checkUnrestrictedPoliciesInstalled()) {
+        if (SKIP_AES_GCM_TESTS || !SecurityTestUtil.checkUnrestrictedPoliciesInstalled()) {
             return;
         }
         
->>>>>>> 4ba52d1... Fixing failing tests with limited security policies
         String address = "https://localhost:" + PORT + "/jwejwsjsonhmac";
         List<?> extraProviders = Arrays.asList(new JacksonJsonProvider(),
                                                new JweWriterInterceptor(),

@@ -47,6 +47,7 @@ import org.apache.cxf.rs.security.jose.jwe.AesWrapKeyEncryptionAlgorithm;
 import org.apache.cxf.rs.security.jose.jws.HmacJwsSignatureProvider;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
 import org.apache.cxf.systest.jaxrs.security.Book;
+import org.apache.cxf.systest.jaxrs.security.SecurityTestUtil;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
@@ -451,6 +452,9 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
     // Test signing and encrypting an XML payload
     @Test
     public void testJweRsaJwsRsaXML() throws Exception {
+        if (SKIP_AES_GCM_TESTS || !SecurityTestUtil.checkUnrestrictedPoliciesInstalled()) {
+            return;
+        }
         String address = "https://localhost:" + PORT + "/jwejwsrsa";
         BookStore bs = createJweJwsBookStore(address, null, null);
         Book book = new Book();
