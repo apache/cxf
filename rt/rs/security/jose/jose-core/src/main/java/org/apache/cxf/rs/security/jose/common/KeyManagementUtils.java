@@ -330,9 +330,12 @@ public final class KeyManagementUtils {
                 }
             }
         }
-        if (props == null && required) { 
-            LOG.warning("Properties resource is not identified");
-            throw new JoseException();
+        if (props == null) {
+            if (required) {
+                LOG.warning("Properties resource is not identified");
+                throw new JoseException();
+            }
+            props = new Properties();
         }
         return props; 
     }

@@ -139,11 +139,6 @@ public final class JoseConstants {
     public static final String RSSEC_SIGNATURE_PROPS = "rs.security.signature.properties";
     
     /**
-     * Whether a "none" signature is allowed or not. The default is "false".
-     */
-    public static final String RSSEC_SIGNATURE_ALLOW_NONE_SIGNATURE = "rs.security.signature.allow.none";
-    
-    /**
      * TODO documentation for these
      */
     public static final String RSSEC_SIGNATURE_REPORT_KEY_PROP = "rs.security.signature.report.public.key";
