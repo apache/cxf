@@ -204,18 +204,9 @@ public final class JwsUtils {
     }
     public static JwsSignatureVerifier loadSignatureVerifier(JwsHeaders headers, boolean required) {
         Message m = PhaseInterceptorChain.getCurrentMessage();
-        boolean allowNoneSignature = 
-            MessageUtils.getContextualBoolean(m, JoseConstants.RSSEC_SIGNATURE_ALLOW_NONE_SIGNATURE, false);
-        if (allowNoneSignature && SignatureAlgorithm.NONE.getJwaName().equals(headers.getAlgorithm())) {
-            return new NoneJwsSignatureVerifier();
-        }
-            
         Properties props = KeyManagementUtils.loadStoreProperties(m, required, 
                                                                   JoseConstants.RSSEC_SIGNATURE_IN_PROPS, 
                                                                   JoseConstants.RSSEC_SIGNATURE_PROPS);
-        if (props == null) {
-            return null;
-        }
         return loadSignatureVerifier(m, props, headers, false);
     }
     public static List<JwsSignatureProvider> loadSignatureProviders(String propLoc, Message m) {
@@ -338,9 +329,14 @@ public final class JwsUtils {
             
         } else {
             String signatureAlgo = getSignatureAlgo(m, props, null, null);
-            theVerifier = getPublicKeySignatureVerifier(
+            if (SignatureAlgorithm.getAlgorithm(signatureAlgo) == SignatureAlgorithm.NONE 
+                && SignatureAlgorithm.NONE.getJwaName().equals(inHeaders.getAlgorithm())) {
+                theVerifier = new NoneJwsSignatureVerifier();
+            } else {
+                theVerifier = getPublicKeySignatureVerifier(
                               KeyManagementUtils.loadPublicKey(m, props), 
                               SignatureAlgorithm.getAlgorithm(signatureAlgo));
+            }
         }
         if (theVerifier == null && !ignoreNullVerifier) {
             LOG.warning("Verifier is not available");
