@@ -111,7 +111,7 @@ public final class JoseConstants {
     public static final String RSSEC_SIGNATURE_KEY_PSWD_PROVIDER = "rs.security.signature.key.password.provider";
     
     /**
-     * The signature algorithm to use. For example 'RS256'.
+     * The signature algorithm to use. The default algorithm if not specified is 'RS256'.
      */
     public static final String RSSEC_SIGNATURE_ALGORITHM = "rs.security.signature.algorithm";
     
@@ -160,7 +160,7 @@ public final class JoseConstants {
     public static final String RSSEC_DECRYPTION_KEY_PSWD_PROVIDER = "rs.security.decryption.key.password.provider";
     
     /**
-     * The encryption content algorithm to use.
+     * The encryption content algorithm to use. The default algorithm if not specified is 'A128GCM'.
      */
     public static final String RSSEC_ENCRYPTION_CONTENT_ALGORITHM = "rs.security.encryption.content.algorithm";
     
@@ -172,7 +172,8 @@ public final class JoseConstants {
         "rs.security.jwe.content.encryption.algorithm";
     
     /**
-     * The encryption key algorithm to use.
+     * The encryption key algorithm to use. The default algorithm if not specified is 'RSA-OAEP' if the key is an
+     * RSA key, and 'A128GCMKW' if it is an octet sequence.
      */
     public static final String RSSEC_ENCRYPTION_KEY_ALGORITHM = "rs.security.encryption.key.algorithm";
     
