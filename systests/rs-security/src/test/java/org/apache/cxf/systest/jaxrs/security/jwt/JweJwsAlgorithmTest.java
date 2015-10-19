@@ -34,6 +34,7 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.jose.jaxrs.JweWriterInterceptor;
 import org.apache.cxf.rs.security.jose.jaxrs.JwsWriterInterceptor;
 import org.apache.cxf.systest.jaxrs.security.Book;
+import org.apache.cxf.systest.jaxrs.security.SecurityTestUtil;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.AfterClass;
@@ -150,6 +151,9 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
     
     @org.junit.Test
     public void testWrongContentEncryptionAlgorithm() throws Exception {
+        if (!SecurityTestUtil.checkUnrestrictedPoliciesInstalled()) {
+            return;
+        }
 
         URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
 

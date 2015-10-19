@@ -43,6 +43,7 @@ import org.apache.cxf.rs.security.jose.jaxrs.JwsJsonClientResponseFilter;
 import org.apache.cxf.rs.security.jose.jaxrs.JwsJsonWriterInterceptor;
 import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.systest.jaxrs.security.Book;
+import org.apache.cxf.systest.jaxrs.security.SecurityTestUtil;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
@@ -100,9 +101,16 @@ public class JAXRSJwsJsonTest extends AbstractBusClientServerTestBase {
     }
     @Test
     public void testJweCompactJwsJsonBookBeanHmac() throws Exception {
+<<<<<<< HEAD
         if (SKIP_AES_GCM_TESTS) {
             return;
         }
+=======
+        if (!SecurityTestUtil.checkUnrestrictedPoliciesInstalled()) {
+            return;
+        }
+        
+>>>>>>> 4ba52d1... Fixing failing tests with limited security policies
         String address = "https://localhost:" + PORT + "/jwejwsjsonhmac";
         List<?> extraProviders = Arrays.asList(new JacksonJsonProvider(),
                                                new JweWriterInterceptor(),
