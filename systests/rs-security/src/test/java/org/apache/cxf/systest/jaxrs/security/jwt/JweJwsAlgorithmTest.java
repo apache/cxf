@@ -348,4 +348,45 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
         assertEquals(returnedBook.getName(), "book");
         assertEquals(returnedBook.getId(), 123L);
     }
+    
+    @org.junit.Test
+    public void testManualSignature() throws Exception {
+
+        URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
+
+        List<Object> providers = new ArrayList<Object>();
+        providers.add(new JacksonJsonProvider());
+
+        String address = "http://localhost:" + PORT + "/jws/bookstore/books";
+        WebClient client = 
+            WebClient.create(address, providers, busFile.toString());
+        client.type("application/json").accept("application/json");
+
+        Map<String, Object> properties = new HashMap<String, Object>();
+        WebClient.getConfig(client).getRequestContext().putAll(properties);
+        
+        String header = "eyJhbGciOiJSUzI1NiIsImN0eSI6Impzb24ifQ";
+        String payload = "eyJCb29rIjp7ImlkIjoxMjMsIm5hbWUiOiJib29rIn19";
+        String sig = "mZJVPy83atFNxQMeJqkVbR8t1srr9LgKBGT0hgiymjNepRgqedvFG5B8E8UPAzfzNLsos91gGdneUEKrWauU4GoDPTzngX"
+            + "798aDP6lsn5bUoTMKLfaWp9uzHDIzLMjGkabn92nrIpdK4JKDYNjdSUJIT2L97jggg0aoLhJQHVw2LdF1fpYdM-HCyccNW"
+            + "HQbAR7bDZdITZFnDi8b22QfHCqeLV7m4mBvNDtNX337wtoUKyjPYBMoWc12hHDCwQyu_gfW6zFioF5TGx-Ifg8hrFlnyUr"
+            + "vnSdP-FUtXiGeWBIvE_L6gD7DfM4u9hkK757vTjjMR_pF2CW3pfSH-Ha8v0A";
+
+        // Successful test
+        Response response = client.post(header + "." + payload + "." + sig);
+        assertEquals(response.getStatus(), 200);
+        
+        Book returnedBook = response.readEntity(Book.class);
+        assertEquals(returnedBook.getName(), "book");
+        assertEquals(returnedBook.getId(), 123L);
+        
+        // No signature
+        response = client.post(header + "." + payload + ".");
+        assertNotEquals(response.getStatus(), 200);
+        
+        // Modified signature
+        String sig2 = sig.replace('y', 'z');
+        response = client.post(header + "." + payload + "." + sig2);
+        assertNotEquals(response.getStatus(), 200);
+    }
 }
