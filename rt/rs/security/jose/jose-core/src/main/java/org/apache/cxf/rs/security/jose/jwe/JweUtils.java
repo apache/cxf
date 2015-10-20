@@ -19,11 +19,13 @@
 package org.apache.cxf.rs.security.jose.jwe;
 
 import java.nio.ByteBuffer;
+import java.security.Key;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
+import java.security.interfaces.RSAKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Arrays;
@@ -658,5 +660,12 @@ public final class JweUtils {
                                                                   JoseConstants.RSSEC_ENCRYPTION_PROPS);
         KeyManagementUtils.validateCertificateChain(props, certs);
     }
-    
+
+    public static void checkEncryptionKeySize(Key key) {
+        if (key instanceof RSAKey && ((RSAKey)key).getModulus().bitLength() < 2048) {
+            LOG.fine("A key of size: " + ((RSAKey)key).getModulus().bitLength()
+                     + " was used with an RSA encryption algorithm. 2048 is the minimum size that is accepted");
+            throw new JweException(JweException.Error.KEY_DECRYPTION_FAILURE);
+        }
+    }
 }

@@ -18,11 +18,13 @@
  */
 package org.apache.cxf.rs.security.jose.jws;
 
+import java.security.Key;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
+import java.security.interfaces.RSAKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.ArrayList;
@@ -412,5 +414,13 @@ public final class JwsUtils {
     }
     public static boolean isPayloadUnencoded(JwsHeaders jwsHeaders) {
         return jwsHeaders.getPayloadEncodingStatus() == Boolean.FALSE;
+    }
+    
+    public static void checkSignatureKeySize(Key key) {
+        if (key instanceof RSAKey && ((RSAKey)key).getModulus().bitLength() < 2048) {
+            LOG.fine("A key of size: " + ((RSAKey)key).getModulus().bitLength()
+                     + " was used with an RSA signature algorithm. 2048 is the minimum size that is accepted");
+            throw new JwsException(JwsException.Error.INVALID_KEY);
+        }
     }
 }
