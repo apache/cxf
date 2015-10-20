@@ -31,6 +31,7 @@ public class IdTokenCodeResponseFilter extends AbstractOAuthServerJoseJwtProduce
     private String issuer;
     @Override
     public void process(ClientAccessToken ct, ServerAccessToken st) {
+        // This may also be done directly inside a data provider code creating the server token
         IdToken token = 
             userInfoProvider.getIdToken(st.getClient().getClientId(), st.getSubject(), st.getScopes());
         token.setIssuer(issuer);

@@ -69,9 +69,9 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
                                                              String redirectUri,
                                                              UserSubject subject,
                                                              List<OAuthPermission> perms,
-                                                             boolean preAuthorizedTokenAvailable) {
+                                                             boolean authorizationCanBeSkipped) {
         OAuthAuthorizationData data = 
-            super.createAuthorizationData(client, params, redirectUri, subject, perms, preAuthorizedTokenAvailable);
+            super.createAuthorizationData(client, params, redirectUri, subject, perms, authorizationCanBeSkipped);
         setCodeQualifier(data, params);
         return data;
     }
