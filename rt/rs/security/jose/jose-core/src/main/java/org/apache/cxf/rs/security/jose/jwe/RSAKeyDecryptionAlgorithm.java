@@ -32,6 +32,7 @@ public class RSAKeyDecryptionAlgorithm extends WrappedKeyDecryptionAlgorithm {
     }
     public RSAKeyDecryptionAlgorithm(RSAPrivateKey privateKey, KeyAlgorithm supportedAlgo, boolean unwrap) {    
         super(privateKey, supportedAlgo, unwrap);
+        JweUtils.checkEncryptionKeySize(privateKey);
     }
     protected int getKeyCipherBlockSize() {
         return ((RSAPrivateKey)getCekDecryptionKey()).getModulus().toByteArray().length;

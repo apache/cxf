@@ -42,6 +42,25 @@ under the License.
        </jaxrs:properties>
    </jaxrs:server>
    
+   <jaxrs:server address="http://localhost:${testutil.ports.jaxrs-jwejws-algorithms}/jwesmallkey">
+       <jaxrs:serviceBeans>
+          <ref bean="serviceBean"/>
+       </jaxrs:serviceBeans>
+       <jaxrs:providers>
+          <ref bean="jweInFilter"/>
+       </jaxrs:providers>
+       <jaxrs:properties>
+            <entry key="rs.security.keystore.type" value="jks"/>
+            <entry key="rs.security.keystore.alias" value="smallkey"/>
+            <entry key="rs.security.keystore.password" value="security"/>
+            <entry key="rs.security.key.password" value="security"/>
+            <entry key="rs.security.keystore.file" 
+                   value="org/apache/cxf/systest/jaxrs/security/certs/smallkeysize.jks"/>
+            <entry key="rs.security.encryption.content.algorithm" value="A128GCM"/>
+            <entry key="rs.security.encryption.key.algorithm" value="RSA-OAEP"/>
+       </jaxrs:properties>
+   </jaxrs:server>
+   
     <bean id="jwsInFilter" class="org.apache.cxf.rs.security.jose.jaxrs.JwsContainerRequestFilter"/>
     
     <jaxrs:server address="http://localhost:${testutil.ports.jaxrs-jwejws-algorithms}/jws">
@@ -70,6 +89,24 @@ under the License.
             <entry key="rs.security.keystore.file" 
                    value="org/apache/cxf/systest/jaxrs/security/certs/jwkPublicSet.txt"/>
             <entry key="rs.security.signature.algorithm" value="ES256"/>
+       </jaxrs:properties>
+   </jaxrs:server>
+   
+   <jaxrs:server address="http://localhost:${testutil.ports.jaxrs-jwejws-algorithms}/jwssmallkey">
+       <jaxrs:serviceBeans>
+          <ref bean="serviceBean"/>
+       </jaxrs:serviceBeans>
+       <jaxrs:providers>
+          <ref bean="jwsInFilter"/>
+       </jaxrs:providers>
+       <jaxrs:properties>
+            <entry key="rs.security.keystore.type" value="jks"/>
+            <entry key="rs.security.keystore.alias" value="smallkey"/>
+            <entry key="rs.security.keystore.password" value="security"/>
+            <entry key="rs.security.key.password" value="security"/>
+            <entry key="rs.security.keystore.file" 
+                   value="org/apache/cxf/systest/jaxrs/security/certs/smallkeysize.jks"/>
+            <entry key="rs.security.signature.algorithm" value="RS256"/>
        </jaxrs:properties>
    </jaxrs:server>
    

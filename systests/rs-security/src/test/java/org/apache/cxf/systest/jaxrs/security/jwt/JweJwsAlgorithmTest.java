@@ -204,6 +204,35 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
         assertNotEquals(response.getStatus(), 200);
     }
     
+    // 1024 bits not allowed with RSA according to the spec
+    @org.junit.Test
+    public void testSmallEncryptionKeySize() throws Exception {
+        URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
+
+        List<Object> providers = new ArrayList<Object>();
+        providers.add(new JacksonJsonProvider());
+        providers.add(new JweWriterInterceptor());
+
+        String address = "http://localhost:" + PORT + "/jwesmallkey/bookstore/books";
+        WebClient client = 
+            WebClient.create(address, providers, busFile.toString());
+        client.type("application/json").accept("application/json");
+
+        Map<String, Object> properties = new HashMap<String, Object>();
+        properties.put("rs.security.keystore.type", "jks");
+        properties.put("rs.security.keystore.alias", "smallkey");
+        properties.put("rs.security.keystore.password", "security");
+        properties.put("rs.security.keystore.file", 
+            "org/apache/cxf/systest/jaxrs/security/certs/smallkeysize.jks");
+        properties.put("rs.security.encryption.content.algorithm", "A128GCM");
+        properties.put("rs.security.encryption.key.algorithm", "RSA-OAEP");
+        WebClient.getConfig(client).getRequestContext().putAll(properties);
+
+        Response response = client.post(new Book("book", 123L));
+        assertNotEquals(response.getStatus(), 200);
+    }
+
+    
     //
     // Signature tests
     //
@@ -318,7 +347,7 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
         Response response = client.post(new Book("book", 123L));
         assertNotEquals(response.getStatus(), 200);
     }
-    
+
     @org.junit.Test
     public void testSignatureEllipticCurve() throws Exception {
 
@@ -389,4 +418,34 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
         response = client.post(header + "." + payload + "." + sig2);
         assertNotEquals(response.getStatus(), 200);
     }
+    
+    // 1024 bits not allowed with RSA according to the spec
+    @org.junit.Test
+    public void testSmallSignatureKeySize() throws Exception {
+
+        URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
+
+        List<Object> providers = new ArrayList<Object>();
+        providers.add(new JacksonJsonProvider());
+        providers.add(new JwsWriterInterceptor());
+
+        String address = "http://localhost:" + PORT + "/jwssmallkey/bookstore/books";
+        WebClient client = 
+            WebClient.create(address, providers, busFile.toString());
+        client.type("application/json").accept("application/json");
+
+        Map<String, Object> properties = new HashMap<String, Object>();
+        properties.put("rs.security.keystore.type", "jks");
+        properties.put("rs.security.keystore.alias", "smallkey");
+        properties.put("rs.security.keystore.password", "security");
+        properties.put("rs.security.key.password", "security");
+        properties.put("rs.security.keystore.file", 
+            "org/apache/cxf/systest/jaxrs/security/certs/smallkeysize.jks");
+        properties.put("rs.security.signature.algorithm", "RS256");
+        WebClient.getConfig(client).getRequestContext().putAll(properties);
+
+        Response response = client.post(new Book("book", 123L));
+        assertNotEquals(response.getStatus(), 200);
+    }
+    
 }

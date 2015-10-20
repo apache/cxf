@@ -41,6 +41,7 @@ public class PublicKeyJwsSignatureVerifier implements JwsSignatureVerifier {
         this.key = key;
         this.signatureSpec = spec;
         this.supportedAlgo = supportedAlgo;
+        JwsUtils.checkSignatureKeySize(key);
     }
     @Override
     public boolean verify(JwsHeaders headers, String unsignedText, byte[] signature) {
