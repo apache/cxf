@@ -15,9 +15,9 @@
         <bundle dependency="true">mvn:com.fasterxml.jackson.dataformat/jackson-dataformat-yaml/2.4.6</bundle>
 
         <!-- swagger -->
-        <bundle dependency="true">mvn:io.swagger/swagger-annotations/1.5.4-SNAPSHOT</bundle>
-        <bundle dependency="true">mvn:io.swagger/swagger-models/1.5.4-SNAPSHOT</bundle>
-        <bundle dependency="true">mvn:io.swagger/swagger-core/1.5.4-SNAPSHOT</bundle>
+        <bundle dependency="true">mvn:io.swagger/swagger-annotations/1.5.4</bundle>
+        <bundle dependency="true">mvn:io.swagger/swagger-models/1.5.4</bundle>
+        <bundle dependency="true">mvn:io.swagger/swagger-core/1.5.4</bundle>
     </feature>
 
     <feature name="demo-swagger-jaxrs" version="1.0.0" resolver="(obr)">
@@ -33,7 +33,7 @@
 
         <!-- swagger -->
         <feature version='1.0.0'>demo-swagger-core</feature>
-        <bundle dependency="true">mvn:io.swagger/swagger-jaxrs/1.5.4-SNAPSHOT</bundle>
+        <bundle dependency="true">mvn:io.swagger/swagger-jaxrs/1.5.4</bundle>
     </feature>
 
 
