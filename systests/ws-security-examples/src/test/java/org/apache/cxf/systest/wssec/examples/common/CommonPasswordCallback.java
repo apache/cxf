@@ -42,6 +42,7 @@ public class CommonPasswordCallback implements CallbackHandler {
         passwords.put("alice", "password");
         passwords.put("bob", "password");
         passwords.put("cxfca", "password");
+        passwords.put("sts", "password");
     }
 
     /**
