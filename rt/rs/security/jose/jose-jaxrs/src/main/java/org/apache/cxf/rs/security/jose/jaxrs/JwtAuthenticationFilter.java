@@ -30,8 +30,12 @@ import javax.ws.rs.core.HttpHeaders;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.rs.security.jose.common.JoseConstants;
 import org.apache.cxf.rs.security.jose.common.JoseException;
 import org.apache.cxf.rs.security.jose.common.JoseUtils;
+import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jwt.AbstractJoseJwtConsumer;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rs.security.jose.jwt.JwtUtils;
@@ -62,11 +66,29 @@ public class JwtAuthenticationFilter extends AbstractJoseJwtConsumer implements 
         if (securityContext != null) {
             JAXRSUtils.getCurrentMessage().put(SecurityContext.class, securityContext);
         }
-
     }
     
     protected SecurityContext configureSecurityContext(JwtToken jwt) {
-        return new JwtTokenSecurityContext(jwt, roleClaim);
+        Message m = JAXRSUtils.getCurrentMessage();
+        boolean enableUnsignedJwt = 
+            MessageUtils.getContextualBoolean(m, JoseConstants.ENABLE_UNSIGNED_JWT_PRINCIPAL, false);
+        
+        // The token must be signed/verified with a public key to set up the security context, 
+        // unless we directly configure otherwise
+        if (isVerifiedWithAPublicKey(jwt) || enableUnsignedJwt) {
+            return new JwtTokenSecurityContext(jwt, roleClaim);
+        }
+        return null;
+    }
+    
+    private boolean isVerifiedWithAPublicKey(JwtToken jwt) {
+        if (isJwsRequired()) {
+            String alg = (String)jwt.getHeader(JoseConstants.HEADER_ALGORITHM);
+            SignatureAlgorithm sigAlg = SignatureAlgorithm.getAlgorithm(alg);
+            return SignatureAlgorithm.isPublicKeyAlgorithm(sigAlg);
+        }
+        
+        return false;
     }
 
     

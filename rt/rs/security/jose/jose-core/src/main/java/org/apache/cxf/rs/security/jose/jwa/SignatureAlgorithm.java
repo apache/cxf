@@ -80,4 +80,13 @@ public enum SignatureAlgorithm {
         
     }
     
+    public static boolean isPublicKeyAlgorithm(SignatureAlgorithm sigAlgorithm) {
+        if (sigAlgorithm == null || sigAlgorithm.getJwaName() == null) {
+            return false;
+        }
+        
+        return sigAlgorithm.getJwaName().startsWith("RS") || sigAlgorithm.getJwaName().startsWith("PS")
+            || sigAlgorithm.getJwaName().startsWith("ES");
+    }
+    
 }
