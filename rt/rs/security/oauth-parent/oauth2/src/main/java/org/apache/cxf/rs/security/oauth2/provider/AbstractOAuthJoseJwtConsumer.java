@@ -45,17 +45,14 @@ public abstract class AbstractOAuthJoseJwtConsumer extends AbstractJoseJwtConsum
         if (verifyWithClientSecret) {
             byte[] hmac = CryptoUtils.decodeSequence(clientSecret);
             return JwsUtils.getHmacSignatureVerifier(hmac, SignatureAlgorithm.HS256);
-        } 
-        return super.getInitializedSignatureVerifier();
+        }
+        return null;
     }
     protected JweDecryptionProvider getInitializedDecryptionProvider(String clientSecret) {
         JweDecryptionProvider theDecryptionProvider = null;
         if (decryptWithClientSecret) {
             SecretKey key = CryptoUtils.decodeSecretKey(clientSecret);
             theDecryptionProvider = JweUtils.getDirectKeyJweDecryption(key, ContentAlgorithm.A128GCM);
-        }
-        if (theDecryptionProvider == null) {
-            theDecryptionProvider = super.getInitializedDecryptionProvider();
         }
         return theDecryptionProvider;
         
