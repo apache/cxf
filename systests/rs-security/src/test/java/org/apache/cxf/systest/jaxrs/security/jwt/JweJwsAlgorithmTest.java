@@ -230,6 +230,11 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
     // 1024 bits not allowed with RSA according to the spec
     @org.junit.Test
     public void testSmallEncryptionKeySize() throws Exception {
+        
+        if (SKIP_AES_GCM_TESTS) {
+            return;
+        }
+        
         URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<Object>();
