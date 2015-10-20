@@ -41,8 +41,8 @@
         <value>http://localhost:(\d)*/DoubleItSamlSymmetricIssuedToken</value>
     </util:list>
     <bean id="symmetricSTSProperties" class="org.apache.cxf.sts.StaticSTSProperties">
-        <property name="signaturePropertiesFile" value="cxfca.properties"/>
-        <property name="signatureUsername" value="cxfca"/>
+        <property name="signaturePropertiesFile" value="sts.properties"/>
+        <property name="signatureUsername" value="sts"/>
         <property name="callbackHandlerClass" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
         <property name="encryptionPropertiesFile" value="bob.properties"/>
         <property name="issuer" value="DoubleItSTSIssuer"/>
@@ -51,7 +51,7 @@
     <jaxws:endpoint xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/" id="SymmetricSTS" implementor="#symmetricSTSProviderBean" address="http://localhost:${testutil.ports.sts.STSServer}/SecurityTokenService/Symmetric" wsdlLocation="src/test/resources/org/apache/cxf/systest/wssec/examples/sts/ws-trust-1.4-service.wsdl" serviceName="ns1:SecurityTokenService" endpointName="ns1:Symmetric_Port">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
-            <entry key="security.signature.properties" value="cxfca.properties"/>
+            <entry key="security.signature.properties" value="sts.properties"/>
         </jaxws:properties>
     </jaxws:endpoint>
 </beans>

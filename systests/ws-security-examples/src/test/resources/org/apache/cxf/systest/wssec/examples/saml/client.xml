@@ -112,8 +112,8 @@
                         <map>
                             <entry key="security.username" value="alice"/>
                             <entry key="security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
-                            <entry key="security.encryption.properties" value="alice.properties"/>
-                            <entry key="security.encryption.username" value="cxfca"/>
+                            <entry key="security.encryption.properties" value="sts.properties"/>
+                            <entry key="security.encryption.username" value="sts"/>
                         </map>
                     </property>
                 </bean>

@@ -170,7 +170,8 @@
                 <constructor-arg>
                     <map>
                         <entry key="action" value="Signature"/>
-                        <entry key="signatureVerificationPropFile" value="bob.properties"/>
+                        <entry key="signatureVerificationPropFile" 
+                               value="org/apache/cxf/systest/ws/action/bob-modified.properties"/>
                     </map>
                 </constructor-arg>
             </bean>
