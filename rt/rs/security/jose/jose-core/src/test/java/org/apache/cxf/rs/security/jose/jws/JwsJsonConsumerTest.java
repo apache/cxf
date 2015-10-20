@@ -52,6 +52,11 @@ public class JwsJsonConsumerTest extends Assert {
     private static final String KID_OF_THE_FIRST_SIGNER = "2010-12-29";
     private static final String KID_OF_THE_SECOND_SIGNER = "e9bc097a-ce51-4036-9562-d2ade882db0d";
     
+    private static boolean isJava6() {
+        String version = System.getProperty("java.version");
+        return 1.6D == Double.parseDouble(version.substring(0, 3));    
+    }
+    
     @Test
     public void testVerifySignedWithProtectedHeaderOnlyUnencodedPayload() {
         JwsJsonConsumer consumer = 
@@ -64,6 +69,10 @@ public class JwsJsonConsumerTest extends Assert {
     
     @Test
     public void testVerifyDualSignedDocument() throws Exception {
+        if (isJava6()) {
+            return;
+        }
+        
         JwsJsonConsumer consumer = new JwsJsonConsumer(DUAL_SIGNED_DOCUMENT); 
         JsonWebKeys jwks = readKeySet("jwkPublicJsonConsumerSet.txt");
         

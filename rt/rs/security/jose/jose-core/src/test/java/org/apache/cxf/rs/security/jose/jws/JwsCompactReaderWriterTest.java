@@ -98,6 +98,12 @@ public class JwsCompactReaderWriterTest extends Assert {
         "f83OJ3D2xF1Bg8vub9tLe1gHMzV76e8Tus9uPHvRVEU";
     private static final String EC_Y_POINT_ENCODED = 
         "x_FEzRu9m36HLN_tue659LNpXW6pCyStikYjKIWI5a0";
+    
+    private static boolean isJava6() {
+        String version = System.getProperty("java.version");
+        return 1.6D == Double.parseDouble(version.substring(0, 3));    
+    }
+    
     @Test
     public void testWriteJwsSignedByMacSpecExample() throws Exception {
         JwsHeaders headers = new JwsHeaders();
@@ -256,6 +262,10 @@ public class JwsCompactReaderWriterTest extends Assert {
     
     @Test
     public void testWriteReadJwsSignedByESPrivateKey() throws Exception {
+        if (isJava6()) {
+            return;
+        }
+        
         JwsHeaders headers = new JwsHeaders();
         headers.setSignatureAlgorithm(SignatureAlgorithm.ES256);
         JwsCompactProducer jws = initSpecJwtTokenWriter(headers);
