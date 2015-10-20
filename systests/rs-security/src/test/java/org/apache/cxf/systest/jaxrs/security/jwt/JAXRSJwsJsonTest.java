@@ -29,7 +29,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.crypto.Cipher;
 import javax.ws.rs.BadRequestException;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
@@ -41,7 +40,6 @@ import org.apache.cxf.rs.security.jose.jaxrs.JweClientResponseFilter;
 import org.apache.cxf.rs.security.jose.jaxrs.JweWriterInterceptor;
 import org.apache.cxf.rs.security.jose.jaxrs.JwsJsonClientResponseFilter;
 import org.apache.cxf.rs.security.jose.jaxrs.JwsJsonWriterInterceptor;
-import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.systest.jaxrs.security.Book;
 import org.apache.cxf.systest.jaxrs.security.SecurityTestUtil;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -63,17 +61,11 @@ public class JAXRSJwsJsonTest extends AbstractBusClientServerTestBase {
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", 
                    launchServer(BookServerJwsJson.class, true));
-        registerBouncyCastleIfNeeded();
+        registerBouncyCastle();
     }
     
-    private static void registerBouncyCastleIfNeeded() throws Exception {
-        try {
-            // Java 8 apparently has it
-            Cipher.getInstance(AlgorithmUtils.AES_GCM_ALGO_JAVA);
-        } catch (Throwable t) {
-            // Oracle Java 7
-            Security.addProvider(new BouncyCastleProvider());    
-        }
+    private static void registerBouncyCastle() throws Exception {
+        Security.addProvider(new BouncyCastleProvider());    
     }
     @AfterClass
     public static void unregisterBouncyCastleIfNeeded() throws Exception {
@@ -104,7 +96,6 @@ public class JAXRSJwsJsonTest extends AbstractBusClientServerTestBase {
         if (SKIP_AES_GCM_TESTS || !SecurityTestUtil.checkUnrestrictedPoliciesInstalled()) {
             return;
         }
-        
         String address = "https://localhost:" + PORT + "/jwejwsjsonhmac";
         List<?> extraProviders = Arrays.asList(new JacksonJsonProvider(),
                                                new JweWriterInterceptor(),
