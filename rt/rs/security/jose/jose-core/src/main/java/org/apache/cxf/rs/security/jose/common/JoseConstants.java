@@ -212,6 +212,17 @@ public final class JoseConstants {
     public static final String RSSEC_ENCRYPTION_REPORT_KEY_PROP = "rs.security.encryption.report.public.key";
     public static final String RSSEC_ENCRYPTION_REPORT_KEY_ID_PROP = "rs.security.encryption.report.public.key.id";
     
+    //
+    // JWT specific configuration
+    //
+    
+    /**
+     * Whether to allow unsigned JWT tokens as SecurityContext Principals. The default is false.
+     */
+    public static final String ENABLE_UNSIGNED_JWT_PRINCIPAL = "rs.security.enable.unsigned-jwt.principal";
+    
+    
+    
     private JoseConstants() {
         
     }
