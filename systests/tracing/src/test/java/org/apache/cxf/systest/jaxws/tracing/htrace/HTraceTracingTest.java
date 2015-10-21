@@ -216,8 +216,7 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
         properties.put(Tracer.SPAN_RECEIVER_CLASSES_KEY, TestSpanReceiver.class.getName());
         properties.put(Tracer.SAMPLER_CLASSES_KEY, AlwaysSampler.class.getName());
         
-        return new Tracer.Builder()
-            .name("tracer")
+        return new Tracer.Builder("tracer")
             .conf(HTraceConfiguration.fromMap(properties))
             .build();
     }

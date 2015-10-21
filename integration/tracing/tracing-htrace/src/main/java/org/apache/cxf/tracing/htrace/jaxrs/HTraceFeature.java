@@ -46,9 +46,8 @@ public class HTraceFeature extends AbstractFeature {
             .getEndpoint()
             .get(ServerProviderFactory.class.getName());
 
-        final Tracer tracer = new Tracer.Builder()
+        final Tracer tracer = new Tracer.Builder(name)
             .conf(configuration)
-            .name(name)
             .build();
         
         if (providerFactory != null) {

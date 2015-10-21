@@ -43,8 +43,7 @@ public final class Client {
         properties.put(Tracer.SPAN_RECEIVER_CLASSES_KEY, TracingConfiguration.SPAN_RECEIVER.getName());
         properties.put(Tracer.SAMPLER_CLASSES_KEY, AlwaysSampler.class.getName());
         
-        final Tracer tracer = new Tracer.Builder()
-            .name("catalog-client")
+        final Tracer tracer = new Tracer.Builder("catalog-client")
             .conf(HTraceConfiguration.fromMap(properties))
             .build();
         

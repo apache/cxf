@@ -60,7 +60,7 @@ public class Catalog {
         final Configuration configuration = HBaseConfiguration.create();
         configuration.set("hbase.zookeeper.quorum", "hbase");
         configuration.set("hbase.zookeeper.property.clientPort", "2181");
-        configuration.set(SpanReceiverHost.SPAN_RECEIVERS_CONF_KEY, TracingConfiguration.SPAN_RECEIVER.getName());
+        configuration.set(SpanReceiverHost.SPAN_RECEIVERS_CONF_KEY, TracingConfiguration.HBASE_SPAN_RECEIVER.getName());
         store = new CatalogStore(configuration, "catalog");
     }
     
