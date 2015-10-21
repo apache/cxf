@@ -39,7 +39,6 @@
             org.osgi.service.http
         </cxf.osgi.import>
         <cxf.osgi.export>
-            org.osgi.service.http,
             org.apache.cxf.transports.http*,
             org.apache.cxf.transport.http.*,
             org.apache.cxf.transport.https.*,
