@@ -35,53 +35,29 @@ Starting Karaf (refer to http://karaf.apache.org/manual/latest-3.0.x/quick-start
   Hit '<ctrl-d>' or type 'system:shutdown' or 'logout' to shutdown Karaf.
 
 
-Install this demo feature using the local features.xml file that is located in
-samples/jax_rs/description_swagger2_osgi/target/test-classes/features/features.xml, you
-can directly use this file or copy it to somewhere. Assuming you have put this features.xml file at
-/Users/me/work/cxf/samples/features.xml
+In order to install CXF's features, you need to add the CXF's features repo using
 
-You can add this local feature url by typing
+  feature:repo-add cxf 3.n.m
 
-  karaf@root()> feature:repo-add file:///Users/me/work/cxf/samples/features.xml
-  Adding feature url file:///Users/me/work/cxf/samples/features.xml
+ where 3.n.m corresponds to a valid CXF version number (e.g., 3.0.7).
 
-Now you can see the features defined in this features file.
+Install CXF's cxf-rs-description-swagger2 feature that installs all the required bundles
+for this demo bundle.
 
-  karaf@root()> feature:list | grep demo
-  demo-swagger-core             | 1.0.0            |           | demo-cxf-swagger-sample-1.0.0 | 
-  demo-swagger-jaxrs            | 1.0.0            |           | demo-cxf-swagger-sample-1.0.0 | 
-  demo-cxf-swagger-jaxrs-sample | 1.0.0            |           | demo-cxf-swagger-sample-1.0.0 | 
-  karaf@root()> 
+  feature:install cxf-rs-description-swagger2
 
-Install the demo sample feature that transitively install other features and bundles that are
-required to run this demo sample.
+Install this demo bundle
 
-  feature:install demo-cxf-swagger-jaxrs-sample
+  install -s mvn:org.apache.cxf.samples/jax_rs_description_swagger2_osgi
 
 You can verify if the CXF JAX-RS Swagger2 Blueprint Demo is installed and started.
 
-  karaf@root()> list 
+  karaf@root()> list
   START LEVEL 100 , List Threshold: 50
-   ID | State  | Lvl | Version          | Name                                       
-  -----------------------------------------------------------------------------------
-  107 | Active |  80 | 1.1.0.Final      | Bean Validation API                        
-  108 | Active |  80 | 3.4.0            | Apache Commons Lang                        
-  109 | Active |  80 | 2.4.6            | Jackson-core                               
-  110 | Active |  80 | 2.4.6            | Jackson-annotations                        
-  111 | Active |  80 | 2.4.6            | jackson-databind                           
-  112 | Active |  80 | 2.4.6            | Jackson-dataformat-YAML                    
-  113 | Active |  80 | 1.5.4.SNAPSHOT   | swagger-annotations                        
-  114 | Active |  80 | 1.5.4.SNAPSHOT   | swagger-models                             
-  115 | Active |  80 | 1.5.4.SNAPSHOT   | swagger-core                               
-  116 | Active |  80 | 18.0.0           | Guava: Google Core Libraries for Java      
-  117 | Active |  80 | 3.19.0.GA        | Javassist                                  
-  118 | Active |  80 | 0.9.9.2          | Apache ServiceMix :: Bundles :: reflections
-  119 | Active |  80 | 2.4.6            | Jackson-JAXRS-base                         
-  120 | Active |  80 | 2.4.6            | Jackson-JAXRS-JSON                         
-  121 | Active |  80 | 1.5.4.SNAPSHOT   | swagger-jaxrs                              
-  122 | Active |  80 | 3.0.7            | CXF JAX-RS Swagger2 Blueprint Demo    
+   ID | State  | Lvl | Version | Name                              
+  -----------------------------------------------------------------
+  122 | Active |  80 | 3.0.7   | CXF JAX-RS Swagger2 Blueprint Demo
   karaf@root()>
-
 
 Now, you will be able to access this CXF JAXRS demo service on your Karaf instance at
 
