@@ -19,19 +19,22 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>cxf-rt-rs-security-jose-parent</artifactId>
+    <artifactId>cxf-rt-rs-security</artifactId>
     <packaging>pom</packaging>
-    <name>Apache CXF JOSE Security</name>
-    <description>Apache CXF JOSE Security</description>
+    <name>Apache CXF Rest Security Runtime</name>
+    <description>Apache CXF Rest Security Runtime</description>
     <url>http://cxf.apache.org</url>
     <parent>
         <groupId>org.apache.cxf</groupId>
-        <artifactId>cxf-parent</artifactId>
-        <version>3.0.7-SNAPSHOT</version>
-        <relativePath>../../../../parent/pom.xml</relativePath>
+        <artifactId>cxf-rt-rs</artifactId>
+        <version>3.1.4-SNAPSHOT</version>
     </parent>
     <modules>
-        <module>jose-core</module>
-        <module>jose-jaxrs</module>
+        <module>xml</module>
+        <module>jose-parent</module>
+        <module>oauth-parent</module>
+        <module>sso/saml</module>
+        <module>sso/oidc</module>
+        <module>cors</module>
     </modules>
 </project>
