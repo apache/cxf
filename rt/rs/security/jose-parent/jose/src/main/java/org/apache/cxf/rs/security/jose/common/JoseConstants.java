@@ -122,21 +122,38 @@ public final class JoseConstants {
     public static final String DEPR_RSSEC_SIGNATURE_ALGORITHM = "rs.security.jws.content.signature.algorithm";
     
     /**
-     * The signature properties file for signature creation. If not specified then it falls back to 
+     * The signature properties file for compact signature creation. If not specified then it falls back to 
      * RSSEC_SIGNATURE_PROPS.
      */
     public static final String RSSEC_SIGNATURE_OUT_PROPS = "rs.security.signature.out.properties";
     
     /**
-     * The signature properties file for signature verification. If not specified then it falls back to 
+     * The signature properties file for compact signature verification. If not specified then it falls back to 
      * RSSEC_SIGNATURE_PROPS.
      */
     public static final String RSSEC_SIGNATURE_IN_PROPS = "rs.security.signature.in.properties";
     
     /**
-     * The signature properties file for signature creation/verification.
+     * The signature properties file for compact signature creation/verification.
      */
     public static final String RSSEC_SIGNATURE_PROPS = "rs.security.signature.properties";
+    
+    /**
+     * The signature properties file for JSON Serialization signature creation. If not specified then it 
+     * falls back to RSSEC_SIGNATURE_LIST_PROPS.
+     */
+    public static final String RSSEC_SIGNATURE_LIST_OUT_PROPS = "rs.security.signature.list.out.properties";
+    
+    /**
+     * The signature properties file for JSON Serialization signature verification. If not specified then it 
+     * falls back to RSSEC_SIGNATURE_LIST_PROPS.
+     */
+    public static final String RSSEC_SIGNATURE_LIST_IN_PROPS = "rs.security.signature.list.in.properties";
+    
+    /**
+     * The signature properties file for JSON Serialization signature creation/verification.
+     */
+    public static final String RSSEC_SIGNATURE_LIST_PROPS = "rs.security.signature.list.properties";
     
     /**
      * TODO documentation for these

@@ -29,14 +29,13 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.rs.security.jose.common.JoseConstants;
 import org.apache.cxf.rs.security.jose.jws.JwsException;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 
 public class AbstractJwsJsonReaderProvider {
     protected static final Logger LOG = LogUtils.getL7dLogger(AbstractJwsJsonReaderProvider.class);
-    private static final String RSSEC_SIGNATURE_IN_LIST_PROPS = "rs.security.signature.in.list.properties";
-    private static final String RSSEC_SIGNATURE_LIST_PROPS = "rs.security.signature.list.properties";
     
     private List<JwsSignatureVerifier> sigVerifiers;
     private String defaultMediaType;
@@ -55,7 +54,8 @@ public class AbstractJwsJsonReaderProvider {
         }
         Message m = JAXRSUtils.getCurrentMessage();
         Object propLocsProp = 
-            MessageUtils.getContextualProperty(m, RSSEC_SIGNATURE_IN_LIST_PROPS, RSSEC_SIGNATURE_LIST_PROPS);
+            MessageUtils.getContextualProperty(m, JoseConstants.RSSEC_SIGNATURE_LIST_IN_PROPS, 
+                                               JoseConstants.RSSEC_SIGNATURE_LIST_PROPS);
         if (propLocsProp == null) {
             LOG.warning("JWS JSON init properties resource is not identified");
             throw new JwsException(JwsException.Error.NO_INIT_PROPERTIES);
