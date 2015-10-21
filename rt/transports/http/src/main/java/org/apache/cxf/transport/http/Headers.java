@@ -304,8 +304,16 @@ public class Headers {
         boolean dropContentType = false;
         boolean emptyRequest = PropertyUtils.isTrue(message.get(EMPTY_REQUEST_PROPERTY));
         if (emptyRequest) { 
-            // drop only if a user explicitly requested it by setting the property to false
-            dropContentType = !MessageUtils.getContextualBoolean(message, SET_EMPTY_REQUEST_CT_PROPERTY, true);
+            Object setCtForEmptyRequestProp = message.getContextualProperty(SET_EMPTY_REQUEST_CT_PROPERTY);
+            if (setCtForEmptyRequestProp != null) {
+                // If SET_EMPTY_REQUEST_CT_PROPERTY is set then do as a user prefers.
+                // CT will be dropped if setting CT for empty requests was explicitly disabled
+                dropContentType = PropertyUtils.isFalse(setCtForEmptyRequestProp);
+            } else if ("GET".equals((String)message.get(Message.HTTP_REQUEST_METHOD))) {
+                // otherwise if it is GET then just drop it
+                dropContentType = true;
+            }
+            
         }
         if (!dropContentType) {
             String ct = emptyRequest && !headers.containsKey(Message.CONTENT_TYPE) ? "*/*" : determineContentType();
