@@ -64,7 +64,7 @@
         <module>rs/extensions/providers</module>
         <module>rs/extensions/search</module>
         <module>rs/security/xml</module>
-        <module>rs/security/jose</module>
+        <module>rs/security/jose-parent</module>
         <module>rs/security/oauth-parent</module>
         <module>rs/security/sso/saml</module>
         <module>rs/security/sso/oidc</module>
