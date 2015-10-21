@@ -48,7 +48,7 @@ public abstract class AbstractHTraceProvider extends AbstractTracingProvider {
         final SpanId spanId = getFirstValueOrDefault(requestHeaders, getSpanIdHeader(), SpanId.INVALID); 
         
         TraceScope traceScope = null;
-        if (spanId == SpanId.INVALID) {
+        if (SpanId.INVALID.equals(spanId)) {
             traceScope = tracer.newScope(buildSpanDescription(path, method));
         } else {
             traceScope = tracer.newScope(buildSpanDescription(path, method), spanId);
