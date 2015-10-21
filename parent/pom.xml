@@ -94,7 +94,7 @@
         <cxf.httpcomponents.client.version>4.3.5</cxf.httpcomponents.client.version>
         <cxf.httpcomponents.core.version>4.3.3</cxf.httpcomponents.core.version>
         <cxf.httpcomponents.core.version.range>[4.3,4.4.0)</cxf.httpcomponents.core.version.range>
-        <cxf.jackson.version>2.4.1</cxf.jackson.version>
+        <cxf.jackson.version>2.4.6</cxf.jackson.version>
         <cxf.james.mim4j.version>0.7.2</cxf.james.mim4j.version>
         <cxf.logback.classic.version>1.0.13</cxf.logback.classic.version>
         <cxf.log4j.version>1.2.17</cxf.log4j.version>
