@@ -31,7 +31,7 @@
     </parent>
     <modules>
         <module>xml</module>
-        <module>jose</module>
+        <module>jose-parent</module>
         <module>oauth-parent</module>
         <module>sso/saml</module>
         <module>sso/oidc</module>
