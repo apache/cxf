@@ -210,6 +210,24 @@
         <feature version="${project.version}">cxf-rs-security-jose</feature>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-rs-security-oauth2/${project.version}</bundle>
     </feature>
+    <feature name="cxf-rs-description-swagger2" version="${project.version}" resolver="(obr)">
+        <feature version="${project.version}">cxf-jaxrs</feature>
+        <bundle start-level="10" dependency="true">mvn:javax.validation/validation-api/${cxf.validation.api.version}</bundle>
+        <bundle start-level="35" dependency="true">mvn:org.apache.commons/commons-lang3/${cxf.commons-lang3.version}</bundle>
+        <bundle start-level="35" dependency="true">mvn:com.fasterxml.jackson.core/jackson-core/${cxf.jackson.version}</bundle>
+        <bundle start-level="35" dependency="true">mvn:com.fasterxml.jackson.core/jackson-annotations/${cxf.jackson.version}</bundle>
+        <bundle start-level="35" dependency="true">mvn:com.fasterxml.jackson.core/jackson-databind/${cxf.jackson.version}</bundle>
+        <bundle start-level="35" dependency="true">mvn:com.fasterxml.jackson.dataformat/jackson-dataformat-yaml/${cxf.jackson.version}</bundle>
+        <bundle start-level="35" dependency="true">mvn:com.fasterxml.jackson.jaxrs/jackson-jaxrs-base/${cxf.jackson.version}</bundle>
+        <bundle start-level="35" dependency="true">mvn:com.fasterxml.jackson.jaxrs/jackson-jaxrs-json-provider/${cxf.jackson.version}</bundle>
+        <bundle start-level="30" dependency="true">mvn:org.javassist/javassist/${cxf.javassist.version}</bundle>
+        <bundle start-level="30" dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.reflections/${cxf.reflections.bundle.version}</bundle>
+        <bundle start-level="25" dependency="true">mvn:com.google.guava/guava/${cxf.guava.version}</bundle>
+        <bundle start-level="35" dependency="true">mvn:io.swagger/swagger-annotations/${cxf.swagger2.version}</bundle>
+        <bundle start-level="35" dependency="true">mvn:io.swagger/swagger-models/${cxf.swagger2.version}</bundle>
+        <bundle start-level="35" dependency="true">mvn:io.swagger/swagger-core/${cxf.swagger2.version}</bundle>
+        <bundle start-level="35" dependency="true">mvn:io.swagger/swagger-jaxrs/${cxf.swagger2.version}</bundle>
+    </feature>
     <feature name="cxf-databinding-aegis" version="${project.version}" resolver="(obr)">
         <feature version="${project.version}">cxf-wsdl</feature>
         <feature version="${project.version}">cxf-bindings-soap</feature>

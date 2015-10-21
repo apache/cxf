@@ -85,6 +85,7 @@
         <cxf.commons-codec.version>1.10</cxf.commons-codec.version>
         <cxf.commons-collections.version>3.2.1</cxf.commons-collections.version>
         <cxf.commons-lang.version>2.6</cxf.commons-lang.version>
+        <cxf.commons-lang3.version>3.4</cxf.commons-lang3.version>
         <cxf.derby.version>10.2.2.0</cxf.derby.version>
         <cxf.ehcache.version>2.8.5</cxf.ehcache.version>
         <cxf.fastinfoset.bundle.version>1.2.13_1</cxf.fastinfoset.bundle.version>
@@ -108,6 +109,7 @@
         <cxf.geronimo.servlet25.version>1.2</cxf.geronimo.servlet25.version>
         <cxf.geronimo.transaction.version>1.1.1</cxf.geronimo.transaction.version>
         <cxf.jasypt.bundle.version>1.9.0_1</cxf.jasypt.bundle.version>
+        <cxf.javassist.version>3.19.0-GA</cxf.javassist.version>
         <cxf.javax.ws.rs.version>2.0.1</cxf.javax.ws.rs.version>
         <cxf.jaxb21.version>2.1</cxf.jaxb21.version>
         <cxf.jaxb21.impl.version>2.1.14</cxf.jaxb21.impl.version>
@@ -143,6 +145,7 @@
         <cxf.opensamlws.version>1.5.0_1</cxf.opensamlws.version>
         <cxf.rhino.version>1.7R2</cxf.rhino.version>
         <cxf.saaj-api.version>1.3.5</cxf.saaj-api.version>
+        <cxf.reflections.bundle.version>0.9.9_2</cxf.reflections.bundle.version>
         <cxf.servlet-api.group>org.apache.geronimo.specs</cxf.servlet-api.group>
         <cxf.servlet-api.artifact>geronimo-servlet_3.0_spec</cxf.servlet-api.artifact>
         <cxf.servlet-api.version>1.0</cxf.servlet-api.version>
