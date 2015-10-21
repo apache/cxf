@@ -72,12 +72,20 @@ public final class JoseConstants {
     public static final String RSSEC_KEY_PSWD = "rs.security.key.password";
     
     /**
-     * The keystore alias corresponding to the key to use
+     * The keystore alias corresponding to the key to use. You can append one of the following to this tag to
+     * get the alias for more specific operations:
+     *  - jwe.out
+     *  - jwe.in
+     *  - jws.out
+     *  - jws.in
      */
     public static final String RSSEC_KEY_STORE_ALIAS = "rs.security.keystore.alias";
     
     /**
-     * The keystore aliases corresponding to the keys to use, when using the JSON serialization form.
+     * The keystore aliases corresponding to the keys to use, when using the JSON serialization form. You can 
+     * append one of the following to this tag to get the alias for more specific operations:
+     *  - jws.out
+     *  - jws.in
      */
     public static final String RSSEC_KEY_STORE_ALIASES = "rs.security.keystore.aliases";
     
