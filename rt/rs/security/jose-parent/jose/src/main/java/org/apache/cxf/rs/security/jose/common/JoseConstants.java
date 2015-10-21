@@ -142,13 +142,13 @@ public final class JoseConstants {
      * The signature properties file for JSON Serialization signature creation. If not specified then it 
      * falls back to RSSEC_SIGNATURE_LIST_PROPS.
      */
-    public static final String RSSEC_SIGNATURE_LIST_OUT_PROPS = "rs.security.signature.list.out.properties";
+    public static final String RSSEC_SIGNATURE_OUT_LIST_PROPS = "rs.security.signature.out.list.properties";
     
     /**
      * The signature properties file for JSON Serialization signature verification. If not specified then it 
      * falls back to RSSEC_SIGNATURE_LIST_PROPS.
      */
-    public static final String RSSEC_SIGNATURE_LIST_IN_PROPS = "rs.security.signature.list.in.properties";
+    public static final String RSSEC_SIGNATURE_IN_LIST_PROPS = "rs.security.signature.in.list.properties";
     
     /**
      * The signature properties file for JSON Serialization signature creation/verification.

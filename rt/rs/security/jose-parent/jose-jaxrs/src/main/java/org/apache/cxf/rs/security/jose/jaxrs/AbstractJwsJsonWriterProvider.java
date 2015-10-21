@@ -58,7 +58,7 @@ public class AbstractJwsJsonWriterProvider {
         } 
         Message m = JAXRSUtils.getCurrentMessage();
         Object propLocsProp = 
-            MessageUtils.getContextualProperty(m, JoseConstants.RSSEC_SIGNATURE_LIST_OUT_PROPS, 
+            MessageUtils.getContextualProperty(m, JoseConstants.RSSEC_SIGNATURE_OUT_LIST_PROPS, 
                                                JoseConstants.RSSEC_SIGNATURE_LIST_PROPS);
         if (propLocsProp == null) {
             LOG.warning("JWS JSON init properties resource is not identified");
