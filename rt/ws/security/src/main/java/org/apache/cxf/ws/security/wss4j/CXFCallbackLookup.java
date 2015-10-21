@@ -34,6 +34,7 @@ public class CXFCallbackLookup extends DOMCallbackLookup {
     
     public CXFCallbackLookup(Document doc, Element soapBody) {
         super(doc);
+        this.doc = doc;
         this.soapBody = soapBody;
     }
     

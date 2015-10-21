@@ -21,10 +21,11 @@ package org.apache.cxf.systest.kerberos.ldap;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.URI;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -32,7 +33,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.rt.security.claims.Claim;
 import org.apache.cxf.rt.security.claims.ClaimCollection;
@@ -112,17 +112,12 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
             }
             
             // Read in ldap.xml and substitute in the correct port
-            File f = new File(basedir + "/src/test/resources/ldap.xml");
-            
-            FileInputStream inputStream = new FileInputStream(f);
-            String content = IOUtils.toString(inputStream, "UTF-8");
-            inputStream.close();
+            Path path = FileSystems.getDefault().getPath(basedir, "/src/test/resources/ldap.xml");
+            String content = new String(Files.readAllBytes(path), "UTF-8");
             content = content.replaceAll("portno", "" + super.getLdapServer().getPort());
             
-            File f2 = new File(basedir + "/target/test-classes/ldapport.xml");
-            FileOutputStream outputStream = new FileOutputStream(f2);
-            IOUtils.write(content, outputStream, "UTF-8");
-            outputStream.close();
+            Path path2 = FileSystems.getDefault().getPath(basedir, "/target/test-classes/ldapport.xml");
+            Files.write(path2, content.getBytes());
             
             portUpdated = true;
         }

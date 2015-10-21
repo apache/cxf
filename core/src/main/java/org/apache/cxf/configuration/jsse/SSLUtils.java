@@ -20,12 +20,13 @@
 package org.apache.cxf.configuration.jsse;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
@@ -108,12 +109,8 @@ public final class SSLUtils {
         KeyStore ks = KeyStore.getInstance(keyStoreType);
         
         if (keyStoreType.equalsIgnoreCase(PKCS12_TYPE)) {
-            byte[] bytes = null;
-            try (FileInputStream fis = new FileInputStream(keyStoreLocation);
-                DataInputStream dis = new DataInputStream(fis)) {
-                bytes = new byte[dis.available()];
-                dis.readFully(bytes);
-            }
+            Path path = FileSystems.getDefault().getPath(keyStoreLocation);
+            byte[] bytes = Files.readAllBytes(path);
             ByteArrayInputStream bin = new ByteArrayInputStream(bytes);
             
             if (keyStorePassword != null) {
@@ -125,7 +122,7 @@ public final class SSLUtils {
                                                 log);
             }
         } else {        
-            byte[] sslCert = loadClientCredential(keyStoreLocation);
+            byte[] sslCert = loadFile(keyStoreLocation);
             
             if (sslCert != null && sslCert.length > 0 && keyStorePassword != null) {
                 ByteArrayInputStream bin = new ByteArrayInputStream(sslCert);
@@ -233,7 +230,7 @@ public final class SSLUtils {
             
             trustedCertStore.load(null, "".toCharArray());
             CertificateFactory cf = CertificateFactory.getInstance(CERTIFICATE_FACTORY_TYPE);
-            byte[] caCert = loadCACert(trustStoreLocation);
+            byte[] caCert = loadFile(trustStoreLocation);
             try {
                 if (caCert != null) {
                     ByteArrayInputStream cabin = new ByteArrayInputStream(caCert);
@@ -258,37 +255,12 @@ public final class SSLUtils {
         return tmf.getTrustManagers();
     }
     
-    protected static byte[] loadClientCredential(String fileName) throws IOException {
+    protected static byte[] loadFile(String fileName) throws IOException {
         if (fileName == null) {
             return null;
         }
-        try (FileInputStream in = new FileInputStream(fileName);
-            ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-            byte[] buf = new byte[512];
-            int i = in.read(buf);
-            while (i  > 0) {
-                out.write(buf, 0, i);
-                i = in.read(buf);
-            }
-            return out.toByteArray();
-        }
-    }
-
-    protected static byte[] loadCACert(String fileName) throws IOException {
-        if (fileName == null) {
-            return null;
-        }
-        try (FileInputStream in = new FileInputStream(fileName);
-            ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-            byte[] buf = new byte[512];
-            int i = in.read(buf);
-        
-            while (i > 0) {
-                out.write(buf, 0, i);
-                i = in.read(buf);
-            }
-            return out.toByteArray();
-        }
+        Path path = FileSystems.getDefault().getPath(fileName);
+        return Files.readAllBytes(path);
     }
 
     public static String getKeystore(String keyStoreLocation, Logger log) {

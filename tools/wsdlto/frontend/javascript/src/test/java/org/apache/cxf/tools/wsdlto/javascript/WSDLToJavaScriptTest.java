@@ -19,10 +19,10 @@
 
 package org.apache.cxf.tools.wsdlto.javascript;
 
-import java.io.File;
-import java.io.FileInputStream;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
-import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.tools.common.ProcessorTestBase;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolContext;
@@ -56,11 +56,12 @@ public class WSDLToJavaScriptTest extends ProcessorTestBase {
         context.put(ToolConstants.CFG_JSPACKAGEPREFIX, prefixes);
         container.setContext(context); 
         container.execute();
+        
         // now we really want to check some results.
-        File resultFile = new File(output, "SOAPService_Test1.js");
-        assertTrue(resultFile.canRead());
-        FileInputStream fis = new FileInputStream(resultFile);
-        String javascript = IOUtils.readStringFromStream(fis);
+        Path path = FileSystems.getDefault().getPath(output.getPath(), "SOAPService_Test1.js");
+        assertTrue(Files.isReadable(path));
+        String javascript = new String(Files.readAllBytes(path), "UTF-8");
+        
         assertTrue(javascript.contains("xmlns:murble='http://apache.org/hello_world_soap_http'"));
         assertEquals("Number of '{' does not match number of '}' in generated JavaScript.",
                 countChar(javascript, '{'),
@@ -79,11 +80,12 @@ public class WSDLToJavaScriptTest extends ProcessorTestBase {
         context.put(ToolConstants.CFG_JSPACKAGEPREFIX, prefixes);
         container.setContext(context); 
         container.execute();
+        
         // now we really want to check some results.
-        File resultFile = new File(output, "SOAPService.js");
-        assertTrue(resultFile.canRead());
-        FileInputStream fis = new FileInputStream(resultFile);
-        String javascript = IOUtils.readStringFromStream(fis);
+        Path path = FileSystems.getDefault().getPath(output.getPath(), "SOAPService.js");
+        assertTrue(Files.isReadable(path));
+        String javascript = new String(Files.readAllBytes(path), "UTF-8");
+        
         assertTrue(javascript.contains("xmlns:murble='http://apache.org/hello_world_soap_http'"));
         assertEquals("Number of '{' does not match number of '}' in generated JavaScript.",
                 countChar(javascript, '{'),

@@ -18,12 +18,14 @@
  */
 package org.apache.cxf.tools.wsdlto.jaxws;
 
-import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
@@ -222,13 +224,11 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/bug305772/hello_world.wsdl"));
         processor.setContext(env);
         processor.execute();
-        File file = new File(output.getCanonicalPath(), "build.xml");
-        FileInputStream fileinput = new FileInputStream(file);
-        BufferedInputStream filebuffer = new BufferedInputStream(fileinput);
-        byte[] buffer = new byte[(int)file.length()];
-        filebuffer.read(buffer);
-        String content = IOUtils.newStringFromBytes(buffer);
-        filebuffer.close();
+        
+        Path path = FileSystems.getDefault().getPath(output.getCanonicalPath(), "build.xml");
+        assertTrue(Files.isReadable(path));
+        String content = new String(Files.readAllBytes(path), "UTF-8");
+        
         assertTrue("wsdl location should be url style in build.xml", content.indexOf("param1=\"file:") > -1);
 
     }

@@ -64,5 +64,58 @@ public class SAMLClaim extends Claim {
         this.friendlyName = friendlyName;
     }
     
+    @Override
+    public int hashCode() {
+        int hashCode = super.hashCode();
+        
+        if (nameFormat != null) {
+            hashCode = 31 * hashCode + nameFormat.hashCode();
+        }
+        if (name != null) {
+            hashCode = 31 * hashCode + name.hashCode();
+        }
+        if (friendlyName != null) {
+            hashCode = 31 * hashCode + friendlyName.hashCode();
+        }
+        
+        return hashCode;
+    }
     
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        
+        if (!super.equals(obj)) {
+            return false;
+        }
+        
+        if (!(obj instanceof SAMLClaim)) {
+            return false;
+        }
+        
+        if (nameFormat == null && ((SAMLClaim)obj).getNameFormat() != null) {
+            return false;
+        } else if (nameFormat != null
+            && !nameFormat.equals(((SAMLClaim)obj).getNameFormat())) {
+            return false;
+        }
+        
+        if (name == null && ((SAMLClaim)obj).getName() != null) {
+            return false;
+        } else if (name != null
+             && !name.equals(((SAMLClaim)obj).getName())) {
+            return false;
+        }
+        
+        if (friendlyName == null && ((SAMLClaim)obj).getFriendlyName() != null) {
+            return false;
+        } else if (friendlyName != null
+            && !friendlyName.equals(((SAMLClaim)obj).getFriendlyName())) {
+            return false;
+        }
+        
+        return true;
+    }
 }

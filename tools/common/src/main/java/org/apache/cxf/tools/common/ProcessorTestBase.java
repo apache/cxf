@@ -20,7 +20,6 @@
 package org.apache.cxf.tools.common;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -48,7 +47,6 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.tools.util.ToolsStaxUtils;
 import org.apache.ws.commons.schema.constants.Constants;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.ComparisonFailure;
@@ -200,25 +198,7 @@ public class ProcessorTestBase extends Assert {
     }
 
     public String getStringFromFile(File location) {
-        InputStream is = null;
-        String result = null;
-
-        try {
-            is = new FileInputStream(location);
-            result = FileUtils.normalizeCRLF(is);
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (Exception e) {
-                    //do nothing
-                }
-            }
-        }
-
-        return result;
+        return FileUtils.getStringFromFile(location);
     }
 
     public boolean assertXmlEquals(final File expected, final File source) throws Exception {

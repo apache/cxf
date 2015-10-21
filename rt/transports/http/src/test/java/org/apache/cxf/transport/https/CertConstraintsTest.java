@@ -21,8 +21,9 @@
 package org.apache.cxf.transport.https;
 
 import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.FileInputStream;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 
@@ -116,12 +117,10 @@ public class CertConstraintsTest extends org.junit.Assert {
         final String id
     ) throws Exception {
         final KeyStore store = KeyStore.getInstance(keystoreType);
-        FileInputStream fis = new FileInputStream(
-                "src/test/java/org/apache/cxf/transport/https/resources/" + keystoreFilename);
-        DataInputStream dis = new DataInputStream(fis);
-        byte[] bytes = new byte[dis.available()];
-        dis.readFully(bytes);
-        dis.close();
+        Path path = 
+            FileSystems.getDefault().getPath("src/test/java/org/apache/cxf/transport/https/resources/", 
+                                             keystoreFilename);
+        byte[] bytes = Files.readAllBytes(path);
         ByteArrayInputStream bin = new ByteArrayInputStream(bytes);
         store.load(bin, keystorePassword.toCharArray());
         for (java.util.Enumeration<String> aliases = store.aliases(); aliases.hasMoreElements();) {

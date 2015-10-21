@@ -290,6 +290,7 @@ public class JAXRSClientServerResourceCreatedSpringProviderTest extends Abstract
         httpUrlConnection.setRequestProperty("Connection",   "close");   
 
         OutputStream outputstream = httpUrlConnection.getOutputStream();
+        
         File inputFile = new File(getClass().getResource("resources/singleValPostBody.txt").toURI());         
          
         byte[] tmp = new byte[4096];

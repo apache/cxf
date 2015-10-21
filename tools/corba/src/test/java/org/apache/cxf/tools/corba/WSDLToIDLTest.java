@@ -19,16 +19,16 @@
 
 package org.apache.cxf.tools.corba;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import javax.wsdl.Definition;
 import javax.xml.namespace.QName;
@@ -171,14 +171,11 @@ public class WSDLToIDLTest extends ToolTestBase {
         int exc = execute(cmdArgs);
         assertEquals("WSDLToIDL Failed", noError, exc);
 
-        File f = new File(output, "simple-binding.idl");
-        assertTrue("simple-binding.idl should be generated", f.exists());
-        FileInputStream stream = new FileInputStream(f);            
-        BufferedInputStream bis = new BufferedInputStream(stream); 
-        DataInputStream dis = new DataInputStream(bis);
-        String line = dis.toString();
+        Path path = FileSystems.getDefault().getPath(output.getPath(), "simple-binding.idl");
+        assertTrue("simple-binding.idl should be generated", Files.isReadable(path));
+        
+        String line = new String(Files.readAllBytes(path), "UTF-8");
         assertTrue("Invalid Idl File Generated", line.length() > 0);
-        stream.close();       
     }   
     
     public void testIDLGenSpecifiedFile() throws Exception {
@@ -189,15 +186,11 @@ public class WSDLToIDLTest extends ToolTestBase {
         int exc = execute(cmdArgs);
         assertEquals("WSDLToIDL Failed in Idl Generation", noError, exc);
 
-        File f = new File(output, "simple-binding_gen.idl");
-        assertTrue("simple-binding_gen.idl should be generated", f.exists());
+        Path path = FileSystems.getDefault().getPath(output.getPath(), "simple-binding_gen.idl");
+        assertTrue("simple-binding_gen.idl should be generated", Files.isReadable(path));
 
-        FileInputStream stream = new FileInputStream(f);            
-        BufferedInputStream bis = new BufferedInputStream(stream); 
-        DataInputStream dis = new DataInputStream(bis);
-        String line = dis.toString();
+        String line = new String(Files.readAllBytes(path), "UTF-8");
         assertTrue("Invalid Idl File Generated", line.length() > 0);
-        stream.close();
     }
 
     // tests generating corba and idl in default wsdl and idl files
@@ -210,14 +203,14 @@ public class WSDLToIDLTest extends ToolTestBase {
         int exc = execute(cmdArgs);
         assertEquals("WSDLToIDL Failed", noError, exc);
 
-        File f1 = new File(output, "simple-binding-corba.wsdl");
-        assertTrue("simple-binding-corba.wsdl should be generated", f1.exists());
-        File f2 = new File(output, "simple-binding.idl");
-        assertTrue("simple-binding.idl should be generated", f2.exists());
+        Path path1 = FileSystems.getDefault().getPath(output.getPath(), "simple-binding-corba.wsdl");
+        assertTrue("simple-binding-corba.wsdl should be generated", Files.isReadable(path1));
+        Path path2 = FileSystems.getDefault().getPath(output.getPath(), "simple-binding.idl");
+        assertTrue("simple-binding.idl should be generated", Files.isReadable(path2));
 
         WSDLToProcessor proc = new WSDLToProcessor();
         try {
-            proc.parseWSDL(f1.getAbsolutePath());
+            proc.parseWSDL(path1.toAbsolutePath().toString());
             Definition model = proc.getWSDLDefinition();
             assertNotNull("WSDL Definition Should not be Null", model);
             QName bindingName = new QName("http://schemas.apache.org/tests", "BaseOneCORBABinding");
@@ -226,12 +219,8 @@ public class WSDLToIDLTest extends ToolTestBase {
             fail("WSDLToIDL generated an invalid simple-binding-corba.wsdl");
         }
 
-        FileInputStream stream = new FileInputStream(f2);            
-        BufferedInputStream bis = new BufferedInputStream(stream); 
-        DataInputStream dis = new DataInputStream(bis);
-        String line = dis.toString();
+        String line = new String(Files.readAllBytes(path2), "UTF-8");
         assertTrue("Invalid Idl File Generated", line.length() > 0);
-        stream.close();
     }
     
     public void testNoArgs() throws Exception {
