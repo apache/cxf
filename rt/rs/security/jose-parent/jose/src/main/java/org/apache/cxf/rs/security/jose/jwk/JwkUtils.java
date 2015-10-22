@@ -508,24 +508,23 @@ public final class JwkUtils {
     private static JweHeaders toJweHeaders(String ct) {
         return new JweHeaders(Collections.<String, Object>singletonMap(JoseConstants.HEADER_CONTENT_TYPE, ct));
     }
-    public static void setPublicKeyInfo(JsonWebKey jwk, JoseHeaders headers, String algo,
-                                        boolean reportPublicKey, boolean reportPublicKeyId) {
-        if (reportPublicKey && KeyType.RSA.equals(jwk.getKeyType())) {
+    
+    public static void includeCertChain(JsonWebKey jwk, JoseHeaders headers, String algo) {
+        if (KeyType.RSA.equals(jwk.getKeyType())) {
             List<String> chain = CastUtils.cast((List<?>)jwk.getProperty("x5c"));
-            //TODO: if needed the chain can be reported as part of a 'jwk' property
             if (chain != null) {
                 headers.setX509Chain(chain);
-            } else {
-                JsonWebKey jwkPublic = JwkUtils.fromRSAPublicKey(JwkUtils.toRSAPublicKey(jwk), algo);
-                if (reportPublicKeyId && jwk.getKeyId() != null) {
-                    jwkPublic.setKeyId(jwk.getKeyId());
-                }
-                headers.setJsonWebKey(jwkPublic);
             }
         }
-        if (reportPublicKeyId && jwk.getKeyId() != null) {
-            headers.setKeyId(jwk.getKeyId());
+    }
+    
+    public static void includePublicKey(JsonWebKey jwk, JoseHeaders headers, String algo) {
+        if (KeyType.RSA.equals(jwk.getKeyType())) {
+            JsonWebKey jwkPublic = JwkUtils.fromRSAPublicKey(JwkUtils.toRSAPublicKey(jwk), algo);
+            if (jwk.getKeyId() != null) {
+                jwkPublic.setKeyId(jwk.getKeyId());
+            }
+            headers.setJsonWebKey(jwkPublic);
         }
-        
     }
 }

@@ -281,14 +281,13 @@ public final class JweUtils {
             return null;
         }
         
-        boolean reportPublicKey = 
+        boolean includeCert = 
             headers != null && MessageUtils.isTrue(
-                MessageUtils.getContextualProperty(m, JoseConstants.RSSEC_ENCRYPTION_REPORT_KEY_PROP, 
-                                                   JoseConstants.RSSEC_REPORT_KEY_PROP));
-        boolean reportPublicKeyId = 
-            headers != null && MessageUtils.isTrue(
-                MessageUtils.getContextualProperty(m, JoseConstants.RSSEC_ENCRYPTION_REPORT_KEY_ID_PROP, 
-                                                   JoseConstants.RSSEC_REPORT_KEY_ID_PROP));
+                MessageUtils.getContextualProperty(m, JoseConstants.RSSEC_ENCRYPTION_INCLUDE_CERT, 
+                                                   JoseConstants.RSSEC_INCLUDE_CERT));
+        boolean includeCertSha1 = headers != null && MessageUtils.isTrue(
+                MessageUtils.getContextualProperty(m, JoseConstants.RSSEC_ENCRYPTION_INCLUDE_CERT_SHA1, 
+                                                   JoseConstants.RSSEC_INCLUDE_CERT_SHA1));
         
         KeyEncryptionProvider keyEncryptionProvider = null;
         String keyEncryptionAlgo = getKeyEncryptionAlgo(m, props, null, null);
@@ -304,19 +303,43 @@ public final class JweUtils {
                 keyEncryptionAlgo = getKeyEncryptionAlgo(m, props, jwk.getAlgorithm(), 
                                                          getDefaultKeyAlgo(jwk));
                 keyEncryptionProvider = getKeyEncryptionProvider(jwk, keyAlgo);
-                if (reportPublicKey || reportPublicKeyId) {
-                    JwkUtils.setPublicKeyInfo(jwk, headers, keyEncryptionAlgo, 
-                                              reportPublicKey, reportPublicKeyId);
+                
+                boolean includePublicKey = headers != null && MessageUtils.isTrue(
+                    MessageUtils.getContextualProperty(m, JoseConstants.RSSEC_ENCRYPTION_INCLUDE_PUBLIC_KEY,
+                                                       JoseConstants.RSSEC_INCLUDE_PUBLIC_KEY));
+                boolean includeKeyId = headers != null && MessageUtils.isTrue(
+                    MessageUtils.getContextualProperty(m, JoseConstants.RSSEC_ENCRYPTION_INCLUDE_KEY_ID,
+                                                       JoseConstants.RSSEC_INCLUDE_KEY_ID));
+                
+                if (includeCert) {
+                    JwkUtils.includeCertChain(jwk, headers, keyEncryptionAlgo);
+                }
+                if (includeCertSha1 && headers != null) {
+                    String digest = KeyManagementUtils.loadDigestAndEncodeX509Certificate(m, props);
+                    if (digest != null) {
+                        headers.setX509Thumbprint(digest);
+                    }
+                }
+                if (includePublicKey) {
+                    JwkUtils.includePublicKey(jwk, headers, keyEncryptionAlgo);
+                }
+                if (includeKeyId && jwk.getKeyId() != null && headers != null) {
+                    headers.setKeyId(jwk.getKeyId());
                 }
             }
         } else {
             keyEncryptionProvider = getPublicKeyEncryptionProvider(
                 KeyManagementUtils.loadPublicKey(m, props), 
                 keyAlgo);
-            if (reportPublicKey) {
+            if (includeCert) {
                 headers.setX509Chain(KeyManagementUtils.loadAndEncodeX509CertificateOrChain(m, props));
             }
-            
+            if (includeCertSha1 && headers != null) {
+                String digest = KeyManagementUtils.loadDigestAndEncodeX509Certificate(m, props);
+                if (digest != null) {
+                    headers.setX509Thumbprint(digest);
+                }
+            }
         }
         
         String compression = props.getProperty(JoseConstants.RSSEC_ENCRYPTION_ZIP_ALGORITHM);
