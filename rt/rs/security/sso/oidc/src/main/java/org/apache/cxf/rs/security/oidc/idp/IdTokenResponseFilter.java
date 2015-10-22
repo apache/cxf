@@ -26,19 +26,25 @@ import org.apache.cxf.rs.security.oauth2.provider.AccessTokenResponseFilter;
 import org.apache.cxf.rs.security.oidc.common.IdToken;
 import org.apache.cxf.rs.security.oidc.utils.OidcUtils;
 
-public class IdTokenCodeResponseFilter extends AbstractOAuthServerJoseJwtProducer implements AccessTokenResponseFilter {
+public class IdTokenResponseFilter extends AbstractOAuthServerJoseJwtProducer implements AccessTokenResponseFilter {
     private UserInfoProvider userInfoProvider;
     private String issuer;
     @Override
     public void process(ClientAccessToken ct, ServerAccessToken st) {
-        IdToken token = 
-            userInfoProvider.getIdToken(st.getClient().getClientId(), st.getSubject(), st.getScopes());
-        token.setIssuer(issuer);
-        token.setAudience(st.getClient().getClientId());
-        
-        String responseEntity = super.processJwt(new JwtToken(token), 
-                                                 st.getClient());
-        ct.getParameters().put(OidcUtils.ID_TOKEN, responseEntity);
+        // This may also be done directly inside a data provider code creating the server token
+        if (userInfoProvider != null) {
+            IdToken token = 
+                userInfoProvider.getIdToken(st.getClient().getClientId(), st.getSubject(), st.getScopes());
+            token.setIssuer(issuer);
+            token.setAudience(st.getClient().getClientId());
+            
+            String responseEntity = super.processJwt(new JwtToken(token), 
+                                                     st.getClient());
+            ct.getParameters().put(OidcUtils.ID_TOKEN, responseEntity);
+        } else if (st.getSubject().getProperties().containsKey("id_token")) {
+            ct.getParameters().put(OidcUtils.ID_TOKEN, 
+                                   st.getSubject().getProperties().get("id_token"));
+        }
         
     }
     
