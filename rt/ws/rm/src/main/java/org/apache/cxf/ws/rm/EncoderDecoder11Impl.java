@@ -42,6 +42,7 @@ import org.apache.cxf.ws.rm.v200702.AckRequestedType;
 import org.apache.cxf.ws.rm.v200702.CloseSequenceType;
 import org.apache.cxf.ws.rm.v200702.CreateSequenceResponseType;
 import org.apache.cxf.ws.rm.v200702.CreateSequenceType;
+import org.apache.cxf.ws.rm.v200702.DetailType;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
 import org.apache.cxf.ws.rm.v200702.SequenceFaultType;
@@ -166,14 +167,21 @@ public final class EncoderDecoder11Impl implements EncoderDecoder {
         }
         Element data = doc.getDocumentElement();
         if (data != null) {
-            flt.getDetail().getAny().add(data);
+            addDetail(flt, data);
         }
         data = sf.getExtraDetail();
         if (data != null) {
-            flt.getDetail().getAny().add(data);
+            addDetail(flt, data);
         }
         marshaller.marshal(new JAXBElement<SequenceFaultType>(fqname, SequenceFaultType.class, flt), header);
         return header;
+    }
+
+    private static void addDetail(SequenceFaultType sft, Element data) {
+        if (!sft.isSetDetail()) {
+            sft.setDetail(new DetailType());
+        }
+        sft.getDetail().getAny().add(data);
     }
 
     public Element encodeSequenceAcknowledgement(SequenceAcknowledgement ack) throws JAXBException {
