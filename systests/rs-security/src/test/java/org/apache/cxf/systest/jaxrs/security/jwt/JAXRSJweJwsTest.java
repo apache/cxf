@@ -218,7 +218,7 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
     public void testJweRsaJwsRsaCertInHeaders() throws Exception {
         String address = "https://localhost:" + PORT + "/jwejwsrsaCertInHeaders";
         BookStore bs = createJweJwsBookStore(address, null, null);
-        WebClient.getConfig(bs).getRequestContext().put("rs.security.report.public.key", "true");
+        WebClient.getConfig(bs).getRequestContext().put("rs.security.include.cert", "true");
         String text = bs.echoText("book");
         assertEquals("book", text);
     }
@@ -318,8 +318,8 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         doTestJwsJwkRSA("https://localhost:" + PORT + "/jwsjwkrsa", false, true);
     }
     private void doTestJwsJwkRSA(String address, 
-                                 boolean reportPublicKey,
-                                 boolean reportPublicKeyId) throws Exception {
+                                 boolean includePublicKey,
+                                 boolean includeKeyId) throws Exception {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = JAXRSJweJwsTest.class.getResource("client.xml");
@@ -337,11 +337,11 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
             "org/apache/cxf/systest/jaxrs/security/alice.jwk.properties");
         bean.getProperties(true).put("rs.security.signature.in.properties",
             "org/apache/cxf/systest/jaxrs/security/bob.jwk.properties");
-        if (reportPublicKey) {
-            bean.getProperties(true).put("rs.security.report.public.key", true);
+        if (includePublicKey) {
+            bean.getProperties(true).put("rs.security.include.public.key", true);
         }
-        if (reportPublicKeyId) {
-            bean.getProperties(true).put("rs.security.report.public.key.id", true);
+        if (includeKeyId) {
+            bean.getProperties(true).put("rs.security.include.key.id", true);
         }
         BookStore bs = bean.create(BookStore.class);
         String text = bs.echoText("book");

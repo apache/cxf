@@ -21,6 +21,7 @@ package org.apache.cxf.rs.security.jose.common;
 
 import java.io.InputStream;
 import java.security.KeyStore;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.CertPath;
@@ -29,6 +30,7 @@ import java.security.cert.CertPathBuilderResult;
 import java.security.cert.CertPathValidator;
 import java.security.cert.CertStore;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.CollectionCertStoreParameters;
 import java.security.cert.PKIXBuilderParameters;
 import java.security.cert.X509CertSelector;
@@ -38,15 +40,18 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.rs.security.jose.jwk.KeyOperation;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
+import org.apache.cxf.rt.security.crypto.MessageDigestUtils;
 
 /**
  * Encryption helpers
@@ -56,10 +61,32 @@ public final class KeyManagementUtils {
     
     private KeyManagementUtils() {
     }
+    
     public static List<String> loadAndEncodeX509CertificateOrChain(Message m, Properties props) {
         X509Certificate[] chain = loadX509CertificateOrChain(m, props);
         return encodeX509CertificateChain(chain);
     }
+    
+    public static String loadDigestAndEncodeX509Certificate(Message m, Properties props) {
+        X509Certificate[] certs = loadX509CertificateOrChain(m, props);
+        if (certs != null && certs.length > 0) {
+            try {
+                byte[] digest = 
+                    MessageDigestUtils.createDigest(certs[0].getEncoded(), 
+                                                MessageDigestUtils.ALGO_SHA_1);
+                return Base64UrlUtility.encode(digest);
+            } catch (NoSuchAlgorithmException ex) {
+                LOG.log(Level.FINE, "Error creating digest", ex);
+                throw new JoseException(ex);
+            } catch (CertificateEncodingException ex) {
+                LOG.log(Level.FINE, "Error creating digest", ex);
+                throw new JoseException(ex);
+            }
+        }
+        
+        return null;
+    }
+    
     public static X509Certificate[] loadX509CertificateOrChain(Message m, Properties props) {
         KeyStore keyStore = KeyManagementUtils.loadPersistKeyStore(m, props);
         String alias = props.getProperty(JoseConstants.RSSEC_KEY_STORE_ALIAS);

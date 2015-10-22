@@ -266,20 +266,40 @@ public final class JwsUtils {
                                                               boolean ignoreNullProvider) {
         JwsSignatureProvider theSigProvider = null;
         
-        boolean reportPublicKey = headers != null && MessageUtils.isTrue(
-                MessageUtils.getContextualProperty(m, JoseConstants.RSSEC_REPORT_KEY_PROP, 
-                                                   JoseConstants.RSSEC_REPORT_KEY_PROP));
-        boolean reportPublicKeyId = 
-            headers != null && MessageUtils.isTrue(
-                MessageUtils.getContextualProperty(m, JoseConstants.RSSEC_REPORT_KEY_ID_PROP,
-                                                   JoseConstants.RSSEC_REPORT_KEY_ID_PROP));
+        boolean includeCert = headers != null && MessageUtils.isTrue(
+                MessageUtils.getContextualProperty(m, JoseConstants.RSSEC_SIGNATURE_INCLUDE_CERT, 
+                                                   JoseConstants.RSSEC_INCLUDE_CERT));
+        boolean includeCertSha1 = headers != null && MessageUtils.isTrue(
+                MessageUtils.getContextualProperty(m, JoseConstants.RSSEC_SIGNATURE_INCLUDE_CERT_SHA1, 
+                                                   JoseConstants.RSSEC_INCLUDE_CERT_SHA1));
+        
         if (JoseConstants.HEADER_JSON_WEB_KEY.equals(props.get(JoseConstants.RSSEC_KEY_STORE_TYPE))) {
             JsonWebKey jwk = JwkUtils.loadJsonWebKey(m, props, KeyOperation.SIGN);
             if (jwk != null) {
                 String signatureAlgo = getSignatureAlgo(m, props, jwk.getAlgorithm(), getDefaultKeyAlgo(jwk));
                 theSigProvider = JwsUtils.getSignatureProvider(jwk, SignatureAlgorithm.getAlgorithm(signatureAlgo));
-                if (reportPublicKey || reportPublicKeyId) {
-                    JwkUtils.setPublicKeyInfo(jwk, headers, signatureAlgo, reportPublicKey, reportPublicKeyId);
+                
+                boolean includePublicKey = headers != null && MessageUtils.isTrue(
+                    MessageUtils.getContextualProperty(m, JoseConstants.RSSEC_SIGNATURE_INCLUDE_PUBLIC_KEY,
+                                                       JoseConstants.RSSEC_INCLUDE_PUBLIC_KEY));
+                boolean includeKeyId = headers != null && MessageUtils.isTrue(
+                    MessageUtils.getContextualProperty(m, JoseConstants.RSSEC_SIGNATURE_INCLUDE_KEY_ID,
+                                                       JoseConstants.RSSEC_INCLUDE_KEY_ID));
+                
+                if (includeCert) {
+                    JwkUtils.includeCertChain(jwk, headers, signatureAlgo);
+                }
+                if (includeCertSha1 && headers != null) {
+                    String digest = KeyManagementUtils.loadDigestAndEncodeX509Certificate(m, props);
+                    if (digest != null) {
+                        headers.setX509Thumbprint(digest);
+                    }
+                }
+                if (includePublicKey) {
+                    JwkUtils.includePublicKey(jwk, headers, signatureAlgo);
+                }
+                if (includeKeyId && jwk.getKeyId() != null && headers != null) {
+                    headers.setKeyId(jwk.getKeyId());
                 }
             }
         } else {
@@ -287,8 +307,14 @@ public final class JwsUtils {
             PrivateKey pk = KeyManagementUtils.loadPrivateKey(m, props, KeyOperation.SIGN);
             theSigProvider = getPrivateKeySignatureProvider(pk, 
                                                             SignatureAlgorithm.getAlgorithm(signatureAlgo));
-            if (reportPublicKey) {
+            if (includeCert && headers != null) {
                 headers.setX509Chain(KeyManagementUtils.loadAndEncodeX509CertificateOrChain(m, props));
+            }
+            if (includeCertSha1 && headers != null) {
+                String digest = KeyManagementUtils.loadDigestAndEncodeX509Certificate(m, props);
+                if (digest != null) {
+                    headers.setX509Thumbprint(digest);
+                }
             }
         }
         if (theSigProvider == null && !ignoreNullProvider) {

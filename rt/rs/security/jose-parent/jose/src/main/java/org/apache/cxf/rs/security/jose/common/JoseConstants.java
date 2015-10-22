@@ -53,7 +53,7 @@ public final class JoseConstants {
     //
     
     // 
-    // Shared Keys/keystore configuration
+    // Shared configuration
     //
     
     /**
@@ -100,10 +100,28 @@ public final class JoseConstants {
     public static final String RSSEC_KEY_PSWD_PROVIDER = "rs.security.key.password.provider";
     
     /**
+     * Include the JWK public key (for signature or encryption) in the "jwk" header.
+     */
+    public static final String RSSEC_INCLUDE_PUBLIC_KEY = "rs.security.include.public.key";
+    
+    /**
+     * Include the X.509 certificate (for signature or encryption) in the "x5c" header.
+     */
+    public static final String RSSEC_INCLUDE_CERT = "rs.security.include.cert";
+    
+    /**
+     * Include the JWK key id (for signature or encryption) in the "kid" header.
+     */
+    public static final String RSSEC_INCLUDE_KEY_ID = "rs.security.include.key.id";
+    
+    /**
+     * Include the X.509 certificate SHA-1 digest (for signature or encryption) in the "x5t" header.
+     */
+    public static final String RSSEC_INCLUDE_CERT_SHA1 = "rs.security.include.cert.sha1";
+    
+    /**
      * TODO documentation for these
      */
-    public static final String RSSEC_REPORT_KEY_PROP = "rs.security.report.public.key";
-    public static final String RSSEC_REPORT_KEY_ID_PROP = "rs.security.report.public.key.id";
     public static final String RSSEC_ACCEPT_PUBLIC_KEY_PROP = "rs.security.accept.public.key.properties";
     public static final String RSSEC_KEY_STORE_JWKSET = "rs.security.keystore.jwkset";
     public static final String RSSEC_KEY_STORE_JWKKEY = "rs.security.keystore.jwkkey";
@@ -164,10 +182,24 @@ public final class JoseConstants {
     public static final String RSSEC_SIGNATURE_LIST_PROPS = "rs.security.signature.list.properties";
     
     /**
-     * TODO documentation for these
+     * Include the JWK public key for signature in the "jwk" header.
      */
-    public static final String RSSEC_SIGNATURE_REPORT_KEY_PROP = "rs.security.signature.report.public.key";
-    public static final String RSSEC_SIGNATURE_REPORT_KEY_ID_PROP = "rs.security.signature.report.public.key.id";
+    public static final String RSSEC_SIGNATURE_INCLUDE_PUBLIC_KEY = "rs.security.signature.include.public.key";
+    
+    /**
+     * Include the X.509 certificate for signaturein the "x5c" header.
+     */
+    public static final String RSSEC_SIGNATURE_INCLUDE_CERT = "rs.security.signature.include.cert";
+    
+    /**
+     * Include the JWK key id for signature in the "kid" header.
+     */
+    public static final String RSSEC_SIGNATURE_INCLUDE_KEY_ID = "rs.security.signature.include.key.id";
+    
+    /**
+     * Include the X.509 certificate SHA-1 digest for signature in the "x5t" header.
+     */
+    public static final String RSSEC_SIGNATURE_INCLUDE_CERT_SHA1 = "rs.security.signature.include.cert.sha1";
     
     //
     // JWE specific Configuration
@@ -232,10 +264,24 @@ public final class JoseConstants {
     public static final String RSSEC_ENCRYPTION_PROPS = "rs.security.encryption.properties";
     
     /**
-     * TODO documentation for these
+     * Include the JWK public key for encryption in the "jwk" header.
      */
-    public static final String RSSEC_ENCRYPTION_REPORT_KEY_PROP = "rs.security.encryption.report.public.key";
-    public static final String RSSEC_ENCRYPTION_REPORT_KEY_ID_PROP = "rs.security.encryption.report.public.key.id";
+    public static final String RSSEC_ENCRYPTION_INCLUDE_PUBLIC_KEY = "rs.security.encryption.include.public.key";
+    
+    /**
+     * Include the X.509 certificate for encryption the "x5c" header.
+     */
+    public static final String RSSEC_ENCRYPTION_INCLUDE_CERT = "rs.security.encryption.include.cert";
+    
+    /**
+     * Include the JWK key id for encryption in the "kid" header.
+     */
+    public static final String RSSEC_ENCRYPTION_INCLUDE_KEY_ID = "rs.security.encryption.include.key.id";
+    
+    /**
+     * Include the X.509 certificate SHA-1 digest for encryption in the "x5t" header.
+     */
+    public static final String RSSEC_ENCRYPTION_INCLUDE_CERT_SHA1 = "rs.security.encryption.include.cert.sha1";
     
     //
     // JWT specific configuration
