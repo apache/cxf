@@ -94,7 +94,7 @@ public class RESTLoggingTest {
 
     private void checkRequestIn(LogEvent requestIn) {
         Assert.assertEquals(SERVICE_URI + "/test1", requestIn.getAddress());
-        Assert.assertEquals("*/*", requestIn.getContentType());
+        Assert.assertNull(requestIn.getContentType());
         Assert.assertEquals(EventType.REQ_IN, requestIn.getType());
         Assert.assertNull(requestIn.getEncoding());
         Assert.assertNotNull(requestIn.getExchangeId());
