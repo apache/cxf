@@ -145,9 +145,9 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
             return createErrorResponse(params, redirectUri, OAuthConstants.INVALID_SCOPE);
         }
         // Convert the requested scopes to OAuthPermission instances
-        List<OAuthPermission> permissions = null;
+        List<OAuthPermission> requestedPermissions = null;
         try {
-            permissions = getDataProvider().convertScopeToPermissions(client, requestedScope);
+            requestedPermissions = getDataProvider().convertScopeToPermissions(client, requestedScope);
         } catch (OAuthServiceException ex) {
             return createErrorResponse(params, redirectUri, OAuthConstants.INVALID_SCOPE);
         }
@@ -161,18 +161,21 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         ServerAccessToken preAuthorizedToken = getDataProvider().getPreauthorizedToken(
             client, requestedScope, userSubject, supportedGrantType);
         final boolean authorizationCanBeSkipped = 
-            preAuthorizedToken != null || canAuthorizationBeSkipped(client, permissions);
+            preAuthorizedToken != null 
+            || canAuthorizationBeSkipped(client, requestedScope, requestedPermissions);
         
         // Populate the authorization challenge data 
         OAuthAuthorizationData data = 
-            createAuthorizationData(client, params, redirectUri, userSubject, permissions, 
+            createAuthorizationData(client, params, redirectUri, userSubject, requestedPermissions, 
                                     authorizationCanBeSkipped);
         
         if (authorizationCanBeSkipped) {
+            List<OAuthPermission> approvedScopes = 
+                preAuthorizedToken != null ? preAuthorizedToken.getScopes() : requestedPermissions; 
             return createGrant(data,
                                client, 
                                requestedScope,
-                               OAuthUtils.convertPermissionsToScopeList(preAuthorizedToken.getScopes()),
+                               OAuthUtils.convertPermissionsToScopeList(approvedScopes),
                                userSubject,
                                preAuthorizedToken);
         }
@@ -181,7 +184,9 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         
     }
     
-    protected boolean canAuthorizationBeSkipped(Client client, List<OAuthPermission> permissions) {
+    protected boolean canAuthorizationBeSkipped(Client client, 
+                                                List<String> requestedScope, 
+                                                List<OAuthPermission> permissions) {
         return false;
     }
 

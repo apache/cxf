@@ -29,13 +29,19 @@ import org.apache.cxf.rs.security.oauth2.services.AuthorizationCodeGrantService;
 @Path("/login")
 public class OidcAuthorizationCodeService extends AuthorizationCodeGrantService {
     private static final String OPEN_ID_CONNECT_SCOPE = "openid";
+    private boolean skipAuthorizationWithOidcScope;
     @Override
-    protected boolean canAuthorizationBeSkipped(Client client, List<OAuthPermission> permissions) {
+    protected boolean canAuthorizationBeSkipped(Client client,
+                                                List<String> requestedScope,
+                                                List<OAuthPermission> permissions) {
         // No need to challenge the authenticated user with the authorization form 
         // if all the client application redirecting a user needs is to get this user authenticated
         // with OIDC IDP
-        return permissions.size() == 1 
-            && OPEN_ID_CONNECT_SCOPE.equals(permissions.get(0).getPermission());
+        return requestedScope.size() == 1 && skipAuthorizationWithOidcScope
+            && OPEN_ID_CONNECT_SCOPE.equals(requestedScope.get(0));
+    }
+    public void setSkipAuthorizationWithOidcScope(boolean skipAuthorizationWithOidcScope) {
+        this.skipAuthorizationWithOidcScope = skipAuthorizationWithOidcScope;
     }
     
 }
