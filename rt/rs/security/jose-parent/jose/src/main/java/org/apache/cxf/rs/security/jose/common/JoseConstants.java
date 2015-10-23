@@ -120,9 +120,14 @@ public final class JoseConstants {
     public static final String RSSEC_INCLUDE_CERT_SHA1 = "rs.security.include.cert.sha1";
     
     /**
+     * Whether to allow using a JWK received in the header for signature validation. The default
+     * is "false".
+     */
+    public static final String RSSEC_ACCEPT_PUBLIC_KEY = "rs.security.accept.public.key";
+    
+    /**
      * TODO documentation for these
      */
-    public static final String RSSEC_ACCEPT_PUBLIC_KEY_PROP = "rs.security.accept.public.key.properties";
     public static final String RSSEC_KEY_STORE_JWKSET = "rs.security.keystore.jwkset";
     public static final String RSSEC_KEY_STORE_JWKKEY = "rs.security.keystore.jwkkey";
     
@@ -187,7 +192,7 @@ public final class JoseConstants {
     public static final String RSSEC_SIGNATURE_INCLUDE_PUBLIC_KEY = "rs.security.signature.include.public.key";
     
     /**
-     * Include the X.509 certificate for signaturein the "x5c" header.
+     * Include the X.509 certificate for signature in the "x5c" header.
      */
     public static final String RSSEC_SIGNATURE_INCLUDE_CERT = "rs.security.signature.include.cert";
     

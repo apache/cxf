@@ -336,7 +336,7 @@ public final class JwsUtils {
             if (inHeaders.getHeader(JoseConstants.HEADER_JSON_WEB_KEY) != null) {
                 JsonWebKey publicJwk = inHeaders.getJsonWebKey();
                 if (inHeaderKid != null && !inHeaderKid.equals(publicJwk.getKeyId())
-                    || !MessageUtils.getContextualBoolean(m, JoseConstants.RSSEC_ACCEPT_PUBLIC_KEY_PROP, true)) {
+                    || !MessageUtils.getContextualBoolean(m, JoseConstants.RSSEC_ACCEPT_PUBLIC_KEY, false)) {
                     throw new JwsException(JwsException.Error.INVALID_KEY);
                 }
                 return getSignatureVerifier(publicJwk, 

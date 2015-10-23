@@ -231,6 +231,7 @@ under the License.
         <jaxrs:properties>
             <entry key="rs.security.signature.in.properties" value="org/apache/cxf/systest/jaxrs/security/bob.jwk.properties"/>
             <entry key="rs.security.signature.out.properties" value="org/apache/cxf/systest/jaxrs/security/alice.jwk.properties"/>
+            <entry key="rs.security.accept.public.key" value="true"/>
         </jaxrs:properties>
     </jaxrs:server>
     <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jwt}/jweaescbchmac">
