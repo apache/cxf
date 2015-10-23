@@ -312,7 +312,7 @@ public final class JwkUtils {
         JsonWebKeys jwkSet = loadJwkSet(m, props, cb, reader);
         String kid = null;
         if (inHeaderKid != null 
-            && MessageUtils.getContextualBoolean(m, JoseConstants.RSSEC_ACCEPT_PUBLIC_KEY_PROP, true)) {
+            && MessageUtils.getContextualBoolean(m, JoseConstants.RSSEC_ACCEPT_PUBLIC_KEY, false)) {
             kid = inHeaderKid;
         } else {
             kid = KeyManagementUtils.getKeyId(m, props, JoseConstants.RSSEC_KEY_STORE_ALIAS, keyOper);
