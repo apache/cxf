@@ -40,7 +40,7 @@
     <!-- Current the abdera bundle is not working as we expect -->
     <feature name="cxf-abdera" version="${project.version}" resolver="(obr)">
         <feature version="${project.version}">cxf-specs</feature>
-        <bundle start-level="35" dependency="true">mvn:commons-codec/commons-codec/${cxf.commons-codec.version}</bundle>
+        <bundle start-level="25" dependency="true">mvn:commons-codec/commons-codec/${cxf.commons-codec.version}</bundle>
         <bundle start-level="35">mvn:org.apache.abdera/abdera-core/${cxf.abdera.version}</bundle>
         <bundle start-level="35">mvn:org.apache.abdera/abdera-extensions-main/${cxf.abdera.version}</bundle>
         <bundle start-level="35">mvn:org.apache.abdera/abdera-i18n/${cxf.abdera.version}</bundle>
@@ -76,7 +76,7 @@
     <feature name="cxf-core" version="${project.version}" resolver="(obr)">
         <feature version="${project.version}">cxf-specs</feature>
         <bundle start-level="30" dependency="true">mvn:org.apache.ws.xmlschema/xmlschema-core/${cxf.xmlschema.version}</bundle>
-        <bundle start-level="30" dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xmlresolver/${cxf.xmlresolver.bundle.version}</bundle>
+        <bundle start-level="25" dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xmlresolver/${cxf.xmlresolver.bundle.version}</bundle>
         <bundle start-level="30" dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.fastinfoset/${cxf.fastinfoset.bundle.version}</bundle>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-core/${project.version}</bundle>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-management/${project.version}</bundle>
@@ -339,7 +339,7 @@
     </feature>
     <feature name="cxf-xjc-runtime" version="${project.version}" resolver="(obr)">
         <feature version="${project.version}">cxf-jaxb</feature>
-        <bundle start-level="40" dependency="true">mvn:commons-lang/commons-lang/${cxf.commons-lang.version}</bundle>
+        <bundle start-level="35" dependency="true">mvn:commons-lang/commons-lang/${cxf.commons-lang.version}</bundle>
         <bundle start-level="40">mvn:org.apache.cxf.xjc-utils/cxf-xjc-runtime/${cxf.xjc-utils.version}</bundle>
     </feature>
     <feature name="cxf-tools" version="${project.version}" resolver="(obr)">
@@ -351,7 +351,7 @@
         <feature version="${project.version}">cxf-jaxrs</feature>
         <feature version="${project.version}">cxf-jaxws</feature>
         <feature version="${project.version}">cxf-javascript</feature>
-        <bundle>mvn:commons-lang/commons-lang/${cxf.commons-lang.version}</bundle>
+        <bundle start-level="35">mvn:commons-lang/commons-lang/${cxf.commons-lang.version}</bundle>
         <bundle>mvn:org.apache.velocity/velocity/${cxf.velocity.version}</bundle>
         <bundle>mvn:commons-collections/commons-collections/${cxf.commons-collections.version}</bundle>
         <bundle>mvn:org.apache.cxf/cxf-tools-common/${project.version}</bundle>
@@ -450,7 +450,7 @@
         <feature version="${project.version}">cxf-core</feature>
         <feature version="${project.version}">cxf-jaxrs</feature>
         <bundle start-level="35" dependency="true">mvn:commons-lang/commons-lang/${cxf.commons-lang.version}</bundle>
-        <bundle start-level="35" dependency="true">mvn:commons-codec/commons-codec/${cxf.commons-codec.version}</bundle>
+        <bundle start-level="25" dependency="true">mvn:commons-codec/commons-codec/${cxf.commons-codec.version}</bundle>
         <bundle start-level="35">mvn:org.apache.abdera/abdera-core/${cxf.abdera.version}</bundle>
         <bundle start-level="35">mvn:org.apache.abdera/abdera-i18n/${cxf.abdera.version}</bundle>
         <bundle start-level="35">mvn:org.apache.james/apache-mime4j-core/${cxf.james.mim4j.version}</bundle>
