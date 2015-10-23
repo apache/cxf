@@ -150,6 +150,9 @@ public class SecurityConstants {
     
     /**
      * Whether to allow unsigned saml assertions as SecurityContext Principals. The default is false.
+     * Note that "unsigned" refers to an internal signature. Even if the token is signed by an
+     * external signature (as per the "sender-vouches" requirement), this boolean must still be
+     * configured if you want to use the token to set up the security context.
      */
     public static final String ENABLE_UNSIGNED_SAML_ASSERTION_PRINCIPAL = 
             "security.enable.unsigned-saml-assertion.principal";
