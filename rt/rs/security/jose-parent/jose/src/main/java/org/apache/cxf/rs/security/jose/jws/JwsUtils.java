@@ -49,6 +49,7 @@ import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 import org.apache.cxf.rs.security.jose.jwk.JwkUtils;
 import org.apache.cxf.rs.security.jose.jwk.KeyOperation;
 import org.apache.cxf.rs.security.jose.jwk.KeyType;
+import org.apache.cxf.rt.security.crypto.MessageDigestUtils;
 
 public final class JwsUtils {
     private static final Logger LOG = LogUtils.getL7dLogger(JwsUtils.class);
@@ -346,6 +347,15 @@ public final class JwsUtils {
                 KeyManagementUtils.validateCertificateChain(props, chain);
                 return getPublicKeySignatureVerifier(chain.get(0).getPublicKey(), 
                                                      inHeaders.getSignatureAlgorithm());
+            } else if (inHeaders.getHeader(JoseConstants.HEADER_X509_THUMBPRINT) != null) {
+                X509Certificate foundCert = 
+                    KeyManagementUtils.getCertificateFromThumbprint(inHeaders.getX509Thumbprint(), 
+                                                                    MessageDigestUtils.ALGO_SHA_1,
+                                                                    m, props);
+                if (foundCert != null) {
+                    return getPublicKeySignatureVerifier(foundCert.getPublicKey(), 
+                                                         inHeaders.getSignatureAlgorithm());
+                }
             }
         }
         

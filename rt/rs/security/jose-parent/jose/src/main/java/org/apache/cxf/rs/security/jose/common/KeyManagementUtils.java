@@ -21,6 +21,7 @@ package org.apache.cxf.rs.security.jose.common;
 
 import java.io.InputStream;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -45,6 +46,7 @@ import java.util.logging.Logger;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
@@ -389,5 +391,55 @@ public final class KeyManagementUtils {
             LOG.warning("Private key can not be loaded");
             throw new JoseException(ex);
         }
+    }
+    
+    public static X509Certificate getCertificateFromThumbprint(String thumbprint,
+                                                               String digestAlgorithm,
+                                                               Message m, 
+                                                               Properties props) {
+        KeyStore ks = loadPersistKeyStore(m, props);
+        if (ks == null || thumbprint == null) {
+            return null;
+        }
+        
+        try {
+            byte[] decodedThumbprint = Base64UrlUtility.decode(thumbprint);
+            
+            for (Enumeration<String> e = ks.aliases(); e.hasMoreElements();) {
+                String alias = e.nextElement();
+                Certificate[] certs = ks.getCertificateChain(alias);
+                if (certs == null || certs.length == 0) {
+                    // no cert chain, so lets check if getCertificate gives us a result.
+                    Certificate cert = ks.getCertificate(alias);
+                    if (cert != null) {
+                        certs = new Certificate[]{cert};
+                    }
+                }
+                
+                if (certs != null && certs.length > 0 && certs[0] instanceof X509Certificate) {
+                    X509Certificate x509cert = (X509Certificate) certs[0];
+                    byte[] data = 
+                        MessageDigestUtils.createDigest(x509cert.getEncoded(), digestAlgorithm);
+
+                    if (Arrays.equals(data, decodedThumbprint)) {
+                        return x509cert;
+                    }
+                }
+            }
+        } catch (KeyStoreException e) {
+            LOG.log(Level.WARNING, "X509Certificate can not be loaded: ", e);
+            throw new JoseException(e);
+        } catch (CertificateEncodingException e) {
+            LOG.log(Level.WARNING, "X509Certificate can not be loaded: ", e);
+            throw new JoseException(e);
+        } catch (NoSuchAlgorithmException e) {
+            LOG.log(Level.WARNING, "X509Certificate can not be loaded: ", e);
+            throw new JoseException(e);
+        } catch (Base64Exception e) {
+            LOG.log(Level.WARNING, "X509Certificate can not be loaded: ", e);
+            throw new JoseException(e);
+        }
+        
+        return null;
     }
 }
