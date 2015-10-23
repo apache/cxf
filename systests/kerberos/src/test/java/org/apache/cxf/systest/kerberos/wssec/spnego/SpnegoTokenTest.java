@@ -34,7 +34,6 @@ import org.apache.cxf.systest.kerberos.common.SecurityTestUtil;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.directory.server.annotations.CreateKdcServer;
-import org.apache.directory.server.annotations.CreateLdapServer;
 import org.apache.directory.server.annotations.CreateTransport;
 import org.apache.directory.server.core.annotations.ApplyLdifFiles;
 import org.apache.directory.server.core.annotations.CreateDS;
@@ -73,12 +72,6 @@ import org.junit.runner.RunWith;
         ) },
     additionalInterceptors = {
         KeyDerivationInterceptor.class
-        }
-)
-
-@CreateLdapServer(
-    transports = {
-        @CreateTransport(protocol = "LDAP")
         }
 )
 
