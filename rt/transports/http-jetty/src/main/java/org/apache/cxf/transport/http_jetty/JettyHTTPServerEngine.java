@@ -594,14 +594,11 @@ public class JettyHTTPServerEngine implements ServerEngine {
         
         int major = 8;
         int minor = 0;
-        try
-        {
+        try {
             String[] version = Server.getVersion().split("\\.");
             major = Integer.parseInt(version[0]);
             minor = Integer.parseInt(version[1]);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             // unparsable version
         }
     
