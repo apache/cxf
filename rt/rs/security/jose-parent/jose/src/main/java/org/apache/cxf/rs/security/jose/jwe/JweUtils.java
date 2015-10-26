@@ -282,12 +282,10 @@ public final class JweUtils {
         }
         
         boolean includeCert = 
-            headers != null && MessageUtils.isTrue(
-                MessageUtils.getContextualProperty(m, JoseConstants.RSSEC_ENCRYPTION_INCLUDE_CERT, 
-                                                   JoseConstants.RSSEC_INCLUDE_CERT));
-        boolean includeCertSha1 = headers != null && MessageUtils.isTrue(
-                MessageUtils.getContextualProperty(m, JoseConstants.RSSEC_ENCRYPTION_INCLUDE_CERT_SHA1, 
-                                                   JoseConstants.RSSEC_INCLUDE_CERT_SHA1));
+            headers != null && MessageUtils.getContextualBoolean(
+                m, JoseConstants.RSSEC_ENCRYPTION_INCLUDE_CERT, false);
+        boolean includeCertSha1 = headers != null && MessageUtils.getContextualBoolean(
+                m, JoseConstants.RSSEC_ENCRYPTION_INCLUDE_CERT_SHA1, false);
         
         KeyEncryptionProvider keyEncryptionProvider = null;
         String keyEncryptionAlgo = getKeyEncryptionAlgo(m, props, null, null);
@@ -304,12 +302,10 @@ public final class JweUtils {
                                                          getDefaultKeyAlgo(jwk));
                 keyEncryptionProvider = getKeyEncryptionProvider(jwk, keyAlgo);
                 
-                boolean includePublicKey = headers != null && MessageUtils.isTrue(
-                    MessageUtils.getContextualProperty(m, JoseConstants.RSSEC_ENCRYPTION_INCLUDE_PUBLIC_KEY,
-                                                       JoseConstants.RSSEC_INCLUDE_PUBLIC_KEY));
-                boolean includeKeyId = headers != null && MessageUtils.isTrue(
-                    MessageUtils.getContextualProperty(m, JoseConstants.RSSEC_ENCRYPTION_INCLUDE_KEY_ID,
-                                                       JoseConstants.RSSEC_INCLUDE_KEY_ID));
+                boolean includePublicKey = headers != null && MessageUtils.getContextualBoolean(
+                    m, JoseConstants.RSSEC_ENCRYPTION_INCLUDE_PUBLIC_KEY, false);
+                boolean includeKeyId = headers != null && MessageUtils.getContextualBoolean(
+                    m, JoseConstants.RSSEC_ENCRYPTION_INCLUDE_KEY_ID, false);
                 
                 if (includeCert) {
                     JwkUtils.includeCertChain(jwk, headers, keyEncryptionAlgo);
