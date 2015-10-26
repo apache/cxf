@@ -711,6 +711,10 @@ public final class CryptoUtils {
             if (!keyStore.containsAlias(alias)) {
                 throw new SecurityException("No alias exists in the keystore for: " + alias);
             }
+            if (!keyStore.isKeyEntry(alias)) {
+                throw new SecurityException("The given alias " + alias 
+                                            + " is not a private key in the keystore.");
+            }
             KeyStore.PrivateKeyEntry pkEntry = (KeyStore.PrivateKeyEntry)
                 keyStore.getEntry(alias, new KeyStore.PasswordProtection(keyPassword));
             return pkEntry.getPrivateKey();
