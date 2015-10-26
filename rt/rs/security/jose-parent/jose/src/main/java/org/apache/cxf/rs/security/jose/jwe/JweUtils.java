@@ -368,11 +368,24 @@ public final class JweUtils {
             // Supporting loading a private key via a certificate for now
             List<X509Certificate> chain = KeyManagementUtils.toX509CertificateChain(inHeaders.getX509Chain());
             KeyManagementUtils.validateCertificateChain(props, chain);
+            X509Certificate cert = chain == null ? null : chain.get(0);
             PrivateKey privateKey = 
-                KeyManagementUtils.loadPrivateKey(m, props, chain, KeyOperation.DECRYPT);
+                KeyManagementUtils.loadPrivateKey(m, props, cert, KeyOperation.DECRYPT);
             contentEncryptionAlgo = inHeaders.getContentEncryptionAlgorithm().getJwaName();
             keyDecryptionProvider = getPrivateKeyDecryptionProvider(privateKey, 
                                                                  inHeaders.getKeyEncryptionAlgorithm());
+        } else if (inHeaders != null && inHeaders.getHeader(JoseConstants.HEADER_X509_THUMBPRINT) != null) {
+            X509Certificate foundCert = 
+                KeyManagementUtils.getCertificateFromThumbprint(inHeaders.getX509Thumbprint(), 
+                                                                MessageDigestUtils.ALGO_SHA_1,
+                                                                m, props);
+            if (foundCert != null) {
+                PrivateKey privateKey = 
+                    KeyManagementUtils.loadPrivateKey(m, props, foundCert, KeyOperation.DECRYPT);
+                contentEncryptionAlgo = inHeaders.getContentEncryptionAlgorithm().getJwaName();
+                keyDecryptionProvider = getPrivateKeyDecryptionProvider(privateKey, 
+                                                                     inHeaders.getKeyEncryptionAlgorithm());
+            }
         } else {
             if (JoseConstants.HEADER_JSON_WEB_KEY.equals(props.get(JoseConstants.RSSEC_KEY_STORE_TYPE))) {
                 JsonWebKey jwk = JwkUtils.loadJsonWebKey(m, props, KeyOperation.DECRYPT);
