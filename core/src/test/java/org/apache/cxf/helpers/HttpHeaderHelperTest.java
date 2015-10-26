@@ -53,4 +53,10 @@ public class HttpHeaderHelperTest {
         assertEquals("ISO-8859-1", cs);
     }
 
+    @Test
+    public void testFindCharsetDoesNotCrashOnEmptyCharset() {
+        HttpHeaderHelper.findCharset("foo/bar; charset=");
+        HttpHeaderHelper.findCharset("foo/bar; charset=;");
+    }
+
 }
