@@ -24,10 +24,12 @@
             <wsdl:input message="x1:sayHiRequest"/>
             <wsdl:output message="x1:sayHiResponse"/>
         </wsdl:operation>
+
         <wsdl:operation name="greetMe">
             <wsdl:input message="x1:greetMeRequest"/>
             <wsdl:output message="x1:greetMeResponse"/>
         </wsdl:operation>
+
         <wsdl:operation name="pingMe">
             <wsdl:input message="x1:pingMeRequest"/>
             <wsdl:output message="x1:pingMeResponse"/>

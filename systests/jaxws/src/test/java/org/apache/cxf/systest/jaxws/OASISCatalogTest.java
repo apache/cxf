@@ -63,29 +63,31 @@ public class OASISCatalogTest extends Assert {
         Endpoint ep = Endpoint.publish("http://localhost:" + PORT + "/SoapContext/SoapPort",
                                        new GreeterImpl());
 
-        String result = readUrl("http://localhost:" + PORT + "/SoapContext/SoapPort?"
-                + "xsd=hello_world_schema2.xsd");
-        assertTrue(result, result.contains("xsd=hello_world_schema.xsd"));
-        assertTrue(result, result.contains("xsd=hello_world_schema3.xsd"));
-        assertTrue(result, result.contains("xsd=d/hello_world_schema4.xsd"));
+        try {
+            String result = readUrl("http://localhost:" + PORT + "/SoapContext/SoapPort?"
+                    + "xsd=hello_world_schema2.xsd");
+            assertTrue(result, result.contains("xsd=hello_world_schema.xsd"));
+            assertTrue(result, result.contains("xsd=hello_world_schema3.xsd"));
+            assertTrue(result, result.contains("xsd=d/hello_world_schema4.xsd"));
 
-        result = readUrl("http://localhost:" + PORT + "/SoapContext/SoapPort?"
-                + "xsd=hello_world_schema3.xsd");
-        assertTrue(result.length() > 0);
+            result = readUrl("http://localhost:" + PORT + "/SoapContext/SoapPort?"
+                    + "xsd=hello_world_schema3.xsd");
+            assertTrue(result.length() > 0);
 
-        result = readUrl("http://localhost:" + PORT + "/SoapContext/SoapPort?"
-                + "xsd=d/hello_world_schema4.xsd");
-        assertTrue(result, result.contains("xsd=d/d/hello_world_schema4.xsd"));
+            result = readUrl("http://localhost:" + PORT + "/SoapContext/SoapPort?"
+                    + "xsd=d/hello_world_schema4.xsd");
+            assertTrue(result, result.contains("xsd=d/d/hello_world_schema4.xsd"));
 
-        result = readUrl("http://localhost:" + PORT + "/SoapContext/SoapPort"
-                + "?xsd=hello_world_schema.xsd");
-        assertTrue(result, result.contains("xsd=http://apache.org/hello_world/types2/hello_world_schema2.xsd"));
+            result = readUrl("http://localhost:" + PORT + "/SoapContext/SoapPort"
+                    + "?xsd=hello_world_schema.xsd");
+            assertTrue(result, result.contains("xsd=http://apache.org/hello_world/types2/hello_world_schema2.xsd"));
 
-        result = readUrl("http://localhost:" + PORT + "/SoapContext/SoapPort"
-                + "?wsdl=hello_world_messages_catalog.wsdl");
-        assertTrue(result, result.contains("xsd=hello_world_schema.xsd"));
-
-        ep.stop();
+            result = readUrl("http://localhost:" + PORT + "/SoapContext/SoapPort"
+                    + "?wsdl=hello_world_messages_catalog.wsdl");
+            assertTrue(result, result.contains("xsd=hello_world_schema.xsd"));
+        } finally {
+            ep.stop();
+        }
     }
 
     /**
@@ -101,30 +103,65 @@ public class OASISCatalogTest extends Assert {
     public void testWSDLPublishWithCatalogsRewritePaths() {
         Endpoint ep = Endpoint.publish("http://localhost:" + PORT + "/SoapContext/SoapPort",
                 new GreeterImpl());
+        try {
+            // schemas in the same directory as WSDL
 
-        String result = readUrl("http://localhost:" + PORT + "/SoapContext/SoapPort?"
-                + "xsd=http://apache.org/hello_world/types2/hello_world_schema2.xsd");
-        assertTrue(result, result.contains("xsd=http://apache.org/hello_world/types2/hello_world_schema.xsd"));
-        assertTrue(result, result.contains("xsd=http://apache.org/hello_world/types2/hello_world_schema3.xsd"));
-        assertTrue(result, result.contains("xsd=http://apache.org/hello_world/types2/d/hello_world_schema4.xsd"));
+            String result = readUrl("http://localhost:" + PORT + "/SoapContext/SoapPort?"
+                    + "xsd=http://apache.org/hello_world/types2/hello_world_schema2.xsd");
+            assertTrue(result, result.contains("xsd=http://apache.org/hello_world/types2/hello_world_schema.xsd"));
+            assertTrue(result, result.contains("xsd=http://apache.org/hello_world/types2/hello_world_schema3.xsd"));
+            assertTrue(result, result.contains("xsd=http://apache.org/hello_world/types2/d/hello_world_schema4.xsd"));
 
-        result = readUrl("http://localhost:" + PORT + "/SoapContext/SoapPort?"
-                + "xsd=http://apache.org/hello_world/types2/hello_world_schema.xsd");
-        assertTrue(result, result.contains("xsd=http://apache.org/hello_world/types2/hello_world_schema2.xsd"));
+            result = readUrl("http://localhost:" + PORT + "/SoapContext/SoapPort?"
+                    + "xsd=http://apache.org/hello_world/types2/hello_world_schema.xsd");
+            assertTrue(result, result.contains("xsd=http://apache.org/hello_world/types2/hello_world_schema2.xsd"));
 
-        result = readUrl("http://localhost:" + PORT + "/SoapContext/SoapPort?"
-                + "xsd=http://apache.org/hello_world/types2/hello_world_schema3.xsd");
-        assertTrue(result.length() > 0);
+            result = readUrl("http://localhost:" + PORT + "/SoapContext/SoapPort?"
+                    + "xsd=http://apache.org/hello_world/types2/hello_world_schema3.xsd");
+            assertTrue(result.length() > 0);
 
-        result = readUrl("http://localhost:" + PORT + "/SoapContext/SoapPort?"
-                + "xsd=http://apache.org/hello_world/types2/d/hello_world_schema4.xsd");
-        assertTrue(result, result.contains("xsd=http://apache.org/hello_world/types2/d/d/hello_world_schema4.xsd"));
+            result = readUrl("http://localhost:" + PORT + "/SoapContext/SoapPort?"
+                    + "xsd=http://apache.org/hello_world/types2/d/hello_world_schema4.xsd");
+            assertTrue(result, result.contains("xsd=http://apache.org/hello_world/types2/d/d/hello_world_schema4.xsd"));
 
-        result = readUrl("http://localhost:" + PORT + "/SoapContext/SoapPort?"
-                + "xsd=http://apache.org/hello_world/types2/d/d/hello_world_schema4.xsd");
-        assertTrue(result.length() > 0);
+            result = readUrl("http://localhost:" + PORT + "/SoapContext/SoapPort?"
+                    + "xsd=http://apache.org/hello_world/types2/d/d/hello_world_schema4.xsd");
+            assertFalse(result.contains("schemaLocation"));
 
-        ep.stop();
+            // schemas in separate directory which is not subdirectory of WSDL dir
+
+            result = readUrl("http://localhost:" + PORT + "/SoapContext/SoapPort?"
+                    + "wsdl=http://apache.org/hello_world/types2/hello_world_messages_catalog.wsdl");
+            assertTrue(result, result.contains("xsd=http://apache.org/hello_world/schemas-in-separate-dir/schema.xsd"));
+
+            result = readUrl("http://localhost:" + PORT + "/SoapContext/SoapPort?"
+                    + "xsd=http://apache.org/hello_world/schemas-in-separate-dir/schema.xsd");
+            assertTrue(result,
+                    result.contains("xsd=http://apache.org/hello_world/schemas-in-separate-dir/d/included.xsd"));
+
+            result = readUrl("http://localhost:" + PORT + "/SoapContext/SoapPort?"
+                    + "xsd=http://apache.org/hello_world/schemas-in-separate-dir/d/included.xsd");
+            assertTrue(result,
+                    result.contains("xsd=http://apache.org/hello_world/schemas-in-separate-dir/d/d/included.xsd"));
+
+            result = readUrl("http://localhost:" + PORT + "/SoapContext/SoapPort?"
+                    + "xsd=http://apache.org/hello_world/schemas-in-separate-dir/d/d/included.xsd");
+            assertFalse(result, result.contains("schemaLocation"));
+
+            // rewrite rule that doesn't begin with 'classpath:' but contains only the path
+
+            result = readUrl("http://localhost:" + PORT + "/SoapContext/SoapPort?"
+                    + "xsd=http://apache.org/hello_world/schemas-in-separate-dir-non-cp/another-schema.xsd");
+            assertTrue(result, result.contains("xsd=http://apache.org/hello_world/schemas-in-separate-dir-non-cp/d/"
+                    + "another-included.xsd"));
+
+            result = readUrl("http://localhost:" + PORT + "/SoapContext/SoapPort?"
+                    + "xsd=http://apache.org/hello_world/schemas-in-separate-dir-non-cp/d/another-included.xsd");
+            assertTrue(result, result.contains("xsd=http://apache.org/hello_world/schemas-in-separate-dir-non-cp/d/d/"
+                    + "another-included.xsd"));
+        } finally {
+            ep.stop();
+        }
     }
     
     @Test

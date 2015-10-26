@@ -57,9 +57,9 @@ public class SchemaImportTest extends AbstractBusClientServerTestBase {
     @Test
     public void testImportSchema2() throws Exception {
         String schemaURL = "http://localhost:" + PORT + "/schemaimport/sayHi2"
-            + "?xsd=../sayhi/sayhi/sayhi-schema1.xsd";
+                           + "?xsd=../sayhi/sayhi/sayhi-schema1.xsd";
         URL url = new URL(schemaURL);
-        try  {
+        try {
             InputStream ins = url.openStream();
             String output = IOUtils.toString(ins);
             assertTrue(output.indexOf("sayHiArray") > -1);
