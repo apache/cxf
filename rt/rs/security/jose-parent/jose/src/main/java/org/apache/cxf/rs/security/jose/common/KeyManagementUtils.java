@@ -369,12 +369,12 @@ public final class KeyManagementUtils {
         return props; 
     }
     public static PrivateKey loadPrivateKey(Message m, Properties props, 
-                                            List<X509Certificate> inCerts, 
+                                            X509Certificate inCert, 
                                             KeyOperation keyOper) {
         KeyStore ks = loadPersistKeyStore(m, props);
         
         try {
-            String alias = ks.getCertificateAlias(inCerts.get(0));
+            String alias = ks.getCertificateAlias(inCert);
             return loadPrivateKey(ks, m, props, keyOper, alias);
             
         } catch (Exception ex) {
