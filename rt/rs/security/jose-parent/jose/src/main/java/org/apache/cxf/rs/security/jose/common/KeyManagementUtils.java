@@ -375,16 +375,6 @@ public final class KeyManagementUtils {
         
         try {
             String alias = ks.getCertificateAlias(inCerts.get(0));
-            if (alias != null) {
-                for (Enumeration<String> e = ks.aliases(); e.hasMoreElements();) {
-                    String currentAlias = e.nextElement();
-                    X509Certificate[] currentCertArray = loadX509CertificateOrChain(ks, currentAlias);
-                    if (currentCertArray != null) {
-                        alias = currentAlias;
-                        break;
-                    }
-                }
-            }
             return loadPrivateKey(ks, m, props, keyOper, alias);
             
         } catch (Exception ex) {
