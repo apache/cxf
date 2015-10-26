@@ -17,10 +17,29 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://apache.org/hello_world/messages" xmlns:x1="http://apache.org/hello_world/types" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="HelloWorld" targetNamespace="http://apache.org/hello_world/messages">
+<wsdl:definitions name="HelloWorld"
+    xmlns="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:tns="http://apache.org/hello_world/messages"
+    xmlns:x1="http://apache.org/hello_world/types"
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="http://apache.org/hello_world/messages">
     <wsdl:types>
-        <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://apache.org/hello_world/types/schema" elementFormDefault="qualified">
-            <xsd:import namespace="http://apache.org/hello_world/types" schemaLocation="hello_world_schema.xsd"/>
+        <schema targetNamespace="http://apache.org/hello_world/types/schema" 
+            xmlns="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+            <xsd:import namespace="http://apache.org/hello_world/types" 
+                schemaLocation="hello_world_schema.xsd"/>
+        </schema>
+        <schema targetNamespace="http://apache.org/hello_world/schemas-in-separate-dir"
+                xmlns="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+            <xsd:import namespace="http://apache.org/hello_world/schemas-in-separate-dir"
+                        schemaLocation="http://apache.org/hello_world/schemas-in-separate-dir/schema.xsd"/>
+        </schema>
+        <schema targetNamespace="http://apache.org/hello_world/schemas-in-separate-dir"
+                xmlns="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+            <xsd:import namespace="http://apache.org/hello_world/schemas-in-separate-dir"
+                        schemaLocation="http://apache.org/hello_world/schemas-in-separate-dir-non-cp/another-schema.xsd"/>
         </schema>
     </wsdl:types>
     <wsdl:message name="sayHiRequest">
