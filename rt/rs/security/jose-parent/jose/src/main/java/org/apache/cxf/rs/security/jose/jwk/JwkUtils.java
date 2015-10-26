@@ -266,7 +266,8 @@ public final class JwkUtils {
     public static JsonWebKeys loadJwkSet(Properties props, Bus bus, PrivateKeyPasswordProvider cb, 
                                          JwkReaderWriter reader) {
         JweDecryptionProvider decryption = cb != null
-            ? new AesCbcHmacJweDecryption(new PbesHmacAesWrapKeyDecryptionAlgorithm(cb.getPassword(props))) : null;
+            ? new AesCbcHmacJweDecryption(new PbesHmacAesWrapKeyDecryptionAlgorithm(
+                cb.getPassword(null, props))) : null;
         return loadJwkSet(props, bus, decryption, reader);
     }
     public static JsonWebKeys loadJwkSet(Properties props, Bus bus, JweDecryptionProvider jwe, JwkReaderWriter reader) {

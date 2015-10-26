@@ -32,7 +32,7 @@ public class PrivateKeyPasswordProviderImpl implements PrivateKeyPasswordProvide
         this.password = password;
     }
     @Override
-    public char[] getPassword(Properties storeProperties) {
+    public char[] getPassword(String alias, Properties storeProperties) {
         return password.toCharArray();
     }
     
