@@ -243,7 +243,8 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         }
         String address = "https://localhost:" + PORT + "/jwejwsrsaCertInHeaders";
         BookStore bs = createJweJwsBookStore(address, null, null);
-        WebClient.getConfig(bs).getRequestContext().put("rs.security.include.cert", "true");
+        WebClient.getConfig(bs).getRequestContext().put("rs.security.signature.include.cert", "true");
+        WebClient.getConfig(bs).getRequestContext().put("rs.security.encryption.include.cert", "true");
         String text = bs.echoText("book");
         assertEquals("book", text);
     }
@@ -369,10 +370,10 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         bean.getProperties(true).put("rs.security.signature.in.properties",
             "org/apache/cxf/systest/jaxrs/security/bob.jwk.properties");
         if (includePublicKey) {
-            bean.getProperties(true).put("rs.security.include.public.key", true);
+            bean.getProperties(true).put("rs.security.signature.include.public.key", true);
         }
         if (includeKeyId) {
-            bean.getProperties(true).put("rs.security.include.key.id", true);
+            bean.getProperties(true).put("rs.security.signature.include.key.id", true);
         }
         BookStore bs = bean.create(BookStore.class);
         String text = bs.echoText("book");

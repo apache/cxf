@@ -100,26 +100,6 @@ public final class JoseConstants {
     public static final String RSSEC_KEY_PSWD_PROVIDER = "rs.security.key.password.provider";
     
     /**
-     * Include the JWK public key (for signature or encryption) in the "jwk" header.
-     */
-    public static final String RSSEC_INCLUDE_PUBLIC_KEY = "rs.security.include.public.key";
-    
-    /**
-     * Include the X.509 certificate (for signature or encryption) in the "x5c" header.
-     */
-    public static final String RSSEC_INCLUDE_CERT = "rs.security.include.cert";
-    
-    /**
-     * Include the JWK key id (for signature or encryption) in the "kid" header.
-     */
-    public static final String RSSEC_INCLUDE_KEY_ID = "rs.security.include.key.id";
-    
-    /**
-     * Include the X.509 certificate SHA-1 digest (for signature or encryption) in the "x5t" header.
-     */
-    public static final String RSSEC_INCLUDE_CERT_SHA1 = "rs.security.include.cert.sha1";
-    
-    /**
      * Whether to allow using a JWK received in the header for signature validation. The default
      * is "false".
      */
@@ -187,26 +167,22 @@ public final class JoseConstants {
     public static final String RSSEC_SIGNATURE_LIST_PROPS = "rs.security.signature.list.properties";
     
     /**
-     * Include the JWK public key for signature in the "jwk" header. If not configured then it
-     * falls back to RSSEC_INCLUDE_PUBLIC_KEY.
+     * Include the JWK public key for signature in the "jwk" header. 
      */
     public static final String RSSEC_SIGNATURE_INCLUDE_PUBLIC_KEY = "rs.security.signature.include.public.key";
     
     /**
-     * Include the X.509 certificate for signature in the "x5c" header. If not configured then it
-     * falls back to RSSEC_INCLUDE_CERT.
+     * Include the X.509 certificate for signature in the "x5c" header. 
      */
     public static final String RSSEC_SIGNATURE_INCLUDE_CERT = "rs.security.signature.include.cert";
     
     /**
-     * Include the JWK key id for signature in the "kid" header. If not configured then it
-     * falls back to RSSEC_INCLUDE_KEY_ID.
+     * Include the JWK key id for signature in the "kid" header.
      */
     public static final String RSSEC_SIGNATURE_INCLUDE_KEY_ID = "rs.security.signature.include.key.id";
     
     /**
-     * Include the X.509 certificate SHA-1 digest for signature in the "x5t" header. If not configured then it
-     * falls back to RSSEC_INCLUDE_CERT_SHA1.
+     * Include the X.509 certificate SHA-1 digest for signature in the "x5t" header. 
      */
     public static final String RSSEC_SIGNATURE_INCLUDE_CERT_SHA1 = "rs.security.signature.include.cert.sha1";
     

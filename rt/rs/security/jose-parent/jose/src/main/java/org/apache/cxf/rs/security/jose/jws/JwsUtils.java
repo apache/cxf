@@ -268,12 +268,10 @@ public final class JwsUtils {
                                                               boolean ignoreNullProvider) {
         JwsSignatureProvider theSigProvider = null;
         
-        boolean includeCert = headers != null && MessageUtils.isTrue(
-                MessageUtils.getContextualProperty(m, JoseConstants.RSSEC_SIGNATURE_INCLUDE_CERT, 
-                                                   JoseConstants.RSSEC_INCLUDE_CERT));
-        boolean includeCertSha1 = headers != null && MessageUtils.isTrue(
-                MessageUtils.getContextualProperty(m, JoseConstants.RSSEC_SIGNATURE_INCLUDE_CERT_SHA1, 
-                                                   JoseConstants.RSSEC_INCLUDE_CERT_SHA1));
+        boolean includeCert = headers != null && MessageUtils.getContextualBoolean(
+                m, JoseConstants.RSSEC_SIGNATURE_INCLUDE_CERT, false);
+        boolean includeCertSha1 = headers != null && MessageUtils.getContextualBoolean(
+                m, JoseConstants.RSSEC_SIGNATURE_INCLUDE_CERT_SHA1, false);
         
         if (JoseConstants.HEADER_JSON_WEB_KEY.equals(props.get(JoseConstants.RSSEC_KEY_STORE_TYPE))) {
             JsonWebKey jwk = JwkUtils.loadJsonWebKey(m, props, KeyOperation.SIGN);
@@ -281,12 +279,10 @@ public final class JwsUtils {
                 String signatureAlgo = getSignatureAlgo(m, props, jwk.getAlgorithm(), getDefaultKeyAlgo(jwk));
                 theSigProvider = JwsUtils.getSignatureProvider(jwk, SignatureAlgorithm.getAlgorithm(signatureAlgo));
                 
-                boolean includePublicKey = headers != null && MessageUtils.isTrue(
-                    MessageUtils.getContextualProperty(m, JoseConstants.RSSEC_SIGNATURE_INCLUDE_PUBLIC_KEY,
-                                                       JoseConstants.RSSEC_INCLUDE_PUBLIC_KEY));
-                boolean includeKeyId = headers != null && MessageUtils.isTrue(
-                    MessageUtils.getContextualProperty(m, JoseConstants.RSSEC_SIGNATURE_INCLUDE_KEY_ID,
-                                                       JoseConstants.RSSEC_INCLUDE_KEY_ID));
+                boolean includePublicKey = headers != null && MessageUtils.getContextualBoolean(
+                    m, JoseConstants.RSSEC_SIGNATURE_INCLUDE_PUBLIC_KEY, false);
+                boolean includeKeyId = headers != null && MessageUtils.getContextualBoolean(
+                    m, JoseConstants.RSSEC_SIGNATURE_INCLUDE_KEY_ID, false);
                 
                 if (includeCert) {
                     JwkUtils.includeCertChain(jwk, headers, signatureAlgo);
