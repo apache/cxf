@@ -187,22 +187,26 @@ public final class JoseConstants {
     public static final String RSSEC_SIGNATURE_LIST_PROPS = "rs.security.signature.list.properties";
     
     /**
-     * Include the JWK public key for signature in the "jwk" header.
+     * Include the JWK public key for signature in the "jwk" header. If not configured then it
+     * falls back to RSSEC_INCLUDE_PUBLIC_KEY.
      */
     public static final String RSSEC_SIGNATURE_INCLUDE_PUBLIC_KEY = "rs.security.signature.include.public.key";
     
     /**
-     * Include the X.509 certificate for signature in the "x5c" header.
+     * Include the X.509 certificate for signature in the "x5c" header. If not configured then it
+     * falls back to RSSEC_INCLUDE_CERT.
      */
     public static final String RSSEC_SIGNATURE_INCLUDE_CERT = "rs.security.signature.include.cert";
     
     /**
-     * Include the JWK key id for signature in the "kid" header.
+     * Include the JWK key id for signature in the "kid" header. If not configured then it
+     * falls back to RSSEC_INCLUDE_KEY_ID.
      */
     public static final String RSSEC_SIGNATURE_INCLUDE_KEY_ID = "rs.security.signature.include.key.id";
     
     /**
-     * Include the X.509 certificate SHA-1 digest for signature in the "x5t" header.
+     * Include the X.509 certificate SHA-1 digest for signature in the "x5t" header. If not configured then it
+     * falls back to RSSEC_INCLUDE_CERT_SHA1.
      */
     public static final String RSSEC_SIGNATURE_INCLUDE_CERT_SHA1 = "rs.security.signature.include.cert.sha1";
     
