@@ -87,20 +87,26 @@ public final class JwtUtils {
         }
         
         Date createdDate = new Date(issuedAtInSecs * 1000L);
-        if (clockOffset != 0) {
-            // Calculate the time that is allowed for the message to travel
-            createdDate.setTime(createdDate.getTime() - (long)clockOffset * 1000L);
-        }
-        
         Date validCreation = new Date();
-        if (timeToLive != 0) {
-            long currentTime = validCreation.getTime();
-            currentTime -= (long)timeToLive * 1000L;
-            validCreation.setTime(currentTime);
+        long currentTime = validCreation.getTime();
+        if (clockOffset > 0) {
+            validCreation.setTime(currentTime + (long)clockOffset * 1000L);
         }
         
+        // Check to see if the IssuedAt time is in the future
         if (createdDate.after(validCreation)) {
             throw new JwtException("Invalid issuedAt");
+        }
+        
+        if (timeToLive > 0) {
+            // Calculate the time that is allowed for the message to travel
+            currentTime -= (long)timeToLive * 1000L;
+            validCreation.setTime(currentTime);
+    
+            // Validate the time it took the message to travel
+            if (createdDate.before(validCreation)) {
+                throw new JwtException("Invalid issuedAt");
+            }
         }
     }
     
