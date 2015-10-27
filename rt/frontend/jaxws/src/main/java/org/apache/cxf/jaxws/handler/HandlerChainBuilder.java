@@ -93,21 +93,22 @@ public class HandlerChainBuilder {
      */
     public List<Handler> sortHandlers(List<Handler> handlers) {
 
-        List<LogicalHandler<?>> logicalHandlers = new ArrayList<LogicalHandler<?>>();
-        List<Handler<?>> protocolHandlers = new ArrayList<Handler<?>>();
+        final int size = handlers.size();
+        List<Handler> logicalHandlers = new ArrayList<Handler>(size);
+        List<Handler> protocolHandlers = new ArrayList<Handler>(Math.min(10, size));
 
         for (Handler<?> handler : handlers) {
             if (handler instanceof LogicalHandler) {
-                logicalHandlers.add((LogicalHandler<?>)handler);
+                logicalHandlers.add(handler);
             } else {
                 protocolHandlers.add(handler);
             }
         }
 
-        List<Handler> sortedHandlers = new ArrayList<Handler>();
-        sortedHandlers.addAll(logicalHandlers);
-        sortedHandlers.addAll(protocolHandlers);
-        return sortedHandlers;
+        if (!protocolHandlers.isEmpty()) {
+            logicalHandlers.addAll(protocolHandlers);
+        }
+        return logicalHandlers;
     }
 
     protected ClassLoader getHandlerClassLoader() {
@@ -117,7 +118,10 @@ public class HandlerChainBuilder {
     protected List<Handler> buildHandlerChain(PortComponentHandlerType ht, ClassLoader classLoader) {
         List<Handler> handlerChain = new ArrayList<Handler>();
         try {
-            LOG.log(Level.FINE, "loading handler", trimString(ht.getHandlerName().getValue()));
+            final boolean fineLog = LOG.isLoggable(Level.FINE);
+            if (fineLog) {
+                LOG.log(Level.FINE, "loading handler", trimString(ht.getHandlerName().getValue()));
+            }
 
             Class<? extends Handler> handlerClass = Class.forName(
                                                                   trimString(ht.getHandlerClass()
@@ -125,7 +129,9 @@ public class HandlerChainBuilder {
                 .asSubclass(Handler.class);
 
             Handler<?> handler = handlerClass.newInstance();
-            LOG.fine("adding handler to chain: " + handler);
+            if (fineLog) {
+                LOG.fine("adding handler to chain: " + handler);
+            }
             configureHandler(handler, ht);
             handlerChain.add(handler);
         } catch (Exception e) {

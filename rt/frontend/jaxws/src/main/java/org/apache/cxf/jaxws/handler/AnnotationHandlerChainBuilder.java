@@ -211,14 +211,15 @@ public class AnnotationHandlerChainBuilder extends HandlerChainBuilder {
         if ("*".equals(namePattern)) {
             return true;
         }
-        if (!namePattern.contains(":")) {
+        final int idx = namePattern.indexOf(':');
+        if (idx < 0) {
             String xml = StaxUtils.toString(el);
             throw new WebServiceException(
                 BundleUtils.getFormattedString(BUNDLE,
                                                "NOT_A_QNAME_PATTER",
                                                namePattern, xml));                    
         }
-        String pfx = namePattern.substring(0, namePattern.indexOf(':'));
+        String pfx = namePattern.substring(0, idx);
         String ns = el.lookupNamespaceURI(pfx);
         if (ns == null) {
             ns = pfx;
@@ -226,7 +227,7 @@ public class AnnotationHandlerChainBuilder extends HandlerChainBuilder {
         if (!ns.equals(comp.getNamespaceURI())) {
             return false;
         }
-        String localPart = namePattern.substring(namePattern.indexOf(':') + 1,
+        String localPart = namePattern.substring(idx + 1,
                                                  namePattern.length());
         if (localPart.contains("*")) {
             //wildcard pattern matching

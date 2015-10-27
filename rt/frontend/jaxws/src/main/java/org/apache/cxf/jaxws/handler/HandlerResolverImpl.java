@@ -31,9 +31,7 @@ import javax.xml.ws.handler.PortInfo;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.ResourceInjector;
-import org.apache.cxf.resource.DefaultResourceManager;
 import org.apache.cxf.resource.ResourceManager;
-import org.apache.cxf.resource.ResourceResolver;
 
 @SuppressWarnings("rawtypes")
 public class HandlerResolverImpl implements HandlerResolver {
@@ -104,9 +102,6 @@ public class HandlerResolverImpl implements HandlerResolver {
     private void configHandler(Handler<?> handler) {
         if (handler != null) {
             ResourceManager resourceManager = bus.getExtension(ResourceManager.class);
-            List<ResourceResolver> resolvers = resourceManager.getResourceResolvers();
-            resourceManager = new DefaultResourceManager(resolvers);
-//            resourceManager.addResourceResolver(new WebContextEntriesResourceResolver());
             ResourceInjector injector = new ResourceInjector(resourceManager);
             injector.inject(handler);
             injector.construct(handler);
