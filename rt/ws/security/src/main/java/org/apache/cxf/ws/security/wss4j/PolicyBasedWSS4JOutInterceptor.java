@@ -49,7 +49,7 @@ import org.apache.cxf.ws.security.wss4j.policyhandlers.TransportBindingHandler;
 import org.apache.neethi.Policy;
 import org.apache.wss4j.common.crypto.ThreadLocalSecurityProvider;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.dom.WSSConfig;
+import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.policy.model.AbstractBinding;

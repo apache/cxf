@@ -27,7 +27,7 @@ import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.dom.WSSecurityEngine;
+import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.validate.Validator;
 
@@ -36,14 +36,14 @@ public class CXFRequestData extends RequestData {
     private static Map<QName, String> validatorKeys = new HashMap<>();
     
     static {
-        validatorKeys.put(WSSecurityEngine.SAML_TOKEN, SecurityConstants.SAML1_TOKEN_VALIDATOR);
-        validatorKeys.put(WSSecurityEngine.SAML2_TOKEN, SecurityConstants.SAML2_TOKEN_VALIDATOR);
-        validatorKeys.put(WSSecurityEngine.USERNAME_TOKEN, SecurityConstants.USERNAME_TOKEN_VALIDATOR);
-        validatorKeys.put(WSSecurityEngine.SIGNATURE, SecurityConstants.SIGNATURE_TOKEN_VALIDATOR);
-        validatorKeys.put(WSSecurityEngine.TIMESTAMP, SecurityConstants.TIMESTAMP_TOKEN_VALIDATOR);
-        validatorKeys.put(WSSecurityEngine.BINARY_TOKEN, SecurityConstants.BST_TOKEN_VALIDATOR);
-        validatorKeys.put(WSSecurityEngine.SECURITY_CONTEXT_TOKEN_05_02, SecurityConstants.SCT_TOKEN_VALIDATOR);
-        validatorKeys.put(WSSecurityEngine.SECURITY_CONTEXT_TOKEN_05_12, SecurityConstants.SCT_TOKEN_VALIDATOR);
+        validatorKeys.put(WSConstants.SAML_TOKEN, SecurityConstants.SAML1_TOKEN_VALIDATOR);
+        validatorKeys.put(WSConstants.SAML2_TOKEN, SecurityConstants.SAML2_TOKEN_VALIDATOR);
+        validatorKeys.put(WSConstants.USERNAME_TOKEN, SecurityConstants.USERNAME_TOKEN_VALIDATOR);
+        validatorKeys.put(WSConstants.SIGNATURE, SecurityConstants.SIGNATURE_TOKEN_VALIDATOR);
+        validatorKeys.put(WSConstants.TIMESTAMP, SecurityConstants.TIMESTAMP_TOKEN_VALIDATOR);
+        validatorKeys.put(WSConstants.BINARY_TOKEN, SecurityConstants.BST_TOKEN_VALIDATOR);
+        validatorKeys.put(WSConstants.SECURITY_CONTEXT_TOKEN_05_02, SecurityConstants.SCT_TOKEN_VALIDATOR);
+        validatorKeys.put(WSConstants.SECURITY_CONTEXT_TOKEN_05_12, SecurityConstants.SCT_TOKEN_VALIDATOR);
     }
     
     public CXFRequestData() {

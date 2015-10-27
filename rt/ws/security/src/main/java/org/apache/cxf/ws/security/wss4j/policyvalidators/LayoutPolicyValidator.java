@@ -40,8 +40,7 @@ import org.apache.wss4j.common.token.PKIPathSecurity;
 import org.apache.wss4j.common.token.X509Security;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDataRef;
-import org.apache.wss4j.dom.WSSecurityEngine;
-import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.model.Layout;
@@ -193,7 +192,7 @@ public class LayoutPolicyValidator extends AbstractSecurityPolicyValidator {
             if (sl != null && sl.size() >= 1) {
                 for (WSDataRef dataRef : sl) {
                     QName signedQName = dataRef.getName();
-                    if (WSSecurityEngine.SIGNATURE.equals(signedQName)) {
+                    if (WSConstants.SIGNATURE.equals(signedQName)) {
                         Element protectedElement = dataRef.getProtectedElement();
                         if (!isEndorsingSignatureInCorrectPlace(results, signedResult,
                                                                 protectedElement)) {

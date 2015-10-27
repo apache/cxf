@@ -58,8 +58,7 @@ import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSSecurityEngine;
-import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.junit.Test;
@@ -98,8 +97,8 @@ public class SamlTokenTest extends AbstractSecurityTest {
         inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SAML_TOKEN_UNSIGNED);
         final Map<QName, Object> customMap = new HashMap<QName, Object>();
         CustomSamlValidator validator = new CustomSamlValidator();
-        customMap.put(WSSecurityEngine.SAML_TOKEN, validator);
-        customMap.put(WSSecurityEngine.SAML2_TOKEN, validator);
+        customMap.put(WSConstants.SAML_TOKEN, validator);
+        customMap.put(WSConstants.SAML2_TOKEN, validator);
         inProperties.put(WSS4JInInterceptor.VALIDATOR_MAP, customMap);
         
         List<String> xpaths = new ArrayList<String>();
@@ -148,8 +147,8 @@ public class SamlTokenTest extends AbstractSecurityTest {
         inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
         final Map<QName, Object> customMap = new HashMap<QName, Object>();
         CustomSamlValidator validator = new CustomSamlValidator();
-        customMap.put(WSSecurityEngine.SAML_TOKEN, validator);
-        customMap.put(WSSecurityEngine.SAML2_TOKEN, validator);
+        customMap.put(WSConstants.SAML_TOKEN, validator);
+        customMap.put(WSConstants.SAML2_TOKEN, validator);
         inProperties.put(WSS4JInInterceptor.VALIDATOR_MAP, customMap);
         
         List<String> xpaths = new ArrayList<String>();
@@ -187,8 +186,8 @@ public class SamlTokenTest extends AbstractSecurityTest {
         final Map<QName, Object> customMap = new HashMap<QName, Object>();
         CustomSamlValidator validator = new CustomSamlValidator();
         validator.setRequireSAML1Assertion(false);
-        customMap.put(WSSecurityEngine.SAML_TOKEN, validator);
-        customMap.put(WSSecurityEngine.SAML2_TOKEN, validator);
+        customMap.put(WSConstants.SAML_TOKEN, validator);
+        customMap.put(WSConstants.SAML2_TOKEN, validator);
         inProperties.put(WSS4JInInterceptor.VALIDATOR_MAP, customMap);
         
         List<String> xpaths = new ArrayList<String>();
@@ -232,8 +231,8 @@ public class SamlTokenTest extends AbstractSecurityTest {
         final Map<QName, Object> customMap = new HashMap<QName, Object>();
         CustomSamlValidator validator = new CustomSamlValidator();
         validator.setRequireSAML1Assertion(false);
-        customMap.put(WSSecurityEngine.SAML_TOKEN, validator);
-        customMap.put(WSSecurityEngine.SAML2_TOKEN, validator);
+        customMap.put(WSConstants.SAML_TOKEN, validator);
+        customMap.put(WSConstants.SAML2_TOKEN, validator);
         inProperties.put(WSS4JInInterceptor.VALIDATOR_MAP, customMap);
         
         List<String> xpaths = new ArrayList<String>();
@@ -283,8 +282,8 @@ public class SamlTokenTest extends AbstractSecurityTest {
         inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
         final Map<QName, Object> customMap = new HashMap<QName, Object>();
         CustomSamlValidator validator = new CustomSamlValidator();
-        customMap.put(WSSecurityEngine.SAML_TOKEN, validator);
-        customMap.put(WSSecurityEngine.SAML2_TOKEN, validator);
+        customMap.put(WSConstants.SAML_TOKEN, validator);
+        customMap.put(WSConstants.SAML2_TOKEN, validator);
         inProperties.put(WSS4JInInterceptor.VALIDATOR_MAP, customMap);
         
         List<String> xpaths = new ArrayList<String>();
@@ -341,8 +340,8 @@ public class SamlTokenTest extends AbstractSecurityTest {
         inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
         final Map<QName, Object> customMap = new HashMap<QName, Object>();
         CustomSamlValidator validator = new CustomSamlValidator();
-        customMap.put(WSSecurityEngine.SAML_TOKEN, validator);
-        customMap.put(WSSecurityEngine.SAML2_TOKEN, validator);
+        customMap.put(WSConstants.SAML_TOKEN, validator);
+        customMap.put(WSConstants.SAML2_TOKEN, validator);
         inProperties.put(WSS4JInInterceptor.VALIDATOR_MAP, customMap);
         
         List<String> xpaths = new ArrayList<String>();
@@ -412,8 +411,8 @@ public class SamlTokenTest extends AbstractSecurityTest {
         validator.setRequireSAML1Assertion(false);
         validator.setRequireSenderVouches(false);
         validator.setRequireBearer(true);
-        customMap.put(WSSecurityEngine.SAML_TOKEN, validator);
-        customMap.put(WSSecurityEngine.SAML2_TOKEN, validator);
+        customMap.put(WSConstants.SAML_TOKEN, validator);
+        customMap.put(WSConstants.SAML2_TOKEN, validator);
         inProperties.put(WSS4JInInterceptor.VALIDATOR_MAP, customMap);
         
         List<String> xpaths = new ArrayList<String>();
@@ -472,8 +471,8 @@ public class SamlTokenTest extends AbstractSecurityTest {
         validator.setRequireSAML1Assertion(false);
         validator.setRequireSenderVouches(false);
         validator.setRequireBearer(true);
-        customMap.put(WSSecurityEngine.SAML_TOKEN, validator);
-        customMap.put(WSSecurityEngine.SAML2_TOKEN, validator);
+        customMap.put(WSConstants.SAML_TOKEN, validator);
+        customMap.put(WSConstants.SAML2_TOKEN, validator);
         inProperties.put(WSS4JInInterceptor.VALIDATOR_MAP, customMap);
         
         List<String> xpaths = new ArrayList<String>();
@@ -531,8 +530,8 @@ public class SamlTokenTest extends AbstractSecurityTest {
         validator.setRequireSAML1Assertion(true);
         validator.setRequireSenderVouches(false);
         validator.setRequireBearer(true);
-        customMap.put(WSSecurityEngine.SAML_TOKEN, validator);
-        customMap.put(WSSecurityEngine.SAML2_TOKEN, validator);
+        customMap.put(WSConstants.SAML_TOKEN, validator);
+        customMap.put(WSConstants.SAML2_TOKEN, validator);
         inProperties.put(WSS4JInInterceptor.VALIDATOR_MAP, customMap);
         
         List<String> xpaths = new ArrayList<String>();

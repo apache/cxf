@@ -56,9 +56,9 @@ import org.apache.wss4j.common.crypto.PasswordEncryptor;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.Loader;
-import org.apache.wss4j.stax.ConfigurationConverter;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
+import org.apache.wss4j.stax.setup.ConfigurationConverter;
 
 public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor, 
     PhaseInterceptor<SoapMessage> {

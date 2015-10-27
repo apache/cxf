@@ -39,7 +39,7 @@ import org.apache.cxf.ws.security.wss4j.WSS4JStaxInInterceptor;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
-import org.apache.wss4j.dom.WSSecurityEngine;
+import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.junit.Test;
@@ -191,8 +191,8 @@ public class DOMToStaxSamlTest extends AbstractSecurityTest {
         inProperties.setSignatureVerificationCryptoProperties(cryptoProperties);
         
         CustomStaxSamlValidator validator = new CustomStaxSamlValidator();
-        inProperties.addValidator(WSSecurityEngine.SAML_TOKEN, validator);
-        inProperties.addValidator(WSSecurityEngine.SAML2_TOKEN, validator);
+        inProperties.addValidator(WSConstants.SAML_TOKEN, validator);
+        inProperties.addValidator(WSConstants.SAML2_TOKEN, validator);
         
         WSS4JStaxInInterceptor inhandler = new WSS4JStaxInInterceptor(inProperties);
         service.getInInterceptors().add(inhandler);
@@ -243,8 +243,8 @@ public class DOMToStaxSamlTest extends AbstractSecurityTest {
         inProperties.setSignatureVerificationCryptoProperties(cryptoProperties);
         
         CustomStaxSamlValidator validator = new CustomStaxSamlValidator();
-        inProperties.addValidator(WSSecurityEngine.SAML_TOKEN, validator);
-        inProperties.addValidator(WSSecurityEngine.SAML2_TOKEN, validator);
+        inProperties.addValidator(WSConstants.SAML_TOKEN, validator);
+        inProperties.addValidator(WSConstants.SAML2_TOKEN, validator);
         
         WSS4JStaxInInterceptor inhandler = new WSS4JStaxInInterceptor(inProperties);
         service.getInInterceptors().add(inhandler);

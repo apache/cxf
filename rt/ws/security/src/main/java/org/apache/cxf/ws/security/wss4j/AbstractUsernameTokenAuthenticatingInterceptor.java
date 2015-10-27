@@ -36,7 +36,8 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.dom.WSSecurityEngine;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.validate.UsernameTokenValidator;
 import org.apache.wss4j.dom.validate.Validator;
@@ -176,7 +177,7 @@ public abstract class AbstractUsernameTokenAuthenticatingInterceptor extends WSS
         Map<QName, Object> profiles = new HashMap<QName, Object>(1);
         
         Validator validator = new CustomValidator();
-        profiles.put(WSSecurityEngine.USERNAME_TOKEN, validator);
+        profiles.put(WSConstants.USERNAME_TOKEN, validator);
         return createSecurityEngine(profiles);
     }
     

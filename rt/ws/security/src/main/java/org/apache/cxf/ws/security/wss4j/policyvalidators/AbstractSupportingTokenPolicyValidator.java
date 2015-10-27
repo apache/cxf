@@ -54,8 +54,7 @@ import org.apache.wss4j.common.token.PKIPathSecurity;
 import org.apache.wss4j.common.token.X509Security;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDataRef;
-import org.apache.wss4j.dom.WSSecurityEngine;
-import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.token.KerberosSecurity;
 import org.apache.wss4j.policy.SPConstants;
@@ -532,7 +531,7 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSec
             if (sl != null && sl.size() >= 1) {
                 for (WSDataRef dataRef : sl) {
                     QName signedQName = dataRef.getName();
-                    if (WSSecurityEngine.SIGNATURE.equals(signedQName)
+                    if (WSConstants.SIGNATURE.equals(signedQName)
                         && checkSignatureOrEncryptionResult(signedResult, tokenResults)) {
                         return true;
                     }

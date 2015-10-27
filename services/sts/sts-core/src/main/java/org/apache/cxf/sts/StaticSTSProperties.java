@@ -39,7 +39,7 @@ import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.dom.WSSConfig;
+import org.apache.wss4j.dom.engine.WSSConfig;
 
 /**
  * A static implementation of the STSPropertiesMBean.

@@ -85,7 +85,7 @@ public class SecureConversationTokenInterceptorProvider extends AbstractPolicyIn
         if (endorse) {
             SupportingTokens st = 
                 new SupportingTokens(SPConstants.SPVersion.SP12, 
-                                     SP12Constants.SupportingTokenTypes.EndorsingSupportingTokens,
+                                     SP12Constants.ENDORSING_SUPPORTING_TOKENS,
                                      new Policy());
             st.addToken(itok);
             all.addPolicyComponent(st);

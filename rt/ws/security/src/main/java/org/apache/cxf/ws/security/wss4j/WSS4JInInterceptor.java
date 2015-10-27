@@ -75,9 +75,9 @@ import org.apache.wss4j.common.crypto.ThreadLocalSecurityProvider;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSSConfig;
-import org.apache.wss4j.dom.WSSecurityEngine;
-import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.engine.WSSConfig;
+import org.apache.wss4j.dom.engine.WSSecurityEngine;
+import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
@@ -726,7 +726,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         if (!utWithCallbacks) {
             Map<QName, Object> profiles = new HashMap<QName, Object>(1);
             Validator validator = new NoOpValidator();
-            profiles.put(WSSecurityEngine.USERNAME_TOKEN, validator);
+            profiles.put(WSConstants.USERNAME_TOKEN, validator);
             return createSecurityEngine(profiles);
         }
         

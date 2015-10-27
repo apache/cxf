@@ -34,7 +34,7 @@ import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.wss4j.common.util.KeyUtils;
-import org.apache.wss4j.dom.WSSConfig;
+import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.message.token.KerberosSecurity;
 import org.apache.xml.security.utils.Base64;
 import org.ietf.jgss.GSSCredential;
