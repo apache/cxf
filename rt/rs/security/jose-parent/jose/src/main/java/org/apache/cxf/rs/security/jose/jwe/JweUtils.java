@@ -388,6 +388,11 @@ public final class JweUtils {
         } else {
             if (JoseConstants.HEADER_JSON_WEB_KEY.equals(props.get(JoseConstants.RSSEC_KEY_STORE_TYPE))) {
                 JsonWebKey jwk = JwkUtils.loadJsonWebKey(m, props, KeyOperation.DECRYPT);
+                if (jwk == null) {
+                    LOG.warning("Extracting the JsonWebKey failed");
+                    throw new JweException(JweException.Error.KEY_DECRYPTION_FAILURE);
+                }
+                
                 if ("direct".equals(keyEncryptionAlgo)) {
                     contentEncryptionAlgo = getContentEncryptionAlgo(m, props, jwk.getAlgorithm());
                     ctDecryptionKey = getContentDecryptionSecretKey(jwk, contentEncryptionAlgo);
