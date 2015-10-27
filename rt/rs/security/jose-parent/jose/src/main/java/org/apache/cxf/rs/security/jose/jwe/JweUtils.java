@@ -364,7 +364,6 @@ public final class JweUtils {
         SecretKey ctDecryptionKey = null;
         String keyEncryptionAlgo = getKeyEncryptionAlgo(m, props, null, null);
         if (inHeaders != null && inHeaders.getHeader(JoseConstants.HEADER_X509_CHAIN) != null) {
-            //TODO: optionally validate inHeaders.getAlgorithm against a property in props
             // Supporting loading a private key via a certificate for now
             List<X509Certificate> chain = KeyManagementUtils.toX509CertificateChain(inHeaders.getX509Chain());
             KeyManagementUtils.validateCertificateChain(props, chain);

@@ -168,6 +168,33 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.Test
+    public void testWrongKeyEncryptionAlgorithmKeyIncluded() throws Exception {
+
+        URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
+
+        List<Object> providers = new ArrayList<Object>();
+        providers.add(new JacksonJsonProvider());
+        providers.add(new JweWriterInterceptor());
+
+        String address = "http://localhost:" + PORT + "/jweoaepgcm/bookstore/books";
+        WebClient client = 
+            WebClient.create(address, providers, busFile.toString());
+        client.type("application/json").accept("application/json");
+
+        Map<String, Object> properties = new HashMap<String, Object>();
+        properties.put("rs.security.keystore.type", "jwk");
+        properties.put("rs.security.keystore.alias", "2011-04-29");
+        properties.put("rs.security.keystore.file", "org/apache/cxf/systest/jaxrs/security/certs/jwkPublicSet.txt");
+        properties.put("rs.security.encryption.content.algorithm", "A128GCM");
+        properties.put("rs.security.encryption.key.algorithm", "RSA1_5");
+        properties.put("rs.security.encryption.include.public.key", "true");
+        WebClient.getConfig(client).getRequestContext().putAll(properties);
+
+        Response response = client.post(new Book("book", 123L));
+        assertNotEquals(response.getStatus(), 200);
+    }
+    
+    @org.junit.Test
     public void testWrongContentEncryptionAlgorithm() throws Exception {
         
         if (SKIP_AES_GCM_TESTS || !SecurityTestUtil.checkUnrestrictedPoliciesInstalled()) {
@@ -260,7 +287,6 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
         assertNotEquals(response.getStatus(), 200);
     }
 
-    
     //
     // Signature tests
     //
@@ -342,6 +368,33 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.keystore.file", 
                        "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
         properties.put("rs.security.signature.algorithm", "PS256");
+        WebClient.getConfig(client).getRequestContext().putAll(properties);
+
+        Response response = client.post(new Book("book", 123L));
+        assertNotEquals(response.getStatus(), 200);
+    }
+    
+    @org.junit.Test
+    public void testWrongSignatureAlgorithmKeyIncluded() throws Exception {
+
+        URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
+
+        List<Object> providers = new ArrayList<Object>();
+        providers.add(new JacksonJsonProvider());
+        providers.add(new JwsWriterInterceptor());
+
+        String address = "http://localhost:" + PORT + "/jws/bookstore/books";
+        WebClient client = 
+            WebClient.create(address, providers, busFile.toString());
+        client.type("application/json").accept("application/json");
+
+        Map<String, Object> properties = new HashMap<String, Object>();
+        properties.put("rs.security.keystore.type", "jwk");
+        properties.put("rs.security.keystore.alias", "2011-04-29");
+        properties.put("rs.security.keystore.file", 
+                       "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
+        properties.put("rs.security.signature.algorithm", "PS256");
+        properties.put("rs.security.signature.include.public.key", true);
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 
         Response response = client.post(new Book("book", 123L));
