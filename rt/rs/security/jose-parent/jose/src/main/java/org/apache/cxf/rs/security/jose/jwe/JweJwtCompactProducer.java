@@ -38,7 +38,7 @@ public class JweJwtCompactProducer  {
         this(new JweHeaders(), claims);
     }
     public JweJwtCompactProducer(JweHeaders joseHeaders, JwtClaims claims) {
-        headers = new JweHeaders(joseHeaders);
+        headers = joseHeaders;
         claimsJson = JwtUtils.claimsToJson(claims);
     }
     
