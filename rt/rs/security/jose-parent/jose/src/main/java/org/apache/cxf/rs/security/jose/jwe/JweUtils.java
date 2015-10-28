@@ -137,9 +137,15 @@ public final class JweUtils {
             keyEncryptionProvider = getSecretKeyEncryptionAlgorithm(JwkUtils.toSecretKey(jwk), 
                                                                     keyAlgo);
         } else {
+            ContentAlgorithm ctAlgo = null;
+            Message m = PhaseInterceptorChain.getCurrentMessage();
+            if (m != null) {
+                ctAlgo = getContentAlgo((String)m.get(JoseConstants.RSSEC_ENCRYPTION_CONTENT_ALGORITHM));
+            }
             keyEncryptionProvider = new EcdhAesWrapKeyEncryptionAlgorithm(JwkUtils.toECPublicKey(jwk),
                                         jwk.getStringProperty(JsonWebKey.EC_CURVE),
-                                        keyAlgo);
+                                        keyAlgo,
+                                        ctAlgo == null ? ContentAlgorithm.A128GCM : ctAlgo);
         }
         return keyEncryptionProvider;
     }
@@ -147,7 +153,15 @@ public final class JweUtils {
         if (key instanceof RSAPublicKey) {
             return new RSAKeyEncryptionAlgorithm((RSAPublicKey)key, algo);
         } else if (key instanceof ECPublicKey) {
-            return new EcdhAesWrapKeyEncryptionAlgorithm((ECPublicKey)key, algo);
+            ContentAlgorithm ctAlgo = null;
+            Message m = PhaseInterceptorChain.getCurrentMessage();
+            if (m != null) {
+                ctAlgo = getContentAlgo((String)m.get(JoseConstants.RSSEC_ENCRYPTION_CONTENT_ALGORITHM));
+            }
+            return new EcdhAesWrapKeyEncryptionAlgorithm((ECPublicKey)key, 
+                                                         JsonWebKey.EC_CURVE_P256, 
+                                                         algo, 
+                                                         ctAlgo == null ? ContentAlgorithm.A128GCM : ctAlgo);
         }
         
         return null;
@@ -291,6 +305,7 @@ public final class JweUtils {
         String keyEncryptionAlgo = getKeyEncryptionAlgo(m, props, null, null);
         KeyAlgorithm keyAlgo = KeyAlgorithm.getAlgorithm(keyEncryptionAlgo); 
         String contentEncryptionAlgo = getContentEncryptionAlgo(m, props, null);
+        m.put(JoseConstants.RSSEC_ENCRYPTION_CONTENT_ALGORITHM, contentEncryptionAlgo);
         ContentEncryptionProvider ctEncryptionProvider = null;
         if (JoseConstants.HEADER_JSON_WEB_KEY.equals(props.get(JoseConstants.RSSEC_KEY_STORE_TYPE))) {
             JsonWebKey jwk = JwkUtils.loadJsonWebKey(m, props, KeyOperation.ENCRYPT);
