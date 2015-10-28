@@ -109,6 +109,9 @@ public class JwsCompactProducer {
     }
     
     public String signWith(JwsSignatureProvider signer) {
+        if (headers.getSignatureAlgorithm() == null) {
+            headers.setSignatureAlgorithm(signer.getAlgorithm());
+        }
         byte[] bytes = StringUtils.toBytesUTF8(getSigningInput());
         byte[] sig = signer.sign(getJwsHeaders(), bytes);
         return setSignatureBytes(sig);
@@ -135,7 +138,7 @@ public class JwsCompactProducer {
         return getJwsHeaders().getSignatureAlgorithm();
     }
     private void checkAlgorithm() {
-        if (getAlgorithm() == null) {
+        if (getAlgorithm() == null && PhaseInterceptorChain.getCurrentMessage() != null) {
             Message m = PhaseInterceptorChain.getCurrentMessage();
             Properties props = KeyManagementUtils.loadStoreProperties(m, false, 
                                                                       JoseConstants.RSSEC_SIGNATURE_OUT_PROPS, 

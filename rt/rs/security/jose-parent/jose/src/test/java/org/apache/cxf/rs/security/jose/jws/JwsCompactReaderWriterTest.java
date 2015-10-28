@@ -124,6 +124,18 @@ public class JwsCompactReaderWriterTest extends Assert {
             new HmacJwsSignatureVerifier(ENCODED_MAC_KEY, SignatureAlgorithm.HS256)));
     }
     @Test
+    public void testNoneSignature() throws Exception {
+        JwtClaims claims = new JwtClaims();
+        claims.setClaim("a", "b");
+        JwsJwtCompactProducer producer = new JwsJwtCompactProducer(claims);
+        producer.signWith(new NoneJwsSignatureProvider());
+                
+        JwsJwtCompactConsumer consumer = new JwsJwtCompactConsumer(producer.getSignedEncodedJws());
+        assertTrue(consumer.verifySignatureWith(new NoneJwsSignatureVerifier()));
+        JwtClaims claims2 = consumer.getJwtClaims();
+        assertEquals(claims, claims2);
+    }
+    @Test
     public void testWriteReadJwsUnsigned() throws Exception {
         JwsHeaders headers = new JwsHeaders(JoseType.JWT);
         headers.setSignatureAlgorithm(SignatureAlgorithm.NONE);
