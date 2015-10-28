@@ -718,4 +718,5 @@ public final class JweUtils {
             throw new JweException(JweException.Error.KEY_DECRYPTION_FAILURE);
         }
     }
+    
 }

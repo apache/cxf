@@ -277,7 +277,10 @@ public final class JoseConstants {
      */
     public static final String ENABLE_UNSIGNED_JWT_PRINCIPAL = "rs.security.enable.unsigned-jwt.principal";
     
-    
+    /**
+     * Whether to trace JOSE headers.
+     */
+    public static final String JOSE_DEBUG = "jose.debug";
     
     private JoseConstants() {
         
