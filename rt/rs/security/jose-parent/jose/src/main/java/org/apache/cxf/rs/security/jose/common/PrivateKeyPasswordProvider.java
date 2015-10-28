@@ -21,5 +21,5 @@ package org.apache.cxf.rs.security.jose.common;
 import java.util.Properties;
 
 public interface PrivateKeyPasswordProvider {
-    char[] getPassword(String alias, Properties storeProperties); 
+    char[] getPassword(Properties storeProperties); 
 }

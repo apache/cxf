@@ -146,7 +146,10 @@ public final class KeyManagementUtils {
         
         String keyPswd = props.getProperty(JoseConstants.RSSEC_KEY_PSWD);
         String theAlias = alias != null ? alias : getKeyId(m, props, JoseConstants.RSSEC_KEY_STORE_ALIAS, keyOper);
-        char[] keyPswdChars = provider != null ? provider.getPassword(theAlias, props) 
+        if (theAlias != null) {
+            props.put(JoseConstants.RSSEC_KEY_STORE_ALIAS, theAlias);
+        }
+        char[] keyPswdChars = provider != null ? provider.getPassword(props) 
             : keyPswd != null ? keyPswd.toCharArray() : null;    
         return CryptoUtils.loadPrivateKey(keyStore, keyPswdChars, theAlias);
     }
