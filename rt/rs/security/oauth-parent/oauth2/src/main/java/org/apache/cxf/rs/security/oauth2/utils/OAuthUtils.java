@@ -131,7 +131,7 @@ public final class OAuthUtils {
     public static boolean isGrantSupportedForClient(Client client, 
                                                     boolean canSupportPublicClients, 
                                                     String grantType) {
-        if (!client.isConfidential() && !canSupportPublicClients) {
+        if (grantType == null || !client.isConfidential() && !canSupportPublicClients) {
             return false;
         }
         List<String> allowedGrants = client.getAllowedGrantTypes();
