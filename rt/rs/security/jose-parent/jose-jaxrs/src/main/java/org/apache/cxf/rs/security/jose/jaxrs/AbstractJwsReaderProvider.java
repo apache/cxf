@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.rs.security.jose.jaxrs;
 
+import org.apache.cxf.rs.security.jose.common.JoseUtils;
 import org.apache.cxf.rs.security.jose.jws.JwsHeaders;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
@@ -31,12 +32,13 @@ public class AbstractJwsReaderProvider {
     }
 
     protected JwsSignatureVerifier getInitializedSigVerifier(JwsHeaders headers) {
+        JoseUtils.traceHeaders(headers);
         if (sigVerifier != null) {
             return sigVerifier;    
         } 
         return JwsUtils.loadSignatureVerifier(headers, true);
     }
-
+    
     public String getDefaultMediaType() {
         return defaultMediaType;
     }

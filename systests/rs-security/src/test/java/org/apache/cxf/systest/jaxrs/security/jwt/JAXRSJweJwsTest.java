@@ -136,6 +136,7 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         bean.setProviders(providers);
         bean.getProperties(true).put("rs.security.encryption.properties",
                                      "org/apache/cxf/systest/jaxrs/security/secret.jwk.properties");
+        bean.getProperties(true).put("jose.debug", true);
         BookStore bs = bean.create(BookStore.class);
         String text = bs.echoText("book");
         assertEquals("book", text);

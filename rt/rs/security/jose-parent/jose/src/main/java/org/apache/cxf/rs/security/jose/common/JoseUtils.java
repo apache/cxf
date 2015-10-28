@@ -32,9 +32,13 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.jaxrs.json.basic.JsonMapObjectReaderWriter;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.resource.ResourceManager;
+import org.apache.cxf.rs.security.jose.jwe.JweHeaders;
+import org.apache.cxf.rs.security.jose.jws.JwsHeaders;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
 
 public final class JoseUtils {
@@ -137,6 +141,14 @@ public final class JoseUtils {
         return list.size() > inputSet.size();
     }
     
+    public static void traceHeaders(JoseHeaders headers) {
+        Message m = PhaseInterceptorChain.getCurrentMessage();
+        if (MessageUtils.getContextualBoolean(m, JoseConstants.JOSE_DEBUG, false)) {
+            JsonMapObjectReaderWriter writer = new JsonMapObjectReaderWriter(true);
+            String thePrefix = headers instanceof JwsHeaders ? "JWS" : headers instanceof JweHeaders ? "JWE" : "JOSE";
+            LOG.info(thePrefix + " Headers: \r\n" + writer.toJson(headers));
+        }
+    }
     //
     // <Start> Copied from JAX-RS RT FRONTEND ResourceUtils
     //

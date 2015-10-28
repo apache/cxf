@@ -36,6 +36,7 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.rs.security.jose.common.JoseConstants;
+import org.apache.cxf.rs.security.jose.common.JoseUtils;
 import org.apache.cxf.rs.security.jose.jwe.JweCompactProducer;
 import org.apache.cxf.rs.security.jose.jwe.JweEncryptionInput;
 import org.apache.cxf.rs.security.jose.jwe.JweEncryptionOutput;
@@ -77,6 +78,7 @@ public class JweWriterInterceptor implements WriterInterceptor {
         if (useJweOutputStream) {
             JweEncryptionOutput encryption = 
                 theEncryptionProvider.getEncryptionOutput(new JweEncryptionInput(jweHeaders));
+            JoseUtils.traceHeaders(encryption.getHeaders());
             try {
                 JweCompactProducer.startJweContent(actualOs,
                                                    encryption.getHeaders(), 
@@ -103,6 +105,7 @@ public class JweWriterInterceptor implements WriterInterceptor {
             ctx.setOutputStream(cos);
             ctx.proceed();
             String jweContent = theEncryptionProvider.encrypt(cos.getBytes(), jweHeaders);
+            JoseUtils.traceHeaders(jweHeaders);
             setJoseMediaType(ctx);
             IOUtils.copy(new ByteArrayInputStream(StringUtils.toBytesUTF8(jweContent)), 
                          actualOs);

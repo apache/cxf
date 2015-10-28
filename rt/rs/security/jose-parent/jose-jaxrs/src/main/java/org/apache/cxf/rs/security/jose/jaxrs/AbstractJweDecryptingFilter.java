@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.rs.security.jose.common.JoseUtils;
 import org.apache.cxf.rs.security.jose.jwe.JweCompactConsumer;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionOutput;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionProvider;
@@ -35,6 +36,7 @@ public class AbstractJweDecryptingFilter {
         JweCompactConsumer jwe = new JweCompactConsumer(new String(IOUtils.readBytesFromStream(is), "UTF-8"));
         JweDecryptionProvider theDecryptor = getInitializedDecryptionProvider(jwe.getJweHeaders());
         JweDecryptionOutput out = new JweDecryptionOutput(jwe.getJweHeaders(), jwe.getDecryptedContent(theDecryptor));
+        JoseUtils.traceHeaders(out.getHeaders());
         validateHeaders(out.getHeaders());
         return out;
     }

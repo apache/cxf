@@ -51,6 +51,7 @@ public class AbstractJwsWriterProvider {
     protected void writeJws(JwsCompactProducer p, JwsSignatureProvider theSigProvider, OutputStream os) 
         throws IOException {
         p.signWith(theSigProvider);
+        JoseUtils.traceHeaders(p.getJwsHeaders());
         byte[] bytes = StringUtils.toBytesUTF8(p.getSignedEncodedJws());
         IOUtils.copy(new ByteArrayInputStream(bytes), os);
     }
