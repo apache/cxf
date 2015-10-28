@@ -36,6 +36,7 @@ import org.apache.cxf.rs.security.jose.jaxrs.JwsWriterInterceptor;
 import org.apache.cxf.systest.jaxrs.security.Book;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
@@ -44,7 +45,7 @@ import org.junit.BeforeClass;
  */
 public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
     public static final String PORT = BookServerReference.PORT;
-    
+    private static final Boolean SKIP_AES_GCM_TESTS = isJava6();
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", 
@@ -56,7 +57,10 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
         // Still need it for Oracle Java 7 and Java 8
         Security.addProvider(new BouncyCastleProvider());    
     }
-    
+    private static boolean isJava6() {
+        String version = System.getProperty("java.version");
+        return 1.6D == Double.parseDouble(version.substring(0, 3));    
+    }
     @AfterClass
     public static void unregisterBouncyCastleIfNeeded() throws Exception {
         Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);    
@@ -69,7 +73,9 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     @org.junit.Ignore
     public void testEncryptionIncludePublicKey() throws Exception {
-
+        if (SKIP_AES_GCM_TESTS) {
+            return;
+        }
         URL busFile = JweJwsReferenceTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<Object>();
@@ -96,7 +102,9 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
     
     @org.junit.Test
     public void testEncryptionIncludeCert() throws Exception {
-
+        if (SKIP_AES_GCM_TESTS) {
+            return;
+        }
         URL busFile = JweJwsReferenceTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<Object>();
@@ -134,7 +142,9 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
     
     @org.junit.Test
     public void testEncryptionIncludeCertNegativeTest() throws Exception {
-
+        if (SKIP_AES_GCM_TESTS) {
+            return;
+        }
         URL busFile = JweJwsReferenceTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<Object>();
@@ -165,7 +175,9 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
     
     @org.junit.Test
     public void testEncryptionIncludeCertSha1() throws Exception {
-
+        if (SKIP_AES_GCM_TESTS) {
+            return;
+        }
         URL busFile = JweJwsReferenceTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<Object>();
@@ -203,7 +215,9 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
     
     @org.junit.Test
     public void testEncryptionIncludeCertSha1NegativeTest() throws Exception {
-
+        if (SKIP_AES_GCM_TESTS) {
+            return;
+        }
         URL busFile = JweJwsReferenceTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<Object>();
@@ -275,6 +289,7 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testSignatureIncludeCertNegativeTest() throws Exception {
 
+        
         URL busFile = JweJwsReferenceTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<Object>();

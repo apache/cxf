@@ -169,7 +169,9 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
     
     @org.junit.Test
     public void testWrongKeyEncryptionAlgorithmKeyIncluded() throws Exception {
-
+        if (SKIP_AES_GCM_TESTS) {
+            return;
+        }
         URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<Object>();
