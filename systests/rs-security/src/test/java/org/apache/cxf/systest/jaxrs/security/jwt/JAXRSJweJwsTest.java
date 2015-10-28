@@ -473,7 +473,7 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
             this.password = password;
         }
         @Override
-        public char[] getPassword(String alias, Properties storeProperties) {
+        public char[] getPassword(Properties storeProperties) {
             return password.toCharArray();
         }
         
