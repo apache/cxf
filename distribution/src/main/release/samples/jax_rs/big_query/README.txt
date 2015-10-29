@@ -5,7 +5,7 @@ This demo demonstrates how Google BigQuery service can be used with
 OAuth2 Authorization Code flow and a Google server-to-server flow and shows
 Apache CXF OIDC RP and JOSE support in action. 
 
-The demo access public BigQuery data sets - it is easy to modify it to access 
+The demo accesses public BigQuery data sets - it is easy to modify it to access 
 the project-specific datasets if preferred.
 
 First, create a Big Query project as described in
