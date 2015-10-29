@@ -275,12 +275,16 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
             verifyStrategy(bookStore, expectRandom 
                               ? RandomStrategy.class
                               : SequentialStrategy.class);
-            String bookId = expectServerException ? "9999" : "123";
             Exception ex = null;
             try {
-                Book book = bookStore.getBook(bookId);
-                assertNotNull("expected non-null response", book);
-                assertEquals("unexpected id", 123L, book.getId());
+                if (expectServerException) {
+                    bookStore.getBook("9999");
+                    fail("Exception expected");
+                } else {
+                    Book book = bookStore.echoBookElementJson(new Book("CXF", 123));
+                    assertNotNull("expected non-null response", book);
+                    assertEquals("unexpected id", 123L, book.getId());
+                }
             } catch (Exception error) {
                 if (!expectServerException) {
                     //String currEndpoint = getCurrentEndpointAddress(bookStore);

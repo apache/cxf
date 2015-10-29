@@ -1153,6 +1153,13 @@ public class BookStore {
     public Book echoBookElement(Book element) throws Exception {
         return element;
     }
+    @POST
+    @Path("/books/json/echo")
+    @Consumes("application/json")
+    @Produces("application/json")
+    public Book echoBookElementJson(Book element) throws Exception {
+        return element;
+    }
     
     @SuppressWarnings("unchecked")
     @POST
