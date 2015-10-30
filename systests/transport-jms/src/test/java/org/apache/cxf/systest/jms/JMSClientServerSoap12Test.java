@@ -50,7 +50,8 @@ public class JMSClientServerSoap12Test extends AbstractBusClientServerTestBase {
     
     static EmbeddedJMSBrokerLauncher broker;
 
-    private String wsdlString;
+    private static String serverWsdlString;
+    private static String wsdlString;
     
     public static class Soap12Server extends AbstractBusTestServerBase {
         public static final String PORT = allocatePort(Soap12Server.class);
@@ -61,7 +62,14 @@ public class JMSClientServerSoap12Test extends AbstractBusClientServerTestBase {
             Bus bus = bf.createBus("org/apache/cxf/systest/jms/soap12Bus.xml");
             BusFactory.setDefaultBus(bus);
             setBus(bus);
-            broker.updateWsdl(bus, "testutils/hello_world_doc_lit.wsdl");
+            
+            serverWsdlString = "testutils/hello_world_doc_lit.wsdl".intern();
+            broker.updateWsdl(bus, serverWsdlString);
+            
+            URL u = getClass().getResource("/wsdl/hello_world_doc_lit.wsdl");
+            wsdlString = u.toString().intern();
+            broker.updateWsdl(getBus(), wsdlString);
+            
             Endpoint.publish(null, impleDoc);
         }
     }
@@ -75,12 +83,10 @@ public class JMSClientServerSoap12Test extends AbstractBusClientServerTestBase {
                    launchServer(Soap12Server.class, true));
     }
     
-    public URL getWSDLURL(String s) throws Exception {
+    public URL getWSDLURL(String s, Bus bus) throws Exception {
         URL u = getClass().getResource(s);
         wsdlString = u.toString().intern();
-        broker.updateWsdl(getBus(), wsdlString);
-        System.gc();
-        System.gc();
+        broker.updateWsdl(bus, wsdlString);
         return u;
     }
     public QName getServiceName(QName q) {
@@ -98,7 +104,7 @@ public class JMSClientServerSoap12Test extends AbstractBusClientServerTestBase {
         QName serviceName = getServiceName(new QName("http://apache.org/hello_world_doc_lit", 
                                  "SOAPService8"));
         QName portName = getPortName(new QName("http://apache.org/hello_world_doc_lit", "SoapPort8"));
-        URL wsdl = getWSDLURL("/wsdl/hello_world_doc_lit.wsdl");
+        URL wsdl = getWSDLURL("/wsdl/hello_world_doc_lit.wsdl", bus);
         assertNotNull(wsdl);
 
         SOAPService2 service = new SOAPService2(wsdl, serviceName);
@@ -154,7 +160,7 @@ public class JMSClientServerSoap12Test extends AbstractBusClientServerTestBase {
         QName serviceName = new QName("http://apache.org/hello_world_doc_lit", 
                                  "SOAPService8");
         QName portName = new QName("http://apache.org/hello_world_doc_lit", "SoapPort8");
-        URL wsdl = getWSDLURL("/wsdl/hello_world_doc_lit.wsdl");
+        URL wsdl = getWSDLURL("/wsdl/hello_world_doc_lit.wsdl", bus);
         SOAPService2 service = new SOAPService2(wsdl, serviceName);
         Greeter greeter = service.getPort(portName, Greeter.class, new AddressingFeature());
 

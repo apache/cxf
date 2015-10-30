@@ -47,8 +47,8 @@ public class JMSClientServerGzipTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(GzipServer.class);
     
     static EmbeddedJMSBrokerLauncher broker;
-    private String wsdlString;
-    
+    private static String serverWsdlString;
+    private static String wsdlString;
     
     public static class GzipServer extends AbstractBusTestServerBase {
         Endpoint ep;
@@ -58,7 +58,14 @@ public class JMSClientServerGzipTest extends AbstractBusClientServerTestBase {
             Bus bus = bf.createBus("org/apache/cxf/systest/jms/gzipBus.xml");
             BusFactory.setDefaultBus(bus);
             setBus(bus);
-            broker.updateWsdl(bus, "testutils/hello_world_doc_lit.wsdl");
+            
+            serverWsdlString = "testutils/hello_world_doc_lit.wsdl".intern();
+            broker.updateWsdl(bus, serverWsdlString);
+            
+            URL u = getClass().getResource("/wsdl/hello_world_doc_lit.wsdl");
+            wsdlString = u.toString().intern();
+            broker.updateWsdl(getBus(), wsdlString);
+
             ep = Endpoint.publish(null, impleDoc);
         }
         public void tearDown() {
@@ -74,12 +81,10 @@ public class JMSClientServerGzipTest extends AbstractBusClientServerTestBase {
         
     }
     
-    public URL getWSDLURL(String s) throws Exception {
+    public URL getWSDLURL(String s, Bus bus) throws Exception {
         URL u = getClass().getResource(s);
         wsdlString = u.toString().intern();
-        broker.updateWsdl(getBus(), wsdlString);
-        System.gc();
-        System.gc();
+        broker.updateWsdl(bus, wsdlString);
         return u;
     }
     public QName getServiceName(QName q) {
@@ -94,10 +99,10 @@ public class JMSClientServerGzipTest extends AbstractBusClientServerTestBase {
         SpringBusFactory bf = new SpringBusFactory();
         Bus bus = bf.createBus("org/apache/cxf/systest/jms/gzipBus.xml");
         BusFactory.setDefaultBus(bus);
-        QName serviceName = getServiceName(new QName("http://apache.org/hello_world_doc_lit", 
+        QName serviceName = getServiceName(new QName("http://apache.org/hello_world_doc_lit",
                                  "SOAPService2"));
         QName portName = getPortName(new QName("http://apache.org/hello_world_doc_lit", "SoapPort2"));
-        URL wsdl = getWSDLURL("/wsdl/hello_world_doc_lit.wsdl");
+        URL wsdl = getWSDLURL("/wsdl/hello_world_doc_lit.wsdl", bus);
         assertNotNull(wsdl);
 
         SOAPService2 service = new SOAPService2(wsdl, serviceName);
