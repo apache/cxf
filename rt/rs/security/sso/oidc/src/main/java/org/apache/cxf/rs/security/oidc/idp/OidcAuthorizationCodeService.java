@@ -37,7 +37,7 @@ public class OidcAuthorizationCodeService extends AuthorizationCodeGrantService 
         // No need to challenge the authenticated user with the authorization form 
         // if all the client application redirecting a user needs is to get this user authenticated
         // with OIDC IDP
-        return requestedScope.size() == 1 && skipAuthorizationWithOidcScope
+        return requestedScope.size() == 1 && permissions.size() == 1 && skipAuthorizationWithOidcScope
             && OPEN_ID_CONNECT_SCOPE.equals(requestedScope.get(0));
     }
     public void setSkipAuthorizationWithOidcScope(boolean skipAuthorizationWithOidcScope) {
