@@ -26,9 +26,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import java.util.logging.Level;
@@ -38,6 +40,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.apache.cxf.message.Message;
@@ -58,7 +61,6 @@ public class Headers {
     public static final String HTTP_HEADERS_LINK = "Link";
     public static final String EMPTY_REQUEST_PROPERTY = "org.apache.cxf.empty.request";
     private static final String SET_EMPTY_REQUEST_CT_PROPERTY = "set.content.type.for.empty.request";
-    private static final TimeZone TIME_ZONE_GMT = TimeZone.getTimeZone("GMT");
     private static final Logger LOG = LogUtils.getL7dLogger(Headers.class);
     
     /**
@@ -72,7 +74,6 @@ public class Headers {
         HTTP_HEADERS_SINGLE_VALUE_ONLY.add(HTTP_HEADERS_LINK);
     }
     
-    private static final Logger LOG = LogUtils.getL7dLogger(Headers.class);
     private final Message message;
     private final Map<String, List<String>> headers;
 
