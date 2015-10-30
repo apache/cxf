@@ -676,10 +676,14 @@ public abstract class HTTPConduit
         setAndGetDefaultAddress();
         if (result == null) {
             if (pathInfo == null && queryString == null) {
-                message.put(Message.ENDPOINT_ADDRESS, defaultAddress.getString());
+                if (defaultAddress != null) {
+                    message.put(Message.ENDPOINT_ADDRESS, defaultAddress.getString());
+                }
                 return defaultAddress;
             }
-            message.put(Message.ENDPOINT_ADDRESS, defaultAddress.getString());
+            if (defaultAddress != null) {
+                message.put(Message.ENDPOINT_ADDRESS, defaultAddress.getString());
+            }
         }
         
         // REVISIT: is this really correct?
@@ -688,8 +692,12 @@ public abstract class HTTPConduit
         }
         if (queryString != null) {
             result = result + "?" + queryString;
-        }        
-        return result.equals(defaultAddress.getString()) ? defaultAddress : new Address(result);
+        }
+        if (defaultAddress == null) {
+            return setAndGetDefaultAddress(result);
+        } else {
+            return result.equals(defaultAddress.getString()) ? defaultAddress : new Address(result);
+        }
     }
 
     /**
@@ -726,12 +734,7 @@ public abstract class HTTPConduit
                 if (defaultAddress == null) {
                     if (fromEndpointReferenceType && getTarget().getAddress().getValue() != null) {
                         defaultAddress = new Address(this.getTarget().getAddress().getValue());
-                    } else {
-                        if (endpointInfo.getAddress() == null) {
-                            throw new URISyntaxException("<null>", 
-                                                         "Invalid address. Endpoint address cannot be null.",
-                                                         0);
-                        }
+                    } else if (endpointInfo.getAddress() != null) {
                         defaultAddress = new Address(endpointInfo.getAddress());
                     }
                 }
@@ -740,6 +743,21 @@ public abstract class HTTPConduit
         return defaultAddress;
     }
 
+    private Address setAndGetDefaultAddress(String curAddr) throws URISyntaxException {
+        if (defaultAddress == null) {
+            synchronized (this) {
+                if (defaultAddress == null) {
+                    if (curAddr != null) {
+                        defaultAddress = new Address(curAddr);
+                    } else {
+                        throw new URISyntaxException("<null>",
+                                                     "Invalid address. Endpoint address cannot be null.", 0);
+                    }
+                }
+            }
+        }
+        return defaultAddress;
+    }
     /**
      * This call places HTTP Header strings into the headers that are relevant
      * to the Authorization policies that are set on this conduit by
