@@ -48,7 +48,7 @@ public class IdTokenReader extends AbstractTokenValidator {
     private IdToken getIdTokenFromJwt(JwtToken jwt) {
         return new IdToken(jwt.getClaims().asMap());
     }
-    public void setRequireAtHash(boolean requireAtHash) {
-        this.requireAtHash = requireAtHash;
+    public void setRequireAccessTokenHash(boolean require) {
+        this.requireAtHash = require;
     }
 }
