@@ -92,21 +92,23 @@ public final class OidcUtils {
         validateAccessTokenHash(at, jwt, true);
     }
     public static void validateAccessTokenHash(ClientAccessToken at, JwtToken jwt, boolean required) {
-        validateHash(at.getTokenKey(),
-                     (String)jwt.getClaims().getClaim("at_hash"),
-                     jwt.getHeaders().getAlgorithm(),
-                     required);
+        if (required) {
+            validateHash(at.getTokenKey(),
+                         (String)jwt.getClaims().getClaim("at_hash"),
+                         jwt.getHeaders().getAlgorithm());
+        }
     }
     public static void validateCodeHash(String code, JwtToken jwt) {
         validateCodeHash(code, jwt, true);
     }
     public static void validateCodeHash(String code, JwtToken jwt, boolean required) {
-        validateHash(code,
-                     (String)jwt.getClaims().getClaim("c_hash"),
-                     jwt.getHeaders().getAlgorithm(),
-                     required);
+        if (required) {
+            validateHash(code,
+                         (String)jwt.getClaims().getClaim("c_hash"),
+                         jwt.getHeaders().getAlgorithm());
+        }
     }
-    private static void validateHash(String value, String theHash, String joseAlgo, boolean required) {
+    private static void validateHash(String value, String theHash, String joseAlgo) {
         String hash = calculateHash(value, joseAlgo);
         if (!hash.equals(theHash)) {
             throw new SecurityException("Invalid hash");
