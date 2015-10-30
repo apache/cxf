@@ -50,6 +50,8 @@ import org.apache.cxf.transport.servlet.servicelist.ServiceListGeneratorServlet;
 public class CXFNonSpringServlet extends AbstractHTTPServlet {
 
     private static final long serialVersionUID = -2437897227486327166L;
+    private static final String IGNORE_SERVLET_CONTEXT_RESOLVER = "ignore.servlet.context.resolver";
+
     private DestinationRegistry destinationRegistry;
     private boolean globalRegistry;
     private Bus bus;
@@ -77,8 +79,7 @@ public class CXFNonSpringServlet extends AbstractHTTPServlet {
         }
         if (this.bus != null) {
             loader = initClassLoader();
-            ResourceManager resourceManager = bus.getExtension(ResourceManager.class);
-            resourceManager.addResourceResolver(new ServletContextResourceResolver(sc.getServletContext()));
+            registerServletContextResolver(sc);
             if (destinationRegistry == null) {
                 this.destinationRegistry = getDestinationRegistryFromBus(this.bus);
             }
@@ -86,6 +87,15 @@ public class CXFNonSpringServlet extends AbstractHTTPServlet {
 
         this.controller = createServletController(sc);
         finalizeServletInit(sc);
+    }
+
+    protected void registerServletContextResolver(ServletConfig sc) {
+        if (Boolean.valueOf(sc.getInitParameter(IGNORE_SERVLET_CONTEXT_RESOLVER))) {
+            return;
+        }
+        
+        ResourceManager resourceManager = bus.getExtension(ResourceManager.class);
+        resourceManager.addResourceResolver(new ServletContextResourceResolver(sc.getServletContext()));
     }
 
     protected ClassLoader initClassLoader() {
