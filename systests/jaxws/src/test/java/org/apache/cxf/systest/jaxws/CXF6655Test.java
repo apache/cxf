@@ -80,12 +80,24 @@ public class CXF6655Test extends AbstractClientServerTestBase {
                                            new HashMap<String, HttpFilter>());
         proxy.start();
     }
+    
+    @Test
+    public void testConnection() throws Exception {
+        QName serviceName = new QName("http://cxf.apache.org/systest/jaxws/", "HelloService");
+        HelloService service = new HelloService(null, serviceName);
+        assertNotNull(service);
+        Hello hello = service.getHelloPort();
+
+        ((BindingProvider)hello).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
+                                                         "http://localhost:" + PORT + "/hello");
+        assertEquals("getSayHi", hello.sayHi("SayHi"));
+
+    }
 
     @Test
     public void testConnectionWithProxy() throws Exception {
         QName serviceName = new QName("http://cxf.apache.org/systest/jaxws/", "HelloService");
-        HelloService service = new HelloService(getClass().getResource("/wsdl/others/hello.wsdl"),
-                                                serviceName);
+        HelloService service = new HelloService(null, serviceName);
         assertNotNull(service);
         Hello hello = service.getHelloPort();
 
