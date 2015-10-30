@@ -1,6 +1,9 @@
-Apache CXF 2.7.17 Release Notes
+Apache CXF 2.7.18 Release Notes
 
 1. Overview
+
+Note: 2.7.18 will be the last release on the 2.7.x line.  Users are
+STRONGLY encouraged to upgrade to the latest CXF 3.x versions.
 
 The 2.7.x versions of Apache CXF are significant new versions of CXF 
 that provides several new features and enhancements.  
@@ -28,8 +31,7 @@ In particular, Apache CXF no longer supports Java5.   Users must upgrade to
 Java 6 in order to upgrade to Apache CXF 2.7.x.
 
 
-2.7.17 fixes over 18 JIRA issues reported by users and the community.
-
+2.7.18 fixes over 25 JIRA issues reported by users and the community.
 
 
 2. Installation Prerequisites 
@@ -72,28 +74,35 @@ for caveats when upgrading from CXF 2.6.x to 2.7.x.
 
 7. Specific issues, features, and improvements fixed in this version
 
-
 ** Bug
-    * [CXF-6392] - Schema imports are not handled correctly in generated WSDL and XSD files
-    * [CXF-6402] - JettyHTTPServerEngine cannot set a provided Jetty Server
-    * [CXF-6408] - HTTP Conduit throws NPE exception for "invalid" 401 HTTP response
-    * [CXF-6430] - SwA: Wrong Content-Type of root part
-    * [CXF-6431] - Attachment serialization does not conform to the relevant specs
-    * [CXF-6433] - SOAPAction value may not be extracted correctly for SOAP 1.2 with Attachments
-    * [CXF-6444] - CrossOriginResourceSharingFilter.java should not set Origin=* when Credentials=true
-    * [CXF-6467] - Jaxrs client handles array type property in a form object as a single element
-    * [CXF-6469] - schemaLocation in xsd import is not rewritten correctly in Java 8
-    * [CXF-6473] - Double signatures while using AsymmetricBindingHandler
-    * [CXF-6479] - Denial of Service: Regular Expression in StringUtils
-    * [CXF-6480] - InjectionUtils createThreadLocalServletApiContext better error message for invalid @Context classes
-    * [CXF-6484] - Regression in Content-id format
-    * [CXF-6502] - JAXRSInInterceptor throw java.lang.IndexOutOfBoundsException if content-type header is empty
+    * [CXF-6198] - No SOAPFault for HTTP error code 400
+    * [CXF-6413] - WSDL Import SchemaLocation Error on Relative Path
+    * [CXF-6488] - Binding style vs part type R2203 And R2204 problems in wsdl document
+    * [CXF-6517] - Regression in 3.1.2 attachment handling
+    * [CXF-6519] - WS-RM - Invalid response for CloseSequence
+    * [CXF-6522] - ThreadLocalInvocationHandler doesn't handle InvocationTargetException
+    * [CXF-6527] - WSDLRefValidator reject valid target reference URI/IRI
+    * [CXF-6551] - Digest authentication to intermediate HTTP proxy fails with 407 without retry
+    * [CXF-6570] - FormattedServiceListWriter - meta http-equiv value not quoted
+    * [CXF-6574] -  Issue with Digest Authentication
+    * [CXF-6575] - WS-A Action generation defect
+    * [CXF-6579] - Inflated tokens can be corrupted if compression ratio is greater than 2:1
+    * [CXF-6580] - wsdl2java - Issue with import to default namespace
+    * [CXF-6591] - Aegis DataSourceType.getBytes fails to close the InputStream fetched from DataSource, which prevents the underlying file to be deleted on Windows
+    * [CXF-6593] - Some thread-local contexts may get lost on the client side after a refresh
+    * [CXF-6599] - CXF ProxyHelper might cause OOM like conditions
+    * [CXF-6606] - Encoded characters in URI are decoded multiple times during preprocess
+    * [CXF-6609] - Data Race in org/apache/cxf/transport/http/HTTPConduit.prepare 
+    * [CXF-6614] - "Comparison method violates its general contract" in DestinationRegistryImpl.getSortedDestinations
+    * [CXF-6621] - Schema imports are not handled correctly in generated WSDL and XSD files when using catalog rewrites
+    * [CXF-6632] - Memory leak due to literal keys in WSDLDefinition map
+    * [CXF-6637] - @GZIP and similar CXF annotations are not recognized if set on super classes
+    * [CXF-6638] - AsyncHTTPConduit does not allow body payloads with "PATCH" method
+    * [CXF-6653] - NPE may result while generating a SequenceFault in WS-RM 1.1
+    * [CXF-6657] - CXF Failover using JAXRS prevents header retrieval from ResponseExceptionMappers
+
 
 ** Improvement
-    * [CXF-5926] - Extend SSL KeyManagers with password callback handler 
-    * [CXF-6394] - Add an option to add the namespace map of the container element in the message
-    * [CXF-6432] - Remove default empty password in SamlTokenInterceptor 
+    * [CXF-6658] - Make ServletContextResourceResolver optionally ignored 
 
-** New Feature
-    * [CXF-6477] - Add "publish" attribute to jaxrs blueprint bean
 
