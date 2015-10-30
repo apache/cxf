@@ -26,7 +26,7 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.0.7-SNAPSHOT</version>
+        <version>3.0.7</version>
         <relativePath>../../../../parent/pom.xml</relativePath>
     </parent>
     <dependencies>
@@ -154,7 +154,7 @@
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
-                                        <ignore></ignore>
+                                        <ignore />
                                     </action>
                                 </pluginExecution>
                             </pluginExecutions>
