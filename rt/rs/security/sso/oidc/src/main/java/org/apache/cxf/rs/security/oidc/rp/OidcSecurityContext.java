@@ -31,17 +31,22 @@ public class OidcSecurityContext extends SimpleSecurityContext implements Securi
         this(new OidcClientTokenContextImpl(token));
     }
     public OidcSecurityContext(OidcClientTokenContext oidcContext) {
-        super(getUserName(oidcContext));
+        super(getPrincipalName(oidcContext));
         this.oidcContext = oidcContext;
     }
     public OidcClientTokenContext getOidcContext() {
         return oidcContext;
     }
-    private static String getUserName(OidcClientTokenContext oidcContext) {
+    private static String getPrincipalName(OidcClientTokenContext oidcContext) {
         if (oidcContext.getUserInfo() != null) {
             return oidcContext.getUserInfo().getEmail();
         } else {
-            return oidcContext.getIdToken().getEmail();
+            IdToken token = oidcContext.getIdToken();
+            String name = token.getEmail();
+            if (name == null) {
+                name = token.getSubject();
+            }
+            return name;
         }
     }
     @Override
