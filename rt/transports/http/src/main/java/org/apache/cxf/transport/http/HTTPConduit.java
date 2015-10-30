@@ -1553,6 +1553,9 @@ public abstract class HTTPConduit
             }
             if (exchange != null) {
                 exchange.put(Message.RESPONSE_CODE, rc);
+                if (rc == 404 || rc == 503) {
+                    exchange.put("org.apache.cxf.transport.service_not_available", true);
+                } 
             }
                        
             // "org.apache.cxf.transport.no_io_exceptions" property should be set in case the exceptions
@@ -1565,10 +1568,6 @@ public abstract class HTTPConduit
                 && !MessageUtils.isTrue(outMessage.getContextualProperty("org.apache.cxf.transport.no_io_exceptions"))
                 && (rc > 400 || !MessageUtils.isTrue(outMessage
                     .getContextualProperty("org.apache.cxf.transport.process_fault_on_http_400")))) {
-
-                if (rc == 404 || rc == 503) {
-                    exchange.put("org.apache.cxf.transport.service_not_available", true);
-                }
 
                 throw new HTTPException(rc, getResponseMessage(), url.toURL());
             }

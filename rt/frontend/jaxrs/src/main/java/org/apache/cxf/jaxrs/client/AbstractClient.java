@@ -59,6 +59,7 @@ import javax.xml.stream.XMLStreamWriter;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.endpoint.ClientLifeCycleManager;
 import org.apache.cxf.endpoint.ConduitSelector;
 import org.apache.cxf.endpoint.Endpoint;
@@ -105,8 +106,10 @@ public abstract class AbstractClient implements Client, Retryable {
     protected static final String HTTP_SCHEME = "http";
 
     private static final String PROXY_PROPERTY = "jaxrs.proxy";
-    private static final String HEADER_SPLIT_PROPERTY =
-        "org.apache.cxf.http.header.split";
+    private static final String HEADER_SPLIT_PROPERTY = "org.apache.cxf.http.header.split";
+    private static final String SERVICE_NOT_AVAIL_PROPERTY = "org.apache.cxf.transport.service_not_available";
+    private static final String COMPLETE_IF_SERVICE_NOT_AVAIL_PROPERTY = 
+        "org.apache.cxf.transport.complete_if_service_not_available";
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractClient.class);
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(AbstractClient.class);
     
@@ -456,8 +459,8 @@ public abstract class AbstractClient implements Client, Retryable {
     }
     
     protected WebApplicationException convertToWebApplicationException(Response r) {
-        Class<?> exceptionClass = ExceptionUtils.getWebApplicationExceptionClass(r, 
-                                       WebApplicationException.class);
+        Class<?> exceptionClass = ExceptionUtils.getWebApplicationExceptionClass(r,
+                WebApplicationException.class);
         try {
             Constructor<?> ctr = exceptionClass.getConstructor(Response.class);
             return (WebApplicationException)ctr.newInstance(r);
@@ -551,15 +554,19 @@ public abstract class AbstractClient implements Client, Retryable {
     protected Object[] preProcessResult(Message message) throws Exception {
         
         Exchange exchange = message.getExchange(); 
-      
+
         Exception ex = message.getContent(Exception.class);
-        if (ex != null) {
+        if (ex != null
+                || PropertyUtils.isTrue(exchange.get(SERVICE_NOT_AVAIL_PROPERTY))
+                && PropertyUtils.isTrue(exchange.get(COMPLETE_IF_SERVICE_NOT_AVAIL_PROPERTY))) {
             getConfiguration().getConduitSelector().complete(exchange);
+        }
+        if (ex != null) {
             checkClientException(message, ex);
         }
-        checkClientException(message, message.getExchange().get(Exception.class));
+        checkClientException(message, exchange.get(Exception.class));
         
-        List<?> result = message.getExchange().get(List.class);
+        List<?> result = exchange.get(List.class);
         return result != null ? result.toArray() : null;
     }
     
