@@ -58,6 +58,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.endpoint.ClientLifeCycleManager;
 import org.apache.cxf.endpoint.ConduitSelector;
 import org.apache.cxf.endpoint.Endpoint;
@@ -106,8 +107,11 @@ public abstract class AbstractClient implements Client {
     protected static final String HTTP_SCHEME = "http";
     
     private static final String PROXY_PROPERTY = "jaxrs.proxy";
-    private static final String HEADER_SPLIT_PROPERTY =
-        "org.apache.cxf.http.header.split";
+    private static final String HEADER_SPLIT_PROPERTY = "org.apache.cxf.http.header.split";
+    private static final String SERVICE_NOT_AVAIL_PROPERTY = "org.apache.cxf.transport.service_not_available";
+    private static final String COMPLETE_IF_SERVICE_NOT_AVAIL_PROPERTY = 
+        "org.apache.cxf.transport.complete_if_service_not_available";
+    
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractClient.class);
     private static final Set<String> KNOWN_METHODS = new HashSet<String>(
         Arrays.asList("GET", "POST", "HEAD", "OPTIONS", "PUT", "DELETE", "TRACE"));
@@ -551,13 +555,17 @@ public abstract class AbstractClient implements Client {
         Exchange exchange = message.getExchange(); 
       
         Exception ex = message.getContent(Exception.class);
-        if (ex != null) {
+        if (ex != null
+            || PropertyUtils.isTrue(exchange.get(SERVICE_NOT_AVAIL_PROPERTY))
+                && PropertyUtils.isTrue(exchange.get(COMPLETE_IF_SERVICE_NOT_AVAIL_PROPERTY))) {
             getConfiguration().getConduitSelector().complete(exchange);
+        }
+        if (ex != null) {
             checkClientException(message, ex);
         }
-        checkClientException(message, message.getExchange().get(Exception.class));
+        checkClientException(message, exchange.get(Exception.class));
         
-        List<?> result = message.getExchange().get(List.class);
+        List<?> result = exchange.get(List.class);
         return result != null ? result.toArray() : null;
     }
     

@@ -47,8 +47,10 @@ import org.apache.cxf.transport.Conduit;
  */
 public class FailoverTargetSelector extends AbstractConduitSelector {
 
-    private static final Logger LOG =
-        LogUtils.getL7dLogger(FailoverTargetSelector.class);
+    private static final Logger LOG = LogUtils.getL7dLogger(FailoverTargetSelector.class);
+    private static final String COMPLETE_IF_SERVICE_NOT_AVAIL_PROPERTY = 
+        "org.apache.cxf.transport.complete_if_service_not_available";
+
     protected ConcurrentHashMap<InvocationKey, InvocationContext> inProgress 
         = new ConcurrentHashMap<InvocationKey, InvocationContext>();
     protected FailoverStrategy failoverStrategy;
@@ -99,7 +101,10 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
     }
 
     protected void setupExchangeExceptionProperties(Exchange ex) {
-        ex.remove("org.apache.cxf.transport.no_io_exceptions");
+        if (!isSupportNotAvailableErrorsOnly()) {
+            ex.remove("org.apache.cxf.transport.no_io_exceptions");
+        }
+        ex.put(COMPLETE_IF_SERVICE_NOT_AVAIL_PROPERTY, true);
     }
     
     /**
@@ -144,6 +149,7 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
                 removeConduit(old);
                 failover = performFailover(exchange, invocation);
             } else {
+                exchange.remove(COMPLETE_IF_SERVICE_NOT_AVAIL_PROPERTY);
                 setOriginalEndpoint(invocation);
             }
         } else {
@@ -273,12 +279,11 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
                             "CHECK_FAILURE_IN_TRANSPORT",
                             new Object[] {ex, failover});
         }
-        if (failover 
-            && isSupportNotAvailableErrorsOnly()
-            && exchange.get(Message.RESPONSE_CODE) != null
-            && !PropertyUtils.isTrue(exchange.get("org.apache.cxf.transport.service_not_available"))) { 
-            failover = false;
+
+        if (isSupportNotAvailableErrorsOnly() && exchange.get(Message.RESPONSE_CODE) != null) {
+            failover = PropertyUtils.isTrue(exchange.get("org.apache.cxf.transport.service_not_available"));
         }
+
         return failover;
     }
     
