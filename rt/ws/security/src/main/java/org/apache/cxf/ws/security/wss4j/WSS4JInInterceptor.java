@@ -342,9 +342,12 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             SecurityUtils.getSecurityPropertyBoolean(SecurityConstants.AUDIENCE_RESTRICTION_VALIDATION, msg, true);
         if (enableAudienceRestriction) {
             List<String> audiences = new ArrayList<>();
-            if (msg.getContextualProperty(org.apache.cxf.message.Message.REQUEST_URL) != null) {
-                audiences.add((String)msg.getContextualProperty(org.apache.cxf.message.Message.REQUEST_URL));
+            if (msg.get(org.apache.cxf.message.Message.REQUEST_URL) != null) {
+                audiences.add((String)msg.get(org.apache.cxf.message.Message.REQUEST_URL));
+            } else if (msg.get(org.apache.cxf.message.Message.REQUEST_URI) != null) {
+                audiences.add((String)msg.get(org.apache.cxf.message.Message.REQUEST_URL));
             }
+            
             if (msg.getContextualProperty("javax.xml.ws.wsdl.service") != null) {
                 audiences.add(msg.getContextualProperty("javax.xml.ws.wsdl.service").toString());
             }
