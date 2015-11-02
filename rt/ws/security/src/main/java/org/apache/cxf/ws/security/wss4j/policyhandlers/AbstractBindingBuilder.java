@@ -967,22 +967,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
     }
     
     protected CallbackHandler getCallbackHandler() {
-        Object o = message.getContextualProperty(SecurityConstants.CALLBACK_HANDLER);
-        
-        CallbackHandler handler = null;
-        if (o instanceof CallbackHandler) {
-            handler = (CallbackHandler)o;
-        } else if (o instanceof String) {
-            try {
-                handler = (CallbackHandler)ClassLoaderUtils
-                    .loadClass((String)o, this.getClass()).newInstance();
-                message.put(SecurityConstants.CALLBACK_HANDLER, handler);
-            } catch (Exception e) {
-                handler = null;
-            }
-        }
-        
-        return handler;
+        return WSS4JUtils.getCallbackHandler(message);
     }
 
     /**
@@ -1526,26 +1511,6 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         return crypto;
     }
     
-<<<<<<< HEAD
-    protected PasswordEncryptor getPasswordEncryptor() {
-        PasswordEncryptor passwordEncryptor = 
-            (PasswordEncryptor)message.getContextualProperty(
-                SecurityConstants.PASSWORD_ENCRYPTOR_INSTANCE
-            );
-        if (passwordEncryptor != null) {
-            return passwordEncryptor;
-        }
-        
-        CallbackHandler callbackHandler = getCallbackHandler();
-        if (callbackHandler != null) {
-            return new JasyptPasswordEncryptor(callbackHandler);
-        }
-        
-        return null;
-    }
-    
-=======
->>>>>>> fcd965e... Make it possible to use a PasswordEncryptor with the SamlTokenInterceptor
     public void setKeyIdentifierType(WSSecBase secBase, AbstractToken token) {
         boolean tokenTypeSet = false;
         

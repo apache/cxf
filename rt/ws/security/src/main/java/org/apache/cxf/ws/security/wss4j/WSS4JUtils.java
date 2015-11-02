@@ -300,7 +300,6 @@ public final class WSS4JUtils {
         return properties;
     }
     
-<<<<<<< HEAD
     public static URL getPropertiesFileURL(
         Object o, ResourceManager manager, Class<?> callingClass
     ) {
@@ -331,7 +330,7 @@ public final class WSS4JUtils {
         } else if (o instanceof URL) {
             return (URL)o;        
         }
-=======
+
     public static PasswordEncryptor getPasswordEncryptor(Message message) {
         if (message == null) {
             return null;
@@ -344,9 +343,8 @@ public final class WSS4JUtils {
             return passwordEncryptor;
         }
         
-        Object o = SecurityUtils.getSecurityPropertyValue(SecurityConstants.CALLBACK_HANDLER, message);
         try {
-            CallbackHandler callbackHandler = SecurityUtils.getCallbackHandler(o);
+            CallbackHandler callbackHandler = getCallbackHandler(message);
             if (callbackHandler != null) {
                 return new JasyptPasswordEncryptor(callbackHandler);
             }
@@ -354,8 +352,26 @@ public final class WSS4JUtils {
             return null;
         }
         
->>>>>>> fcd965e... Make it possible to use a PasswordEncryptor with the SamlTokenInterceptor
         return null;
+    }
+    
+    public static CallbackHandler getCallbackHandler(Message message) {
+        Object o = message.getContextualProperty(SecurityConstants.CALLBACK_HANDLER);
+        
+        CallbackHandler handler = null;
+        if (o instanceof CallbackHandler) {
+            handler = (CallbackHandler)o;
+        } else if (o instanceof String) {
+            try {
+                handler = (CallbackHandler)ClassLoaderUtils
+                    .loadClass((String)o, WSS4JUtils.class).newInstance();
+                message.put(SecurityConstants.CALLBACK_HANDLER, handler);
+            } catch (Exception e) {
+                handler = null;
+            }
+        }
+        
+        return handler;
     }
     
     public static Crypto loadCryptoFromPropertiesFile(
