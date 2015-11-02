@@ -348,10 +348,19 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                                               SecurityConstants.AUDIENCE_RESTRICTION_VALIDATION, 
                                               true);
         if (enableAudienceRestriction) {
+<<<<<<< HEAD
             List<String> audiences = new ArrayList<String>();
             if (msg.getContextualProperty(org.apache.cxf.message.Message.REQUEST_URL) != null) {
                 audiences.add((String)msg.getContextualProperty(org.apache.cxf.message.Message.REQUEST_URL));
+=======
+            List<String> audiences = new ArrayList<>();
+            if (msg.get(org.apache.cxf.message.Message.REQUEST_URL) != null) {
+                audiences.add((String)msg.get(org.apache.cxf.message.Message.REQUEST_URL));
+            } else if (msg.get(org.apache.cxf.message.Message.REQUEST_URI) != null) {
+                audiences.add((String)msg.get(org.apache.cxf.message.Message.REQUEST_URL));
+>>>>>>> 0c0b31f... Don't use getContextualProperty to get the REQUEST_URL. Fallback to REQUEST_URI if it's not set
             }
+            
             if (msg.getContextualProperty("javax.xml.ws.wsdl.service") != null) {
                 audiences.add(msg.getContextualProperty("javax.xml.ws.wsdl.service").toString());
             }
