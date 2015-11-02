@@ -76,7 +76,9 @@ public final class AuthorizationUtils {
         if (headers != null && headers.size() == 1) {
             String[] parts = headers.get(0).split(" ");
             if (parts.length > 0 
-                && (challenges == null || challenges.isEmpty() || challenges.contains(parts[0]))) {
+                && (challenges == null || challenges.isEmpty() 
+                || challenges.contains(parts[0])
+                || challenges.size() == 1 && challenges.contains("*"))) {
                 return parts;       
             }
         }

@@ -19,6 +19,7 @@
 package org.apache.cxf.rs.security.oauth2.filters;
 
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.ws.rs.core.MultivaluedMap;
@@ -34,9 +35,11 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 public class AccessTokenValidatorClient implements AccessTokenValidator {
 
     private WebClient tokenValidatorClient;
-    
+    private List<String> supportedSchemes = new LinkedList<String>();
     public List<String> getSupportedAuthorizationSchemes() {
-        return Collections.singletonList(OAuthConstants.ALL_AUTH_SCHEMES);
+        return supportedSchemes.isEmpty() 
+            ? Collections.singletonList(OAuthConstants.ALL_AUTH_SCHEMES) 
+            : Collections.unmodifiableList(supportedSchemes);
     }
 
     public AccessTokenValidation validateAccessToken(MessageContext mc,
@@ -56,6 +59,12 @@ public class AccessTokenValidatorClient implements AccessTokenValidator {
 
     public void setTokenValidatorClient(WebClient tokenValidatorClient) {
         this.tokenValidatorClient = tokenValidatorClient;
+    }
+    public void setSupportedSchemes(List<String> schemes) {
+        this.supportedSchemes.addAll(schemes);
+    }
+    public void setSupportedScheme(String scheme) {
+        this.supportedSchemes.add(scheme);
     }
 
 }
