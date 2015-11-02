@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.jaxrs.client.WebClient;
@@ -54,7 +55,11 @@ public class AccessTokenValidatorClient implements AccessTokenValidator {
         if (extraProps != null) {
             props.putAll(extraProps);
         }
-        return client.post(props, AccessTokenValidation.class);
+        try {
+            return client.post(props, AccessTokenValidation.class);
+        } catch (WebApplicationException ex) {
+            throw new OAuthServiceException(ex);
+        }
     }
 
     public void setTokenValidatorClient(WebClient tokenValidatorClient) {
