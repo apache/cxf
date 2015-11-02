@@ -114,6 +114,7 @@ import org.apache.neethi.PolicyRegistry;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
+import org.apache.wss4j.common.crypto.PasswordEncryptor;
 import org.apache.wss4j.common.derivedKey.P_SHA1;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.token.Reference;
@@ -1611,7 +1612,8 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
         Properties properties = WSS4JUtils.getProps(o, propsURL);
         
         if (properties != null) {
-            return CryptoFactory.getInstance(properties);
+            PasswordEncryptor passwordEncryptor = WSS4JUtils.getPasswordEncryptor(message);
+            return CryptoFactory.getInstance(properties, this.getClass().getClassLoader(), passwordEncryptor);
         }
         if (decrypt) {
             return createCrypto(false);

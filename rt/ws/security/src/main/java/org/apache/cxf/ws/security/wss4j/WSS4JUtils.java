@@ -30,6 +30,7 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import javax.crypto.SecretKey;
+import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.SoapFault;
@@ -49,6 +50,7 @@ import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.cache.ReplayCacheFactory;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.crypto.JasyptPasswordEncryptor;
 import org.apache.wss4j.common.crypto.PasswordEncryptor;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.Loader;
@@ -239,6 +241,31 @@ public final class WSS4JUtils {
         }
         
         return properties;
+    }
+    
+    public static PasswordEncryptor getPasswordEncryptor(Message message) {
+        if (message == null) {
+            return null;
+        }
+        PasswordEncryptor passwordEncryptor = 
+            (PasswordEncryptor)message.getContextualProperty(
+                SecurityConstants.PASSWORD_ENCRYPTOR_INSTANCE
+            );
+        if (passwordEncryptor != null) {
+            return passwordEncryptor;
+        }
+        
+        Object o = SecurityUtils.getSecurityPropertyValue(SecurityConstants.CALLBACK_HANDLER, message);
+        try {
+            CallbackHandler callbackHandler = SecurityUtils.getCallbackHandler(o);
+            if (callbackHandler != null) {
+                return new JasyptPasswordEncryptor(callbackHandler);
+            }
+        } catch (Exception ex) {
+            return null;
+        }
+        
+        return null;
     }
     
     public static Crypto loadCryptoFromPropertiesFile(

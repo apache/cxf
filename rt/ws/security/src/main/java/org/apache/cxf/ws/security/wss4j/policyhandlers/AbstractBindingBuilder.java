@@ -81,8 +81,6 @@ import org.apache.wss4j.common.bsp.BSPEnforcer;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
-import org.apache.wss4j.common.crypto.JasyptPasswordEncryptor;
-import org.apache.wss4j.common.crypto.PasswordEncryptor;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -1523,32 +1521,10 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         if (properties != null) {
             crypto = CryptoFactory.getInstance(properties, 
                                                Loader.getClassLoader(CryptoFactory.class),
-                                               getPasswordEncryptor());
+                                               WSS4JUtils.getPasswordEncryptor(message));
             getCryptoCache().put(o, crypto);
         }
         return crypto;
-    }
-    
-    protected PasswordEncryptor getPasswordEncryptor() {
-        PasswordEncryptor passwordEncryptor = 
-            (PasswordEncryptor)message.getContextualProperty(
-                SecurityConstants.PASSWORD_ENCRYPTOR_INSTANCE
-            );
-        if (passwordEncryptor != null) {
-            return passwordEncryptor;
-        }
-        
-        Object o = SecurityUtils.getSecurityPropertyValue(SecurityConstants.CALLBACK_HANDLER, message);
-        try {
-            CallbackHandler callbackHandler = SecurityUtils.getCallbackHandler(o);
-            if (callbackHandler != null) {
-                return new JasyptPasswordEncryptor(callbackHandler);
-            }
-        } catch (Exception ex) {
-            return null;
-        }
-        
-        return null;
     }
     
     public void setKeyIdentifierType(WSSecBase secBase, AbstractToken token) {
