@@ -128,7 +128,7 @@ public class JMSWSSecurityTest extends AbstractBusClientServerTestBase {
         
         ConditionsBean conditions = new ConditionsBean();
         conditions.setTokenPeriodMinutes(5);
-        List<String> audiences = new ArrayList<>();
+        List<String> audiences = new ArrayList<String>();
         audiences.add("http://apache.org/one");
         AudienceRestrictionBean audienceRestrictionBean = new AudienceRestrictionBean();
         audienceRestrictionBean.setAudienceURIs(audiences);

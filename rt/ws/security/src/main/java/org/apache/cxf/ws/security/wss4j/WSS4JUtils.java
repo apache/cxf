@@ -330,6 +330,9 @@ public final class WSS4JUtils {
         } else if (o instanceof URL) {
             return (URL)o;        
         }
+        
+        return null;
+    }
 
     public static PasswordEncryptor getPasswordEncryptor(Message message) {
         if (message == null) {
