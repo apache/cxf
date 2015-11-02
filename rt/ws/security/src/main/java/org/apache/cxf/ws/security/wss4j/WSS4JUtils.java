@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Properties;
 
 import javax.crypto.SecretKey;
+import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.SoapFault;
@@ -49,6 +50,7 @@ import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.cache.ReplayCacheFactory;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.crypto.JasyptPasswordEncryptor;
 import org.apache.wss4j.common.crypto.PasswordEncryptor;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
@@ -298,6 +300,7 @@ public final class WSS4JUtils {
         return properties;
     }
     
+<<<<<<< HEAD
     public static URL getPropertiesFileURL(
         Object o, ResourceManager manager, Class<?> callingClass
     ) {
@@ -328,6 +331,30 @@ public final class WSS4JUtils {
         } else if (o instanceof URL) {
             return (URL)o;        
         }
+=======
+    public static PasswordEncryptor getPasswordEncryptor(Message message) {
+        if (message == null) {
+            return null;
+        }
+        PasswordEncryptor passwordEncryptor = 
+            (PasswordEncryptor)message.getContextualProperty(
+                SecurityConstants.PASSWORD_ENCRYPTOR_INSTANCE
+            );
+        if (passwordEncryptor != null) {
+            return passwordEncryptor;
+        }
+        
+        Object o = SecurityUtils.getSecurityPropertyValue(SecurityConstants.CALLBACK_HANDLER, message);
+        try {
+            CallbackHandler callbackHandler = SecurityUtils.getCallbackHandler(o);
+            if (callbackHandler != null) {
+                return new JasyptPasswordEncryptor(callbackHandler);
+            }
+        } catch (Exception ex) {
+            return null;
+        }
+        
+>>>>>>> fcd965e... Make it possible to use a PasswordEncryptor with the SamlTokenInterceptor
         return null;
     }
     

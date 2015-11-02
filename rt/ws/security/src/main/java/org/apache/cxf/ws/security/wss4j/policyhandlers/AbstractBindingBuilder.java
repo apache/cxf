@@ -79,8 +79,6 @@ import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
-import org.apache.wss4j.common.crypto.JasyptPasswordEncryptor;
-import org.apache.wss4j.common.crypto.PasswordEncryptor;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -1522,12 +1520,13 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         if (properties != null) {
             crypto = CryptoFactory.getInstance(properties, 
                                                Loader.getClassLoader(CryptoFactory.class),
-                                               getPasswordEncryptor());
+                                               WSS4JUtils.getPasswordEncryptor(message));
             getCryptoCache().put(o, crypto);
         }
         return crypto;
     }
     
+<<<<<<< HEAD
     protected PasswordEncryptor getPasswordEncryptor() {
         PasswordEncryptor passwordEncryptor = 
             (PasswordEncryptor)message.getContextualProperty(
@@ -1545,6 +1544,8 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         return null;
     }
     
+=======
+>>>>>>> fcd965e... Make it possible to use a PasswordEncryptor with the SamlTokenInterceptor
     public void setKeyIdentifierType(WSSecBase secBase, AbstractToken token) {
         boolean tokenTypeSet = false;
         

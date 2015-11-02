@@ -46,6 +46,7 @@ import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.crypto.PasswordEncryptor;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLCallback;
@@ -334,7 +335,8 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
         Properties properties = WSS4JUtils.getProps(o, propsURL);
 
         if (properties != null) {
-            crypto = CryptoFactory.getInstance(properties);
+            PasswordEncryptor passwordEncryptor = WSS4JUtils.getPasswordEncryptor(message);
+            crypto = CryptoFactory.getInstance(properties, this.getClass().getClassLoader(), passwordEncryptor);
         }
         return crypto;
     }
