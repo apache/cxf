@@ -106,8 +106,9 @@ public abstract class AbstractAccessTokenValidator {
                 accessTokenV = handler.validateAccessToken(getMessageContext(), authScheme, authSchemeData, 
                                                            extraProps);
             } catch (OAuthServiceException ex) {
-                AuthorizationUtils.throwAuthorizationFailure(
-                    Collections.singleton(authScheme), realm);
+                AuthorizationUtils.throwAuthorizationFailure(Collections.singleton(authScheme), realm);
+            } catch (RuntimeException ex) {
+                AuthorizationUtils.throwAuthorizationFailure(Collections.singleton(authScheme), realm);
             }
         }
         // Default processing if no registered providers available
