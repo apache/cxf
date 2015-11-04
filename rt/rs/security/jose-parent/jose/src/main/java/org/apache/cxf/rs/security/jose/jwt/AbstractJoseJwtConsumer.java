@@ -18,25 +18,27 @@
  */
 package org.apache.cxf.rs.security.jose.jwt;
 
-import org.apache.cxf.rs.security.jose.common.AbstractJoseConsumer;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionOutput;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionProvider;
 import org.apache.cxf.rs.security.jose.jwe.JweHeaders;
 import org.apache.cxf.rs.security.jose.jwe.JweJwtCompactConsumer;
+import org.apache.cxf.rs.security.jose.jwe.JweUtils;
+import org.apache.cxf.rs.security.jose.jws.JwsHeaders;
 import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactConsumer;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 
-public abstract class AbstractJoseJwtConsumer extends AbstractJoseConsumer {
+public abstract class AbstractJoseJwtConsumer {
+    private JweDecryptionProvider jweDecryptor;
+    private JwsSignatureVerifier jwsVerifier;
     private boolean jwsRequired = true;
     private boolean jweRequired;
-    
     
     protected JwtToken getJwtToken(String wrappedJwtToken) {
         return getJwtToken(wrappedJwtToken, null, null);
     }
     protected JwtToken getJwtToken(String wrappedJwtToken,
-                                   JweDecryptionProvider jweDecryptor,
+                                   JweDecryptionProvider theDecryptor,
                                    JwsSignatureVerifier theSigVerifier) {
         if (!isJwsRequired() && !isJweRequired()) {
             throw new JwtException("Unable to process JWT");
@@ -44,17 +46,20 @@ public abstract class AbstractJoseJwtConsumer extends AbstractJoseConsumer {
         
         JweHeaders jweHeaders = new JweHeaders();
         if (isJweRequired()) {
-            if (jweDecryptor == null) {
-                jweDecryptor = getInitializedDecryptionProvider();
+            JweJwtCompactConsumer jwtConsumer = new JweJwtCompactConsumer(wrappedJwtToken);
+            
+            if (theDecryptor == null) {
+                theDecryptor = getInitializedDecryptionProvider(jwtConsumer.getHeaders());
             }
-            if (jweDecryptor == null) {
+            if (theDecryptor == null) {
                 throw new JwtException("Unable to decrypt JWT");
             }
             
             if (!isJwsRequired()) {
-                return new JweJwtCompactConsumer(wrappedJwtToken).decryptWith(jweDecryptor);    
+                return jwtConsumer.decryptWith(theDecryptor);    
             }
-            JweDecryptionOutput decOutput = jweDecryptor.decrypt(wrappedJwtToken);
+            
+            JweDecryptionOutput decOutput = theDecryptor.decrypt(wrappedJwtToken);
             wrappedJwtToken = decOutput.getContentText();
             jweHeaders = decOutput.getHeaders();
         }
@@ -66,7 +71,7 @@ public abstract class AbstractJoseJwtConsumer extends AbstractJoseConsumer {
         
         if (isJwsRequired()) {
             if (theSigVerifier == null) {
-                theSigVerifier = getInitializedSignatureVerifier(jwt);
+                theSigVerifier = getInitializedSignatureVerifier(jwt.getJwsHeaders());
             }
             if (theSigVerifier == null) {
                 throw new JwtException("Unable to validate JWT");
@@ -80,13 +85,21 @@ public abstract class AbstractJoseJwtConsumer extends AbstractJoseConsumer {
         validateToken(jwt);
         return jwt; 
     }
-    protected JwsSignatureVerifier getInitializedSignatureVerifier(JwtToken jwt) {
-        if (super.getJwsVerifier() != null) {
-            return super.getJwsVerifier();    
+    protected JwsSignatureVerifier getInitializedSignatureVerifier(JwsHeaders jwsHeaders) {
+        if (jwsVerifier != null) {
+            return jwsVerifier;    
         }
         
-        return JwsUtils.loadSignatureVerifier(jwt.getJwsHeaders(), false);
+        return JwsUtils.loadSignatureVerifier(jwsHeaders, false);
     }
+    
+    protected JweDecryptionProvider getInitializedDecryptionProvider(JweHeaders jweHeaders) {
+        if (jweDecryptor != null) {
+            return jweDecryptor;    
+        } 
+        return JweUtils.loadDecryptionProvider(jweHeaders, false);
+    }
+    
     protected void validateToken(JwtToken jwt) {
     }
     public boolean isJwsRequired() {
@@ -105,4 +118,20 @@ public abstract class AbstractJoseJwtConsumer extends AbstractJoseConsumer {
         this.jweRequired = jweRequired;
     }
     
+    public void setJweDecryptor(JweDecryptionProvider jweDecryptor) {
+        this.jweDecryptor = jweDecryptor;
+    }
+    
+    public JweDecryptionProvider getJweDecryptor() {
+        return jweDecryptor;
+    }
+
+    public void setJwsVerifier(JwsSignatureVerifier theJwsVerifier) {
+        this.jwsVerifier = theJwsVerifier;
+    }
+    
+    public JwsSignatureVerifier getJwsVerifier() {
+        return jwsVerifier;
+    }
+
 }
