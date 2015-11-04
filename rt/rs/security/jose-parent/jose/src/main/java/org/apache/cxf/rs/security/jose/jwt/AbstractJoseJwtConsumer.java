@@ -67,7 +67,7 @@ public abstract class AbstractJoseJwtConsumer extends AbstractJoseConsumer {
         
         if (isJwsRequired()) {
             if (theSigVerifier == null) {
-                theSigVerifier = getInitializedSignatureVerifier(jwt.getJwsHeaders());
+                theSigVerifier = getInitializedSignatureVerifier(jwt);
             }
             if (theSigVerifier == null) {
                 throw new JwtException("Unable to validate JWT");
@@ -80,6 +80,10 @@ public abstract class AbstractJoseJwtConsumer extends AbstractJoseConsumer {
         
         validateToken(jwt);
         return jwt; 
+    }
+    
+    protected JwsSignatureVerifier getInitializedSignatureVerifier(JwtToken jwt) {
+        return super.getInitializedSignatureVerifier(jwt.getJwsHeaders());
     }
     
     protected void validateToken(JwtToken jwt) {
