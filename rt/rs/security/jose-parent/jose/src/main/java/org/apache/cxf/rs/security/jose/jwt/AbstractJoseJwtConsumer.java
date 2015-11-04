@@ -18,19 +18,15 @@
  */
 package org.apache.cxf.rs.security.jose.jwt;
 
+import org.apache.cxf.rs.security.jose.common.AbstractJoseConsumer;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionOutput;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionProvider;
 import org.apache.cxf.rs.security.jose.jwe.JweHeaders;
 import org.apache.cxf.rs.security.jose.jwe.JweJwtCompactConsumer;
-import org.apache.cxf.rs.security.jose.jwe.JweUtils;
-import org.apache.cxf.rs.security.jose.jws.JwsHeaders;
 import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactConsumer;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
-import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 
-public abstract class AbstractJoseJwtConsumer {
-    private JweDecryptionProvider jweDecryptor;
-    private JwsSignatureVerifier jwsVerifier;
+public abstract class AbstractJoseJwtConsumer extends AbstractJoseConsumer {
     private boolean jwsRequired = true;
     private boolean jweRequired;
     
@@ -85,20 +81,6 @@ public abstract class AbstractJoseJwtConsumer {
         validateToken(jwt);
         return jwt; 
     }
-    protected JwsSignatureVerifier getInitializedSignatureVerifier(JwsHeaders jwsHeaders) {
-        if (jwsVerifier != null) {
-            return jwsVerifier;    
-        }
-        
-        return JwsUtils.loadSignatureVerifier(jwsHeaders, false);
-    }
-    
-    protected JweDecryptionProvider getInitializedDecryptionProvider(JweHeaders jweHeaders) {
-        if (jweDecryptor != null) {
-            return jweDecryptor;    
-        } 
-        return JweUtils.loadDecryptionProvider(jweHeaders, false);
-    }
     
     protected void validateToken(JwtToken jwt) {
     }
@@ -118,20 +100,4 @@ public abstract class AbstractJoseJwtConsumer {
         this.jweRequired = jweRequired;
     }
     
-    public void setJweDecryptor(JweDecryptionProvider jweDecryptor) {
-        this.jweDecryptor = jweDecryptor;
-    }
-    
-    public JweDecryptionProvider getJweDecryptor() {
-        return jweDecryptor;
-    }
-
-    public void setJwsVerifier(JwsSignatureVerifier theJwsVerifier) {
-        this.jwsVerifier = theJwsVerifier;
-    }
-    
-    public JwsSignatureVerifier getJwsVerifier() {
-        return jwsVerifier;
-    }
-
 }

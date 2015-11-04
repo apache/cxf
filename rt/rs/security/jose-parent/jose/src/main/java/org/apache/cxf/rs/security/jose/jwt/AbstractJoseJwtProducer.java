@@ -19,18 +19,13 @@
 package org.apache.cxf.rs.security.jose.jwt;
 
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.rs.security.jose.common.AbstractJoseProducer;
 import org.apache.cxf.rs.security.jose.jwe.JweEncryptionProvider;
-import org.apache.cxf.rs.security.jose.jwe.JweHeaders;
 import org.apache.cxf.rs.security.jose.jwe.JweJwtCompactProducer;
-import org.apache.cxf.rs.security.jose.jwe.JweUtils;
-import org.apache.cxf.rs.security.jose.jws.JwsHeaders;
 import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactProducer;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
-import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 
-public abstract class AbstractJoseJwtProducer {
-    private JwsSignatureProvider sigProvider;
-    private JweEncryptionProvider encryptionProvider;
+public abstract class AbstractJoseJwtProducer extends AbstractJoseProducer {
     private boolean jwsRequired = true;
     private boolean jweRequired;
     
@@ -76,20 +71,6 @@ public abstract class AbstractJoseJwtProducer {
         }
         return data;
     }
-    
-    protected JwsSignatureProvider getInitializedSignatureProvider(JwsHeaders jwsHeaders) {
-        if (sigProvider != null) {
-            return sigProvider;    
-        } 
-        
-        return JwsUtils.loadSignatureProvider(jwsHeaders, false);
-    }
-    protected JweEncryptionProvider getInitializedEncryptionProvider(JweHeaders jweHeaders) {
-        if (encryptionProvider != null) {
-            return encryptionProvider;    
-        }
-        return JweUtils.loadEncryptionProvider(jweHeaders, false);
-    }
 
     public boolean isJwsRequired() {
         return jwsRequired;
@@ -107,11 +88,4 @@ public abstract class AbstractJoseJwtProducer {
         this.jweRequired = jweRequired;
     }
     
-    public void setEncryptionProvider(JweEncryptionProvider encryptionProvider) {
-        this.encryptionProvider = encryptionProvider;
-    }
-
-    public void setSignatureProvider(JwsSignatureProvider signatureProvider) {
-        this.sigProvider = signatureProvider;
-    }
 }
