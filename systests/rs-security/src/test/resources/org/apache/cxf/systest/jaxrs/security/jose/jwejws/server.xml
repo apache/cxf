@@ -37,7 +37,7 @@ under the License.
             </httpj:tlsServerParameters>
         </httpj:engine>
     </httpj:engine-factory>
-    <bean id="serviceBean" class="org.apache.cxf.systest.jaxrs.security.jwt.BookStore"/>
+    <bean id="serviceBean" class="org.apache.cxf.systest.jaxrs.security.jose.BookStore"/>
     <bean id="jweInFilter" class="org.apache.cxf.rs.security.jose.jaxrs.JweContainerRequestFilter"/>
     <bean id="jweOutFilter" class="org.apache.cxf.rs.security.jose.jaxrs.JweWriterInterceptor"/>
     
@@ -73,8 +73,8 @@ under the License.
     </bean>
     <bean id="jwsInFilter" class="org.apache.cxf.rs.security.jose.jaxrs.JwsContainerRequestFilter"/>
     <bean id="jwsOutFilter" class="org.apache.cxf.rs.security.jose.jaxrs.JwsWriterInterceptor"/>
-    <bean id="keyPasswordProvider" class="org.apache.cxf.systest.jaxrs.security.jwt.PrivateKeyPasswordProviderImpl"/>
-    <bean id="keyPasswordProvider2" class="org.apache.cxf.systest.jaxrs.security.jwt.PrivateKeyPasswordProviderImpl">
+    <bean id="keyPasswordProvider" class="org.apache.cxf.systest.jaxrs.security.jose.jwejws.PrivateKeyPasswordProviderImpl"/>
+    <bean id="keyPasswordProvider2" class="org.apache.cxf.systest.jaxrs.security.jose.jwejws.PrivateKeyPasswordProviderImpl">
          <constructor-arg value="Thus from my lips, by yours, my sin is purged."/>
     </bean>
     <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jwt}/jwejwsrsa">

@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.jaxrs.security.jwt;
+package org.apache.cxf.systest.jaxrs.security.jose.jwejws;
 
 import java.net.URL;
 import java.security.Security;
@@ -47,6 +47,7 @@ import org.apache.cxf.rs.security.jose.jwe.AesWrapKeyEncryptionAlgorithm;
 import org.apache.cxf.rs.security.jose.jws.HmacJwsSignatureProvider;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
 import org.apache.cxf.systest.jaxrs.security.Book;
+import org.apache.cxf.systest.jaxrs.security.jose.BookStore;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 

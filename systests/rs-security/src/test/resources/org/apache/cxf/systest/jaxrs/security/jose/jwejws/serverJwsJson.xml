@@ -38,7 +38,7 @@ under the License.
         </httpj:engine>
     </httpj:engine-factory>
     
-    <bean id="serviceBean" class="org.apache.cxf.systest.jaxrs.security.jwt.BookStore"/>
+    <bean id="serviceBean" class="org.apache.cxf.systest.jaxrs.security.jose.BookStore"/>
     <bean id="jwsInFilter" class="org.apache.cxf.rs.security.jose.jaxrs.JwsJsonContainerRequestFilter"/>
     <bean id="jwsOutFilter" class="org.apache.cxf.rs.security.jose.jaxrs.JwsJsonWriterInterceptor"/>
     <bean id="jackson" class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider"/>
