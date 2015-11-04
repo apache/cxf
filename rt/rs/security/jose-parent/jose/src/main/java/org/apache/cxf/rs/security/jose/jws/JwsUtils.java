@@ -287,7 +287,7 @@ public final class JwsUtils {
                 if (includeCert) {
                     JwkUtils.includeCertChain(jwk, headers, signatureAlgo);
                 }
-                if (includeCertSha1 && headers != null) {
+                if (includeCertSha1) {
                     String digest = KeyManagementUtils.loadDigestAndEncodeX509Certificate(m, props);
                     if (digest != null) {
                         headers.setX509Thumbprint(digest);
@@ -305,10 +305,10 @@ public final class JwsUtils {
             PrivateKey pk = KeyManagementUtils.loadPrivateKey(m, props, KeyOperation.SIGN);
             theSigProvider = getPrivateKeySignatureProvider(pk, 
                                                             SignatureAlgorithm.getAlgorithm(signatureAlgo));
-            if (includeCert && headers != null) {
+            if (includeCert) {
                 headers.setX509Chain(KeyManagementUtils.loadAndEncodeX509CertificateOrChain(m, props));
             }
-            if (includeCertSha1 && headers != null) {
+            if (includeCertSha1) {
                 String digest = KeyManagementUtils.loadDigestAndEncodeX509Certificate(m, props);
                 if (digest != null) {
                     headers.setX509Thumbprint(digest);
