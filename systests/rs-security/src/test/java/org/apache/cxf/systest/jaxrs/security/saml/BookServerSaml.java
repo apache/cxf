@@ -19,6 +19,8 @@
 
 package org.apache.cxf.systest.jaxrs.security.saml;
 
+import java.net.URL;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
@@ -27,8 +29,8 @@ import org.apache.cxf.testutil.common.TestUtil;
     
 public class BookServerSaml extends AbstractBusTestServerBase {
     public static final String PORT = TestUtil.getPortNumber("jaxrs-saml");
-    private static final String SERVER_CONFIG_FILE =
-        "org/apache/cxf/systest/jaxrs/security/saml/server.xml";
+    private static final URL SERVER_CONFIG_FILE =
+        BookServerSaml.class.getResource("server.xml");
     
     protected void run() {
         SpringBusFactory bf = new SpringBusFactory();

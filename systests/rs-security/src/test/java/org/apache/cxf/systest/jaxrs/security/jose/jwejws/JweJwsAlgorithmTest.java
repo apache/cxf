@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.jaxrs.security.jwt;
+package org.apache.cxf.systest.jaxrs.security.jose.jwejws;
 
 import java.net.URL;
 import java.security.Security;

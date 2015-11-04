@@ -16,25 +16,47 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.jaxrs.security.jwt;
 
-import java.util.Properties;
+package org.apache.cxf.systest.jaxrs.security.jose;
 
-import org.apache.cxf.rs.security.jose.common.PrivateKeyPasswordProvider;
 
-public class PrivateKeyPasswordProviderImpl implements PrivateKeyPasswordProvider {
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 
-    private String password = "password";
-    public PrivateKeyPasswordProviderImpl() {
-        
+import org.apache.cxf.systest.jaxrs.security.Book;
+
+@Path("/bookstore")
+public class BookStore {
+    
+    public BookStore() {
     }
-    public PrivateKeyPasswordProviderImpl(String password) {
-        this.password = password;
+    
+    @POST
+    @Path("/books")
+    @Produces("text/plain")
+    @Consumes("text/plain")
+    public String echoText(String text) {
+        return text;
     }
-    @Override
-    public char[] getPassword(Properties storeProperties) {
-        return password.toCharArray();
+    
+    @POST
+    @Path("/books")
+    @Produces("application/json")
+    @Consumes("application/json")
+    public Book echoBook(Book book) {
+        return book;
+    }
+    
+    @POST
+    @Path("/books")
+    @Produces("application/xml")
+    @Consumes("application/xml")
+    public Book echoBook2(Book book) {
+        return book;
     }
     
 }
+
 

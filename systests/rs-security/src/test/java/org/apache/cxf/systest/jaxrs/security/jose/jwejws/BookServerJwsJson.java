@@ -17,7 +17,9 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.jaxrs.security.jwt;
+package org.apache.cxf.systest.jaxrs.security.jose.jwejws;
+
+import java.net.URL;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -27,8 +29,8 @@ import org.apache.cxf.testutil.common.TestUtil;
     
 public class BookServerJwsJson extends AbstractBusTestServerBase {
     public static final String PORT = TestUtil.getPortNumber("jaxrs-jws-json");
-    private static final String SERVER_CONFIG_FILE =
-        "org/apache/cxf/systest/jaxrs/security/jwt/serverJwsJson.xml";
+    private static final URL SERVER_CONFIG_FILE =
+        BookServerJwsJson.class.getResource("serverJwsJson.xml");
     
     protected void run() {
         SpringBusFactory bf = new SpringBusFactory();

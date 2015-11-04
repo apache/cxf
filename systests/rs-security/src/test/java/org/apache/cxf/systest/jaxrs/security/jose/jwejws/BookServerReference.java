@@ -17,7 +17,9 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.jaxrs.security.jwt;
+package org.apache.cxf.systest.jaxrs.security.jose.jwejws;
+
+import java.net.URL;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -25,10 +27,10 @@ import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.TestUtil;
     
-public class BookServerJwt extends AbstractBusTestServerBase {
-    public static final String PORT = TestUtil.getPortNumber("jaxrs-jwt");
-    private static final String SERVER_CONFIG_FILE =
-        "org/apache/cxf/systest/jaxrs/security/jwt/server.xml";
+public class BookServerReference extends AbstractBusTestServerBase {
+    public static final String PORT = TestUtil.getPortNumber("jaxrs-jwejws-reference");
+    private static final URL SERVER_CONFIG_FILE =
+        BookServerReference.class.getResource("reference-server.xml");
     
     protected void run() {
         SpringBusFactory bf = new SpringBusFactory();
@@ -37,7 +39,7 @@ public class BookServerJwt extends AbstractBusTestServerBase {
         setBus(springBus);
         
         try {
-            new BookServerJwt();
+            new BookServerReference();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }        
@@ -45,7 +47,7 @@ public class BookServerJwt extends AbstractBusTestServerBase {
 
     public static void main(String[] args) {
         try {
-            BookServerJwt s = new BookServerJwt();
+            BookServerReference s = new BookServerReference();
             s.start();
         } catch (Exception ex) {
             ex.printStackTrace();
