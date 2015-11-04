@@ -53,6 +53,10 @@ public class JweJwtCompactConsumer  {
         JwtClaims claims = new JwtTokenReaderWriter().fromJsonClaims(toString(bytes));
         return new JwtToken(headers, claims);
     }
+    
+    public JweHeaders getHeaders() {
+        return headers;
+    }
     private static String toString(byte[] bytes) {
         try {
             return new String(bytes, "UTF-8");
