@@ -33,7 +33,6 @@ import javax.ws.rs.core.MultivaluedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
@@ -93,20 +92,11 @@ public class Swagger2Serializers extends SwaggerSerializers {
                 new HashMap<Pair<String, String>, OperationResourceInfo>();
             for (ClassResourceInfo cri : cris) {
                 for (OperationResourceInfo ori : cri.getMethodDispatcher().getOperationResourceInfos()) {
-                    StringBuilder fullPath = new StringBuilder().
-                            append(cri.getURITemplate().getValue()).
-                            append(ori.getURITemplate().getValue());
-                    if (fullPath.charAt(fullPath.length() - 1) == '/') {
-                        fullPath.setLength(fullPath.length() - 1);
-                    }
-                    // Adapt to Swagger's path expression
-                    if (fullPath.toString().endsWith(":.*}")) {
-                        fullPath.setLength(fullPath.length() - 4);
-                        fullPath.append('}');
-                    }
+                    String normalizedPath = getNormalizedPath(cri.getURITemplate().getValue(), ori
+                        .getURITemplate().getValue());
 
-                    operations.put(fullPath.toString(), cri);
-                    methods.put(ImmutablePair.of(ori.getHttpMethod(), fullPath.toString()), ori);
+                    operations.put(normalizedPath, cri);
+                    methods.put(ImmutablePair.of(ori.getHttpMethod(), normalizedPath), ori);
                 }
             }
 
@@ -154,5 +144,26 @@ public class Swagger2Serializers extends SwaggerSerializers {
         }
 
         super.writeTo(data, type, genericType, annotations, mediaType, headers, out);
+    }
+
+    private String getNormalizedPath(String classResourcePath, String operationResourcePath) {
+        StringBuilder path = new StringBuilder().
+            append(classResourcePath).
+            append(operationResourcePath);
+
+        StringBuilder normalizedPath = new StringBuilder();
+
+        String[] segments = StringUtils.split(path.toString(), "/");
+        for (String segment : segments) {
+            if (!StringUtils.isEmpty(segment)) {
+                normalizedPath.append("/").append(segment);
+            }
+        }
+        // Adapt to Swagger's path expression
+        if (normalizedPath.toString().endsWith(":.*}")) {
+            normalizedPath.setLength(normalizedPath.length() - 4);
+            normalizedPath.append('}');
+        }
+        return normalizedPath.toString();
     }
 }
