@@ -97,7 +97,6 @@ public abstract class AbstractTokenValidator extends AbstractOAuthJoseJwtConsume
         this.jwkSetClient = jwkSetClient;
     }
 
-    @Override
     protected JwsSignatureVerifier getInitializedSignatureVerifier(JwtToken jwt) {
         JsonWebKey key = null;
         if (supportSelfIssuedProvider && SELF_ISSUED_ISSUER.equals(jwt.getClaim("issuer"))) {
@@ -129,7 +128,7 @@ public abstract class AbstractTokenValidator extends AbstractOAuthJoseJwtConsume
         if (key != null) {
             theJwsVerifier = JwsUtils.getSignatureVerifier(key);
         } else {
-            theJwsVerifier = super.getInitializedSignatureVerifier(jwt);
+            theJwsVerifier = super.getInitializedSignatureVerifier(jwt.getJwsHeaders());
         }
         if (theJwsVerifier == null) {
             throw new SecurityException("JWS Verifier is not available");
