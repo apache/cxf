@@ -816,7 +816,6 @@ public class RMEndpoint {
                         // REVISIT: this may be non-standard
                         // getProxy().ackRequested(seq);
                     } else {
-
                         getProxy().lastMessage(seq);
                     }
                 } catch (RMException ex) {
