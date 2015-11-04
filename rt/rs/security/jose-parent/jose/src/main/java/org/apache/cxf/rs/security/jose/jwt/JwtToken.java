@@ -18,39 +18,56 @@
  */
 package org.apache.cxf.rs.security.jose.jwt;
 
-import org.apache.cxf.rs.security.jose.common.JoseHeaders;
+import org.apache.cxf.rs.security.jose.jwe.JweHeaders;
+import org.apache.cxf.rs.security.jose.jws.JwsHeaders;
 
 
 
 public class JwtToken {
-    private JoseHeaders headers;
+    private JwsHeaders jwsHeaders;
+    private JweHeaders jweHeaders;
     private JwtClaims claims;
+    
     public JwtToken(JwtClaims claims) {
-        this(new JoseHeaders() { }, claims);
+        this(new JwsHeaders() { }, new JweHeaders() { }, claims);
     }
-    public JwtToken(JoseHeaders headers, JwtClaims claims) {
-        this.headers = headers;
+    public JwtToken(JwsHeaders jwsHeaders, JwtClaims claims) {
+        this(jwsHeaders, new JweHeaders() { }, claims);
+    }
+    public JwtToken(JweHeaders jweHeaders, JwtClaims claims) {
+        this(new JwsHeaders() { }, jweHeaders, claims);
+    }
+    public JwtToken(JwsHeaders jwsHeaders, JweHeaders jweHeaders, JwtClaims claims) {
+        this.jwsHeaders = jwsHeaders;
+        this.jweHeaders = jweHeaders;
         this.claims = claims;
     }
-    public JoseHeaders getHeaders() {
-        return headers;
+    public JwsHeaders getJwsHeaders() {
+        return jwsHeaders;
+    }
+    public JweHeaders getJweHeaders() {
+        return jweHeaders;
     }
     public JwtClaims getClaims() {
         return claims;
     }
-    public Object getHeader(String name) {
-        return headers.getHeader(name);
+    public Object getJwsHeader(String name) {
+        return jwsHeaders.getHeader(name);
+    }
+    public Object getJweHeader(String name) {
+        return jweHeaders.getHeader(name);
     }
     public Object getClaim(String name) {
         return claims.getClaim(name);
     }
     public int hashCode() { 
-        return headers.hashCode() + 37 * claims.hashCode();
+        return jwsHeaders.hashCode() + 37 * claims.hashCode() + 37 * jweHeaders.hashCode();
     }
     
     public boolean equals(Object obj) {
         return obj instanceof JwtToken 
-            && ((JwtToken)obj).headers.equals(this.headers)
+            && ((JwtToken)obj).jwsHeaders.equals(this.jwsHeaders)
+            && ((JwtToken)obj).jweHeaders.equals(this.jweHeaders)
             && ((JwtToken)obj).claims.equals(this.claims);
     }
 }

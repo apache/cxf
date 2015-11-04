@@ -34,7 +34,6 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.rs.security.jose.common.JoseConstants;
 import org.apache.cxf.rs.security.jose.common.JoseException;
-import org.apache.cxf.rs.security.jose.common.JoseUtils;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jwt.AbstractJoseJwtConsumer;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
@@ -60,7 +59,6 @@ public class JwtAuthenticationFilter extends AbstractJoseJwtConsumer implements 
             throw new JoseException(expectedAuthScheme + " scheme is expected");
         }
         JwtToken token = super.getJwtToken(parts[1]);
-        JoseUtils.setMessageContextProperty(token.getHeaders());
         
         SecurityContext securityContext = configureSecurityContext(token);
         if (securityContext != null) {
@@ -83,7 +81,7 @@ public class JwtAuthenticationFilter extends AbstractJoseJwtConsumer implements 
     
     private boolean isVerifiedWithAPublicKey(JwtToken jwt) {
         if (isJwsRequired()) {
-            String alg = (String)jwt.getHeader(JoseConstants.HEADER_ALGORITHM);
+            String alg = (String)jwt.getJwsHeader(JoseConstants.HEADER_ALGORITHM);
             SignatureAlgorithm sigAlg = SignatureAlgorithm.getAlgorithm(alg);
             return SignatureAlgorithm.isPublicKeyAlgorithm(sigAlg);
         }

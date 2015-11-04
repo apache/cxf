@@ -32,7 +32,6 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.rs.security.jose.common.JoseException;
-import org.apache.cxf.rs.security.jose.common.JoseUtils;
 import org.apache.cxf.rs.security.jose.jwe.JweHeaders;
 import org.apache.cxf.rs.security.jose.jwt.AbstractJoseJwtProducer;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
@@ -63,8 +62,6 @@ public class JwtAuthenticationClientFilter extends AbstractJoseJwtProducer
         if (jwt == null) {
             throw new JoseException("JWT token is not available");
         }
-        JoseUtils.setJoseMessageContextProperty(jwt.getHeaders(),
-                                                getContextPropertyValue());
         String data = super.processJwt(jwt);
         requestContext.getHeaders().putSingle(HttpHeaders.AUTHORIZATION, 
                                               authScheme + " " + data);

@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.cxf.rs.security.jose.common.JoseConstants;
-import org.apache.cxf.rs.security.jose.common.JoseHeaders;
 import org.apache.cxf.rs.security.jose.common.JoseType;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
@@ -164,7 +163,7 @@ public class JwsCompactReaderWriterTest extends Assert {
         assertTrue(jws.verifySignatureWith(new HmacJwsSignatureVerifier(ENCODED_MAC_KEY,
                                                                         SignatureAlgorithm.HS256)));
         JwtToken token = jws.getJwtToken();
-        JwsHeaders headers = new JwsHeaders(token.getHeaders());
+        JwsHeaders headers = new JwsHeaders(token.getJwsHeaders());
         assertEquals(JoseType.JWT, headers.getType());
         assertEquals(SignatureAlgorithm.HS256, headers.getSignatureAlgorithm());
         validateSpecClaim(token.getClaims());
@@ -212,7 +211,7 @@ public class JwsCompactReaderWriterTest extends Assert {
         assertTrue(jws.verifySignatureWith(new HmacJwsSignatureVerifier(ENCODED_MAC_KEY,
                                                                         SignatureAlgorithm.HS256)));
         JwtToken token = jws.getJwtToken();
-        JwsHeaders headers = new JwsHeaders(token.getHeaders());
+        JwsHeaders headers = new JwsHeaders(token.getJwsHeaders());
         assertEquals(JoseType.JWT, headers.getType());
         assertEquals(SignatureAlgorithm.HS256, headers.getSignatureAlgorithm());
         
@@ -257,7 +256,7 @@ public class JwsCompactReaderWriterTest extends Assert {
             RSAPublicKey key = CryptoUtils.getRSAPublicKey(RSA_MODULUS_ENCODED, RSA_PUBLIC_EXPONENT_ENCODED);
             assertTrue(jws.verifySignatureWith(new PublicKeyJwsSignatureVerifier(key, SignatureAlgorithm.PS256)));
             JwtToken token = jws.getJwtToken();
-            JwsHeaders inHeaders = new JwsHeaders(token.getHeaders());
+            JwsHeaders inHeaders = new JwsHeaders(token.getJwsHeaders());
             assertEquals(SignatureAlgorithm.PS256, 
                          inHeaders.getSignatureAlgorithm());
             validateSpecClaim(token.getClaims());
@@ -283,7 +282,7 @@ public class JwsCompactReaderWriterTest extends Assert {
         assertTrue(jwsConsumer.verifySignatureWith(new EcDsaJwsSignatureVerifier(publicKey,
                                                    SignatureAlgorithm.ES256)));
         JwtToken token = jwsConsumer.getJwtToken();
-        JwsHeaders headersReceived = new JwsHeaders(token.getHeaders());
+        JwsHeaders headersReceived = new JwsHeaders(token.getJwsHeaders());
         assertEquals(SignatureAlgorithm.ES256, headersReceived.getSignatureAlgorithm());
         validateSpecClaim(token.getClaims());
     }
@@ -294,19 +293,19 @@ public class JwsCompactReaderWriterTest extends Assert {
         RSAPublicKey key = CryptoUtils.getRSAPublicKey(RSA_MODULUS_ENCODED, RSA_PUBLIC_EXPONENT_ENCODED);
         assertTrue(jws.verifySignatureWith(new PublicKeyJwsSignatureVerifier(key, SignatureAlgorithm.RS256)));
         JwtToken token = jws.getJwtToken();
-        JwsHeaders headers = new JwsHeaders(token.getHeaders());
+        JwsHeaders headers = new JwsHeaders(token.getJwsHeaders());
         assertEquals(SignatureAlgorithm.RS256, headers.getSignatureAlgorithm());
         validateSpecClaim(token.getClaims());
     }
     
-    private JwsCompactProducer initSpecJwtTokenWriter(JoseHeaders headers) throws Exception {
+    private JwsCompactProducer initSpecJwtTokenWriter(JwsHeaders jwsHeaders) throws Exception {
         
         JwtClaims claims = new JwtClaims();
         claims.setIssuer("joe");
         claims.setExpiryTime(1300819380L);
         claims.setClaim("http://example.com/is_root", Boolean.TRUE);
         
-        JwtToken token = new JwtToken(headers, claims);
+        JwtToken token = new JwtToken(jwsHeaders, claims);
         return new JwsJwtCompactProducer(token, getWriter());
     }
 

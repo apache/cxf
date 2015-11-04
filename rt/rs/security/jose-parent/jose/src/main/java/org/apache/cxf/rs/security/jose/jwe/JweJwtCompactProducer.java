@@ -32,7 +32,7 @@ public class JweJwtCompactProducer  {
     private JweHeaders headers;
     private String claimsJson;
     public JweJwtCompactProducer(JwtToken token) {
-        this(new JweHeaders(token.getHeaders()), token.getClaims());
+        this(new JweHeaders(token.getJweHeaders()), token.getClaims());
     }
     public JweJwtCompactProducer(JwtClaims claims) {
         this(new JweHeaders(), claims);
