@@ -325,7 +325,7 @@ public final class JweUtils {
                 if (includeCert) {
                     JwkUtils.includeCertChain(jwk, headers, keyEncryptionAlgo);
                 }
-                if (includeCertSha1 && headers != null) {
+                if (includeCertSha1) {
                     String digest = KeyManagementUtils.loadDigestAndEncodeX509Certificate(m, props);
                     if (digest != null) {
                         headers.setX509Thumbprint(digest);
@@ -345,7 +345,7 @@ public final class JweUtils {
             if (includeCert) {
                 headers.setX509Chain(KeyManagementUtils.loadAndEncodeX509CertificateOrChain(m, props));
             }
-            if (includeCertSha1 && headers != null) {
+            if (includeCertSha1) {
                 String digest = KeyManagementUtils.loadDigestAndEncodeX509Certificate(m, props);
                 if (digest != null) {
                     headers.setX509Thumbprint(digest);
