@@ -17,6 +17,7 @@
  * under the License.
  */
 package org.apache.cxf.rs.security.jose.jws;
+
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rs.security.jose.jwt.JwtTokenReaderWriter;
@@ -35,7 +36,7 @@ public class JwsJwtCompactProducer extends JwsCompactProducer {
         this(new JwtToken(headers, claims), null);
     }
     protected JwsJwtCompactProducer(JwtToken token, JwtTokenReaderWriter w) {
-        super(new JwsHeaders(token.getHeaders()), w, 
+        super(new JwsHeaders(token.getJwsHeaders()), w, 
               JwtUtils.claimsToJson(token.getClaims(), w));
     }
     

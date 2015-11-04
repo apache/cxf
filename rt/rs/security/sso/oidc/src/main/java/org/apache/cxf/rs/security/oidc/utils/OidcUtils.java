@@ -95,7 +95,7 @@ public final class OidcUtils {
         if (required) {
             validateHash(at.getTokenKey(),
                          (String)jwt.getClaims().getClaim("at_hash"),
-                         jwt.getHeaders().getAlgorithm());
+                         jwt.getJwsHeaders().getAlgorithm());
         }
     }
     public static void validateCodeHash(String code, JwtToken jwt) {
@@ -105,7 +105,7 @@ public final class OidcUtils {
         if (required) {
             validateHash(code,
                          (String)jwt.getClaims().getClaim("c_hash"),
-                         jwt.getHeaders().getAlgorithm());
+                         jwt.getJwsHeaders().getAlgorithm());
         }
     }
     private static void validateHash(String value, String theHash, String joseAlgo) {
