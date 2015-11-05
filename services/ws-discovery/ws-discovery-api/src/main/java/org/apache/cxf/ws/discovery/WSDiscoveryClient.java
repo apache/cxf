@@ -78,10 +78,8 @@ import org.apache.cxf.wsdl.EndpointReferenceUtils;
 public class WSDiscoveryClient implements Closeable {
     
     public static final QName SERVICE_QNAME = new QName(WSDVersion.NS_1_1, "DiscoveryProxy");
-    
-    
-    
     String address = "soap.udp://239.255.255.250:3702";
+    String ipv6Address = "soap.udp://[FF02::C]:3702";
     boolean adHoc = true;
     AtomicInteger msgId = new AtomicInteger(1);
     long instanceId = System.currentTimeMillis();
@@ -96,9 +94,11 @@ public class WSDiscoveryClient implements Closeable {
 
     public WSDiscoveryClient() {
         this((Bus)null);
+        setIpV6Address();
     }
     public WSDiscoveryClient(Bus b) {
         this.bus = b == null ? BusFactory.getThreadDefaultBus() : b;
+        setIpV6Address();
     }
     public WSDiscoveryClient(String address) {
         this((Bus)null);
@@ -159,6 +159,14 @@ public class WSDiscoveryClient implements Closeable {
         if (!soapVersion.equals(newVer)) {
             soapVersion = newVer;
             uncache();
+        }
+    }
+
+    private void setIpV6Address() {
+        String preferIPv4StackValue = System.getProperty("java.net.preferIPv4Stack");
+        String preferIPv6AddressesValue = System.getProperty("java.net.preferIPv6Addresses");
+        if ("true".equals(preferIPv6AddressesValue) && "false".equals(preferIPv4StackValue)) {
+            address = "soap.udp://[FF02::C]:3702";
         }
     }
     private void uncache() {
