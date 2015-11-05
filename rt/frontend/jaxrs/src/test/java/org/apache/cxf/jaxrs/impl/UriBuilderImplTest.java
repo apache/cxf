@@ -1547,6 +1547,13 @@ public class UriBuilderImplTest extends Assert {
     }
     
     @Test
+    public void testFromUriWithMatrix() {
+        String expected = "http://localhost:8080/name;a=b";
+        URI uri = UriBuilder.fromUri("http://localhost:8080/name;a=b").build();
+        assertEquals(expected, uri.toString());
+    }
+    
+    @Test
     public void testPathParamSpaceBuildEncoded() {
         String expected = "http://localhost:8080/name/%20";
         URI uri = UriBuilder.fromUri("http://localhost:8080").path("name/%20").buildFromEncoded();
