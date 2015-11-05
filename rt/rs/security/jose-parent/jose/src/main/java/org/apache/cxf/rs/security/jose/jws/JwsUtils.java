@@ -302,16 +302,20 @@ public final class JwsUtils {
             }
         } else {
             String signatureAlgo = getSignatureAlgo(m, props, null, null);
-            PrivateKey pk = KeyManagementUtils.loadPrivateKey(m, props, KeyOperation.SIGN);
-            theSigProvider = getPrivateKeySignatureProvider(pk, 
-                                                            SignatureAlgorithm.getAlgorithm(signatureAlgo));
-            if (includeCert) {
-                headers.setX509Chain(KeyManagementUtils.loadAndEncodeX509CertificateOrChain(m, props));
-            }
-            if (includeCertSha1) {
-                String digest = KeyManagementUtils.loadDigestAndEncodeX509Certificate(m, props);
-                if (digest != null) {
-                    headers.setX509Thumbprint(digest);
+            if (SignatureAlgorithm.getAlgorithm(signatureAlgo) == SignatureAlgorithm.NONE) {
+                theSigProvider = new NoneJwsSignatureProvider();
+            } else {
+                PrivateKey pk = KeyManagementUtils.loadPrivateKey(m, props, KeyOperation.SIGN);
+                theSigProvider = getPrivateKeySignatureProvider(pk, 
+                                                                SignatureAlgorithm.getAlgorithm(signatureAlgo));
+                if (includeCert) {
+                    headers.setX509Chain(KeyManagementUtils.loadAndEncodeX509CertificateOrChain(m, props));
+                }
+                if (includeCertSha1) {
+                    String digest = KeyManagementUtils.loadDigestAndEncodeX509Certificate(m, props);
+                    if (digest != null) {
+                        headers.setX509Thumbprint(digest);
+                    }
                 }
             }
         }
