@@ -49,27 +49,6 @@
         <module>cdi</module>
         <module>rs-http-sci</module>
         <module>tracing</module>
+	<module>jibx</module>
     </modules>
-
-    <profiles>
-      <!-- jibx does support JDK8 -->
-      <profile>
-        <id>jdk-7</id>
-        <modules>
-          <module>jibx</module>
-        </modules>
-        <activation>
-          <jdk>1.7</jdk>
-        </activation>
-      </profile>
-      <profile>
-        <id>jdk-6</id>
-        <modules>
-          <module>jibx</module>
-        </modules>
-        <activation>
-          <jdk>1.6</jdk>
-        </activation>
-      </profile>
-    </profiles>
 </project>
