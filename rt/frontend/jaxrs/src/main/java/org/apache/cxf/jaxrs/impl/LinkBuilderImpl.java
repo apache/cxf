@@ -74,12 +74,25 @@ public class LinkBuilderImpl implements Builder {
 
     @Override
     public Builder link(String link) {
+        
+        link = link.trim();
+        if (link.length() > 1 && link.startsWith("<")) {
+            int index = link.indexOf(">", 1);
+            if (index != -1) {
+                String uri = link.substring(1, index);
+                ub = UriBuilder.fromUri(uri);
+                if (index + 1 == link.length()) {
+                    link = "";
+                } else {
+                    link = link.substring(index + 1);
+                }
+            }
+        }
+        
         String[] tokens = StringUtils.split(link, ";");
         for (String token : tokens) {
             String theToken = token.trim();
-            if (theToken.startsWith("<") && theToken.endsWith(">")) {
-                ub = UriBuilder.fromUri(theToken.substring(1, theToken.length() - 1));
-            } else {
+            if (!theToken.isEmpty()) {
                 int i = theToken.indexOf('=');
                 if (i != -1) {
                     String name = theToken.substring(0, i);
