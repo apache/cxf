@@ -48,6 +48,12 @@ import org.junit.BeforeClass;
  */
 public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
     public static final String PORT = BookServerJwtAlgorithms.PORT;
+    private static final Boolean SKIP_AES_GCM_TESTS = isJava6();
+    
+    private static boolean isJava6() {
+        String version = System.getProperty("java.version");
+        return 1.6D == Double.parseDouble(version.substring(0, 3));    
+    }
     
     @BeforeClass
     public static void startServers() throws Exception {
@@ -72,6 +78,10 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
     
     @org.junit.Test
     public void testEncryptionProperties() throws Exception {
+        
+        if (SKIP_AES_GCM_TESTS) {
+            return;
+        }
 
         URL busFile = JWTAlgorithmTest.class.getResource("client.xml");
 
@@ -111,6 +121,10 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
     
     @org.junit.Test
     public void testEncryptionDynamic() throws Exception {
+        
+        if (SKIP_AES_GCM_TESTS) {
+            return;
+        }
 
         URL busFile = JWTAlgorithmTest.class.getResource("client.xml");
 
@@ -153,6 +167,10 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
     
     @org.junit.Test
     public void testWrongKeyEncryptionAlgorithm() throws Exception {
+        
+        if (SKIP_AES_GCM_TESTS) {
+            return;
+        }
 
         URL busFile = JWTAlgorithmTest.class.getResource("client.xml");
 
@@ -191,7 +209,7 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
     
     @org.junit.Test
     public void testWrongContentEncryptionAlgorithm() throws Exception {
-        if (!SecurityTestUtil.checkUnrestrictedPoliciesInstalled()) {
+        if (SKIP_AES_GCM_TESTS || !SecurityTestUtil.checkUnrestrictedPoliciesInstalled()) {
             return;
         }
         
@@ -233,7 +251,7 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
     
     @org.junit.Test
     public void testBadEncryptingKey() throws Exception {
-        if (!SecurityTestUtil.checkUnrestrictedPoliciesInstalled()) {
+        if (SKIP_AES_GCM_TESTS || !SecurityTestUtil.checkUnrestrictedPoliciesInstalled()) {
             return;
         }
         
@@ -568,6 +586,10 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
     
     @org.junit.Test
     public void testSignatureEncryptionProperties() throws Exception {
+        
+        if (SKIP_AES_GCM_TESTS) {
+            return;
+        }
 
         URL busFile = JWTAlgorithmTest.class.getResource("client.xml");
 
