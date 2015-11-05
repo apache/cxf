@@ -512,7 +512,7 @@ public final class JwkUtils {
     
     public static void includeCertChain(JsonWebKey jwk, JoseHeaders headers, String algo) {
         if (KeyType.RSA.equals(jwk.getKeyType())) {
-            List<String> chain = CastUtils.cast((List<?>)jwk.getProperty("x5c"));
+            List<String> chain = CastUtils.cast((List<?>)jwk.getProperty(JsonWebKey.X509_CHAIN));
             if (chain != null) {
                 headers.setX509Chain(chain);
             }

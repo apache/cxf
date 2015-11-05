@@ -17,11 +17,12 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.jaxrs.security.jose.jwejws;
+package org.apache.cxf.systest.jaxrs.security.jose.jwt;
 
 import java.net.URL;
 import java.security.Security;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,8 +32,10 @@ import javax.ws.rs.core.Response;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import org.apache.cxf.jaxrs.client.WebClient;
-import org.apache.cxf.rs.security.jose.jaxrs.JweWriterInterceptor;
-import org.apache.cxf.rs.security.jose.jaxrs.JwsWriterInterceptor;
+import org.apache.cxf.rs.security.jose.jaxrs.JwtAuthenticationClientFilter;
+import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
+import org.apache.cxf.rs.security.jose.jwt.JwtConstants;
+import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.systest.jaxrs.security.Book;
 import org.apache.cxf.systest.jaxrs.security.SecurityTestUtil;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -41,15 +44,15 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
 /**
- * Some encryption or signature tests, focus on algorithms.
+ * Some tests for JWT tokens.
  */
-public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = BookServerAlgorithms.PORT;
+public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
+    public static final String PORT = BookServerJwtAlgorithms.PORT;
     
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", 
-                   launchServer(BookServerAlgorithms.class, true));
+                   launchServer(BookServerJwtAlgorithms.class, true));
         registerBouncyCastleIfNeeded();
     }
     
@@ -66,23 +69,36 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
     //
     // Encryption tests
     //
+    
     @org.junit.Test
     public void testEncryptionProperties() throws Exception {
 
-        URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
+        URL busFile = JWTAlgorithmTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<Object>();
         providers.add(new JacksonJsonProvider());
-        providers.add(new JweWriterInterceptor());
+        JwtAuthenticationClientFilter clientFilter = new JwtAuthenticationClientFilter();
+        clientFilter.setJwsRequired(false);
+        clientFilter.setJweRequired(true);
+        providers.add(clientFilter);
 
-        String address = "http://localhost:" + PORT + "/jweoaepgcm/bookstore/books";
+        String address = "https://localhost:" + PORT + "/encryptedjwt/bookstore/books";
         WebClient client = 
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
+        
+        // Create the JWT Token
+        JwtClaims claims = new JwtClaims();
+        claims.setSubject("alice");
+        claims.setIssuer("DoubleItSTSIssuer");
+        claims.setIssuedAt(new Date().getTime() / 1000L);
+        
+        JwtToken token = new JwtToken(claims);
 
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("rs.security.encryption.properties", 
-                       "org/apache/cxf/systest/jaxrs/security/bob.jwk.properties");
+            "org/apache/cxf/systest/jaxrs/security/bob.jwk.properties");
+        properties.put(JwtConstants.JWT_TOKEN, token);
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 
         Response response = client.post(new Book("book", 123L));
@@ -96,16 +112,27 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testEncryptionDynamic() throws Exception {
 
-        URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
+        URL busFile = JWTAlgorithmTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<Object>();
         providers.add(new JacksonJsonProvider());
-        providers.add(new JweWriterInterceptor());
+        JwtAuthenticationClientFilter clientFilter = new JwtAuthenticationClientFilter();
+        clientFilter.setJwsRequired(false);
+        clientFilter.setJweRequired(true);
+        providers.add(clientFilter);
 
-        String address = "http://localhost:" + PORT + "/jweoaepgcm/bookstore/books";
+        String address = "https://localhost:" + PORT + "/encryptedjwt/bookstore/books";
         WebClient client = 
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
+        
+        // Create the JWT Token
+        JwtClaims claims = new JwtClaims();
+        claims.setSubject("alice");
+        claims.setIssuer("DoubleItSTSIssuer");
+        claims.setIssuedAt(new Date().getTime() / 1000L);
+        
+        JwtToken token = new JwtToken(claims);
 
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("rs.security.keystore.type", "jwk");
@@ -113,6 +140,7 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.keystore.file", "org/apache/cxf/systest/jaxrs/security/certs/jwkPublicSet.txt");
         properties.put("rs.security.encryption.content.algorithm", "A128GCM");
         properties.put("rs.security.encryption.key.algorithm", "RSA-OAEP");
+        properties.put(JwtConstants.JWT_TOKEN, token);
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 
         Response response = client.post(new Book("book", 123L));
@@ -122,20 +150,31 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
         assertEquals(returnedBook.getName(), "book");
         assertEquals(returnedBook.getId(), 123L);
     }
-
+    
     @org.junit.Test
     public void testWrongKeyEncryptionAlgorithm() throws Exception {
 
-        URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
+        URL busFile = JWTAlgorithmTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<Object>();
         providers.add(new JacksonJsonProvider());
-        providers.add(new JweWriterInterceptor());
+        JwtAuthenticationClientFilter clientFilter = new JwtAuthenticationClientFilter();
+        clientFilter.setJwsRequired(false);
+        clientFilter.setJweRequired(true);
+        providers.add(clientFilter);
 
-        String address = "http://localhost:" + PORT + "/jweoaepgcm/bookstore/books";
+        String address = "https://localhost:" + PORT + "/encryptedjwt/bookstore/books";
         WebClient client = 
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
+        
+        // Create the JWT Token
+        JwtClaims claims = new JwtClaims();
+        claims.setSubject("alice");
+        claims.setIssuer("DoubleItSTSIssuer");
+        claims.setIssuedAt(new Date().getTime() / 1000L);
+        
+        JwtToken token = new JwtToken(claims);
 
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("rs.security.keystore.type", "jwk");
@@ -143,33 +182,7 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.keystore.file", "org/apache/cxf/systest/jaxrs/security/certs/jwkPublicSet.txt");
         properties.put("rs.security.encryption.content.algorithm", "A128GCM");
         properties.put("rs.security.encryption.key.algorithm", "RSA1_5");
-        WebClient.getConfig(client).getRequestContext().putAll(properties);
-
-        Response response = client.post(new Book("book", 123L));
-        assertNotEquals(response.getStatus(), 200);
-    }
-    
-    @org.junit.Test
-    public void testWrongKeyEncryptionAlgorithmKeyIncluded() throws Exception {
-
-        URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
-
-        List<Object> providers = new ArrayList<Object>();
-        providers.add(new JacksonJsonProvider());
-        providers.add(new JweWriterInterceptor());
-
-        String address = "http://localhost:" + PORT + "/jweoaepgcm/bookstore/books";
-        WebClient client = 
-            WebClient.create(address, providers, busFile.toString());
-        client.type("application/json").accept("application/json");
-
-        Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("rs.security.keystore.type", "jwk");
-        properties.put("rs.security.keystore.alias", "2011-04-29");
-        properties.put("rs.security.keystore.file", "org/apache/cxf/systest/jaxrs/security/certs/jwkPublicSet.txt");
-        properties.put("rs.security.encryption.content.algorithm", "A128GCM");
-        properties.put("rs.security.encryption.key.algorithm", "RSA1_5");
-        properties.put("rs.security.encryption.include.public.key", "true");
+        properties.put(JwtConstants.JWT_TOKEN, token);
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 
         Response response = client.post(new Book("book", 123L));
@@ -181,43 +194,70 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
         if (!SecurityTestUtil.checkUnrestrictedPoliciesInstalled()) {
             return;
         }
-
-        URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
+        
+        URL busFile = JWTAlgorithmTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<Object>();
         providers.add(new JacksonJsonProvider());
-        providers.add(new JweWriterInterceptor());
+        JwtAuthenticationClientFilter clientFilter = new JwtAuthenticationClientFilter();
+        clientFilter.setJwsRequired(false);
+        clientFilter.setJweRequired(true);
+        providers.add(clientFilter);
 
-        String address = "http://localhost:" + PORT + "/jweoaepgcm/bookstore/books";
+        String address = "https://localhost:" + PORT + "/encryptedjwt/bookstore/books";
         WebClient client = 
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
+        
+        // Create the JWT Token
+        JwtClaims claims = new JwtClaims();
+        claims.setSubject("alice");
+        claims.setIssuer("DoubleItSTSIssuer");
+        claims.setIssuedAt(new Date().getTime() / 1000L);
+        
+        JwtToken token = new JwtToken(claims);
 
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("rs.security.keystore.type", "jwk");
         properties.put("rs.security.keystore.alias", "2011-04-29");
         properties.put("rs.security.keystore.file", "org/apache/cxf/systest/jaxrs/security/certs/jwkPublicSet.txt");
+        properties.put("rs.security.encryption.content.algorithm", "A128GCM");
         properties.put("rs.security.encryption.content.algorithm", "A192GCM");
         properties.put("rs.security.encryption.key.algorithm", "RSA-OAEP");
+        properties.put(JwtConstants.JWT_TOKEN, token);
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 
         Response response = client.post(new Book("book", 123L));
         assertNotEquals(response.getStatus(), 200);
     }
-
+    
     @org.junit.Test
     public void testBadEncryptingKey() throws Exception {
-
-        URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
+        if (!SecurityTestUtil.checkUnrestrictedPoliciesInstalled()) {
+            return;
+        }
+        
+        URL busFile = JWTAlgorithmTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<Object>();
         providers.add(new JacksonJsonProvider());
-        providers.add(new JweWriterInterceptor());
+        JwtAuthenticationClientFilter clientFilter = new JwtAuthenticationClientFilter();
+        clientFilter.setJwsRequired(false);
+        clientFilter.setJweRequired(true);
+        providers.add(clientFilter);
 
-        String address = "http://localhost:" + PORT + "/jweoaepgcm/bookstore/books";
+        String address = "https://localhost:" + PORT + "/encryptedjwt/bookstore/books";
         WebClient client = 
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
+        
+        // Create the JWT Token
+        JwtClaims claims = new JwtClaims();
+        claims.setSubject("alice");
+        claims.setIssuer("DoubleItSTSIssuer");
+        claims.setIssuedAt(new Date().getTime() / 1000L);
+        
+        JwtToken token = new JwtToken(claims);
 
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("rs.security.keystore.type", "jwk");
@@ -225,40 +265,13 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.keystore.file", "org/apache/cxf/systest/jaxrs/security/certs/jwkPublicSet.txt");
         properties.put("rs.security.encryption.content.algorithm", "A128GCM");
         properties.put("rs.security.encryption.key.algorithm", "RSA-OAEP");
+        properties.put(JwtConstants.JWT_TOKEN, token);
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 
         Response response = client.post(new Book("book", 123L));
         assertNotEquals(response.getStatus(), 200);
     }
     
-    // 1024 bits not allowed with RSA according to the spec
-    @org.junit.Test
-    public void testSmallEncryptionKeySize() throws Exception {
-        URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
-
-        List<Object> providers = new ArrayList<Object>();
-        providers.add(new JacksonJsonProvider());
-        providers.add(new JweWriterInterceptor());
-
-        String address = "http://localhost:" + PORT + "/jwesmallkey/bookstore/books";
-        WebClient client = 
-            WebClient.create(address, providers, busFile.toString());
-        client.type("application/json").accept("application/json");
-
-        Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("rs.security.keystore.type", "jks");
-        properties.put("rs.security.keystore.alias", "smallkey");
-        properties.put("rs.security.keystore.password", "security");
-        properties.put("rs.security.keystore.file", 
-            "org/apache/cxf/systest/jaxrs/security/certs/smallkeysize.jks");
-        properties.put("rs.security.encryption.content.algorithm", "A128GCM");
-        properties.put("rs.security.encryption.key.algorithm", "RSA-OAEP");
-        WebClient.getConfig(client).getRequestContext().putAll(properties);
-
-        Response response = client.post(new Book("book", 123L));
-        assertNotEquals(response.getStatus(), 200);
-    }
-
     //
     // Signature tests
     //
@@ -266,20 +279,29 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testSignatureProperties() throws Exception {
 
-        URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
+        URL busFile = JWTAlgorithmTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<Object>();
         providers.add(new JacksonJsonProvider());
-        providers.add(new JwsWriterInterceptor());
+        providers.add(new JwtAuthenticationClientFilter());
 
-        String address = "http://localhost:" + PORT + "/jws/bookstore/books";
+        String address = "https://localhost:" + PORT + "/signedjwt/bookstore/books";
         WebClient client = 
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
+        
+        // Create the JWT Token
+        JwtClaims claims = new JwtClaims();
+        claims.setSubject("alice");
+        claims.setIssuer("DoubleItSTSIssuer");
+        claims.setIssuedAt(new Date().getTime() / 1000L);
+        
+        JwtToken token = new JwtToken(claims);
 
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("rs.security.signature.properties", 
                        "org/apache/cxf/systest/jaxrs/security/alice.jwk.properties");
+        properties.put(JwtConstants.JWT_TOKEN, token);
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 
         Response response = client.post(new Book("book", 123L));
@@ -293,16 +315,24 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testSignatureDynamic() throws Exception {
 
-        URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
+        URL busFile = JWTAlgorithmTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<Object>();
         providers.add(new JacksonJsonProvider());
-        providers.add(new JwsWriterInterceptor());
+        providers.add(new JwtAuthenticationClientFilter());
 
-        String address = "http://localhost:" + PORT + "/jws/bookstore/books";
+        String address = "https://localhost:" + PORT + "/signedjwt/bookstore/books";
         WebClient client = 
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
+        
+        // Create the JWT Token
+        JwtClaims claims = new JwtClaims();
+        claims.setSubject("alice");
+        claims.setIssuer("DoubleItSTSIssuer");
+        claims.setIssuedAt(new Date().getTime() / 1000L);
+        
+        JwtToken token = new JwtToken(claims);
 
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("rs.security.keystore.type", "jwk");
@@ -310,6 +340,7 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.keystore.file", 
                        "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
         properties.put("rs.security.signature.algorithm", "RS256");
+        properties.put(JwtConstants.JWT_TOKEN, token);
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 
         Response response = client.post(new Book("book", 123L));
@@ -323,16 +354,24 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testWrongSignatureAlgorithm() throws Exception {
 
-        URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
+        URL busFile = JWTAlgorithmTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<Object>();
         providers.add(new JacksonJsonProvider());
-        providers.add(new JwsWriterInterceptor());
+        providers.add(new JwtAuthenticationClientFilter());
 
-        String address = "http://localhost:" + PORT + "/jws/bookstore/books";
+        String address = "https://localhost:" + PORT + "/signedjwt/bookstore/books";
         WebClient client = 
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
+        
+        // Create the JWT Token
+        JwtClaims claims = new JwtClaims();
+        claims.setSubject("alice");
+        claims.setIssuer("DoubleItSTSIssuer");
+        claims.setIssuedAt(new Date().getTime() / 1000L);
+        
+        JwtToken token = new JwtToken(claims);
 
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("rs.security.keystore.type", "jwk");
@@ -340,33 +379,7 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.keystore.file", 
                        "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
         properties.put("rs.security.signature.algorithm", "PS256");
-        WebClient.getConfig(client).getRequestContext().putAll(properties);
-
-        Response response = client.post(new Book("book", 123L));
-        assertNotEquals(response.getStatus(), 200);
-    }
-    
-    @org.junit.Test
-    public void testWrongSignatureAlgorithmKeyIncluded() throws Exception {
-
-        URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
-
-        List<Object> providers = new ArrayList<Object>();
-        providers.add(new JacksonJsonProvider());
-        providers.add(new JwsWriterInterceptor());
-
-        String address = "http://localhost:" + PORT + "/jws/bookstore/books";
-        WebClient client = 
-            WebClient.create(address, providers, busFile.toString());
-        client.type("application/json").accept("application/json");
-
-        Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("rs.security.keystore.type", "jwk");
-        properties.put("rs.security.keystore.alias", "2011-04-29");
-        properties.put("rs.security.keystore.file", 
-                       "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
-        properties.put("rs.security.signature.algorithm", "PS256");
-        properties.put("rs.security.signature.include.public.key", true);
+        properties.put(JwtConstants.JWT_TOKEN, token);
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 
         Response response = client.post(new Book("book", 123L));
@@ -376,16 +389,24 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testBadSigningKey() throws Exception {
 
-        URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
+        URL busFile = JWTAlgorithmTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<Object>();
         providers.add(new JacksonJsonProvider());
-        providers.add(new JwsWriterInterceptor());
+        providers.add(new JwtAuthenticationClientFilter());
 
-        String address = "http://localhost:" + PORT + "/jws/bookstore/books";
+        String address = "https://localhost:" + PORT + "/signedjwt/bookstore/books";
         WebClient client = 
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
+        
+        // Create the JWT Token
+        JwtClaims claims = new JwtClaims();
+        claims.setSubject("alice");
+        claims.setIssuer("DoubleItSTSIssuer");
+        claims.setIssuedAt(new Date().getTime() / 1000L);
+        
+        JwtToken token = new JwtToken(claims);
 
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("rs.security.keystore.type", "jks");
@@ -395,25 +416,34 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.keystore.file", 
                        "org/apache/cxf/systest/jaxrs/security/certs/alice.jks");
         properties.put("rs.security.signature.algorithm", "RS256");
+        properties.put(JwtConstants.JWT_TOKEN, token);
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 
         Response response = client.post(new Book("book", 123L));
         assertNotEquals(response.getStatus(), 200);
     }
-
+    
     @org.junit.Test
     public void testSignatureEllipticCurve() throws Exception {
 
-        URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
+        URL busFile = JWTAlgorithmTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<Object>();
         providers.add(new JacksonJsonProvider());
-        providers.add(new JwsWriterInterceptor());
+        providers.add(new JwtAuthenticationClientFilter());
 
-        String address = "http://localhost:" + PORT + "/jwsec/bookstore/books";
+        String address = "https://localhost:" + PORT + "/signedjwtec/bookstore/books";
         WebClient client = 
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
+        
+        // Create the JWT Token
+        JwtClaims claims = new JwtClaims();
+        claims.setSubject("alice");
+        claims.setIssuer("DoubleItSTSIssuer");
+        claims.setIssuedAt(new Date().getTime() / 1000L);
+        
+        JwtToken token = new JwtToken(claims);
 
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("rs.security.keystore.type", "jwk");
@@ -421,6 +451,7 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.keystore.file", 
                        "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
         properties.put("rs.security.signature.algorithm", "ES256");
+        properties.put(JwtConstants.JWT_TOKEN, token);
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 
         Response response = client.post(new Book("book", 123L));
@@ -431,66 +462,28 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
         assertEquals(returnedBook.getId(), 123L);
     }
     
-    @org.junit.Test
-    public void testManualSignature() throws Exception {
-
-        URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
-
-        List<Object> providers = new ArrayList<Object>();
-        providers.add(new JacksonJsonProvider());
-
-        String address = "http://localhost:" + PORT + "/jws/bookstore/books";
-        WebClient client = 
-            WebClient.create(address, providers, busFile.toString());
-        client.type("application/json").accept("application/json");
-
-        Map<String, Object> properties = new HashMap<String, Object>();
-        WebClient.getConfig(client).getRequestContext().putAll(properties);
-        
-        String header = "eyJhbGciOiJSUzI1NiIsImN0eSI6Impzb24ifQ";
-        String payload = "eyJCb29rIjp7ImlkIjoxMjMsIm5hbWUiOiJib29rIn19";
-        String sig = "mZJVPy83atFNxQMeJqkVbR8t1srr9LgKBGT0hgiymjNepRgqedvFG5B8E8UPAzfzNLsos91gGdneUEKrWauU4GoDPTzngX"
-            + "798aDP6lsn5bUoTMKLfaWp9uzHDIzLMjGkabn92nrIpdK4JKDYNjdSUJIT2L97jggg0aoLhJQHVw2LdF1fpYdM-HCyccNW"
-            + "HQbAR7bDZdITZFnDi8b22QfHCqeLV7m4mBvNDtNX337wtoUKyjPYBMoWc12hHDCwQyu_gfW6zFioF5TGx-Ifg8hrFlnyUr"
-            + "vnSdP-FUtXiGeWBIvE_L6gD7DfM4u9hkK757vTjjMR_pF2CW3pfSH-Ha8v0A";
-
-        // Successful test
-        Response response = client.post(header + "." + payload + "." + sig);
-        assertEquals(response.getStatus(), 200);
-        
-        Book returnedBook = response.readEntity(Book.class);
-        assertEquals(returnedBook.getName(), "book");
-        assertEquals(returnedBook.getId(), 123L);
-        
-        // No signature
-        response = client.post(header + "." + payload + ".");
-        assertNotEquals(response.getStatus(), 200);
-        
-        // Modified signature
-        String sig2 = sig.replace('y', 'z');
-        response = client.post(header + "." + payload + "." + sig2);
-        assertNotEquals(response.getStatus(), 200);
-        
-        // Modified payload
-        String payload2 = payload.replace('y', 'z');
-        response = client.post(header + "." + payload2 + "." + sig);
-        assertNotEquals(response.getStatus(), 200);
-    }
-    
     // 1024 bits not allowed with RSA according to the spec
     @org.junit.Test
     public void testSmallSignatureKeySize() throws Exception {
 
-        URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
+        URL busFile = JWTAlgorithmTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<Object>();
         providers.add(new JacksonJsonProvider());
-        providers.add(new JwsWriterInterceptor());
+        providers.add(new JwtAuthenticationClientFilter());
 
-        String address = "http://localhost:" + PORT + "/jwssmallkey/bookstore/books";
+        String address = "https://localhost:" + PORT + "/signedjwt/bookstore/books";
         WebClient client = 
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
+
+        // Create the JWT Token
+        JwtClaims claims = new JwtClaims();
+        claims.setSubject("alice");
+        claims.setIssuer("DoubleItSTSIssuer");
+        claims.setIssuedAt(new Date().getTime() / 1000L);
+
+        JwtToken token = new JwtToken(claims);
 
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("rs.security.keystore.type", "jks");
@@ -500,10 +493,117 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.keystore.file", 
             "org/apache/cxf/systest/jaxrs/security/certs/smallkeysize.jks");
         properties.put("rs.security.signature.algorithm", "RS256");
+        properties.put(JwtConstants.JWT_TOKEN, token);
+        WebClient.getConfig(client).getRequestContext().putAll(properties);
+
+        Response response = client.post(new Book("book", 123L));
+        assertNotEquals(response.getStatus(), 200);
+    }
+ 
+    @org.junit.Test
+    public void testUnsignedTokenSuccess() throws Exception {
+
+        URL busFile = JWTAlgorithmTest.class.getResource("client.xml");
+
+        List<Object> providers = new ArrayList<Object>();
+        providers.add(new JacksonJsonProvider());
+        providers.add(new JwtAuthenticationClientFilter());
+
+        String address = "https://localhost:" + PORT + "/unsignedjwt/bookstore/books";
+        WebClient client = 
+            WebClient.create(address, providers, busFile.toString());
+        client.type("application/json").accept("application/json");
+        
+        // Create the JWT Token
+        JwtClaims claims = new JwtClaims();
+        claims.setSubject("alice");
+        claims.setIssuer("DoubleItSTSIssuer");
+        claims.setIssuedAt(new Date().getTime() / 1000L);
+        
+        JwtToken token = new JwtToken(claims);
+        
+        Map<String, Object> properties = new HashMap<String, Object>();
+        properties.put("rs.security.signature.algorithm", "none");
+        properties.put(JwtConstants.JWT_TOKEN, token);
+        WebClient.getConfig(client).getRequestContext().putAll(properties);
+
+        Response response = client.post(new Book("book", 123L));
+        assertEquals(response.getStatus(), 200);
+        
+        Book returnedBook = response.readEntity(Book.class);
+        assertEquals(returnedBook.getName(), "book");
+        assertEquals(returnedBook.getId(), 123L);
+    }
+    
+    @org.junit.Test
+    public void testUnsignedTokenFailure() throws Exception {
+
+        URL busFile = JWTAlgorithmTest.class.getResource("client.xml");
+
+        List<Object> providers = new ArrayList<Object>();
+        providers.add(new JacksonJsonProvider());
+        providers.add(new JwtAuthenticationClientFilter());
+
+        String address = "https://localhost:" + PORT + "/signedjwt/bookstore/books";
+        WebClient client = 
+            WebClient.create(address, providers, busFile.toString());
+        client.type("application/json").accept("application/json");
+        
+        // Create the JWT Token
+        JwtClaims claims = new JwtClaims();
+        claims.setSubject("alice");
+        claims.setIssuer("DoubleItSTSIssuer");
+        claims.setIssuedAt(new Date().getTime() / 1000L);
+        
+        JwtToken token = new JwtToken(claims);
+        
+        Map<String, Object> properties = new HashMap<String, Object>();
+        properties.put("rs.security.signature.algorithm", "none");
+        properties.put(JwtConstants.JWT_TOKEN, token);
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 
         Response response = client.post(new Book("book", 123L));
         assertNotEquals(response.getStatus(), 200);
     }
     
+    @org.junit.Test
+    public void testSignatureEncryptionProperties() throws Exception {
+
+        URL busFile = JWTAlgorithmTest.class.getResource("client.xml");
+
+        List<Object> providers = new ArrayList<Object>();
+        providers.add(new JacksonJsonProvider());
+        JwtAuthenticationClientFilter clientFilter = new JwtAuthenticationClientFilter();
+        clientFilter.setJwsRequired(true);
+        clientFilter.setJweRequired(true);
+        providers.add(clientFilter);
+
+        String address = "https://localhost:" + PORT + "/signedencryptedjwt/bookstore/books";
+        WebClient client = 
+            WebClient.create(address, providers, busFile.toString());
+        client.type("application/json").accept("application/json");
+        
+        // Create the JWT Token
+        JwtClaims claims = new JwtClaims();
+        claims.setSubject("alice");
+        claims.setIssuer("DoubleItSTSIssuer");
+        claims.setIssuedAt(new Date().getTime() / 1000L);
+        
+        JwtToken token = new JwtToken(claims);
+
+        Map<String, Object> properties = new HashMap<String, Object>();
+        properties.put("rs.security.signature.properties", 
+                       "org/apache/cxf/systest/jaxrs/security/alice.jwk.properties");
+        properties.put("rs.security.encryption.properties", 
+                       "org/apache/cxf/systest/jaxrs/security/bob.jwk.properties");
+        properties.put(JwtConstants.JWT_TOKEN, token);
+        WebClient.getConfig(client).getRequestContext().putAll(properties);
+
+        Response response = client.post(new Book("book", 123L));
+        assertEquals(response.getStatus(), 200);
+        
+        Book returnedBook = response.readEntity(Book.class);
+        assertEquals(returnedBook.getName(), "book");
+        assertEquals(returnedBook.getId(), 123L);
+    }
 }
