@@ -16,34 +16,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.cxf.rs.security.oauth2.provider;
 
-package org.apache.cxf.rs.security.oauth2.services;
+import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.rs.security.oauth2.common.UserSubject;
+import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
+import org.apache.cxf.security.SecurityContext;
 
-import java.util.Set;
+public class DefaultSubjectCreator implements SubjectCreator {
 
-import javax.ws.rs.Path;
-
-import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
-
-
-/**
- * Redirection-based Implicit Grant Service
- * 
- * This resource handles the End User authorising
- * or denying the Client embedded in the Web agent.
- * 
- * We can consider having a single authorization service dealing with either
- * authorization code or implicit grant.
- */
-@Path("/authorize-implicit")
-public class ImplicitGrantService extends AbstractImplicitGrantService {
-
-    public ImplicitGrantService() {
-        super(OAuthConstants.TOKEN_RESPONSE_TYPE, OAuthConstants.IMPLICIT_GRANT);
+    @Override
+    public UserSubject createUserSubject(MessageContext mc) throws OAuthServiceException {
+        return OAuthUtils.createSubject(mc, 
+                                        (SecurityContext)mc.get(SecurityContext.class.getName()));
     }
-    public ImplicitGrantService(Set<String> responseTypes) {
-        super(responseTypes, OAuthConstants.IMPLICIT_GRANT);
-    }
+
 }
-
-

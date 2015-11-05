@@ -23,6 +23,7 @@ import java.net.URI;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.ws.rs.core.Response;
 
@@ -48,6 +49,10 @@ public abstract class AbstractImplicitGrantService extends RedirectionBasedGrant
                                            String supportedGrantType) {
         super(supportedResponseType, supportedGrantType);
     }
+    protected AbstractImplicitGrantService(Set<String> supportedResponseTypes,
+                                           String supportedGrantType) {
+        super(supportedResponseTypes, supportedGrantType);
+    }
     
     protected Response createGrant(OAuthRedirectionState state,
                                    Client client,
@@ -55,43 +60,63 @@ public abstract class AbstractImplicitGrantService extends RedirectionBasedGrant
                                    List<String> approvedScope,
                                    UserSubject userSubject,
                                    ServerAccessToken preAuthorizedToken) {
+        
+        boolean tokenCanBeReturned = preAuthorizedToken != null;
         ServerAccessToken token = null;
         if (preAuthorizedToken == null) {
-            AccessTokenRegistration reg = new AccessTokenRegistration();
-            reg.setClient(client);
-            reg.setGrantType(super.getSupportedGrantType());
-            reg.setSubject(userSubject);
-            reg.setRequestedScope(requestedScope);        
-            if (approvedScope != null && approvedScope.isEmpty()) {
-                // no down-scoping done by a user, all of the requested scopes have been authorized
-                reg.setApprovedScope(requestedScope);
-            } else {
-                reg.setApprovedScope(approvedScope);
+            tokenCanBeReturned = canAccessTokenBeReturned(requestedScope, approvedScope);
+            if (tokenCanBeReturned) {
+                AccessTokenRegistration reg = new AccessTokenRegistration();
+                reg.setClient(client);
+                reg.setGrantType(super.getSupportedGrantType());
+                reg.setSubject(userSubject);
+                reg.setRequestedScope(requestedScope);        
+                if (approvedScope != null && approvedScope.isEmpty()) {
+                    // no down-scoping done by a user, all of the requested scopes have been authorized
+                    reg.setApprovedScope(requestedScope);
+                } else {
+                    reg.setApprovedScope(approvedScope);
+                }
+                reg.setAudience(state.getAudience());
+                token = getDataProvider().createAccessToken(reg);
             }
-            reg.setAudience(state.getAudience());
-            token = getDataProvider().createAccessToken(reg);
         } else {
             token = preAuthorizedToken;
         }
         
-        ClientAccessToken clientToken = OAuthUtils.toClientAccessToken(token, isWriteOptionalParameters());
+        ClientAccessToken clientToken = null;
+        if (token != null) {
+            clientToken = OAuthUtils.toClientAccessToken(token, isWriteOptionalParameters());
+        } else {
+            // this is not ideal - it is only done to have OIDC Implicit to have an id_token added
+            // via AccessTokenResponseFilter. Note if id_token is needed (with or without access token)
+            // then the service needs to be injected with SubjectCreator, example, DefaultSubjectCreator
+            // extension which will have a chance to attach id_token to Subject properties which are checked
+            // by id_token AccessTokenResponseFilter. If at is also needed then OAuthDataProvider may deal 
+            // with attaching id_token itself in which case no SubjectCreator injection is necessary
+            clientToken = new ClientAccessToken();
+        }
         processClientAccessToken(clientToken, token);
    
         // return the token by appending it as a fragment parameter to the redirect URI
         
         StringBuilder sb = getUriWithFragment(state.getRedirectUri());
+        if (tokenCanBeReturned) {
+            sb.append(OAuthConstants.ACCESS_TOKEN).append("=").append(clientToken.getTokenKey());
+            sb.append("&");
+            sb.append(OAuthConstants.ACCESS_TOKEN_TYPE).append("=").append(clientToken.getTokenType());
+        }
         
-        sb.append(OAuthConstants.ACCESS_TOKEN).append("=").append(clientToken.getTokenKey());
         if (state.getState() != null) {
             sb.append("&");
             sb.append(OAuthConstants.STATE).append("=").append(state.getState());   
         }
-        sb.append("&")
-            .append(OAuthConstants.ACCESS_TOKEN_TYPE).append("=").append(clientToken.getTokenType());
         
         if (isWriteOptionalParameters()) {
-            sb.append("&").append(OAuthConstants.ACCESS_TOKEN_EXPIRES_IN)
-                .append("=").append(clientToken.getExpiresIn());
+            if (tokenCanBeReturned) {
+                sb.append("&").append(OAuthConstants.ACCESS_TOKEN_EXPIRES_IN)
+                    .append("=").append(clientToken.getExpiresIn());
+            }
             if (!StringUtils.isEmpty(clientToken.getApprovedScope())) {
                 sb.append("&").append(OAuthConstants.SCOPE).append("=")
                     .append(HttpUtils.queryEncode(clientToken.getApprovedScope()));
@@ -100,7 +125,7 @@ public abstract class AbstractImplicitGrantService extends RedirectionBasedGrant
                 sb.append("&").append(entry.getKey()).append("=").append(HttpUtils.queryEncode(entry.getValue()));
             }
         }
-        if (token.getRefreshToken() != null) {
+        if (tokenCanBeReturned && token.getRefreshToken() != null) {
             processRefreshToken(sb, token.getRefreshToken());
         }
         if (reportClientId) {
@@ -108,6 +133,9 @@ public abstract class AbstractImplicitGrantService extends RedirectionBasedGrant
         }
         
         return Response.seeOther(URI.create(sb.toString())).build();
+    }
+    protected boolean canAccessTokenBeReturned(List<String> requestedScope, List<String> approvedScope) {
+        return true;
     }
     protected void processRefreshToken(StringBuilder sb, String refreshToken) {
         LOG.warning("Implicit grant tokens MUST not have refresh tokens, refresh token will not be reported");

@@ -19,9 +19,11 @@
 
 package org.apache.cxf.rs.security.oauth2.services;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -53,7 +55,7 @@ import org.apache.cxf.security.SecurityContext;
  * The Base Redirection-Based Grant Service
  */
 public abstract class RedirectionBasedGrantService extends AbstractOAuthService {
-    private String supportedResponseType;
+    private Set<String> supportedResponseTypes;
     private String supportedGrantType;
     private boolean partialMatchScopeValidation;
     private boolean useRegisteredRedirectUriIfPossible = true;
@@ -65,7 +67,11 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
     
     protected RedirectionBasedGrantService(String supportedResponseType,
                                            String supportedGrantType) {
-        this.supportedResponseType = supportedResponseType;
+        this(Collections.singleton(supportedResponseType), supportedGrantType);
+    }
+    protected RedirectionBasedGrantService(Set<String> supportedResponseTypes,
+                                           String supportedGrantType) {
+        this.supportedResponseTypes = supportedResponseTypes;
         this.supportedGrantType = supportedGrantType;
     }
     
@@ -131,7 +137,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         
         // Check response_type
         String responseType = params.getFirst(OAuthConstants.RESPONSE_TYPE);
-        if (responseType == null || !responseType.equals(supportedResponseType)) {
+        if (responseType == null || !supportedResponseTypes.contains(responseType)) {
             return createErrorResponse(params, redirectUri, OAuthConstants.UNSUPPORTED_RESPONSE_TYPE);
         }
         // Get the requested scopes
@@ -324,13 +330,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
                 return subject; 
             }
         }
-        
-        subject = getMessageContext().getContent(UserSubject.class);
-        if (subject != null) {
-            return subject;
-        } else {
-            return OAuthUtils.createSubject(securityContext);
-        }
+        return OAuthUtils.createSubject(getMessageContext(), securityContext);
     }
     
     protected Response createErrorResponse(MultivaluedMap<String, String> params,

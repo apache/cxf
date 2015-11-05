@@ -91,7 +91,14 @@ public final class OAuthUtils {
         }
         return sessionToken;
     }
-    
+    public static UserSubject createSubject(MessageContext mc, SecurityContext sc) {
+        UserSubject subject = mc.getContent(UserSubject.class);
+        if (subject != null) {
+            return subject;
+        } else {
+            return OAuthUtils.createSubject(sc);
+        }
+    }
     public static UserSubject createSubject(SecurityContext securityContext) {
         List<String> roleNames = Collections.emptyList();
         if (securityContext instanceof LoginSecurityContext) {
