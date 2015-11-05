@@ -246,6 +246,7 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
                 udpEndpoint = new EndpointImpl(bus, new WSDiscoveryProvider());
                 Map<String, Object> props = new HashMap<String, Object>();
                 props.put("jaxws.provider.interpretNullAsOneway", "true");
+                udpEndpoint.setProperties(props);
                 if ("true".equals(preferIPv6AddressesValue) && "false".equals(preferIPv4StackValue)) {
                     try {
                         udpEndpoint.publish("soap.udp://[FF02::C]:3702");
