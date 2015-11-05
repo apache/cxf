@@ -104,6 +104,13 @@
                 <groupId>org.jibx</groupId>
                 <artifactId>maven-jibx-plugin</artifactId>
                 <version>${cxf.jibx.version}</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.google.code.findbugs</groupId>
+                        <artifactId>bcel-findbugs</artifactId>
+                        <version>6.0</version>
+                    </dependency>
+                </dependencies>
                 <configuration>
                     <directory>target/generated/src/test/java/jibx_bindings</directory>
                     <!--load>true</load-->
