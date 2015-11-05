@@ -41,7 +41,7 @@ public class LinkBuilderImplTest extends Assert {
     }
     
     @Test
-    public void testbBuildObjects() throws Exception {
+    public void testBuildObjects() throws Exception {
         StringBuilder path1 = new StringBuilder().append("p1");
         ByteArrayInputStream path2 = new ByteArrayInputStream("p2".getBytes()) {
             @Override
