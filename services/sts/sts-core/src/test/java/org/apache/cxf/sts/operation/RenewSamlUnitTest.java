@@ -516,7 +516,7 @@ public class RenewSamlUnitTest extends org.junit.Assert {
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
-        return providerResponse.getToken();
+        return (Element)providerResponse.getToken();
     }
 
     private TokenProviderParameters createProviderParameters(

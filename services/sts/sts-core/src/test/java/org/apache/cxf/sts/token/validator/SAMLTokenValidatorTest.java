@@ -516,7 +516,7 @@ public class SAMLTokenValidatorTest extends org.junit.Assert {
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
         
-        return providerResponse.getToken();
+        return (Element)providerResponse.getToken();
     }
     
     private Element createSAMLAssertionWithRoles(
@@ -546,7 +546,7 @@ public class SAMLTokenValidatorTest extends org.junit.Assert {
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
-        return providerResponse.getToken();
+        return (Element)providerResponse.getToken();
     }
     
     private Element createSAMLAssertionWithClaimsProvider(
@@ -563,7 +563,7 @@ public class SAMLTokenValidatorTest extends org.junit.Assert {
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
-        return providerResponse.getToken();
+        return (Element)providerResponse.getToken();
     }
     
     private Element createSAMLAssertion(
@@ -596,7 +596,7 @@ public class SAMLTokenValidatorTest extends org.junit.Assert {
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
-        return providerResponse.getToken();
+        return (Element)providerResponse.getToken();
     }    
     
     private TokenProviderParameters createProviderParameters(
