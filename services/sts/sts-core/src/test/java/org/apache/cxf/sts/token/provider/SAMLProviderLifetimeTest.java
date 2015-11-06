@@ -81,7 +81,7 @@ public class SAMLProviderLifetimeTest extends org.junit.Assert {
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
         assertEquals(requestedLifetime * 1000L, providerResponse.getExpires().getTime() 
                      - providerResponse.getCreated().getTime());
-        Element token = providerResponse.getToken();
+        Element token = (Element)providerResponse.getToken();
         String tokenString = DOM2Writer.nodeToString(token);
         assertTrue(tokenString.contains(providerResponse.getTokenId()));
     }
@@ -112,7 +112,7 @@ public class SAMLProviderLifetimeTest extends org.junit.Assert {
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
         assertEquals(providerLifetime * 1000L, providerResponse.getExpires().getTime() 
                      - providerResponse.getCreated().getTime());
-        Element token = providerResponse.getToken();
+        Element token = (Element)providerResponse.getToken();
         String tokenString = DOM2Writer.nodeToString(token);
         assertTrue(tokenString.contains(providerResponse.getTokenId()));
     }
@@ -234,7 +234,7 @@ public class SAMLProviderLifetimeTest extends org.junit.Assert {
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
         assertEquals(maxLifetime * 1000L, providerResponse.getExpires().getTime() 
                      - providerResponse.getCreated().getTime());
-        Element token = providerResponse.getToken();
+        Element token = (Element)providerResponse.getToken();
         String tokenString = DOM2Writer.nodeToString(token);
         assertTrue(tokenString.contains(providerResponse.getTokenId()));
     }
@@ -274,7 +274,7 @@ public class SAMLProviderLifetimeTest extends org.junit.Assert {
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
         assertEquals(50L * 1000L, providerResponse.getExpires().getTime() 
                      - providerResponse.getCreated().getTime());
-        Element token = providerResponse.getToken();
+        Element token = (Element)providerResponse.getToken();
         String tokenString = DOM2Writer.nodeToString(token);
         assertTrue(tokenString.contains(providerResponse.getTokenId()));
     }
@@ -322,7 +322,7 @@ public class SAMLProviderLifetimeTest extends org.junit.Assert {
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
-        Element token = providerResponse.getToken();
+        Element token = (Element)providerResponse.getToken();
         String tokenString = DOM2Writer.nodeToString(token);
         assertTrue(tokenString.contains(providerResponse.getTokenId()));
     }
@@ -359,7 +359,7 @@ public class SAMLProviderLifetimeTest extends org.junit.Assert {
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
         assertEquals(conditionsProvider.getLifetime() * 1000L, providerResponse.getExpires().getTime() 
                      - providerResponse.getCreated().getTime());
-        Element token = providerResponse.getToken();
+        Element token = (Element)providerResponse.getToken();
         String tokenString = DOM2Writer.nodeToString(token);
         assertTrue(tokenString.contains(providerResponse.getTokenId()));
     }

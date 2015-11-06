@@ -72,7 +72,7 @@ public class SAMLProviderRealmTest extends org.junit.Assert {
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
         
-        Element token = providerResponse.getToken();
+        Element token = (Element)providerResponse.getToken();
         String tokenString = DOM2Writer.nodeToString(token);
         assertTrue(tokenString.contains(providerResponse.getTokenId()));
         assertTrue(tokenString.contains("A-Issuer"));
@@ -86,7 +86,7 @@ public class SAMLProviderRealmTest extends org.junit.Assert {
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
         
-        token = providerResponse.getToken();
+        token = (Element)providerResponse.getToken();
         tokenString = DOM2Writer.nodeToString(token);
         assertTrue(tokenString.contains(providerResponse.getTokenId()));
         assertFalse(tokenString.contains("A-Issuer"));
@@ -100,7 +100,7 @@ public class SAMLProviderRealmTest extends org.junit.Assert {
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
         
-        token = providerResponse.getToken();
+        token = (Element)providerResponse.getToken();
         tokenString = DOM2Writer.nodeToString(token);
         assertTrue(tokenString.contains(providerResponse.getTokenId()));
         assertFalse(tokenString.contains("A-Issuer"));

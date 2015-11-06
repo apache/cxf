@@ -31,6 +31,8 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
 
+import org.w3c.dom.Element;
+
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.rt.security.claims.ClaimCollection;
@@ -286,9 +288,12 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
         if (!encryptIssuedToken) {
             requestedTokenType.setAny(tokenResponse.getToken());
         } else {
+            if (!(tokenResponse.getToken() instanceof Element)) {
+                throw new STSException("Error in creating the response", STSException.REQUEST_FAILED);
+            }
             requestedTokenType.setAny(
                 encryptToken(
-                    tokenResponse.getToken(), tokenResponse.getTokenId(), 
+                    (Element)tokenResponse.getToken(), tokenResponse.getTokenId(), 
                     encryptionProperties, keyRequirements, webServiceContext
                 )
             );

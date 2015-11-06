@@ -98,7 +98,7 @@ public class CancelSCTUnitTest extends org.junit.Assert {
         
         // Get a SecurityContextToken via the SCTProvider
         TokenProviderResponse providerResponse = createSCT();
-        Element sct = providerResponse.getToken();
+        Element sct = (Element)providerResponse.getToken();
         Document doc = sct.getOwnerDocument();
         sct = (Element)doc.appendChild(sct);
         CancelTargetType cancelTarget = new CancelTargetType();

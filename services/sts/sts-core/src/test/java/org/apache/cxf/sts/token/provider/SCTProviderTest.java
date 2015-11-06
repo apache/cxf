@@ -63,7 +63,7 @@ public class SCTProviderTest extends org.junit.Assert {
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
-        Element token = providerResponse.getToken();
+        Element token = (Element)providerResponse.getToken();
         String tokenString = DOM2Writer.nodeToString(token);
         assertTrue(tokenString.contains(ConversationConstants.WSC_NS_05_12));
         assertFalse(tokenString.contains(ConversationConstants.WSC_NS_05_02));
@@ -84,7 +84,7 @@ public class SCTProviderTest extends org.junit.Assert {
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
-        Element token = providerResponse.getToken();
+        Element token = (Element)providerResponse.getToken();
         String tokenString = DOM2Writer.nodeToString(token);
         assertTrue(tokenString.contains(ConversationConstants.WSC_NS_05_02));
         assertFalse(tokenString.contains(ConversationConstants.WSC_NS_05_12));
@@ -129,7 +129,7 @@ public class SCTProviderTest extends org.junit.Assert {
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
-        Element token = providerResponse.getToken();
+        Element token = (Element)providerResponse.getToken();
         SecurityContextToken sctToken = new SecurityContextToken(token);
         String identifier = sctToken.getIdentifier();
         assertNotNull(tokenStore.getToken(identifier));

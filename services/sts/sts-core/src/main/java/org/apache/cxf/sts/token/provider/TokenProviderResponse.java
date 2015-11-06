@@ -21,14 +21,12 @@ package org.apache.cxf.sts.token.provider;
 
 import java.util.Date;
 
-import org.w3c.dom.Element;
-
 /**
  * This class encapsulates the response from a TokenProvider instance after creating a token.
  */
 public class TokenProviderResponse {
 
-    private Element token;
+    private Object token;
     private String tokenId;
     private byte[] entropy;
     private long keySize;
@@ -70,7 +68,7 @@ public class TokenProviderResponse {
      * Set the token
      * @param token the token to set
      */
-    public void setToken(Element token) {
+    public void setToken(Object token) {
         this.token = token;
     }
     
@@ -78,7 +76,7 @@ public class TokenProviderResponse {
      * Get the token
      * @return the token to set
      */
-    public Element getToken() {
+    public Object getToken() {
         return token;
     }
 

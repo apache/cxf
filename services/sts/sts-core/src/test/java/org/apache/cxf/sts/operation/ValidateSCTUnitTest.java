@@ -105,7 +105,7 @@ public class ValidateSCTUnitTest extends org.junit.Assert {
         
         // Get a SecurityContextToken via the SCTProvider
         TokenProviderResponse providerResponse = createSCT();
-        Element sct = providerResponse.getToken();
+        Element sct = (Element)providerResponse.getToken();
         Document doc = sct.getOwnerDocument();
         sct = (Element)doc.appendChild(sct);
         ValidateTargetType validateTarget = new ValidateTargetType();

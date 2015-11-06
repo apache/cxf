@@ -69,7 +69,7 @@ public class SAMLProviderKeyTypeTest extends org.junit.Assert {
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
         
-        Element token = providerResponse.getToken();
+        Element token = (Element)providerResponse.getToken();
         String tokenString = DOM2Writer.nodeToString(token);
         assertTrue(tokenString.contains(providerResponse.getTokenId()));
         assertTrue(tokenString.contains("AttributeStatement"));
@@ -92,7 +92,7 @@ public class SAMLProviderKeyTypeTest extends org.junit.Assert {
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
         
-        Element token = providerResponse.getToken();
+        Element token = (Element)providerResponse.getToken();
         String tokenString = DOM2Writer.nodeToString(token);
         assertTrue(tokenString.contains(providerResponse.getTokenId()));
         assertTrue(tokenString.contains("AttributeStatement"));
@@ -133,7 +133,7 @@ public class SAMLProviderKeyTypeTest extends org.junit.Assert {
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
         
-        Element token = providerResponse.getToken();
+        Element token = (Element)providerResponse.getToken();
         String tokenString = DOM2Writer.nodeToString(token);
         assertTrue(tokenString.contains(providerResponse.getTokenId()));
         assertTrue(tokenString.contains("AttributeStatement"));
@@ -173,7 +173,7 @@ public class SAMLProviderKeyTypeTest extends org.junit.Assert {
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
         
-        Element token = providerResponse.getToken();
+        Element token = (Element)providerResponse.getToken();
         String tokenString = DOM2Writer.nodeToString(token);
         assertTrue(tokenString.contains(providerResponse.getTokenId()));
         assertTrue(tokenString.contains("AttributeStatement"));
@@ -221,7 +221,7 @@ public class SAMLProviderKeyTypeTest extends org.junit.Assert {
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
         
-        Element token = providerResponse.getToken();
+        Element token = (Element)providerResponse.getToken();
         String tokenString = DOM2Writer.nodeToString(token);
         assertTrue(tokenString.contains(providerResponse.getTokenId()));
         assertTrue(tokenString.contains("AttributeStatement"));
@@ -268,7 +268,7 @@ public class SAMLProviderKeyTypeTest extends org.junit.Assert {
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
         
-        Element token = providerResponse.getToken();
+        Element token = (Element)providerResponse.getToken();
         String tokenString = DOM2Writer.nodeToString(token);
         assertTrue(tokenString.contains(providerResponse.getTokenId()));
         assertTrue(tokenString.contains("AttributeStatement"));
@@ -320,7 +320,7 @@ public class SAMLProviderKeyTypeTest extends org.junit.Assert {
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
         
-        Element token = providerResponse.getToken();
+        Element token = (Element)providerResponse.getToken();
         String tokenString = DOM2Writer.nodeToString(token);
         assertTrue(tokenString.contains(providerResponse.getTokenId()));
         assertTrue(tokenString.contains("AttributeStatement"));
@@ -389,7 +389,7 @@ public class SAMLProviderKeyTypeTest extends org.junit.Assert {
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
         
-        Element token = providerResponse.getToken();
+        Element token = (Element)providerResponse.getToken();
         String tokenString = DOM2Writer.nodeToString(token);
         assertTrue(tokenString.contains(providerResponse.getTokenId()));
         assertTrue(tokenString.contains("AttributeStatement"));
@@ -417,7 +417,7 @@ public class SAMLProviderKeyTypeTest extends org.junit.Assert {
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
         
-        Element token = providerResponse.getToken();
+        Element token = (Element)providerResponse.getToken();
         String tokenString = DOM2Writer.nodeToString(token);
         assertTrue(tokenString.contains(providerResponse.getTokenId()));
         assertTrue(tokenString.contains("AttributeStatement"));
@@ -446,7 +446,7 @@ public class SAMLProviderKeyTypeTest extends org.junit.Assert {
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
         
-        Element token = providerResponse.getToken();
+        Element token = (Element)providerResponse.getToken();
         String tokenString = DOM2Writer.nodeToString(token);
         assertTrue(tokenString.contains(providerResponse.getTokenId()));
         assertTrue(tokenString.contains("AttributeStatement"));
@@ -473,7 +473,7 @@ public class SAMLProviderKeyTypeTest extends org.junit.Assert {
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
         
-        Element token = providerResponse.getToken();
+        Element token = (Element)providerResponse.getToken();
         String tokenString = DOM2Writer.nodeToString(token);
         assertFalse(tokenString.contains(WSConstants.C14N_EXCL_WITH_COMMENTS));
         assertTrue(tokenString.contains(WSConstants.C14N_EXCL_OMIT_COMMENTS));
@@ -491,7 +491,7 @@ public class SAMLProviderKeyTypeTest extends org.junit.Assert {
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
         
-        token = providerResponse.getToken();
+        token = (Element)providerResponse.getToken();
         tokenString = DOM2Writer.nodeToString(token);
         assertTrue(tokenString.contains(WSConstants.C14N_EXCL_WITH_COMMENTS));
     }
@@ -515,7 +515,7 @@ public class SAMLProviderKeyTypeTest extends org.junit.Assert {
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
         
-        Element token = providerResponse.getToken();
+        Element token = (Element)providerResponse.getToken();
         String tokenString = DOM2Writer.nodeToString(token);
         assertTrue(tokenString.contains("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"));
         
@@ -528,7 +528,7 @@ public class SAMLProviderKeyTypeTest extends org.junit.Assert {
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
         
-        token = providerResponse.getToken();
+        token = (Element)providerResponse.getToken();
         tokenString = DOM2Writer.nodeToString(token);
         assertFalse(tokenString.contains(signatureAlgorithm));
         assertTrue(tokenString.contains("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"));
@@ -542,7 +542,7 @@ public class SAMLProviderKeyTypeTest extends org.junit.Assert {
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
         
-        token = providerResponse.getToken();
+        token = (Element)providerResponse.getToken();
         tokenString = DOM2Writer.nodeToString(token);
         assertTrue(tokenString.contains(signatureAlgorithm));
     }
@@ -561,7 +561,7 @@ public class SAMLProviderKeyTypeTest extends org.junit.Assert {
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
         
-        Element token = providerResponse.getToken();
+        Element token = (Element)providerResponse.getToken();
         String tokenString = DOM2Writer.nodeToString(token);
         assertTrue(tokenString.contains(WSConstants.SHA256));
         
@@ -574,7 +574,7 @@ public class SAMLProviderKeyTypeTest extends org.junit.Assert {
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
         
-        token = providerResponse.getToken();
+        token = (Element)providerResponse.getToken();
         tokenString = DOM2Writer.nodeToString(token);
         assertTrue(tokenString.contains(WSConstants.SHA1));
     }
