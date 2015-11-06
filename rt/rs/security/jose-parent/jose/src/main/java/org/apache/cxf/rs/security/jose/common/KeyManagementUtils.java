@@ -311,7 +311,7 @@ public final class KeyManagementUtils {
     }
     public static String getKeyAlgorithm(Message m, Properties props, String propName, String defaultAlg) {
         String algo = props.getProperty(propName);
-        if (algo == null) {
+        if (algo == null && m != null) {
             algo = (String)m.getContextualProperty(propName);
         }
         if (algo == null) {

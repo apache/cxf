@@ -37,6 +37,7 @@ public class JwsCompactProducer {
     private String plainJwsPayload;
     private String signature;
     private boolean detached;
+    private Properties signatureProperties;
     public JwsCompactProducer(String plainJwsPayload) {
         this(plainJwsPayload, false);
     }
@@ -138,12 +139,10 @@ public class JwsCompactProducer {
         return getJwsHeaders().getSignatureAlgorithm();
     }
     private void checkAlgorithm() {
-        if (getAlgorithm() == null && PhaseInterceptorChain.getCurrentMessage() != null) {
+        if (getAlgorithm() == null) {
+            Properties sigProps = getSignatureProperties();
             Message m = PhaseInterceptorChain.getCurrentMessage();
-            Properties props = KeyManagementUtils.loadStoreProperties(m, false, 
-                                                                      JoseConstants.RSSEC_SIGNATURE_OUT_PROPS, 
-                                                                      JoseConstants.RSSEC_SIGNATURE_PROPS);
-            String signatureAlgo = JwsUtils.getSignatureAlgo(m, props, null, null);
+            String signatureAlgo = JwsUtils.getSignatureAlgo(m, sigProps, null, null);
             if (signatureAlgo != null) {
                 getJwsHeaders().setSignatureAlgorithm(SignatureAlgorithm.getAlgorithm(signatureAlgo));
             }
@@ -152,5 +151,18 @@ public class JwsCompactProducer {
         if (getAlgorithm() == null) {
             throw new JwsException(JwsException.Error.INVALID_ALGORITHM);
         }
+    }
+    public Properties getSignatureProperties() {
+        if (signatureProperties == null && PhaseInterceptorChain.getCurrentMessage() != null) {
+            Message m = PhaseInterceptorChain.getCurrentMessage();
+            signatureProperties = KeyManagementUtils.loadStoreProperties(m, false, 
+                                                                      JoseConstants.RSSEC_SIGNATURE_OUT_PROPS, 
+                                                                      JoseConstants.RSSEC_SIGNATURE_PROPS);
+            
+        }
+        return signatureProperties;
+    }
+    public void setSignatureProperties(Properties signatureProperties) {
+        this.signatureProperties = signatureProperties;
     }
 }
