@@ -126,6 +126,7 @@ public class SchemaValidator extends AbstractDefinitionValidator {
 
         SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         sf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
+        sf.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "file");
         SchemaResourceResolver resourceResolver = new SchemaResourceResolver();
 
         sf.setResourceResolver(resourceResolver);
@@ -354,7 +355,6 @@ class SchemaResourceResolver implements LSResourceResolver {
     private LSInput loadLSInput(String ns) {
         String path = ToolConstants.CXF_SCHEMAS_DIR_INJAR + NSFILEMAP.get(ns);
         URL url = getClass().getClassLoader().getResource(path);
-        System.out.println(url);
         LSInput lsin = new LSInputImpl();
         lsin.setSystemId(url.toString());
         try {
