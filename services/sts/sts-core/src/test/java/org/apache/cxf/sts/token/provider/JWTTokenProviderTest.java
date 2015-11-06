@@ -18,11 +18,13 @@
  */
 package org.apache.cxf.sts.token.provider;
 
+import java.security.cert.X509Certificate;
 import java.util.Properties;
 
 import org.apache.cxf.jaxws.context.WebServiceContextImpl;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactConsumer;
 import org.apache.cxf.rs.security.jose.jwt.JwtConstants;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
@@ -36,6 +38,7 @@ import org.apache.cxf.sts.token.provider.jwt.JWTTokenProvider;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.junit.Assert;
@@ -50,6 +53,7 @@ public class JWTTokenProviderTest extends org.junit.Assert {
     @org.junit.Test
     public void testCreateUnsignedJWT() throws Exception {
         TokenProvider jwtTokenProvider = new JWTTokenProvider();
+        ((JWTTokenProvider)jwtTokenProvider).setSignToken(false);
         
         TokenProviderParameters providerParameters = createProviderParameters();
         
@@ -71,6 +75,42 @@ public class JWTTokenProviderTest extends org.junit.Assert {
                             jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT));
         Assert.assertEquals(providerResponse.getExpires().getTime() / 1000L, 
                             jwt.getClaim(JwtConstants.CLAIM_EXPIRY));
+    }
+    
+    @org.junit.Test
+    public void testCreateSignedJWT() throws Exception {
+        TokenProvider jwtTokenProvider = new JWTTokenProvider();
+        ((JWTTokenProvider)jwtTokenProvider).setSignToken(true);
+        
+        TokenProviderParameters providerParameters = createProviderParameters();
+        
+        assertTrue(jwtTokenProvider.canHandleToken(JWTTokenProvider.JWT_TOKEN_TYPE));
+        TokenProviderResponse providerResponse = jwtTokenProvider.createToken(providerParameters);
+        assertTrue(providerResponse != null);
+        assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
+
+        String token = (String)providerResponse.getToken();
+        assertNotNull(token);
+        assertTrue(token.split("\\.").length == 3);
+        
+        // Validate the token
+        JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token);
+        JwtToken jwt = jwtConsumer.getJwtToken();
+        Assert.assertEquals("alice", jwt.getClaim(JwtConstants.CLAIM_SUBJECT));
+        Assert.assertEquals(providerResponse.getTokenId(), jwt.getClaim(JwtConstants.CLAIM_JWT_ID));
+        Assert.assertEquals(providerResponse.getCreated().getTime() / 1000L, 
+                            jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT));
+        Assert.assertEquals(providerResponse.getExpires().getTime() / 1000L, 
+                            jwt.getClaim(JwtConstants.CLAIM_EXPIRY));
+        
+        // Verify Signature
+        Crypto crypto = providerParameters.getStsProperties().getSignatureCrypto();
+        CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+        cryptoType.setAlias(providerParameters.getStsProperties().getSignatureUsername());
+        X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
+        assertNotNull(certs);
+        
+        assertTrue(jwtConsumer.verifySignatureWith(certs[0], SignatureAlgorithm.RS256));
     }
     
     private TokenProviderParameters createProviderParameters() throws WSSecurityException {
