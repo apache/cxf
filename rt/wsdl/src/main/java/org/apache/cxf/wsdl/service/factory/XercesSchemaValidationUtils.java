@@ -21,6 +21,8 @@ package org.apache.cxf.wsdl.service.factory;
 
 import java.io.InputStream;
 import java.io.Reader;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,8 +31,11 @@ import java.util.Map;
 import javax.xml.XMLConstants;
 import javax.xml.transform.TransformerException;
 
+import org.w3c.dom.DOMConfiguration;
 import org.w3c.dom.DOMErrorHandler;
+import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
+import org.w3c.dom.bootstrap.DOMImplementationRegistry;
 import org.w3c.dom.ls.LSInput;
 import org.w3c.dom.ls.LSResourceResolver;
 
@@ -38,35 +43,13 @@ import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaCollection;
 import org.apache.ws.commons.schema.XmlSchemaSerializer;
-import org.apache.ws.commons.schema.XmlSchemaSerializer.XmlSchemaSerializerException;
-import org.apache.xerces.dom.DOMXSImplementationSourceImpl;
-import org.apache.xerces.xs.LSInputList;
-import org.apache.xerces.xs.XSImplementation;
-import org.apache.xerces.xs.XSLoader;
 
 /**
  * 
  */
 class XercesSchemaValidationUtils {
 
-    @SuppressWarnings("rawtypes")
-    private static final class ListLSInput extends ArrayList implements LSInputList {
-        private static final long serialVersionUID = 1L;
-
-        @SuppressWarnings("unchecked")
-        private ListLSInput(List inputs) {
-            super(inputs);
-        }
-
-        public int getLength() {
-            return size();
-        }
-
-        public LSInput item(int index) {
-            return (LSInput)get(index);
-        }
-    }
-    
+   
     class DOMLSInput implements LSInput {
         private String systemId;
         private String data;
@@ -150,15 +133,27 @@ class XercesSchemaValidationUtils {
     }
     
     
-    private XSImplementation impl;
+    private DOMImplementation impl;
 
-    XercesSchemaValidationUtils() {
-        DOMXSImplementationSourceImpl source = new org.apache.xerces.dom.DOMXSImplementationSourceImpl();
-        impl = (XSImplementation)source.getDOMImplementation("XS-Loader");
+    XercesSchemaValidationUtils() throws ClassNotFoundException, InstantiationException,
+        IllegalAccessException, ClassCastException {
+        
+        DOMImplementationRegistry registry = DOMImplementationRegistry.newInstance();
+        impl = registry.getDOMImplementation("XS-Loader");
     }
 
+    
+    Method findMethod(Object o, String name) {
+        for (Method m: o.getClass().getMethods()) {
+            if (m.getName() == name) {
+                m.setAccessible(true);
+                return m;
+            }
+        }
+        return null;
+    }
     void tryToParseSchemas(XmlSchemaCollection collection, DOMErrorHandler handler)
-        throws XmlSchemaSerializerException, TransformerException {
+        throws Exception {
 
         final List<DOMLSInput> inputs = new ArrayList<DOMLSInput>();
         final Map<String, LSInput> resolverMap = new HashMap<String, LSInput>();
@@ -173,17 +168,30 @@ class XercesSchemaValidationUtils {
             inputs.add(input);
         }
 
-        XSLoader schemaLoader = impl.createXSLoader(null);
-        schemaLoader.getConfig().setParameter("validate", Boolean.TRUE);
-        schemaLoader.getConfig().setParameter("error-handler", handler);
-        schemaLoader.getConfig().setParameter("resource-resolver", new LSResourceResolver() {
-
-            public LSInput resolveResource(String type, String namespaceURI, String publicId,
-                                           String systemId, String baseURI) {
-                return resolverMap.get(namespaceURI);
-            }
-        });
-
-        schemaLoader.loadInputList(new ListLSInput(inputs));
+        try {
+        
+            Object schemaLoader = findMethod(impl, "createXSLoader").invoke(impl, new Object[1]);
+            DOMConfiguration config = (DOMConfiguration)findMethod(schemaLoader, "getConfig").invoke(schemaLoader);
+    
+            config.setParameter("validate", Boolean.TRUE);
+            config.setParameter("error-handler", handler);
+            config.setParameter("resource-resolver", new LSResourceResolver() {
+                public LSInput resolveResource(String type, String namespaceURI, String publicId,
+                                               String systemId, String baseURI) {
+                    return resolverMap.get(namespaceURI);
+                }
+            });
+    
+            
+            Method m = findMethod(schemaLoader, "loadInputList");
+            String name = m.getParameterTypes()[0].getName() + "Impl";
+            name = name.replace("xs.LS", "impl.xs.util.LS");
+            Class<?> c = Class.forName(name);
+            Object inputList = c.getConstructor(LSInput[].class, Integer.TYPE)
+                .newInstance(inputs.toArray(new LSInput[inputs.size()]), inputs.size());
+            m.invoke(schemaLoader, inputList);
+        } catch (InvocationTargetException e) {
+            throw (Exception)e.getTargetException(); 
+        }
     }
 }

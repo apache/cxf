@@ -354,6 +354,7 @@ class SchemaResourceResolver implements LSResourceResolver {
     private LSInput loadLSInput(String ns) {
         String path = ToolConstants.CXF_SCHEMAS_DIR_INJAR + NSFILEMAP.get(ns);
         URL url = getClass().getClassLoader().getResource(path);
+        System.out.println(url);
         LSInput lsin = new LSInputImpl();
         lsin.setSystemId(url.toString());
         try {

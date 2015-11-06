@@ -19,6 +19,8 @@
 
 package org.apache.cxf.common.xmlschema;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,8 +32,10 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMSource;
 
+import org.w3c.dom.DOMConfiguration;
 import org.w3c.dom.DOMError;
 import org.w3c.dom.DOMErrorHandler;
+import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.bootstrap.DOMImplementationRegistry;
 import org.w3c.dom.ls.LSInput;
@@ -52,9 +56,6 @@ import org.apache.ws.commons.schema.XmlSchemaSerializer;
 import org.apache.ws.commons.schema.XmlSchemaSimpleType;
 import org.apache.ws.commons.schema.XmlSchemaSimpleTypeRestriction;
 import org.apache.ws.commons.schema.utils.NamespaceMap;
-import org.apache.xerces.xs.LSInputList;
-import org.apache.xerces.xs.XSImplementation;
-import org.apache.xerces.xs.XSLoader;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -65,24 +66,6 @@ import org.junit.Test;
 public class ImportRepairTest extends Assert {
 
     static boolean dumpSchemas;
-
-    @SuppressWarnings("rawtypes")
-    private static final class ListLSInput extends ArrayList implements LSInputList {
-        private static final long serialVersionUID = 1L;
-
-        @SuppressWarnings("unchecked")
-        private ListLSInput(List inputs) {
-            super(inputs);
-        }
-
-        public int getLength() {
-            return size();
-        }
-
-        public LSInput item(int index) {
-            return (LSInput)get(index);
-        }
-    }
 
     private static final Logger LOG = LogUtils.getL7dLogger(ImportRepairTest.class);
 
@@ -152,6 +135,15 @@ public class ImportRepairTest extends Assert {
         collection.addCrossImports();
         tryToParseSchemas();
     }
+    
+    Method findMethod(Object o, String name) {
+        for (Method m: o.getClass().getMethods()) {
+            if (m.getName() == name) {
+                return m;
+            }
+        }
+        return null;
+    }
 
     private void tryToParseSchemas() throws Exception {
         // Get DOM Implementation using DOM Registry
@@ -169,34 +161,57 @@ public class ImportRepairTest extends Assert {
             inputs.add(input);
         }
 
-        System.setProperty(DOMImplementationRegistry.PROPERTY,
-                           "org.apache.xerces.dom.DOMXSImplementationSourceImpl");
         DOMImplementationRegistry registry = DOMImplementationRegistry.newInstance();
+        DOMImplementation impl = registry.getDOMImplementation("XS-Loader");
 
-        XSImplementation impl = (XSImplementation)registry.getDOMImplementation("XS-Loader");
-
-        XSLoader schemaLoader = impl.createXSLoader(null);
-        schemaLoader.getConfig().setParameter("validate", Boolean.TRUE);
-        schemaLoader.getConfig().setParameter("error-handler", new DOMErrorHandler() {
-
-            public boolean handleError(DOMError error) {
-                LOG.info("Schema parsing error: " + error.getMessage()
-                         + " " + error.getType()
-                         + " " + error.getLocation().getUri()
-                         + " " + error.getLocation().getLineNumber()
-                         + ":" + error.getLocation().getColumnNumber());
-                throw new DOMErrorException(error);
+        
+        try {
+            Object schemaLoader = findMethod(impl, "createXSLoader").invoke(impl, new Object[1]);
+            DOMConfiguration config = (DOMConfiguration)findMethod(schemaLoader, "getConfig").invoke(schemaLoader);
+            
+            config.setParameter("validate", Boolean.TRUE);
+            try {
+                //bug in the JDK doesn't set this, but accesses it 
+                config.setParameter("http://www.oracle.com/xml/jaxp/properties/xmlSecurityPropertyManager",
+                                    Class.forName("com.sun.org.apache.xerces.internal.utils.XMLSecurityPropertyManager")
+                                        .newInstance());
+                
+                config.setParameter("http://apache.org/xml/properties/security-manager",
+                                    Class.forName("com.sun.org.apache.xerces.internal.utils.XMLSecurityManager")
+                                        .newInstance());
+            } catch (Throwable t) {
+                //ignore
             }
-        });
-        schemaLoader.getConfig().setParameter("resource-resolver", new LSResourceResolver() {
-
-            public LSInput resolveResource(String type, String namespaceURI, String publicId,
-                                           String systemId, String baseURI) {
-                return resolverMap.get(namespaceURI);
-            }
-        });
-
-        schemaLoader.loadInputList(new ListLSInput(inputs));
+            config.setParameter("error-handler", new DOMErrorHandler() {
+    
+                public boolean handleError(DOMError error) {
+                    LOG.info("Schema parsing error: " + error.getMessage()
+                             + " " + error.getType()
+                             + " " + error.getLocation().getUri()
+                             + " " + error.getLocation().getLineNumber()
+                             + ":" + error.getLocation().getColumnNumber());
+                    throw new DOMErrorException(error);
+                }
+            });
+            config.setParameter("resource-resolver", new LSResourceResolver() {
+    
+                public LSInput resolveResource(String type, String namespaceURI, String publicId,
+                                               String systemId, String baseURI) {
+                    return resolverMap.get(namespaceURI);
+                }
+            });
+    
+            Method m = findMethod(schemaLoader, "loadInputList");
+            String name = m.getParameterTypes()[0].getName() + "Impl";
+            name = name.replace("xs.LS", "impl.xs.util.LS");
+            Class<?> c = Class.forName(name);
+            Object inputList = c.getConstructor(LSInput[].class, Integer.TYPE)
+            .newInstance(inputs.toArray(new LSInput[inputs.size()]), inputs.size());
+        
+            findMethod(schemaLoader, "loadInputList").invoke(schemaLoader, inputList);
+        } catch (InvocationTargetException ite) {
+            throw (Exception)ite.getTargetException();
+        }
     }
 
     private void dumpSchema(Document document) throws Exception {
