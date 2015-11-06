@@ -1423,7 +1423,8 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
         Element entropy = null;
         String tt = null;
         String retKeySize = null;
-
+        String tokenData = null;
+        
         while (el != null) {
             String ln = el.getLocalName();
             if (namespace.equals(el.getNamespaceURI())) {
@@ -1431,6 +1432,9 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
                     lte = el;
                 } else if ("RequestedSecurityToken".equals(ln)) {
                     rst = DOMUtils.getFirstElement(el);
+                    if (rst == null) {
+                        tokenData = el.getTextContent();
+                    }
                 } else if ("RequestedAttachedReference".equals(ln)) {
                     rar = DOMUtils.getFirstElement(el);
                 } else if ("RequestedUnattachedReference".equals(ln)) {
@@ -1457,6 +1461,9 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
         token.setUnattachedReference(rur);
         token.setIssuerAddress(location);
         token.setTokenType(tt);
+        if (tokenData != null) {
+            token.setData(tokenData.getBytes());
+        }
 
         byte[] secret = null;
 
