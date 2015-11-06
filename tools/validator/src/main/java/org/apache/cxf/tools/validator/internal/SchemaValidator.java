@@ -126,6 +126,7 @@ public class SchemaValidator extends AbstractDefinitionValidator {
 
         SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         sf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
+        sf.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "file");
         SchemaResourceResolver resourceResolver = new SchemaResourceResolver();
 
         sf.setResourceResolver(resourceResolver);
