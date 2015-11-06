@@ -40,7 +40,7 @@
         <cxf.compile.flags>-Xlint:unchecked,deprecation,fallthrough,finally</cxf.compile.flags>
         <cxf.compile.show.deprecation>true</cxf.compile.show.deprecation>
         <cxf.codegenplugin.forkmode>once</cxf.codegenplugin.forkmode>
-        <cxf.codegen.jvmArgs />
+        <cxf.codegen.jvmArgs>-Djavax.xml.accessExternalSchema=file</cxf.codegen.jvmArgs>
         <cxf.eclipse.outputDirectory>${basedir}/target/classes</cxf.eclipse.outputDirectory>
         <!-- stuff related to ASM -->
         <cxf.asm.groupId>org.ow2.asm</cxf.asm.groupId>
@@ -1800,49 +1800,6 @@
         </dependencies>
     </dependencyManagement>
     <profiles>
-        <profile>
-            <id>jdk18</id>
-            <activation>
-                <jdk>1.8</jdk>
-            </activation>
-            <properties>
-                <cxf.codegen.jvmArgs>-Djavax.xml.accessExternalSchema=file</cxf.codegen.jvmArgs>
-            </properties>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-checkstyle-plugin</artifactId>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-compiler-plugin</artifactId>
-                        <configuration>
-                            <showDeprecation>${cxf.compile.show.deprecation}</showDeprecation>
-                            <showWarnings>true</showWarnings>
-                            <compilerArgument>${cxf.compile.flags}</compilerArgument>
-                        </configuration>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-pmd-plugin</artifactId>
-                    </plugin>
-                </plugins>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-javadoc-plugin</artifactId>
-                            <configuration>
-                                <additionalJOptions>
-                                    <additionalJOption>-Xdoclint:none</additionalJOption>
-                                </additionalJOptions>
-                            </configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-            </build>
-        </profile>
         <profile>
             <id>validateServices</id>
             <properties>
