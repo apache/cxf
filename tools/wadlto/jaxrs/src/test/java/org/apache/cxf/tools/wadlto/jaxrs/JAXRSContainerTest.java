@@ -20,10 +20,19 @@
 package org.apache.cxf.tools.wadlto.jaxrs;
 
 import java.io.File;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.List;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.PUT;
+import javax.ws.rs.QueryParam;
+
 import org.apache.cxf.helpers.FileUtils;
+import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import org.apache.cxf.tools.common.ProcessorTestBase;
 import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.wadlto.WadlToolConstants;
@@ -333,6 +342,63 @@ public class JAXRSContainerTest extends ProcessorTestBase {
             assertEquals(2, files.size());
             assertTrue(checkContains(files, "application.Test1.class"));
             assertTrue(checkContains(files, "application.Test2.class"));
+            
+            @SuppressWarnings("resource")
+            ClassLoader loader = new URLClassLoader(new URL[] {output.toURI().toURL() });
+            
+            Class<?> test1 = loader.loadClass("application.Test1");
+            Method[] test1Methods = test1.getDeclaredMethods();
+            assertEquals(1, test1Methods.length);
+            
+            assertEquals(2, test1Methods[0].getAnnotations().length);
+            assertNotNull(test1Methods[0].getAnnotation(PUT.class));
+            Consumes consumes1 = test1Methods[0].getAnnotation(Consumes.class);
+            assertNotNull(consumes1);
+            assertEquals(1, consumes1.value().length);
+            assertEquals("multipart/mixed", consumes1.value()[0]);
+            
+            assertEquals("put", test1Methods[0].getName());
+            Class<?>[] paramTypes = test1Methods[0].getParameterTypes();
+            assertEquals(3, paramTypes.length);
+            Annotation[][] paramAnns = test1Methods[0].getParameterAnnotations();
+            assertEquals(Boolean.class, paramTypes[0]);
+            assertEquals(1, paramAnns[0].length);
+            QueryParam test1QueryParam1 = (QueryParam)paramAnns[0][0];
+            assertEquals("standalone", test1QueryParam1.value());
+            assertEquals(String.class, paramTypes[1]);
+            assertEquals(1, paramAnns[1].length);
+            Multipart test1MultipartParam1 = (Multipart)paramAnns[1][0];
+            assertEquals("action", test1MultipartParam1.value());
+            assertTrue(test1MultipartParam1.required());
+            assertEquals(String.class, paramTypes[2]);
+            assertEquals(1, paramAnns[2].length);
+            Multipart test1MultipartParam2 = (Multipart)paramAnns[2][0];
+            assertEquals("sources", test1MultipartParam2.value());
+            assertFalse(test1MultipartParam2.required());
+            
+            Class<?> test2 = loader.loadClass("application.Test2");
+            Method[] test2Methods = test2.getDeclaredMethods();
+            assertEquals(1, test2Methods.length);
+            
+            assertEquals(2, test2Methods[0].getAnnotations().length);
+            assertNotNull(test2Methods[0].getAnnotation(PUT.class));
+            Consumes consumes2 = test2Methods[0].getAnnotation(Consumes.class);
+            assertNotNull(consumes2);
+            assertEquals(1, consumes2.value().length);
+            assertEquals("application/json", consumes2.value()[0]);
+            
+            assertEquals("put", test2Methods[0].getName());
+            Class<?>[] paramTypes2 = test2Methods[0].getParameterTypes();
+            assertEquals(2, paramTypes2.length);
+            Annotation[][] paramAnns2 = test2Methods[0].getParameterAnnotations();
+            assertEquals(boolean.class, paramTypes2[0]);
+            assertEquals(1, paramAnns2[0].length);
+            QueryParam test2QueryParam1 = (QueryParam)paramAnns2[0][0];
+            assertEquals("snapshot", test2QueryParam1.value());
+            assertEquals(String.class, paramTypes2[1]);
+            assertEquals(0, paramAnns2[1].length);
+            
+            
         } catch (Exception e) {
             e.printStackTrace();
             fail();
