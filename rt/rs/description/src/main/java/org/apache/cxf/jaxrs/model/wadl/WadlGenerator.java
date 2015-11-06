@@ -2164,12 +2164,12 @@ public class WadlGenerator implements ContainerRequestFilter {
     public void setStylesheetReference(String stylesheetReference) {
         this.stylesheetReference = stylesheetReference;
     }
-    public void setIncludeWadlSchemaLocation(String loc) {
+    public void setWadlSchemaLocation(String loc) {
         this.wadlSchemaLocation = loc;
     }
     public void setIncludeDefaultWadlSchemaLocation(boolean inc) {
         if (inc) {
-            setIncludeWadlSchemaLocation(DEFAULT_WADL_SCHEMA_LOC);
+            setWadlSchemaLocation(DEFAULT_WADL_SCHEMA_LOC);
         }
     }
 
