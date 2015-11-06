@@ -135,6 +135,7 @@ public class WadlGenerator implements ContainerRequestFilter {
     public static final String WADL_QUERY = "_wadl";
     public static final MediaType WADL_TYPE = JAXRSUtils.toMediaType("application/vnd.sun.wadl+xml");
     public static final String WADL_NS = "http://wadl.dev.java.net/2009/02";
+    public static final String DEFAULT_WADL_SCHEMA_LOC = "http://www.w3.org/Submission/wadl/wadl.xsd";
 
     private static final Logger LOG = LogUtils.getL7dLogger(WadlGenerator.class);
     private static final String CONVERT_WADL_RESOURCES_TO_DOM = "convert.wadl.resources.to.dom";
@@ -172,7 +173,7 @@ public class WadlGenerator implements ContainerRequestFilter {
     private boolean ignoreMessageWriters = true;
     private boolean ignoreRequests;
     private boolean convertResourcesToDOM = true;
-    
+    private String wadlSchemaLocation;
     private List<String> externalSchemasCache;
     private List<URI> externalSchemaLinks;
     private Map<String, List<String>> externalQnamesMap;
@@ -374,6 +375,13 @@ public class WadlGenerator implements ContainerRequestFilter {
                 .append("\"");
         }
 
+        if (wadlSchemaLocation != null) {
+            sbApp.append(" xmlns:xsi=\"").append(Constants.URI_2001_SCHEMA_XSI).append("\"");
+            sbApp.append(" xsi:schemaLocation=\"")
+                 .append(getNamespace()).append(" ").append(wadlSchemaLocation)
+                 .append("\"");
+        }
+        
         writer.write(sbGrammars);
     }
 
@@ -2155,6 +2163,14 @@ public class WadlGenerator implements ContainerRequestFilter {
     }
     public void setStylesheetReference(String stylesheetReference) {
         this.stylesheetReference = stylesheetReference;
+    }
+    public void setIncludeWadlSchemaLocation(String loc) {
+        this.wadlSchemaLocation = loc;
+    }
+    public void setIncludeDefaultWadlSchemaLocation(boolean inc) {
+        if (inc) {
+            setIncludeWadlSchemaLocation(DEFAULT_WADL_SCHEMA_LOC);
+        }
     }
 
     public void setIgnoreOverloadedMethods(boolean ignore) {

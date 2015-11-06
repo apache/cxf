@@ -142,6 +142,11 @@ public class Java2WADLMojo extends AbstractMojo {
     /**
      * @parameter default-value="false"
      */
+    private boolean includeDefaultWadlSchemaLocation;
+    
+    /**
+     * @parameter default-value="false"
+     */
     private boolean ignoreForwardSlash;
     
     /**
@@ -242,6 +247,7 @@ public class Java2WADLMojo extends AbstractMojo {
     private void setExtraProperties(WadlGenerator wg) {
         wg.setSingleResourceMultipleMethods(singleResourceMultipleMethods);
         wg.setUseSingleSlashResource(useSingleSlashResource);
+        wg.setIncludeDefaultWadlSchemaLocation(includeDefaultWadlSchemaLocation);
         wg.setIgnoreForwardSlash(ignoreForwardSlash);
         wg.setAddResourceAndMethodIds(addResourceAndMethodIds);
         wg.setLinkAnyMediaTypeToXmlSchema(linkAnyMediaTypeToXmlSchema);
