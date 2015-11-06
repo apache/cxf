@@ -97,7 +97,7 @@ public final class JoseConstants {
     /**
      * The KeyStore Object.
      */
-    public static final String RSSEC_KEY_STORE= "rs.security.keystore";
+    public static final String RSSEC_KEY_STORE = "rs.security.keystore";
     
     /**
      * A reference to a PrivateKeyPasswordProvider instance used to retrieve passwords to access keys.
