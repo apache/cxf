@@ -95,6 +95,14 @@ public final class JoseConstants {
     public static final String RSSEC_KEY_STORE_FILE = "rs.security.keystore.file";
     
     /**
+<<<<<<< HEAD
+=======
+     * The KeyStore Object.
+     */
+    public static final String RSSEC_KEY_STORE = "rs.security.keystore";
+    
+    /**
+>>>>>>> 9245fcb... Updating STS keys to be 2048 bits
      * A reference to a PrivateKeyPasswordProvider instance used to retrieve passwords to access keys.
      */
     public static final String RSSEC_KEY_PSWD_PROVIDER = "rs.security.key.password.provider";
