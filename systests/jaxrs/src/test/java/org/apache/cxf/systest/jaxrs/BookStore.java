@@ -306,7 +306,10 @@ public class BookStore {
     @POST
     @Path("/echoxmlbookquery")
     @Produces("application/xml")
-    public Book echoXmlBookQuery(@QueryParam("book") Book book) {
+    public Book echoXmlBookQuery(@QueryParam("book") Book book, @QueryParam("id") byte id) {
+        if (book.getId() != (long)id) {
+            throw new RuntimeException();
+        }
         return book;
     }
     

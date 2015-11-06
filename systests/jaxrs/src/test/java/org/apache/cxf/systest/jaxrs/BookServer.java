@@ -124,7 +124,7 @@ public class BookServer extends AbstractBusTestServerBase {
         providers.add(new BlockingRequestFilter());
         providers.add(new FaultyResponseFilter());
         providers.add(new BlockedExceptionMapper());
-        providers.add(new XmlBookParamConverter());
+        providers.add(new ParamConverterImpl());
         sf.setProviders(providers);
         List<Interceptor<? extends Message>> inInts = new ArrayList<Interceptor<? extends Message>>();
         inInts.add(new CustomInFaultyInterceptor());
@@ -270,7 +270,7 @@ public class BookServer extends AbstractBusTestServerBase {
         }
         
     }
-    public static class XmlBookParamConverter implements ParamConverterProvider {
+    public static class ParamConverterImpl implements ParamConverterProvider {
 
         @Context
         private Providers providers;
@@ -278,19 +278,34 @@ public class BookServer extends AbstractBusTestServerBase {
         @Override
         public <T> ParamConverter<T> getConverter(Class<T> rawType, Type genericType,
                                                   Annotation[] annotations) {
-            if (rawType != Book.class) {
+            if (rawType == Book.class) {
+                
+                MessageBodyReader<Book> mbr = providers.getMessageBodyReader(Book.class, 
+                                                                             Book.class, 
+                                                                             annotations, 
+                                                                             MediaType.APPLICATION_XML_TYPE);
+                MessageBodyWriter<Book> mbw = providers.getMessageBodyWriter(Book.class, 
+                                                                             Book.class, 
+                                                                             annotations, 
+                                                                             MediaType.APPLICATION_XML_TYPE);
+                return (ParamConverter<T>)new XmlParamConverter(mbr, mbw);
+            } else if (rawType == byte.class) {
+                return (ParamConverter<T>)new ByteConverter();
+            } else {
                 return null;
             }
-            MessageBodyReader<Book> mbr = providers.getMessageBodyReader(Book.class, 
-                                                                         Book.class, 
-                                                                         annotations, 
-                                                                         MediaType.APPLICATION_XML_TYPE);
-            MessageBodyWriter<Book> mbw = providers.getMessageBodyWriter(Book.class, 
-                                                                         Book.class, 
-                                                                         annotations, 
-                                                                         MediaType.APPLICATION_XML_TYPE);
-            return (ParamConverter<T>)new XmlParamConverter(mbr, mbw);
             
+        }
+        private static class ByteConverter implements ParamConverter<Byte> {
+            @Override
+            public Byte fromString(String t) {
+                return new Byte(t); 
+            }
+
+            @Override
+            public String toString(Byte b) {
+                return b.toString();
+            }
         }
         private static class XmlParamConverter implements ParamConverter<Book> {
             private MessageBodyReader<Book> mbr;
