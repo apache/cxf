@@ -212,7 +212,7 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
         setScopes(sb.toString());
     }
     public void setScopes(String scopes) {
-        this.scopes = scopes;
+        this.scopes = scopes.trim();
     }
 
     public void setStartUri(String relStartUri) {
