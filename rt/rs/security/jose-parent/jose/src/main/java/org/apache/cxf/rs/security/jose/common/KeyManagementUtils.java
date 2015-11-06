@@ -139,8 +139,6 @@ public final class KeyManagementUtils {
     private static PrivateKey loadPrivateKey(KeyStore keyStore, 
                                             Message m,
                                             Properties props, 
-                                            Bus bus, 
-                                            PrivateKeyPasswordProvider provider,
                                             KeyOperation keyOper,
                                             String alias) {
         
@@ -149,8 +147,11 @@ public final class KeyManagementUtils {
         if (theAlias != null) {
             props.put(JoseConstants.RSSEC_KEY_STORE_ALIAS, theAlias);
         }
-        char[] keyPswdChars = provider != null ? provider.getPassword(props) 
-            : keyPswd != null ? keyPswd.toCharArray() : null;    
+        char[] keyPswdChars = keyPswd != null ? keyPswd.toCharArray() : null;
+        if (keyPswdChars == null) {
+            PrivateKeyPasswordProvider provider = loadPasswordProvider(m, props, keyOper);
+            keyPswdChars = provider != null ? provider.getPassword(props) : null;
+        }
         return CryptoUtils.loadPrivateKey(keyStore, keyPswdChars, theAlias);
     }
     
@@ -174,7 +175,7 @@ public final class KeyManagementUtils {
                                   KeyOperation keyOper) {
         String kid = null;
         String altPropertyName = null;
-        if (keyOper != null) {
+        if (keyOper != null && m != null) {
             if (keyOper == KeyOperation.ENCRYPT || keyOper == KeyOperation.DECRYPT) {
                 altPropertyName = preferredPropertyName + ".jwe";
             } else if (keyOper == KeyOperation.SIGN || keyOper == KeyOperation.VERIFY) {
@@ -216,21 +217,25 @@ public final class KeyManagementUtils {
         KeyStore keyStore = loadPersistKeyStore(m, props);
         return loadPrivateKey(keyStore, m, props, keyOper, null);
     }
-    private static PrivateKey loadPrivateKey(KeyStore keyStore, Message m, Properties props, KeyOperation keyOper, 
-                                                String alias) {
-        Bus bus = m.getExchange().getBus();
-        PrivateKeyPasswordProvider cb = loadPasswordProvider(m, props, keyOper);
-        return loadPrivateKey(keyStore, m, props, bus, cb, keyOper, alias);
-    }
     public static KeyStore loadPersistKeyStore(Message m, Properties props) {
-        if (!props.containsKey(JoseConstants.RSSEC_KEY_STORE_FILE)) {
-            LOG.warning("No keystore file has been configured");
-            throw new JoseException("No keystore file has been configured");
+        KeyStore keyStore = null;
+        if (props.containsKey(JoseConstants.RSSEC_KEY_STORE)) {
+            keyStore = (KeyStore)props.get(JoseConstants.RSSEC_KEY_STORE);
         }
-        KeyStore keyStore = (KeyStore)m.getExchange().get(props.get(JoseConstants.RSSEC_KEY_STORE_FILE));
+        
+        if (keyStore == null) {
+            if (!props.containsKey(JoseConstants.RSSEC_KEY_STORE_FILE)) {
+                LOG.warning("No keystore file has been configured");
+                throw new JoseException("No keystore file has been configured");
+            }
+            keyStore = (KeyStore)m.getExchange().get(props.get(JoseConstants.RSSEC_KEY_STORE_FILE));
+        }
+        
         if (keyStore == null) {
             keyStore = loadKeyStore(props, m.getExchange().getBus());
-            m.getExchange().put((String)props.get(JoseConstants.RSSEC_KEY_STORE_FILE), keyStore);
+            if (m != null) {
+                m.getExchange().put((String)props.get(JoseConstants.RSSEC_KEY_STORE_FILE), keyStore);
+            }
         }
         return keyStore;
     }

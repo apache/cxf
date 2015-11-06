@@ -261,7 +261,7 @@ public final class JwsUtils {
         //TODO: validate JWS specific constraints
         return JoseUtils.validateCriticalHeaders(headers);
     }
-    private static JwsSignatureProvider loadSignatureProvider(Message m, 
+    public static JwsSignatureProvider loadSignatureProvider(Message m, 
                                                               Properties props,
                                                               JoseHeaders headers,
                                                               boolean ignoreNullProvider) {

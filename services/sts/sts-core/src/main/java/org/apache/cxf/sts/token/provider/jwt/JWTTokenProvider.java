@@ -19,6 +19,7 @@
 
 package org.apache.cxf.sts.token.provider.jwt;
 
+import java.security.KeyStore;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,17 +27,29 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.security.auth.callback.CallbackHandler;
+
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.rs.security.jose.common.JoseConstants;
+import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactProducer;
+import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
+import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
+import org.apache.cxf.sts.STSPropertiesMBean;
+import org.apache.cxf.sts.SignatureProperties;
 import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.sts.token.provider.TokenProvider;
 import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.cxf.sts.token.provider.TokenProviderResponse;
 import org.apache.cxf.sts.token.realm.SAMLRealm;
 import org.apache.cxf.ws.security.sts.provider.STSException;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.Merlin;
+import org.apache.wss4j.common.ext.WSPasswordCallback;
 
 /**
  * A TokenProvider implementation that provides a JWT Token.
@@ -85,13 +98,6 @@ public class JWTTokenProvider implements TokenProvider {
         
         JwtClaims claims = jwtClaimsProvider.getJwtClaims(jwtClaimsProviderParameters);
         
-        /*
-        if (signToken) {
-            STSPropertiesMBean stsProperties = tokenParameters.getStsProperties();
-            signToken(assertion, samlRealm, stsProperties, tokenParameters.getKeyRequirements());
-        }
-        */
-        
         try {
             /*
             Document doc = DOMUtils.createDocument();
@@ -120,12 +126,8 @@ public class JWTTokenProvider implements TokenProvider {
             
             JwtToken token = new JwtToken(claims);
             
-            Properties signingProperties = new Properties();
-            signingProperties.put(JoseConstants.RSSEC_SIGNATURE_ALGORITHM, "none");
-            
-            JwsJwtCompactProducer jws = new JwsJwtCompactProducer(token);
-            jws.setSignatureProperties(signingProperties);
-            String tokenData = jws.getSignedEncodedJws();
+            String tokenData = signToken(token, null, tokenParameters.getStsProperties(), 
+                      tokenParameters.getTokenRequirements());
             
             TokenProviderResponse response = new TokenProviderResponse();
             response.setToken(tokenData);
@@ -139,12 +141,6 @@ public class JWTTokenProvider implements TokenProvider {
                 response.setExpires(new Date(claims.getExpiryTime() * 1000L));
             }
             
-            /*response.setEntropy(entropyBytes);
-            if (keySize > 0) {
-                response.setKeySize(keySize);
-            }
-            response.setComputedKey(computedKey);
-            */
             LOG.fine("JWT Token successfully created");
             return response;
         } catch (Exception e) {
@@ -192,4 +188,85 @@ public class JWTTokenProvider implements TokenProvider {
         this.jwtClaimsProvider = jwtClaimsProvider;
     }
     
+    private String signToken(
+        JwtToken token, 
+        SAMLRealm samlRealm,
+        STSPropertiesMBean stsProperties,
+        TokenRequirements tokenRequirements
+    ) throws Exception {
+        
+        Properties signingProperties = new Properties();
+        
+        if (signToken) {
+            // Initialise signature objects with defaults of STSPropertiesMBean
+            Crypto signatureCrypto = stsProperties.getSignatureCrypto();
+            CallbackHandler callbackHandler = stsProperties.getCallbackHandler();
+            SignatureProperties signatureProperties = stsProperties.getSignatureProperties();
+            String alias = stsProperties.getSignatureUsername();
+
+            if (samlRealm != null) {
+                // If SignatureCrypto configured in realm then
+                // callbackhandler and alias of STSPropertiesMBean is ignored
+                if (samlRealm.getSignatureCrypto() != null) {
+                    LOG.fine("SAMLRealm signature keystore used");
+                    signatureCrypto = samlRealm.getSignatureCrypto();
+                    callbackHandler = samlRealm.getCallbackHandler();
+                    alias = samlRealm.getSignatureAlias();
+                }
+                // SignatureProperties can be defined independently of SignatureCrypto
+                if (samlRealm.getSignatureProperties() != null) {
+                    signatureProperties = samlRealm.getSignatureProperties();
+                }
+            }
+
+            // Get the signature algorithm to use - for now we don't allow the client to ask
+            // for a particular signature algorithm, as with SAML
+            String signatureAlgorithm = signatureProperties.getSignatureAlgorithm();
+            try {
+                SignatureAlgorithm.getAlgorithm(signatureAlgorithm);
+            } catch (IllegalArgumentException ex) {
+                signatureAlgorithm = SignatureAlgorithm.RS256.name();
+            }
+
+            // If alias not defined, get the default of the SignatureCrypto
+            if ((alias == null || "".equals(alias)) && (signatureCrypto != null)) {
+                alias = signatureCrypto.getDefaultX509Identifier();
+                if (LOG.isLoggable(Level.FINE)) {
+                    LOG.fine("Signature alias is null so using default alias: " + alias);
+                }
+            }
+            // Get the password
+            WSPasswordCallback[] cb = {new WSPasswordCallback(alias, WSPasswordCallback.SIGNATURE)};
+            callbackHandler.handle(cb);
+            String password = cb[0].getPassword();
+
+            signingProperties.put(JoseConstants.RSSEC_SIGNATURE_ALGORITHM, signatureAlgorithm);
+            signingProperties.put(JoseConstants.RSSEC_KEY_STORE_ALIAS, alias);
+            signingProperties.put(JoseConstants.RSSEC_KEY_PSWD, password);
+            
+            if (!(signatureCrypto instanceof Merlin)) {
+                throw new STSException("Can't get the keystore", STSException.REQUEST_FAILED);
+            }
+            KeyStore keystore = ((Merlin)signatureCrypto).getKeyStore();
+            signingProperties.put(JoseConstants.RSSEC_KEY_STORE, keystore);
+            
+            JwsJwtCompactProducer jws = new JwsJwtCompactProducer(token);
+            jws.setSignatureProperties(signingProperties);
+            
+            Message m = PhaseInterceptorChain.getCurrentMessage();
+            JwsSignatureProvider sigProvider = 
+                JwsUtils.loadSignatureProvider(m, signingProperties, token.getJwsHeaders(), false);
+            token.getJwsHeaders().setSignatureAlgorithm(sigProvider.getAlgorithm());
+            
+            return jws.signWith(sigProvider);
+        } else {
+            signingProperties.put(JoseConstants.RSSEC_SIGNATURE_ALGORITHM, "none");
+            
+            JwsJwtCompactProducer jws = new JwsJwtCompactProducer(token);
+            jws.setSignatureProperties(signingProperties);
+            return jws.getSignedEncodedJws();
+        }
+        
+    }
+
 }
