@@ -400,7 +400,7 @@ public final class JwsUtils {
             
             // Check for deprecated identifier first
             String sigAlgo = props.getProperty(JoseConstants.DEPR_RSSEC_SIGNATURE_ALGORITHM);
-            if (sigAlgo == null) {
+            if (sigAlgo == null && m != null) {
                 sigAlgo = (String)m.getContextualProperty(JoseConstants.DEPR_RSSEC_SIGNATURE_ALGORITHM);
             }
             if (sigAlgo != null) {
