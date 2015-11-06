@@ -98,7 +98,7 @@ public class JWTUnitTest extends AbstractBusClientServerTestBase {
             properties.put(
                            SecurityConstants.CALLBACK_HANDLER, 
                            "org.apache.cxf.systest.sts.common.CommonCallbackHandler"
-                );
+            );
         }
 
         stsClient.setProperties(properties);

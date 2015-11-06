@@ -326,7 +326,7 @@ public class SAMLDelegationTest extends AbstractBusClientServerTestBase {
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
-        return providerResponse.getToken();
+        return (Element)providerResponse.getToken();
     }
     
     private Element createUnsignedSAMLAssertion(
@@ -344,7 +344,7 @@ public class SAMLDelegationTest extends AbstractBusClientServerTestBase {
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
-        return providerResponse.getToken();
+        return (Element)providerResponse.getToken();
     }
     
     private TokenProviderParameters createProviderParameters(
