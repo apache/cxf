@@ -110,7 +110,7 @@ public class WSDLValidationTest extends ToolTestBase {
                                       getLocation("/validator_wsdl/hello_world_import.wsdl")};
         WSDLValidator.main(args);
         
-        assertTrue("Is not valid wsdl!: " + getStdOut(),
+        assertTrue("Is not valid wsdl!: " + getStdOut() + "\n" + getStdErr(),
                    getStdOut().indexOf("Passed Validation") > -1);
     }
 
