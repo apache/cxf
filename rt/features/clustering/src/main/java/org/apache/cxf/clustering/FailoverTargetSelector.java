@@ -139,8 +139,9 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
         }
         
         boolean failover = false;
-        if (requiresFailover(exchange)) {
-            onFailure(invocation);
+        final Exception ex = getExceptionIfPresent(exchange);
+        if (requiresFailover(exchange, ex)) {
+            onFailure(invocation, ex);
             Conduit old = (Conduit)exchange.getOutMessage().remove(Conduit.class.getName());
             
             Endpoint failoverTarget = getFailoverTarget(exchange, invocation);
@@ -208,7 +209,7 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
     protected void onSuccess(InvocationContext context) {
     }
     
-    protected void onFailure(InvocationContext context) {
+    protected void onFailure(InvocationContext context, Exception ex) {
     }
     
     /**
@@ -260,11 +261,7 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
      * @param exchange the current Exchange
      * @return boolean true if a failover should be attempted
      */
-    protected boolean requiresFailover(Exchange exchange) {
-        Message outMessage = exchange.getOutMessage();
-        Exception ex = outMessage.get(Exception.class) != null
-                       ? outMessage.get(Exception.class)
-                       : exchange.get(Exception.class);
+    protected boolean requiresFailover(Exchange exchange, Exception ex) {
         getLogger().log(Level.FINE,
                         "CHECK_LAST_INVOKE_FAILED",
                         new Object[] {ex != null});
@@ -285,6 +282,14 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
         }
 
         return failover;
+    }
+
+    private Exception getExceptionIfPresent(Exchange exchange) {
+        Message outMessage = exchange.getOutMessage();
+        Exception ex = outMessage.get(Exception.class) != null
+                       ? outMessage.get(Exception.class)
+                       : exchange.get(Exception.class);
+        return ex;
     }
     
     /**

@@ -522,6 +522,11 @@
             <artifactId>atmosphere-runtime</artifactId>
             <version>${cxf.atmosphere.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.qi4j.library</groupId>
+            <artifactId>org.qi4j.library.circuitbreaker</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

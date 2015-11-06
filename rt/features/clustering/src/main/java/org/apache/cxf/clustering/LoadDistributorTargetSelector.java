@@ -212,8 +212,8 @@ public class LoadDistributorTargetSelector extends FailoverTargetSelector {
     }
 
     @Override
-    protected boolean requiresFailover(Exchange exchange) {
-        return failover && super.requiresFailover(exchange);
+    protected boolean requiresFailover(Exchange exchange, Exception ex) {
+        return failover && super.requiresFailover(exchange, ex);
     }
 
 }

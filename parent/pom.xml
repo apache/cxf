@@ -195,6 +195,7 @@
         <cxf.tika.version>1.6</cxf.tika.version>
         <cxf.jexl.version>2.1.1</cxf.jexl.version>
         <cxf.htrace.version>4.0.1-incubating</cxf.htrace.version>
+        <cxf.zest.version>2.1</cxf.zest.version>
         <cxf.checkstyle.extension />
         <cxf.jaxb.context.class />
         <cxf.jaxb.context.class.property>none</cxf.jaxb.context.class.property>
@@ -1790,6 +1791,11 @@
                 <groupId>org.apache.htrace</groupId>
                 <artifactId>htrace-core4</artifactId>
                 <version>${cxf.htrace.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.qi4j.library</groupId>
+                <artifactId>org.qi4j.library.circuitbreaker</artifactId>
+                <version>${cxf.zest.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
