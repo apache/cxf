@@ -357,6 +357,7 @@ public final class InjectionUtils {
         return null;
     }
     
+    @SuppressWarnings("unchecked")
     public static <T> T handleParameter(String value, 
                                         boolean decoded,
                                         Class<T> pClass,
@@ -385,11 +386,16 @@ public final class InjectionUtils {
             throw createParamConversionException(pType, nfe);
         }
         if (result != null) {
-            return pClass.cast(result);
+            T theResult = null;
+            if (pClass.isPrimitive()) {
+                theResult = (T)result;
+            } else {
+                theResult = pClass.cast(result);
+            }
+            return theResult;
         }
         if (pClass.isPrimitive()) {
             try {
-                @SuppressWarnings("unchecked")
                 T ret = (T)PrimitiveUtils.read(value, pClass);
                 // cannot us pClass.cast as the pClass is something like
                 // Boolean.TYPE (representing the boolean primitive) and

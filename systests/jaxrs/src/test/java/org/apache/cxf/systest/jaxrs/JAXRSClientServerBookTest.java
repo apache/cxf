@@ -135,11 +135,12 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     public void testEchoXmlBookQuery() throws Exception {
         String address = "http://localhost:" + PORT;
         BookStore store = JAXRSClientFactory.create(address, BookStore.class,
-            Collections.singletonList(new BookServer.XmlBookParamConverter()));
-        Book b = store.echoXmlBookQuery(new Book("query", 125L));
+            Collections.singletonList(new BookServer.ParamConverterImpl()));
+        Book b = store.echoXmlBookQuery(new Book("query", 125L), (byte)125);
         assertEquals(125L, b.getId());
         assertEquals("query", b.getName());
     }
+    
     @Test
     public void testGetBookRoot() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/;JSESSIONID=xxx";
