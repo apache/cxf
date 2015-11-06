@@ -1201,15 +1201,16 @@ public class SourceGenerator {
         boolean multipart = false;
         boolean formOrMultipartParamsAvailable = false;
         String requestMediaType = null;
+        int currentSize = 0;
         if (requestEl != null) {
             inParamEls.addAll(getWadlElements(requestEl, "param"));
-            int currentSize = inParamEls.size();
+            currentSize = inParamEls.size();
             List<Element> repElements = getWadlElements(requestEl, "representation");
             form = addFormParameters(inParamEls, requestEl, repElements);
             if (form) {
                 formOrMultipartParamsAvailable = currentSize < inParamEls.size();
                 requestMediaType = repElements.get(0).getAttribute("mediaType");
-                multipart = form && requestMediaType.startsWith("multipart/");
+                multipart = requestMediaType.startsWith("multipart/");
             }
         }
                   
@@ -1218,7 +1219,7 @@ public class SourceGenerator {
             Element paramEl = inParamEls.get(i);
             
             Class<?> paramAnn = getParamAnnotation(paramEl.getAttribute("style"));
-            if (paramAnn == QueryParam.class && formOrMultipartParamsAvailable) {
+            if (i >= currentSize && paramAnn == QueryParam.class && formOrMultipartParamsAvailable) {
                 paramAnn = !multipart ? FormParam.class : Multipart.class; 
             } 
             String name = paramEl.getAttribute("name");

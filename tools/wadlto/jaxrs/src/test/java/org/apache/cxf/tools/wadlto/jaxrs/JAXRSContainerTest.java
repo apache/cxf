@@ -314,6 +314,31 @@ public class JAXRSContainerTest extends ProcessorTestBase {
         }
     }
     
+    @Test
+    public void testQueryMultipartParam() {
+        try {
+            JAXRSContainer container = new JAXRSContainer(null);
+
+            ToolContext context = new ToolContext();
+            context.put(WadlToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
+            context.put(WadlToolConstants.CFG_WADLURL, getLocation("/wadl/testQueryMultipartParam.wadl"));
+            context.put(WadlToolConstants.CFG_COMPILE, "true");
+
+            container.setContext(context);
+            container.execute();
+
+            assertNotNull(output.list());
+            
+            List<File> files = FileUtils.getFilesRecurse(output, ".+\\." + "class" + "$");
+            assertEquals(2, files.size());
+            assertTrue(checkContains(files, "application.Test1.class"));
+            assertTrue(checkContains(files, "application.Test2.class"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
+    
     @Test    
     public void testCodeGenWithImportedSchemaAndResourceSet() {
         try {
