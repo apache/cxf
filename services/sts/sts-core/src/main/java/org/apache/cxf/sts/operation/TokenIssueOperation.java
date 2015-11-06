@@ -31,12 +31,15 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.rt.security.claims.ClaimCollection;
 import org.apache.cxf.sts.QNameConstants;
+import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.event.STSIssueFailureEvent;
 import org.apache.cxf.sts.event.STSIssueSuccessEvent;
 import org.apache.cxf.sts.request.KeyRequirements;
@@ -286,7 +289,16 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
             QNameConstants.WS_TRUST_FACTORY.createRequestedSecurityToken(requestedTokenType);
         LOG.fine("Encrypting Issued Token: " + encryptIssuedToken);
         if (!encryptIssuedToken) {
-            requestedTokenType.setAny(tokenResponse.getToken());
+            if (tokenResponse.getToken() instanceof String) {
+                Document doc = DOMUtils.newDocument();
+                Element requestedTokenEl = doc.createElementNS(STSConstants.WST_NS_05_12, 
+                                                             "RequestedSecurityToken");
+                requestedTokenEl.setTextContent((String)tokenResponse.getToken());
+                response.getAny().add(requestedTokenEl);
+            } else {
+                requestedTokenType.setAny(tokenResponse.getToken());
+                response.getAny().add(requestedToken);
+            }
         } else {
             if (!(tokenResponse.getToken() instanceof Element)) {
                 throw new STSException("Error in creating the response", STSException.REQUEST_FAILED);
@@ -297,8 +309,8 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
                     encryptionProperties, keyRequirements, webServiceContext
                 )
             );
+            response.getAny().add(requestedToken);
         }
-        response.getAny().add(requestedToken);
 
         if (returnReferences) {
             // RequestedAttachedReference
