@@ -44,11 +44,11 @@
     <util:list id="transportTokenValidators">
         <ref bean="transportSAMLValidator"/>
     </util:list>
-    <bean id="realmA" class="org.apache.cxf.sts.token.realm.SAMLRealm">
+    <bean id="realmA" class="org.apache.cxf.sts.token.realm.RealmProperties">
         <property name="issuer" value="A-Issuer"/>
         <property name="signatureAlias" value="myclientkey"/>
     </bean>
-    <bean id="realmC" class="org.apache.cxf.sts.token.realm.SAMLRealm">
+    <bean id="realmC" class="org.apache.cxf.sts.token.realm.RealmProperties">
         <property name="issuer" value="C-Issuer"/>
         <property name="signatureAlias" value="myservicekey"/>
     </bean>

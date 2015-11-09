@@ -84,10 +84,10 @@
         <value>https://localhost:(\d)*/doubleit/services/doubleittransport.*
         </value>
     </util:list>
-    <bean id="realmA" class="org.apache.cxf.sts.token.realm.SAMLRealm">
+    <bean id="realmA" class="org.apache.cxf.sts.token.realm.RealmProperties">
         <property name="issuer" value="a-issuer"/>
     </bean>
-    <bean id="realmB" class="org.apache.cxf.sts.token.realm.SAMLRealm">
+    <bean id="realmB" class="org.apache.cxf.sts.token.realm.RealmProperties">
         <property name="issuer" value="b-issuer"/>
     </bean>
     <util:map id="realms">

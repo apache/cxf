@@ -43,7 +43,7 @@ import org.apache.cxf.sts.token.provider.SAMLTokenProvider;
 import org.apache.cxf.sts.token.provider.TokenProvider;
 import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.cxf.sts.token.provider.TokenProviderResponse;
-import org.apache.cxf.sts.token.realm.SAMLRealm;
+import org.apache.cxf.sts.token.realm.RealmProperties;
 import org.apache.cxf.sts.token.realm.SAMLRealmCodec;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
@@ -188,7 +188,7 @@ public class SAMLTokenValidatorRealmTest extends org.junit.Assert {
         providerParameters.setRealm(realm);
         
         // Create Realms
-        Map<String, SAMLRealm> samlRealms = getSamlRealms();
+        Map<String, RealmProperties> samlRealms = getSamlRealms();
         ((SAMLTokenProvider)samlTokenProvider).setRealmMap(samlRealms);
         
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
@@ -198,13 +198,13 @@ public class SAMLTokenValidatorRealmTest extends org.junit.Assert {
         return (Element)providerResponse.getToken();
     }
     
-    private Map<String, SAMLRealm> getSamlRealms() {
+    private Map<String, RealmProperties> getSamlRealms() {
         // Create Realms
-        Map<String, SAMLRealm> samlRealms = new HashMap<String, SAMLRealm>();
-        SAMLRealm samlRealm = new SAMLRealm();
+        Map<String, RealmProperties> samlRealms = new HashMap<String, RealmProperties>();
+        RealmProperties samlRealm = new RealmProperties();
         samlRealm.setIssuer("A-Issuer");
         samlRealms.put("A", samlRealm);
-        samlRealm = new SAMLRealm();
+        samlRealm = new RealmProperties();
         samlRealm.setIssuer("B-Issuer");
         samlRealms.put("B", samlRealm);
         return samlRealms;

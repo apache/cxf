@@ -47,7 +47,7 @@ import org.apache.cxf.sts.token.provider.SAMLTokenProvider;
 import org.apache.cxf.sts.token.provider.TokenProvider;
 import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.cxf.sts.token.provider.TokenProviderResponse;
-import org.apache.cxf.sts.token.realm.SAMLRealm;
+import org.apache.cxf.sts.token.realm.RealmProperties;
 import org.apache.cxf.sts.token.realm.SAMLRealmCodec;
 import org.apache.cxf.sts.token.validator.IssuerSAMLRealmCodec;
 import org.apache.cxf.sts.token.validator.SAMLTokenValidator;
@@ -128,7 +128,7 @@ public class SAMLTokenRenewerRealmTest extends org.junit.Assert {
         TokenRenewer samlTokenRenewer = new SAMLTokenRenewer();
         samlTokenRenewer.setVerifyProofOfPossession(false);
         samlTokenRenewer.setAllowRenewalAfterExpiry(true);
-        Map<String, SAMLRealm> samlRealms = getSamlRealms();
+        Map<String, RealmProperties> samlRealms = getSamlRealms();
         ((SAMLTokenRenewer)samlTokenRenewer).setRealmMap(samlRealms);
         String realm = validatorResponse.getTokenRealm();
         assertTrue(samlTokenRenewer.canHandleToken(validatorResponse.getToken(), realm));
@@ -201,7 +201,7 @@ public class SAMLTokenRenewerRealmTest extends org.junit.Assert {
         TokenRenewer samlTokenRenewer = new SAMLTokenRenewer();
         samlTokenRenewer.setVerifyProofOfPossession(false);
         samlTokenRenewer.setAllowRenewalAfterExpiry(true);
-        Map<String, SAMLRealm> samlRealms = getSamlRealms();
+        Map<String, RealmProperties> samlRealms = getSamlRealms();
         ((SAMLTokenRenewer)samlTokenRenewer).setRealmMap(samlRealms);
         String realm = validatorResponse.getTokenRealm();
         assertTrue(samlTokenRenewer.canHandleToken(validatorResponse.getToken(), realm));
@@ -287,7 +287,7 @@ public class SAMLTokenRenewerRealmTest extends org.junit.Assert {
         }
         
         // Create Realms
-        Map<String, SAMLRealm> samlRealms = getSamlRealms();
+        Map<String, RealmProperties> samlRealms = getSamlRealms();
         ((SAMLTokenProvider)samlTokenProvider).setRealmMap(samlRealms);
         
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
@@ -297,13 +297,13 @@ public class SAMLTokenRenewerRealmTest extends org.junit.Assert {
         return (Element)providerResponse.getToken();
     }
     
-    private Map<String, SAMLRealm> getSamlRealms() {
+    private Map<String, RealmProperties> getSamlRealms() {
         // Create Realms
-        Map<String, SAMLRealm> samlRealms = new HashMap<String, SAMLRealm>();
-        SAMLRealm samlRealm = new SAMLRealm();
+        Map<String, RealmProperties> samlRealms = new HashMap<String, RealmProperties>();
+        RealmProperties samlRealm = new RealmProperties();
         samlRealm.setIssuer("A-Issuer");
         samlRealms.put("A", samlRealm);
-        samlRealm = new SAMLRealm();
+        samlRealm = new RealmProperties();
         samlRealm.setIssuer("B-Issuer");
         samlRealms.put("B", samlRealm);
         return samlRealms;

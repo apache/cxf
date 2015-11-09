@@ -23,6 +23,7 @@ import java.security.Principal;
 import java.security.cert.Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +48,7 @@ import org.apache.cxf.sts.token.provider.AbstractSAMLTokenProvider;
 import org.apache.cxf.sts.token.provider.ConditionsProvider;
 import org.apache.cxf.sts.token.provider.DefaultConditionsProvider;
 import org.apache.cxf.sts.token.provider.TokenProviderParameters;
-import org.apache.cxf.sts.token.realm.SAMLRealm;
+import org.apache.cxf.sts.token.realm.RealmProperties;
 import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
@@ -85,7 +86,7 @@ public class SAMLTokenRenewer extends AbstractSAMLTokenProvider implements Token
     private static final Logger LOG = LogUtils.getL7dLogger(SAMLTokenRenewer.class);
     private boolean signToken = true;
     private ConditionsProvider conditionsProvider = new DefaultConditionsProvider();
-    private Map<String, SAMLRealm> realmMap = new HashMap<>();
+    private Map<String, RealmProperties> realmMap = new HashMap<>();
     private long maxExpiry = DEFAULT_MAX_EXPIRY;
     // boolean to enable/disable the check of proof of possession
     private boolean verifyProofOfPossession = true;
@@ -265,19 +266,20 @@ public class SAMLTokenRenewer extends AbstractSAMLTokenProvider implements Token
     }
     
     /**
-     * Set the map of realm->SAMLRealm for this token provider
-     * @param realms the map of realm->SAMLRealm for this token provider
+     * Set the map of realm->RealmProperties for this token provider
+     * @param realms the map of realm->RealmProperties for this token provider
      */
-    public void setRealmMap(Map<String, SAMLRealm> realms) {
-        this.realmMap = realms;
+    public void setRealmMap(Map<String, ? extends RealmProperties> realms) {
+        this.realmMap.clear();
+        this.realmMap.putAll(realms);
     }
     
     /**
-     * Get the map of realm->SAMLRealm for this token provider
-     * @return the map of realm->SAMLRealm for this token provider
+     * Get the map of realm->RealmProperties for this token provider
+     * @return the map of realm->RealmProperties for this token provider
      */
-    public Map<String, SAMLRealm> getRealmMap() {
-        return realmMap;
+    public Map<String, RealmProperties> getRealmMap() {
+        return Collections.unmodifiableMap(realmMap);
     }
     
     private void validateAssertion(
@@ -426,7 +428,7 @@ public class SAMLTokenRenewer extends AbstractSAMLTokenProvider implements Token
         if (signToken) {
             STSPropertiesMBean stsProperties = tokenParameters.getStsProperties();
             String realm = tokenParameters.getRealm();
-            SAMLRealm samlRealm = null;
+            RealmProperties samlRealm = null;
             if (realm != null && realmMap.containsKey(realm)) {
                 samlRealm = realmMap.get(realm);
             }

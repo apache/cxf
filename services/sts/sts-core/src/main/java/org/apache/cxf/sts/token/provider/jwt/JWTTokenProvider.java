@@ -20,6 +20,7 @@
 package org.apache.cxf.sts.token.provider.jwt;
 
 import java.security.KeyStore;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -45,7 +46,7 @@ import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.sts.token.provider.TokenProvider;
 import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.cxf.sts.token.provider.TokenProviderResponse;
-import org.apache.cxf.sts.token.realm.SAMLRealm;
+import org.apache.cxf.sts.token.realm.RealmProperties;
 import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.Merlin;
@@ -60,7 +61,7 @@ public class JWTTokenProvider implements TokenProvider {
     private static final Logger LOG = LogUtils.getL7dLogger(JWTTokenProvider.class);
     
     private boolean signToken = true;
-    private Map<String, SAMLRealm> realmMap = new HashMap<>();
+    private Map<String, RealmProperties> realmMap = new HashMap<>();
     private JWTClaimsProvider jwtClaimsProvider = new DefaultJWTClaimsProvider();
     
     /**
@@ -165,19 +166,20 @@ public class JWTTokenProvider implements TokenProvider {
     }
     
     /**
-     * Set the map of realm->SAMLRealm for this token provider
-     * @param realms the map of realm->SAMLRealm for this token provider
+     * Set the map of realm->RealmProperties for this token provider
+     * @param realms the map of realm->RealmProperties for this token provider
      */
-    public void setRealmMap(Map<String, SAMLRealm> realms) {
-        this.realmMap = realms;
+    public void setRealmMap(Map<String, ? extends RealmProperties> realms) {
+        this.realmMap.clear();
+        this.realmMap.putAll(realms);
     }
     
     /**
-     * Get the map of realm->SAMLRealm for this token provider
-     * @return the map of realm->SAMLRealm for this token provider
+     * Get the map of realm->RealmProperties for this token provider
+     * @return the map of realm->RealmProperties for this token provider
      */
-    public Map<String, SAMLRealm> getRealmMap() {
-        return realmMap;
+    public Map<String, RealmProperties> getRealmMap() {
+        return Collections.unmodifiableMap(realmMap);
     }
 
     public JWTClaimsProvider getJwtClaimsProvider() {
@@ -190,7 +192,7 @@ public class JWTTokenProvider implements TokenProvider {
     
     private String signToken(
         JwtToken token, 
-        SAMLRealm samlRealm,
+        RealmProperties jwtRealm,
         STSPropertiesMBean stsProperties,
         TokenRequirements tokenRequirements
     ) throws Exception {
@@ -204,18 +206,18 @@ public class JWTTokenProvider implements TokenProvider {
             SignatureProperties signatureProperties = stsProperties.getSignatureProperties();
             String alias = stsProperties.getSignatureUsername();
 
-            if (samlRealm != null) {
+            if (jwtRealm != null) {
                 // If SignatureCrypto configured in realm then
                 // callbackhandler and alias of STSPropertiesMBean is ignored
-                if (samlRealm.getSignatureCrypto() != null) {
+                if (jwtRealm.getSignatureCrypto() != null) {
                     LOG.fine("SAMLRealm signature keystore used");
-                    signatureCrypto = samlRealm.getSignatureCrypto();
-                    callbackHandler = samlRealm.getCallbackHandler();
-                    alias = samlRealm.getSignatureAlias();
+                    signatureCrypto = jwtRealm.getSignatureCrypto();
+                    callbackHandler = jwtRealm.getCallbackHandler();
+                    alias = jwtRealm.getSignatureAlias();
                 }
                 // SignatureProperties can be defined independently of SignatureCrypto
-                if (samlRealm.getSignatureProperties() != null) {
-                    signatureProperties = samlRealm.getSignatureProperties();
+                if (jwtRealm.getSignatureProperties() != null) {
+                    signatureProperties = jwtRealm.getSignatureProperties();
                 }
             }
 

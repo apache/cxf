@@ -29,7 +29,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.SignatureProperties;
 import org.apache.cxf.sts.request.KeyRequirements;
-import org.apache.cxf.sts.token.realm.SAMLRealm;
+import org.apache.cxf.sts.token.realm.RealmProperties;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
@@ -43,7 +43,7 @@ public abstract class AbstractSAMLTokenProvider {
     
     protected void signToken(
         SamlAssertionWrapper assertion, 
-        SAMLRealm samlRealm,
+        RealmProperties samlRealm,
         STSPropertiesMBean stsProperties,
         KeyRequirements keyRequirements
     ) throws Exception {
