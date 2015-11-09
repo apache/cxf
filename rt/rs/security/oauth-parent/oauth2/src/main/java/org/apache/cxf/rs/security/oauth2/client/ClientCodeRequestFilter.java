@@ -114,7 +114,7 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
         if (sc == null || sc.getUserPrincipal() == null) {
             if (codeParam == null 
                 && requestParams.containsKey(OAuthConstants.ERROR_KEY)
-                && OAuthConstants.ACCESS_DENIED.equals(requestParams.get(OAuthConstants.ERROR_KEY))
+                && OAuthConstants.ACCESS_DENIED.equals(requestParams.getFirst(OAuthConstants.ERROR_KEY))
                 && !faultAccessDeniedResponses) {
                 if (!applicationCanHandleAccessDenied) {
                     rc.abortWith(Response.ok(new AccessDeniedResponse()).build());    
