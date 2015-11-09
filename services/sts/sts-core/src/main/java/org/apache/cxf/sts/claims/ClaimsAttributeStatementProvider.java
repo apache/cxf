@@ -36,35 +36,7 @@ public class ClaimsAttributeStatementProvider implements AttributeStatementProvi
 
     public AttributeStatementBean getStatement(TokenProviderParameters providerParameters) {
         // Handle Claims
-        ClaimsManager claimsManager = providerParameters.getClaimsManager();
-        ProcessedClaimCollection retrievedClaims = new ProcessedClaimCollection();
-        if (claimsManager != null) {
-            ClaimsParameters params = new ClaimsParameters();
-            params.setAdditionalProperties(providerParameters.getAdditionalProperties());
-            params.setAppliesToAddress(providerParameters.getAppliesToAddress());
-            params.setEncryptionProperties(providerParameters.getEncryptionProperties());
-            params.setKeyRequirements(providerParameters.getKeyRequirements());
-            if (providerParameters.getTokenRequirements().getOnBehalfOf() != null) {
-                params.setPrincipal(providerParameters.getTokenRequirements().getOnBehalfOf().getPrincipal());
-                params.setRoles(providerParameters.getTokenRequirements().getOnBehalfOf().getRoles());
-            } else if (providerParameters.getTokenRequirements().getActAs() != null) {
-                params.setPrincipal(providerParameters.getTokenRequirements().getActAs().getPrincipal());    
-                params.setRoles(providerParameters.getTokenRequirements().getActAs().getRoles());
-            } else {
-                params.setPrincipal(providerParameters.getPrincipal());
-            }
-            params.setRealm(providerParameters.getRealm());
-            params.setStsProperties(providerParameters.getStsProperties());
-            params.setTokenRequirements(providerParameters.getTokenRequirements());
-            params.setTokenStore(providerParameters.getTokenStore());
-            params.setWebServiceContext(providerParameters.getWebServiceContext());
-            retrievedClaims = 
-                claimsManager.retrieveClaimValues(
-                    providerParameters.getRequestedPrimaryClaims(),
-                    providerParameters.getRequestedSecondaryClaims(),
-                    params
-                );
-        }
+        ProcessedClaimCollection retrievedClaims = ClaimsUtils.processClaims(providerParameters);
         if (retrievedClaims == null) {
             return null;
         }
