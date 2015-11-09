@@ -27,6 +27,7 @@ import javax.security.auth.x500.X500Principal;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
+import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.request.ReceivedToken.STATE;
 import org.apache.cxf.sts.token.provider.TokenProviderParameters;
@@ -49,7 +50,15 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
         JwtClaims claims = new JwtClaims();
         claims.setSubject(getSubjectName(jwtClaimsProviderParameters));
         claims.setTokenId(UUID.randomUUID().toString());
-        claims.setIssuer("DoubleItSTSIssuer");
+        
+        // Set the Issuer
+        String issuer = jwtClaimsProviderParameters.getIssuer();
+        if (issuer == null) {
+            STSPropertiesMBean stsProperties = jwtClaimsProviderParameters.getProviderParameters().getStsProperties();
+            claims.setIssuer(stsProperties.getIssuer());
+        } else {
+            claims.setIssuer(issuer);
+        }
         
         Date currentDate = new Date();
         claims.setIssuedAt(currentDate.getTime() / 1000L);
