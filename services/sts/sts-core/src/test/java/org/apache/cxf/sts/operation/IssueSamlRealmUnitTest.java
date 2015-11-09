@@ -46,7 +46,7 @@ import org.apache.cxf.sts.service.ServiceMBean;
 import org.apache.cxf.sts.service.StaticService;
 import org.apache.cxf.sts.token.provider.SAMLTokenProvider;
 import org.apache.cxf.sts.token.provider.TokenProvider;
-import org.apache.cxf.sts.token.realm.SAMLRealm;
+import org.apache.cxf.sts.token.realm.RealmProperties;
 import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseCollectionType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseType;
@@ -332,8 +332,8 @@ public class IssueSamlRealmUnitTest extends org.junit.Assert {
         issueOperation.setStsProperties(stsProperties);
         
         // Set signature properties in SAMLRealm B
-        Map<String, SAMLRealm> samlRealms = provider.getRealmMap();
-        SAMLRealm realm = samlRealms.get("B");
+        Map<String, RealmProperties> samlRealms = provider.getRealmMap();
+        RealmProperties realm = samlRealms.get("B");
         realm.setSignatureCrypto(crypto);
         realm.setCallbackHandler(new PasswordCallbackHandler());
         
@@ -431,8 +431,8 @@ public class IssueSamlRealmUnitTest extends org.junit.Assert {
         issueOperation.setStsProperties(stsProperties);
         
         // Set signature properties in SAMLRealm B
-        Map<String, SAMLRealm> samlRealms = provider.getRealmMap();
-        SAMLRealm realm = samlRealms.get("B");
+        Map<String, RealmProperties> samlRealms = provider.getRealmMap();
+        RealmProperties realm = samlRealms.get("B");
         realm.setSignatureCrypto(CryptoFactory.getInstance(getEncryptionPropertiesPKCS12()));
         realm.setCallbackHandler(new PasswordCallbackHandler());
         
@@ -485,12 +485,12 @@ public class IssueSamlRealmUnitTest extends org.junit.Assert {
     /**
      * Create some SAML Realms
      */
-    private Map<String, SAMLRealm> createRealms() {
-        Map<String, SAMLRealm> samlRealms = new HashMap<String, SAMLRealm>();
-        SAMLRealm samlRealm = new SAMLRealm();
+    private Map<String, RealmProperties> createRealms() {
+        Map<String, RealmProperties> samlRealms = new HashMap<String, RealmProperties>();
+        RealmProperties samlRealm = new RealmProperties();
         samlRealm.setIssuer("A-Issuer");
         samlRealms.put("A", samlRealm);
-        samlRealm = new SAMLRealm();
+        samlRealm = new RealmProperties();
         samlRealm.setIssuer("B-Issuer");
         samlRealms.put("B", samlRealm);
         

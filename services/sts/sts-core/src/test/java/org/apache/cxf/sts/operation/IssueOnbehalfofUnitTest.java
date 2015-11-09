@@ -33,6 +33,7 @@ import javax.xml.namespace.QName;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxws.context.WebServiceContextImpl;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
@@ -63,7 +64,7 @@ import org.apache.cxf.sts.token.provider.SAMLTokenProvider;
 import org.apache.cxf.sts.token.provider.TokenProvider;
 import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.cxf.sts.token.provider.TokenProviderResponse;
-import org.apache.cxf.sts.token.realm.SAMLRealm;
+import org.apache.cxf.sts.token.realm.RealmProperties;
 import org.apache.cxf.sts.token.validator.IssuerSAMLRealmCodec;
 import org.apache.cxf.sts.token.validator.SAMLTokenValidator;
 import org.apache.cxf.sts.token.validator.TokenValidator;
@@ -87,7 +88,6 @@ import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.dom.WSConstants;
-
 
 /**
  * Some unit tests for the issue operation.
@@ -920,7 +920,7 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         stsProperties.setIdentityMapper(new CustomIdentityMapper());
         issueOperation.setStsProperties(stsProperties);
         
-        Map<String, SAMLRealm> realms = createSamlRealms();
+        Map<String, RealmProperties> realms = createSamlRealms();
         
         // Mock up a request
         RequestSecurityTokenType request = new RequestSecurityTokenType();
@@ -1224,7 +1224,7 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
      */
     private Element createSAMLAssertion(
             String tokenType, Crypto crypto, String signatureUsername, CallbackHandler callbackHandler,
-            Map<String, SAMLRealm> realms, String keyType
+            Map<String, RealmProperties> realms, String keyType
     ) throws WSSecurityException {
         SAMLTokenProvider samlTokenProvider = new SAMLTokenProvider();
         samlTokenProvider.setRealmMap(realms);
@@ -1315,13 +1315,13 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         return tokenType;
     }
 
-    private Map<String, SAMLRealm> createSamlRealms() {
+    private Map<String, RealmProperties> createSamlRealms() {
         // Create Realms
-        Map<String, SAMLRealm> samlRealms = new HashMap<String, SAMLRealm>();
-        SAMLRealm samlRealm = new SAMLRealm();
+        Map<String, RealmProperties> samlRealms = new HashMap<String, RealmProperties>();
+        RealmProperties samlRealm = new RealmProperties();
         samlRealm.setIssuer("A-Issuer");
         samlRealms.put("A", samlRealm);
-        samlRealm = new SAMLRealm();
+        samlRealm = new RealmProperties();
         samlRealm.setIssuer("B-Issuer");
         samlRealms.put("B", samlRealm);
         return samlRealms;

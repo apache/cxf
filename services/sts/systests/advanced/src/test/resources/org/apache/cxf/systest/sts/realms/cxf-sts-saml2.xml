@@ -44,7 +44,7 @@
     <util:list id="transportTokenValidators">
         <ref bean="transportSAMLValidator"/>
     </util:list>
-    <bean id="realmB" class="org.apache.cxf.sts.token.realm.SAMLRealm">
+    <bean id="realmB" class="org.apache.cxf.sts.token.realm.RealmProperties">
         <property name="issuer" value="B-Issuer"/>
     </bean>
     <util:map id="realms">
