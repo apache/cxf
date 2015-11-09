@@ -25,16 +25,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
-import javax.xml.bind.JAXBElement;
-import javax.xml.namespace.QName;
-
-import org.w3c.dom.Element;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.request.Lifetime;
 import org.apache.cxf.sts.request.Participants;
-import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.wss4j.common.saml.bean.AudienceRestrictionBean;
 import org.apache.wss4j.common.saml.bean.ConditionsBean;
@@ -261,41 +254,7 @@ public class DefaultConditionsProvider implements ConditionsProvider {
      * Extract an address from a Participants EPR DOM element
      */
     protected String extractAddressFromParticipantsEPR(Object participants) {
-        if (participants instanceof Element) {
-            String localName = ((Element)participants).getLocalName();
-            String namespace = ((Element)participants).getNamespaceURI();
-            
-            if (STSConstants.WSA_NS_05.equals(namespace) && "EndpointReference".equals(localName)) {
-                LOG.fine("Found EndpointReference element");
-                Element address = 
-                    DOMUtils.getFirstChildWithName((Element)participants, 
-                            STSConstants.WSA_NS_05, "Address");
-                if (address != null) {
-                    LOG.fine("Found address element");
-                    return address.getTextContent();
-                }
-            } else if ((STSConstants.WSP_NS.equals(namespace) || STSConstants.WSP_NS_04.equals(namespace))
-                && "URI".equals(localName)) {
-                return ((Element)participants).getTextContent();
-            }
-            LOG.fine("Participants element does not exist or could not be parsed");
-            return null;
-        } else if (participants instanceof JAXBElement<?>) {
-            JAXBElement<?> jaxbElement = (JAXBElement<?>) participants;
-            QName participantsName = jaxbElement.getName();
-            if (STSConstants.WSA_NS_05.equals(participantsName.getNamespaceURI()) 
-                && "EndpointReference".equals(participantsName.getLocalPart())) {
-                LOG.fine("Found EndpointReference element");
-                EndpointReferenceType endpointReference = (EndpointReferenceType)jaxbElement.getValue();
-                if (endpointReference.getAddress() != null) {
-                    LOG.fine("Found address element");
-                    return endpointReference.getAddress().getValue();
-                }
-            }
-            LOG.fine("Participants element does not exist or could not be parsed");
-        }
-        
-        return null;
+        return TokenProviderUtils.extractAddressFromParticipantsEPR(participants);
     }
 
 }
