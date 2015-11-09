@@ -93,9 +93,18 @@ public class JWTTokenProvider implements TokenProvider {
             LOG.fine("Handling token of type: " + tokenRequirements.getTokenType());
         }
         
+        String realm = tokenParameters.getRealm();
+        RealmProperties jwtRealm = null;
+        if (realm != null && realmMap.containsKey(realm)) {
+            jwtRealm = realmMap.get(realm);
+        }
+        
         // Get the claims
         JWTClaimsProviderParameters jwtClaimsProviderParameters = new JWTClaimsProviderParameters();
         jwtClaimsProviderParameters.setProviderParameters(tokenParameters);
+        if (jwtRealm != null) {
+            jwtClaimsProviderParameters.setIssuer(jwtRealm.getIssuer());
+        }
         
         JwtClaims claims = jwtClaimsProvider.getJwtClaims(jwtClaimsProviderParameters);
         
@@ -127,7 +136,7 @@ public class JWTTokenProvider implements TokenProvider {
             
             JwtToken token = new JwtToken(claims);
             
-            String tokenData = signToken(token, null, tokenParameters.getStsProperties(), 
+            String tokenData = signToken(token, jwtRealm, tokenParameters.getStsProperties(), 
                       tokenParameters.getTokenRequirements());
             
             TokenProviderResponse response = new TokenProviderResponse();
@@ -243,8 +252,14 @@ public class JWTTokenProvider implements TokenProvider {
             String password = cb[0].getPassword();
 
             signingProperties.put(JoseConstants.RSSEC_SIGNATURE_ALGORITHM, signatureAlgorithm);
-            signingProperties.put(JoseConstants.RSSEC_KEY_STORE_ALIAS, alias);
-            signingProperties.put(JoseConstants.RSSEC_KEY_PSWD, password);
+            if (alias != null) {
+                signingProperties.put(JoseConstants.RSSEC_KEY_STORE_ALIAS, alias);
+            }
+            if (password != null) {
+                signingProperties.put(JoseConstants.RSSEC_KEY_PSWD, password);
+            } else {
+                throw new STSException("Can't get the password", STSException.REQUEST_FAILED);
+            }
             
             if (!(signatureCrypto instanceof Merlin)) {
                 throw new STSException("Can't get the keystore", STSException.REQUEST_FAILED);

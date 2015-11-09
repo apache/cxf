@@ -27,6 +27,7 @@ import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 public class JWTClaimsProviderParameters {
 
     private TokenProviderParameters providerParameters;
+    private String issuer;
     
     public TokenProviderParameters getProviderParameters() {
         return providerParameters;
@@ -34,6 +35,14 @@ public class JWTClaimsProviderParameters {
     
     public void setProviderParameters(TokenProviderParameters providerParameters) {
         this.providerParameters = providerParameters;
+    }
+
+    public String getIssuer() {
+        return issuer;
+    }
+
+    public void setIssuer(String issuer) {
+        this.issuer = issuer;
     }
     
 }
