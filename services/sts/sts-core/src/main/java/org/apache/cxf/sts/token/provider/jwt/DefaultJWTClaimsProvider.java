@@ -20,6 +20,7 @@ package org.apache.cxf.sts.token.provider.jwt;
 
 import java.security.Principal;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -28,6 +29,9 @@ import javax.security.auth.x500.X500Principal;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 import org.apache.cxf.sts.STSPropertiesMBean;
+import org.apache.cxf.sts.claims.ClaimsUtils;
+import org.apache.cxf.sts.claims.ProcessedClaim;
+import org.apache.cxf.sts.claims.ProcessedClaimCollection;
 import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.request.ReceivedToken.STATE;
 import org.apache.cxf.sts.token.provider.TokenProviderParameters;
@@ -59,6 +63,8 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
         } else {
             claims.setIssuer(issuer);
         }
+        
+        handleWSTrustClaims(jwtClaimsProviderParameters, claims);
         
         Date currentDate = new Date();
         claims.setIssuedAt(currentDate.getTime() / 1000L);
@@ -127,6 +133,26 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
         }
 
         return principal;
+    }
+    
+    protected void handleWSTrustClaims(JWTClaimsProviderParameters jwtClaimsProviderParameters, JwtClaims claims) {
+        TokenProviderParameters providerParameters = jwtClaimsProviderParameters.getProviderParameters();
+        
+        // Handle Claims
+        ProcessedClaimCollection retrievedClaims = ClaimsUtils.processClaims(providerParameters);
+        if (retrievedClaims != null) {
+            Iterator<ProcessedClaim> claimIterator = retrievedClaims.iterator();
+            while (claimIterator.hasNext()) {
+                ProcessedClaim claim = claimIterator.next();
+                if (claim.getClaimType() != null && claim.getValues() != null && !claim.getValues().isEmpty()) {
+                    Object claimValues = claim.getValues();
+                    if (claim.getValues().size() == 1) {
+                        claimValues = claim.getValues().get(0);
+                    }
+                    claims.setProperty(claim.getClaimType().toString(), claimValues);
+                }
+            }
+        }
     }
     
     public boolean isUseX500CN() {
