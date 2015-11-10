@@ -42,12 +42,14 @@ import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.SignatureProperties;
+import org.apache.cxf.sts.cache.CacheUtils;
 import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.sts.token.provider.TokenProvider;
 import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.cxf.sts.token.provider.TokenProviderResponse;
 import org.apache.cxf.sts.token.realm.RealmProperties;
 import org.apache.cxf.ws.security.sts.provider.STSException;
+import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.Merlin;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
@@ -109,31 +111,6 @@ public class JWTTokenProvider implements TokenProvider {
         JwtClaims claims = jwtClaimsProvider.getJwtClaims(jwtClaimsProviderParameters);
         
         try {
-            /*
-            Document doc = DOMUtils.createDocument();
-            SamlAssertionWrapper assertion = createSamlToken(tokenParameters, secret, doc);
-            Element token = assertion.toDOM(doc);
-            
-            // set the token in cache (only if the token is signed)
-            byte[] signatureValue = assertion.getSignatureValue();
-            if (tokenParameters.getTokenStore() != null && signatureValue != null
-                && signatureValue.length > 0) {
-                DateTime validTill = null;
-                if (assertion.getSamlVersion().equals(SAMLVersion.VERSION_20)) {
-                    validTill = assertion.getSaml2().getConditions().getNotOnOrAfter();
-                } else {
-                    validTill = assertion.getSaml1().getConditions().getNotOnOrAfter();
-                }
-                
-                SecurityToken securityToken = 
-                    CacheUtils.createSecurityTokenForStorage(token, assertion.getId(), 
-                        validTill.toDate(), tokenParameters.getPrincipal(), tokenParameters.getRealm(),
-                        tokenParameters.getTokenRequirements().getRenewing());
-                CacheUtils.storeTokenInCache(
-                    securityToken, tokenParameters.getTokenStore(), signatureValue);
-            }
-            */
-            
             JwtToken token = new JwtToken(claims);
             
             String tokenData = signToken(token, jwtRealm, tokenParameters.getStsProperties(), 
@@ -147,8 +124,23 @@ public class JWTTokenProvider implements TokenProvider {
             if (claims.getIssuedAt() > 0) {
                 response.setCreated(new Date(claims.getIssuedAt() * 1000L));
             }
+            Date expires = null;
             if (claims.getExpiryTime() > 0) {
-                response.setExpires(new Date(claims.getExpiryTime() * 1000L));
+                expires = new Date(claims.getExpiryTime() * 1000L);
+                response.setExpires(expires);
+            }
+            
+            // set the token in cache (only if the token is signed)
+            if (signToken && tokenParameters.getTokenStore() != null) {
+                SecurityToken securityToken = 
+                    CacheUtils.createSecurityTokenForStorage(null, claims.getTokenId(), 
+                        expires, tokenParameters.getPrincipal(), tokenParameters.getRealm(),
+                        tokenParameters.getTokenRequirements().getRenewing());
+                securityToken.setData(tokenData.getBytes());
+                
+                String signature = tokenData.substring(tokenData.lastIndexOf(".") + 1);
+                CacheUtils.storeTokenInCache(
+                    securityToken, tokenParameters.getTokenStore(), signature.getBytes());
             }
             
             LOG.fine("JWT Token successfully created");
