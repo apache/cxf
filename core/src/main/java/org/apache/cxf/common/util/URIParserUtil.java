@@ -20,11 +20,11 @@
 package org.apache.cxf.common.util;
 
 import java.io.File;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -222,15 +222,11 @@ public final class URIParserUtil {
         for (int x = 0; x < s.length(); x++) {
             char ch = s.charAt(x);
             if (isExcluded(ch)) {
-                try {
-                    byte[] bytes = Character.toString(ch).getBytes("UTF-8");
-                    for (int y = 0; y < bytes.length; y++) {
-                        b.append("%");
-                        b.append(HEX_DIGITS.charAt((bytes[y] & 0xFF) >> 4));
-                        b.append(HEX_DIGITS.charAt(bytes[y] & 0x0F));
-                    }
-                } catch (UnsupportedEncodingException e) {
-                    //should not happen
+                byte[] bytes = Character.toString(ch).getBytes(StandardCharsets.UTF_8);
+                for (int y = 0; y < bytes.length; y++) {
+                    b.append("%");
+                    b.append(HEX_DIGITS.charAt((bytes[y] & 0xFF) >> 4));
+                    b.append(HEX_DIGITS.charAt(bytes[y] & 0x0F));
                 }
             } else {
                 b.append(ch);

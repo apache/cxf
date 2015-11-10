@@ -23,6 +23,7 @@ package org.apache.cxf.jaxb.io;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -130,7 +131,7 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
         try {
             
             marshaller = context.createMarshaller();
-            marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
+            marshaller.setProperty(Marshaller.JAXB_ENCODING, StandardCharsets.UTF_8.name());
             marshaller.setProperty(Marshaller.JAXB_FRAGMENT, true);
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.FALSE);
             marshaller.setListener(databinding.getMarshallerListener());

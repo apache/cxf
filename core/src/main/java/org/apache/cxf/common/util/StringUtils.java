@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -197,7 +198,7 @@ public final class StringUtils {
     }    
     
     public static byte[] toBytesUTF8(String str) {
-        return toBytes(str, "UTF-8");
+        return toBytes(str, StandardCharsets.UTF_8.name());
     }
     public static byte[] toBytesASCII(String str) {
         return toBytes(str, "US-ASCII");

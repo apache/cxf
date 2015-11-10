@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -253,14 +254,14 @@ public abstract class CachedStreamTestBase extends Assert {
     protected static String readFromStream(InputStream is) throws IOException {
         try (ByteArrayOutputStream buf = new ByteArrayOutputStream()) {
             IOUtils.copyAndCloseInput(is, buf);
-            return new String(buf.toByteArray(), "UTF-8");
+            return new String(buf.toByteArray(), StandardCharsets.UTF_8);
         }
     }
 
     protected static String readPartiallyFromStream(InputStream is, int len) throws IOException {
         try (ByteArrayOutputStream buf = new ByteArrayOutputStream()) {
             IOUtils.copyAtLeast(is, buf, len);
-            return new String(buf.toByteArray(), "UTF-8");
+            return new String(buf.toByteArray(), StandardCharsets.UTF_8);
         }
     }
  

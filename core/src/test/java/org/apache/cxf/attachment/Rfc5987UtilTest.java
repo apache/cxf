@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.attachment;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,8 +50,8 @@ public class Rfc5987UtilTest {
 
     @Test
     public void test() throws Exception {
-        assertEquals(expected, Rfc5987Util.encode(input, "UTF-8"));
+        assertEquals(expected, Rfc5987Util.encode(input, StandardCharsets.UTF_8.name()));
 
-        assertEquals(input, Rfc5987Util.decode(expected, "UTF-8"));
+        assertEquals(input, Rfc5987Util.decode(expected, StandardCharsets.UTF_8.name()));
     }
 }

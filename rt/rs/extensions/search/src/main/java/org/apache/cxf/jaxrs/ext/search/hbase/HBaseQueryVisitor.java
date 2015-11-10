@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.jaxrs.ext.search.hbase;
 
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -118,10 +118,10 @@ public class HBaseQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Filt
         String theFamily = family != null ? family : familyMap.get(qualifier);
         ByteArrayComparable byteArrayComparable = regexCompRequired 
             ? new RegexStringComparator(value.toString().replace("*", "."))
-            : new BinaryComparator(getBytes(value.toString()));
+            : new BinaryComparator(value.toString().getBytes(StandardCharsets.UTF_8));
         
-        Filter query = new SingleColumnValueFilter(getBytes(theFamily),
-                                                   getBytes(qualifier),
+        Filter query = new SingleColumnValueFilter(theFamily.getBytes(StandardCharsets.UTF_8),
+                                                   qualifier.getBytes(StandardCharsets.UTF_8),
                                                    compareOp,
                                                    byteArrayComparable);
         return query;
@@ -138,11 +138,4 @@ public class HBaseQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Filt
         return list;
     }
     
-    private byte[] getBytes(String value) {
-        try {
-            return value.getBytes("UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
-    }
 }

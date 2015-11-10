@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -114,7 +115,7 @@ public final class AegisJSONProvider<T> extends AegisElementProvider<T> {
             Document dom = w3cStreamWriter.getDocument();
             // ok, now the namespace map has all the prefixes.
             
-            String enc = HttpUtils.getSetEncoding(m, headers, "UTF-8");
+            String enc = HttpUtils.getSetEncoding(m, headers, StandardCharsets.UTF_8.name());
             
             XMLStreamWriter xmlStreamWriter = createStreamWriter(aegisType.getSchemaType(), enc, os);
             xmlStreamWriter.writeStartDocument();

@@ -68,7 +68,7 @@ public class ApplicationController implements ServletContextAware {
         String consumerKey = clientApp.getConsumerKey();
         if (StringUtils.isEmpty(consumerKey)) {
             consumerKey = tokenGen
-                .generate((principal.getName() + clientApp.getClientName()).getBytes("UTF-8"));
+                .generate((principal.getName() + clientApp.getClientName()).getBytes(StandardCharsets.UTF_8));
         }
 
         String secretKey = tokenGen.generate(new SecureRandom().generateSeed(20));

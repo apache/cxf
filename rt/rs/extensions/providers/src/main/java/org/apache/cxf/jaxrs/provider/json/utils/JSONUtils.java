@@ -21,6 +21,7 @@ package org.apache.cxf.jaxrs.provider.json.utils;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -135,7 +136,7 @@ public final class JSONUtils {
     
     public static XMLStreamReader createStreamReader(InputStream is, boolean readXsiType,
         ConcurrentHashMap<String, String> namespaceMap) throws Exception {
-        return createStreamReader(is, readXsiType, namespaceMap, null, null, null, "UTF-8");
+        return createStreamReader(is, readXsiType, namespaceMap, null, null, null, StandardCharsets.UTF_8.name());
     }
     
     public static XMLStreamReader createStreamReader(InputStream is, boolean readXsiType,

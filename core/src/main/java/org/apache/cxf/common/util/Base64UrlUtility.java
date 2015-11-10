@@ -29,7 +29,7 @@ package org.apache.cxf.common.util;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 
 
 public final class Base64UrlUtility {
@@ -42,11 +42,7 @@ public final class Base64UrlUtility {
     }
 
     public static String encode(String str) {
-        try {
-            return encode(str.getBytes("UTF-8"));
-        } catch (UnsupportedEncodingException ex) {
-            throw new RuntimeException(ex);
-        }
+        return encode(str.getBytes(StandardCharsets.UTF_8));
     }
     
     public static String encode(byte[] id) {

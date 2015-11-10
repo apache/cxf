@@ -20,6 +20,7 @@ package org.apache.cxf.systest.servlet;
 
 
 
+import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -67,7 +68,7 @@ public class CXFServletTest extends AbstractServletTest {
     @Test
     public void testPostInvokeServices() throws Exception {
         
-        invoke("UTF-8");
+        invoke(StandardCharsets.UTF_8.name());
         invoke("iso-8859-1");        
     }
 

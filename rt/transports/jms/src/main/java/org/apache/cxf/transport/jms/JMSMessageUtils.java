@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -277,7 +278,7 @@ final class JMSMessageUtils {
             }
         }
 
-        String normalizedEncoding = HttpHeaderHelper.mapCharset(enc, "UTF-8");
+        String normalizedEncoding = HttpHeaderHelper.mapCharset(enc, StandardCharsets.UTF_8.name());
         if (normalizedEncoding == null) {
             String m = new org.apache.cxf.common.i18n.Message("INVALID_ENCODING_MSG", LOG, new Object[] {
                 enc

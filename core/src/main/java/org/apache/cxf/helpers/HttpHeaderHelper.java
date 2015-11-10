@@ -108,7 +108,7 @@ public final class HttpHeaderHelper {
             return deflt;
         }
         //older versions of tomcat don't properly parse ContentType headers with stuff
-        //after charset="UTF-8"
+        //after charset=StandardCharsets.UTF_8
         int idx = enc.indexOf(";");
         if (idx != -1) {
             enc = enc.substring(0, idx);

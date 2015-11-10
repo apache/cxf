@@ -22,7 +22,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.StringReader;
 import java.lang.annotation.Annotation;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -197,7 +197,7 @@ public class AtomPojoProviderTest extends Assert {
                                   new Annotation[0],
                                   MediaType.valueOf("application/atom+xml;type=entry"),
                                   new MetadataMap<String, String>(),
-                                  new ByteArrayInputStream(entryNoContent.getBytes(Charset.forName("UTF-8"))));
+                                  new ByteArrayInputStream(entryNoContent.getBytes(StandardCharsets.UTF_8)));
         assertNull(type);
     }
     
@@ -231,7 +231,7 @@ public class AtomPojoProviderTest extends Assert {
                                   new Annotation[0],
                                   MediaType.valueOf(mediaType),
                                   new MetadataMap<String, String>(),
-                                  new ByteArrayInputStream(entryWithContent.getBytes(Charset.forName("UTF-8"))));
+                                  new ByteArrayInputStream(entryWithContent.getBytes(StandardCharsets.UTF_8)));
         assertNotNull(type);
     }
     

@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.ws.rm;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -39,7 +40,7 @@ public class CapturingXMLWriter implements XMLStreamWriter {
 
     public CapturingXMLWriter(XMLStreamWriter del) {
         delegate = del;
-        capture = StaxUtils.createXMLStreamWriter(bos, "UTF-8");
+        capture = StaxUtils.createXMLStreamWriter(bos, StandardCharsets.UTF_8.name());
         
         Map<String, String> map = new HashMap<String, String>();
         map.put("{http://schemas.xmlsoap.org/ws/2005/02/rm}Sequence", "");

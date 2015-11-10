@@ -19,6 +19,7 @@
 package org.apache.cxf.rs.security.oidc.rp;
 
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 
 import javax.annotation.Priority;
 import javax.ws.rs.Priorities;
@@ -85,9 +86,9 @@ public class OidcRpAuthenticationFilter implements ContainerRequestFilter {
         MultivaluedMap<String, String> requestState = new MetadataMap<String, String>();
         requestState.putAll(rc.getUriInfo().getQueryParameters(true));
         if (MediaType.APPLICATION_FORM_URLENCODED_TYPE.isCompatible(rc.getMediaType())) {
-            String body = FormUtils.readBody(rc.getEntityStream(), "UTF-8");
+            String body = FormUtils.readBody(rc.getEntityStream(), StandardCharsets.UTF_8.name());
             FormUtils.populateMapFromString(requestState, JAXRSUtils.getCurrentMessage(), body, 
-                                            "UTF-8", true);
+                                            StandardCharsets.UTF_8.name(), true);
         }
         return requestState;
     }

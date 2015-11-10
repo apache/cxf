@@ -25,6 +25,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
 import java.security.AccessController;
 import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
@@ -226,11 +227,7 @@ public class SwAOutInterceptor extends AbstractSoapInterceptor {
                 if (ct == null) {
                     ct = "text/plain; charset=\'UTF-8\'";
                 }
-                try {
-                    dh = new DataHandler(new ByteDataSource(((String)o).getBytes("UTF-8"), ct));
-                } catch (IOException e) {
-                    throw new Fault(e);
-                }                
+                dh = new DataHandler(new ByteDataSource(((String)o).getBytes(StandardCharsets.UTF_8), ct));
             } else {
                 throw new Fault(new org.apache.cxf.common.i18n.Message("ATTACHMENT_NOT_SUPPORTED", 
                                                                        LOG, o.getClass()));
@@ -260,7 +257,7 @@ public class SwAOutInterceptor extends AbstractSoapInterceptor {
                     IOUtils.copy(src.getInputStream(), bos, 1024);
                     ds = new ByteDataSource(bos.toByteArray(), ct);
                 } else {
-                    ds = new ByteDataSource(IOUtils.toString(src.getReader()).getBytes("UTF-8"),
+                    ds = new ByteDataSource(IOUtils.toString(src.getReader()).getBytes(StandardCharsets.UTF_8),
                                                  ct);                            
                 }
             } catch (IOException e) {

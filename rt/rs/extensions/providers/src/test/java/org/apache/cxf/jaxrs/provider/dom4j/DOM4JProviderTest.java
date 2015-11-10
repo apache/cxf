@@ -21,6 +21,7 @@ package org.apache.cxf.jaxrs.provider.dom4j;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.lang.annotation.Annotation;
+import java.nio.charset.StandardCharsets;
 
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
@@ -58,7 +59,7 @@ public class DOM4JProviderTest extends Assert {
         p.setProviders(new ProvidersImpl(createMessage(false)));
         org.dom4j.Document dom = p.readFrom(org.dom4j.Document.class, org.dom4j.Document.class, 
             new Annotation[] {}, ct, new MetadataMap<String, String>(),
-            new ByteArrayInputStream(xml.getBytes("UTF-8")));
+            new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
         return dom;
     }
     
@@ -69,7 +70,7 @@ public class DOM4JProviderTest extends Assert {
         p.setProviders(new ProvidersImpl(createMessage(false)));
         org.dom4j.Document dom = p.readFrom(org.dom4j.Document.class, org.dom4j.Document.class, 
                    new Annotation[]{}, MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, String>(),
-                   new ByteArrayInputStream(xml.getBytes("UTF-8")));
+                   new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
         String str = dom.asXML();
         // starts with the xml PI
         assertTrue(str.contains("<a><b>2</b></a>"));

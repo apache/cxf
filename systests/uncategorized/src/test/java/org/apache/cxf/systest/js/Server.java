@@ -21,6 +21,7 @@ package org.apache.cxf.systest.js;
 
 import java.io.File;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.cxf.js.rhino.ProviderFactory;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
@@ -33,11 +34,11 @@ public class Server extends AbstractBusTestServerBase {
     protected void run()  {
         try {            
             String f = getClass().getResource("resources/hello_world.js").toURI().getPath();
-            f = URLDecoder.decode(f, "UTF-8");
+            f = URLDecoder.decode(f, StandardCharsets.UTF_8.name());
             pf.createAndPublish(new File(f), "http://localhost:" + JS_PORT 
                                 + "/SoapContext/SoapPort", false);
             f = getClass().getResource("resources/hello_world.jsx").toURI().getPath();
-            f = URLDecoder.decode(f, "UTF-8");
+            f = URLDecoder.decode(f, StandardCharsets.UTF_8.name());
             pf.createAndPublish(new File(f), "http://localhost:" + JSX_PORT, false);
         } catch (Exception ex) {
             ex.printStackTrace();

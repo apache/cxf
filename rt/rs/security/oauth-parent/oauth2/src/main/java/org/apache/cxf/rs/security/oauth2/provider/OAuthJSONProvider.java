@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -81,7 +82,7 @@ public class OAuthJSONProvider implements MessageBodyWriter<Object>,
         
         sb.append("}");
         String result = sb.toString();
-        os.write(result.getBytes("UTF-8"));
+        os.write(result.getBytes(StandardCharsets.UTF_8));
         os.flush();
     }
 
@@ -110,7 +111,7 @@ public class OAuthJSONProvider implements MessageBodyWriter<Object>,
         }
         sb.append("}");
         String result = sb.toString();
-        os.write(result.getBytes("UTF-8"));
+        os.write(result.getBytes(StandardCharsets.UTF_8));
         os.flush();
     }
 

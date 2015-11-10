@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -53,7 +54,7 @@ public final class PublicSuffixMatcherLoader {
 
     private static PublicSuffixMatcher load(final InputStream in) throws IOException {
         final PublicSuffixList list = new PublicSuffixListParser().parse(
-                new InputStreamReader(in, "UTF-8"));
+                new InputStreamReader(in, StandardCharsets.UTF_8));
         return new PublicSuffixMatcher(list.getRules(), list.getExceptions());
     }
 

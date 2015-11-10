@@ -22,6 +22,7 @@ package org.apache.cxf.rs.security.xml;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 
@@ -82,7 +83,7 @@ public abstract class AbstractXmlEncInHandler extends AbstractXmlSecInHandler {
         Document payloadDoc = null;
         try {
             payloadDoc = StaxUtils.read(new InputStreamReader(new ByteArrayInputStream(decryptedPayload),
-                                               "UTF-8"));
+                                               StandardCharsets.UTF_8));
         } catch (Exception ex) {
             throwFault("Payload document can not be created", ex);
         }

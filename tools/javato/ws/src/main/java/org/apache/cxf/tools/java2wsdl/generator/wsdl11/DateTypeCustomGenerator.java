@@ -20,6 +20,7 @@ package org.apache.cxf.tools.java2wsdl.generator.wsdl11;
 
 import java.io.File;
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -95,7 +96,7 @@ public final class DateTypeCustomGenerator extends AbstractGenerator<File> {
 
             try {
                 generator.doWrite(getTemplate(), new FileWriterUtil(xjb.getParent(), getOutputStreamCreator())
-                    .getWriter(xjb, "UTF-8"));
+                    .getWriter(xjb, StandardCharsets.UTF_8.name()));
             } catch (Exception e) {
                 e.printStackTrace();
             }

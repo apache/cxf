@@ -22,6 +22,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.security.cert.Certificate;
 import java.util.ArrayList;
@@ -81,7 +82,8 @@ public class Saml2BearerGrantHandler extends AbstractGrantHandler {
         //  AccessTokenService may be configured with the form provider
         // which will not decode by default - so listing both the actual 
         // and encoded grant type value will help
-        ENCODED_SAML2_BEARER_GRANT = HttpUtils.urlEncode(Constants.SAML2_BEARER_GRANT, "UTF-8");
+        ENCODED_SAML2_BEARER_GRANT = HttpUtils.urlEncode(Constants.SAML2_BEARER_GRANT, 
+                                                         StandardCharsets.UTF_8.name());
     }
     private Validator samlValidator = new SamlAssertionValidator();
     private SamlOAuthValidator samlOAuthValidator = new SamlOAuthValidator(); 
@@ -164,7 +166,7 @@ public class Saml2BearerGrantHandler extends AbstractGrantHandler {
     protected Element readToken(InputStream tokenStream) {
         
         try {
-            Document doc = StaxUtils.read(new InputStreamReader(tokenStream, "UTF-8"));
+            Document doc = StaxUtils.read(new InputStreamReader(tokenStream, StandardCharsets.UTF_8));
             return doc.getDocumentElement();
         } catch (Exception ex) {
             throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);

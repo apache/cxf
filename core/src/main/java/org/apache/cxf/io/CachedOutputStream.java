@@ -31,6 +31,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -310,7 +311,7 @@ public class CachedOutputStream extends OutputStream {
     }
     
     public void writeCacheTo(StringBuilder out, long limit) throws IOException {
-        writeCacheTo(out, "UTF-8", limit);
+        writeCacheTo(out, StandardCharsets.UTF_8.name(), limit);
     }
     
     public void writeCacheTo(StringBuilder out, String charsetName, long limit) throws IOException {
@@ -356,7 +357,7 @@ public class CachedOutputStream extends OutputStream {
     }
     
     public void writeCacheTo(StringBuilder out) throws IOException {
-        writeCacheTo(out, "UTF-8");
+        writeCacheTo(out, StandardCharsets.UTF_8.name());
     }
     
     public void writeCacheTo(StringBuilder out, String charsetName) throws IOException {

@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.rs.security.jose.jwe;
 
+import java.nio.charset.StandardCharsets;
 import java.security.Security;
 
 import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
@@ -46,7 +47,7 @@ public class JwePbeHmacAesWrapTest extends Assert {
             new PbesHmacAesWrapKeyEncryptionAlgorithm(password, KeyAlgorithm.PBES2_HS256_A128KW);
         JweEncryptionProvider encryption = new AesCbcHmacJweEncryption(ContentAlgorithm.A128CBC_HS256,
                                                                        keyEncryption);
-        String jweContent = encryption.encrypt(specPlainText.getBytes("UTF-8"), null);
+        String jweContent = encryption.encrypt(specPlainText.getBytes(StandardCharsets.UTF_8), null);
         
         PbesHmacAesWrapKeyDecryptionAlgorithm keyDecryption = new PbesHmacAesWrapKeyDecryptionAlgorithm(password);
         JweDecryptionProvider decryption = new AesCbcHmacJweDecryption(keyDecryption);
@@ -65,7 +66,7 @@ public class JwePbeHmacAesWrapTest extends Assert {
             new PbesHmacAesWrapKeyEncryptionAlgorithm(password, KeyAlgorithm.PBES2_HS256_A128KW);
         JweEncryptionProvider encryption = new JweEncryption(keyEncryption,
             new AesGcmContentEncryptionAlgorithm(ContentAlgorithm.A128GCM));
-        String jweContent = encryption.encrypt(specPlainText.getBytes("UTF-8"), null);
+        String jweContent = encryption.encrypt(specPlainText.getBytes(StandardCharsets.UTF_8), null);
         PbesHmacAesWrapKeyDecryptionAlgorithm keyDecryption = new PbesHmacAesWrapKeyDecryptionAlgorithm(password);
         JweDecryptionProvider decryption = new JweDecryption(keyDecryption, 
                                                new AesGcmContentDecryptionAlgorithm(ContentAlgorithm.A128GCM));

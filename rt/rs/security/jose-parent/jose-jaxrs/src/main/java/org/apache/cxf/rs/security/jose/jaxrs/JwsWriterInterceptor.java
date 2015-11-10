@@ -20,6 +20,7 @@ package org.apache.cxf.rs.security.jose.jaxrs;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 
 import javax.annotation.Priority;
 import javax.ws.rs.WebApplicationException;
@@ -75,7 +76,7 @@ public class JwsWriterInterceptor extends AbstractJwsWriterProvider implements W
             CachedOutputStream cos = new CachedOutputStream(); 
             ctx.setOutputStream(cos);
             ctx.proceed();
-            JwsCompactProducer p = new JwsCompactProducer(headers, new String(cos.getBytes(), "UTF-8"));
+            JwsCompactProducer p = new JwsCompactProducer(headers, new String(cos.getBytes(), StandardCharsets.UTF_8));
             setJoseMediaType(ctx);
             writeJws(p, sigProvider, actualOs);
         }

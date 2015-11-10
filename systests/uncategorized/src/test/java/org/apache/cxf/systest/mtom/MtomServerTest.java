@@ -23,6 +23,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -169,10 +170,10 @@ public class MtomServerTest extends AbstractBusClientServerTestBase {
         }
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
         IOUtils.copy(is, bout);
-        String s = bout.toString("UTF-8");
+        String s = bout.toString(StandardCharsets.UTF_8.name());
         s = s.replaceAll(":9036/", ":" + PORT2 + "/");
 
-        os.write(s.getBytes("UTF-8"));
+        os.write(s.getBytes(StandardCharsets.UTF_8));
         os.flush();
         is.close();
         os.close();

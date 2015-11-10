@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
@@ -105,7 +106,7 @@ public class DataBindingProvider<T> implements MessageBodyReader<T>, MessageBody
         throws IOException {
         XMLStreamWriter writer = null;
         try {
-            String enc = HttpUtils.getSetEncoding(m, headers, "UTF-8");
+            String enc = HttpUtils.getSetEncoding(m, headers, StandardCharsets.UTF_8.name());
             writer = createWriter(clazz, genericType, enc, os);
             writeToWriter(writer, o);
         } catch (Exception ex) {

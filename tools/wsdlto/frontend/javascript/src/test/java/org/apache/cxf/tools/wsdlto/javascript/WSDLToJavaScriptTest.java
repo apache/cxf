@@ -19,6 +19,7 @@
 
 package org.apache.cxf.tools.wsdlto.javascript;
 
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -60,7 +61,7 @@ public class WSDLToJavaScriptTest extends ProcessorTestBase {
         // now we really want to check some results.
         Path path = FileSystems.getDefault().getPath(output.getPath(), "SOAPService_Test1.js");
         assertTrue(Files.isReadable(path));
-        String javascript = new String(Files.readAllBytes(path), "UTF-8");
+        String javascript = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
         
         assertTrue(javascript.contains("xmlns:murble='http://apache.org/hello_world_soap_http'"));
         assertEquals("Number of '{' does not match number of '}' in generated JavaScript.",
@@ -84,7 +85,7 @@ public class WSDLToJavaScriptTest extends ProcessorTestBase {
         // now we really want to check some results.
         Path path = FileSystems.getDefault().getPath(output.getPath(), "SOAPService.js");
         assertTrue(Files.isReadable(path));
-        String javascript = new String(Files.readAllBytes(path), "UTF-8");
+        String javascript = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
         
         assertTrue(javascript.contains("xmlns:murble='http://apache.org/hello_world_soap_http'"));
         assertEquals("Number of '{' does not match number of '}' in generated JavaScript.",

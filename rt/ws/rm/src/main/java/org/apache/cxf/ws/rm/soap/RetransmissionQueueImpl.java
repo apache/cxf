@@ -20,6 +20,7 @@
 package org.apache.cxf.ws.rm.soap;
 
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -761,7 +762,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
             // read SOAP headers from saved input stream
             RewindableInputStream is = (RewindableInputStream)message.get(RMMessageConstants.SAVED_CONTENT);
             is.rewind();
-            XMLStreamReader reader = StaxUtils.createXMLStreamReader(is, "UTF-8");
+            XMLStreamReader reader = StaxUtils.createXMLStreamReader(is, StandardCharsets.UTF_8.name());
             message.getHeaders().clear();
             if (reader.getEventType() != XMLStreamConstants.START_ELEMENT
                 && reader.nextTag() != XMLStreamConstants.START_ELEMENT) {

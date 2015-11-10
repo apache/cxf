@@ -27,6 +27,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -945,7 +946,7 @@ public final class JAXRSUtils {
             m.put(FormUtils.FORM_PARAM_MAP, params);
         
             if (mt == null || mt.isCompatible(MediaType.APPLICATION_FORM_URLENCODED_TYPE)) {
-                String enc = HttpUtils.getEncoding(mt, "UTF-8");
+                String enc = HttpUtils.getEncoding(mt, StandardCharsets.UTF_8.name());
                 String body = FormUtils.readBody(m.getContent(InputStream.class), enc);
                 HttpServletRequest request = (HttpServletRequest)m.get(AbstractHTTPDestination.HTTP_REQUEST);
                 FormUtils.populateMapFromString(params, m, body, enc, decode, request);

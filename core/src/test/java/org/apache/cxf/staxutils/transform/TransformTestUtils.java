@@ -21,6 +21,7 @@ package org.apache.cxf.staxutils.transform;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -111,7 +112,7 @@ public final class TransformTestUtils {
 
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         XMLStreamWriter writer = 
-            new OutTransformWriter(StaxUtils.createXMLStreamWriter(os, "UTF-8"), 
+            new OutTransformWriter(StaxUtils.createXMLStreamWriter(os, StandardCharsets.UTF_8.name()), 
                                    emap, append, dropEls, amap, attributesToElements, defaultNamespace);
         StaxUtils.copy(new StreamSource(TransformTestUtils.class.getResourceAsStream(file)), writer);
         writer.flush();

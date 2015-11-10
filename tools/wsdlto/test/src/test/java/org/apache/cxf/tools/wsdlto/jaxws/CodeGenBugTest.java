@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -227,7 +228,7 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
         
         Path path = FileSystems.getDefault().getPath(output.getCanonicalPath(), "build.xml");
         assertTrue(Files.isReadable(path));
-        String content = new String(Files.readAllBytes(path), "UTF-8");
+        String content = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
         
         assertTrue("wsdl location should be url style in build.xml", content.indexOf("param1=\"file:") > -1);
 

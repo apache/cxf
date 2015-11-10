@@ -19,6 +19,7 @@
 package org.apache.cxf.rs.security.saml.sso;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 
@@ -95,9 +96,9 @@ public class SamlPostBindingFilter extends AbstractServiceProviderFilter {
         // Not correct according to the spec but required by some IDPs.
         if (useDeflateEncoding) {
             DeflateEncoderDecoder encoder = new DeflateEncoderDecoder();
-            deflatedBytes = encoder.deflateToken(requestMessage.getBytes("UTF-8"));
+            deflatedBytes = encoder.deflateToken(requestMessage.getBytes(StandardCharsets.UTF_8));
         } else {
-            deflatedBytes = requestMessage.getBytes("UTF-8");
+            deflatedBytes = requestMessage.getBytes(StandardCharsets.UTF_8);
         }
 
         return Base64Utility.encode(deflatedBytes);

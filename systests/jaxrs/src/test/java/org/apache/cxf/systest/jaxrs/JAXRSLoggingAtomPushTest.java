@@ -20,6 +20,7 @@ package org.apache.cxf.systest.jaxrs;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -87,7 +88,7 @@ public class JAXRSLoggingAtomPushTest extends Assert {
         String s = IOUtils.readStringFromStream(ins);
         ins.close();
         s = s.replaceAll("9080", PORT);
-        lm.readConfiguration(new ByteArrayInputStream(s.getBytes("UTF-8")));
+        lm.readConfiguration(new ByteArrayInputStream(s.getBytes(StandardCharsets.UTF_8)));
         
         for (Handler h : LOG.getHandlers()) {
             LOG.removeHandler(h);

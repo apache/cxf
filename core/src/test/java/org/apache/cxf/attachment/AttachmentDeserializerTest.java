@@ -23,6 +23,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -84,7 +85,7 @@ public class AttachmentDeserializerTest extends Assert {
         Assert.assertTrue(m.find());
         
         msg = new MessageImpl();
-        msg.setContent(InputStream.class, new ByteArrayInputStream(message.getBytes("UTF-8")));
+        msg.setContent(InputStream.class, new ByteArrayInputStream(message.getBytes(StandardCharsets.UTF_8)));
         msg.put(Message.CONTENT_TYPE, "multipart/related");
         AttachmentDeserializer ad = new AttachmentDeserializer(msg);
         ad.initializeAttachments();
@@ -427,7 +428,7 @@ public class AttachmentDeserializerTest extends Assert {
                 + "------=_Part_1"
                 + "\n\nContent-Transfer-Encoding: binary\n\n"
                 + "ABCD3\r\n"
-                + "------=_Part_1--").getBytes("UTF-8");
+                + "------=_Part_1--").getBytes(StandardCharsets.UTF_8);
         ByteArrayInputStream in = new ByteArrayInputStream(messageBytes) {
             public int read(byte[] b, int off, int len) {
                 return super.read(b, off, len >= 2 ? 2 : len); 

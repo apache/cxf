@@ -20,6 +20,7 @@
 package org.apache.cxf.wsdl11;
 
 import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -359,7 +360,7 @@ public class ServiceWSDLBuilderTest extends Assert {
         writer.close();
 
         // this is a test to make sure any embedded namespaces are properly included
-        String savedSchema = new String(outputStream.toByteArray(), "UTF-8");
+        String savedSchema = new String(outputStream.toByteArray(), StandardCharsets.UTF_8);
         assertTrue(savedSchema.contains("http://www.w3.org/2005/05/xmlmime"));
         
         SchemaImport types2SchemaImport = getImport(typesSchema.getImports(),

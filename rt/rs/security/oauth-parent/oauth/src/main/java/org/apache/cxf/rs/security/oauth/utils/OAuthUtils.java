@@ -20,6 +20,7 @@ package org.apache.cxf.rs.security.oauth.utils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -130,7 +131,7 @@ public final class OAuthUtils {
                                              OAuthMessage oAuthMessage) throws IOException {
         List<Entry<String, String>> params = oAuthMessage.getParameters();
         String enc = oAuthMessage.getBodyEncoding();
-        enc = enc == null ? "UTF-8" : enc;
+        enc = enc == null ? StandardCharsets.UTF_8.name() : enc;
         
         if (params.isEmpty() 
             && MediaType.APPLICATION_FORM_URLENCODED_TYPE.isCompatible(

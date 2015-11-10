@@ -28,6 +28,7 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -382,7 +383,7 @@ public final class StaxUtils {
 
     public static XMLStreamWriter createXMLStreamWriter(OutputStream out, String encoding) {
         if (encoding == null) {
-            encoding = "UTF-8";
+            encoding = StandardCharsets.UTF_8.name();
         }
         XMLOutputFactory factory = getXMLOutputFactory();
         try {
@@ -1695,7 +1696,7 @@ public final class StaxUtils {
      */
     public static XMLStreamReader createXMLStreamReader(InputStream in, String encoding) {
         if (encoding == null) {
-            encoding = "UTF-8";
+            encoding = StandardCharsets.UTF_8.name();
         }
 
         XMLInputFactory factory = getXMLInputFactory();

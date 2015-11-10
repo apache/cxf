@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.test.AbstractCXFSpringTest;
@@ -59,7 +60,7 @@ public class SoapFaultHandlerTest extends AbstractCXFSpringTest {
         out.close();
         InputStream response = getInputStream(connection);
         // get the response fault message
-        String result = IOUtils.toString(response, "UTF-8");
+        String result = IOUtils.toString(response, StandardCharsets.UTF_8.name());
         // just make sure the custom namespace is working
         assertTrue("The custom namespace is not working.", result.indexOf("cxf:Provider") > 0);
         

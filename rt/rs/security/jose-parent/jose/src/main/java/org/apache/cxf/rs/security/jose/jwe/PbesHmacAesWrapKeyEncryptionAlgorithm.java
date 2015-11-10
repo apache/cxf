@@ -20,7 +20,7 @@ package org.apache.cxf.rs.security.jose.jwe;
 
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -179,7 +179,7 @@ public class PbesHmacAesWrapKeyEncryptionAlgorithm implements KeyEncryptionProvi
         return StringUtils.toBytesUTF8(str);
     }
     static byte[] charsToBytes(char[] chars) {
-        ByteBuffer bb = Charset.forName("UTF-8").encode(CharBuffer.wrap(chars));
+        ByteBuffer bb = StandardCharsets.UTF_8.encode(CharBuffer.wrap(chars));
         byte[] b = new byte[bb.remaining()];
         bb.get(b);
         return b;

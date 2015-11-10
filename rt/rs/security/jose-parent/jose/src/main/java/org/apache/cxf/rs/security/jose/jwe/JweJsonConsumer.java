@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.rs.security.jose.jwe;
 
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -29,7 +29,6 @@ import java.util.logging.Logger;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.json.basic.JsonMapObjectReaderWriter;
-import org.apache.cxf.rs.security.jose.common.JoseException;
 import org.apache.cxf.rs.security.jose.common.JoseUtils;
 import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 
@@ -175,11 +174,7 @@ public class JweJsonConsumer {
         if (aad == null) {
             return null;
         }
-        try {
-            return new String(aad, "UTF-8");
-        } catch (UnsupportedEncodingException ex) {
-            throw new JoseException(ex);
-        }
+        return new String(aad, StandardCharsets.UTF_8);
     }
     public List<JweJsonEncryptionEntry> getRecipients() {
         return recipients;

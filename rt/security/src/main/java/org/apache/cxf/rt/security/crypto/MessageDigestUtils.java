@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.rt.security.crypto;
 
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -53,9 +53,7 @@ public final class MessageDigestUtils {
 
     public static byte[] createDigest(String input, String algo) {
         try {
-            return createDigest(input.getBytes("UTF-8"), algo);
-        } catch (UnsupportedEncodingException e) {
-            throw new SecurityException(e);
+            return createDigest(input.getBytes(StandardCharsets.UTF_8), algo);
         } catch (NoSuchAlgorithmException e) {
             throw new SecurityException(e);
         }   

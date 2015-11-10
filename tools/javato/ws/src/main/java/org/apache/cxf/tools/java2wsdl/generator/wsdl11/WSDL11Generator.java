@@ -26,6 +26,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,7 +71,7 @@ public class WSDL11Generator extends AbstractGenerator<Definition> {
         Definition def = null;
         try {
             Writer os = new FileWriterUtil(file.getParent(),
-                                           getOutputStreamCreator()).getWriter(file, "UTF-8");
+                                           getOutputStreamCreator()).getWriter(file, StandardCharsets.UTF_8.name());
             WSDLWriter wsdlWriter = WSDLFactory.newInstance().newWSDLWriter();
 
             ServiceWSDLBuilder builder = new ServiceWSDLBuilder(getBus(), getServiceModel());
@@ -105,8 +106,9 @@ public class WSDL11Generator extends AbstractGenerator<Definition> {
                 File impfile = new File(file.getParentFile(), imp.getKey());
                 Element el = imp.getValue().getElement();
                 updateImports(el, imports);
-                os = new FileWriterUtil(impfile.getParent(),
-                                        getToolContext().get(OutputStreamCreator.class)).getWriter(impfile, "UTF-8");
+                FileWriterUtil fileWriterUtil = 
+                    new FileWriterUtil(impfile.getParent(), getToolContext().get(OutputStreamCreator.class));
+                os = fileWriterUtil.getWriter(impfile, StandardCharsets.UTF_8.name());
                 StaxUtils.writeTo(el, os, 2);
                 os.close();
             }

@@ -26,6 +26,7 @@ import java.io.Reader;
 import java.io.Writer;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -360,7 +361,7 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
         }
         
         StringBuilder pi = new StringBuilder();
-        pi.append(XML_PI_START + (enc == null ? "UTF-8" : enc) + "\"?>");
+        pi.append(XML_PI_START + (enc == null ? StandardCharsets.UTF_8.name() : enc) + "\"?>");
         os.write(pi.toString().getBytes());
         String startTag = null;
         String endTag = null;

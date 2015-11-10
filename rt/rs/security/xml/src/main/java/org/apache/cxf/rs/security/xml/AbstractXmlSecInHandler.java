@@ -21,6 +21,7 @@ package org.apache.cxf.rs.security.xml;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.logging.Logger;
 
 import javax.ws.rs.core.Response;
@@ -78,7 +79,7 @@ public abstract class AbstractXmlSecInHandler {
         InputStream is = message.getContent(InputStream.class);
         if (is != null) {
             try {
-                doc = StaxUtils.read(new InputStreamReader(is, "UTF-8"));
+                doc = StaxUtils.read(new InputStreamReader(is, StandardCharsets.UTF_8));
             } catch (Exception ex) {
                 throwFault("Invalid XML payload", ex);
             }

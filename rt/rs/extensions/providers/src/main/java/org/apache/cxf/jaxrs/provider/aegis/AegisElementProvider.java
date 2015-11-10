@@ -26,6 +26,7 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
@@ -113,7 +114,7 @@ public class AegisElementProvider<T> extends AbstractAegisProvider<T>  {
         AegisType aegisType = context.getTypeMapping().getType(genericType);
         AegisWriter<XMLStreamWriter> aegisWriter = context.createXMLStreamWriter();
         try {
-            String enc = HttpUtils.getSetEncoding(m, headers, "UTF-8");
+            String enc = HttpUtils.getSetEncoding(m, headers, StandardCharsets.UTF_8.name());
             XMLStreamWriter xmlStreamWriter = createStreamWriter(aegisType.getSchemaType(), enc, os);
             // use type qname as element qname?
             xmlStreamWriter.writeStartDocument();

@@ -20,6 +20,7 @@ package org.apache.cxf.rs.security.jose.jaxrs;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.rs.security.jose.common.JoseUtils;
@@ -33,7 +34,8 @@ public class AbstractJweDecryptingFilter {
     private JweDecryptionProvider decryption;
     private String defaultMediaType;
     protected JweDecryptionOutput decrypt(InputStream is) throws IOException {
-        JweCompactConsumer jwe = new JweCompactConsumer(new String(IOUtils.readBytesFromStream(is), "UTF-8"));
+        JweCompactConsumer jwe = new JweCompactConsumer(new String(IOUtils.readBytesFromStream(is), 
+                                                                   StandardCharsets.UTF_8));
         JweDecryptionProvider theDecryptor = getInitializedDecryptionProvider(jwe.getJweHeaders());
         JweDecryptionOutput out = new JweDecryptionOutput(jwe.getJweHeaders(), jwe.getDecryptedContent(theDecryptor));
         JoseUtils.traceHeaders(out.getHeaders());

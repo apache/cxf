@@ -19,6 +19,7 @@
 
 package org.apache.cxf.jaxrs.impl;
 
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -66,9 +67,9 @@ public class RequestImplTest extends Assert {
         metadata.putSingle(HttpHeaders.CONTENT_LANGUAGE, "en");
         metadata.putSingle(HttpHeaders.CONTENT_ENCODING, "utf-8");
         
-        assertSameVariant(MediaType.APPLICATION_XML_TYPE, new Locale("en"), "UTF-8");
-        assertSameVariant(null, new Locale("en"), "UTF-8");
-        assertSameVariant(MediaType.APPLICATION_XML_TYPE, null, "UTF-8");
+        assertSameVariant(MediaType.APPLICATION_XML_TYPE, new Locale("en"), StandardCharsets.UTF_8.name());
+        assertSameVariant(null, new Locale("en"), StandardCharsets.UTF_8.name());
+        assertSameVariant(MediaType.APPLICATION_XML_TYPE, null, StandardCharsets.UTF_8.name());
         assertSameVariant(MediaType.APPLICATION_XML_TYPE, new Locale("en"), null);
         
     }
@@ -77,9 +78,9 @@ public class RequestImplTest extends Assert {
     public void testSingleMatchingVariantWithContentTypeOnly() {
         metadata.putSingle(HttpHeaders.CONTENT_TYPE, "application/xml");
         
-        assertSameVariant(MediaType.APPLICATION_XML_TYPE, new Locale("en"), "UTF-8");
-        assertSameVariant(null, new Locale("en"), "UTF-8");
-        assertSameVariant(MediaType.APPLICATION_XML_TYPE, null, "UTF-8");
+        assertSameVariant(MediaType.APPLICATION_XML_TYPE, new Locale("en"), StandardCharsets.UTF_8.name());
+        assertSameVariant(null, new Locale("en"), StandardCharsets.UTF_8.name());
+        assertSameVariant(MediaType.APPLICATION_XML_TYPE, null, StandardCharsets.UTF_8.name());
         assertSameVariant(MediaType.APPLICATION_XML_TYPE, new Locale("en"), null);
         
     }

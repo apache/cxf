@@ -21,6 +21,7 @@ package org.apache.cxf.systest.kerberos.wssec.kerberos;
 
 import java.io.File;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -118,7 +119,7 @@ public class KerberosTokenTest extends AbstractLdapTestUnit {
             
             // Read in krb5.conf and substitute in the correct port
             Path path = FileSystems.getDefault().getPath(basedir, "/src/test/resources/krb5.conf");
-            String content = new String(Files.readAllBytes(path), "UTF-8");
+            String content = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
             content = content.replaceAll("port", "" + super.getKdcServer().getTransports()[0].getPort());
             
             Path path2 = FileSystems.getDefault().getPath(basedir, "/target/test-classes/wssec.kerberos.krb5.conf");

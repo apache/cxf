@@ -26,6 +26,7 @@ import java.net.InterfaceAddress;
 import java.net.MulticastSocket;
 import java.net.NetworkInterface;
 import java.net.SocketAddress;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -116,7 +117,7 @@ public final class WSDiscoveryClientTest {
                     DatagramPacket p = new DatagramPacket(bytes, bytes.length, address, Integer.parseInt(PORT));
                     s.receive(p);
                     SocketAddress sa = p.getSocketAddress();
-                    String incoming = new String(p.getData(), 0, p.getLength(), "UTF-8");
+                    String incoming = new String(p.getData(), 0, p.getLength(), StandardCharsets.UTF_8);
                     int idx = incoming.indexOf("MessageID");
                     idx = incoming.indexOf('>', idx);
                     incoming = incoming.substring(idx + 1);
@@ -127,7 +128,7 @@ public final class WSDiscoveryClientTest {
                         String msg = IOUtils.readStringFromStream(ins);
                         msg = msg.replace("urn:uuid:883d0d53-92aa-4066-9b6f-9eadb1832366",
                                           incoming);
-                        byte out[] = msg.getBytes("UTF-8");
+                        byte out[] = msg.getBytes(StandardCharsets.UTF_8);
                         DatagramPacket outp = new DatagramPacket(out, 0, out.length, sa);
                         s.send(outp);
                     }

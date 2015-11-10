@@ -26,6 +26,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Writer;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -414,7 +415,7 @@ public class IDLToWSDLProcessor extends IDLProcessor {
             String encoding = env.get(ToolCorbaConstants.CFG_WSDL_ENCODING).toString();            
             return new FileWriterUtil().getWriter(file, encoding); 
         } else {
-            return new FileWriterUtil().getWriter(file, "UTF-8");
+            return new FileWriterUtil().getWriter(file, StandardCharsets.UTF_8.name());
         }       
     }    
 

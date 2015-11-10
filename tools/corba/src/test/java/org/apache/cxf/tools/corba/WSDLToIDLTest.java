@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -174,7 +175,7 @@ public class WSDLToIDLTest extends ToolTestBase {
         Path path = FileSystems.getDefault().getPath(output.getPath(), "simple-binding.idl");
         assertTrue("simple-binding.idl should be generated", Files.isReadable(path));
         
-        String line = new String(Files.readAllBytes(path), "UTF-8");
+        String line = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
         assertTrue("Invalid Idl File Generated", line.length() > 0);
     }   
     
@@ -189,7 +190,7 @@ public class WSDLToIDLTest extends ToolTestBase {
         Path path = FileSystems.getDefault().getPath(output.getPath(), "simple-binding_gen.idl");
         assertTrue("simple-binding_gen.idl should be generated", Files.isReadable(path));
 
-        String line = new String(Files.readAllBytes(path), "UTF-8");
+        String line = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
         assertTrue("Invalid Idl File Generated", line.length() > 0);
     }
 
@@ -219,7 +220,7 @@ public class WSDLToIDLTest extends ToolTestBase {
             fail("WSDLToIDL generated an invalid simple-binding-corba.wsdl");
         }
 
-        String line = new String(Files.readAllBytes(path2), "UTF-8");
+        String line = new String(Files.readAllBytes(path2), StandardCharsets.UTF_8);
         assertTrue("Invalid Idl File Generated", line.length() > 0);
     }
     

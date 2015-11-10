@@ -28,6 +28,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -130,7 +131,7 @@ public class JAXBElementProviderTest extends Assert {
         Book book = p.readFrom(Book.class, null,
                 new Annotation[]{}, 
                 MediaType.valueOf(MediaType.APPLICATION_XML + ";charset=UTF-8"), null, 
-                new ByteArrayInputStream(bookStringUTF16.getBytes("UTF-8")));
+                new ByteArrayInputStream(bookStringUTF16.getBytes(StandardCharsets.UTF_8)));
         assertEquals(book.getName(), nameStringUTF16);
     }
     
@@ -705,7 +706,7 @@ public class JAXBElementProviderTest extends Assert {
         JAXBElementProvider<JAXBElement> provider = new JAXBElementProvider<JAXBElement>();
         JAXBElement<Book> jaxbElement = provider.readFrom(JAXBElement.class, Book.class,
              new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, String>(),
-             new ByteArrayInputStream(xml.getBytes("UTF-8")));
+             new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
         Book book = jaxbElement.getValue();
         assertEquals(123L, book.getId());
         assertEquals("CXF in Action", book.getName());
@@ -719,7 +720,7 @@ public class JAXBElementProviderTest extends Assert {
         JAXBElementProvider<ParamJAXBElement> provider = new JAXBElementProvider<ParamJAXBElement>();
         ParamJAXBElement jaxbElement = provider.readFrom(ParamJAXBElement.class, ParamJAXBElement.class,
              new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, String>(),
-             new ByteArrayInputStream(xml.getBytes("UTF-8")));
+             new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
         ParamType param = jaxbElement.getValue();
         assertEquals("a", param.getComment());
     }
