@@ -33,7 +33,7 @@ import org.apache.cxf.rt.security.crypto.MessageDigestUtils;
 
 public final class OidcUtils {
     public static final String ID_TOKEN = "id_token";
-    public static final String OIDC_SCOPE = "oidc";
+    public static final String OPENID_SCOPE = "openid";
     public static final String PROFILE_SCOPE = "profile";
     public static final String EMAIL_SCOPE = "email";
     public static final String ADDRESS_SCOPE = "address";
@@ -56,23 +56,23 @@ public final class OidcUtils {
     private OidcUtils() {
         
     }
-    public static String getOidcScope() {
-        return OIDC_SCOPE;
+    public static String getOpenIdScope() {
+        return OPENID_SCOPE;
     }
     public static String getProfileScope() {
-        return getScope(OIDC_SCOPE, PROFILE_SCOPE);
+        return getScope(OPENID_SCOPE, PROFILE_SCOPE);
     }
     public static String getEmailScope() {
-        return getScope(OIDC_SCOPE, EMAIL_SCOPE);
+        return getScope(OPENID_SCOPE, EMAIL_SCOPE);
     }
     public static String getAddressScope() {
-        return getScope(OIDC_SCOPE, ADDRESS_SCOPE);
+        return getScope(OPENID_SCOPE, ADDRESS_SCOPE);
     }
     public static String getPhoneScope() {
-        return getScope(OIDC_SCOPE, PHONE_SCOPE);
+        return getScope(OPENID_SCOPE, PHONE_SCOPE);
     }
     public static String getAllScopes() {
-        return getScope(OIDC_SCOPE, PROFILE_SCOPE, EMAIL_SCOPE, ADDRESS_SCOPE, PHONE_SCOPE);
+        return getScope(OPENID_SCOPE, PROFILE_SCOPE, EMAIL_SCOPE, ADDRESS_SCOPE, PHONE_SCOPE);
     }
     public static List<String> getScopeProperties(String scope) {
         return SCOPES_MAP.get(scope);
