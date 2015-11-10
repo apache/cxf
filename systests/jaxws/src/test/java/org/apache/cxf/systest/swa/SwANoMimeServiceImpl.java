@@ -20,6 +20,7 @@ package org.apache.cxf.systest.swa;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 import javax.activation.DataHandler;
 import javax.jws.WebService;
@@ -95,12 +96,7 @@ public class SwANoMimeServiceImpl implements SwAServiceInterface {
     }
 
     public void echoData(Holder<String> text, Holder<byte[]> data) {
-        try {
-            data.value = ("test" + new String(data.value, 0, 6)).getBytes("UTF-8"); 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        
+        data.value = ("test" + new String(data.value, 0, 6)).getBytes(StandardCharsets.UTF_8); 
     }
 
     public void echoDataRef(Holder<DataStruct> data) {
@@ -120,11 +116,7 @@ public class SwANoMimeServiceImpl implements SwAServiceInterface {
     }
 
     public void echoDataWithHeader(Holder<String> text, Holder<byte[]> data, Holder<String> headerText) {
-        try {
-            data.value = ("test" + new String(data.value, 0, 6)).getBytes("UTF-8"); 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        data.value = ("test" + new String(data.value, 0, 6)).getBytes(StandardCharsets.UTF_8); 
     }
 
 }

@@ -32,6 +32,7 @@ import java.io.OutputStream;
 import java.io.Writer;
 import java.net.URI;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -820,7 +821,7 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
                     Element el = imp.getSchemaDocument().getDocumentElement();
                     updateImports(el, sourceMap);
                     os = new FileWriterUtil(impfile.getParent(), context.get(OutputStreamCreator.class))
-                        .getWriter(impfile, "UTF-8");
+                        .getWriter(impfile, StandardCharsets.UTF_8.name());
                     StaxUtils.writeTo(el, os, 2);
                     os.close();
                 }

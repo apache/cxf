@@ -28,6 +28,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -542,7 +543,7 @@ public final class ResourceUtils {
     }
     
     public static List<UserResource> getUserResources(InputStream is) throws Exception {
-        Document doc = StaxUtils.read(new InputStreamReader(is, "UTF-8"));
+        Document doc = StaxUtils.read(new InputStreamReader(is, StandardCharsets.UTF_8));
         return getResourcesFromElement(doc.getDocumentElement());
     }
     

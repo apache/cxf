@@ -21,6 +21,7 @@ package org.apache.cxf.transport.jms;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -29,8 +30,10 @@ public class JMSMessageUtilTest extends Assert {
     
     @Test
     public void testGetEncoding() throws IOException {                
-        assertEquals("Get the wrong encoding", JMSMessageUtils.getEncoding("text/xml; charset=utf-8"), "UTF-8");
-        assertEquals("Get the wrong encoding", JMSMessageUtils.getEncoding("text/xml"), "UTF-8");
+        assertEquals("Get the wrong encoding", JMSMessageUtils.getEncoding("text/xml; charset=utf-8"), 
+                     StandardCharsets.UTF_8.name());
+        assertEquals("Get the wrong encoding", JMSMessageUtils.getEncoding("text/xml"), 
+                     StandardCharsets.UTF_8.name());
         assertEquals("Get the wrong encoding", JMSMessageUtils.getEncoding("text/xml; charset=GBK"), "GBK");
         try {
             JMSMessageUtils.getEncoding("text/xml; charset=asci");

@@ -21,6 +21,7 @@ package org.apache.cxf.rs.security.saml;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -58,7 +59,7 @@ public class SamlEnvelopedInHandler extends AbstractSamlInHandler {
         InputStream is = message.getContent(InputStream.class);
         if (is != null) {
             try {
-                doc = StaxUtils.read(new InputStreamReader(is, "UTF-8"));
+                doc = StaxUtils.read(new InputStreamReader(is, StandardCharsets.UTF_8));
             } catch (Exception ex) {
                 throwFault("Invalid XML payload", ex);
             }

@@ -22,6 +22,7 @@ package org.apache.cxf.rs.security.saml;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
@@ -101,7 +102,7 @@ public abstract class AbstractSamlInHandler implements ContainerRequestFilter {
     protected Element readToken(Message message, InputStream tokenStream) {
         
         try {
-            Document doc = StaxUtils.read(new InputStreamReader(tokenStream, "UTF-8"));
+            Document doc = StaxUtils.read(new InputStreamReader(tokenStream, StandardCharsets.UTF_8));
             return doc.getDocumentElement();
         } catch (Exception ex) {
             throwFault("Assertion can not be read as XML document", ex);

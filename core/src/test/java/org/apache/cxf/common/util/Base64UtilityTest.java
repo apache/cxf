@@ -21,6 +21,7 @@ package org.apache.cxf.common.util;
 
 import java.io.ByteArrayOutputStream;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.cxf.helpers.IOUtils;
 
@@ -43,7 +44,7 @@ public class Base64UtilityTest extends Assert {
     @Test
     public void testEncodeMultipleChunks() throws Exception {
         final String text = "The true sign of intelligence is not knowledge but imagination.";
-        byte[] bytes = text.getBytes("UTF-8");
+        byte[] bytes = text.getBytes(StandardCharsets.UTF_8);
         // multiple of 3 octets
         assertEquals(63, bytes.length);
         String s1 = new String(Base64Utility.encodeChunk(bytes, 0, bytes.length));
@@ -64,7 +65,7 @@ public class Base64UtilityTest extends Assert {
     public void testEncodeAndStream() throws Exception {
         final String text = "The true sign of intelligence is not knowledge but imagination.";
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        byte[] bytes = text.getBytes("UTF-8");
+        byte[] bytes = text.getBytes(StandardCharsets.UTF_8);
         Base64Utility.encodeAndStream(bytes, 0, bytes.length, bos);
         String decodedText = new String(Base64Utility.decode(bos.toString()));
         assertEquals(decodedText, text);

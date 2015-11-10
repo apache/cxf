@@ -22,6 +22,7 @@ package org.apache.cxf.jaxrs.utils;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -132,7 +133,7 @@ public final class HttpUtils {
     
     public static String urlEncode(String value) {
         
-        return urlEncode(value, "UTF-8");
+        return urlEncode(value, StandardCharsets.UTF_8.name());
     }
     
     public static String urlEncode(String value, String enc) {
@@ -558,7 +559,7 @@ public final class HttpUtils {
             headers.putSingle(HttpHeaders.CONTENT_TYPE, 
                 JAXRSUtils.mediaTypeToString(mt, CHARSET_PARAMETER) 
                 + ';' + CHARSET_PARAMETER + "=" 
-                + (defaultEncoding == null ? "UTF-8" : defaultEncoding));
+                + (defaultEncoding == null ? StandardCharsets.UTF_8 : defaultEncoding));
         }
         return defaultEncoding;
     }

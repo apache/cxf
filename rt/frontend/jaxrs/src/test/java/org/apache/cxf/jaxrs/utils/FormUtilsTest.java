@@ -19,6 +19,7 @@
 
 package org.apache.cxf.jaxrs.utils;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -54,7 +55,8 @@ public class FormUtilsTest extends Assert {
         EasyMock.replay(mockMessage, mockRequest);
 
         MultivaluedMap<String, String> params = new MetadataMap<String, String>();
-        FormUtils.populateMapFromString(params, mockMessage, null, "UTF-8", false, mockRequest);
+        FormUtils.populateMapFromString(params, mockMessage, null, StandardCharsets.UTF_8.name(), 
+                                        false, mockRequest);
         
         assertEquals(2, params.size());
         assertEquals(HTTP_PARAM_VALUE1, params.get(HTTP_PARAM1).iterator().next());
@@ -66,7 +68,8 @@ public class FormUtilsTest extends Assert {
         EasyMock.replay(mockMessage, mockRequest);
 
         MultivaluedMap<String, String> params = new MetadataMap<String, String>();
-        FormUtils.populateMapFromString(params, mockMessage, null, "UTF-8", false, mockRequest);
+        FormUtils.populateMapFromString(params, mockMessage, null, StandardCharsets.UTF_8.name(), 
+                                        false, mockRequest);
         
         assertEquals(0, params.size());
     }
@@ -78,7 +81,8 @@ public class FormUtilsTest extends Assert {
 
         MultivaluedMap<String, String> params = new MetadataMap<String, String>();
         String postBody = FORM_PARAM1 + "=" + FORM_PARAM_VALUE1 + "&" + FORM_PARAM2 + "=" + FORM_PARAM_VALUE2;
-        FormUtils.populateMapFromString(params, mockMessage, postBody, "UTF-8", false, mockRequest);
+        FormUtils.populateMapFromString(params, mockMessage, postBody, StandardCharsets.UTF_8.name(), 
+                                        false, mockRequest);
         
         assertEquals(2, params.size());
         assertEquals(FORM_PARAM_VALUE1, params.get(FORM_PARAM1).iterator().next());

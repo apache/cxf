@@ -19,6 +19,7 @@
 package org.apache.cxf.ext.logging;
 
 import java.net.MalformedURLException;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 
@@ -80,7 +81,7 @@ public class SOAPLoggingTest {
         Assert.assertEquals(SERVICE_URI, requestOut.getAddress());
         Assert.assertEquals("text/xml", requestOut.getContentType());
         Assert.assertEquals(EventType.REQ_OUT, requestOut.getType());
-        Assert.assertEquals("UTF-8", requestOut.getEncoding());
+        Assert.assertEquals(StandardCharsets.UTF_8.name(), requestOut.getEncoding());
         Assert.assertNotNull(requestOut.getExchangeId());
         Assert.assertEquals("POST", requestOut.getHttpMethod());
         Assert.assertNotNull(requestOut.getMessageId());
@@ -94,7 +95,7 @@ public class SOAPLoggingTest {
         Assert.assertEquals(SERVICE_URI, requestIn.getAddress());
         Assert.assertEquals("text/xml; charset=UTF-8", requestIn.getContentType());
         Assert.assertEquals(EventType.REQ_IN, requestIn.getType());
-        Assert.assertEquals("UTF-8", requestIn.getEncoding());
+        Assert.assertEquals(StandardCharsets.UTF_8.name(), requestIn.getEncoding());
         Assert.assertNotNull(requestIn.getExchangeId());
         Assert.assertEquals("POST", requestIn.getHttpMethod());
         Assert.assertNotNull(requestIn.getMessageId());
@@ -109,7 +110,7 @@ public class SOAPLoggingTest {
         Assert.assertNull(responseOut.getAddress());
         Assert.assertEquals("text/xml", responseOut.getContentType());
         Assert.assertEquals(EventType.RESP_OUT, responseOut.getType());
-        Assert.assertEquals("UTF-8", responseOut.getEncoding());
+        Assert.assertEquals(StandardCharsets.UTF_8.name(), responseOut.getEncoding());
         Assert.assertNotNull(responseOut.getExchangeId());
         
         // Not yet available
@@ -125,7 +126,7 @@ public class SOAPLoggingTest {
         Assert.assertNull(responseIn.getAddress());
         Assert.assertEquals("text/xml; charset=UTF-8", responseIn.getContentType());
         Assert.assertEquals(EventType.RESP_IN, responseIn.getType());
-        Assert.assertEquals("UTF-8", responseIn.getEncoding());
+        Assert.assertEquals(StandardCharsets.UTF_8.name(), responseIn.getEncoding());
         Assert.assertNotNull(responseIn.getExchangeId());
         
         // Not yet available

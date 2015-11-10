@@ -29,7 +29,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.nio.CharBuffer;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.logging.Logger;
 
@@ -84,8 +84,6 @@ public final class Base64Utility {
     private static final int PAD_SIZE0 = 1;
     private static final int PAD_SIZE4 = 2;
     private static final int PAD_SIZE8 = 3;
-    
-    private static final Charset CHARSET_UTF8 = Charset.forName("UTF-8");
     
     // class static initializer for building decode table
     static {
@@ -379,7 +377,7 @@ public final class Base64Utility {
 
     private static void writeCharArrayToStream(char[] chunk, int len, OutputStream os) throws IOException {
         // may be we can just cast to byte when creating chunk[] earlier on
-        byte[] bytes = CHARSET_UTF8.encode(CharBuffer.wrap(chunk, 0, len)).array();
+        byte[] bytes = StandardCharsets.UTF_8.encode(CharBuffer.wrap(chunk, 0, len)).array();
         os.write(bytes);
     }
     

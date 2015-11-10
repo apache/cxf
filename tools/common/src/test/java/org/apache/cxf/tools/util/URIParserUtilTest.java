@@ -20,6 +20,7 @@
 package org.apache.cxf.tools.util;
 
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.cxf.common.util.URIParserUtil;
 import org.junit.Assert;
@@ -98,9 +99,9 @@ public class URIParserUtilTest extends Assert {
     }
     @Test
     public void testCXF3855() throws Exception {
-        String orig = new String(new byte[] {-47, -122}, "UTF-8");
+        String orig = new String(new byte[] {-47, -122}, StandardCharsets.UTF_8);
         orig = "/foo" + orig + ".txt";
         String s = URIParserUtil.escapeChars(orig);
-        assertEquals(orig, URLDecoder.decode(s, "UTF-8"));
+        assertEquals(orig, URLDecoder.decode(s, StandardCharsets.UTF_8.name()));
     }
 }

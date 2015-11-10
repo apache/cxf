@@ -31,6 +31,7 @@ import java.io.StringReader;
 import java.io.Writer;
 import java.net.URI;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -1666,7 +1667,7 @@ public class SourceGenerator {
         try {
             file.createNewFile();
             try (Writer writer = new OutputStreamWriter(new FileOutputStream(file), 
-                                                encoding == null ? "UTF-8" : encoding)) {
+                                                encoding == null ? StandardCharsets.UTF_8.name() : encoding)) {
                 writer.write(content);
                 writer.flush();
             }
@@ -1683,7 +1684,7 @@ public class SourceGenerator {
             if (validateWadl) {
                 SchemaFactory factory = SchemaFactory.newInstance(Constants.URI_2001_SCHEMA_XSD);
                 URL schemaURL = ResourceUtils.getResourceURL("classpath:/schemas/wadl/wadl.xsd", bus);
-                Reader r = new BufferedReader(new InputStreamReader(schemaURL.openStream(), "UTF-8"));
+                Reader r = new BufferedReader(new InputStreamReader(schemaURL.openStream(), StandardCharsets.UTF_8));
                 StreamSource source = new StreamSource(r);
                 source.setSystemId(schemaURL.toString());
                 Schema s = factory.newSchema(new Source[]{source});
@@ -1714,7 +1715,8 @@ public class SourceGenerator {
     
     private void generateClassesFromSchema(JCodeModel codeModel, File src) {
         try {
-            Object writer = JAXBUtils.createFileCodeWriter(src, encoding == null ? "UTF-8" : encoding);
+            Object writer = JAXBUtils.createFileCodeWriter(src, encoding == null 
+                ? StandardCharsets.UTF_8.name() : encoding);
             codeModel.build(writer);
             generatedTypeClasses = JAXBUtils.getGeneratedClassNames(codeModel);
         } catch (Exception e) {
@@ -1814,7 +1816,7 @@ public class SourceGenerator {
             if (is == null) {
                 is = URI.create(href).toURL().openStream();
             }
-            return readXmlDocument(new InputStreamReader(is, "UTF-8"));
+            return readXmlDocument(new InputStreamReader(is, StandardCharsets.UTF_8));
         } catch (Exception ex) {
             throw new RuntimeException("Resource " + href + " can not be read");
         }

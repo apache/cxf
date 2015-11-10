@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -101,7 +102,7 @@ public class SchemaHandler {
                 }
                 for (URL schemaURL : schemaURLs) {
                     Reader r = new BufferedReader(
-                                   new InputStreamReader(schemaURL.openStream(), "UTF-8"));
+                                   new InputStreamReader(schemaURL.openStream(), StandardCharsets.UTF_8));
                     StreamSource source = new StreamSource(r);
                     source.setSystemId(schemaURL.toString());
                     sources.add(source);

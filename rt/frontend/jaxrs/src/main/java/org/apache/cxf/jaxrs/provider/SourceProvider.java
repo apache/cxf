@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.util.logging.Logger;
 
 import javax.ws.rs.Consumes;
@@ -186,7 +187,7 @@ public class SourceProvider<T> extends AbstractConfigurableProvider implements
         MediaType mt, MultivaluedMap<String, Object> headers, OutputStream os)
         throws IOException {
         
-        String encoding = HttpUtils.getSetEncoding(mt, headers, "UTF-8");
+        String encoding = HttpUtils.getSetEncoding(mt, headers, StandardCharsets.UTF_8.name());
         
         XMLStreamReader reader = 
             source instanceof Source ? StaxUtils.createXMLStreamReader((Source)source) 

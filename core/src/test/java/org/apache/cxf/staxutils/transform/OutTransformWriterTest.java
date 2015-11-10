@@ -21,6 +21,7 @@ package org.apache.cxf.staxutils.transform;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -51,7 +52,7 @@ public class OutTransformWriterTest extends Assert {
     @Test
     public void testDefaultNamespace() throws Exception {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(os, "UTF-8");
+        XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(os, StandardCharsets.UTF_8.name());
         
         Map<String, String> outMap = new HashMap<String, String>();
         outMap.put("{http://testbeans.com}*", "{http://testbeans.com/v2}*");
@@ -148,7 +149,7 @@ public class OutTransformWriterTest extends Assert {
 
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         XMLStreamWriter writer = 
-            new OutTransformWriter(StaxUtils.createXMLStreamWriter(os, "UTF-8"), 
+            new OutTransformWriter(StaxUtils.createXMLStreamWriter(os, StandardCharsets.UTF_8.name()), 
                                    null, Collections.singletonMap("{http://bar}a", "{http://bar}a=1 2 3"),
                                    null, null, false, null);
         StaxUtils.copy(new StreamSource(is), writer);
@@ -255,7 +256,7 @@ public class OutTransformWriterTest extends Assert {
         // writing each child separately (as the soap header children are serialized)
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         XMLStreamWriter writer =
-            new OutTransformWriter(StaxUtils.createXMLStreamWriter(os, "UTF-8"), 
+            new OutTransformWriter(StaxUtils.createXMLStreamWriter(os, StandardCharsets.UTF_8.name()), 
                                    map, null,
                                    null, null, false, null);
         boolean nsset = "ns3".equals(writer.getNamespaceContext().getPrefix("http://testbeans.com/double"));
@@ -520,7 +521,7 @@ public class OutTransformWriterTest extends Assert {
 
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         XMLStreamWriter writer = 
-            new OutTransformWriter(StaxUtils.createXMLStreamWriter(os, "UTF-8"), 
+            new OutTransformWriter(StaxUtils.createXMLStreamWriter(os, StandardCharsets.UTF_8.name()), 
                                    null, null, null, null, false, "");
         StaxUtils.copy(new StreamSource(is), writer);
         writer.flush();

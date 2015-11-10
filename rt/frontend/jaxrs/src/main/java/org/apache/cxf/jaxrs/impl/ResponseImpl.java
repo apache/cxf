@@ -26,6 +26,7 @@ import java.io.Reader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -406,7 +407,7 @@ public final class ResponseImpl extends Response {
         }
         if (stringEntity != null) {
             try {
-                return new ByteArrayInputStream(stringEntity.getBytes("UTF-8"));
+                return new ByteArrayInputStream(stringEntity.getBytes(StandardCharsets.UTF_8));
             } catch (Exception ex) {
                 throw new ProcessingException(ex);
             }

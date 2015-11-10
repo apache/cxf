@@ -28,6 +28,7 @@ import java.net.HttpURLConnection;
 import java.net.Socket;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -151,7 +152,7 @@ public class JAXRSClientServerResourceCreatedSpringProviderTest extends Abstract
     public void testWadlPublishedEndpointUrl() throws Exception {
         String requestURI = "http://localhost:" + PORT + "/webapp/resources2";
         WebClient client = WebClient.create(requestURI + "?_wadl&_type=xml");
-        Document doc = StaxUtils.read(new InputStreamReader(client.get(InputStream.class), "UTF-8"));
+        Document doc = StaxUtils.read(new InputStreamReader(client.get(InputStream.class), StandardCharsets.UTF_8));
         Element root = doc.getDocumentElement();
         assertEquals(WadlGenerator.WADL_NS, root.getNamespaceURI());
         assertEquals("application", root.getLocalName());
@@ -179,7 +180,7 @@ public class JAXRSClientServerResourceCreatedSpringProviderTest extends Abstract
     private List<Element> getWadlResourcesInfo(String baseURI, String requestURI, int size) throws Exception {
         WebClient client = WebClient.create(requestURI + "?_wadl&_type=xml");
         WebClient.getConfig(client).getHttpConduit().getClient().setReceiveTimeout(10000000);
-        Document doc = StaxUtils.read(new InputStreamReader(client.get(InputStream.class), "UTF-8"));
+        Document doc = StaxUtils.read(new InputStreamReader(client.get(InputStream.class), StandardCharsets.UTF_8));
         Element root = doc.getDocumentElement();
         assertEquals(WadlGenerator.WADL_NS, root.getNamespaceURI());
         assertEquals("application", root.getLocalName());

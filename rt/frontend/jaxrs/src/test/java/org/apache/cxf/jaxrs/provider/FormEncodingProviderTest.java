@@ -23,6 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -279,7 +280,7 @@ public class FormEncodingProviderTest extends Assert {
             (MultivaluedMap<String, String>)ferp.readFrom(MultivaluedMap.class, null,
                 new Annotation[]{}, 
                 MediaType.valueOf(MediaType.APPLICATION_FORM_URLENCODED + ";charset=UTF-8"), null, 
-                new ByteArrayInputStream(s.getBytes("UTF-8")));
+                new ByteArrayInputStream(s.getBytes(StandardCharsets.UTF_8)));
         String value = mvMap.getFirst("name");
         assertEquals(s, "name=" + value);
     }

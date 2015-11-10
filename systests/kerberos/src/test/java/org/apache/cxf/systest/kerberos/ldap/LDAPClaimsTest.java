@@ -23,6 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -113,7 +114,7 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
             
             // Read in ldap.xml and substitute in the correct port
             Path path = FileSystems.getDefault().getPath(basedir, "/src/test/resources/ldap.xml");
-            String content = new String(Files.readAllBytes(path), "UTF-8");
+            String content = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
             content = content.replaceAll("portno", "" + super.getLdapServer().getPort());
             
             Path path2 = FileSystems.getDefault().getPath(basedir, "/target/test-classes/ldapport.xml");

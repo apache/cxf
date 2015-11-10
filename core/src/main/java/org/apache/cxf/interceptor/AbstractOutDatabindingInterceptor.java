@@ -20,6 +20,7 @@
 package org.apache.cxf.interceptor;
 
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -178,7 +179,7 @@ public abstract class AbstractOutDatabindingInterceptor extends AbstractPhaseInt
         return info.getClass().getName().equals("org.apache.cxf.binding.soap.model.SoapBindingInfo") 
             && s.getDataBinding().getClass().getName().equals("org.apache.cxf.jaxb.JAXBDataBinding")
             && !MessageUtils.isDOMPresent(m)
-            && (enc == null || "UTF-8".equals(enc));
+            && (enc == null || StandardCharsets.UTF_8.name().equals(enc));
     }
     
     protected <T> DataWriter<T> getDataWriter(Message message, Service service, Class<T> output) {

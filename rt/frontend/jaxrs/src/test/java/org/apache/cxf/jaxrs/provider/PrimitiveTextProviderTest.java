@@ -22,6 +22,7 @@ package org.apache.cxf.jaxrs.provider;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.lang.annotation.Annotation;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 import javax.ws.rs.core.MediaType;
@@ -206,7 +207,7 @@ public class PrimitiveTextProviderTest extends Assert {
         String value = (String)p.readFrom(String.class, null,
                 new Annotation[]{}, 
                 MediaType.valueOf(MediaType.APPLICATION_XML + ";charset=UTF-8"), null, 
-                new ByteArrayInputStream(s.getBytes("UTF-8")));
+                new ByteArrayInputStream(s.getBytes(StandardCharsets.UTF_8)));
         assertEquals(value, value);
     }    
 }

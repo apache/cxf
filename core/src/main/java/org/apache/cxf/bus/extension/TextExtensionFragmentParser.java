@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -71,7 +72,7 @@ public class TextExtensionFragmentParser {
      */
     public List<Extension> getExtensions(InputStream is) throws IOException {
         List<Extension> extensions = new ArrayList<Extension>();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
         String line = reader.readLine();
         while (line != null) {
             final Extension extension = getExtensionFromTextLine(line);

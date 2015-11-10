@@ -20,6 +20,7 @@ package org.apache.cxf.transport.jms.uri;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -94,7 +95,7 @@ final class JMSURIParser {
     
     private static String urldecode(String s) {
         try {
-            return URLDecoder.decode(s, "UTF-8");
+            return URLDecoder.decode(s, StandardCharsets.UTF_8.name());
         } catch (UnsupportedEncodingException e) {
             throw new IllegalArgumentException("Encoding UTF-8 not supported");
         }

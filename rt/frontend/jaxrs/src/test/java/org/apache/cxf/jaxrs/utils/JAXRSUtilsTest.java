@@ -25,6 +25,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -121,8 +122,8 @@ public class JAXRSUtilsTest extends Assert {
     @Test
     public void testFormParametersUTF8Encoding() throws Exception {
         JAXRSUtils.intersectMimeTypes("application/json", "application/json+v2");
-        doTestFormParamsWithEncoding("UTF-8", true);
-        doTestFormParamsWithEncoding("UTF-8", false);
+        doTestFormParamsWithEncoding(StandardCharsets.UTF_8.name(), true);
+        doTestFormParamsWithEncoding(StandardCharsets.UTF_8.name(), false);
     }
     
     @Test

@@ -22,6 +22,7 @@ package org.apache.cxf.rt.security.crypto;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.security.KeyFactory;
 import java.security.KeyPair;
@@ -409,7 +410,7 @@ public final class CryptoUtils {
         byte[] encryptedBytes = decodeSequence(encodedData);
         byte[] bytes = decryptBytes(encryptedBytes, secretKey, props);
         try {
-            return new String(bytes, "UTF-8");
+            return new String(bytes, StandardCharsets.UTF_8);
         } catch (Exception ex) {
             throw new SecurityException(ex);
         }
@@ -422,7 +423,7 @@ public final class CryptoUtils {
     public static String encryptSequence(String sequence, Key secretKey,
         KeyProperties keyProps) throws SecurityException {
         try {
-            byte[] bytes = encryptBytes(sequence.getBytes("UTF-8"), secretKey, keyProps);
+            byte[] bytes = encryptBytes(sequence.getBytes(StandardCharsets.UTF_8), secretKey, keyProps);
             return encodeBytes(bytes);
         } catch (Exception ex) {
             throw new SecurityException(ex);

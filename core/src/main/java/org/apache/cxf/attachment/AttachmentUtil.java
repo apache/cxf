@@ -28,6 +28,7 @@ import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.AbstractMap;
 import java.util.AbstractSet;
 import java.util.ArrayList;
@@ -209,7 +210,8 @@ public final class AttachmentUtil {
                 cid = ns;
             }
         }
-        return URLEncoder.encode(name, "UTF-8") + "@" + URLEncoder.encode(cid, "UTF-8");
+        return URLEncoder.encode(name, StandardCharsets.UTF_8.name()) + "@" 
+            + URLEncoder.encode(cid, StandardCharsets.UTF_8.name());
     }
 
     public static String getUniqueBoundaryValue() {
@@ -335,7 +337,7 @@ public final class AttachmentUtil {
             }
             // urldecode. Is this bad even without cid:? What does decode do with malformed %-signs, anyhow?
             try {
-                id = URLDecoder.decode(id, "UTF-8");
+                id = URLDecoder.decode(id, StandardCharsets.UTF_8.name());
             } catch (UnsupportedEncodingException e) {
                 //ignore, keep id as is
             }
@@ -526,7 +528,7 @@ public final class AttachmentUtil {
         // Is this right? - DD
         if (contentId.startsWith("cid:")) {
             try {
-                contentId = URLDecoder.decode(contentId.substring(4), "UTF-8");
+                contentId = URLDecoder.decode(contentId.substring(4), StandardCharsets.UTF_8.name());
             } catch (UnsupportedEncodingException ue) {
                 contentId = contentId.substring(4);
             }

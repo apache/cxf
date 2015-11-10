@@ -20,6 +20,7 @@ package org.apache.cxf.rs.security.oauth2.client;
 
 import java.io.IOException;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import javax.annotation.Priority;
@@ -213,9 +214,9 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
         MultivaluedMap<String, String> requestState = new MetadataMap<String, String>();
         requestState.putAll(ui.getQueryParameters(decodeRequestParameters));
         if (MediaType.APPLICATION_FORM_URLENCODED_TYPE.isCompatible(rc.getMediaType())) {
-            String body = FormUtils.readBody(rc.getEntityStream(), "UTF-8");
+            String body = FormUtils.readBody(rc.getEntityStream(), StandardCharsets.UTF_8.name());
             FormUtils.populateMapFromString(requestState, JAXRSUtils.getCurrentMessage(), body, 
-                                            "UTF-8", decodeRequestParameters);
+                                            StandardCharsets.UTF_8.name(), decodeRequestParameters);
         }
         return requestState;
     }

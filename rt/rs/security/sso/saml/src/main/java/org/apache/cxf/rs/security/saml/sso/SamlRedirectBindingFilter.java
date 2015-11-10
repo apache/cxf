@@ -20,6 +20,7 @@ package org.apache.cxf.rs.security.saml.sso;
 
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
 import java.security.Signature;
 import java.security.cert.X509Certificate;
@@ -54,7 +55,7 @@ public class SamlRedirectBindingFilter extends AbstractServiceProviderFilter {
             try {
                 SamlRequestInfo info = createSamlRequestInfo(m);
                 String urlEncodedRequest = 
-                    URLEncoder.encode(info.getSamlRequest(), "UTF-8");
+                    URLEncoder.encode(info.getSamlRequest(), StandardCharsets.UTF_8.name());
                 
                 UriBuilder ub = UriBuilder.fromUri(getIdpServiceAddress());
                 
@@ -89,7 +90,7 @@ public class SamlRedirectBindingFilter extends AbstractServiceProviderFilter {
         String requestMessage = DOM2Writer.nodeToString(authnRequest);
 
         DeflateEncoderDecoder encoder = new DeflateEncoderDecoder();
-        byte[] deflatedBytes = encoder.deflateToken(requestMessage.getBytes("UTF-8"));
+        byte[] deflatedBytes = encoder.deflateToken(requestMessage.getBytes(StandardCharsets.UTF_8));
 
         return Base64Utility.encode(deflatedBytes);
     }
@@ -136,7 +137,7 @@ public class SamlRedirectBindingFilter extends AbstractServiceProviderFilter {
             jceSigAlgo = "SHA1withDSA";
         }
         LOG.fine("Using Signature algorithm " + sigAlgo);
-        ub.queryParam(SSOConstants.SIG_ALG, URLEncoder.encode(sigAlgo, "UTF-8"));
+        ub.queryParam(SSOConstants.SIG_ALG, URLEncoder.encode(sigAlgo, StandardCharsets.UTF_8.name()));
         
         // Get the password
         WSPasswordCallback[] cb = {new WSPasswordCallback(signatureUser, WSPasswordCallback.SIGNATURE)};
@@ -153,14 +154,14 @@ public class SamlRedirectBindingFilter extends AbstractServiceProviderFilter {
         String requestToSign = 
             SSOConstants.SAML_REQUEST + "=" + authnRequest + "&"
             + SSOConstants.RELAY_STATE + "=" + relayState + "&"
-            + SSOConstants.SIG_ALG + "=" + URLEncoder.encode(sigAlgo, "UTF-8");
+            + SSOConstants.SIG_ALG + "=" + URLEncoder.encode(sigAlgo, StandardCharsets.UTF_8.name());
 
-        signature.update(requestToSign.getBytes("UTF-8"));
+        signature.update(requestToSign.getBytes(StandardCharsets.UTF_8));
         byte[] signBytes = signature.sign();
         
         String encodedSignature = Base64.encode(signBytes);
         
-        ub.queryParam(SSOConstants.SIGNATURE, URLEncoder.encode(encodedSignature, "UTF-8"));
+        ub.queryParam(SSOConstants.SIGNATURE, URLEncoder.encode(encodedSignature, StandardCharsets.UTF_8.name()));
         
     }
     

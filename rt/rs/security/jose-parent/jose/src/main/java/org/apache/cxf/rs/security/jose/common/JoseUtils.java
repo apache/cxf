@@ -20,8 +20,8 @@ package org.apache.cxf.rs.security.jose.common;
 
 import java.io.File;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
@@ -110,12 +110,7 @@ public final class JoseUtils {
     }
     
     public static String decodeToString(String encoded) {
-        try {
-            return new String(decode(encoded), "UTF-8");
-        } catch (UnsupportedEncodingException ex) {
-            throw new JoseException(ex);
-        }
-        
+        return new String(decode(encoded), StandardCharsets.UTF_8);
     }
     public static byte[] decode(String encoded) {
         return CryptoUtils.decodeSequence(encoded);

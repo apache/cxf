@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.rs.security.jose.jwe;
 
+import java.nio.charset.StandardCharsets;
 import java.security.Security;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
@@ -107,7 +108,7 @@ public class JweCompactReaderWriterTest extends Assert {
                                                            CONTENT_ENCRYPTION_KEY_A3, 
                                                            INIT_VECTOR_A3,
                                                            keyEncryption);
-        String jweContent = encryption.encrypt(specPlainText.getBytes("UTF-8"), null);
+        String jweContent = encryption.encrypt(specPlainText.getBytes(StandardCharsets.UTF_8), null);
         assertEquals(JWE_OUTPUT_A3, jweContent);
         
         AesWrapKeyDecryptionAlgorithm keyDecryption = new AesWrapKeyDecryptionAlgorithm(cekEncryptionKey);
@@ -152,7 +153,7 @@ public class JweCompactReaderWriterTest extends Assert {
                                                            CONTENT_ENCRYPTION_KEY_A3, 
                                                            INIT_VECTOR_A3,
                                                            keyEncryption);
-        String jweContent = encryption.encrypt(specPlainText.getBytes("UTF-8"), null);
+        String jweContent = encryption.encrypt(specPlainText.getBytes(StandardCharsets.UTF_8), null);
         
         RSAPrivateKey privateKey = CryptoUtils.getRSAPrivateKey(RSA_MODULUS_ENCODED_A1, 
                                                                 RSA_PRIVATE_EXPONENT_ENCODED_A1);
@@ -180,7 +181,7 @@ public class JweCompactReaderWriterTest extends Assert {
                                                            CONTENT_ENCRYPTION_KEY_A3, 
                                                            INIT_VECTOR_A3,
                                                            keyEncryption);
-        String jweContent = encryption.encrypt(specPlainText.getBytes("UTF-8"), null);
+        String jweContent = encryption.encrypt(specPlainText.getBytes(StandardCharsets.UTF_8), null);
         
         AesGcmWrapKeyDecryptionAlgorithm keyDecryption = new AesGcmWrapKeyDecryptionAlgorithm(cekEncryptionKey);
         JweDecryptionProvider decryption = new AesCbcHmacJweDecryption(keyDecryption);
@@ -228,12 +229,12 @@ public class JweCompactReaderWriterTest extends Assert {
             new AesGcmContentEncryptionAlgorithm(key == null ? null : key.getEncoded(), INIT_VECTOR_A1, 
                 ContentAlgorithm.getAlgorithm(jwtKeyName));
         JweEncryptionProvider encryptor = new JweEncryption(keyEncryptionAlgo, contentEncryptionAlgo);
-        return encryptor.encrypt(content.getBytes("UTF-8"), null);
+        return encryptor.encrypt(content.getBytes(StandardCharsets.UTF_8), null);
     }
     private String encryptContentDirect(SecretKey key, String content) throws Exception {
         JweEncryption encryptor = new JweEncryption(new DirectKeyEncryptionAlgorithm(),
             new AesGcmContentEncryptionAlgorithm(key, INIT_VECTOR_A1, ContentAlgorithm.A128GCM));
-        return encryptor.encrypt(content.getBytes("UTF-8"), null);
+        return encryptor.encrypt(content.getBytes(StandardCharsets.UTF_8), null);
     }
     private void decrypt(String jweContent, String plainContent, boolean unwrap) throws Exception {
         RSAPrivateKey privateKey = CryptoUtils.getRSAPrivateKey(RSA_MODULUS_ENCODED_A1, 

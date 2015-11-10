@@ -24,6 +24,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.FileNameMap;
 import java.net.URLConnection;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -144,10 +145,10 @@ public final class Utils {
     public static String sanitizeUri(String uri) {
         // Decode the path.
         try {
-            uri = URLDecoder.decode(uri, "UTF-8");
+            uri = URLDecoder.decode(uri, StandardCharsets.UTF_8.name());
         } catch (UnsupportedEncodingException e) {
             try {
-                uri = URLDecoder.decode(uri, "ISO-8859-1");
+                uri = URLDecoder.decode(uri, StandardCharsets.ISO_8859_1.name());
             } catch (UnsupportedEncodingException e1) {
                 throw new Error();
             }

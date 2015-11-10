@@ -24,6 +24,7 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -394,7 +395,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         try {
             String errorMessage = JAXRSUtils.logMessageHandlerProblem(name, cls, ct);
             if (out != null) {
-                out.write(errorMessage.getBytes("UTF-8"));
+                out.write(errorMessage.getBytes(StandardCharsets.UTF_8));
             }
         } catch (IOException another) {
             // ignore
@@ -445,7 +446,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
     
     private void writeResponseToStream(OutputStream os, Object responseObj) {
         try {
-            byte[] bytes = responseObj.toString().getBytes("UTF-8");
+            byte[] bytes = responseObj.toString().getBytes(StandardCharsets.UTF_8);
             os.write(bytes, 0, bytes.length);
         } catch (Exception ex) {
             LOG.severe("Problem with writing the data to the output stream");

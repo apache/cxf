@@ -33,6 +33,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -517,7 +518,7 @@ public class CachedWriter extends Writer {
                         }
                     };
                 }
-                return new InputStreamReader(fileInputStream, "UTF-8");
+                return new InputStreamReader(fileInputStream, StandardCharsets.UTF_8);
             } catch (FileNotFoundException e) {
                 throw new IOException("Cached file was deleted, " + e.toString());
             }

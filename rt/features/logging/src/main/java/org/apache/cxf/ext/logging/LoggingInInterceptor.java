@@ -19,6 +19,7 @@
 package org.apache.cxf.ext.logging;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.util.StringUtils;
@@ -64,7 +65,7 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
     private void handleOutputStream(final LogEvent event, Message message, CachedOutputStream cos) throws IOException {
         String encoding = (String)message.get(Message.ENCODING);
         if (StringUtils.isEmpty(encoding)) {
-            encoding = "UTF-8";
+            encoding = StandardCharsets.UTF_8.name();
         }
         StringBuilder payload = new StringBuilder();
         cos.writeCacheTo(payload, encoding, limit);

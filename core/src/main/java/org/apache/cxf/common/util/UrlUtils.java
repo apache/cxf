@@ -23,6 +23,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -43,7 +44,7 @@ public final class UrlUtils {
 
     public static String urlEncode(String value) {
         
-        return urlEncode(value, "UTF-8");
+        return urlEncode(value, StandardCharsets.UTF_8.name());
     }
     
     public static String urlEncode(String value, String enc) {
@@ -118,7 +119,7 @@ public final class UrlUtils {
 
     
     public static String urlDecode(String value) {
-        return urlDecode(value, "UTF-8");
+        return urlDecode(value, StandardCharsets.UTF_8.name());
     }
     
     /**
@@ -127,7 +128,7 @@ public final class UrlUtils {
      * @param value value to decode
      */
     public static String pathDecode(String value) {
-        return urlDecode(value, "UTF-8", true);
+        return urlDecode(value, StandardCharsets.UTF_8.name(), true);
     }
     
     

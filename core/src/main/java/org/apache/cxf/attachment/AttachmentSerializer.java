@@ -24,6 +24,7 @@ import java.io.OutputStream;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -144,7 +145,7 @@ public class AttachmentSerializer {
         out = message.getContent(OutputStream.class);
         encoding = (String) message.get(Message.ENCODING);
         if (encoding == null) {
-            encoding = "UTF-8";
+            encoding = StandardCharsets.UTF_8.name();
         }
         StringWriter writer = new StringWriter();
         writer.write("--");
@@ -200,7 +201,7 @@ public class AttachmentSerializer {
         if (attachmentId != null) {
             attachmentId = checkAngleBrackets(attachmentId);
             writer.write("Content-ID: <");
-            writer.write(URLDecoder.decode(attachmentId, "UTF-8"));
+            writer.write(URLDecoder.decode(attachmentId, StandardCharsets.UTF_8.name()));
             writer.write(">\r\n");
         }
         // headers like Content-Disposition need to be serialized

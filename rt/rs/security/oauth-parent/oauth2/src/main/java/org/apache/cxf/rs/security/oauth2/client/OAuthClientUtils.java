@@ -21,6 +21,7 @@ package org.apache.cxf.rs.security.oauth2.client;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Map;
 
@@ -285,7 +286,7 @@ public final class OAuthClientUtils {
                 sb.append("Basic ");
                 try {
                     String data = consumer.getKey() + ":" + consumer.getSecret();
-                    sb.append(Base64Utility.encode(data.getBytes("UTF-8")));
+                    sb.append(Base64Utility.encode(data.getBytes(StandardCharsets.UTF_8)));
                 } catch (Exception ex) {
                     throw new ProcessingException(ex);
                 }

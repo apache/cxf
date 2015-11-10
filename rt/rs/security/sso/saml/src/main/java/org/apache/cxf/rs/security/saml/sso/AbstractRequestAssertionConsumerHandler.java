@@ -22,8 +22,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.ResourceBundle;
 import java.util.UUID;
@@ -235,7 +235,7 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
         // URL Decoding only applies for the re-direct binding
         if (!postBinding) {
             try {
-                samlResponseDecoded = URLDecoder.decode(samlResponse, "UTF-8");
+                samlResponseDecoded = URLDecoder.decode(samlResponse, StandardCharsets.UTF_8);
             } catch (UnsupportedEncodingException e) {
                 throw ExceptionUtils.toBadRequestException(null, null);
             }
@@ -254,16 +254,12 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
                 throw ExceptionUtils.toBadRequestException(ex, null);
             }
         } else {
-            try {
-                tokenStream = new ByteArrayInputStream(samlResponseDecoded.getBytes("UTF-8"));
-            } catch (UnsupportedEncodingException ex) {
-                throw ExceptionUtils.toBadRequestException(ex, null);
-            }
+            tokenStream = new ByteArrayInputStream(samlResponseDecoded.getBytes(StandardCharsets.UTF_8));
         }
         
         Document responseDoc = null;
         try {
-            responseDoc = StaxUtils.read(new InputStreamReader(tokenStream, "UTF-8"));
+            responseDoc = StaxUtils.read(new InputStreamReader(tokenStream, StandardCharsets.UTF_8));
         } catch (Exception ex) {
             throw new WebApplicationException(400);
         }

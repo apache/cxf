@@ -21,6 +21,7 @@ package org.apache.cxf.wsdl;
 
 import java.io.PrintWriter;
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -288,7 +289,7 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
         // TODO Auto-generated method stub
         try {
             Marshaller u = createMarshaller();
-            u.setProperty("jaxb.encoding", "UTF-8");
+            u.setProperty("jaxb.encoding", StandardCharsets.UTF_8.name());
             u.setProperty("jaxb.fragment", Boolean.TRUE);
             u.setProperty("jaxb.formatted.output", Boolean.TRUE);
             

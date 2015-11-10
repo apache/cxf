@@ -20,6 +20,7 @@
 package org.apache.cxf.rs.security.saml.sso;
 
 import java.net.MalformedURLException;
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
@@ -71,7 +72,7 @@ public class MetadataWriter {
 
         W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
 
-        writer.writeStartDocument("UTF-8", "1.0");
+        writer.writeStartDocument(StandardCharsets.UTF_8.name(), "1.0");
 
         String referenceID = IDGenerator.generateID("_");
         writer.writeStartElement("md", "EntityDescriptor", SSOConstants.SAML2_METADATA_NS);

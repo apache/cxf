@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.net.URI;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -260,7 +261,7 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
                                                      getWebAppDomain(),
                                                      System.currentTimeMillis());
         
-        String relayState = URLEncoder.encode(UUID.randomUUID().toString(), "UTF-8");
+        String relayState = URLEncoder.encode(UUID.randomUUID().toString(), StandardCharsets.UTF_8.name());
         getStateProvider().setRequestState(relayState, requestState);
         info.setRelayState(relayState);
         info.setWebAppContext(webAppContext);

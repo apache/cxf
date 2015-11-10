@@ -30,6 +30,7 @@ import java.io.StringReader;
 import java.io.Writer;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -216,7 +217,7 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         }
         
         XMLStreamReader reader = null;
-        String enc = HttpUtils.getEncoding(mt, "UTF-8");
+        String enc = HttpUtils.getEncoding(mt, StandardCharsets.UTF_8.name());
         Unmarshaller unmarshaller = null;
         try {
             InputStream realStream = getInputStream(type, genericType, is);
@@ -374,7 +375,7 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         XMLStreamWriter writer = null;
         try {
             
-            String enc = HttpUtils.getSetEncoding(m, headers, "UTF-8");
+            String enc = HttpUtils.getSetEncoding(m, headers, StandardCharsets.UTF_8.name());
             if (Document.class.isAssignableFrom(cls)) {
                 writer = createWriter(obj, cls, genericType, enc, os, false);
                 copyReaderToWriter(StaxUtils.createXMLStreamReader((Document)obj), writer);

@@ -37,6 +37,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -765,7 +766,7 @@ public final class JAXBUtils {
         return classes;
     }
     public static Object createFileCodeWriter(File f) throws JAXBException {
-        return createFileCodeWriter(f, "UTF-8");
+        return createFileCodeWriter(f, StandardCharsets.UTF_8.name());
     }
     public static Object createFileCodeWriter(File f, String encoding) throws JAXBException {
         try {
@@ -896,7 +897,7 @@ public final class JAXBUtils {
             if (entry.getValue() != null) {
                 BufferedReader reader = null;
                 try {
-                    reader = new BufferedReader(new InputStreamReader(entry.getValue(), "UTF-8"));
+                    reader = new BufferedReader(new InputStreamReader(entry.getValue(), StandardCharsets.UTF_8));
                     String pkg = entry.getKey();
                     ClassLoader loader = packageLoaders.get(pkg);
                     if (!StringUtils.isEmpty(pkg)) {

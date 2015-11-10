@@ -20,6 +20,7 @@ package org.apache.cxf.rs.security.jose.jaxrs;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -89,7 +90,7 @@ public class JwsJsonWriterInterceptor extends AbstractJwsJsonWriterProvider impl
             CachedOutputStream cos = new CachedOutputStream(); 
             ctx.setOutputStream(cos);
             ctx.proceed();
-            JwsJsonProducer p = new JwsJsonProducer(new String(cos.getBytes(), "UTF-8"));
+            JwsJsonProducer p = new JwsJsonProducer(new String(cos.getBytes(), StandardCharsets.UTF_8));
             for (JwsSignatureProvider signer : sigProviders) {
                 JwsHeaders protectedHeader = prepareProtectedHeader(ctx, signer);
                 p.signWith(signer, protectedHeader, null);    

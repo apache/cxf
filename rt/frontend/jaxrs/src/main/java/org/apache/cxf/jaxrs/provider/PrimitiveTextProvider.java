@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
@@ -53,7 +54,7 @@ public class PrimitiveTextProvider<T> extends AbstractConfigurableProvider
 
     public T readFrom(Class<T> type, Type genType, Annotation[] anns, MediaType mt, 
                       MultivaluedMap<String, String> headers, InputStream is) throws IOException {
-        String string = IOUtils.toString(is, HttpUtils.getEncoding(mt, "UTF-8"));
+        String string = IOUtils.toString(is, HttpUtils.getEncoding(mt, StandardCharsets.UTF_8.name()));
         if (StringUtils.isEmpty(string)) {
             reportEmptyContentLength();
         }
@@ -82,7 +83,7 @@ public class PrimitiveTextProvider<T> extends AbstractConfigurableProvider
     public void writeTo(T obj, Class<?> type, Type genType, Annotation[] anns, 
                         MediaType mt, MultivaluedMap<String, Object> headers,
                         OutputStream os) throws IOException {
-        String encoding = HttpUtils.getSetEncoding(mt, headers, "UTF-8");
+        String encoding = HttpUtils.getSetEncoding(mt, headers, StandardCharsets.UTF_8.name());
         byte[] bytes = obj.toString().getBytes(encoding);
         os.write(bytes);
         

@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -41,7 +42,7 @@ public class StringTextProvider extends AbstractConfigurableProvider
 
     public String readFrom(Class<String> type, Type genType, Annotation[] anns, MediaType mt, 
                       MultivaluedMap<String, String> headers, InputStream is) throws IOException {
-        return IOUtils.toString(is, HttpUtils.getEncoding(mt, "UTF-8"));
+        return IOUtils.toString(is, HttpUtils.getEncoding(mt, StandardCharsets.UTF_8.name()));
     }
 
     public long getSize(String t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
@@ -55,7 +56,7 @@ public class StringTextProvider extends AbstractConfigurableProvider
     public void writeTo(String obj, Class<?> type, Type genType, Annotation[] anns, 
                         MediaType mt, MultivaluedMap<String, Object> headers,
                         OutputStream os) throws IOException {
-        String encoding = HttpUtils.getSetEncoding(mt, headers, "UTF-8");
+        String encoding = HttpUtils.getSetEncoding(mt, headers, StandardCharsets.UTF_8.name());
         //REVISIT try to avoid instantiating the whole byte array
         byte[] bytes = obj.getBytes(encoding);
         if (bytes.length > bufferSize) {

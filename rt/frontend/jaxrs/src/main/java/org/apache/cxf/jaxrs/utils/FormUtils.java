@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Iterator;
@@ -63,10 +64,9 @@ public final class FormUtils {
     }
     
     public static String formToString(Form form) {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        try {
-            FormUtils.writeMapToOutputStream(form.asMap(), bos, "UTF-8", false);
-            return bos.toString("UTF-8");
+        try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
+            FormUtils.writeMapToOutputStream(form.asMap(), bos, StandardCharsets.UTF_8.name(), false);
+            return bos.toString(StandardCharsets.UTF_8.name());
         } catch (Exception ex) {
             // will not happen
         }

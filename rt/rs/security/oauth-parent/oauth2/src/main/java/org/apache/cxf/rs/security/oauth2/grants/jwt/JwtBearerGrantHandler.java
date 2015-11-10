@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.rs.security.oauth2.grants.jwt;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 import javax.ws.rs.core.MultivaluedMap;
@@ -42,7 +43,7 @@ public class JwtBearerGrantHandler extends AbstractJwtHandler {
         //  AccessTokenService may be configured with the form provider
         // which will not decode by default - so listing both the actual 
         // and encoded grant type value will help
-        ENCODED_JWT_BEARER_GRANT = HttpUtils.urlEncode(Constants.JWT_BEARER_GRANT, "UTF-8");
+        ENCODED_JWT_BEARER_GRANT = HttpUtils.urlEncode(Constants.JWT_BEARER_GRANT, StandardCharsets.UTF_8.name());
     }
     public JwtBearerGrantHandler() {
         super(Arrays.asList(Constants.JWT_BEARER_GRANT, ENCODED_JWT_BEARER_GRANT));

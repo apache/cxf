@@ -33,6 +33,7 @@ import java.io.Reader;
 import java.io.Writer;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.security.DigestInputStream;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -177,7 +178,7 @@ public class BinaryDataProvider<T> extends AbstractConfigurableProvider
     
     private String getEncoding(MediaType mt) {
         String enc = mt.getParameters().get("charset");
-        return enc == null ? "UTF-8" : enc;
+        return enc == null ? StandardCharsets.UTF_8.name() : enc;
     }
     private String getCharset(MediaType mt) {
         return mt.getParameters().get("charset");

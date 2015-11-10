@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.rt.security.crypto;
 
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
@@ -86,11 +86,7 @@ public final class HmacUtils {
     }
     
     public static byte[] computeHmac(String key, Mac hmac, String data) {
-        try {
-            return computeHmac(key.getBytes("UTF-8"), hmac, data);
-        } catch (UnsupportedEncodingException e) {
-            throw new SecurityException(e);
-        }
+        return computeHmac(key.getBytes(StandardCharsets.UTF_8), hmac, data);
     }
     
     public static byte[] computeHmac(byte[] key, Mac hmac, String data) {

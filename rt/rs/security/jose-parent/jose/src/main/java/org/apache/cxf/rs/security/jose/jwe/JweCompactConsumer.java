@@ -19,7 +19,7 @@
 
 package org.apache.cxf.rs.security.jose.jwe;
 
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
@@ -27,7 +27,6 @@ import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.jaxrs.json.basic.JsonMapObject;
 import org.apache.cxf.jaxrs.json.basic.JsonMapObjectReaderWriter;
-import org.apache.cxf.rs.security.jose.common.JoseException;
 import org.apache.cxf.rs.security.jose.common.JoseUtils;
 
 
@@ -113,11 +112,7 @@ public class JweCompactConsumer {
         return decryption.decrypt(jweDecryptionInput);
     }
     public String getDecryptedContentText(JweDecryptionProvider decryption) {
-        try {
-            return new String(getDecryptedContent(decryption), "UTF-8");
-        } catch (UnsupportedEncodingException ex) {
-            throw new JoseException(ex);
-        }
+        return new String(getDecryptedContent(decryption), StandardCharsets.UTF_8);
     }
     public boolean validateCriticalHeaders() {
         return JweUtils.validateCriticalHeaders(getJweHeaders());

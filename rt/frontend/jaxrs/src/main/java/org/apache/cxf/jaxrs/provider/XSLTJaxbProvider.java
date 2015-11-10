@@ -26,6 +26,7 @@ import java.io.Reader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -515,7 +516,7 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
             }
             
             Reader r = new BufferedReader(
-                           new InputStreamReader(urlStream.openStream(), "UTF-8"));
+                           new InputStreamReader(urlStream.openStream(), StandardCharsets.UTF_8));
             Source source = new StreamSource(r);
             source.setSystemId(urlStream.toExternalForm());
             if (factory == null) {

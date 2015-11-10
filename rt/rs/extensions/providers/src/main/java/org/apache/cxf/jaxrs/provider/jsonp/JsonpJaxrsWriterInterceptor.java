@@ -20,6 +20,7 @@
 package org.apache.cxf.jaxrs.provider.jsonp;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.ext.WriterInterceptor;
@@ -47,7 +48,7 @@ public class JsonpJaxrsWriterInterceptor implements WriterInterceptor {
         if (!StringUtils.isEmpty(callback)) {
             context.getHeaders().putSingle(Message.CONTENT_TYPE, 
                                            JAXRSUtils.toMediaType(getMediaType()));
-            context.getOutputStream().write((callback + getPaddingEnd()).getBytes("UTF-8"));
+            context.getOutputStream().write((callback + getPaddingEnd()).getBytes(StandardCharsets.UTF_8));
         }
         context.proceed();
     }
