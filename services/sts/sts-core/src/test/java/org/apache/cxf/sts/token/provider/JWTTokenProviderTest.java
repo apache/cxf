@@ -19,6 +19,7 @@
 package org.apache.cxf.sts.token.provider;
 
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 import java.util.Properties;
 
 import org.apache.cxf.jaxws.context.WebServiceContextImpl;
@@ -35,6 +36,7 @@ import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.sts.service.EncryptionProperties;
 import org.apache.cxf.sts.token.provider.jwt.JWTTokenProvider;
+import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
@@ -111,6 +113,38 @@ public class JWTTokenProviderTest extends org.junit.Assert {
         assertNotNull(certs);
         
         assertTrue(jwtConsumer.verifySignatureWith(certs[0], SignatureAlgorithm.RS256));
+    }
+    
+    @org.junit.Test
+    public void testCachedSignedJWT() throws Exception {
+        TokenProvider jwtTokenProvider = new JWTTokenProvider();
+        ((JWTTokenProvider)jwtTokenProvider).setSignToken(true);
+        
+        TokenProviderParameters providerParameters = createProviderParameters();
+        
+        assertTrue(jwtTokenProvider.canHandleToken(JWTTokenProvider.JWT_TOKEN_TYPE));
+        TokenProviderResponse providerResponse = jwtTokenProvider.createToken(providerParameters);
+        assertTrue(providerResponse != null);
+        assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
+
+        String token = (String)providerResponse.getToken();
+        assertNotNull(token);
+        assertTrue(token.split("\\.").length == 3);
+        
+        // Validate the token
+        JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token);
+        JwtToken jwt = jwtConsumer.getJwtToken();
+        Assert.assertEquals("alice", jwt.getClaim(JwtConstants.CLAIM_SUBJECT));
+        Assert.assertEquals(providerResponse.getTokenId(), jwt.getClaim(JwtConstants.CLAIM_JWT_ID));
+        Assert.assertEquals(providerResponse.getCreated().getTime() / 1000L, 
+                            jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT));
+        Assert.assertEquals(providerResponse.getExpires().getTime() / 1000L, 
+                            jwt.getClaim(JwtConstants.CLAIM_EXPIRY));
+        
+        // Check that the token is stored correctly in the cache
+        String signature = token.substring(token.lastIndexOf(".") + 1);
+        SecurityToken secToken = tokenStore.getToken(Integer.toString(Arrays.hashCode(signature.getBytes())));
+        Assert.assertNotNull(secToken);
     }
     
     private TokenProviderParameters createProviderParameters() throws WSSecurityException {
