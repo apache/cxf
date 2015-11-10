@@ -77,7 +77,6 @@ import org.apache.cxf.ws.security.sts.provider.model.OnBehalfOfType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseCollectionType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
-import org.apache.cxf.ws.security.sts.provider.model.RequestedSecurityTokenType;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -283,14 +282,12 @@ public class IssueJWTClaimsUnitTest extends org.junit.Assert {
     }
     
     /**
-     * Test to successfully issue a SAML 2 token (realm "B") on-behalf-of a SAML 2 token
+     * Test to successfully issue a JWT token (realm "B") on-behalf-of a SAML 2 token
      * which was issued by realm "A".
      * The relationship type between realm A and B is: FederateClaims
-     * TODO
      */
     @org.junit.Test
-    @org.junit.Ignore
-    public void testIssueSaml2TokenOnBehalfOfSaml2DifferentRealmFederateClaims() 
+    public void testIssueJWTTokenOnBehalfOfSaml2DifferentRealmFederateClaims() 
         throws Exception {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
         
@@ -298,13 +295,9 @@ public class IssueJWTClaimsUnitTest extends org.junit.Assert {
         
         // Add Token Provider
         List<TokenProvider> providerList = new ArrayList<TokenProvider>();
-        SAMLTokenProvider samlTokenProvider = new SAMLTokenProvider();
-        samlTokenProvider.setRealmMap(realms);
-        List<AttributeStatementProvider> customProviderList = 
-            new ArrayList<AttributeStatementProvider>();
-        customProviderList.add(new ClaimsAttributeStatementProvider());
-        samlTokenProvider.setAttributeStatementProviders(customProviderList);
-        providerList.add(samlTokenProvider);
+        JWTTokenProvider tokenProvider = new JWTTokenProvider();
+        tokenProvider.setRealmMap(realms);
+        providerList.add(tokenProvider);
         issueOperation.setTokenProviders(providerList);
         
         TokenDelegationHandler delegationHandler = new SAMLDelegationHandler();
@@ -342,7 +335,7 @@ public class IssueJWTClaimsUnitTest extends org.junit.Assert {
         RequestSecurityTokenType request = new RequestSecurityTokenType();
         JAXBElement<String> tokenType = 
             new JAXBElement<String>(
-                QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
+                QNameConstants.TOKEN_TYPE, String.class, JWTTokenProvider.JWT_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
         
@@ -392,57 +385,55 @@ public class IssueJWTClaimsUnitTest extends org.junit.Assert {
         
         List<RequestSecurityTokenResponseType> securityTokenResponseList = issueToken(issueOperation,
                 request, webServiceContext);       
-        RequestSecurityTokenResponseType securityTokenResponse = securityTokenResponseList.get(0);
         
         // Test the generated token.
-        Element assertion = null;
-        for (Object tokenObject : securityTokenResponse.getAny()) {
-            if (tokenObject instanceof JAXBElement<?>
-                && REQUESTED_SECURITY_TOKEN.equals(((JAXBElement<?>)tokenObject).getName())) {
-                RequestedSecurityTokenType rstType = 
-                    (RequestedSecurityTokenType)((JAXBElement<?>)tokenObject).getValue();
-                assertion = (Element)rstType.getAny();
+        String jwtToken = null;
+        for (Object tokenObject : securityTokenResponseList.get(0).getAny()) {
+            if (tokenObject instanceof Element
+                && REQUESTED_SECURITY_TOKEN.getLocalPart().equals(((Element)tokenObject).getLocalName())
+                && REQUESTED_SECURITY_TOKEN.getNamespaceURI().equals(((Element)tokenObject).getNamespaceURI())) {
+                jwtToken = ((Element)tokenObject).getTextContent();
                 break;
             }
         }
-        assertNotNull(assertion);
-        String tokenString = DOM2Writer.nodeToString(assertion);
-        assertTrue(tokenString.contains("AttributeStatement"));
-        assertTrue(tokenString.contains("alice"));  //subject unchanged
-        assertTrue(tokenString.contains("DOE")); //transformed claim (to uppercase)
-        assertTrue(tokenString.contains(SAML2Constants.CONF_BEARER));
+        
+        assertNotNull(jwtToken);
+        
+        // Validate the token
+        JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(jwtToken);
+        JwtToken jwt = jwtConsumer.getJwtToken();
+        // subject unchanged
+        Assert.assertEquals("alice", jwt.getClaim(JwtConstants.CLAIM_SUBJECT));
+        // transformed claim (to uppercase)
+        assertEquals(jwt.getClaim(ClaimTypes.LASTNAME.toString()), "DOE");
     }
     
     /**
-     * Test to successfully issue a SAML 2 token (realm "B") on-behalf-of a SAML 2 token
+     * Test to successfully issue a JWT token (realm "B") on-behalf-of a SAML 2 token
      * which was issued by realm "A".
      * The relationship type between realm A and B is: FederateIdentity
      * IdentityMapper is configured globally in STSPropertiesMBean
-     * TODO
      */
     @org.junit.Test
-    @org.junit.Ignore
-    public void testIssueSaml2TokenOnBehalfOfSaml2DifferentRealmFederateIdentityGlobalConfig()
+    public void testIssueJWTTokenOnBehalfOfSaml2DifferentRealmFederateIdentityGlobalConfig()
         throws Exception {
-        runIssueSaml2TokenOnBehalfOfSaml2DifferentRealmFederateIdentity(true);
+        runIssueJWTTokenOnBehalfOfSaml2DifferentRealmFederateIdentity(true);
     }
     
     
     /**
-     * Test to successfully issue a SAML 2 token (realm "B") on-behalf-of a SAML 2 token
+     * Test to successfully issue a JWT token (realm "B") on-behalf-of a SAML 2 token
      * which was issued by realm "A".
      * The relationship type between realm A and B is: FederateIdentity
      * IdentityMapper is configured in the Relationship
-     * TODO
      */
     @org.junit.Test
-    @org.junit.Ignore
-    public void testIssueSaml2TokenOnBehalfOfSaml2DifferentRealmFederateIdentityRelationshipConfig()
+    public void testIssueJWTTokenOnBehalfOfSaml2DifferentRealmFederateIdentityRelationshipConfig()
         throws Exception {
-        runIssueSaml2TokenOnBehalfOfSaml2DifferentRealmFederateIdentity(false);
+        runIssueJWTTokenOnBehalfOfSaml2DifferentRealmFederateIdentity(false);
     }
 
-    private void runIssueSaml2TokenOnBehalfOfSaml2DifferentRealmFederateIdentity(
+    private void runIssueJWTTokenOnBehalfOfSaml2DifferentRealmFederateIdentity(
             boolean useGlobalIdentityMapper) throws WSSecurityException {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
         
@@ -450,13 +441,9 @@ public class IssueJWTClaimsUnitTest extends org.junit.Assert {
         
         // Add Token Provider
         List<TokenProvider> providerList = new ArrayList<TokenProvider>();
-        SAMLTokenProvider samlTokenProvider = new SAMLTokenProvider();
-        samlTokenProvider.setRealmMap(realms);
-        List<AttributeStatementProvider> customProviderList = 
-            new ArrayList<AttributeStatementProvider>();
-        customProviderList.add(new ClaimsAttributeStatementProvider());
-        samlTokenProvider.setAttributeStatementProviders(customProviderList);
-        providerList.add(samlTokenProvider);
+        JWTTokenProvider tokenProvider = new JWTTokenProvider();
+        tokenProvider.setRealmMap(realms);
+        providerList.add(tokenProvider);
         issueOperation.setTokenProviders(providerList);
         
         TokenDelegationHandler delegationHandler = new SAMLDelegationHandler();
@@ -500,7 +487,7 @@ public class IssueJWTClaimsUnitTest extends org.junit.Assert {
         RequestSecurityTokenType request = new RequestSecurityTokenType();
         JAXBElement<String> tokenType = 
             new JAXBElement<String>(
-                QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
+                QNameConstants.TOKEN_TYPE, String.class, JWTTokenProvider.JWT_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
         
@@ -550,26 +537,27 @@ public class IssueJWTClaimsUnitTest extends org.junit.Assert {
         
         List<RequestSecurityTokenResponseType> securityTokenResponseList = issueToken(issueOperation,
                 request, webServiceContext);       
-        RequestSecurityTokenResponseType securityTokenResponse = securityTokenResponseList.get(0);
         
         // Test the generated token.
-        Element assertion = null;
-        for (Object tokenObject : securityTokenResponse.getAny()) {
-            if (tokenObject instanceof JAXBElement<?>
-                && REQUESTED_SECURITY_TOKEN.equals(((JAXBElement<?>)tokenObject).getName())) {
-                RequestedSecurityTokenType rstType = 
-                    (RequestedSecurityTokenType)((JAXBElement<?>)tokenObject).getValue();
-                assertion = (Element)rstType.getAny();
+        String jwtToken = null;
+        for (Object tokenObject : securityTokenResponseList.get(0).getAny()) {
+            if (tokenObject instanceof Element
+                && REQUESTED_SECURITY_TOKEN.getLocalPart().equals(((Element)tokenObject).getLocalName())
+                && REQUESTED_SECURITY_TOKEN.getNamespaceURI().equals(((Element)tokenObject).getNamespaceURI())) {
+                jwtToken = ((Element)tokenObject).getTextContent();
                 break;
             }
         }
         
-        assertNotNull(assertion);
-        String tokenString = DOM2Writer.nodeToString(assertion);
-        assertTrue(tokenString.contains("AttributeStatement"));
-        assertTrue(tokenString.contains("ALICE"));  //subject changed (to uppercase)
-        assertTrue(tokenString.contains("doe"));  //claim unchanged but requested
-        assertTrue(tokenString.contains(SAML2Constants.CONF_BEARER));
+        assertNotNull(jwtToken);
+        
+        // Validate the token
+        JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(jwtToken);
+        JwtToken jwt = jwtConsumer.getJwtToken();
+        // subject changed (to uppercase)
+        Assert.assertEquals("ALICE", jwt.getClaim(JwtConstants.CLAIM_SUBJECT));
+        // claim unchanged but requested
+        assertEquals(jwt.getClaim(ClaimTypes.LASTNAME.toString()), "doe");
     }
     
 
