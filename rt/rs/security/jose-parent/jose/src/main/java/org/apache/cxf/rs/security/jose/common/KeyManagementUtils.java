@@ -310,7 +310,7 @@ public final class KeyManagementUtils {
         return chain == null ? null : chain.toArray(new X509Certificate[]{});
     }
     public static String getKeyAlgorithm(Message m, Properties props, String propName, String defaultAlg) {
-        String algo = props.getProperty(propName);
+        String algo = props != null ? props.getProperty(propName) : null;
         if (algo == null && m != null) {
             algo = (String)m.getContextualProperty(propName);
         }
