@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.sts.token.provider;
 
+import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Properties;
@@ -25,13 +26,19 @@ import java.util.Properties;
 import org.apache.cxf.jaxws.context.WebServiceContextImpl;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.rs.security.jose.common.JoseConstants;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
+import org.apache.cxf.rs.security.jose.jwe.JweDecryptionOutput;
+import org.apache.cxf.rs.security.jose.jwe.JweDecryptionProvider;
+import org.apache.cxf.rs.security.jose.jwe.JweJwtCompactConsumer;
+import org.apache.cxf.rs.security.jose.jwe.JweUtils;
 import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactConsumer;
 import org.apache.cxf.rs.security.jose.jwt.JwtConstants;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.sts.StaticSTSProperties;
 import org.apache.cxf.sts.cache.DefaultInMemoryTokenStore;
 import org.apache.cxf.sts.common.PasswordCallbackHandler;
+import org.apache.cxf.sts.common.TestUtils;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.sts.service.EncryptionProperties;
@@ -41,6 +48,7 @@ import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
+import org.apache.wss4j.common.crypto.Merlin;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.junit.Assert;
@@ -49,8 +57,12 @@ import org.junit.Assert;
  * Some unit tests for creating JWTTokens.
  */
 public class JWTTokenProviderTest extends org.junit.Assert {
-    
+    private static boolean unrestrictedPoliciesInstalled;
     private static TokenStore tokenStore = new DefaultInMemoryTokenStore();
+    
+    static {
+        unrestrictedPoliciesInstalled = TestUtils.checkUnrestrictedPoliciesInstalled();
+    };
     
     @org.junit.Test
     public void testCreateUnsignedJWT() throws Exception {
@@ -147,6 +159,97 @@ public class JWTTokenProviderTest extends org.junit.Assert {
         Assert.assertNotNull(secToken);
     }
     
+    @org.junit.Test
+    public void testCreateUnsignedEncryptedJWT() throws Exception {
+        TokenProvider jwtTokenProvider = new JWTTokenProvider();
+        ((JWTTokenProvider)jwtTokenProvider).setSignToken(false);
+        
+        TokenProviderParameters providerParameters = createProviderParameters();
+        providerParameters.setEncryptToken(true);
+        
+        assertTrue(jwtTokenProvider.canHandleToken(JWTTokenProvider.JWT_TOKEN_TYPE));
+        TokenProviderResponse providerResponse = jwtTokenProvider.createToken(providerParameters);
+        assertTrue(providerResponse != null);
+        assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
+
+        String token = (String)providerResponse.getToken();
+        assertNotNull(token);
+        assertTrue(token.split("\\.").length == 5);
+        
+        if (unrestrictedPoliciesInstalled) {
+            // Validate the token
+            JweJwtCompactConsumer jwtConsumer = new JweJwtCompactConsumer(token);
+            Properties decProperties = new Properties();
+            Crypto decryptionCrypto = CryptoFactory.getInstance(getDecryptionProperties());
+            KeyStore keystore = ((Merlin)decryptionCrypto).getKeyStore();
+            decProperties.put(JoseConstants.RSSEC_KEY_STORE, keystore);
+            decProperties.put(JoseConstants.RSSEC_KEY_STORE_ALIAS, "myservicekey");
+            decProperties.put(JoseConstants.RSSEC_KEY_PSWD, "skpass");
+            
+            JweDecryptionProvider decProvider =
+                JweUtils.loadDecryptionProvider(decProperties, jwtConsumer.getHeaders(), false);
+            
+            JweDecryptionOutput decOutput = decProvider.decrypt(token);
+            String decToken = decOutput.getContentText();
+            
+            JwsJwtCompactConsumer jwtJwsConsumer = new JwsJwtCompactConsumer(decToken);
+            JwtToken jwt = jwtJwsConsumer.getJwtToken();
+            
+            Assert.assertEquals("alice", jwt.getClaim(JwtConstants.CLAIM_SUBJECT));
+            Assert.assertEquals(providerResponse.getTokenId(), jwt.getClaim(JwtConstants.CLAIM_JWT_ID));
+            Assert.assertEquals(providerResponse.getCreated().getTime() / 1000L, 
+                                jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT));
+            Assert.assertEquals(providerResponse.getExpires().getTime() / 1000L, 
+                                jwt.getClaim(JwtConstants.CLAIM_EXPIRY));
+        }
+                            
+    }
+    
+    @org.junit.Test
+    public void testCreateSignedEncryptedJWT() throws Exception {
+        TokenProvider jwtTokenProvider = new JWTTokenProvider();
+        
+        TokenProviderParameters providerParameters = createProviderParameters();
+        providerParameters.setEncryptToken(true);
+        
+        assertTrue(jwtTokenProvider.canHandleToken(JWTTokenProvider.JWT_TOKEN_TYPE));
+        TokenProviderResponse providerResponse = jwtTokenProvider.createToken(providerParameters);
+        assertTrue(providerResponse != null);
+        assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
+
+        String token = (String)providerResponse.getToken();
+        assertNotNull(token);
+        assertTrue(token.split("\\.").length == 5);
+        
+        if (unrestrictedPoliciesInstalled) {
+            // Validate the token
+            JweJwtCompactConsumer jwtConsumer = new JweJwtCompactConsumer(token);
+            Properties decProperties = new Properties();
+            Crypto decryptionCrypto = CryptoFactory.getInstance(getDecryptionProperties());
+            KeyStore keystore = ((Merlin)decryptionCrypto).getKeyStore();
+            decProperties.put(JoseConstants.RSSEC_KEY_STORE, keystore);
+            decProperties.put(JoseConstants.RSSEC_KEY_STORE_ALIAS, "myservicekey");
+            decProperties.put(JoseConstants.RSSEC_KEY_PSWD, "skpass");
+            
+            JweDecryptionProvider decProvider =
+                JweUtils.loadDecryptionProvider(decProperties, jwtConsumer.getHeaders(), false);
+            
+            JweDecryptionOutput decOutput = decProvider.decrypt(token);
+            String decToken = decOutput.getContentText();
+            
+            JwsJwtCompactConsumer jwtJwsConsumer = new JwsJwtCompactConsumer(decToken);
+            JwtToken jwt = jwtJwsConsumer.getJwtToken();
+            
+            Assert.assertEquals("alice", jwt.getClaim(JwtConstants.CLAIM_SUBJECT));
+            Assert.assertEquals(providerResponse.getTokenId(), jwt.getClaim(JwtConstants.CLAIM_JWT_ID));
+            Assert.assertEquals(providerResponse.getCreated().getTime() / 1000L, 
+                                jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT));
+            Assert.assertEquals(providerResponse.getExpires().getTime() / 1000L, 
+                                jwt.getClaim(JwtConstants.CLAIM_EXPIRY));
+        }
+                            
+    }
+    
     private TokenProviderParameters createProviderParameters() throws WSSecurityException {
         TokenProviderParameters parameters = new TokenProviderParameters();
         
@@ -178,6 +281,9 @@ public class JWTTokenProviderTest extends org.junit.Assert {
         parameters.setStsProperties(stsProperties);
         
         parameters.setEncryptionProperties(new EncryptionProperties());
+        stsProperties.setEncryptionCrypto(crypto);
+        stsProperties.setEncryptionUsername("myservicekey");
+        stsProperties.setCallbackHandler(new PasswordCallbackHandler());
         
         return parameters;
     }
@@ -188,11 +294,24 @@ public class JWTTokenProviderTest extends org.junit.Assert {
             "org.apache.wss4j.crypto.provider", "org.apache.wss4j.common.crypto.Merlin"
         );
         properties.put("org.apache.wss4j.crypto.merlin.keystore.password", "stsspass");
-        properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "stsstore.jks");
+        if (unrestrictedPoliciesInstalled) {
+            properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "stsstore.jks");
+        } else {
+            properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "restricted/stsstore.jks");
+        }
         
         return properties;
     }
     
-  
+    private Properties getDecryptionProperties() {
+        Properties properties = new Properties();
+        properties.put(
+            "org.apache.wss4j.crypto.provider", "org.apache.wss4j.common.crypto.Merlin"
+        );
+        properties.put("org.apache.wss4j.crypto.merlin.keystore.password", "sspass");
+        properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "servicestore.jks");
+        
+        return properties;
+    }
     
 }
