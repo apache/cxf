@@ -96,7 +96,9 @@ public class BookStoreWebSocket {
                             for (int r = 2, i = 1; i <= 5; r *= 2, i++) {
                                 Thread.sleep(500);
                                 out.write(Integer.toString(r).getBytes());
+                                out.flush();
                             }
+                            out.close();
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
