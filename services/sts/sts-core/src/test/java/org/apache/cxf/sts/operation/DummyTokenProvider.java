@@ -20,10 +20,12 @@
 package org.apache.cxf.sts.operation;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.sts.token.provider.TokenProvider;
 import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.cxf.sts.token.provider.TokenProviderResponse;
+import org.apache.cxf.sts.token.provider.TokenProviderUtils;
 import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.wss4j.common.token.BinarySecurity;
 import org.apache.wss4j.dom.WSConstants;
@@ -63,6 +65,17 @@ public class DummyTokenProvider implements TokenProvider {
             TokenProviderResponse response = new TokenProviderResponse();
             response.setToken(bst.getElement());
             response.setTokenId(id);
+            
+            if (tokenParameters.isEncryptToken()) {
+                Element el = TokenProviderUtils.encryptToken(bst.getElement(), response.getTokenId(), 
+                                                        tokenParameters.getStsProperties(), 
+                                                        tokenParameters.getEncryptionProperties(), 
+                                                        tokenParameters.getKeyRequirements(),
+                                                        tokenParameters.getWebServiceContext());
+                response.setToken(el);
+            } else {
+                response.setToken(bst.getElement());
+            }
             
             return response;
         } catch (Exception e) {

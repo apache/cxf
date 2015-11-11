@@ -225,16 +225,7 @@ public class TokenRenewOperation extends AbstractOperation implements RenewOpera
         JAXBElement<RequestedSecurityTokenType> requestedToken = 
             QNameConstants.WS_TRUST_FACTORY.createRequestedSecurityToken(requestedTokenType);
         LOG.fine("Encrypting Issued Token: " + encryptIssuedToken);
-        if (!encryptIssuedToken) {
-            requestedTokenType.setAny(tokenRenewerResponse.getToken());
-        } else {
-            requestedTokenType.setAny(
-                encryptToken(
-                    tokenRenewerResponse.getToken(), tokenRenewerResponse.getTokenId(), 
-                    encryptionProperties, keyRequirements, webServiceContext
-                )
-            );
-        }
+        requestedTokenType.setAny(tokenRenewerResponse.getToken());
         response.getAny().add(requestedToken);
 
         if (returnReferences) {

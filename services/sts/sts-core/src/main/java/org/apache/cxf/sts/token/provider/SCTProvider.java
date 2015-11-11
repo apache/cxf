@@ -26,6 +26,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.sts.STSConstants;
@@ -123,7 +125,6 @@ public class SCTProvider implements TokenProvider {
             sct.setID(wssConfig.getIdAllocator().createId("sctId-", sct));
     
             TokenProviderResponse response = new TokenProviderResponse();
-            response.setToken(sct.getElement());
             response.setTokenId(sct.getIdentifier());
             if (returnEntropy) {
                 response.setEntropy(keyHandler.getEntropyBytes());
@@ -173,6 +174,17 @@ public class SCTProvider implements TokenProvider {
             }
             
             tokenParameters.getTokenStore().add(token);
+            
+            if (tokenParameters.isEncryptToken()) {
+                Element el = TokenProviderUtils.encryptToken(sct.getElement(), response.getTokenId(), 
+                                                        tokenParameters.getStsProperties(), 
+                                                        tokenParameters.getEncryptionProperties(), 
+                                                        tokenParameters.getKeyRequirements(),
+                                                        tokenParameters.getWebServiceContext());
+                response.setToken(el);
+            } else {
+                response.setToken(sct.getElement());
+            }
 
             // Create the references
             TokenReference attachedReference = new TokenReference();

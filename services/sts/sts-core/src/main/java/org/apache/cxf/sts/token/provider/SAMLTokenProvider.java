@@ -137,7 +137,7 @@ public class SAMLTokenProvider extends AbstractSAMLTokenProvider implements Toke
             }
             
             TokenProviderResponse response = new TokenProviderResponse();
-            response.setToken(token);
+            
             String tokenType = tokenRequirements.getTokenType();
             if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType) 
                 || WSConstants.SAML2_NS.equals(tokenType)) {
@@ -145,6 +145,15 @@ public class SAMLTokenProvider extends AbstractSAMLTokenProvider implements Toke
             } else {
                 response.setTokenId(token.getAttributeNS(null, "AssertionID"));
             }
+            
+            if (tokenParameters.isEncryptToken()) {
+                token = TokenProviderUtils.encryptToken(token, response.getTokenId(), 
+                                                        tokenParameters.getStsProperties(), 
+                                                        tokenParameters.getEncryptionProperties(), 
+                                                        keyRequirements,
+                                                        tokenParameters.getWebServiceContext());
+            }
+            response.setToken(token);
             
             DateTime validFrom = null;
             DateTime validTill = null;
