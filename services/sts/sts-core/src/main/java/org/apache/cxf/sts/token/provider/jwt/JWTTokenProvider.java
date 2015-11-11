@@ -31,10 +31,16 @@ import java.util.logging.Logger;
 import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.rs.security.jose.common.JoseConstants;
+import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
+import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
+import org.apache.cxf.rs.security.jose.jwe.JweEncryptionProvider;
+import org.apache.cxf.rs.security.jose.jwe.JweHeaders;
+import org.apache.cxf.rs.security.jose.jwe.JweUtils;
 import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactProducer;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
@@ -43,7 +49,9 @@ import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.SignatureProperties;
 import org.apache.cxf.sts.cache.CacheUtils;
+import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.TokenRequirements;
+import org.apache.cxf.sts.service.EncryptionProperties;
 import org.apache.cxf.sts.token.provider.TokenProvider;
 import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.cxf.sts.token.provider.TokenProviderResponse;
@@ -113,8 +121,13 @@ public class JWTTokenProvider implements TokenProvider {
         try {
             JwtToken token = new JwtToken(claims);
             
-            String tokenData = signToken(token, jwtRealm, tokenParameters.getStsProperties(), 
-                      tokenParameters.getTokenRequirements());
+            String tokenData = signToken(token, jwtRealm, tokenParameters.getStsProperties());
+            if (tokenParameters.isEncryptToken()) {
+                tokenData = encryptToken(tokenData, token.getJweHeaders(), 
+                                         tokenParameters.getStsProperties(),
+                                         tokenParameters.getEncryptionProperties(),
+                                         tokenParameters.getKeyRequirements());
+            }
             
             TokenProviderResponse response = new TokenProviderResponse();
             response.setToken(tokenData);
@@ -194,8 +207,7 @@ public class JWTTokenProvider implements TokenProvider {
     private String signToken(
         JwtToken token, 
         RealmProperties jwtRealm,
-        STSPropertiesMBean stsProperties,
-        TokenRequirements tokenRequirements
+        STSPropertiesMBean stsProperties
     ) throws Exception {
         
         Properties signingProperties = new Properties();
@@ -276,6 +288,63 @@ public class JWTTokenProvider implements TokenProvider {
             return jws.getSignedEncodedJws();
         }
         
+    }
+    
+    private String encryptToken(
+        String token,
+        JweHeaders jweHeaders,
+        STSPropertiesMBean stsProperties,
+        EncryptionProperties encryptionProperties,
+        KeyRequirements keyRequirements
+    ) throws Exception {
+
+        Properties encProperties = new Properties();
+        
+        String name = encryptionProperties.getEncryptionName();
+        if (name == null) {
+            name = stsProperties.getEncryptionUsername();
+        }
+        if (name == null) {
+            LOG.fine("No encryption alias is configured");
+            return token;
+        }
+        encProperties.put(JoseConstants.RSSEC_KEY_STORE_ALIAS, name);
+        
+        // Get the encryption algorithm to use - for now we don't allow the client to ask
+        // for a particular encryption algorithm, as with SAML
+        String encryptionAlgorithm = encryptionProperties.getEncryptionAlgorithm();
+        try {
+            ContentAlgorithm.getAlgorithm(encryptionAlgorithm);
+        } catch (IllegalArgumentException ex) {
+            encryptionAlgorithm = ContentAlgorithm.A128GCM.name();
+        }
+        encProperties.put(JoseConstants.RSSEC_ENCRYPTION_CONTENT_ALGORITHM, encryptionAlgorithm);
+        
+        // Get the key-wrap algorithm to use - for now we don't allow the client to ask
+        // for a particular encryption algorithm, as with SAML
+        String keyWrapAlgorithm = encryptionProperties.getKeyWrapAlgorithm();
+        try {
+            KeyAlgorithm.getAlgorithm(keyWrapAlgorithm);
+        } catch (IllegalArgumentException ex) {
+            keyWrapAlgorithm = KeyAlgorithm.RSA_OAEP.name();
+        }
+        encProperties.put(JoseConstants.RSSEC_ENCRYPTION_KEY_ALGORITHM, keyWrapAlgorithm);
+
+        // Initialise encryption objects with defaults of STSPropertiesMBean
+        Crypto encryptionCrypto = stsProperties.getEncryptionCrypto();
+
+        if (!(encryptionCrypto instanceof Merlin)) {
+            throw new STSException("Can't get the keystore", STSException.REQUEST_FAILED);
+        }
+        KeyStore keystore = ((Merlin)encryptionCrypto).getKeyStore();
+        encProperties.put(JoseConstants.RSSEC_KEY_STORE, keystore);
+
+        JweEncryptionProvider encProvider =
+            JweUtils.loadEncryptionProvider(encProperties, jweHeaders, false);
+        // token.getJwsHeaders().setSignatureAlgorithm(sigProvider.getAlgorithm());
+
+        return encProvider.encrypt(StringUtils.toBytesUTF8(token), null);
+
     }
 
 }
