@@ -26,8 +26,6 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.json.basic.JsonMapObjectReaderWriter;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
-import org.apache.cxf.rs.security.jose.common.JoseConstants;
-import org.apache.cxf.rs.security.jose.common.KeyManagementUtils;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 
@@ -142,7 +140,7 @@ public class JwsCompactProducer {
         if (getAlgorithm() == null) {
             Properties sigProps = getSignatureProperties();
             Message m = PhaseInterceptorChain.getCurrentMessage();
-            String signatureAlgo = JwsUtils.getSignatureAlgo(m, sigProps, null, null);
+            String signatureAlgo = JwsUtils.getSignatureAlgorithm(m, sigProps, null, null);
             if (signatureAlgo != null) {
                 getJwsHeaders().setSignatureAlgorithm(SignatureAlgorithm.getAlgorithm(signatureAlgo));
             }
@@ -153,11 +151,8 @@ public class JwsCompactProducer {
         }
     }
     public Properties getSignatureProperties() {
-        if (signatureProperties == null && PhaseInterceptorChain.getCurrentMessage() != null) {
-            Message m = PhaseInterceptorChain.getCurrentMessage();
-            signatureProperties = KeyManagementUtils.loadStoreProperties(m, false, 
-                                                                      JoseConstants.RSSEC_SIGNATURE_OUT_PROPS, 
-                                                                      JoseConstants.RSSEC_SIGNATURE_PROPS);
+        if (signatureProperties == null) {
+            signatureProperties = JwsUtils.loadSignatureOutProperties(false);
             
         }
         return signatureProperties;
