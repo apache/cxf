@@ -140,9 +140,9 @@ public class JwsCompactProducer {
         if (getAlgorithm() == null) {
             Properties sigProps = getSignatureProperties();
             Message m = PhaseInterceptorChain.getCurrentMessage();
-            String signatureAlgo = JwsUtils.getSignatureAlgorithm(m, sigProps, null, null);
+            SignatureAlgorithm signatureAlgo = JwsUtils.getSignatureAlgorithm(m, sigProps, null, null);
             if (signatureAlgo != null) {
-                getJwsHeaders().setSignatureAlgorithm(SignatureAlgorithm.getAlgorithm(signatureAlgo));
+                getJwsHeaders().setSignatureAlgorithm(signatureAlgo);
             }
         }
         
