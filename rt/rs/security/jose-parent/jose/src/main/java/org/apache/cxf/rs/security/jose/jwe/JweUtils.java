@@ -285,12 +285,17 @@ public final class JweUtils {
     public static JweEncryptionProvider loadEncryptionProvider(boolean required) {
         return loadEncryptionProvider(null, required);
     }
-    @SuppressWarnings("deprecation")
+    
     public static JweEncryptionProvider loadEncryptionProvider(JweHeaders headers, boolean required) {
         Properties props = loadEncryptionOutProperties(required);
         if (props == null) {
             return null;
         }
+        return loadEncryptionProvider(props, headers, required);
+    }
+    
+    @SuppressWarnings("deprecation")
+    public static JweEncryptionProvider loadEncryptionProvider(Properties props, JweHeaders headers, boolean required) {
         Message m = PhaseInterceptorChain.getCurrentMessage();
         
         boolean includeCert = 
@@ -303,7 +308,9 @@ public final class JweUtils {
         String keyEncryptionAlgo = getKeyEncryptionAlgorithm(m, props, null, null);
         KeyAlgorithm keyAlgo = KeyAlgorithm.getAlgorithm(keyEncryptionAlgo); 
         String contentEncryptionAlgo = getContentEncryptionAlgo(m, props, null);
-        m.put(JoseConstants.RSSEC_ENCRYPTION_CONTENT_ALGORITHM, contentEncryptionAlgo);
+        if (m != null) {
+            m.put(JoseConstants.RSSEC_ENCRYPTION_CONTENT_ALGORITHM, contentEncryptionAlgo);
+        }
         ContentEncryptionProvider ctEncryptionProvider = null;
         if (JoseConstants.HEADER_JSON_WEB_KEY.equals(props.get(JoseConstants.RSSEC_KEY_STORE_TYPE))) {
             JsonWebKey jwk = JwkUtils.loadJsonWebKey(m, props, KeyOperation.ENCRYPT);
@@ -367,7 +374,15 @@ public final class JweUtils {
         Properties props = loadEncryptionInProperties(required);
         if (props == null) {
             return null;
-        }    
+        } 
+        
+        return loadDecryptionProvider(props, inHeaders, required);
+    }
+    
+    public static JweDecryptionProvider loadDecryptionProvider(Properties props, 
+                                                               JweHeaders inHeaders, 
+                                                               boolean required) {
+        
         Message m = PhaseInterceptorChain.getCurrentMessage();
         KeyDecryptionProvider keyDecryptionProvider = null;
         String contentEncryptionAlgo = getContentEncryptionAlgo(m, props, null);
@@ -648,7 +663,7 @@ public final class JweUtils {
             if (props != null) {
                 encAlgo = props.getProperty(JoseConstants.DEPR_RSSEC_ENCRYPTION_KEY_ALGORITHM);
             }
-            if (encAlgo == null) {
+            if (encAlgo == null && m != null) {
                 encAlgo = (String)m.getContextualProperty(JoseConstants.DEPR_RSSEC_ENCRYPTION_KEY_ALGORITHM);
             }
             if (encAlgo != null) {
@@ -681,7 +696,7 @@ public final class JweUtils {
         if (algo == null) {
             // Check for deprecated identifier first
             String encAlgo = props.getProperty(JoseConstants.DEPR_RSSEC_ENCRYPTION_CONTENT_ALGORITHM);
-            if (encAlgo == null) {
+            if (encAlgo == null && m != null) {
                 encAlgo = (String)m.getContextualProperty(JoseConstants.DEPR_RSSEC_ENCRYPTION_CONTENT_ALGORITHM);
             }
             if (encAlgo != null) {

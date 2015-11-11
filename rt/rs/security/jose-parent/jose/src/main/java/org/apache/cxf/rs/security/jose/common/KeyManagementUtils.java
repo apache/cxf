@@ -204,11 +204,19 @@ public final class KeyManagementUtils {
                 : keyOper == KeyOperation.DECRYPT 
                 ? JoseConstants.RSSEC_DECRYPTION_KEY_PSWD_PROVIDER : null;
             if (propName != null) {
-                cb = (PrivateKeyPasswordProvider)m.getContextualProperty(propName);
+                if (props.containsKey(propName)) {
+                    cb = (PrivateKeyPasswordProvider)props.get(propName);
+                } else if (m != null) {
+                    cb = (PrivateKeyPasswordProvider)m.getContextualProperty(propName);
+                }
             }
         }
         if (cb == null) {
-            cb = (PrivateKeyPasswordProvider)m.getContextualProperty(JoseConstants.RSSEC_KEY_PSWD_PROVIDER);
+            if (props.containsKey(JoseConstants.RSSEC_KEY_PSWD_PROVIDER)) {
+                cb = (PrivateKeyPasswordProvider)props.get(JoseConstants.RSSEC_KEY_PSWD_PROVIDER);
+            } else if (m != null) {
+                cb = (PrivateKeyPasswordProvider)m.getContextualProperty(JoseConstants.RSSEC_KEY_PSWD_PROVIDER);
+            }
         }
         return cb;
     }
