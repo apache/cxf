@@ -92,7 +92,7 @@
         <cxf.hazelcast.version>1.9.4</cxf.hazelcast.version>
         <cxf.httpcomponents.asyncclient.version>4.0.2</cxf.httpcomponents.asyncclient.version>
         <cxf.httpcomponents.asyncclient.version.range>[4.0,4.1)</cxf.httpcomponents.asyncclient.version.range>
-        <cxf.httpcomponents.client.version>4.3.5</cxf.httpcomponents.client.version>
+        <cxf.httpcomponents.client.version>4.3.6</cxf.httpcomponents.client.version>
         <cxf.httpcomponents.core.version>4.3.3</cxf.httpcomponents.core.version>
         <cxf.httpcomponents.core.version.range>[4.3,4.4.0)</cxf.httpcomponents.core.version.range>
         <cxf.jackson.version>2.4.6</cxf.jackson.version>
