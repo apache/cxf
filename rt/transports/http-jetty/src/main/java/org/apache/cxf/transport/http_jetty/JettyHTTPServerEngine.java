@@ -583,6 +583,7 @@ public class JettyHTTPServerEngine implements ServerEngine {
                 protected void doStart() throws Exception {
                     setSslContext(createSSLContext(this));
                     super.doStart();
+                    checkKeyStore();
                 }
                 public void checkKeyStore() {
                     //we'll handle this later
@@ -653,8 +654,8 @@ public class JettyHTTPServerEngine implements ServerEngine {
                                                                                      String.class)
                                                         .newInstance(sslcf, "HTTP/1.1");
                 connectionFactories.add(scf);
-                String proto = (major > 9 || (major == 9 && minor >= 3)) ? "SSL" : "SSL-HTTP";
-                result.getClass().getMethod("setDefaultProtocol", String.class).invoke(result, proto + "/1.1");
+                String proto = (major > 9 || (major == 9 && minor >= 3)) ? "SSL" : "SSL-HTTP/1.1";
+                result.getClass().getMethod("setDefaultProtocol", String.class).invoke(result, proto);
             }
             connectionFactories.add(httpFactory);
             result.getClass().getMethod("setConnectionFactories", Collection.class)
