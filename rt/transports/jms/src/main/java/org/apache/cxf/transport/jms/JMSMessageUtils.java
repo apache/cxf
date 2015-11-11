@@ -154,7 +154,6 @@ final class JMSMessageUtils {
         inMessage.put(org.apache.cxf.message.Message.PROTOCOL_HEADERS, protHeaders);
 
         populateIncomingMessageProperties(message, inMessage, messageProperties);
-
     }
 
     /**
@@ -208,6 +207,9 @@ final class JMSMessageUtils {
                 if (endpoint.getTargetService() != null) {
                     headers.put(JMSSpecConstants.TARGET_SERVICE_IN_REQUESTURI,
                                 Collections.singletonList("true"));
+                }
+                if (requestURI != null) {
+                    inMessage.put(org.apache.cxf.message.Message.REQUEST_URI, requestURI);
                 }
             } catch (Exception e) {
                 headers.put(JMSSpecConstants.MALFORMED_REQUESTURI, Collections.singletonList("true"));
