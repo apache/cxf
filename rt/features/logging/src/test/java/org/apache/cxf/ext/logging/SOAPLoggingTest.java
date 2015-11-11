@@ -124,7 +124,7 @@ public class SOAPLoggingTest {
     
     private void checkResponseIn(LogEvent responseIn) {
         Assert.assertNull(responseIn.getAddress());
-        Assert.assertEquals("text/xml; charset=UTF-8", responseIn.getContentType());
+        Assert.assertEquals("text/xml;charset=utf-8", responseIn.getContentType().toLowerCase().replace(" ", ""));
         Assert.assertEquals(EventType.RESP_IN, responseIn.getType());
         Assert.assertEquals(StandardCharsets.UTF_8.name(), responseIn.getEncoding());
         Assert.assertNotNull(responseIn.getExchangeId());
