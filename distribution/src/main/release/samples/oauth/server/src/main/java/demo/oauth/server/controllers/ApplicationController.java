@@ -18,6 +18,7 @@
  */
 package demo.oauth.server.controllers;
 
+import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.security.SecureRandom;
 import java.util.Set;
