@@ -20,10 +20,9 @@
 package org.apache.cxf.clustering;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -45,7 +44,7 @@ public class CircuitBreakerTargetSelector extends FailoverTargetSelector {
     
     private final int threshold;
     private final long timeout; 
-    private final ConcurrentMap<String, CircuitBreaker> circuits = new ConcurrentHashMap<>();
+    private final Map<String, CircuitBreaker> circuits = new LinkedHashMap<>();
     
     public CircuitBreakerTargetSelector(final int threshold, final long timeout) {
         super();
