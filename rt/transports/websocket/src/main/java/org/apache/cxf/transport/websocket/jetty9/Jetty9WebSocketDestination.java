@@ -22,6 +22,7 @@ package org.apache.cxf.transport.websocket.jetty9;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 import java.security.Principal;
 import java.util.Enumeration;
@@ -82,10 +83,19 @@ public class Jetty9WebSocketDestination extends JettyHTTPDestination implements
             webSocketFactory = (WebSocketServletFactory)ClassLoaderUtils
                 .loadClass("org.eclipse.jetty.websocket.server.WebSocketServerFactory",
                            WebSocketServletFactory.class).newInstance();
+            
         } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
         webSocketFactory.setCreator(new Creator());
+        
+        try {
+            Field f = webSocketFactory.getClass().getDeclaredField("objectFactory");
+            f.setAccessible(true);
+            f.set(webSocketFactory, f.getType().newInstance());
+        } catch (Throwable t) {
+            //ignore, on Jetty <=9.2 this field doesn't exist
+        }
         executor = bus.getExtension(WorkQueueManager.class).getAutomaticWorkQueue();
     }
     
