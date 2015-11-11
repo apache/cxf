@@ -52,6 +52,7 @@ public class TokenProviderParameters {
     private Map<String, Object> additionalProperties;
     private TokenStore tokenStore;
     private String realm;
+    private boolean encryptToken;
     
     public TokenStore getTokenStore() {
         return tokenStore;
@@ -155,6 +156,14 @@ public class TokenProviderParameters {
 
     public void setRequestedSecondaryClaims(ClaimCollection requestedSecondaryClaims) {
         this.requestedSecondaryClaims = requestedSecondaryClaims;
+    }
+
+    public boolean isEncryptToken() {
+        return encryptToken;
+    }
+
+    public void setEncryptToken(boolean encryptToken) {
+        this.encryptToken = encryptToken;
     }
     
 }

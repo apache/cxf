@@ -288,7 +288,10 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
         JAXBElement<RequestedSecurityTokenType> requestedToken = 
             QNameConstants.WS_TRUST_FACTORY.createRequestedSecurityToken(requestedTokenType);
         LOG.fine("Encrypting Issued Token: " + encryptIssuedToken);
-        if (!encryptIssuedToken) {
+        if (encryptIssuedToken) {
+            requestedTokenType.setAny(tokenResponse.getToken());
+            response.getAny().add(requestedToken);
+        } else {
             if (tokenResponse.getToken() instanceof String) {
                 Document doc = DOMUtils.newDocument();
                 Element requestedTokenEl = doc.createElementNS(STSConstants.WST_NS_05_12, 
@@ -299,17 +302,6 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
                 requestedTokenType.setAny(tokenResponse.getToken());
                 response.getAny().add(requestedToken);
             }
-        } else {
-            if (!(tokenResponse.getToken() instanceof Element)) {
-                throw new STSException("Error in creating the response", STSException.REQUEST_FAILED);
-            }
-            requestedTokenType.setAny(
-                encryptToken(
-                    (Element)tokenResponse.getToken(), tokenResponse.getTokenId(), 
-                    encryptionProperties, keyRequirements, webServiceContext
-                )
-            );
-            response.getAny().add(requestedToken);
         }
 
         if (returnReferences) {

@@ -18,17 +18,37 @@
  */
 package org.apache.cxf.sts.token.provider;
 
+import java.security.cert.X509Certificate;
+import java.util.Collections;
+import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
+import javax.xml.ws.WebServiceContext;
+import javax.xml.ws.handler.MessageContext;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.sts.STSConstants;
+import org.apache.cxf.sts.STSPropertiesMBean;
+import org.apache.cxf.sts.request.KeyRequirements;
+import org.apache.cxf.sts.service.EncryptionProperties;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
+import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
+import org.apache.wss4j.common.WSEncryptionPart;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
+import org.apache.wss4j.dom.message.WSSecEncrypt;
+import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
+import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.stax.securityEvent.AbstractSecuredElementSecurityEvent;
+import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 
 public final class TokenProviderUtils {
     
@@ -79,4 +99,119 @@ public final class TokenProviderUtils {
         return null;
     }
 
+    /**
+     * Encrypt a Token element using the given arguments.
+     */
+    public static Element encryptToken(
+        Element element, 
+        String id, 
+        STSPropertiesMBean stsProperties,
+        EncryptionProperties encryptionProperties,
+        KeyRequirements keyRequirements,
+        WebServiceContext context
+    ) throws WSSecurityException {
+        String name = encryptionProperties.getEncryptionName();
+        if (name == null) {
+            name = stsProperties.getEncryptionUsername();
+        }
+        if (name == null) {
+            LOG.fine("No encryption alias is configured");
+            return element;
+        }
+        
+        // Get the encryption algorithm to use
+        String encryptionAlgorithm = keyRequirements.getEncryptionAlgorithm();
+        if (encryptionAlgorithm == null) {
+            // If none then default to what is configured
+            encryptionAlgorithm = encryptionProperties.getEncryptionAlgorithm();
+        } else {
+            List<String> supportedAlgorithms = 
+                encryptionProperties.getAcceptedEncryptionAlgorithms();
+            if (!supportedAlgorithms.contains(encryptionAlgorithm)) {
+                encryptionAlgorithm = encryptionProperties.getEncryptionAlgorithm();
+                if (LOG.isLoggable(Level.FINE)) {
+                    LOG.fine("EncryptionAlgorithm not supported, defaulting to: " + encryptionAlgorithm);
+                }
+            }
+        }
+        // Get the key-wrap algorithm to use
+        String keyWrapAlgorithm = keyRequirements.getKeywrapAlgorithm();
+        if (keyWrapAlgorithm == null) {
+            // If none then default to what is configured
+            keyWrapAlgorithm = encryptionProperties.getKeyWrapAlgorithm();
+        } else {
+            List<String> supportedAlgorithms = 
+                encryptionProperties.getAcceptedKeyWrapAlgorithms();
+            if (!supportedAlgorithms.contains(keyWrapAlgorithm)) {
+                keyWrapAlgorithm = encryptionProperties.getKeyWrapAlgorithm();
+                if (LOG.isLoggable(Level.FINE)) {
+                    LOG.fine("KeyWrapAlgorithm not supported, defaulting to: " + keyWrapAlgorithm);
+                }
+            }
+        }
+        
+        WSSecEncrypt builder = new WSSecEncrypt();
+        if (WSHandlerConstants.USE_REQ_SIG_CERT.equals(name)) {
+            X509Certificate cert = getReqSigCert(context.getMessageContext());
+            builder.setUseThisCert(cert);
+        } else {
+            builder.setUserInfo(name);
+        }
+        builder.setKeyIdentifierType(encryptionProperties.getKeyIdentifierType());
+        builder.setSymmetricEncAlgorithm(encryptionAlgorithm);
+        builder.setKeyEncAlgo(keyWrapAlgorithm);
+        builder.setEmbedEncryptedKey(true);
+        
+        WSEncryptionPart encryptionPart = new WSEncryptionPart(id, "Element");
+        encryptionPart.setElement(element);
+        
+        Document doc = element.getOwnerDocument();
+        doc.appendChild(element);
+                                 
+        builder.prepare(element.getOwnerDocument(), stsProperties.getEncryptionCrypto());
+        builder.encryptForRef(null, Collections.singletonList(encryptionPart));
+        
+        return doc.getDocumentElement();
+    }
+    
+    /**
+     * Get the X509Certificate associated with the signature that was received. This cert is to be used
+     * for encrypting the issued token.
+     */
+    public static X509Certificate getReqSigCert(MessageContext context) {
+        @SuppressWarnings("unchecked")
+        List<WSHandlerResult> results = 
+            (List<WSHandlerResult>) context.get(WSHandlerConstants.RECV_RESULTS);
+        // DOM
+        X509Certificate cert = WSS4JUtils.getReqSigCert(results);
+        if (cert != null) {
+            return cert;
+        }
+        
+        // Streaming
+        @SuppressWarnings("unchecked")
+        final List<SecurityEvent> incomingEventList = 
+            (List<SecurityEvent>) context.get(SecurityEvent.class.getName() + ".in");
+        if (incomingEventList != null) {
+            for (SecurityEvent incomingEvent : incomingEventList) {
+                if (WSSecurityEventConstants.SignedPart == incomingEvent.getSecurityEventType()
+                    || WSSecurityEventConstants.SignedElement 
+                        == incomingEvent.getSecurityEventType()) {
+                    org.apache.xml.security.stax.securityToken.SecurityToken token = 
+                        ((AbstractSecuredElementSecurityEvent)incomingEvent).getSecurityToken();
+                    try {
+                        if (token != null && token.getX509Certificates() != null
+                            && token.getX509Certificates().length > 0) {
+                            return token.getX509Certificates()[0];
+                        }
+                    } catch (XMLSecurityException ex) {
+                        LOG.log(Level.FINE, ex.getMessage(), ex);
+                        return null;
+                    }
+                }
+            }
+        }
+        
+        return null;
+    }
 }
