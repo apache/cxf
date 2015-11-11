@@ -35,7 +35,7 @@
         <cxf.glassfish.el.version>3.0-b01</cxf.glassfish.el.version>
         <cxf.surefire.fork.vmargs>-XX:MaxPermSize=192m</cxf.surefire.fork.vmargs>
         <cxf.server.launcher.vmargs>-XX:MaxPermSize=192m</cxf.server.launcher.vmargs>
-        <cxf.tomcat.version>7.0.52</cxf.tomcat.version>
+        <cxf.tomcat.version>8.0.28</cxf.tomcat.version>
     </properties>
     <dependencies>
         <dependency>
@@ -89,8 +89,14 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-jsp</artifactId>
+            <artifactId>apache-jsp</artifactId>
             <version>${cxf.jetty.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.mortbay.jasper</groupId>
+                    <artifactId>apache-jsp</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -159,6 +165,11 @@
             <artifactId>tomcat-embed-logging-juli</artifactId>
             <version>${cxf.tomcat.version}</version>
         </dependency>        
+        <dependency>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>tomcat-jasper</artifactId>
+            <version>${cxf.tomcat.version}</version>
+        </dependency>
         <dependency>
             <groupId>com.ning</groupId>
             <artifactId>async-http-client</artifactId>
