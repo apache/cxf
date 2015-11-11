@@ -59,15 +59,9 @@ public abstract class AbstractOAuthJoseJwtConsumer extends AbstractJoseJwtConsum
     }
 
     public void setDecryptWithClientSecret(boolean decryptWithClientSecret) {
-        if (verifyWithClientSecret) {
-            throw new SecurityException();
-        }
         this.decryptWithClientSecret = verifyWithClientSecret;
     }
     public void setVerifyWithClientSecret(boolean verifyWithClientSecret) {
-        if (verifyWithClientSecret) {
-            throw new SecurityException();
-        }
         this.verifyWithClientSecret = verifyWithClientSecret;
     }
 }
