@@ -121,6 +121,7 @@ public class BookStoreWebSocket {
                             for (int i = 2; i <= 5; i++) {
                                 Thread.sleep(500);
                                 out.write(new Book("WebSocket" + i, i));
+                                out.getEntityStream().flush();
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -166,6 +167,7 @@ public class BookStoreWebSocket {
             OutputStream out = it.next();
             try {
                 out.write(("News: event " + name + " created").getBytes());
+                out.flush();
             } catch (IOException e) {
                 it.remove();
                 e.printStackTrace();
