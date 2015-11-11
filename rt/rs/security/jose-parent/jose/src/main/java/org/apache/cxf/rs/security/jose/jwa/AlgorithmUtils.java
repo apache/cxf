@@ -221,9 +221,6 @@ public final class AlgorithmUtils {
     public static boolean isAesCbcHmac(String algo) {
         return ACBC_HS_SET.contains(algo); 
     }
-    public static boolean isHmacSign(String algo) {
-        return HMAC_SIGN_SET.contains(algo); 
-    }
     public static boolean isOctet(String algo) {
         return isHmacSign(algo)
             || isAesCbcHmac(algo)
@@ -231,17 +228,35 @@ public final class AlgorithmUtils {
             || isAesGcmKeyWrap(algo)
             || isAesKeyWrap(algo); 
     }
+    public static boolean isHmacSign(String algo) {
+        return HMAC_SIGN_SET.contains(algo); 
+    }
+    public static boolean isHmacSign(SignatureAlgorithm algo) {
+        return isHmacSign(algo.getJwaName()); 
+    }
     public static boolean isRsaSign(String algo) {
         return isRsaShaSign(algo) || isRsaShaPsSign(algo); 
+    }
+    public static boolean isRsaSign(SignatureAlgorithm algo) {
+        return isRsaSign(algo.getJwaName()); 
     }
     public static boolean isRsaShaSign(String algo) {
         return RSA_SHA_SIGN_SET.contains(algo); 
     }
+    public static boolean isRsaShaSign(SignatureAlgorithm algo) {
+        return isRsaShaSign(algo.getJwaName()); 
+    }
     public static boolean isRsaShaPsSign(String algo) {
         return RSA_SHA_PS_SIGN_SET.contains(algo); 
     }
+    public static boolean isRsaShaPsSign(SignatureAlgorithm algo) {
+        return isRsaShaPsSign(algo.getJwaName()); 
+    }
     public static boolean isEcDsaSign(String algo) {
         return EC_SHA_SIGN_SET.contains(algo); 
+    }
+    public static boolean isEcDsaSign(SignatureAlgorithm algo) {
+        return isEcDsaSign(algo.getJwaName()); 
     }
     
     public static String toJwaName(String javaName, int keyBitSize) {
