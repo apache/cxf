@@ -345,7 +345,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             if (msg.get(org.apache.cxf.message.Message.REQUEST_URL) != null) {
                 audiences.add((String)msg.get(org.apache.cxf.message.Message.REQUEST_URL));
             } else if (msg.get(org.apache.cxf.message.Message.REQUEST_URI) != null) {
-                audiences.add((String)msg.get(org.apache.cxf.message.Message.REQUEST_URL));
+                audiences.add((String)msg.get(org.apache.cxf.message.Message.REQUEST_URI));
             }
             
             if (msg.getContextualProperty("javax.xml.ws.wsdl.service") != null) {

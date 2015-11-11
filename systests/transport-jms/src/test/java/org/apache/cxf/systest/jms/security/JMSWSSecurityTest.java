@@ -112,7 +112,6 @@ public class JMSWSSecurityTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
-    @org.junit.Ignore
     public void testUnsignedSAML2AudienceRestrictionToken() throws Exception {
         QName serviceName = new QName("http://cxf.apache.org/hello_world_jms", "HelloWorldService");
         QName portName = new QName("http://cxf.apache.org/hello_world_jms", "HelloWorldPort");
@@ -129,7 +128,7 @@ public class JMSWSSecurityTest extends AbstractBusClientServerTestBase {
         ConditionsBean conditions = new ConditionsBean();
         conditions.setTokenPeriodMinutes(5);
         List<String> audiences = new ArrayList<>();
-        audiences.add("http://apache.org/one");
+        audiences.add("jms:jndi:dynamicQueues/test.jmstransport.text");
         AudienceRestrictionBean audienceRestrictionBean = new AudienceRestrictionBean();
         audienceRestrictionBean.setAudienceURIs(audiences);
         conditions.setAudienceRestrictions(Collections.singletonList(audienceRestrictionBean));
