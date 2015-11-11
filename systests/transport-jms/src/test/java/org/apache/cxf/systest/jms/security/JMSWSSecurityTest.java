@@ -112,7 +112,6 @@ public class JMSWSSecurityTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
-    @org.junit.Ignore
     public void testUnsignedSAML2AudienceRestrictionToken() throws Exception {
         QName serviceName = new QName("http://cxf.apache.org/hello_world_jms", "HelloWorldService");
         QName portName = new QName("http://cxf.apache.org/hello_world_jms", "HelloWorldPort");
@@ -128,8 +127,13 @@ public class JMSWSSecurityTest extends AbstractBusClientServerTestBase {
         
         ConditionsBean conditions = new ConditionsBean();
         conditions.setTokenPeriodMinutes(5);
+<<<<<<< HEAD
         List<String> audiences = new ArrayList<String>();
         audiences.add("http://apache.org/one");
+=======
+        List<String> audiences = new ArrayList<>();
+        audiences.add("jms:jndi:dynamicQueues/test.jmstransport.text");
+>>>>>>> e7d7190... Fix SAML Audience Restriction problem with JMS
         AudienceRestrictionBean audienceRestrictionBean = new AudienceRestrictionBean();
         audienceRestrictionBean.setAudienceURIs(audiences);
         conditions.setAudienceRestrictions(Collections.singletonList(audienceRestrictionBean));
