@@ -507,7 +507,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
             setDocLocation(bean, servletConfig);
             setSchemasLocations(bean, servletConfig);
             bean.setBus(getBus());
-            bean.setApplication(providerApp);
+            bean.setApplicationInfo(providerApp);
             bean.create();
         }
     }

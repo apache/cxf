@@ -97,10 +97,10 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
      * @param app
      */
     public void setApplication(Application app) {
-        setApplication(new ApplicationInfo(app, getBus()));
+        setApplicationInfo(new ApplicationInfo(app, getBus()));
     }
     
-    public void setApplication(ApplicationInfo provider) {
+    public void setApplicationInfo(ApplicationInfo provider) {
         appProvider = provider;
         Set<String> appNameBindings = AnnotationUtils.getNameBindings(provider.getProvider()
                                                                       .getClass().getAnnotations());
