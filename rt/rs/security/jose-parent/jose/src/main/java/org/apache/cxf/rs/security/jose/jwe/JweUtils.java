@@ -307,16 +307,18 @@ public final class JweUtils {
         
         KeyEncryptionProvider keyEncryptionProvider = null;
         KeyAlgorithm keyAlgo = getKeyEncryptionAlgorithm(m, props, null, null);
-        String contentEncryptionAlgo = getContentEncryptionAlgo(m, props, null);
+        ContentAlgorithm contentAlgo = getContentEncryptionAlgorithm(m, props, null, ContentAlgorithm.A128GCM);
         if (m != null) {
-            m.put(JoseConstants.RSSEC_ENCRYPTION_CONTENT_ALGORITHM, contentEncryptionAlgo);
+            m.put(JoseConstants.RSSEC_ENCRYPTION_CONTENT_ALGORITHM, contentAlgo.getJwaName());
         }
         ContentEncryptionProvider ctEncryptionProvider = null;
         if (JoseConstants.HEADER_JSON_WEB_KEY.equals(props.get(JoseConstants.RSSEC_KEY_STORE_TYPE))) {
             JsonWebKey jwk = JwkUtils.loadJsonWebKey(m, props, KeyOperation.ENCRYPT);
             if ("direct".equals(keyAlgo.getJwaName())) {
-                contentEncryptionAlgo = getContentEncryptionAlgo(m, props, jwk.getAlgorithm());
-                ctEncryptionProvider = getContentEncryptionProvider(jwk, contentEncryptionAlgo);
+                contentAlgo = getContentEncryptionAlgorithm(m, props, 
+                                            ContentAlgorithm.getAlgorithm(jwk.getAlgorithm()), 
+                                            ContentAlgorithm.A128GCM);
+                ctEncryptionProvider = getContentEncryptionProvider(jwk, contentAlgo.getJwaName());
             } else {
                 keyAlgo = getKeyEncryptionAlgorithm(m, props, 
                                                     KeyAlgorithm.getAlgorithm(jwk.getAlgorithm()), 
@@ -365,7 +367,7 @@ public final class JweUtils {
         }
         return createJweEncryptionProvider(keyEncryptionProvider, 
                                     ctEncryptionProvider, 
-                                    contentEncryptionAlgo,
+                                    contentAlgo.getJwaName(),
                                     compression);
     }
     public static JweDecryptionProvider loadDecryptionProvider(boolean required) {
@@ -386,7 +388,8 @@ public final class JweUtils {
         
         Message m = PhaseInterceptorChain.getCurrentMessage();
         KeyDecryptionProvider keyDecryptionProvider = null;
-        String contentEncryptionAlgo = getContentEncryptionAlgo(m, props, null);
+        ContentAlgorithm contentAlgo = 
+            getContentEncryptionAlgorithm(m, props, null, ContentAlgorithm.A128GCM);
         SecretKey ctDecryptionKey = null;
         KeyAlgorithm keyAlgo = getKeyEncryptionAlgorithm(m, props, null, null);
         if (inHeaders != null && inHeaders.getHeader(JoseConstants.HEADER_X509_CHAIN) != null) {
@@ -396,7 +399,7 @@ public final class JweUtils {
             X509Certificate cert = chain == null ? null : chain.get(0);
             PrivateKey privateKey = 
                 KeyManagementUtils.loadPrivateKey(m, props, cert, KeyOperation.DECRYPT);
-            contentEncryptionAlgo = inHeaders.getContentEncryptionAlgorithm().getJwaName();
+            contentAlgo = inHeaders.getContentEncryptionAlgorithm();
             keyDecryptionProvider = getPrivateKeyDecryptionProvider(privateKey, 
                                                                  inHeaders.getKeyEncryptionAlgorithm());
         } else if (inHeaders != null && inHeaders.getHeader(JoseConstants.HEADER_X509_THUMBPRINT) != null) {
@@ -407,7 +410,7 @@ public final class JweUtils {
             if (foundCert != null) {
                 PrivateKey privateKey = 
                     KeyManagementUtils.loadPrivateKey(m, props, foundCert, KeyOperation.DECRYPT);
-                contentEncryptionAlgo = inHeaders.getContentEncryptionAlgorithm().getJwaName();
+                contentAlgo = inHeaders.getContentEncryptionAlgorithm();
                 keyDecryptionProvider = getPrivateKeyDecryptionProvider(privateKey, 
                                                                      inHeaders.getKeyEncryptionAlgorithm());
             }
@@ -420,8 +423,10 @@ public final class JweUtils {
                 }
                 
                 if ("direct".equals(keyAlgo.getJwaName())) {
-                    contentEncryptionAlgo = getContentEncryptionAlgo(m, props, jwk.getAlgorithm());
-                    ctDecryptionKey = getContentDecryptionSecretKey(jwk, contentEncryptionAlgo);
+                    contentAlgo = getContentEncryptionAlgorithm(m, props, 
+                                                ContentAlgorithm.getAlgorithm(jwk.getAlgorithm()),
+                                                ContentAlgorithm.A128GCM);
+                    ctDecryptionKey = getContentDecryptionSecretKey(jwk, contentAlgo.getJwaName());
                 } else {
                     keyAlgo = getKeyEncryptionAlgorithm(m, props, 
                                                         KeyAlgorithm.getAlgorithm(jwk.getAlgorithm()),
@@ -435,7 +440,7 @@ public final class JweUtils {
             }
         }
         return createJweDecryptionProvider(keyDecryptionProvider, ctDecryptionKey, 
-                                           getContentAlgo(contentEncryptionAlgo));
+                                           contentAlgo);
     }
     public static JweEncryptionProvider createJweEncryptionProvider(PublicKey key,
                                                                     KeyAlgorithm keyAlgo,
@@ -694,7 +699,10 @@ public final class JweUtils {
         }
     }
     @SuppressWarnings("deprecation")
-    private static String getContentEncryptionAlgo(Message m, Properties props, String algo) {
+    public static ContentAlgorithm getContentEncryptionAlgorithm(Message m, 
+                                                       Properties props, 
+                                                       ContentAlgorithm algo,
+                                                       ContentAlgorithm defaultAlgo) {
         if (algo == null) {
             // Check for deprecated identifier first
             String encAlgo = props.getProperty(JoseConstants.DEPR_RSSEC_ENCRYPTION_CONTENT_ALGORITHM);
@@ -702,16 +710,23 @@ public final class JweUtils {
                 encAlgo = (String)m.getContextualProperty(JoseConstants.DEPR_RSSEC_ENCRYPTION_CONTENT_ALGORITHM);
             }
             if (encAlgo != null) {
-                return encAlgo;
+                return ContentAlgorithm.getAlgorithm(encAlgo);
             }
             
-            // Otherwise check newer identifier
-            return KeyManagementUtils.getKeyAlgorithm(m, props, 
-                                                      JoseConstants.RSSEC_ENCRYPTION_CONTENT_ALGORITHM, 
-                                                      AlgorithmUtils.A128GCM_ALGO);
+            return getContentEncryptionAlgorithm(props, defaultAlgo);
         }
         return algo;
     }
+    
+    public static ContentAlgorithm getContentEncryptionAlgorithm(Properties props,
+                                                                 ContentAlgorithm defaultAlgo) {
+        String algo = KeyManagementUtils.getKeyAlgorithm(PhaseInterceptorChain.getCurrentMessage(), 
+                                                  props, 
+                                                  JoseConstants.RSSEC_ENCRYPTION_CONTENT_ALGORITHM, 
+                                                  defaultAlgo == null ? null : defaultAlgo.getJwaName());
+        return ContentAlgorithm.getAlgorithm(algo);
+    }
+    
     private static String encrypt(KeyEncryptionProvider keyEncryptionProvider, 
                                   ContentAlgorithm contentAlgo, byte[] content, String ct) {
         JweEncryptionProvider jwe = createJweEncryptionProvider(keyEncryptionProvider, contentAlgo, null);

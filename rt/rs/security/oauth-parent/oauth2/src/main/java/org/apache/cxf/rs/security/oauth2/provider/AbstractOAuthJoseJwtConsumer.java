@@ -58,7 +58,9 @@ public abstract class AbstractOAuthJoseJwtConsumer extends AbstractJoseJwtConsum
         JweDecryptionProvider theDecryptionProvider = null;
         if (decryptWithClientSecret) {
             SecretKey key = CryptoUtils.decodeSecretKey(clientSecret);
-            theDecryptionProvider = JweUtils.getDirectKeyJweDecryption(key, ContentAlgorithm.A128GCM);
+            Properties props = JweUtils.loadEncryptionInProperties(false);
+            ContentAlgorithm ctAlgo = JweUtils.getContentEncryptionAlgorithm(props, ContentAlgorithm.A128GCM);
+            theDecryptionProvider = JweUtils.getDirectKeyJweDecryption(key, ctAlgo);
         }
         return theDecryptionProvider;
         
