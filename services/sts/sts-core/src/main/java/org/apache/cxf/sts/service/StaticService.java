@@ -97,6 +97,7 @@ public class StaticService implements ServiceMBean {
      * Set the list of endpoint addresses that correspond to this service
      */
     public void setEndpoints(List<String> endpoints) {
+        endpointPatterns.clear();
         if (endpoints != null) {
             for (String endpoint : endpoints) {
                 try {
