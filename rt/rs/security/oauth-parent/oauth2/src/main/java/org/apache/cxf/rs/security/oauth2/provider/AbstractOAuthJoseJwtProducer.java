@@ -48,7 +48,7 @@ public abstract class AbstractOAuthJoseJwtProducer extends AbstractJoseJwtProduc
             Properties props = JwsUtils.loadSignatureOutProperties(false);
             SignatureAlgorithm sigAlgo = JwsUtils.getSignatureAlgorithm(props, SignatureAlgorithm.HS256);
             if (AlgorithmUtils.isHmacSign(sigAlgo)) {
-                return JwsUtils.getHmacSignatureProvider(clientSecret, SignatureAlgorithm.HS256);
+                return JwsUtils.getHmacSignatureProvider(clientSecret, sigAlgo);
             }
         }
         return null;
@@ -56,7 +56,9 @@ public abstract class AbstractOAuthJoseJwtProducer extends AbstractJoseJwtProduc
     protected JweEncryptionProvider getInitializedEncryptionProvider(String clientSecret) {
         if (encryptWithClientSecret) {
             SecretKey key = CryptoUtils.decodeSecretKey(clientSecret);
-            return JweUtils.getDirectKeyJweEncryption(key, ContentAlgorithm.A128GCM);
+            Properties props = JweUtils.loadEncryptionOutProperties(false);
+            ContentAlgorithm ctAlgo = JweUtils.getContentEncryptionAlgorithm(props, ContentAlgorithm.A128GCM);
+            return JweUtils.getDirectKeyJweEncryption(key, ctAlgo);
         }
         return null;
     }
