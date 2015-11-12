@@ -136,9 +136,16 @@ public final class STSTokenRetriever {
 
                 Object o = SecurityUtils.getSecurityPropertyValue(SecurityConstants.STS_APPLIES_TO, message);
                 String appliesTo = o == null ? null : o.toString();
-                appliesTo = appliesTo == null
-                    ? message.getContextualProperty(Message.ENDPOINT_ADDRESS).toString()
-                    : appliesTo;
+                if (appliesTo == null) {
+                    String endpointAddress = 
+                        message.getContextualProperty(Message.ENDPOINT_ADDRESS).toString();
+                    // Strip out any query parameters if they exist
+                    int query = endpointAddress.indexOf('?');
+                    if (query > 0) {
+                        endpointAddress = endpointAddress.substring(0, query);
+                    }
+                    appliesTo = endpointAddress;
+                }
                 boolean enableAppliesTo = client.isEnableAppliesTo();
 
                 client.setMessage(message);
