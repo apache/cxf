@@ -18,8 +18,11 @@
  */
 package org.apache.cxf.rs.security.oauth2.provider;
 
+import java.util.Properties;
+
 import javax.crypto.SecretKey;
 
+import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jwe.JweEncryptionProvider;
@@ -42,8 +45,11 @@ public abstract class AbstractOAuthJoseJwtProducer extends AbstractJoseJwtProduc
     
     protected JwsSignatureProvider getInitializedSignatureProvider(String clientSecret) {
         if (signWithClientSecret) {
-            byte[] hmac = CryptoUtils.decodeSequence(clientSecret);
-            return JwsUtils.getHmacSignatureProvider(hmac, SignatureAlgorithm.HS256);
+            Properties props = JwsUtils.loadSignatureOutProperties(false);
+            SignatureAlgorithm sigAlgo = JwsUtils.getSignatureAlgorithm(props, SignatureAlgorithm.HS256);
+            if (AlgorithmUtils.isHmacSign(sigAlgo)) {
+                return JwsUtils.getHmacSignatureProvider(clientSecret, SignatureAlgorithm.HS256);
+            }
         }
         return null;
     }
