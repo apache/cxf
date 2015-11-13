@@ -33,6 +33,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
 import org.apache.cxf.common.util.Base64Utility;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenGrant;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
@@ -281,7 +282,8 @@ public final class OAuthClientUtils {
             }
         }
         if (consumer != null) {
-            if (setAuthorizationHeader) {
+            boolean secretAvailable = !StringUtils.isEmpty(consumer.getSecret());
+            if (setAuthorizationHeader && secretAvailable) {
                 StringBuilder sb = new StringBuilder();
                 sb.append("Basic ");
                 try {
@@ -293,7 +295,7 @@ public final class OAuthClientUtils {
                 accessTokenService.replaceHeader("Authorization", sb.toString());
             } else {
                 form.param(OAuthConstants.CLIENT_ID, consumer.getKey());
-                if (consumer.getSecret() != null) {
+                if (secretAvailable) {
                     form.param(OAuthConstants.CLIENT_SECRET, consumer.getSecret());
                 }
             }
@@ -315,7 +317,7 @@ public final class OAuthClientUtils {
             } else {
                 return token;
             }
-        } else if (400 == response.getStatus() && map.containsKey(OAuthConstants.ERROR_KEY)) {
+        } else if (response.getStatus() >= 400 && map.containsKey(OAuthConstants.ERROR_KEY)) {
             OAuthError error = new OAuthError(map.get(OAuthConstants.ERROR_KEY),
                                               map.get(OAuthConstants.ERROR_DESCRIPTION_KEY));
             error.setErrorUri(map.get(OAuthConstants.ERROR_URI_KEY));
