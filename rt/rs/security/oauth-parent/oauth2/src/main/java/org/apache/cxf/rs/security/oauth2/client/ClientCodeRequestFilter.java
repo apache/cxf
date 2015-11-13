@@ -115,10 +115,10 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
         if (sc == null || sc.getUserPrincipal() == null) {
             if (codeParam == null 
                 && requestParams.containsKey(OAuthConstants.ERROR_KEY)
-                && OAuthConstants.ACCESS_DENIED.equals(requestParams.getFirst(OAuthConstants.ERROR_KEY))
                 && !faultAccessDeniedResponses) {
                 if (!applicationCanHandleAccessDenied) {
-                    rc.abortWith(Response.ok(new AccessDeniedResponse()).build());    
+                    String error = requestParams.getFirst(OAuthConstants.ERROR_KEY);
+                    rc.abortWith(Response.ok(new AccessDeniedResponse(error)).build());    
                 }
             } else {
                 throw ExceptionUtils.toNotAuthorizedException(null, null);

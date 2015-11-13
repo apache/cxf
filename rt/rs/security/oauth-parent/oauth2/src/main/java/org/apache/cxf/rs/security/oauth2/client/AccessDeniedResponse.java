@@ -19,5 +19,11 @@
 package org.apache.cxf.rs.security.oauth2.client;
 
 public class AccessDeniedResponse {
-
+    private String error;
+    public AccessDeniedResponse(String error) {
+        this.error = error;
+    }
+    public String getError() {
+        return error;
+    }
 }

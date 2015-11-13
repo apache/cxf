@@ -22,6 +22,7 @@ import java.util.Properties;
 
 import javax.crypto.SecretKey;
 
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
@@ -44,7 +45,7 @@ public abstract class AbstractOAuthJoseJwtProducer extends AbstractJoseJwtProduc
     }
     
     protected JwsSignatureProvider getInitializedSignatureProvider(String clientSecret) {
-        if (signWithClientSecret) {
+        if (signWithClientSecret && !StringUtils.isEmpty(clientSecret)) {
             Properties props = JwsUtils.loadSignatureOutProperties(false);
             SignatureAlgorithm sigAlgo = JwsUtils.getSignatureAlgorithm(props, SignatureAlgorithm.HS256);
             if (AlgorithmUtils.isHmacSign(sigAlgo)) {
@@ -54,7 +55,7 @@ public abstract class AbstractOAuthJoseJwtProducer extends AbstractJoseJwtProduc
         return null;
     }
     protected JweEncryptionProvider getInitializedEncryptionProvider(String clientSecret) {
-        if (encryptWithClientSecret) {
+        if (encryptWithClientSecret && !StringUtils.isEmpty(clientSecret)) {
             SecretKey key = CryptoUtils.decodeSecretKey(clientSecret);
             Properties props = JweUtils.loadEncryptionOutProperties(false);
             ContentAlgorithm ctAlgo = JweUtils.getContentEncryptionAlgorithm(props, ContentAlgorithm.A128GCM);
