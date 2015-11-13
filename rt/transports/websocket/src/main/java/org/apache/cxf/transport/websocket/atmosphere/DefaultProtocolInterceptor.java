@@ -298,49 +298,60 @@ public class DefaultProtocolInterceptor extends AtmosphereInterceptorAdapter {
         @Override
         public ServletOutputStream getOutputStream() throws IOException {
             if (sout == null) {
-                sout = new ServletOutputStream() {
-                    CachedOutputStream out = new CachedOutputStream();
-                    OutputStream getOut() {
-                        if (out == null) {
-                            out = new CachedOutputStream();
-                        }
-                        return out;
-                    }                
-                    void send(boolean complete) throws IOException {
-                        if (out == null) {
-                            return;
-                        }
-                        if (response.getStatus() >= 400) {
-                            int i = response.getStatus();
-                            response.setStatus(200);
-                            response.addIntHeader(WebSocketUtils.SC_KEY, i);
-                        }
-                        out.flush();
-                        out.lockOutputStream();
-                        out.writeCacheTo(delegate);
-                        delegate.flush();
-                        out.close();
-                        out = null;
-                    }
-                    public void write(int i) throws IOException {
-                        getOut().write(i);
-                    }
-                    public void close() throws IOException {
-                        send(true);
-                        delegate.close();
-                    }
-                    public void flush() throws IOException {
-                        send(false);
-                    }
-                    public void write(byte[] b, int off, int len) throws IOException {
-                        getOut().write(b, off, len);
-                    }
-                    public void write(byte[] b) throws IOException {
-                        getOut().write(b);
-                    }
-                };
+                sout = new BufferedServletOutputStream();
             }
             return sout;
         }
+        
+        private final class BufferedServletOutputStream extends ServletOutputStream {
+            CachedOutputStream out = new CachedOutputStream();
+
+            OutputStream getOut() {
+                if (out == null) {
+                    out = new CachedOutputStream();
+                }
+                return out;
+            }
+
+            void send(boolean complete) throws IOException {
+                if (out == null) {
+                    return;
+                }
+                if (response.getStatus() >= 400) {
+                    int i = response.getStatus();
+                    response.setStatus(200);
+                    response.addIntHeader(WebSocketUtils.SC_KEY, i);
+                }
+                out.flush();
+                out.lockOutputStream();
+                out.writeCacheTo(delegate);
+                delegate.flush();
+                out.close();
+                out = null;
+            }
+
+            public void write(int i) throws IOException {
+                getOut().write(i);
+            }
+
+            public void close() throws IOException {
+                send(true);
+                delegate.close();
+            }
+
+            public void flush() throws IOException {
+                send(false);
+            }
+
+            public void write(byte[] b, int off, int len) throws IOException {
+                getOut().write(b, off, len);
+            }
+
+            public void write(byte[] b) throws IOException {
+                getOut().write(b);
+            }
+        }
+
+        
     }
 }
