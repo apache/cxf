@@ -32,6 +32,7 @@ import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 import org.apache.cxf.rs.security.jose.jwt.AbstractJoseJwtProducer;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
+import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
 
 public abstract class AbstractOAuthJoseJwtProducer extends AbstractJoseJwtProducer {
@@ -47,7 +48,9 @@ public abstract class AbstractOAuthJoseJwtProducer extends AbstractJoseJwtProduc
     protected JwsSignatureProvider getInitializedSignatureProvider(String clientSecret) {
         if (signWithClientSecret && !StringUtils.isEmpty(clientSecret)) {
             Properties props = JwsUtils.loadSignatureOutProperties(false);
-            SignatureAlgorithm sigAlgo = JwsUtils.getSignatureAlgorithm(props, SignatureAlgorithm.HS256);
+            SignatureAlgorithm sigAlgo = SignatureAlgorithm.getAlgorithm(
+                props.getProperty(OAuthConstants.CLIENT_SECRET_SIGNATURE_ALGORITHM));
+            sigAlgo = sigAlgo != null ? sigAlgo : SignatureAlgorithm.HS256;
             if (AlgorithmUtils.isHmacSign(sigAlgo)) {
                 return JwsUtils.getHmacSignatureProvider(clientSecret, sigAlgo);
             }
@@ -58,7 +61,9 @@ public abstract class AbstractOAuthJoseJwtProducer extends AbstractJoseJwtProduc
         if (encryptWithClientSecret && !StringUtils.isEmpty(clientSecret)) {
             SecretKey key = CryptoUtils.decodeSecretKey(clientSecret);
             Properties props = JweUtils.loadEncryptionOutProperties(false);
-            ContentAlgorithm ctAlgo = JweUtils.getContentEncryptionAlgorithm(props, ContentAlgorithm.A128GCM);
+            ContentAlgorithm ctAlgo = ContentAlgorithm.getAlgorithm(
+                props.getProperty(OAuthConstants.CLIENT_SECRET_ENCRYPTION_ALGORITHM));
+            ctAlgo = ctAlgo != null ? ctAlgo : ContentAlgorithm.A128GCM;
             return JweUtils.getDirectKeyJweEncryption(key, ctAlgo);
         }
         return null;

@@ -129,7 +129,12 @@ public final class OAuthConstants {
     // Default refresh token scope value - checked by CXF utility code
     public static final String REFRESH_TOKEN_SCOPE = "refreshToken";
     
+    // Client Secret (JWS) Signature Algorithm
+    public static final String CLIENT_SECRET_SIGNATURE_ALGORITHM = "client.secret.signature.algorithm";
+    // Client Secret (JWE) Encryption Algorithm
+    public static final String CLIENT_SECRET_ENCRYPTION_ALGORITHM = "client.secret.encryption.algorithm";
     
+    // Client Secret Encrypting Algorithm
     private OAuthConstants() {
     }
     

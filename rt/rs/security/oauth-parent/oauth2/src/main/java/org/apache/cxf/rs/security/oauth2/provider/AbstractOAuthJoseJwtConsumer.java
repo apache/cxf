@@ -31,6 +31,7 @@ import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 import org.apache.cxf.rs.security.jose.jwt.AbstractJoseJwtConsumer;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
+import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
 
 public abstract class AbstractOAuthJoseJwtConsumer extends AbstractJoseJwtConsumer {
@@ -47,7 +48,9 @@ public abstract class AbstractOAuthJoseJwtConsumer extends AbstractJoseJwtConsum
     protected JwsSignatureVerifier getInitializedSignatureVerifier(String clientSecret) {
         if (verifyWithClientSecret) {
             Properties props = JwsUtils.loadSignatureInProperties(false);
-            SignatureAlgorithm sigAlgo = JwsUtils.getSignatureAlgorithm(props, SignatureAlgorithm.HS256);
+            SignatureAlgorithm sigAlgo = SignatureAlgorithm.getAlgorithm(
+                props.getProperty(OAuthConstants.CLIENT_SECRET_SIGNATURE_ALGORITHM));
+            sigAlgo = sigAlgo != null ? sigAlgo : SignatureAlgorithm.HS256;
             if (AlgorithmUtils.isHmacSign(sigAlgo)) {
                 return JwsUtils.getHmacSignatureVerifier(clientSecret, sigAlgo);
             }
@@ -59,7 +62,9 @@ public abstract class AbstractOAuthJoseJwtConsumer extends AbstractJoseJwtConsum
         if (decryptWithClientSecret) {
             SecretKey key = CryptoUtils.decodeSecretKey(clientSecret);
             Properties props = JweUtils.loadEncryptionInProperties(false);
-            ContentAlgorithm ctAlgo = JweUtils.getContentEncryptionAlgorithm(props, ContentAlgorithm.A128GCM);
+            ContentAlgorithm ctAlgo = ContentAlgorithm.getAlgorithm(
+                props.getProperty(OAuthConstants.CLIENT_SECRET_ENCRYPTION_ALGORITHM));
+            ctAlgo = ctAlgo != null ? ctAlgo : ContentAlgorithm.A128GCM;
             theDecryptionProvider = JweUtils.getDirectKeyJweDecryption(key, ctAlgo);
         }
         return theDecryptionProvider;
