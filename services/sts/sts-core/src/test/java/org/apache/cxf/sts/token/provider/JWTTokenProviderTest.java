@@ -387,11 +387,7 @@ public class JWTTokenProviderTest extends org.junit.Assert {
             "org.apache.wss4j.crypto.provider", "org.apache.wss4j.common.crypto.Merlin"
         );
         properties.put("org.apache.wss4j.crypto.merlin.keystore.password", "stsspass");
-        if (unrestrictedPoliciesInstalled) {
-            properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "stsstore.jks");
-        } else {
-            properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "restricted/stsstore.jks");
-        }
+        properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "stsstore.jks");
         
         return properties;
     }
