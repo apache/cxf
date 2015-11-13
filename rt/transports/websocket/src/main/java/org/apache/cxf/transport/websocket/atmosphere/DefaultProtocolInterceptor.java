@@ -286,25 +286,28 @@ public class DefaultProtocolInterceptor extends AtmosphereInterceptorAdapter {
     // a workaround to flush the header data upon close when no write operation occurs  
     private class WrappedAtmosphereResponse extends AtmosphereResponse {
         final AtmosphereResponse response;
-        final ServletOutputStream delegate;
         ServletOutputStream sout;
         WrappedAtmosphereResponse(AtmosphereResponse resp, AtmosphereRequest req) throws IOException {
             super((HttpServletResponse)resp.getResponse(), null, req, resp.isDestroyable());
             response = resp;
             response.request(req);
-            delegate = super.getOutputStream();
         }
 
         @Override
         public ServletOutputStream getOutputStream() throws IOException {
             if (sout == null) {
-                sout = new BufferedServletOutputStream();
+                sout = new BufferedServletOutputStream(super.getOutputStream());
             }
             return sout;
         }
         
         private final class BufferedServletOutputStream extends ServletOutputStream {
+            final ServletOutputStream delegate;
             CachedOutputStream out = new CachedOutputStream();
+            
+            BufferedServletOutputStream(ServletOutputStream d) {
+                delegate = d;
+            }
 
             OutputStream getOut() {
                 if (out == null) {
