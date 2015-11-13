@@ -65,12 +65,12 @@ public class AbstractTokenService extends AbstractOAuthService {
                 client = getAndValidateClientFromIdAndSecret(clientId,
                                               params.getFirst(OAuthConstants.CLIENT_SECRET));
             }
-        } else if (principal.getName() != null) {
-            client = getClient(principal.getName());
         } else {
             String clientId = retrieveClientId(params);
             if (clientId != null) {
                 client = getClient(clientId);
+            } else if (principal.getName() != null) {
+                client = getClient(principal.getName());
             } 
         }
         if (client == null) {
