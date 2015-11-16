@@ -128,6 +128,7 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
         if (state.getRedirectUri() == null) {
             OOBAuthorizationResponse oobResponse = new OOBAuthorizationResponse();
             oobResponse.setClientId(client.getClientId());
+            oobResponse.setClientDescription(client.getApplicationDescription());
             oobResponse.setAuthorizationCode(grant.getCode());
             oobResponse.setUserId(userSubject.getLogin());
             oobResponse.setExpiresIn(grant.getExpiresIn());
