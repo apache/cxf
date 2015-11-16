@@ -23,7 +23,7 @@ import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 
 public abstract class AbstractCodeDataProvider extends AbstractOAuthDataProvider 
     implements AuthorizationCodeDataProvider {
-    private long codeLifetime = 3600L;
+    private long codeLifetime = 10 * 60;
     
     protected AbstractCodeDataProvider() {
     }
