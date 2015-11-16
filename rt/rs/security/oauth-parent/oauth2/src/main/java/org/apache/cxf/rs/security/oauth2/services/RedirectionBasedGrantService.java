@@ -363,7 +363,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         
         List<String> uris = client.getRedirectUris();
         if (redirectUri != null) {
-            if (!uris.isEmpty() && !uris.contains(redirectUri)) {
+            if (!uris.contains(redirectUri)) {
                 reportInvalidRequestError("Client Redirect Uri is invalid");
             } 
         } else if (uris.size() == 1 && useRegisteredRedirectUriIfPossible) {
