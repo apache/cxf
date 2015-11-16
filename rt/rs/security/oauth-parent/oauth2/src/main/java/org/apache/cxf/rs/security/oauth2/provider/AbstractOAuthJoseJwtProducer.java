@@ -18,22 +18,12 @@
  */
 package org.apache.cxf.rs.security.oauth2.provider;
 
-import java.util.Properties;
-
-import javax.crypto.SecretKey;
-
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
-import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
-import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jwe.JweEncryptionProvider;
-import org.apache.cxf.rs.security.jose.jwe.JweUtils;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
-import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 import org.apache.cxf.rs.security.jose.jwt.AbstractJoseJwtProducer;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
-import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
-import org.apache.cxf.rt.security.crypto.CryptoUtils;
+import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 
 public abstract class AbstractOAuthJoseJwtProducer extends AbstractJoseJwtProducer {
     private boolean encryptWithClientSecret;
@@ -47,26 +37,17 @@ public abstract class AbstractOAuthJoseJwtProducer extends AbstractJoseJwtProduc
     
     protected JwsSignatureProvider getInitializedSignatureProvider(String clientSecret) {
         if (signWithClientSecret && !StringUtils.isEmpty(clientSecret)) {
-            Properties props = JwsUtils.loadSignatureOutProperties(false);
-            SignatureAlgorithm sigAlgo = SignatureAlgorithm.getAlgorithm(
-                props.getProperty(OAuthConstants.CLIENT_SECRET_SIGNATURE_ALGORITHM));
-            sigAlgo = sigAlgo != null ? sigAlgo : SignatureAlgorithm.HS256;
-            if (AlgorithmUtils.isHmacSign(sigAlgo)) {
-                return JwsUtils.getHmacSignatureProvider(clientSecret, sigAlgo);
-            }
+            return OAuthUtils.getClientSecretSignatureProvider(clientSecret);
+        } else {
+            return null;
         }
-        return null;
     }
     protected JweEncryptionProvider getInitializedEncryptionProvider(String clientSecret) {
         if (encryptWithClientSecret && !StringUtils.isEmpty(clientSecret)) {
-            SecretKey key = CryptoUtils.decodeSecretKey(clientSecret);
-            Properties props = JweUtils.loadEncryptionOutProperties(false);
-            ContentAlgorithm ctAlgo = ContentAlgorithm.getAlgorithm(
-                props.getProperty(OAuthConstants.CLIENT_SECRET_ENCRYPTION_ALGORITHM));
-            ctAlgo = ctAlgo != null ? ctAlgo : ContentAlgorithm.A128GCM;
-            return JweUtils.getDirectKeyJweEncryption(key, ctAlgo);
+            return OAuthUtils.getClientSecretEncryptionProvider(clientSecret);
+        } else {
+            return null;
         }
-        return null;
     }
 
     public void setEncryptWithClientSecret(boolean encryptWithClientSecret) {
