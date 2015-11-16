@@ -346,11 +346,17 @@ public class ClientProxyImpl extends AbstractClient implements
         if (headers.getFirst(HttpHeaders.CONTENT_TYPE) == null) {
             if (formParams || bodyClass != null && MultivaluedMap.class.isAssignableFrom(bodyClass)) {
                 headers.putSingle(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED);
-            } else if (bodyClass != null) {
-                String cType = ori.getConsumeTypes().isEmpty() 
-                    || ori.getConsumeTypes().get(0).equals(MediaType.WILDCARD_TYPE) 
-                    ? MediaType.APPLICATION_XML : JAXRSUtils.mediaTypeToString(ori.getConsumeTypes().get(0));   
-                headers.putSingle(HttpHeaders.CONTENT_TYPE, cType);
+            } else {
+                String ctType = null;
+                List<MediaType> consumeTypes = ori.getConsumeTypes();
+                if (!consumeTypes.isEmpty() && !consumeTypes.get(0).equals(MediaType.WILDCARD_TYPE)) {
+                    ctType = JAXRSUtils.mediaTypeToString(ori.getConsumeTypes().get(0));
+                } else if (bodyClass != null) {
+                    ctType = MediaType.APPLICATION_XML;
+                }
+                if (ctType != null) {
+                    headers.putSingle(HttpHeaders.CONTENT_TYPE, ctType);
+                }
             }
         }
         

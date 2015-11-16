@@ -425,7 +425,11 @@ public class BookStore {
     
     @PUT
     @Path("emptyput")
+    @Consumes("application/json")
     public void emptyput() {
+        if (!httpHeaders.getMediaType().toString().equals("application/json")) {
+            throw new RuntimeException();
+        }
     }
     
     @POST
