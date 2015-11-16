@@ -83,11 +83,7 @@
         <cxf.cglib.bundle.version>2.2_2</cxf.cglib.bundle.version>
         <cxf.cglib.osgi.version>[2.1.3,3.0.0)</cxf.cglib.osgi.version>
         <cxf.commons-codec.version>1.10</cxf.commons-codec.version>
-<<<<<<< HEAD
-        <cxf.commons-collections.version>3.2.1</cxf.commons-collections.version>
-=======
         <cxf.commons-collections.version>3.2.2</cxf.commons-collections.version>
->>>>>>> d2b5baa... [CXF-6675] - Update commons-collections from 3.2.1 to 3.2.2
         <cxf.commons-lang.version>2.6</cxf.commons-lang.version>
         <cxf.commons-lang3.version>3.4</cxf.commons-lang3.version>
         <cxf.derby.version>10.2.2.0</cxf.derby.version>
