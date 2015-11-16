@@ -131,8 +131,9 @@ public final class OAuthConstants {
     
     // Client Secret (JWS) Signature Algorithm
     public static final String CLIENT_SECRET_SIGNATURE_ALGORITHM = "client.secret.signature.algorithm";
-    // Client Secret (JWE) Encryption Algorithm
-    public static final String CLIENT_SECRET_ENCRYPTION_ALGORITHM = "client.secret.encryption.algorithm";
+    // Client Secret (JWE) Content Encryption Algorithm
+    public static final String CLIENT_SECRET_CONTENT_ENCRYPTION_ALGORITHM = 
+        "client.secret.content.encryption.algorithm";
     
     // Client Secret Encrypting Algorithm
     private OAuthConstants() {

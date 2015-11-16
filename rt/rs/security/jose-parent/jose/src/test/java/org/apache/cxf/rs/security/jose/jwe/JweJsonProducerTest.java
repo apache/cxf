@@ -282,7 +282,7 @@ public class JweJsonProducerTest extends Assert {
         KeyEncryptionProvider keyEncryption1 = 
             JweUtils.getSecretKeyEncryptionAlgorithm(wrapperKey1, KeyAlgorithm.A128KW);
         ContentEncryptionProvider contentEncryption = 
-            JweUtils.getContentEncryptionProvider(AlgorithmUtils.A128GCM_ALGO);
+            JweUtils.getContentEncryptionProvider(ContentAlgorithm.A128GCM);
         JweEncryptionProvider jwe1 = new JweEncryption(keyEncryption1, contentEncryption);
         KeyEncryptionProvider keyEncryption2 = 
             JweUtils.getSecretKeyEncryptionAlgorithm(wrapperKey2, KeyAlgorithm.A128KW);
