@@ -21,6 +21,7 @@ package org.apache.cxf.sts.token.validator;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.Properties;
+import java.util.Set;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -29,6 +30,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import org.apache.cxf.jaxws.context.WebServiceContextImpl;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.StaticSTSProperties;
 import org.apache.cxf.sts.cache.DefaultInMemoryTokenStore;
@@ -41,7 +43,11 @@ import org.apache.cxf.sts.service.EncryptionProperties;
 import org.apache.cxf.sts.token.provider.TokenProvider;
 import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.cxf.sts.token.provider.TokenProviderResponse;
+import org.apache.cxf.sts.token.provider.jwt.DefaultJWTClaimsProvider;
+import org.apache.cxf.sts.token.provider.jwt.JWTClaimsProvider;
+import org.apache.cxf.sts.token.provider.jwt.JWTClaimsProviderParameters;
 import org.apache.cxf.sts.token.provider.jwt.JWTTokenProvider;
+import org.apache.cxf.sts.token.validator.jwt.DefaultJWTRoleParser;
 import org.apache.cxf.sts.token.validator.jwt.JWTTokenValidator;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.wss4j.common.crypto.Crypto;
@@ -134,6 +140,182 @@ public class JWTTokenValidatorTest extends org.junit.Assert {
         assertTrue(validatorResponse != null);
         assertTrue(validatorResponse.getToken() != null);
         assertTrue(validatorResponse.getToken().getState() == STATE.INVALID);
+    }
+    
+    @org.junit.Test
+    public void testUnsignedToken() throws Exception {
+        // Create
+        TokenProvider jwtTokenProvider = new JWTTokenProvider();
+        ((JWTTokenProvider)jwtTokenProvider).setSignToken(false);
+        
+        TokenProviderParameters providerParameters = createProviderParameters();
+        Crypto crypto = CryptoFactory.getInstance(getEveCryptoProperties());
+        CallbackHandler callbackHandler = new EveCallbackHandler();
+        providerParameters.getStsProperties().setSignatureCrypto(crypto);
+        providerParameters.getStsProperties().setCallbackHandler(callbackHandler);
+        providerParameters.getStsProperties().setSignatureUsername("eve");
+        
+        assertTrue(jwtTokenProvider.canHandleToken(JWTTokenProvider.JWT_TOKEN_TYPE));
+        TokenProviderResponse providerResponse = jwtTokenProvider.createToken(providerParameters);
+        assertTrue(providerResponse != null);
+        assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
+
+        String token = (String)providerResponse.getToken();
+        assertNotNull(token);
+        assertTrue(token.split("\\.").length == 2);
+        
+        // Validate the token
+        TokenValidator jwtTokenValidator = new JWTTokenValidator();
+        TokenValidatorParameters validatorParameters = createValidatorParameters();
+        TokenRequirements tokenRequirements = validatorParameters.getTokenRequirements();
+        
+        // Create a ValidateTarget consisting of a JWT Token
+        ReceivedToken validateTarget = new ReceivedToken(token);
+        tokenRequirements.setValidateTarget(validateTarget);
+        validatorParameters.setToken(validateTarget);
+        
+        assertTrue(jwtTokenValidator.canHandleToken(validateTarget));
+        
+        TokenValidatorResponse validatorResponse = 
+            jwtTokenValidator.validateToken(validatorParameters);
+        assertTrue(validatorResponse != null);
+        assertTrue(validatorResponse.getToken() != null);
+        assertTrue(validatorResponse.getToken().getState() == STATE.INVALID);
+    }
+    
+    @org.junit.Test
+    public void testInvalidConditionJWT() throws Exception {
+        // Create
+        TokenProvider jwtTokenProvider = new JWTTokenProvider();
+        ((JWTTokenProvider)jwtTokenProvider).setSignToken(true);
+        
+        DefaultJWTClaimsProvider jwtClaimsProvider = new DefaultJWTClaimsProvider();
+        jwtClaimsProvider.setLifetime(1L);
+        ((JWTTokenProvider)jwtTokenProvider).setJwtClaimsProvider(jwtClaimsProvider);
+        
+        TokenProviderParameters providerParameters = createProviderParameters();
+        
+        assertTrue(jwtTokenProvider.canHandleToken(JWTTokenProvider.JWT_TOKEN_TYPE));
+        TokenProviderResponse providerResponse = jwtTokenProvider.createToken(providerParameters);
+        assertTrue(providerResponse != null);
+        assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
+
+        String token = (String)providerResponse.getToken();
+        assertNotNull(token);
+        assertTrue(token.split("\\.").length == 3);
+        
+        Thread.sleep(1500L);
+        
+        // Validate the token
+        TokenValidator jwtTokenValidator = new JWTTokenValidator();
+        TokenValidatorParameters validatorParameters = createValidatorParameters();
+        TokenRequirements tokenRequirements = validatorParameters.getTokenRequirements();
+        
+        // Create a ValidateTarget consisting of a JWT Token
+        ReceivedToken validateTarget = new ReceivedToken(token);
+        tokenRequirements.setValidateTarget(validateTarget);
+        validatorParameters.setToken(validateTarget);
+        
+        assertTrue(jwtTokenValidator.canHandleToken(validateTarget));
+        
+        TokenValidatorResponse validatorResponse = 
+            jwtTokenValidator.validateToken(validatorParameters);
+        assertTrue(validatorResponse != null);
+        assertTrue(validatorResponse.getToken() != null);
+        assertTrue(validatorResponse.getToken().getState() == STATE.INVALID);
+    }
+    
+    @org.junit.Test
+    public void testChangedSignature() throws Exception {
+        // Create
+        TokenProvider jwtTokenProvider = new JWTTokenProvider();
+        ((JWTTokenProvider)jwtTokenProvider).setSignToken(true);
+        
+        DefaultJWTClaimsProvider jwtClaimsProvider = new DefaultJWTClaimsProvider();
+        jwtClaimsProvider.setLifetime(1L);
+        ((JWTTokenProvider)jwtTokenProvider).setJwtClaimsProvider(jwtClaimsProvider);
+        
+        TokenProviderParameters providerParameters = createProviderParameters();
+        
+        assertTrue(jwtTokenProvider.canHandleToken(JWTTokenProvider.JWT_TOKEN_TYPE));
+        TokenProviderResponse providerResponse = jwtTokenProvider.createToken(providerParameters);
+        assertTrue(providerResponse != null);
+        assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
+
+        String token = (String)providerResponse.getToken();
+        // Change the signature
+        token += "blah";
+        assertNotNull(token);
+        assertTrue(token.split("\\.").length == 3);
+        
+        Thread.sleep(1500L);
+        
+        // Validate the token
+        TokenValidator jwtTokenValidator = new JWTTokenValidator();
+        TokenValidatorParameters validatorParameters = createValidatorParameters();
+        TokenRequirements tokenRequirements = validatorParameters.getTokenRequirements();
+        
+        // Create a ValidateTarget consisting of a JWT Token
+        ReceivedToken validateTarget = new ReceivedToken(token);
+        tokenRequirements.setValidateTarget(validateTarget);
+        validatorParameters.setToken(validateTarget);
+        
+        assertTrue(jwtTokenValidator.canHandleToken(validateTarget));
+        
+        TokenValidatorResponse validatorResponse = 
+            jwtTokenValidator.validateToken(validatorParameters);
+        assertTrue(validatorResponse != null);
+        assertTrue(validatorResponse.getToken() != null);
+        assertTrue(validatorResponse.getToken().getState() == STATE.INVALID);
+    }
+    
+    @org.junit.Test
+    public void testJWTWithRoles() throws Exception {
+        // Create
+        TokenProvider jwtTokenProvider = new JWTTokenProvider();
+        ((JWTTokenProvider)jwtTokenProvider).setSignToken(true);
+        
+        JWTClaimsProvider claimsProvider = new RoleJWTClaimsProvider("manager");
+        ((JWTTokenProvider)jwtTokenProvider).setJwtClaimsProvider(claimsProvider);
+        
+        TokenProviderParameters providerParameters = createProviderParameters();
+        
+        assertTrue(jwtTokenProvider.canHandleToken(JWTTokenProvider.JWT_TOKEN_TYPE));
+        TokenProviderResponse providerResponse = jwtTokenProvider.createToken(providerParameters);
+        assertTrue(providerResponse != null);
+        assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
+
+        String token = (String)providerResponse.getToken();
+        assertNotNull(token);
+        assertTrue(token.split("\\.").length == 3);
+        
+        // Validate the token
+        TokenValidator jwtTokenValidator = new JWTTokenValidator();
+        // Set the role
+        DefaultJWTRoleParser roleParser = new DefaultJWTRoleParser();
+        roleParser.setRoleClaim("role");
+        ((JWTTokenValidator)jwtTokenValidator).setRoleParser(roleParser);
+        TokenValidatorParameters validatorParameters = createValidatorParameters();
+        TokenRequirements tokenRequirements = validatorParameters.getTokenRequirements();
+        
+        // Create a ValidateTarget consisting of a JWT Token
+        ReceivedToken validateTarget = new ReceivedToken(token);
+        tokenRequirements.setValidateTarget(validateTarget);
+        validatorParameters.setToken(validateTarget);
+        
+        assertTrue(jwtTokenValidator.canHandleToken(validateTarget));
+        
+        TokenValidatorResponse validatorResponse = 
+            jwtTokenValidator.validateToken(validatorParameters);
+        assertTrue(validatorResponse != null);
+        assertTrue(validatorResponse.getToken() != null);
+        assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
+        
+        Principal principal = validatorResponse.getPrincipal();
+        assertTrue(principal != null && principal.getName() != null);
+        Set<Principal> roles = validatorResponse.getRoles();
+        assertTrue(roles != null && !roles.isEmpty());
+        assertTrue(roles.iterator().next().getName().equals("manager"));
     }
     
     private TokenProviderParameters createProviderParameters() throws WSSecurityException {
@@ -241,6 +423,22 @@ public class JWTTokenValidatorTest extends org.junit.Assert {
                     }
                 }
             }
+        }
+    }
+    
+    private static class RoleJWTClaimsProvider extends DefaultJWTClaimsProvider {
+        
+        private String role;
+        
+        public RoleJWTClaimsProvider(String role) {
+            this.role = role;
+        }
+        
+        @Override
+        public JwtClaims getJwtClaims(JWTClaimsProviderParameters jwtClaimsProviderParameters) {
+            JwtClaims claims = super.getJwtClaims(jwtClaimsProviderParameters);
+            claims.setProperty("role", role);
+            return claims;
         }
     }
 }

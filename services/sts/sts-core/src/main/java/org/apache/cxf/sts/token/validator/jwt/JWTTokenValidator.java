@@ -21,6 +21,7 @@ package org.apache.cxf.sts.token.validator.jwt;
 import java.security.KeyStore;
 import java.security.Principal;
 import java.util.Properties;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -51,6 +52,7 @@ public class JWTTokenValidator implements TokenValidator {
     private static final Logger LOG = LogUtils.getL7dLogger(JWTTokenValidator.class);
     private int clockOffset;
     private int ttl;
+    private JWTRoleParser roleParser;
     
     /**
      * Return true if this TokenValidator implementation is capable of validating the
@@ -134,14 +136,8 @@ public class JWTTokenValidator implements TokenValidator {
             return response;
         }
         
+        
         /*
-        // Parse roles from the validated token
-        if (samlRoleParser != null) {
-            Set<Principal> roles = 
-                samlRoleParser.parseRolesFromAssertion(principal, null, assertion);
-            response.setRoles(roles);
-        }
-
         // Get the realm of the SAML token
         String tokenRealm = null;
         if (samlRealmCodec != null) {
@@ -163,6 +159,13 @@ public class JWTTokenValidator implements TokenValidator {
         if (isVerifiedWithAPublicKey(jwt)) {
             Principal principal = new SimplePrincipal(jwt.getClaims().getSubject());
             response.setPrincipal(principal);
+            
+            // Parse roles from the validated token
+            if (roleParser != null) {
+                Set<Principal> roles = 
+                    roleParser.parseRolesFromToken(principal, null, jwt);
+                response.setRoles(roles);
+            }
         }
 
         validateTarget.setState(STATE.VALID);
@@ -203,5 +206,13 @@ public class JWTTokenValidator implements TokenValidator {
 
     public void setTtl(int ttl) {
         this.ttl = ttl;
+    }
+    
+    public JWTRoleParser getRoleParser() {
+        return roleParser;
+    }
+
+    public void setRoleParser(JWTRoleParser roleParser) {
+        this.roleParser = roleParser;
     }
 }
