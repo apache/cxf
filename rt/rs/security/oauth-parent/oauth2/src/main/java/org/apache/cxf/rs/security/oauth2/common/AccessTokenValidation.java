@@ -48,6 +48,7 @@ public class AccessTokenValidation {
     private UserSubject tokenSubject;
     private List<OAuthPermission> tokenScopes = new LinkedList<OAuthPermission>();
     private String audience;
+    private String clientCodeVerifier;
     private Map<String, String> extraProps = new HashMap<String, String>();
     
     public AccessTokenValidation() {
@@ -68,6 +69,7 @@ public class AccessTokenValidation {
         this.tokenSubject = token.getSubject();
         this.tokenScopes = token.getScopes();
         this.audience = token.getAudience();
+        this.clientCodeVerifier = token.getClientCodeVerifier();
     }
     
     public String getClientId() {
@@ -157,6 +159,13 @@ public class AccessTokenValidation {
 
     public void setClientConfidential(boolean isConfidential) {
         this.isClientConfidential = isConfidential;
+    }
+    public String getClientCodeVerifier() {
+        return clientCodeVerifier;
+    }
+
+    public void setClientCodeVerifier(String clientCodeVerifier) {
+        this.clientCodeVerifier = clientCodeVerifier;
     }
     
 }

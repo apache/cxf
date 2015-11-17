@@ -252,8 +252,10 @@ public final class ModelEncryptionSupport {
             }
             newToken.setScopes(perms);
         }
+        //Client verifier:
+        newToken.setClientCodeVerifier(parts[10]);
         //UserSubject:
-        newToken.setSubject(recreateUserSubject(parts[10]));
+        newToken.setSubject(recreateUserSubject(parts[11]));
                 
         return newToken;
     }
@@ -315,7 +317,10 @@ public final class ModelEncryptionSupport {
             }
         }
         state.append(SEP);
-        // 10: user subject
+        // 10: code verifier
+        state.append(tokenizeString(token.getClientCodeVerifier()));
+        state.append(SEP);
+        // 11: user subject
         tokenizeUserSubject(state, token.getSubject());
         
         return state.toString();
@@ -419,7 +424,7 @@ public final class ModelEncryptionSupport {
         // 5: audience
         state.append(tokenizeString(grant.getAudience()));
         state.append(SEP);
-        // 6: code verifier
+        // 6: code challenge
         state.append(tokenizeString(grant.getClientCodeChallenge()));
         state.append(SEP);
         // 7: approved scopes
