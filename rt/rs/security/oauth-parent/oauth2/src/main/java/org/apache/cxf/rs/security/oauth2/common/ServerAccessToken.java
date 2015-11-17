@@ -36,6 +36,7 @@ public abstract class ServerAccessToken extends AccessToken {
     private List<OAuthPermission> scopes = new LinkedList<OAuthPermission>();
     private UserSubject subject;
     private String audience;
+    private String clientCodeVerifier;
     
     protected ServerAccessToken() {
         
@@ -148,5 +149,13 @@ public abstract class ServerAccessToken extends AccessToken {
             throw new OAuthServiceException(OAuthConstants.SERVER_ERROR);
         }
         return token;
+    }
+    
+    public String getClientCodeVerifier() {
+        return clientCodeVerifier;
+    }
+
+    public void setClientCodeVerifier(String clientCodeVerifier) {
+        this.clientCodeVerifier = clientCodeVerifier;
     }
 }

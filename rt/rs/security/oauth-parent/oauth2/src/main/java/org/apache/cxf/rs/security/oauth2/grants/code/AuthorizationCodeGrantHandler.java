@@ -35,6 +35,7 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 public class AuthorizationCodeGrantHandler extends AbstractGrantHandler {
     
     private CodeVerifierTransformer codeVerifierTransformer;
+    private boolean expectCodeVerifierForPublicClients;
     
     public AuthorizationCodeGrantHandler() {
         super(OAuthConstants.AUTHORIZATION_CODE_GRANT);
@@ -71,32 +72,41 @@ public class AuthorizationCodeGrantHandler extends AbstractGrantHandler {
             throw new OAuthServiceException(OAuthConstants.INVALID_REQUEST);
         }
         
+        String clientCodeVerifier = params.getFirst(OAuthConstants.AUTHORIZATION_CODE_VERIFIER);
         String clientCodeChallenge = grant.getClientCodeChallenge();
-        if (clientCodeChallenge != null) {
-            String clientCodeVerifier = params.getFirst(OAuthConstants.AUTHORIZATION_CODE_VERIFIER);
-            if (!compareCodeVerifierWithChallenge(clientCodeVerifier, clientCodeChallenge)) {
-                throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
-            }
+        if (!compareCodeVerifierWithChallenge(client, clientCodeVerifier, clientCodeChallenge)) {
+            throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
         }
         
         return doCreateAccessToken(client, 
                                    grant.getSubject(), 
+                                   getSingleGrantType(),
                                    grant.getRequestedScopes(),
                                    grant.getApprovedScopes(),
-                                   grant.getAudience());
+                                   grant.getAudience(),
+                                   clientCodeVerifier);
     }
     
-    private boolean compareCodeVerifierWithChallenge(String clientCodeVerifier, String clientCodeChallenge) {
-        if (clientCodeChallenge == null) {
+    private boolean compareCodeVerifierWithChallenge(Client c, String clientCodeVerifier, 
+                                                     String clientCodeChallenge) {
+        if (clientCodeChallenge == null && clientCodeChallenge == null 
+            && (c.isConfidential() || !expectCodeVerifierForPublicClients)) {
+            return true;
+        } else if (clientCodeChallenge != null && clientCodeChallenge == null 
+            || clientCodeChallenge == null && clientCodeChallenge != null) {
             return false;
+        } else {
+            String transformedCodeVerifier = codeVerifierTransformer == null 
+                ? clientCodeVerifier : codeVerifierTransformer.transformCodeVerifier(clientCodeVerifier); 
+            return clientCodeChallenge.equals(transformedCodeVerifier);
         }
-        String transformedCodeVerifier = codeVerifierTransformer == null 
-            ? clientCodeVerifier : codeVerifierTransformer.transformCodeVerifier(clientCodeVerifier); 
-        return clientCodeChallenge.equals(transformedCodeVerifier);
-        
     }
 
     public void setCodeVerifierTransformer(CodeVerifierTransformer codeVerifier) {
         this.codeVerifierTransformer = codeVerifier;
+    }
+
+    public void setExpectCodeVerifierForPublicClients(boolean expectCodeVerifierForPublicClients) {
+        this.expectCodeVerifierForPublicClients = expectCodeVerifierForPublicClients;
     }
 }
