@@ -54,6 +54,7 @@ import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseCollectionType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
+import org.apache.cxf.ws.security.sts.provider.model.RequestedSecurityTokenType;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
@@ -130,18 +131,19 @@ public class IssueJWTRealmUnitTest extends org.junit.Assert {
         assertTrue(!securityTokenResponse.isEmpty());
         
         // Test the generated token.
-        String jwtToken = null;
+        Element token = null;
         for (Object tokenObject : securityTokenResponse.get(0).getAny()) {
-            if (tokenObject instanceof Element
-                && REQUESTED_SECURITY_TOKEN.getLocalPart().equals(((Element)tokenObject).getLocalName())
-                && REQUESTED_SECURITY_TOKEN.getNamespaceURI().equals(((Element)tokenObject).getNamespaceURI())) {
-                jwtToken = ((Element)tokenObject).getTextContent();
+            if (tokenObject instanceof JAXBElement<?>
+                && REQUESTED_SECURITY_TOKEN.equals(((JAXBElement<?>)tokenObject).getName())) {
+                RequestedSecurityTokenType rstType = 
+                    (RequestedSecurityTokenType)((JAXBElement<?>)tokenObject).getValue();
+                token = (Element)rstType.getAny();
                 break;
             }
         }
         
-        assertNotNull(jwtToken);
-        JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(jwtToken);
+        assertNotNull(token);
+        JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token.getTextContent());
         JwtToken jwt = jwtConsumer.getJwtToken();
         Assert.assertEquals("A-Issuer", jwt.getClaim(JwtConstants.CLAIM_ISSUER));
     }
@@ -204,18 +206,19 @@ public class IssueJWTRealmUnitTest extends org.junit.Assert {
         assertTrue(!securityTokenResponse.isEmpty());
         
         // Test the generated token.
-        String jwtToken = null;
+        Element token = null;
         for (Object tokenObject : securityTokenResponse.get(0).getAny()) {
-            if (tokenObject instanceof Element
-                && REQUESTED_SECURITY_TOKEN.getLocalPart().equals(((Element)tokenObject).getLocalName())
-                && REQUESTED_SECURITY_TOKEN.getNamespaceURI().equals(((Element)tokenObject).getNamespaceURI())) {
-                jwtToken = ((Element)tokenObject).getTextContent();
+            if (tokenObject instanceof JAXBElement<?>
+                && REQUESTED_SECURITY_TOKEN.equals(((JAXBElement<?>)tokenObject).getName())) {
+                RequestedSecurityTokenType rstType = 
+                    (RequestedSecurityTokenType)((JAXBElement<?>)tokenObject).getValue();
+                token = (Element)rstType.getAny();
                 break;
             }
         }
         
-        assertNotNull(jwtToken);
-        JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(jwtToken);
+        assertNotNull(token);
+        JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token.getTextContent());
         JwtToken jwt = jwtConsumer.getJwtToken();
         Assert.assertEquals("B-Issuer", jwt.getClaim(JwtConstants.CLAIM_ISSUER));
     }
@@ -278,18 +281,19 @@ public class IssueJWTRealmUnitTest extends org.junit.Assert {
         assertTrue(!securityTokenResponse.isEmpty());
         
         // Test the generated token.
-        String jwtToken = null;
+        Element token = null;
         for (Object tokenObject : securityTokenResponse.get(0).getAny()) {
-            if (tokenObject instanceof Element
-                && REQUESTED_SECURITY_TOKEN.getLocalPart().equals(((Element)tokenObject).getLocalName())
-                && REQUESTED_SECURITY_TOKEN.getNamespaceURI().equals(((Element)tokenObject).getNamespaceURI())) {
-                jwtToken = ((Element)tokenObject).getTextContent();
+            if (tokenObject instanceof JAXBElement<?>
+                && REQUESTED_SECURITY_TOKEN.equals(((JAXBElement<?>)tokenObject).getName())) {
+                RequestedSecurityTokenType rstType = 
+                    (RequestedSecurityTokenType)((JAXBElement<?>)tokenObject).getValue();
+                token = (Element)rstType.getAny();
                 break;
             }
         }
         
-        assertNotNull(jwtToken);
-        JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(jwtToken);
+        assertNotNull(token);
+        JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token.getTextContent());
         JwtToken jwt = jwtConsumer.getJwtToken();
         Assert.assertEquals("STS", jwt.getClaim(JwtConstants.CLAIM_ISSUER));
     }
@@ -371,19 +375,20 @@ public class IssueJWTRealmUnitTest extends org.junit.Assert {
             response.getRequestSecurityTokenResponse();
         assertTrue(!securityTokenResponse.isEmpty());
         
-        // Test the generated token.
-        String jwtToken = null;
+     // Test the generated token.
+        Element token = null;
         for (Object tokenObject : securityTokenResponse.get(0).getAny()) {
-            if (tokenObject instanceof Element
-                && REQUESTED_SECURITY_TOKEN.getLocalPart().equals(((Element)tokenObject).getLocalName())
-                && REQUESTED_SECURITY_TOKEN.getNamespaceURI().equals(((Element)tokenObject).getNamespaceURI())) {
-                jwtToken = ((Element)tokenObject).getTextContent();
+            if (tokenObject instanceof JAXBElement<?>
+                && REQUESTED_SECURITY_TOKEN.equals(((JAXBElement<?>)tokenObject).getName())) {
+                RequestedSecurityTokenType rstType = 
+                    (RequestedSecurityTokenType)((JAXBElement<?>)tokenObject).getValue();
+                token = (Element)rstType.getAny();
                 break;
             }
         }
         
-        assertNotNull(jwtToken);
-        JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(jwtToken);
+        assertNotNull(token);
+        JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token.getTextContent());
         JwtToken jwt = jwtConsumer.getJwtToken();
         Assert.assertEquals("B-Issuer", jwt.getClaim(JwtConstants.CLAIM_ISSUER));
     }

@@ -74,11 +74,6 @@ public class ReceivedToken {
             }
             this.token = receivedToken;
             isDOMElement = true;
-        } else if (receivedToken instanceof String) {
-            if (LOG.isLoggable(Level.FINE)) {
-                LOG.fine("Found ValidateTarget String");
-            }
-            this.token = receivedToken;
         } else {
             LOG.fine("Found ValidateTarget object of unknown type");
             throw new STSException(

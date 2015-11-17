@@ -67,10 +67,16 @@ public class JWTUnitTest extends AbstractBusClientServerTestBase {
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
         
+        // Issue the token
         SecurityToken token = 
             requestSecurityToken(JWT_TOKEN_TYPE, bus, DEFAULT_ADDRESS, null, null);
         assertNotNull(token);
-        assertNotNull(token.getData());
+        assertNotNull(token.getToken());
+        
+        // Validate the token
+        token = validateSecurityToken(token, bus, null, null);
+        assertNotNull(token);
+        assertNotNull(token.getToken());
     }
     
     private SecurityToken requestSecurityToken(
@@ -106,5 +112,38 @@ public class JWTUnitTest extends AbstractBusClientServerTestBase {
         stsClient.setSendKeyType(false);
 
         return stsClient.requestSecurityToken(endpointAddress);
+    }
+    
+    private SecurityToken validateSecurityToken(
+        SecurityToken token,
+        Bus bus,
+        Map<String, Object> msgProperties,
+        String wsdlPort
+    ) throws Exception {
+        STSClient stsClient = new STSClient(bus);
+        String port = STSPORT;
+
+        stsClient.setWsdlLocation("https://localhost:" + port + "/SecurityTokenService/Transport?wsdl");
+        stsClient.setServiceName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService");
+        if (wsdlPort != null) {
+            stsClient.setEndpointName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}" + wsdlPort);
+        } else {
+            stsClient.setEndpointName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Port");
+        }
+
+        Map<String, Object> properties = msgProperties;
+        if (properties == null) {
+            properties = new HashMap<String, Object>();
+            properties.put(SecurityConstants.USERNAME, "alice");
+            properties.put(
+                           SecurityConstants.CALLBACK_HANDLER, 
+                           "org.apache.cxf.systest.sts.common.CommonCallbackHandler"
+                );
+        }
+
+        stsClient.setProperties(properties);
+        stsClient.setSendKeyType(false);
+
+        return stsClient.validateSecurityToken(token).get(0);
     }
 }

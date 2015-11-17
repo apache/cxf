@@ -51,6 +51,7 @@ import org.apache.cxf.sts.token.provider.jwt.JWTTokenProvider;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseCollectionType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
+import org.apache.cxf.ws.security.sts.provider.model.RequestedSecurityTokenType;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
@@ -127,20 +128,21 @@ public class IssueJWTUnitTest extends org.junit.Assert {
         assertTrue(!securityTokenResponse.isEmpty());
         
         // Test the generated token.
-        String jwtToken = null;
+        Element token = null;
         for (Object tokenObject : securityTokenResponse.get(0).getAny()) {
-            if (tokenObject instanceof Element
-                && REQUESTED_SECURITY_TOKEN.getLocalPart().equals(((Element)tokenObject).getLocalName())
-                && REQUESTED_SECURITY_TOKEN.getNamespaceURI().equals(((Element)tokenObject).getNamespaceURI())) {
-                jwtToken = ((Element)tokenObject).getTextContent();
+            if (tokenObject instanceof JAXBElement<?>
+                && REQUESTED_SECURITY_TOKEN.equals(((JAXBElement<?>)tokenObject).getName())) {
+                RequestedSecurityTokenType rstType = 
+                    (RequestedSecurityTokenType)((JAXBElement<?>)tokenObject).getValue();
+                token = (Element)rstType.getAny();
                 break;
             }
         }
         
-        assertNotNull(jwtToken);
+        assertNotNull(token);
         
         // Validate the token
-        JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(jwtToken);
+        JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token.getTextContent());
         JwtToken jwt = jwtConsumer.getJwtToken();
         Assert.assertEquals("alice", jwt.getClaim(JwtConstants.CLAIM_SUBJECT));
     }
