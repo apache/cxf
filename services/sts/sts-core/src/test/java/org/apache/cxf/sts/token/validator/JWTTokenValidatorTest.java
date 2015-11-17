@@ -27,6 +27,10 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxws.context.WebServiceContextImpl;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
@@ -85,7 +89,7 @@ public class JWTTokenValidatorTest extends org.junit.Assert {
         TokenRequirements tokenRequirements = validatorParameters.getTokenRequirements();
         
         // Create a ValidateTarget consisting of a JWT Token
-        ReceivedToken validateTarget = new ReceivedToken(token);
+        ReceivedToken validateTarget = new ReceivedToken(createTokenWrapper(token));
         tokenRequirements.setValidateTarget(validateTarget);
         validatorParameters.setToken(validateTarget);
         
@@ -129,7 +133,7 @@ public class JWTTokenValidatorTest extends org.junit.Assert {
         TokenRequirements tokenRequirements = validatorParameters.getTokenRequirements();
         
         // Create a ValidateTarget consisting of a JWT Token
-        ReceivedToken validateTarget = new ReceivedToken(token);
+        ReceivedToken validateTarget = new ReceivedToken(createTokenWrapper(token));
         tokenRequirements.setValidateTarget(validateTarget);
         validatorParameters.setToken(validateTarget);
         
@@ -170,7 +174,7 @@ public class JWTTokenValidatorTest extends org.junit.Assert {
         TokenRequirements tokenRequirements = validatorParameters.getTokenRequirements();
         
         // Create a ValidateTarget consisting of a JWT Token
-        ReceivedToken validateTarget = new ReceivedToken(token);
+        ReceivedToken validateTarget = new ReceivedToken(createTokenWrapper(token));
         tokenRequirements.setValidateTarget(validateTarget);
         validatorParameters.setToken(validateTarget);
         
@@ -212,7 +216,7 @@ public class JWTTokenValidatorTest extends org.junit.Assert {
         TokenRequirements tokenRequirements = validatorParameters.getTokenRequirements();
         
         // Create a ValidateTarget consisting of a JWT Token
-        ReceivedToken validateTarget = new ReceivedToken(token);
+        ReceivedToken validateTarget = new ReceivedToken(createTokenWrapper(token));
         tokenRequirements.setValidateTarget(validateTarget);
         validatorParameters.setToken(validateTarget);
         
@@ -256,7 +260,7 @@ public class JWTTokenValidatorTest extends org.junit.Assert {
         TokenRequirements tokenRequirements = validatorParameters.getTokenRequirements();
         
         // Create a ValidateTarget consisting of a JWT Token
-        ReceivedToken validateTarget = new ReceivedToken(token);
+        ReceivedToken validateTarget = new ReceivedToken(createTokenWrapper(token));
         tokenRequirements.setValidateTarget(validateTarget);
         validatorParameters.setToken(validateTarget);
         
@@ -299,7 +303,7 @@ public class JWTTokenValidatorTest extends org.junit.Assert {
         TokenRequirements tokenRequirements = validatorParameters.getTokenRequirements();
         
         // Create a ValidateTarget consisting of a JWT Token
-        ReceivedToken validateTarget = new ReceivedToken(token);
+        ReceivedToken validateTarget = new ReceivedToken(createTokenWrapper(token));
         tokenRequirements.setValidateTarget(validateTarget);
         validatorParameters.setToken(validateTarget);
         
@@ -424,6 +428,13 @@ public class JWTTokenValidatorTest extends org.junit.Assert {
                 }
             }
         }
+    }
+    
+    private Element createTokenWrapper(String token) {
+        Document doc = DOMUtils.newDocument();
+        Element tokenWrapper = doc.createElementNS(null, "TokenWrapper");
+        tokenWrapper.setTextContent(token);
+        return tokenWrapper;
     }
     
     private static class RoleJWTClaimsProvider extends DefaultJWTClaimsProvider {

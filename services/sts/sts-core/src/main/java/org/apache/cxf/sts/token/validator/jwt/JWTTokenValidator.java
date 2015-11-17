@@ -25,6 +25,10 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.soap.Node;
+
+import org.w3c.dom.Element;
+
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.security.SimplePrincipal;
 import org.apache.cxf.rs.security.jose.common.JoseConstants;
@@ -37,6 +41,7 @@ import org.apache.cxf.rs.security.jose.jwt.JwtUtils;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.request.ReceivedToken.STATE;
+import org.apache.cxf.sts.token.realm.JWTRealmCodec;
 import org.apache.cxf.sts.token.validator.TokenValidator;
 import org.apache.cxf.sts.token.validator.TokenValidatorParameters;
 import org.apache.cxf.sts.token.validator.TokenValidatorResponse;
@@ -53,6 +58,7 @@ public class JWTTokenValidator implements TokenValidator {
     private int clockOffset;
     private int ttl;
     private JWTRoleParser roleParser;
+    private JWTRealmCodec realmCodec;
     
     /**
      * Return true if this TokenValidator implementation is capable of validating the
@@ -68,14 +74,17 @@ public class JWTTokenValidator implements TokenValidator {
      */
     public boolean canHandleToken(ReceivedToken validateTarget, String realm) {
         Object token = validateTarget.getToken();
-        if (token instanceof String) {
-            try {
-                JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer((String)token);
-                if (jwtConsumer.getJwtToken() != null) {
-                    return true;
+        if (token instanceof Element) {
+            Element tokenEl = (Element)token;
+            if (tokenEl.getFirstChild().getNodeType() == Node.TEXT_NODE) {
+                try {
+                    JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(tokenEl.getTextContent());
+                    if (jwtConsumer.getJwtToken() != null) {
+                        return true;
+                    }
+                } catch (RuntimeException ex) {
+                    return false;
                 }
-            } catch (RuntimeException ex) {
-                return false;
             }
         }
         return false;
@@ -93,8 +102,8 @@ public class JWTTokenValidator implements TokenValidator {
         validateTarget.setState(STATE.INVALID);
         response.setToken(validateTarget);
         
-        String token = (String)validateTarget.getToken();
-        if (token == null) {
+        String token = ((Element)validateTarget.getToken()).getTextContent();
+        if (token == null || "".equals(token)) {
             return response;
         }
         
@@ -137,24 +146,11 @@ public class JWTTokenValidator implements TokenValidator {
         }
         
         
-        /*
-        // Get the realm of the SAML token
-        String tokenRealm = null;
-        if (samlRealmCodec != null) {
-            tokenRealm = samlRealmCodec.getRealmFromToken(assertion);
-            // verify the realm against the cached token
-            if (secToken != null) {
-                Map<String, Object> props = secToken.getProperties();
-                if (props != null) {
-                    String cachedRealm = (String)props.get(STSConstants.TOKEN_REALM);
-                    if (cachedRealm != null && !tokenRealm.equals(cachedRealm)) {
-                        return response;
-                    }
-                }
-            }
+        // Get the realm of the JWT Token
+        if (realmCodec != null) {
+            String tokenRealm = realmCodec.getRealmFromToken(jwt);
+            response.setTokenRealm(tokenRealm);
         }
-        response.setTokenRealm(tokenRealm);
-        */
 
         if (isVerifiedWithAPublicKey(jwt)) {
             Principal principal = new SimplePrincipal(jwt.getClaims().getSubject());
@@ -214,5 +210,13 @@ public class JWTTokenValidator implements TokenValidator {
 
     public void setRoleParser(JWTRoleParser roleParser) {
         this.roleParser = roleParser;
+    }
+
+    public JWTRealmCodec getRealmCodec() {
+        return realmCodec;
+    }
+
+    public void setRealmCodec(JWTRealmCodec realmCodec) {
+        this.realmCodec = realmCodec;
     }
 }

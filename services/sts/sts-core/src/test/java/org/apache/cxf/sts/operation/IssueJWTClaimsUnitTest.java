@@ -77,6 +77,7 @@ import org.apache.cxf.ws.security.sts.provider.model.OnBehalfOfType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseCollectionType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
+import org.apache.cxf.ws.security.sts.provider.model.RequestedSecurityTokenType;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -136,20 +137,21 @@ public class IssueJWTClaimsUnitTest extends org.junit.Assert {
                 webServiceContext);
         
         // Test the generated token.
-        String jwtToken = null;
+        Element token = null;
         for (Object tokenObject : securityTokenResponse.get(0).getAny()) {
-            if (tokenObject instanceof Element
-                && REQUESTED_SECURITY_TOKEN.getLocalPart().equals(((Element)tokenObject).getLocalName())
-                && REQUESTED_SECURITY_TOKEN.getNamespaceURI().equals(((Element)tokenObject).getNamespaceURI())) {
-                jwtToken = ((Element)tokenObject).getTextContent();
+            if (tokenObject instanceof JAXBElement<?>
+                && REQUESTED_SECURITY_TOKEN.equals(((JAXBElement<?>)tokenObject).getName())) {
+                RequestedSecurityTokenType rstType = 
+                    (RequestedSecurityTokenType)((JAXBElement<?>)tokenObject).getValue();
+                token = (Element)rstType.getAny();
                 break;
             }
         }
         
-        assertNotNull(jwtToken);
+        assertNotNull(token);
         
         // Validate the token
-        JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(jwtToken);
+        JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token.getTextContent());
         JwtToken jwt = jwtConsumer.getJwtToken();
         Assert.assertEquals("alice", jwt.getClaim(JwtConstants.CLAIM_SUBJECT));
         assertEquals(jwt.getClaim(ClaimTypes.LASTNAME.toString()), "doe");
@@ -262,20 +264,21 @@ public class IssueJWTClaimsUnitTest extends org.junit.Assert {
                 webServiceContext);
         
         // Test the generated token.
-        String jwtToken = null;
+        Element token = null;
         for (Object tokenObject : securityTokenResponse.get(0).getAny()) {
-            if (tokenObject instanceof Element
-                && REQUESTED_SECURITY_TOKEN.getLocalPart().equals(((Element)tokenObject).getLocalName())
-                && REQUESTED_SECURITY_TOKEN.getNamespaceURI().equals(((Element)tokenObject).getNamespaceURI())) {
-                jwtToken = ((Element)tokenObject).getTextContent();
+            if (tokenObject instanceof JAXBElement<?>
+                && REQUESTED_SECURITY_TOKEN.equals(((JAXBElement<?>)tokenObject).getName())) {
+                RequestedSecurityTokenType rstType = 
+                    (RequestedSecurityTokenType)((JAXBElement<?>)tokenObject).getValue();
+                token = (Element)rstType.getAny();
                 break;
             }
         }
         
-        assertNotNull(jwtToken);
+        assertNotNull(token);
         
         // Validate the token
-        JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(jwtToken);
+        JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token.getTextContent());
         JwtToken jwt = jwtConsumer.getJwtToken();
         Assert.assertEquals("alice", jwt.getClaim(JwtConstants.CLAIM_SUBJECT));
         assertEquals(jwt.getClaim(ClaimTypes.LASTNAME.toString()), "doe");
@@ -387,20 +390,21 @@ public class IssueJWTClaimsUnitTest extends org.junit.Assert {
                 request, webServiceContext);       
         
         // Test the generated token.
-        String jwtToken = null;
+        Element token = null;
         for (Object tokenObject : securityTokenResponseList.get(0).getAny()) {
-            if (tokenObject instanceof Element
-                && REQUESTED_SECURITY_TOKEN.getLocalPart().equals(((Element)tokenObject).getLocalName())
-                && REQUESTED_SECURITY_TOKEN.getNamespaceURI().equals(((Element)tokenObject).getNamespaceURI())) {
-                jwtToken = ((Element)tokenObject).getTextContent();
+            if (tokenObject instanceof JAXBElement<?>
+                && REQUESTED_SECURITY_TOKEN.equals(((JAXBElement<?>)tokenObject).getName())) {
+                RequestedSecurityTokenType rstType = 
+                    (RequestedSecurityTokenType)((JAXBElement<?>)tokenObject).getValue();
+                token = (Element)rstType.getAny();
                 break;
             }
         }
         
-        assertNotNull(jwtToken);
+        assertNotNull(token);
         
         // Validate the token
-        JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(jwtToken);
+        JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token.getTextContent());
         JwtToken jwt = jwtConsumer.getJwtToken();
         // subject unchanged
         Assert.assertEquals("alice", jwt.getClaim(JwtConstants.CLAIM_SUBJECT));
@@ -539,20 +543,21 @@ public class IssueJWTClaimsUnitTest extends org.junit.Assert {
                 request, webServiceContext);       
         
         // Test the generated token.
-        String jwtToken = null;
+        Element token = null;
         for (Object tokenObject : securityTokenResponseList.get(0).getAny()) {
-            if (tokenObject instanceof Element
-                && REQUESTED_SECURITY_TOKEN.getLocalPart().equals(((Element)tokenObject).getLocalName())
-                && REQUESTED_SECURITY_TOKEN.getNamespaceURI().equals(((Element)tokenObject).getNamespaceURI())) {
-                jwtToken = ((Element)tokenObject).getTextContent();
+            if (tokenObject instanceof JAXBElement<?>
+                && REQUESTED_SECURITY_TOKEN.equals(((JAXBElement<?>)tokenObject).getName())) {
+                RequestedSecurityTokenType rstType = 
+                    (RequestedSecurityTokenType)((JAXBElement<?>)tokenObject).getValue();
+                token = (Element)rstType.getAny();
                 break;
             }
         }
         
-        assertNotNull(jwtToken);
+        assertNotNull(token);
         
         // Validate the token
-        JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(jwtToken);
+        JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token.getTextContent());
         JwtToken jwt = jwtConsumer.getJwtToken();
         // subject changed (to uppercase)
         Assert.assertEquals("ALICE", jwt.getClaim(JwtConstants.CLAIM_SUBJECT));

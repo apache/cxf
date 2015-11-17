@@ -1117,7 +1117,9 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
             writer.writeStartElement("wst", "ValidateTarget", namespace);
 
             Element el = tok.getToken();
-            StaxUtils.copy(el, writer);
+            if (el != null) {
+                StaxUtils.copy(el, writer);
+            }
 
             writer.writeEndElement();
             writer.writeEndElement();
