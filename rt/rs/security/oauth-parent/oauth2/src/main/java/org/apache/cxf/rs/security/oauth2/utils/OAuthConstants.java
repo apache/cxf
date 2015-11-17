@@ -57,9 +57,10 @@ public final class OAuthConstants {
     public static final String BEARER_TOKEN_TYPE = "bearer";
     public static final String HAWK_TOKEN_TYPE = "hawk";
     
-    // http://datatracker.ietf.org/doc/draft-sakimura-oauth-tcse
+    // https://tools.ietf.org/html/rfc7636
     public static final String AUTHORIZATION_CODE_VERIFIER = "code_verifier";
     public static final String AUTHORIZATION_CODE_CHALLENGE = "code_challenge";
+    public static final String AUTHORIZATION_CODE_CHALLENGE_METHOD = "code_challenge_method";
     
     // CXF-specific
     public static final String REFRESH_TOKEN_TYPE = "refresh";

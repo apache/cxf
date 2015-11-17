@@ -36,6 +36,7 @@ import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
+import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
@@ -45,8 +46,10 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenGrant;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.grants.code.AuthorizationCodeGrant;
+import org.apache.cxf.rs.security.oauth2.grants.code.CodeVerifierTransformer;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
+import org.apache.cxf.rt.security.crypto.CryptoUtils;
 
 @PreMatching
 @Priority(Priorities.AUTHENTICATION + 1)
@@ -68,6 +71,7 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
     private boolean setFormPostResponseMode;
     private boolean faultAccessDeniedResponses;
     private boolean applicationCanHandleAccessDenied;
+    private CodeVerifierTransformer codeVerifierTransformer;
         
     @Override
     public void filter(ContainerRequestContext rc) throws IOException {
@@ -136,19 +140,32 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
                                              getAbsoluteRedirectUri(ui).toString(), 
                                              theState, 
                                              theScope);
+        setFormPostResponseMode(ub, redirectState);
         setAdditionalCodeRequestParams(ub, redirectState);
         URI uri = ub.build();
         return Response.seeOther(uri).build();
     }
 
-    protected void setAdditionalCodeRequestParams(UriBuilder ub, MultivaluedMap<String, String> redirectState) {
+    protected void setFormPostResponseMode(UriBuilder ub, MultivaluedMap<String, String> redirectState) {
         if (setFormPostResponseMode) {
             // This property is described in OIDC OAuth 2.0 Form Post Response Mode which is technically
             // can be used without OIDC hence this is set in this filter as opposed to the OIDC specific one.
             ub.queryParam("response_mode", "form_post");
         }
     }
-
+    protected void setCodeVerifier(UriBuilder ub, MultivaluedMap<String, String> redirectState) {
+        if (codeVerifierTransformer != null) {
+            String codeVerifier = Base64UrlUtility.encode(CryptoUtils.generateSecureRandomBytes(32));
+            ub.queryParam(OAuthConstants.AUTHORIZATION_CODE_CHALLENGE, 
+                          codeVerifierTransformer.transformCodeVerifier(codeVerifier));
+            ub.queryParam(OAuthConstants.AUTHORIZATION_CODE_CHALLENGE_METHOD, 
+                          codeVerifierTransformer.getChallengeMethod());
+        }
+    }
+    protected void setAdditionalCodeRequestParams(UriBuilder ub, MultivaluedMap<String, String> redirectState) {
+    }
+    
+    
     private URI getAbsoluteRedirectUri(UriInfo ui) {
         if (redirectUri != null) {
             return URI.create(redirectUri);
@@ -314,5 +331,9 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
 
     public void setApplicationCanHandleAccessDenied(boolean applicationCanHandleAccessDenied) {
         this.applicationCanHandleAccessDenied = applicationCanHandleAccessDenied;
+    }
+
+    public void setCodeVerifierTransformer(CodeVerifierTransformer codeVerifierTransformer) {
+        this.codeVerifierTransformer = codeVerifierTransformer;
     }
 }
