@@ -126,6 +126,9 @@ public final class FormUtils {
                                              String postBody, 
                                              String enc,
                                              boolean decode) {
+        if (StringUtils.isEmpty(postBody)) {
+            return;
+        }
         List<String> parts = Arrays.asList(StringUtils.split(postBody, "&"));
         checkNumberOfParts(m, parts.size());
         for (String part : parts) {
