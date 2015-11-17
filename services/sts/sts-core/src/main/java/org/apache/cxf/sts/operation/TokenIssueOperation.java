@@ -39,7 +39,6 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.rt.security.claims.ClaimCollection;
 import org.apache.cxf.sts.QNameConstants;
-import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.event.STSIssueFailureEvent;
 import org.apache.cxf.sts.event.STSIssueSuccessEvent;
 import org.apache.cxf.sts.request.KeyRequirements;
@@ -294,14 +293,13 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
         } else {
             if (tokenResponse.getToken() instanceof String) {
                 Document doc = DOMUtils.newDocument();
-                Element requestedTokenEl = doc.createElementNS(STSConstants.WST_NS_05_12, 
-                                                             "RequestedSecurityToken");
-                requestedTokenEl.setTextContent((String)tokenResponse.getToken());
-                response.getAny().add(requestedTokenEl);
+                Element tokenWrapper = doc.createElementNS(null, "TokenWrapper");
+                tokenWrapper.setTextContent((String)tokenResponse.getToken());
+                requestedTokenType.setAny(tokenWrapper);
             } else {
                 requestedTokenType.setAny(tokenResponse.getToken());
-                response.getAny().add(requestedToken);
             }
+            response.getAny().add(requestedToken);
         }
 
         if (returnReferences) {

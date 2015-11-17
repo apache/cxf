@@ -57,6 +57,7 @@
         <ref bean="transportX509TokenValidator"/>
         <ref bean="transportUsernameTokenValidator"/>
         <ref bean="transportCustomBSTTokenValidator"/>
+        <ref bean="transportJWTTokenValidator"/>
     </util:list>
     <bean id="transportCustomBSTTokenProvider" class="org.apache.cxf.systest.sts.deployment.CustomBSTTokenProvider">
         </bean>
@@ -103,6 +104,8 @@
     <bean id="transportUsernameTokenValidator" class="org.apache.cxf.sts.token.validator.UsernameTokenValidator">
         </bean>
     <bean id="transportSamlTokenValidator" class="org.apache.cxf.sts.token.validator.SAMLTokenValidator">
+        </bean>
+    <bean id="transportJWTTokenValidator" class="org.apache.cxf.sts.token.validator.jwt.JWTTokenValidator">
         </bean>
     <bean id="transportService" class="org.apache.cxf.sts.service.StaticService">
         <property name="endpoints" ref="transportEndpoints"/>
