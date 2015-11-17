@@ -155,8 +155,9 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
     }
     protected void setCodeVerifier(UriBuilder ub, MultivaluedMap<String, String> redirectState) {
         if (codeVerifierTransformer != null) {
+            String codeVerifier = redirectState.getFirst(OAuthConstants.AUTHORIZATION_CODE_VERIFIER);
             ub.queryParam(OAuthConstants.AUTHORIZATION_CODE_CHALLENGE, 
-                          redirectState.getFirst(OAuthConstants.AUTHORIZATION_CODE_VERIFIER));
+                          codeVerifierTransformer.transformCodeVerifier(codeVerifier));
             ub.queryParam(OAuthConstants.AUTHORIZATION_CODE_CHALLENGE_METHOD, 
                           codeVerifierTransformer.getChallengeMethod());
         }
@@ -220,17 +221,26 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
 
     protected MultivaluedMap<String, String> createRedirectState(ContainerRequestContext rc, UriInfo ui) {
         if (clientStateManager == null) {
-            return null;
+            return new MetadataMap<String, String>();
         }
-        return clientStateManager.toRedirectState(mc, 
-                                                  toCodeRequestState(rc, ui));
+        String codeVerifier = null;
+        MultivaluedMap<String, String> codeRequestState = toCodeRequestState(rc, ui);
+        if (codeVerifierTransformer != null) {
+            codeVerifier = Base64UrlUtility.encode(CryptoUtils.generateSecureRandomBytes(32));
+            codeRequestState.putSingle(OAuthConstants.AUTHORIZATION_CODE_VERIFIER, 
+                                       codeVerifier);
+        }
+        MultivaluedMap<String, String> redirectState = 
+            clientStateManager.toRedirectState(mc, codeRequestState);
+        if (codeVerifier != null) {
+            redirectState.putSingle(OAuthConstants.AUTHORIZATION_CODE_VERIFIER, codeVerifier);
+        }
+        return redirectState;
     }
     protected MultivaluedMap<String, String> toCodeRequestState(ContainerRequestContext rc, UriInfo ui) {
         MultivaluedMap<String, String> state = toRequestState(rc, ui);
-        if (codeVerifierTransformer != null) {
-            String codeVerifier = Base64UrlUtility.encode(CryptoUtils.generateSecureRandomBytes(32));
-            state.putSingle(OAuthConstants.AUTHORIZATION_CODE_VERIFIER, 
-                          codeVerifierTransformer.transformCodeVerifier(codeVerifier));
+        if (state == null) {
+            state = new MetadataMap<String, String>();
         }
         return state;
     }
