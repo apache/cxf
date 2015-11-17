@@ -141,6 +141,7 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
                                              theState, 
                                              theScope);
         setFormPostResponseMode(ub, redirectState);
+        setCodeVerifier(ub, redirectState);
         setAdditionalCodeRequestParams(ub, redirectState);
         URI uri = ub.build();
         return Response.seeOther(uri).build();
