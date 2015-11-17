@@ -36,6 +36,7 @@ public class AuthorizationCodeGrant implements AccessTokenGrant {
     private static final long serialVersionUID = -3738825769770411453L;
     private String code;
     private String redirectUri;
+    private String codeVerifier;
     
     public AuthorizationCodeGrant() {
         
@@ -96,7 +97,18 @@ public class AuthorizationCodeGrant implements AccessTokenGrant {
         if (redirectUri != null) {
             map.putSingle(OAuthConstants.REDIRECT_URI, redirectUri);
         }
+        if (codeVerifier != null) {
+            map.putSingle(OAuthConstants.AUTHORIZATION_CODE_VERIFIER, codeVerifier);
+        }
         return map;
+    }
+
+    public String getCodeVerifier() {
+        return codeVerifier;
+    }
+
+    public void setCodeVerifier(String codeVerifier) {
+        this.codeVerifier = codeVerifier;
     }
 
 }

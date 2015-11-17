@@ -43,7 +43,6 @@ import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.FormUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
-import org.apache.cxf.rs.security.oauth2.common.AccessTokenGrant;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.grants.code.AuthorizationCodeGrant;
 import org.apache.cxf.rs.security.oauth2.grants.code.CodeVerifierTransformer;
@@ -156,9 +155,8 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
     }
     protected void setCodeVerifier(UriBuilder ub, MultivaluedMap<String, String> redirectState) {
         if (codeVerifierTransformer != null) {
-            String codeVerifier = Base64UrlUtility.encode(CryptoUtils.generateSecureRandomBytes(32));
             ub.queryParam(OAuthConstants.AUTHORIZATION_CODE_CHALLENGE, 
-                          codeVerifierTransformer.transformCodeVerifier(codeVerifier));
+                          redirectState.getFirst(OAuthConstants.AUTHORIZATION_CODE_VERIFIER));
             ub.queryParam(OAuthConstants.AUTHORIZATION_CODE_CHALLENGE_METHOD, 
                           codeVerifierTransformer.getChallengeMethod());
         }
@@ -181,13 +179,19 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
                                        UriInfo ui,
                                        MultivaluedMap<String, String> requestParams) {
         
+        MultivaluedMap<String, String> state = null;
+        if (clientStateManager != null) {
+            state = clientStateManager.fromRedirectState(mc, requestParams);
+        }
+        
         String codeParam = requestParams.getFirst(OAuthConstants.AUTHORIZATION_CODE_VALUE);
         ClientAccessToken at = null;
         if (codeParam != null) {
-            AccessTokenGrant grant = new AuthorizationCodeGrant(codeParam, getAbsoluteRedirectUri(ui));
+            AuthorizationCodeGrant grant = new AuthorizationCodeGrant(codeParam, getAbsoluteRedirectUri(ui));
+            grant.setCodeVerifier(state.getFirst(OAuthConstants.AUTHORIZATION_CODE_VERIFIER));
             at = OAuthClientUtils.getAccessToken(accessTokenServiceClient, consumer, grant);
         }
-        ClientTokenContext tokenContext = initializeClientTokenContext(rc, at, requestParams);
+        ClientTokenContext tokenContext = initializeClientTokenContext(rc, at, state);
         if (at != null && clientTokenContextManager != null) {
             clientTokenContextManager.setClientTokenContext(mc, tokenContext);
         }
@@ -196,11 +200,7 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
     
     protected ClientTokenContext initializeClientTokenContext(ContainerRequestContext rc, 
                                                               ClientAccessToken at, 
-                                                              MultivaluedMap<String, String> params) {
-        MultivaluedMap<String, String> state = null;
-        if (clientStateManager != null) {
-            state = clientStateManager.fromRedirectState(mc, params);
-        }
+                                                              MultivaluedMap<String, String> state) {
         ClientTokenContext tokenContext = createTokenContext(rc, at, state);
         ((ClientTokenContextImpl)tokenContext).setToken(at);
         ((ClientTokenContextImpl)tokenContext).setState(state);
@@ -226,7 +226,13 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
                                                   toCodeRequestState(rc, ui));
     }
     protected MultivaluedMap<String, String> toCodeRequestState(ContainerRequestContext rc, UriInfo ui) {
-        return toRequestState(rc, ui);
+        MultivaluedMap<String, String> state = toRequestState(rc, ui);
+        if (codeVerifierTransformer != null) {
+            String codeVerifier = Base64UrlUtility.encode(CryptoUtils.generateSecureRandomBytes(32));
+            state.putSingle(OAuthConstants.AUTHORIZATION_CODE_VERIFIER, 
+                          codeVerifierTransformer.transformCodeVerifier(codeVerifier));
+        }
+        return state;
     }
     protected MultivaluedMap<String, String> toRequestState(ContainerRequestContext rc, UriInfo ui) {
         MultivaluedMap<String, String> requestState = new MetadataMap<String, String>();
