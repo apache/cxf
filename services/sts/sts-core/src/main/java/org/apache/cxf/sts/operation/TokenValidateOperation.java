@@ -26,7 +26,11 @@ import java.util.logging.Logger;
 import javax.xml.bind.JAXBElement;
 import javax.xml.ws.WebServiceContext;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.rt.security.claims.ClaimCollection;
 import org.apache.cxf.sts.QNameConstants;
 import org.apache.cxf.sts.RealmParser;
@@ -229,7 +233,14 @@ public class TokenValidateOperation extends AbstractOperation implements Validat
                 QNameConstants.WS_TRUST_FACTORY.createRequestedSecurityTokenType();
             JAXBElement<RequestedSecurityTokenType> requestedToken = 
                 QNameConstants.WS_TRUST_FACTORY.createRequestedSecurityToken(requestedTokenType);
-            requestedTokenType.setAny(tokenProviderResponse.getToken());
+            if (tokenProviderResponse.getToken() instanceof String) {
+                Document doc = DOMUtils.newDocument();
+                Element tokenWrapper = doc.createElementNS(null, "TokenWrapper");
+                tokenWrapper.setTextContent((String)tokenProviderResponse.getToken());
+                requestedTokenType.setAny(tokenWrapper);
+            } else {
+                requestedTokenType.setAny(tokenProviderResponse.getToken());
+            }
             response.getAny().add(requestedToken);
             
             // Lifetime
