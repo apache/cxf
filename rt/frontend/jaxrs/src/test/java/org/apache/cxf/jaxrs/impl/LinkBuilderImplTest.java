@@ -59,6 +59,12 @@ public class LinkBuilderImplTest extends Assert {
     }
     
     @Test
+    public void testSelfLink() throws Exception {
+        Link link = new LinkBuilderImpl().baseUri("http://localhost:8080/resource/1").rel("self").build();
+        assertEquals("<http://localhost:8080/resource/1>;rel=\"self\"", link.toString());
+    }
+    
+    @Test
     public void testBuildManyRels() throws Exception {
         Link.Builder linkBuilder = new LinkBuilderImpl();
         Link prevLink = linkBuilder.uri("http://example.com/page1").rel("1").rel("2").build();
