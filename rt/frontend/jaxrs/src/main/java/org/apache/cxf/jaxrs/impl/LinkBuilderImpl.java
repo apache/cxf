@@ -37,7 +37,7 @@ import org.apache.cxf.jaxrs.utils.HttpUtils;
 
 public class LinkBuilderImpl implements Builder {
     private static final String DOUBLE_QUOTE = "\"";
-    private UriBuilder ub = new UriBuilderImpl();
+    private UriBuilder ub;
     private URI baseUri;
     private Map<String, String> params = new HashMap<String, String>(6);
     
@@ -55,9 +55,16 @@ public class LinkBuilderImpl implements Builder {
     }
 
     private URI getResolvedUri(Object... values) {
+        if (ub == null) {
+            ub = new UriBuilderImpl();
+            if (baseUri != null) {
+                ub.uri(baseUri);    
+            }
+            
+        }
         URI uri = ub.build(values);
                 
-        if (!uri.isAbsolute() && baseUri != null) {
+        if (!uri.isAbsolute() && baseUri != null && baseUri.isAbsolute()) {
             UriBuilder linkUriBuilder = UriBuilder.fromUri(baseUri);
             return HttpUtils.resolve(linkUriBuilder, uri);    
         } else {
