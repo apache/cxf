@@ -37,7 +37,7 @@ import org.apache.cxf.jaxrs.utils.HttpUtils;
 
 public class LinkBuilderImpl implements Builder {
     private static final String DOUBLE_QUOTE = "\"";
-    private UriBuilder ub;
+    private UriBuilder ub = new UriBuilderImpl();
     private URI baseUri;
     private Map<String, String> params = new HashMap<String, String>(6);
     
