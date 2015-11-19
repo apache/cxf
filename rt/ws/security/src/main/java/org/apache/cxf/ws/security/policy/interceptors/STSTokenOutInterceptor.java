@@ -51,7 +51,11 @@ public class STSTokenOutInterceptor extends AbstractPhaseInterceptor<Message> {
     private TokenRequestParams tokenParams;
 
     public STSTokenOutInterceptor(AuthParams authParams, String stsWsdlLocation, Bus bus) {
-        super(Phase.PREPARE_SEND);
+        this(Phase.PREPARE_SEND, authParams, stsWsdlLocation, bus);
+    }
+    
+    public STSTokenOutInterceptor(String phase, AuthParams authParams, String stsWsdlLocation, Bus bus) {
+        super(phase);
         this.stsClient = configureBasicSTSClient(authParams, stsWsdlLocation, bus);
         this.tokenParams = new TokenRequestParams();
     }
@@ -79,6 +83,12 @@ public class STSTokenOutInterceptor extends AbstractPhaseInterceptor<Message> {
         if (tok == null) {
             LOG.warning("Security token was not retrieved from STS");
         }
+        processToken(message, tok);
+    }
+    
+    // An extension point to allow custom processing of the token
+    protected void processToken(Message message, SecurityToken tok) {
+        
     }
     
     public STSClient getSTSClient() {
