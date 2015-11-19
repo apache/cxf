@@ -164,7 +164,7 @@ public class JoseSessionTokenProvider implements SessionAuthenticityTokenProvide
             state.setRedirectUri(parts[5]);
         }
         if (!StringUtils.isEmpty(parts[6])) {
-            state.setRedirectUri(parts[6]);
+            state.setNonce(parts[6]);
         }
         return state;
     }
