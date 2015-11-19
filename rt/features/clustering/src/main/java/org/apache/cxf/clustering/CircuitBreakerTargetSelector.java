@@ -33,13 +33,16 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.transport.Conduit;
 
 public class CircuitBreakerTargetSelector extends FailoverTargetSelector {
     public static final int DEFAULT_TIMEOUT = 1000 * 60 /* 1 minute timeout as default */;
     public static final int DEFAULT_THESHOLD = 1;
 
+    private static final String IS_SELECTED = "org.apache.cxf.clustering.CircuitBreakerTargetSelector.IS_SELECTED";
     private static final Logger LOG = LogUtils.getL7dLogger(CircuitBreakerTargetSelector.class);
     
     private final int threshold;
@@ -60,6 +63,14 @@ public class CircuitBreakerTargetSelector extends FailoverTargetSelector {
     public synchronized void setStrategy(FailoverStrategy strategy) {
         super.setStrategy(strategy);
         
+        // Registering the original endpoint in the list of circuit breakers
+        if (getEndpoint() != null) {
+            circuits.putIfAbsent(
+                getEndpoint().getEndpointInfo().getAddress(), 
+                new ZestCircuitBreaker(threshold, timeout)
+            );
+        }
+        
         if (strategy != null) {
             for (String alternative: strategy.getAlternateAddresses(null /* no Exchange at this point */)) {
                 if (!StringUtils.isEmpty(alternative)) {
@@ -70,6 +81,37 @@ public class CircuitBreakerTargetSelector extends FailoverTargetSelector {
                 }
             }
         }
+    }
+    @Override
+    public synchronized Conduit selectConduit(Message message) {
+        Conduit c = message.get(Conduit.class);
+        if (c != null) {
+            return c;
+        }
+        Exchange exchange = message.getExchange();
+        InvocationKey key = new InvocationKey(exchange);
+        InvocationContext invocation = inProgress.get(key);
+        if (invocation != null && !invocation.getContext().containsKey(IS_SELECTED)) {
+            final String address = (String) message.get(Message.ENDPOINT_ADDRESS);
+            
+            if (isFailoverRequired(address)) {
+                Endpoint target = getFailoverTarget(exchange, invocation);
+                
+                if (target == null) {
+                    throw new Fault(new FailoverFailedException(
+                        "None of alternative addresses are available at the moment"));
+                }
+
+                if (isEndpointChanged(address, target)) {
+                    setEndpoint(target);
+                    message.put(Message.ENDPOINT_ADDRESS, target.getEndpointInfo().getAddress());
+                    overrideAddressProperty(invocation.getContext());
+                    invocation.getContext().put(IS_SELECTED, null);
+                }
+            }
+        }
+
+        return getSelectedConduit(message);
     }
     
     @Override
@@ -135,5 +177,31 @@ public class CircuitBreakerTargetSelector extends FailoverTargetSelector {
                 circuitBreaker.markSuccess();
             }
         }
+    }
+    
+    private boolean isEndpointChanged(final String address, final Endpoint target) {
+        if (address != null) {
+            return !address.startsWith(target.getEndpointInfo().getAddress());
+        } 
+        
+        if (getEndpoint().equals(target)) {
+            return false;
+        }
+        
+        return !getEndpoint().getEndpointInfo().getAddress().startsWith(
+            target.getEndpointInfo().getAddress());
+    }
+    
+    protected boolean isFailoverRequired(final String address) {
+        if (address != null) {
+            for (final Map.Entry<String, CircuitBreaker> entry: circuits.entrySet()) {
+                if (address.startsWith(entry.getKey())) {
+                    return !entry.getValue().allowRequest();
+                }
+            }
+        }
+        
+        LOG.log(Level.WARNING, "No circuit breaker present for address: " + address);
+        return false;
     }
 }
