@@ -248,6 +248,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
             state.setAudience(params.getFirst(OAuthConstants.CLIENT_AUDIENCE));
             state.setProposedScope(params.getFirst(OAuthConstants.SCOPE));
             state.setState(params.getFirst(OAuthConstants.STATE));
+            state.setNonce(params.getFirst(OAuthConstants.NONCE));
         }
         return state;
     }
