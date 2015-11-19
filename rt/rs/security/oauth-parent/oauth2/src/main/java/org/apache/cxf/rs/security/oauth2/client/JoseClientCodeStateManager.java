@@ -61,7 +61,7 @@ public class JoseClientCodeStateManager implements ClientCodeStateManager {
         if (generateNonce && theSigProvider != null) {
             JwsCompactProducer nonceProducer = new JwsCompactProducer(OAuthUtils.generateRandomTokenKey());
             String nonceParam = nonceProducer.signWith(theSigProvider);
-            requestState.putSingle("nonce", nonceParam);
+            requestState.putSingle(OAuthConstants.NONCE, nonceParam);
         }
         Map<String, Object> stateMap = CastUtils.cast((Map<?, ?>)requestState);
         String json = jsonp.toJson(stateMap);

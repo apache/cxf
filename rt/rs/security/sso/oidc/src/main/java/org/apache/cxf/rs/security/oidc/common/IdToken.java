@@ -23,10 +23,11 @@ import java.util.Map;
 
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
+import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 public class IdToken extends UserInfo {
     public static final String AUTH_TIME_CLAIM = "auth_time";
-    public static final String NONCE_CLAIM = "nonce";
+    public static final String NONCE_CLAIM = OAuthConstants.NONCE;
     public static final String ACR_CLAIM = "acr";
     public static final String AZP_CLAIM = "azp";
     public static final String AMR_CLAIM = "amr";
