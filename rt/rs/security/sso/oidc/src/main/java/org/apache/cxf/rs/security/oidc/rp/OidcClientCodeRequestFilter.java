@@ -85,7 +85,7 @@ public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
     }
     private void validateIdToken(IdToken idToken, MultivaluedMap<String, String> state) {
         
-        String nonce = state.getFirst("nonce");
+        String nonce = state.getFirst(IdToken.NONCE_CLAIM);
         String tokenNonce = idToken.getNonce();
         if (nonce != null && (tokenNonce == null || !nonce.equals(tokenNonce))) {
             throw ExceptionUtils.toNotAuthorizedException(null, null);
