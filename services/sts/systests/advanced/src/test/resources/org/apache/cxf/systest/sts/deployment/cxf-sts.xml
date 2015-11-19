@@ -111,8 +111,7 @@
         <property name="endpoints" ref="transportEndpoints"/>
     </bean>
     <util:list id="transportEndpoints">
-        <value>https://localhost:(\d)*/doubleit/services/doubleittransport.*
-                </value>
+        <value>https://localhost:(\d)*/doubleit/services/doubleit.*</value>
     </util:list>
     <bean id="transportSTSProperties" class="org.apache.cxf.sts.StaticSTSProperties">
         <property name="signaturePropertiesFile" value="stsKeystore.properties"/>
