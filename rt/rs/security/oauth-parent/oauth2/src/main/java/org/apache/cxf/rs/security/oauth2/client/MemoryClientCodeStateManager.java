@@ -38,13 +38,15 @@ public class MemoryClientCodeStateManager implements ClientCodeStateManager {
     public MultivaluedMap<String, String> toRedirectState(MessageContext mc, 
                                                           MultivaluedMap<String, String> requestState) {
         String stateParam = OAuthUtils.generateRandomTokenKey();
+        MultivaluedMap<String, String> redirectMap = new MetadataMap<String, String>();
+        
         if (generateNonce) {
             String nonceParam = MessageDigestUtils.generate(CryptoUtils.generateSecureRandomBytes(16));
             requestState.putSingle(OAuthConstants.NONCE, nonceParam);
+            redirectMap.putSingle(OAuthConstants.NONCE, nonceParam);
         }
         map.put(stateParam, requestState);
         OAuthUtils.setSessionToken(mc, stateParam, "state", 0);
-        MultivaluedMap<String, String> redirectMap = new MetadataMap<String, String>();
         redirectMap.putSingle(OAuthConstants.STATE, stateParam);
         return redirectMap;
     }

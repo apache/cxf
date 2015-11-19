@@ -57,11 +57,13 @@ public class JoseClientCodeStateManager implements ClientCodeStateManager {
         if (theEncryptionProvider == null && theSigProvider == null) {
             throw new OAuthServiceException("The state can not be protected");
         }
+        MultivaluedMap<String, String> redirectMap = new MetadataMap<String, String>();
         
         if (generateNonce && theSigProvider != null) {
             JwsCompactProducer nonceProducer = new JwsCompactProducer(OAuthUtils.generateRandomTokenKey());
             String nonceParam = nonceProducer.signWith(theSigProvider);
             requestState.putSingle(OAuthConstants.NONCE, nonceParam);
+            redirectMap.putSingle(OAuthConstants.NONCE, nonceParam);
         }
         Map<String, Object> stateMap = CastUtils.cast((Map<?, ?>)requestState);
         String json = jsonp.toJson(stateMap);
@@ -75,15 +77,14 @@ public class JoseClientCodeStateManager implements ClientCodeStateManager {
         if (theEncryptionProvider != null) {
             stateParam = theEncryptionProvider.encrypt(StringUtils.toBytesUTF8(stateParam), null);
         }
-        MultivaluedMap<String, String> map = new MetadataMap<String, String>();
         if (storeInSession) {
             String sessionStateAttribute = OAuthUtils.generateRandomTokenKey();
             OAuthUtils.setSessionToken(mc, stateParam, sessionStateAttribute, 0);
             stateParam = sessionStateAttribute;
         }
-        map.putSingle(OAuthConstants.STATE, stateParam);
+        redirectMap.putSingle(OAuthConstants.STATE, stateParam);
         
-        return map;
+        return redirectMap;
     }
 
     @Override
