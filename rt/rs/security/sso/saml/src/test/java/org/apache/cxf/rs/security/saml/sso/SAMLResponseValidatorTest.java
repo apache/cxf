@@ -462,6 +462,7 @@ public class SAMLResponseValidatorTest extends org.junit.Assert {
         InputStream input = Merlin.loadInputStream(loader, "alice.jks");
         keyStore.load(input, "password".toCharArray());
         ((Merlin)issuerCrypto).setKeyStore(keyStore);
+        issuerCrypto.setDefaultX509Identifier("alice");
         
         response.getAssertions().add(assertion.getSaml2());
         signResponse(response, "alice", "password", issuerCrypto, false);
