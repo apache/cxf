@@ -32,6 +32,8 @@ import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.rs.security.oauth2.client.ClientCodeRequestFilter;
 import org.apache.cxf.rs.security.oauth2.client.ClientTokenContext;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
+import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
+import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rs.security.oidc.common.IdToken;
 
 public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
@@ -88,20 +90,20 @@ public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
         String nonce = state.getFirst(IdToken.NONCE_CLAIM);
         String tokenNonce = idToken.getNonce();
         if (nonce != null && (tokenNonce == null || !nonce.equals(tokenNonce))) {
-            throw ExceptionUtils.toNotAuthorizedException(null, null);
+            throw new OAuthServiceException(OAuthConstants.INVALID_REQUEST);
         }
         if (maxAgeOffset != null) {
             Long authTime = Long.parseLong(state.getFirst(MAX_AGE_PARAMETER));
             Long tokenAuthTime = idToken.getAuthenticationTime();
             if (tokenAuthTime > authTime) {
-                throw ExceptionUtils.toNotAuthorizedException(null, null);
+                throw new OAuthServiceException(OAuthConstants.INVALID_REQUEST);
             }
         }
         
         String acr = idToken.getAuthenticationContextRef();
         // Skip the check if the acr is not set given it is a voluntary claim
         if (acr != null && authenticationContextRef != null && !authenticationContextRef.contains(acr)) {
-            throw ExceptionUtils.toNotAuthorizedException(null, null);
+            throw new OAuthServiceException(OAuthConstants.INVALID_REQUEST);
         }
         
     }
