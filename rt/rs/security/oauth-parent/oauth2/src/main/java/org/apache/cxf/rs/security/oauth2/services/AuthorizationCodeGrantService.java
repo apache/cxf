@@ -113,6 +113,7 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
         }
         codeReg.setSubject(userSubject);
         codeReg.setAudience(state.getAudience());
+        codeReg.setNonce(state.getNonce());
         codeReg.setClientCodeChallenge(state.getClientCodeChallenge());
         
         ServerAuthorizationCodeGrant grant = null;
