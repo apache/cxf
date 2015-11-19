@@ -20,7 +20,7 @@ package org.apache.cxf.systest.sts.jwt;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -91,7 +91,8 @@ public class JaxrsJWTTest extends AbstractBusClientServerTestBase {
         final String address = "https://localhost:" + PORT + "/doubleit/services/doubleit-rs";
         final int numToDouble = 25;  
        
-        List<Object> providers = Collections.singletonList(new JwtOutFilter());
+        List<ClientRequestFilter> providers = new ArrayList<ClientRequestFilter>();
+        providers.add(new JwtOutFilter());
         
         WebClient client = WebClient.create(address, providers);
         client.type("text/plain").accept("text/plain");
