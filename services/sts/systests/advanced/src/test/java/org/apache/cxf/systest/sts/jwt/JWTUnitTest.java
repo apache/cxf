@@ -61,7 +61,7 @@ public class JWTUnitTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testIssueJWTToken() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = JWTUnitTest.class.getResource("cxf-unit-client.xml");
+        URL busFile = JWTUnitTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
