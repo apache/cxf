@@ -28,7 +28,10 @@ import java.net.URLClassLoader;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 
 import org.apache.cxf.helpers.FileUtils;
@@ -398,6 +401,51 @@ public class JAXRSContainerTest extends ProcessorTestBase {
             assertEquals(String.class, paramTypes2[1]);
             assertEquals(0, paramAnns2[1].length);
             
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
+    
+    @Test
+    public void testComplexPath() {
+        try {
+            JAXRSContainer container = new JAXRSContainer(null);
+
+            ToolContext context = new ToolContext();
+            context.put(WadlToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
+            context.put(WadlToolConstants.CFG_WADLURL, getLocation("/wadl/testComplexPath.xml"));
+            context.put(WadlToolConstants.CFG_COMPILE, "true");
+
+            container.setContext(context);
+            container.execute();
+
+            assertNotNull(output.list());
+            
+            List<File> files = FileUtils.getFilesRecurse(output, ".+\\." + "class" + "$");
+            assertEquals(1, files.size());
+            assertTrue(checkContains(files, "application.Resource.class"));
+            @SuppressWarnings("resource")
+            ClassLoader loader = new URLClassLoader(new URL[] {output.toURI().toURL() });
+            
+            Class<?> test1 = loader.loadClass("application.Resource");
+            Method[] test1Methods = test1.getDeclaredMethods();
+            assertEquals(1, test1Methods.length);
+            assertEquals(2, test1Methods[0].getAnnotations().length);
+            assertNotNull(test1Methods[0].getAnnotation(GET.class));            
+            Path path = test1Methods[0].getAnnotation(Path.class);
+            assertNotNull(path);
+            assertEquals("/get-add-method", path.value());
+            
+            assertEquals("getGetaddmethod", test1Methods[0].getName());
+            Class<?>[] paramTypes = test1Methods[0].getParameterTypes();
+            assertEquals(1, paramTypes.length);
+            Annotation[][] paramAnns = test1Methods[0].getParameterAnnotations();
+            assertEquals(String.class, paramTypes[0]);
+            assertEquals(1, paramAnns[0].length);
+            PathParam test1PathParam1 = (PathParam)paramAnns[0][0];
+            assertEquals("id", test1PathParam1.value());
             
         } catch (Exception e) {
             e.printStackTrace();
