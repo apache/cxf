@@ -78,6 +78,7 @@ public abstract class AbstractImplicitGrantService extends RedirectionBasedGrant
                     reg.setApprovedScope(approvedScope);
                 }
                 reg.setAudience(state.getAudience());
+                reg.setNonce(state.getNonce());
                 token = getDataProvider().createAccessToken(reg);
             }
         } else {
