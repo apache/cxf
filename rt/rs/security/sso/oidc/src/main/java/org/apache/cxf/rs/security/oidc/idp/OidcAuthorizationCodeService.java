@@ -20,13 +20,10 @@ package org.apache.cxf.rs.security.oidc.idp;
 
 import java.util.List;
 
-import javax.ws.rs.Path;
-
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
 import org.apache.cxf.rs.security.oauth2.services.AuthorizationCodeGrantService;
 
-@Path("/login")
 public class OidcAuthorizationCodeService extends AuthorizationCodeGrantService {
     private static final String OPEN_ID_CONNECT_SCOPE = "openid";
     private boolean skipAuthorizationWithOidcScope;

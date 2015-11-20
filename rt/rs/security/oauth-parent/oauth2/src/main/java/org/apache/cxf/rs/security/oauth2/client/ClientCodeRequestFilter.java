@@ -195,6 +195,7 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
         ClientTokenContext tokenContext = initializeClientTokenContext(rc, at, state);
         if (at != null && clientTokenContextManager != null) {
             clientTokenContextManager.setClientTokenContext(mc, tokenContext);
+            JAXRSUtils.getCurrentMessage().setContent(ClientTokenContextManager.class, clientTokenContextManager);
         }
         setClientCodeRequest(tokenContext);
     }
