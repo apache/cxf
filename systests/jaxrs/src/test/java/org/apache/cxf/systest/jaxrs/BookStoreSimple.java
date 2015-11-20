@@ -20,12 +20,29 @@ package org.apache.cxf.systest.jaxrs;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import javax.ws.rs.BeanParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 
 @Path("/simplebooks/{id}")
 public class BookStoreSimple {
+    public static class BookBean {
+        private long id;
+        public BookBean() {
+            
+        }
+        public BookBean(long id) {
+            this.id = id;
+        }
+        public long getId() {
+            return id;
+        }
+        @PathParam("id")
+        public void setId(long id) {
+            this.id = id;
+        }
+    }
     @Resource
     private Book injectedBook; 
     
@@ -45,5 +62,10 @@ public class BookStoreSimple {
         if (injectedBook == null) {
             throw new IllegalStateException("Book resource has not been injected");
         }    
+    }
+    @GET
+    @Path("/beanparam")
+    public Book getBookBeanParam(@BeanParam BookBean bookBean) {
+        return getBook(bookBean.getId());
     }
 }
