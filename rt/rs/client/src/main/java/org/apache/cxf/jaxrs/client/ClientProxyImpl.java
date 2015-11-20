@@ -398,12 +398,32 @@ public class ClientProxyImpl extends AbstractClient implements
                                             OperationResourceInfo ori,
                                             int bodyIndex) {
         List<Object> list = new LinkedList<Object>();
+        
+        List<String> methodVars = ori.getURITemplate().getVariables();
+        List<Parameter> paramsList =  getParameters(map, ParameterType.PATH);
+        Map<String, BeanPair> beanParamValues = new HashMap<String, BeanPair>(beanParams.size());
+        for (Parameter p : beanParams) {
+            beanParamValues.putAll(getValuesFromBeanParam(params[p.getIndex()], PathParam.class));
+        }
+        if (!beanParamValues.isEmpty() && !methodVars.containsAll(beanParamValues.keySet())) {
+            List<String> classVars = ori.getClassResourceInfo().getURITemplate().getVariables();
+            for (String classVar : classVars) {
+                BeanPair pair = beanParamValues.get(classVar);
+                if (pair != null) {
+                    Object paramValue = convertParamValue(pair.getValue(), pair.getAnns());
+                    if (isRoot) {
+                        valuesMap.put(classVar, paramValue);
+                    } else {
+                        list.add(paramValue);
+                    }
+                }
+            }
+        }
         if (isRoot) {
             list.addAll(valuesMap.values());
         }
-        List<String> methodVars = ori.getURITemplate().getVariables();
         
-        List<Parameter> paramsList =  getParameters(map, ParameterType.PATH);
+        
         Map<String, Parameter> paramsMap = new LinkedHashMap<String, Parameter>();
         for (Parameter p : paramsList) {
             if (p.getName().length() == 0) {
@@ -417,10 +437,6 @@ public class ClientProxyImpl extends AbstractClient implements
             }
         }
         
-        Map<String, BeanPair> beanParamValues = new HashMap<String, BeanPair>(beanParams.size());
-        for (Parameter p : beanParams) {
-            beanParamValues.putAll(getValuesFromBeanParam(params[p.getIndex()], PathParam.class));
-        }
         Object requestBody = bodyIndex == -1 ? null : params[bodyIndex];
         for (String varName : methodVars) {
             Parameter p = paramsMap.remove(varName);
