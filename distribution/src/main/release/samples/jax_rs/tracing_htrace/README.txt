@@ -1,4 +1,4 @@
-JAX-RS Search Demo 
+JAX-RS HTrace Demo 
 =================
 
 The demo shows a basic usage of HTrace distributed tracer with REST based 
