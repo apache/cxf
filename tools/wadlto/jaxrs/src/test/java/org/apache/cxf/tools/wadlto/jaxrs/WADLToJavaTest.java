@@ -74,6 +74,7 @@ public class WADLToJavaTest extends ProcessorTestBase {
                 "custom.service",
                 "-async getName,delete",
                 "-compile",
+                "-xjc-episode " + output.getAbsolutePath() + "/test.episode",
                 "-xjc-XtoString",
                 getLocation("/wadl/bookstore.xml"),
             };
@@ -84,6 +85,7 @@ public class WADLToJavaTest extends ProcessorTestBase {
 
             verifyFiles("java", true, false, "superbooks", "custom.service");
             verifyFiles("class", true, false, "superbooks", "custom.service");
+            assertTrue(new File(output.getAbsolutePath() + "/test.episode").exists());
 
             List<Class<?>> schemaClassFiles = getSchemaClassFiles();
             assertEquals(4, schemaClassFiles.size());
