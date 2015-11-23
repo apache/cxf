@@ -134,7 +134,12 @@ public class UserSubject implements Serializable {
         return am;
     }
 
+    @Deprecated
     public void setAthenticationMethod(AuthenticationMethod method) {
+        setAuthenticationMethod(method);
+    }
+    
+    public void setAuthenticationMethod(AuthenticationMethod method) {
         this.am = method;
     }
     
