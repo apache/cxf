@@ -46,6 +46,7 @@ public class OAuthAuthorizationData extends OAuthRedirectionState implements Ser
     private String applicationLogoUri;
     private List<String> applicationCertificates = new LinkedList<String>();
     private Map<String, String> extraApplicationProperties = new HashMap<String, String>();
+    private boolean implicitFlow;
     
     private List<? extends Permission> permissions;
     
@@ -191,5 +192,13 @@ public class OAuthAuthorizationData extends OAuthRedirectionState implements Ser
 
     public void setApplicationCertificates(List<String> applicationCertificates) {
         this.applicationCertificates = applicationCertificates;
+    }
+
+    public boolean isImplicitFlow() {
+        return implicitFlow;
+    }
+
+    public void setImplicitFlow(boolean implicitFlow) {
+        this.implicitFlow = implicitFlow;
     }
 }

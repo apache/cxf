@@ -19,10 +19,16 @@
 
 package org.apache.cxf.rs.security.oauth2.services;
 
+import java.util.List;
 import java.util.Set;
 
 import javax.ws.rs.Path;
+import javax.ws.rs.core.MultivaluedMap;
 
+import org.apache.cxf.rs.security.oauth2.common.Client;
+import org.apache.cxf.rs.security.oauth2.common.OAuthAuthorizationData;
+import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
+import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 
@@ -43,6 +49,18 @@ public class ImplicitGrantService extends AbstractImplicitGrantService {
     }
     public ImplicitGrantService(Set<String> responseTypes) {
         super(responseTypes, OAuthConstants.IMPLICIT_GRANT);
+    }
+    @Override
+    protected OAuthAuthorizationData createAuthorizationData(Client client, 
+                                                             MultivaluedMap<String, String> params,
+                                                             String redirectUri,
+                                                             UserSubject subject,
+                                                             List<OAuthPermission> perms,
+                                                             boolean authorizationCanBeSkipped) {
+        OAuthAuthorizationData data = 
+            super.createAuthorizationData(client, params, redirectUri, subject, perms, authorizationCanBeSkipped);
+        data.setImplicitFlow(true);
+        return data;
     }
 }
 
