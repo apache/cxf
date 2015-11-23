@@ -104,7 +104,7 @@ public final class OAuthUtils {
         UserSubject subject = new UserSubject(securityContext.getUserPrincipal().getName(), roleNames);
         Message m = JAXRSUtils.getCurrentMessage();
         if (m != null && m.get(AuthenticationMethod.class) != null) {
-            subject.setAthenticationMethod(m.get(AuthenticationMethod.class));
+            subject.setAuthenticationMethod(m.get(AuthenticationMethod.class));
         }
         return subject;
     }
