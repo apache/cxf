@@ -187,7 +187,8 @@
         <cxf.xmlresolver.bundle.version>1.2_5</cxf.xmlresolver.bundle.version>
         <cxf.xerces.bundle.version>2.11.0_1</cxf.xerces.bundle.version>
         <cxf.bcel.bundle.version>5.2_4</cxf.bcel.bundle.version>
-        <cxf.xalan.bundle.version>2.7.1_7</cxf.xalan.bundle.version>
+        <cxf.xalan.version>2.7.2</cxf.xalan.version>
+        <cxf.xalan.bundle.version>2.7.2_2</cxf.xalan.bundle.version>
         <cxf.oro.bundle.version>2.0.8_6</cxf.oro.bundle.version>
         <cxf.dom4j.bundle.version>1.6.1_5</cxf.dom4j.bundle.version>
         <cxf.jdom.bundle.version>1.1_4</cxf.jdom.bundle.version>
@@ -998,7 +999,7 @@
             <dependency>
                 <groupId>xalan</groupId>
                 <artifactId>xalan</artifactId>
-                <version>2.7.2</version>
+                <version>${cxf.xalan.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>xml-apis</groupId>
