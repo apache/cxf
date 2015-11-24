@@ -19,6 +19,7 @@
 
 package org.apache.cxf.systest.jaxrs.failover;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,9 +63,50 @@ public class CircuitBreakerFailoverTest extends AbstractFailoverTest {
         }
     }
     
+    @Test
+    public void testSequentialStrategyWithElapsingCircuitBreakerTimeout() throws Throwable {
+        FailoverFeature feature = customizeFeature(
+            new CircuitBreakerFailoverFeature(1, 3000), false, 
+            "http://localhost:" + NON_PORT + "/non-existent", 
+            "http://localhost:" + NON_PORT + "/non-existent2"); 
+        
+        final BookStore bookStore = getBookStore(
+            "http://localhost:" + NON_PORT + "/non-existent", feature);
+        
+        // First iteration is going to open all circuit breakers. The timeout at the end
+        // should reset all circuit breakers and the URLs could be tried again. 
+        for (int i = 0; i < 2; ++i) {
+            try {
+                bookStore.getBook(1);
+                fail("Exception expected");
+            } catch (ProcessingException ex) {
+                if (!(ex.getCause() instanceof IOException)) {
+                    throw ex.getCause();
+                }
+            }
+            
+            // Let's wait a bit more than circuit breaker timeout
+            Thread.sleep(4000);
+        }
+    }
+    
+    @Test
+    public void testSequentialStrategyWithRetry() throws Exception {
+        FailoverFeature feature = getFeature(false, 
+            "http://localhost:" + NON_PORT + "/non-existent", 
+            Server.ADDRESS2); 
+        
+        strategyTest("http://localhost:" + NON_PORT + "/non-existent", feature, 
+            Server.ADDRESS2, null, false, false, false);
+    }
+    
     @Override
     protected FailoverFeature getFeature(boolean random, String ...address) {
-        CircuitBreakerFailoverFeature feature = new CircuitBreakerFailoverFeature();
+        return customizeFeature(new CircuitBreakerFailoverFeature(), random, address);
+    }
+    
+    private FailoverFeature customizeFeature(CircuitBreakerFailoverFeature feature, 
+            boolean random, String ...address) {
         List<String> alternateAddresses = new ArrayList<String>();
         for (String s : address) {
             alternateAddresses.add(s);
