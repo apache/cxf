@@ -32,8 +32,6 @@ import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.message.Message;
-import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.rs.security.jose.common.JoseConstants;
 import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
 import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
@@ -41,11 +39,11 @@ import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jwe.JweEncryptionProvider;
 import org.apache.cxf.rs.security.jose.jwe.JweHeaders;
 import org.apache.cxf.rs.security.jose.jwe.JweUtils;
+import org.apache.cxf.rs.security.jose.jws.JwsHeaders;
 import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactProducer;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
-import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.SignatureProperties;
 import org.apache.cxf.sts.cache.CacheUtils;
@@ -119,11 +117,9 @@ public class JWTTokenProvider implements TokenProvider {
         JwtClaims claims = jwtClaimsProvider.getJwtClaims(jwtClaimsProviderParameters);
         
         try {
-            JwtToken token = new JwtToken(claims);
-            
-            String tokenData = signToken(token, jwtRealm, tokenParameters.getStsProperties());
+            String tokenData = signToken(claims, jwtRealm, tokenParameters.getStsProperties());
             if (tokenParameters.isEncryptToken()) {
-                tokenData = encryptToken(tokenData, token.getJweHeaders(), 
+                tokenData = encryptToken(tokenData, new JweHeaders(), 
                                          tokenParameters.getStsProperties(),
                                          tokenParameters.getEncryptionProperties(),
                                          tokenParameters.getKeyRequirements());
@@ -205,12 +201,10 @@ public class JWTTokenProvider implements TokenProvider {
     }
     
     private String signToken(
-        JwtToken token, 
+        JwtClaims claims, 
         RealmProperties jwtRealm,
         STSPropertiesMBean stsProperties
     ) throws Exception {
-        
-        Properties signingProperties = new Properties();
         
         if (signToken) {
             // Initialise signature objects with defaults of STSPropertiesMBean
@@ -255,6 +249,8 @@ public class JWTTokenProvider implements TokenProvider {
             callbackHandler.handle(cb);
             String password = cb[0].getPassword();
 
+            Properties signingProperties = new Properties();
+            
             signingProperties.put(JoseConstants.RSSEC_SIGNATURE_ALGORITHM, signatureAlgorithm);
             if (alias != null) {
                 signingProperties.put(JoseConstants.RSSEC_KEY_STORE_ALIAS, alias);
@@ -271,20 +267,16 @@ public class JWTTokenProvider implements TokenProvider {
             KeyStore keystore = ((Merlin)signatureCrypto).getKeyStore();
             signingProperties.put(JoseConstants.RSSEC_KEY_STORE, keystore);
             
-            JwsJwtCompactProducer jws = new JwsJwtCompactProducer(token);
-            jws.setSignatureProperties(signingProperties);
+            JwsHeaders jwsHeaders = new JwsHeaders(signingProperties);
+            JwsJwtCompactProducer jws = new JwsJwtCompactProducer(jwsHeaders, claims);
             
-            Message m = PhaseInterceptorChain.getCurrentMessage();
             JwsSignatureProvider sigProvider = 
-                JwsUtils.loadSignatureProvider(m, signingProperties, token.getJwsHeaders(), false);
-            token.getJwsHeaders().setSignatureAlgorithm(sigProvider.getAlgorithm());
+                JwsUtils.loadSignatureProvider(signingProperties, jwsHeaders);
             
             return jws.signWith(sigProvider);
         } else {
-            signingProperties.put(JoseConstants.RSSEC_SIGNATURE_ALGORITHM, "none");
-            
-            JwsJwtCompactProducer jws = new JwsJwtCompactProducer(token);
-            jws.setSignatureProperties(signingProperties);
+            JwsHeaders jwsHeaders = new JwsHeaders(SignatureAlgorithm.NONE);
+            JwsJwtCompactProducer jws = new JwsJwtCompactProducer(jwsHeaders, claims);
             return jws.getSignedEncodedJws();
         }
         

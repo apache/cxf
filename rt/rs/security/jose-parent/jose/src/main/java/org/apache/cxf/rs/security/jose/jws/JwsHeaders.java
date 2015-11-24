@@ -19,6 +19,7 @@
 package org.apache.cxf.rs.security.jose.jws;
 
 import java.util.Map;
+import java.util.Properties;
 
 import org.apache.cxf.rs.security.jose.common.JoseConstants;
 import org.apache.cxf.rs.security.jose.common.JoseHeaders;
@@ -31,7 +32,7 @@ public class JwsHeaders extends JoseHeaders {
     public JwsHeaders(JoseType type) {
         super(type);
     }
-    public JwsHeaders(JoseHeaders headers) {
+    public JwsHeaders(JwsHeaders headers) {
         super(headers.asMap());
     }
     
@@ -40,6 +41,9 @@ public class JwsHeaders extends JoseHeaders {
     }
     public JwsHeaders(SignatureAlgorithm sigAlgo) {
         init(sigAlgo);
+    }
+    public JwsHeaders(Properties sigProps) {
+        init(getSignatureAlgorithm(sigProps));
     }
     public JwsHeaders(JoseType type, SignatureAlgorithm sigAlgo) {
         super(type);
@@ -62,5 +66,8 @@ public class JwsHeaders extends JoseHeaders {
     }
     public Boolean getPayloadEncodingStatus() {
         return super.getBooleanProperty(JoseConstants.JWS_HEADER_B64_STATUS_HEADER);
+    }
+    private static SignatureAlgorithm getSignatureAlgorithm(Properties sigProps) {
+        return JwsUtils.getSignatureAlgorithm(sigProps, null);
     }
 }

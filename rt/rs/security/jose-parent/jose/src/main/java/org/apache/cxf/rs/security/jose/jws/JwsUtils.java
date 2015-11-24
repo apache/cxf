@@ -40,7 +40,6 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.rs.security.jose.common.JoseConstants;
-import org.apache.cxf.rs.security.jose.common.JoseHeaders;
 import org.apache.cxf.rs.security.jose.common.JoseUtils;
 import org.apache.cxf.rs.security.jose.common.KeyManagementUtils;
 import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
@@ -278,18 +277,18 @@ public final class JwsUtils {
         }
         return theVerifiers;
     }
-    public static boolean validateCriticalHeaders(JoseHeaders headers) {
+    public static boolean validateCriticalHeaders(JwsHeaders headers) {
         //TODO: validate JWS specific constraints
         return JoseUtils.validateCriticalHeaders(headers);
     }
     public static JwsSignatureProvider loadSignatureProvider(Properties props,
-                                                             JoseHeaders headers) {
+                                                             JwsHeaders headers) {
         return loadSignatureProvider(PhaseInterceptorChain.getCurrentMessage(),
                                      props, headers, false);
     }
     public static JwsSignatureProvider loadSignatureProvider(Message m, 
                                                              Properties props,
-                                                             JoseHeaders headers,
+                                                             JwsHeaders headers,
                                                              boolean ignoreNullProvider) {
         JwsSignatureProvider theSigProvider = null;
         

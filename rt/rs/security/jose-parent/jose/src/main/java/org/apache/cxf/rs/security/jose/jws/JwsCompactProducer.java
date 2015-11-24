@@ -35,7 +35,6 @@ public class JwsCompactProducer {
     private String plainJwsPayload;
     private String signature;
     private boolean detached;
-    private Properties signatureProperties;
     public JwsCompactProducer(String plainJwsPayload) {
         this(plainJwsPayload, false);
     }
@@ -138,7 +137,7 @@ public class JwsCompactProducer {
     }
     private void checkAlgorithm() {
         if (getAlgorithm() == null) {
-            Properties sigProps = getSignatureProperties();
+            Properties sigProps = JwsUtils.loadSignatureOutProperties(false);
             Message m = PhaseInterceptorChain.getCurrentMessage();
             SignatureAlgorithm signatureAlgo = JwsUtils.getSignatureAlgorithm(m, sigProps, null, null);
             if (signatureAlgo != null) {
@@ -150,14 +149,5 @@ public class JwsCompactProducer {
             throw new JwsException(JwsException.Error.INVALID_ALGORITHM);
         }
     }
-    public Properties getSignatureProperties() {
-        if (signatureProperties == null) {
-            signatureProperties = JwsUtils.loadSignatureOutProperties(false);
-            
-        }
-        return signatureProperties;
-    }
-    public void setSignatureProperties(Properties signatureProperties) {
-        this.signatureProperties = signatureProperties;
-    }
+    
 }
