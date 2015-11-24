@@ -18,9 +18,11 @@
  */
 package org.apache.cxf.rs.security.oauth2.client;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 import javax.ws.rs.NotAuthorizedException;
 
-import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.JAXRSInvoker;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.MessageContext;
@@ -33,10 +35,11 @@ public class OAuthInvoker extends JAXRSInvoker {
     private WebClient accessTokenServiceClient;
     private Consumer consumer;
     @Override
-    public Object invoke(Exchange exchange, Object requestParams, Object resourceObject) {
+    protected Object performInvocation(Exchange exchange, final Object serviceObject, Method m,
+                                       Object[] paramArray) throws Exception {
         try {
-            return super.invoke(exchange, requestParams, resourceObject);
-        } catch (Fault ex) {
+            return super.performInvocation(exchange, serviceObject, m, paramArray);
+        } catch (InvocationTargetException ex) {
             if (ex.getCause() instanceof NotAuthorizedException) {
                 Message inMessage = exchange.getInMessage();
                 ClientTokenContext tokenContext = inMessage.getContent(ClientTokenContext.class);
@@ -53,7 +56,7 @@ public class OAuthInvoker extends JAXRSInvoker {
                     contextManager.setClientTokenContext(mc, tokenContext);
                     
                     //retry
-                    return super.invoke(exchange, requestParams, resourceObject);
+                    return super.performInvocation(exchange, serviceObject, m, paramArray);
                 }
             }
             throw ex;
