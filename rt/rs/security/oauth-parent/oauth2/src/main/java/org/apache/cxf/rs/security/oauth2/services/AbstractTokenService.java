@@ -110,14 +110,14 @@ public class AbstractTokenService extends AbstractOAuthService {
     protected Client getAndValidateClientFromIdAndSecret(String clientId, String providedClientSecret) {
         Client client = getClient(clientId);
         if (!client.getClientId().equals(clientId)) {
-            throw ExceptionUtils.toNotAuthorizedException(null, null);
+            reportInvalidClient();
         }
         if (isValidPublicClient(client, clientId, providedClientSecret)) {
             return client;
         }
         if (!client.isConfidential()
             || !isConfidenatialClientSecretValid(client, providedClientSecret)) {
-            throw ExceptionUtils.toNotAuthorizedException(null, null);
+            reportInvalidClient();
         }
         return client;
     }
