@@ -95,7 +95,7 @@ public class OidcRpAuthenticationFilter implements ContainerRequestFilter {
     public void setRedirectUri(String redirectUri) {
         this.redirectUri = redirectUri;
     }
-    public void setStateManager(ClientTokenContextManager stateManager) {
-        this.stateManager = stateManager;
+    public void setClientTokenContextManager(ClientTokenContextManager manager) {
+        this.stateManager = manager;
     }
 }

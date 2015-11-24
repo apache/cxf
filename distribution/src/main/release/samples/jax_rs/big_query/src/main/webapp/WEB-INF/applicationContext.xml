@@ -72,7 +72,7 @@
               This state manager is shared between this filter and the RP endpoint, 
               the RP endpoint sets an OIDC context on it and this filter checks the context is available 
          -->
-         <property name="stateManager" ref="stateManager"/>
+         <property name="clientTokenContextManager" ref="stateManager"/>
          
          <!-- The address to redirect to if no OIDC context is available -->
          <property name="redirectUri" value="/forms/simpleLogin.jsp"/>    
@@ -102,7 +102,7 @@
          <!-- This state manager is shared between this RP endpoint and the oidcRpFilter which protects
               the application endpoint, the RP endpoint sets an OIDC context on it and the filter checks 
               the context is available -->
-         <property name="stateManager" ref="stateManager"/>
+         <property name="clientTokenContextManager" ref="stateManager"/>
          <!-- Where to redirect to once the authentication is complete -->
          <property name="defaultLocation" value="/service/search/start"/>
      </bean>

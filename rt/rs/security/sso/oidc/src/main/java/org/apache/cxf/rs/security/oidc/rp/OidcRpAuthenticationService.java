@@ -75,8 +75,8 @@ public class OidcRpAuthenticationService {
         this.defaultLocation = defaultLocation;
     }
 
-    public void setStateManager(ClientTokenContextManager stateManager) {
-        this.stateManager = stateManager;
+    public void setClientTokenContextManager(ClientTokenContextManager manager) {
+        this.stateManager = manager;
     }
 
 }
