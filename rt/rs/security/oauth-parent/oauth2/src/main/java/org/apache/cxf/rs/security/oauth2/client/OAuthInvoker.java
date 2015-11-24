@@ -33,6 +33,7 @@ import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 
 public class OAuthInvoker extends JAXRSInvoker {
     private WebClient accessTokenServiceClient;
+    private ClientTokenContextManager clientTokenContextManager;
     private Consumer consumer;
     @Override
     protected Object performInvocation(Exchange exchange, final Object serviceObject, Method m,
@@ -49,11 +50,9 @@ public class OAuthInvoker extends JAXRSInvoker {
                     accessToken = OAuthClientUtils.refreshAccessToken(accessTokenServiceClient, 
                                                         consumer, 
                                                         accessToken);
-                    ClientTokenContextManager contextManager = 
-                        exchange.getInMessage().getContent(ClientTokenContextManager.class);
                     MessageContext mc = new MessageContextImpl(inMessage);
                     ((ClientTokenContextImpl)tokenContext).setToken(accessToken);           
-                    contextManager.setClientTokenContext(mc, tokenContext);
+                    clientTokenContextManager.setClientTokenContext(mc, tokenContext);
                     
                     //retry
                     return super.performInvocation(exchange, serviceObject, m, paramArray);
@@ -70,5 +69,9 @@ public class OAuthInvoker extends JAXRSInvoker {
     
     public void setConsumer(Consumer consumer) {
         this.consumer = consumer;
+    }
+
+    public void setClientTokenContextManager(ClientTokenContextManager clientTokenContextManager) {
+        this.clientTokenContextManager = clientTokenContextManager;
     }
 }
