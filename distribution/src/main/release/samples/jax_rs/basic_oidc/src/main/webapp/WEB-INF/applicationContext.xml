@@ -44,7 +44,7 @@
               This state manager is shared between this filter and the RP endpoint, 
               the RP endpoint sets an OIDC context on it and this filter checks the context is available 
          -->
-         <property name="stateManager" ref="stateManager"/>
+         <property name="clientTokenContextManager" ref="stateManager"/>
      </bean>
 
      <bean id="searchView" class="org.apache.cxf.jaxrs.provider.RequestDispatcherProvider">
@@ -77,7 +77,7 @@
          <!-- This state manager is shared between this RP endpoint and the oidcRpFilter which protects
               the application endpoint, the RP endpoint sets an OIDC context on it and the filter checks 
               the context is available -->
-         <property name="stateManager" ref="stateManager"/>
+         <property name="clientTokenContextManager" ref="stateManager"/>
      </bean>
      <!-- The state manager shared between the RP and application endpoints -->
      <bean id="stateManager" class="org.apache.cxf.rs.security.oauth2.client.MemoryClientTokenContextManager"/>
