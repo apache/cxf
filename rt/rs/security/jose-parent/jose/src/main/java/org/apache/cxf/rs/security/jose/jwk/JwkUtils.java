@@ -373,12 +373,18 @@ public final class JwkUtils {
         return jwk;
     }
     public static JsonWebKey fromPublicKey(PublicKey key, Properties props, String algoProp) {
+        JsonWebKey jwk = null;
         if (key instanceof RSAPublicKey) {
-            return JwkUtils.fromRSAPublicKey((RSAPublicKey)key, algoProp);
+            jwk = JwkUtils.fromRSAPublicKey((RSAPublicKey)key, props.getProperty(algoProp));
         } else {
-            return JwkUtils.fromECPublicKey((ECPublicKey)key, 
+            jwk = JwkUtils.fromECPublicKey((ECPublicKey)key, 
                                          props.getProperty(JoseConstants.RSSEC_EC_CURVE));
         }
+        String kid = props.getProperty(JoseConstants.RSSEC_KEY_STORE_ALIAS);
+        if (kid != null) {
+            jwk.setKeyId(kid);
+        }
+        return jwk;
     }
     public static JsonWebKey fromX509CertificateChain(List<X509Certificate> chain, String algo) {
         JsonWebKey jwk = new JsonWebKey();
