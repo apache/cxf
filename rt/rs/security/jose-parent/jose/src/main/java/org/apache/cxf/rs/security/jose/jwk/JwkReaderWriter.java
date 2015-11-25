@@ -18,10 +18,27 @@
  */
 package org.apache.cxf.rs.security.jose.jwk;
 
+import org.apache.cxf.jaxrs.json.basic.JsonMapObjectReaderWriter;
 
-public interface JwkReaderWriter {
-    String jwkToJson(JsonWebKey jwk);
-    JsonWebKey jsonToJwk(String jwkJson);
-    String jwkSetToJson(JsonWebKeys jwkSet);
-    JsonWebKeys jsonToJwkSet(String jwkSetJson);
+
+
+
+
+public class JwkReaderWriter extends JsonMapObjectReaderWriter {
+    public String jwkSetToJson(JsonWebKeys jwks) {
+        return toJson(jwks);
+    }
+    public JsonWebKeys jsonToJwkSet(String jwksJson) {
+        JsonWebKeys jwks = new JsonWebKeys();
+        fromJson(jwks, jwksJson);
+        return jwks;
+    }
+    public String jwkToJson(JsonWebKey jwk) {
+        return toJson(jwk);
+    }
+    public JsonWebKey jsonToJwk(String jwkJson) {
+        JsonWebKey jwk = new JsonWebKey();
+        fromJson(jwk, jwkJson);
+        return jwk;
+    }
 }
