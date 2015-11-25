@@ -32,7 +32,7 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 public abstract class AbstractOAuthDataProvider implements OAuthDataProvider {
     private long accessTokenLifetime = 3600L;
-    private long refreshTokenLifetime = -1;
+    private long refreshTokenLifetime; // refresh tokens are eternal by default
     
     protected AbstractOAuthDataProvider() {
     }

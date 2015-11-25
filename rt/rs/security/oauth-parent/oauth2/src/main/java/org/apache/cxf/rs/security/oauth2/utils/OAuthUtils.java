@@ -183,7 +183,7 @@ public final class OAuthUtils {
     }
     
     public static boolean isExpired(Long issuedAt, Long lifetime) {
-        return lifetime != -1
+        return lifetime != 0L
             && issuedAt + lifetime < System.currentTimeMillis() / 1000;
     }
     
