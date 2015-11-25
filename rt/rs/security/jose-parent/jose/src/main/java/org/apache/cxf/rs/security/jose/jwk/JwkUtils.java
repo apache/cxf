@@ -114,16 +114,16 @@ public final class JwkUtils {
         return readJwkSet(IOUtils.readStringFromStream(is));
     }
     public static JsonWebKey readJwkKey(String jwkJson) {
-        return new DefaultJwkReaderWriter().jsonToJwk(jwkJson);
+        return new JwkReaderWriter().jsonToJwk(jwkJson);
     }
     public static JsonWebKeys readJwkSet(String jwksJson) {
-        return new DefaultJwkReaderWriter().jsonToJwkSet(jwksJson);
+        return new JwkReaderWriter().jsonToJwkSet(jwksJson);
     }
     public static String jwkKeyToJson(JsonWebKey jwkKey) {
-        return new DefaultJwkReaderWriter().jwkToJson(jwkKey);
+        return new JwkReaderWriter().jwkToJson(jwkKey);
     }
     public static String jwkSetToJson(JsonWebKeys jwkSet) {
-        return new DefaultJwkReaderWriter().jwkSetToJson(jwkSet);
+        return new JwkReaderWriter().jwkSetToJson(jwkSet);
     }
     public static String encodeJwkKey(JsonWebKey jwkKey) {
         return Base64UrlUtility.encode(jwkKeyToJson(jwkKey));
@@ -138,13 +138,10 @@ public final class JwkUtils {
         return readJwkSet(JoseUtils.decodeToString(jwksJson));
     }
     public static String encryptJwkSet(JsonWebKeys jwkSet, char[] password) {
-        return encryptJwkSet(jwkSet, password, new DefaultJwkReaderWriter());
+        return encryptJwkSet(jwkSet, createDefaultEncryption(password));
     }
-    public static String encryptJwkSet(JsonWebKeys jwkSet, char[] password, JwkReaderWriter writer) {
-        return encryptJwkSet(jwkSet, createDefaultEncryption(password), writer);
-    }
-    public static String encryptJwkSet(JsonWebKeys jwkSet, JweEncryptionProvider jwe, JwkReaderWriter writer) {
-        return jwe.encrypt(StringUtils.toBytesUTF8(writer.jwkSetToJson(jwkSet)), 
+    public static String encryptJwkSet(JsonWebKeys jwkSet, JweEncryptionProvider jwe) {
+        return jwe.encrypt(StringUtils.toBytesUTF8(new JwkReaderWriter().jwkSetToJson(jwkSet)), 
                            toJweHeaders("jwk-set+json"));
     }
     public static String encryptJwkSet(JsonWebKeys jwkSet, PublicKey key, KeyAlgorithm keyAlgo, 
@@ -161,13 +158,10 @@ public final class JwkUtils {
                                 "jwk-set+json");
     }
     public static JsonWebKeys decryptJwkSet(String jsonJwkSet, char[] password) {
-        return decryptJwkSet(jsonJwkSet, password, new DefaultJwkReaderWriter());
+        return decryptJwkSet(jsonJwkSet, createDefaultDecryption(password));
     }
-    public static JsonWebKeys decryptJwkSet(String jsonJwkSet, char[] password, JwkReaderWriter reader) {
-        return decryptJwkSet(jsonJwkSet, createDefaultDecryption(password), reader);
-    }
-    public static JsonWebKeys decryptJwkSet(String jsonJwkSet, JweDecryptionProvider jwe, JwkReaderWriter reader) {
-        return reader.jsonToJwkSet(jwe.decrypt(jsonJwkSet).getContentText());
+    public static JsonWebKeys decryptJwkSet(String jsonJwkSet, JweDecryptionProvider jwe) {
+        return new JwkReaderWriter().jsonToJwkSet(jwe.decrypt(jsonJwkSet).getContentText());
     }
     public static JsonWebKeys decryptJwkSet(PrivateKey key, KeyAlgorithm keyAlgo, ContentAlgorithm ctAlgo,
                                             String jsonJwkSet) {
@@ -180,25 +174,20 @@ public final class JwkUtils {
                                             String jsonJwkSet) {
         return readJwkSet(toString(JweUtils.decrypt(key, keyAlgo, ctAlgo, jsonJwkSet)));
     }
-    public static JsonWebKeys decryptJwkSet(InputStream is, char[] password) throws IOException {
-        return decryptJwkSet(is, password, new DefaultJwkReaderWriter());
-    }
-    public static JsonWebKeys decryptJwkSet(InputStream is, char[] password, JwkReaderWriter reader) 
+    public static JsonWebKeys decryptJwkSet(InputStream is, char[] password) 
         throws IOException {
-        return decryptJwkSet(is, createDefaultDecryption(password), reader);
+        return decryptJwkSet(is, createDefaultDecryption(password));
     }
-    public static JsonWebKeys decryptJwkSet(InputStream is, JweDecryptionProvider jwe, JwkReaderWriter reader)
+    public static JsonWebKeys decryptJwkSet(InputStream is, JweDecryptionProvider jwe)
         throws IOException {
-        return reader.jsonToJwkSet(jwe.decrypt(IOUtils.readStringFromStream(is)).getContentText());
+        return new JwkReaderWriter().jsonToJwkSet(
+            jwe.decrypt(IOUtils.readStringFromStream(is)).getContentText());
     }
-    public static String encryptJwkKey(JsonWebKey jwk, char[] password) {
-        return encryptJwkKey(jwk, password, new DefaultJwkReaderWriter());
+    public static String encryptJwkKey(JsonWebKey jwkKey, char[] password) {
+        return encryptJwkKey(jwkKey, createDefaultEncryption(password));
     }
-    public static String encryptJwkKey(JsonWebKey jwkKey, char[] password, JwkReaderWriter writer) {
-        return encryptJwkKey(jwkKey, createDefaultEncryption(password), writer);
-    }
-    public static String encryptJwkKey(JsonWebKey jwkKey, JweEncryptionProvider jwe, JwkReaderWriter writer) {
-        return jwe.encrypt(StringUtils.toBytesUTF8(writer.jwkToJson(jwkKey)), 
+    public static String encryptJwkKey(JsonWebKey jwkKey, JweEncryptionProvider jwe) {
+        return jwe.encrypt(StringUtils.toBytesUTF8(new JwkReaderWriter().jwkToJson(jwkKey)), 
                            toJweHeaders("jwk+json"));
     }
     public static String encryptJwkKey(JsonWebKey jwkKey, PublicKey key, KeyAlgorithm keyAlgo, 
@@ -215,10 +204,7 @@ public final class JwkUtils {
         return JwsUtils.sign(key, algo, jwkKeyToJson(jwkKey), "jwk+json");
     }
     public static JsonWebKey decryptJwkKey(String jsonJwkKey, char[] password) {
-        return decryptJwkKey(jsonJwkKey, password, new DefaultJwkReaderWriter());
-    }
-    public static JsonWebKey decryptJwkKey(String jsonJwkKey, char[] password, JwkReaderWriter reader) {
-        return decryptJwkKey(jsonJwkKey, createDefaultDecryption(password), reader);
+        return decryptJwkKey(jsonJwkKey, createDefaultDecryption(password));
     }
     public static JsonWebKey decryptJwkKey(PrivateKey key, KeyAlgorithm keyAlgo, ContentAlgorithm ctAlgo, 
                                            String jsonJwk) {
@@ -231,29 +217,26 @@ public final class JwkUtils {
                                            String jsonJwk) {
         return readJwkKey(toString(JweUtils.decrypt(key, keyAlgo, ctAlgo, jsonJwk)));
     }
-    public static JsonWebKey decryptJwkKey(String jsonJwkKey, JweDecryptionProvider jwe, JwkReaderWriter reader) {
-        return reader.jsonToJwk(jwe.decrypt(jsonJwkKey).getContentText());
+    public static JsonWebKey decryptJwkKey(String jsonJwkKey, JweDecryptionProvider jwe) {
+        return new JwkReaderWriter().jsonToJwk(jwe.decrypt(jsonJwkKey).getContentText());
     }
-    public static JsonWebKey decryptJwkKey(InputStream is, char[] password) throws IOException {
-        return decryptJwkKey(is, password, new DefaultJwkReaderWriter());
-    }
-    public static JsonWebKey decryptJwkKey(InputStream is, char[] password, JwkReaderWriter reader) 
+    public static JsonWebKey decryptJwkKey(InputStream is, char[] password) 
         throws IOException {
-        return decryptJwkKey(is, createDefaultDecryption(password), reader);
+        return decryptJwkKey(is, createDefaultDecryption(password));
     }
-    public static JsonWebKey decryptJwkKey(InputStream is, JweDecryptionProvider jwe, JwkReaderWriter reader) 
+    public static JsonWebKey decryptJwkKey(InputStream is, JweDecryptionProvider jwe) 
         throws IOException {
-        return reader.jsonToJwk(jwe.decrypt(IOUtils.readStringFromStream(is)).getContentText());
+        return new JwkReaderWriter().jsonToJwk(
+            jwe.decrypt(IOUtils.readStringFromStream(is)).getContentText());
+    }
+    public static JsonWebKeys loadPublicJwkSet(Message m, Properties props) {
+        return loadJwkSet(m, props, null);
     }
     public static JsonWebKeys loadJwkSet(Message m, Properties props, PrivateKeyPasswordProvider cb) {
-        return loadJwkSet(m, props, cb, new DefaultJwkReaderWriter());
-    }
-    public static JsonWebKeys loadJwkSet(Message m, Properties props, PrivateKeyPasswordProvider cb, 
-                                         JwkReaderWriter reader) {
         String key = (String)props.get(JoseConstants.RSSEC_KEY_STORE_FILE);
         JsonWebKeys jwkSet = key != null ? (JsonWebKeys)m.getExchange().get(key) : null;
         if (jwkSet == null) {
-            jwkSet = loadJwkSet(props, m.getExchange().getBus(), cb, reader);
+            jwkSet = loadJwkSet(props, m.getExchange().getBus(), cb);
             if (key != null) {
                 m.getExchange().put(key, jwkSet);
             }
@@ -261,16 +244,12 @@ public final class JwkUtils {
         return jwkSet;
     }
     public static JsonWebKeys loadJwkSet(Properties props, Bus bus, PrivateKeyPasswordProvider cb) {
-        return loadJwkSet(props, bus, cb, new DefaultJwkReaderWriter());
-    }
-    public static JsonWebKeys loadJwkSet(Properties props, Bus bus, PrivateKeyPasswordProvider cb, 
-                                         JwkReaderWriter reader) {
         JweDecryptionProvider decryption = cb != null
             ? new AesCbcHmacJweDecryption(new PbesHmacAesWrapKeyDecryptionAlgorithm(
                 cb.getPassword(props))) : null;
-        return loadJwkSet(props, bus, decryption, reader);
+        return loadJwkSet(props, bus, decryption);
     }
-    public static JsonWebKeys loadJwkSet(Properties props, Bus bus, JweDecryptionProvider jwe, JwkReaderWriter reader) {
+    public static JsonWebKeys loadJwkSet(Properties props, Bus bus, JweDecryptionProvider jwe) {
         String keyContent = null;
         String keyStoreLoc = props.getProperty(JoseConstants.RSSEC_KEY_STORE_FILE);
         if (keyStoreLoc != null) {
@@ -292,25 +271,21 @@ public final class JwkUtils {
         if (jwe != null) {
             keyContent = jwe.decrypt(keyContent).getContentText();
         }
+        JwkReaderWriter reader = new JwkReaderWriter();
         if (props.getProperty(JoseConstants.RSSEC_KEY_STORE_JWKKEY) == null) {
             return reader.jsonToJwkSet(keyContent);
         } else {
-            JsonWebKey key = reader.jsonToJwk(keyContent);
-            JsonWebKeys keys = new JsonWebKeys();
-            keys.setKeys(Collections.singletonList(key));
-            return keys;
+            JsonWebKey jwk = reader.jsonToJwk(keyContent);
+            return new JsonWebKeys(jwk);
         }
     }
+    
     public static JsonWebKey loadJsonWebKey(Message m, Properties props, KeyOperation keyOper) {
         return loadJsonWebKey(m, props, keyOper, null);
     }
     public static JsonWebKey loadJsonWebKey(Message m, Properties props, KeyOperation keyOper, String inHeaderKid) {
-        return loadJsonWebKey(m, props, keyOper, inHeaderKid, new DefaultJwkReaderWriter());
-    }
-    public static JsonWebKey loadJsonWebKey(Message m, Properties props, KeyOperation keyOper, String inHeaderKid, 
-                                            JwkReaderWriter reader) {
         PrivateKeyPasswordProvider cb = KeyManagementUtils.loadPasswordProvider(m, props, keyOper);
-        JsonWebKeys jwkSet = loadJwkSet(m, props, cb, reader);
+        JsonWebKeys jwkSet = loadJwkSet(m, props, cb);
         String kid = null;
         if (inHeaderKid != null 
             && MessageUtils.getContextualBoolean(m, JoseConstants.RSSEC_ACCEPT_PUBLIC_KEY, false)) {
@@ -328,15 +303,11 @@ public final class JwkUtils {
         }
         return null;
     }
-    public static List<JsonWebKey> loadJsonWebKeys(Message m, Properties props, KeyOperation keyOper) {
-        return loadJsonWebKeys(m, props, keyOper, new DefaultJwkReaderWriter());
-    }
-
-    public static List<JsonWebKey> loadJsonWebKeys(Message m, Properties props, 
-                                                   KeyOperation keyOper, 
-                                                   JwkReaderWriter reader) {
+    public static List<JsonWebKey> loadJsonWebKeys(Message m, 
+                                                   Properties props, 
+                                                   KeyOperation keyOper) {
         PrivateKeyPasswordProvider cb = KeyManagementUtils.loadPasswordProvider(m, props, keyOper);
-        JsonWebKeys jwkSet = loadJwkSet(m, props, cb, reader);
+        JsonWebKeys jwkSet = loadJwkSet(m, props, cb);
         String kid = KeyManagementUtils.getKeyId(m, props, JoseConstants.RSSEC_KEY_STORE_ALIAS, keyOper);
         if (kid != null) {
             return Collections.singletonList(jwkSet.getKey(kid));
@@ -399,6 +370,16 @@ public final class JwkUtils {
         String encodedPublicExponent = Base64UrlUtility.encode(pk.getPublicExponent().toByteArray());
         jwk.setProperty(JsonWebKey.RSA_PUBLIC_EXP, encodedPublicExponent);
         return jwk;
+    }
+    public static JsonWebKey fromPublicKey(PublicKey key, Properties props, String algoProp) {
+        // EC keys can  be supported once we figure out how to get a curve name 
+        // from an EC key instance or if a curve property is introduced
+        if (key instanceof RSAPublicKey) {
+            return JwkUtils.fromRSAPublicKey((RSAPublicKey)key, algoProp);
+        } else {
+            return JwkUtils.fromECPublicKey((ECPublicKey)key, 
+                                         props.getProperty(JoseConstants.RSSEC_EC_CURVE));
+        }
     }
     public static JsonWebKey fromX509CertificateChain(List<X509Certificate> chain, String algo) {
         JsonWebKey jwk = new JsonWebKey();

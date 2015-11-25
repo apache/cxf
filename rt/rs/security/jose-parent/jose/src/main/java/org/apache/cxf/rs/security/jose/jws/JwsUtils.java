@@ -46,6 +46,7 @@ import org.apache.cxf.rs.security.jose.common.KeyManagementUtils;
 import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
+import org.apache.cxf.rs.security.jose.jwk.JsonWebKeys;
 import org.apache.cxf.rs.security.jose.jwk.JwkUtils;
 import org.apache.cxf.rs.security.jose.jwk.KeyOperation;
 import org.apache.cxf.rs.security.jose.jwk.KeyType;
@@ -459,5 +460,15 @@ public final class JwsUtils {
             throw new JwsException(JwsException.Error.INVALID_KEY);
         }
     }
-    
+    public static JsonWebKeys loadPublicVerificationKeys(Message m, Properties props) {
+        String storeType = props.getProperty(JoseConstants.RSSEC_KEY_STORE_TYPE);
+        if ("jwk".equals(storeType)) {
+            return JwkUtils.loadPublicJwkSet(m, props);
+        } else {
+            //TODO: consider loading all the public keys in the store
+            PublicKey key = KeyManagementUtils.loadPublicKey(m, props);
+            JsonWebKey jwk = JwkUtils.fromPublicKey(key, props, JoseConstants.RSSEC_SIGNATURE_ALGORITHM);
+            return new JsonWebKeys(jwk);
+        }
+    }
 }

@@ -127,6 +127,12 @@ public final class JoseConstants {
     public static final String RSSEC_SIGNATURE_ALGORITHM = "rs.security.signature.algorithm";
     
     /**
+     * The EC Curve to use with EC keys loaded from Java Key Store. 
+     * JWK EC Keys are expected to use a standard "crv" property instead.
+     */
+    public static final String RSSEC_EC_CURVE = "rs.security.elliptic.curve";
+    
+    /**
      * The OLD signature algorithm identifier. Use RSSEC_SIGNATURE_ALGORITHM instead.
      */
     @Deprecated

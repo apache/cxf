@@ -50,6 +50,7 @@ import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
 import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
+import org.apache.cxf.rs.security.jose.jwk.JsonWebKeys;
 import org.apache.cxf.rs.security.jose.jwk.JwkUtils;
 import org.apache.cxf.rs.security.jose.jwk.KeyOperation;
 import org.apache.cxf.rs.security.jose.jwk.KeyType;
@@ -149,7 +150,13 @@ public final class JweUtils {
         }
         return keyEncryptionProvider;
     }
-    public static KeyEncryptionProvider getPublicKeyEncryptionProvider(PublicKey key, KeyAlgorithm algo) {
+    public static KeyEncryptionProvider getPublicKeyEncryptionProvider(PublicKey key, 
+                                                                       KeyAlgorithm algo) {
+        return getPublicKeyEncryptionProvider(key, null, algo);
+    }
+    public static KeyEncryptionProvider getPublicKeyEncryptionProvider(PublicKey key, 
+                                                                       Properties props,
+                                                                       KeyAlgorithm algo) {
         if (key instanceof RSAPublicKey) {
             return new RSAKeyEncryptionAlgorithm((RSAPublicKey)key, algo);
         } else if (key instanceof ECPublicKey) {
@@ -158,8 +165,10 @@ public final class JweUtils {
             if (m != null) {
                 ctAlgo = getContentAlgo((String)m.get(JoseConstants.RSSEC_ENCRYPTION_CONTENT_ALGORITHM));
             }
+            String curve = props == null ? JsonWebKey.EC_CURVE_P256 
+                : props.getProperty(JoseConstants.RSSEC_EC_CURVE, JsonWebKey.EC_CURVE_P256);
             return new EcdhAesWrapKeyEncryptionAlgorithm((ECPublicKey)key, 
-                                                         JsonWebKey.EC_CURVE_P256, 
+                                                         curve, 
                                                          algo, 
                                                          ctAlgo == null ? ContentAlgorithm.A128GCM : ctAlgo);
         }
@@ -341,6 +350,7 @@ public final class JweUtils {
         } else {
             keyEncryptionProvider = getPublicKeyEncryptionProvider(
                 KeyManagementUtils.loadPublicKey(m, props), 
+                props,
                 keyAlgo);
             if (includeCert) {
                 headers.setX509Chain(KeyManagementUtils.loadAndEncodeX509CertificateOrChain(m, props));
@@ -718,5 +728,15 @@ public final class JweUtils {
             throw new JweException(JweException.Error.KEY_DECRYPTION_FAILURE);
         }
     }
-    
+    public static JsonWebKeys loadPublicKeyEncryptionKeys(Message m, Properties props) {
+        String storeType = props.getProperty(JoseConstants.RSSEC_KEY_STORE_TYPE);
+        if ("jwk".equals(storeType)) {
+            return JwkUtils.loadPublicJwkSet(m, props);
+        } else {
+            //TODO: consider loading all the public keys in the store
+            PublicKey key = KeyManagementUtils.loadPublicKey(m, props);
+            JsonWebKey jwk = JwkUtils.fromPublicKey(key, props, JoseConstants.RSSEC_ENCRYPTION_KEY_ALGORITHM);
+            return new JsonWebKeys(jwk);
+        }
+    }
 }
