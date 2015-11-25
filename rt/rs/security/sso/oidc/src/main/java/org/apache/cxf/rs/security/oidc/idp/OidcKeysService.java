@@ -16,34 +16,31 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.jose.jwk;
+package org.apache.cxf.rs.security.oidc.idp;
 
-import org.apache.cxf.jaxrs.json.basic.JsonMapObjectReaderWriter;
+import java.util.Properties;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.rs.security.jose.jwk.JsonWebKeys;
+import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 
+@Path("keys")
+public class OidcKeysService {
 
-
-public class DefaultJwkReaderWriter extends JsonMapObjectReaderWriter
-    implements JwkReaderWriter {
-    @Override
-    public String jwkSetToJson(JsonWebKeys jwks) {
-        return toJson(jwks);
+    private volatile JsonWebKeys keySet;
+    
+    @GET
+    @Produces("application/json")
+    public JsonWebKeys getPublicVerificationKeys() {
+        Properties props = JwsUtils.loadSignatureInProperties(true);
+        if (keySet == null) {
+            keySet = JwsUtils.loadPublicVerificationKeys(JAXRSUtils.getCurrentMessage(), props);
+        }
+        return keySet;
     }
-    @Override
-    public JsonWebKeys jsonToJwkSet(String jwksJson) {
-        JsonWebKeys jwks = new JsonWebKeys();
-        fromJson(jwks, jwksJson);
-        return jwks;
-    }
-    @Override
-    public String jwkToJson(JsonWebKey jwk) {
-        return toJson(jwk);
-    }
-    @Override
-    public JsonWebKey jsonToJwk(String jwkJson) {
-        JsonWebKey jwk = new JsonWebKey();
-        fromJson(jwk, jwkJson);
-        return jwk;
-    }
+    
 }
