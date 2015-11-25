@@ -122,6 +122,8 @@ public abstract class AbstractTokenValidator extends AbstractOAuthJoseJwtConsume
                 } else if (keys.getKeys().size() == 1) {
                     key = keys.getKeys().get(0);
                 }
+                //jwkSetClient returns the most up-to-date keys
+                keyMap.clear();
                 keyMap.putAll(keys.getKeyIdMap());
             }
         }

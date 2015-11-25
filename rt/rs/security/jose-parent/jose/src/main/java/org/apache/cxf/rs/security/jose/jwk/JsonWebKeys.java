@@ -29,6 +29,15 @@ import org.apache.cxf.jaxrs.json.basic.JsonMapObject;
 
 public class JsonWebKeys extends JsonMapObject {
     public static final String KEYS_PROPERTY = "keys";
+    public JsonWebKeys() {
+        
+    }
+    public JsonWebKeys(JsonWebKey key) {
+        setInitKey(key);
+    }
+    private void setInitKey(JsonWebKey key) {
+        setKey(key);
+    }
     public List<JsonWebKey> getKeys() {
         List<?> list = (List<?>)super.getProperty(KEYS_PROPERTY);
         if (list != null && !list.isEmpty()) {
@@ -48,7 +57,9 @@ public class JsonWebKeys extends JsonMapObject {
             return null;
         }
     }
-
+    public void setKey(JsonWebKey key) {
+        setKeys(Collections.singletonList(key));
+    } 
     public void setKeys(List<JsonWebKey> keys) {
         super.setProperty(KEYS_PROPERTY, keys);
     }
