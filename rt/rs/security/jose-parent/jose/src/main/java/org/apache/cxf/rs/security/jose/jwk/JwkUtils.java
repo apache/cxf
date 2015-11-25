@@ -373,8 +373,6 @@ public final class JwkUtils {
         return jwk;
     }
     public static JsonWebKey fromPublicKey(PublicKey key, Properties props, String algoProp) {
-        // EC keys can  be supported once we figure out how to get a curve name 
-        // from an EC key instance or if a curve property is introduced
         if (key instanceof RSAPublicKey) {
             return JwkUtils.fromRSAPublicKey((RSAPublicKey)key, algoProp);
         } else {
