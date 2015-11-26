@@ -18,8 +18,10 @@
  */
 package org.apache.cxf.rs.security.jose.jwk;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.math.BigInteger;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
@@ -123,8 +125,14 @@ public final class JwkUtils {
     public static String jwkKeyToJson(JsonWebKey jwkKey) {
         return new JwkReaderWriter().jwkToJson(jwkKey);
     }
+    public static void jwkKeyToJson(JsonWebKey jwkKey, OutputStream os) throws IOException {
+        IOUtils.copy(new ByteArrayInputStream(StringUtils.toBytesUTF8(jwkKeyToJson(jwkKey))), os);
+    }
     public static String jwkSetToJson(JsonWebKeys jwkSet) {
         return new JwkReaderWriter().jwkSetToJson(jwkSet);
+    }
+    public static void jwkSetToJson(JsonWebKeys jwkSet, OutputStream os) throws IOException {
+        IOUtils.copy(new ByteArrayInputStream(StringUtils.toBytesUTF8(jwkSetToJson(jwkSet))), os);
     }
     public static String encodeJwkKey(JsonWebKey jwkKey) {
         return Base64UrlUtility.encode(jwkKeyToJson(jwkKey));

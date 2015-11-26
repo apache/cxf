@@ -20,6 +20,7 @@ package org.apache.cxf.rs.security.jose.jaxrs;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
@@ -27,11 +28,12 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
+import javax.ws.rs.ext.MessageBodyWriter;
 
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKeys;
 import org.apache.cxf.rs.security.jose.jwk.JwkUtils;
 
-public class JsonWebKeysProvider implements MessageBodyReader<JsonWebKeys> {
+public class JsonWebKeysProvider implements MessageBodyReader<JsonWebKeys>, MessageBodyWriter<JsonWebKeys> {
     
     @Override
     public boolean isReadable(Class<?> cls, Type type, Annotation[] anns, MediaType mt) {
@@ -43,6 +45,26 @@ public class JsonWebKeysProvider implements MessageBodyReader<JsonWebKeys> {
                              MultivaluedMap<String, String> headers, InputStream is) throws IOException,
         WebApplicationException {
         return JwkUtils.readJwkSet(is);
+    }
+
+    @Override
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations,
+                               MediaType mediaType) {
+        return type == JsonWebKeys.class;
+    }
+
+    @Override
+    public long getSize(JsonWebKeys t, Class<?> type, Type genericType, Annotation[] annotations,
+                        MediaType mediaType) {
+        return -1;
+    }
+
+    @Override
+    public void writeTo(JsonWebKeys t, Class<?> type, Type genericType, Annotation[] annotations,
+                        MediaType mediaType, MultivaluedMap<String, Object> httpHeaders,
+                        OutputStream entityStream) throws IOException, WebApplicationException {
+        JwkUtils.jwkSetToJson(t, entityStream);
+        
     }
     
 }

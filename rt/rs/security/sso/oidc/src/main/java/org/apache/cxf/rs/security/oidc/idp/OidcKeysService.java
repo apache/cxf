@@ -36,8 +36,8 @@ public class OidcKeysService {
     @GET
     @Produces("application/json")
     public JsonWebKeys getPublicVerificationKeys() {
-        Properties props = JwsUtils.loadSignatureInProperties(true);
         if (keySet == null) {
+            Properties props = JwsUtils.loadSignatureInProperties(true);
             keySet = JwsUtils.loadPublicVerificationKeys(JAXRSUtils.getCurrentMessage(), props);
         }
         return keySet;
