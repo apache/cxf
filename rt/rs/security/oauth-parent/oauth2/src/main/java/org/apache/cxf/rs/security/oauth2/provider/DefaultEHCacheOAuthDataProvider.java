@@ -54,7 +54,7 @@ public class DefaultEHCacheOAuthDataProvider extends AbstractOAuthDataProvider
     private Ehcache refreshTokenCache;
     
     public DefaultEHCacheOAuthDataProvider() {
-        this(DEFAULT_CONFIG_URL, null);
+        this(DEFAULT_CONFIG_URL, BusFactory.getThreadDefaultBus(true));
     }
     
     public DefaultEHCacheOAuthDataProvider(String configFileURL, Bus bus) {
@@ -193,5 +193,8 @@ public class DefaultEHCacheOAuthDataProvider extends AbstractOAuthDataProvider
         refreshTokenCache = createCache(cacheManager, refreshTokenKey);
     }
 
-    
+    public void close() {
+        cacheManager.shutdown();
+    }
+
 }

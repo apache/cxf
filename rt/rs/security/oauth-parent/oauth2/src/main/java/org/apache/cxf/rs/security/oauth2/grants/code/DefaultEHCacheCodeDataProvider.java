@@ -21,6 +21,7 @@ package org.apache.cxf.rs.security.oauth2.grants.code;
 import net.sf.ehcache.Ehcache;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.rs.security.oauth2.provider.DefaultEHCacheOAuthDataProvider;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 
@@ -32,7 +33,7 @@ public class DefaultEHCacheCodeDataProvider extends DefaultEHCacheOAuthDataProvi
     private Ehcache codeGrantCache;
     
     protected DefaultEHCacheCodeDataProvider() {
-        this(DEFAULT_CONFIG_URL, null);
+        this(DEFAULT_CONFIG_URL, BusFactory.getThreadDefaultBus(true));
     }
     
     protected DefaultEHCacheCodeDataProvider(String configFileURL, Bus bus) {
@@ -72,7 +73,7 @@ public class DefaultEHCacheCodeDataProvider extends DefaultEHCacheOAuthDataProvi
     protected void saveCodeGrant(ServerAuthorizationCodeGrant grant) { 
         putCacheValue(codeGrantCache, grant.getCode(), grant, grant.getExpiresIn());
     }
-    
+
     public void setCodeLifetime(long codeLifetime) {
         this.codeLifetime = codeLifetime;
     }
