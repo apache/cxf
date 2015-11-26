@@ -349,9 +349,7 @@ public final class JwkUtils {
         return KeyManagementUtils.toX509CertificateChain(base64EncodedChain);
     }
     public static JsonWebKey fromECPublicKey(ECPublicKey pk, String curve) {
-        JsonWebKey jwk = new JsonWebKey();
-        jwk.setKeyType(KeyType.EC);
-        jwk.setProperty(JsonWebKey.EC_CURVE, curve);
+        JsonWebKey jwk = prepareECJwk(curve);
         jwk.setProperty(JsonWebKey.EC_X_COORDINATE, 
                         Base64UrlUtility.encode(pk.getW().getAffineX().toByteArray()));
         jwk.setProperty(JsonWebKey.EC_Y_COORDINATE, 
@@ -359,9 +357,7 @@ public final class JwkUtils {
         return jwk;
     }
     public static JsonWebKey fromECPrivateKey(ECPrivateKey pk, String curve) {
-        JsonWebKey jwk = new JsonWebKey();
-        jwk.setKeyType(KeyType.EC);
-        jwk.setProperty(JsonWebKey.EC_CURVE, curve);
+        JsonWebKey jwk = prepareECJwk(curve);
         jwk.setProperty(JsonWebKey.EC_PRIVATE_KEY, 
                         Base64UrlUtility.encode(pk.getS().toByteArray()));
         return jwk;
@@ -375,10 +371,11 @@ public final class JwkUtils {
     public static JsonWebKey fromPublicKey(PublicKey key, Properties props, String algoProp) {
         JsonWebKey jwk = null;
         if (key instanceof RSAPublicKey) {
-            jwk = JwkUtils.fromRSAPublicKey((RSAPublicKey)key, props.getProperty(algoProp));
+            String algo = props.getProperty(algoProp);
+            jwk = JwkUtils.fromRSAPublicKey((RSAPublicKey)key, algo);
         } else {
-            jwk = JwkUtils.fromECPublicKey((ECPublicKey)key, 
-                                         props.getProperty(JoseConstants.RSSEC_EC_CURVE));
+            jwk = JwkUtils.fromECPublicKey((ECPublicKey)key,
+                                           props.getProperty(JoseConstants.RSSEC_EC_CURVE));
         }
         String kid = props.getProperty(JoseConstants.RSSEC_KEY_STORE_ALIAS);
         if (kid != null) {
@@ -475,14 +472,22 @@ public final class JwkUtils {
         return new AesCbcHmacJweDecryption(keyDecryption);
     }
     private static JsonWebKey prepareRSAJwk(BigInteger modulus, String algo) {
-        if (!AlgorithmUtils.isRsa(algo)) {
-            throw new JwkException("Invalid algorithm");
-        }
         JsonWebKey jwk = new JsonWebKey();
         jwk.setKeyType(KeyType.RSA);
-        jwk.setAlgorithm(algo);
+        if (algo != null) {
+            if (!AlgorithmUtils.isRsa(algo)) {
+                throw new JwkException("Invalid algorithm");
+            }
+            jwk.setAlgorithm(algo);
+        }
         String encodedModulus = Base64UrlUtility.encode(modulus.toByteArray());
         jwk.setProperty(JsonWebKey.RSA_MODULUS, encodedModulus);
+        return jwk;
+    }
+    private static JsonWebKey prepareECJwk(String curve) {
+        JsonWebKey jwk = new JsonWebKey();
+        jwk.setKeyType(KeyType.EC);
+        jwk.setProperty(JsonWebKey.EC_CURVE, curve);
         return jwk;
     }
     private static String toString(byte[] bytes) {

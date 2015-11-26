@@ -197,6 +197,9 @@ public final class AlgorithmUtils {
     public static boolean isRsa(String algo) {
         return isRsaKeyWrap(algo) || isRsaSign(algo);
     }
+    public static boolean isEc(String algo) {
+        return isEcDsaSign(algo) || isEcdhEsWrap(algo);
+    }
     public static boolean isRsaKeyWrap(String algo) {
         return RSA_CEK_SET.contains(algo);
     }
