@@ -28,7 +28,7 @@ public class DefaultEHCacheCodeDataProvider extends DefaultEHCacheOAuthDataProvi
     implements AuthorizationCodeDataProvider {
     public static final String CODE_GRANT_CACHE_KEY = "cxf.oauth2.codegrant.cache";
     
-    private long codeLifetime = 3600L;
+    private long codeLifetime = 10 * 60;
     private Ehcache codeGrantCache;
     
     protected DefaultEHCacheCodeDataProvider() {
