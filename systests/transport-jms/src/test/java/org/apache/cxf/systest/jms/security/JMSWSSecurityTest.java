@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
+import javax.xml.ws.soap.SOAPFaultException;
 
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.endpoint.Client;
@@ -112,7 +113,7 @@ public class JMSWSSecurityTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
-    public void testUnsignedSAML2AudienceRestrictionToken() throws Exception {
+    public void testUnsignedSAML2AudienceRestrictionTokenURI() throws Exception {
         QName serviceName = new QName("http://cxf.apache.org/hello_world_jms", "HelloWorldService");
         QName portName = new QName("http://cxf.apache.org/hello_world_jms", "HelloWorldPort");
         URL wsdl = getWSDLURL("/wsdl/jms_test.wsdl");
@@ -150,5 +151,124 @@ public class JMSWSSecurityTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)greeter).close();
     }
     
+    @Test
+    public void testUnsignedSAML2AudienceRestrictionTokenBadURI() throws Exception {
+        QName serviceName = new QName("http://cxf.apache.org/hello_world_jms", "HelloWorldService");
+        QName portName = new QName("http://cxf.apache.org/hello_world_jms", "HelloWorldPort");
+        URL wsdl = getWSDLURL("/wsdl/jms_test.wsdl");
+        HelloWorldService service = new HelloWorldService(wsdl, serviceName);
 
+        HelloWorldPortType greeter = service.getPort(portName, HelloWorldPortType.class);
+        
+        SamlCallbackHandler callbackHandler = new SamlCallbackHandler();
+        callbackHandler.setSignAssertion(true);
+        callbackHandler.setConfirmationMethod(SAML2Constants.CONF_BEARER);
+        
+        ConditionsBean conditions = new ConditionsBean();
+        conditions.setTokenPeriodMinutes(5);
+        List<String> audiences = new ArrayList<>();
+        audiences.add("jms:jndi:dynamicQueues/test.jmstransport.text.bad");
+        AudienceRestrictionBean audienceRestrictionBean = new AudienceRestrictionBean();
+        audienceRestrictionBean.setAudienceURIs(audiences);
+        conditions.setAudienceRestrictions(Collections.singletonList(audienceRestrictionBean));
+        
+        callbackHandler.setConditions(conditions);
+        
+        Map<String, Object> outProperties = new HashMap<String, Object>();
+        outProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SAML_TOKEN_UNSIGNED);
+        outProperties.put(WSHandlerConstants.SAML_CALLBACK_REF, callbackHandler);
+        
+        WSS4JOutInterceptor outInterceptor = new WSS4JOutInterceptor(outProperties);
+        Client client = ClientProxy.getClient(greeter);
+        client.getOutInterceptors().add(outInterceptor);
+        
+        try {
+            greeter.sayHi();
+            fail("Failure expected on a bad audience restriction");
+        } catch (SOAPFaultException ex) {
+            // expected
+        }
+
+        ((java.io.Closeable)greeter).close();
+    }
+    
+    @Test
+    public void testUnsignedSAML2AudienceRestrictionTokenServiceName() throws Exception {
+        QName serviceName = new QName("http://cxf.apache.org/hello_world_jms", "HelloWorldService");
+        QName portName = new QName("http://cxf.apache.org/hello_world_jms", "HelloWorldPort");
+        URL wsdl = getWSDLURL("/wsdl/jms_test.wsdl");
+        HelloWorldService service = new HelloWorldService(wsdl, serviceName);
+
+        String response = new String("Bonjour");
+        HelloWorldPortType greeter = service.getPort(portName, HelloWorldPortType.class);
+        
+        SamlCallbackHandler callbackHandler = new SamlCallbackHandler();
+        callbackHandler.setSignAssertion(true);
+        callbackHandler.setConfirmationMethod(SAML2Constants.CONF_BEARER);
+        
+        ConditionsBean conditions = new ConditionsBean();
+        conditions.setTokenPeriodMinutes(5);
+        List<String> audiences = new ArrayList<>();
+        audiences.add("{http://cxf.apache.org/hello_world_jms}HelloWorldService");
+        AudienceRestrictionBean audienceRestrictionBean = new AudienceRestrictionBean();
+        audienceRestrictionBean.setAudienceURIs(audiences);
+        conditions.setAudienceRestrictions(Collections.singletonList(audienceRestrictionBean));
+        
+        callbackHandler.setConditions(conditions);
+        
+        Map<String, Object> outProperties = new HashMap<String, Object>();
+        outProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SAML_TOKEN_UNSIGNED);
+        outProperties.put(WSHandlerConstants.SAML_CALLBACK_REF, callbackHandler);
+        
+        WSS4JOutInterceptor outInterceptor = new WSS4JOutInterceptor(outProperties);
+        Client client = ClientProxy.getClient(greeter);
+        client.getOutInterceptors().add(outInterceptor);
+        
+        String reply = greeter.sayHi();
+        assertNotNull("no response received from service", reply);
+        assertEquals(response, reply);
+
+        ((java.io.Closeable)greeter).close();
+    }
+    
+    @Test
+    public void testUnsignedSAML2AudienceRestrictionTokenBadServiceName() throws Exception {
+        QName serviceName = new QName("http://cxf.apache.org/hello_world_jms", "HelloWorldService");
+        QName portName = new QName("http://cxf.apache.org/hello_world_jms", "HelloWorldPort");
+        URL wsdl = getWSDLURL("/wsdl/jms_test.wsdl");
+        HelloWorldService service = new HelloWorldService(wsdl, serviceName);
+
+        HelloWorldPortType greeter = service.getPort(portName, HelloWorldPortType.class);
+        
+        SamlCallbackHandler callbackHandler = new SamlCallbackHandler();
+        callbackHandler.setSignAssertion(true);
+        callbackHandler.setConfirmationMethod(SAML2Constants.CONF_BEARER);
+        
+        ConditionsBean conditions = new ConditionsBean();
+        conditions.setTokenPeriodMinutes(5);
+        List<String> audiences = new ArrayList<>();
+        audiences.add("{http://cxf.apache.org/hello_world_jms}BadHelloWorldService");
+        AudienceRestrictionBean audienceRestrictionBean = new AudienceRestrictionBean();
+        audienceRestrictionBean.setAudienceURIs(audiences);
+        conditions.setAudienceRestrictions(Collections.singletonList(audienceRestrictionBean));
+        
+        callbackHandler.setConditions(conditions);
+        
+        Map<String, Object> outProperties = new HashMap<String, Object>();
+        outProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SAML_TOKEN_UNSIGNED);
+        outProperties.put(WSHandlerConstants.SAML_CALLBACK_REF, callbackHandler);
+        
+        WSS4JOutInterceptor outInterceptor = new WSS4JOutInterceptor(outProperties);
+        Client client = ClientProxy.getClient(greeter);
+        client.getOutInterceptors().add(outInterceptor);
+        
+        try {
+            greeter.sayHi();
+            fail("Failure expected on a bad audience restriction");
+        } catch (SOAPFaultException ex) {
+            // expected
+        }
+
+        ((java.io.Closeable)greeter).close();
+    }
 }
