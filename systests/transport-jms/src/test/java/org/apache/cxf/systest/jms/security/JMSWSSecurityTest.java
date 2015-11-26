@@ -166,7 +166,7 @@ public class JMSWSSecurityTest extends AbstractBusClientServerTestBase {
         
         ConditionsBean conditions = new ConditionsBean();
         conditions.setTokenPeriodMinutes(5);
-        List<String> audiences = new ArrayList<>();
+        List<String> audiences = new ArrayList<String>();
         audiences.add("jms:jndi:dynamicQueues/test.jmstransport.text.bad");
         AudienceRestrictionBean audienceRestrictionBean = new AudienceRestrictionBean();
         audienceRestrictionBean.setAudienceURIs(audiences);
@@ -208,7 +208,7 @@ public class JMSWSSecurityTest extends AbstractBusClientServerTestBase {
         
         ConditionsBean conditions = new ConditionsBean();
         conditions.setTokenPeriodMinutes(5);
-        List<String> audiences = new ArrayList<>();
+        List<String> audiences = new ArrayList<String>();
         audiences.add("{http://cxf.apache.org/hello_world_jms}HelloWorldService");
         AudienceRestrictionBean audienceRestrictionBean = new AudienceRestrictionBean();
         audienceRestrictionBean.setAudienceURIs(audiences);
@@ -246,7 +246,7 @@ public class JMSWSSecurityTest extends AbstractBusClientServerTestBase {
         
         ConditionsBean conditions = new ConditionsBean();
         conditions.setTokenPeriodMinutes(5);
-        List<String> audiences = new ArrayList<>();
+        List<String> audiences = new ArrayList<String>();
         audiences.add("{http://cxf.apache.org/hello_world_jms}BadHelloWorldService");
         AudienceRestrictionBean audienceRestrictionBean = new AudienceRestrictionBean();
         audienceRestrictionBean.setAudienceURIs(audiences);
