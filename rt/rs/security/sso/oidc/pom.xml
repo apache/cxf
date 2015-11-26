@@ -36,6 +36,11 @@
             <artifactId>cxf-rt-rs-security-oauth2</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-rs-security-jose-jaxrs</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <!--test dependencies-->
         <dependency>
             <groupId>junit</groupId>
