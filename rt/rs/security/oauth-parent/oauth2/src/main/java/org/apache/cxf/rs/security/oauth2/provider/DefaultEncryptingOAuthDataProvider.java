@@ -35,8 +35,7 @@ import org.apache.cxf.rs.security.oauth2.utils.crypto.ModelEncryptionSupport;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
 import org.apache.cxf.rt.security.crypto.KeyProperties;
 
-public class DefaultEncryptingOAuthDataProvider extends AbstractOAuthDataProvider 
-    implements ClientRegistrationProvider {
+public class DefaultEncryptingOAuthDataProvider extends AbstractOAuthDataProvider {
     protected SecretKey key;
     private Set<String> tokens = Collections.synchronizedSet(new HashSet<String>());
     private ConcurrentHashMap<String, String> refreshTokens = new ConcurrentHashMap<String, String>();
