@@ -31,7 +31,7 @@ import org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 
-public abstract class AbstractOAuthDataProvider implements OAuthDataProvider {
+public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, ClientRegistrationProvider {
     private long accessTokenLifetime = 3600L;
     private long refreshTokenLifetime; // refresh tokens are eternal by default
     private boolean recycleRefreshTokens = true;

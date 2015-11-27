@@ -41,8 +41,7 @@ import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken;
 import org.apache.cxf.rs.security.oauth2.utils.EHCacheUtil;
 
-public class DefaultEHCacheOAuthDataProvider extends AbstractOAuthDataProvider 
-    implements ClientRegistrationProvider {
+public class DefaultEHCacheOAuthDataProvider extends AbstractOAuthDataProvider {
     public static final String CLIENT_CACHE_KEY = "cxf.oauth2.client.cache";
     public static final String ACCESS_TOKEN_CACHE_KEY = "cxf.oauth2.accesstoken.cache";
     public static final String REFRESH_TOKEN_CACHE_KEY = "cxf.oauth2.refreshtoken.cache";
