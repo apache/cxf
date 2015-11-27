@@ -37,16 +37,12 @@ import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
-<<<<<<< HEAD
+import org.opensaml.saml1.core.AttributeStatement;
+import org.opensaml.saml1.core.AuthenticationStatement;
+import org.opensaml.saml1.core.AuthorizationDecisionStatement;
+import org.opensaml.saml1.core.NameIdentifier;
+import org.opensaml.saml1.core.Statement;
 import org.opensaml.saml2.core.NameID;
-=======
-import org.opensaml.saml.saml1.core.AttributeStatement;
-import org.opensaml.saml.saml1.core.AuthenticationStatement;
-import org.opensaml.saml.saml1.core.AuthorizationDecisionStatement;
-import org.opensaml.saml.saml1.core.NameIdentifier;
-import org.opensaml.saml.saml1.core.Statement;
-import org.opensaml.saml.saml2.core.NameID;
->>>>>>> e81610d... Allow setting the security context up with a SAML 1.1 assertion
 
 public final class SAMLUtils {
     private static final Logger LOG = 
@@ -57,22 +53,8 @@ public final class SAMLUtils {
     }
     
     public static Subject getSubject(Message message, SamlAssertionWrapper assertionW) {
-<<<<<<< HEAD
-        org.opensaml.saml2.core.Subject s = assertionW.getSaml2().getSubject();
-        Subject subject = new Subject();
-        NameID nameId = s.getNameID();
-        subject.setNameQualifier(nameId.getNameQualifier());
-        // if format is transient then we may need to use STSClient
-        // to request an alternate name from IDP
-        subject.setNameFormat(nameId.getFormat());
-        
-        subject.setName(nameId.getValue());
-        subject.setSpId(nameId.getSPProvidedID());
-        subject.setSpQualifier(nameId.getSPNameQualifier());
-        return subject;
-=======
         if (assertionW.getSaml2() != null) {
-            org.opensaml.saml.saml2.core.Subject s = assertionW.getSaml2().getSubject();
+            org.opensaml.saml2.core.Subject s = assertionW.getSaml2().getSubject();
             Subject subject = new Subject();
             NameID nameId = s.getNameID();
             subject.setNameQualifier(nameId.getNameQualifier());
@@ -85,7 +67,7 @@ public final class SAMLUtils {
             subject.setSpQualifier(nameId.getSPNameQualifier());
             return subject;
         } else if (assertionW.getSaml1() != null) {
-            org.opensaml.saml.saml1.core.Subject s = getSaml1Subject(assertionW);
+            org.opensaml.saml1.core.Subject s = getSaml1Subject(assertionW);
             if (s != null) {
                 Subject subject = new Subject();
                 NameIdentifier nameId = s.getNameIdentifier();
@@ -94,16 +76,16 @@ public final class SAMLUtils {
                 // to request an alternate name from IDP
                 subject.setNameFormat(nameId.getFormat());
                 
-                subject.setName(nameId.getValue());
+                subject.setName(nameId.getNameIdentifier());
                 return subject;
             }
         }
         return null;
     }
     
-    private static org.opensaml.saml.saml1.core.Subject getSaml1Subject(SamlAssertionWrapper assertionW) {
-        for (Statement stmt : ((org.opensaml.saml.saml1.core.Assertion)assertionW.getSaml1()).getStatements()) {
-            org.opensaml.saml.saml1.core.Subject samlSubject = null;
+    private static org.opensaml.saml1.core.Subject getSaml1Subject(SamlAssertionWrapper assertionW) {
+        for (Statement stmt : ((org.opensaml.saml1.core.Assertion)assertionW.getSaml1()).getStatements()) {
+            org.opensaml.saml1.core.Subject samlSubject = null;
             if (stmt instanceof AttributeStatement) {
                 AttributeStatement attrStmt = (AttributeStatement) stmt;
                 samlSubject = attrStmt.getSubject();
@@ -120,7 +102,6 @@ public final class SAMLUtils {
             }
         }
         return null;
->>>>>>> e81610d... Allow setting the security context up with a SAML 1.1 assertion
     }
     
     public static SamlAssertionWrapper createAssertion(Message message) throws Fault {

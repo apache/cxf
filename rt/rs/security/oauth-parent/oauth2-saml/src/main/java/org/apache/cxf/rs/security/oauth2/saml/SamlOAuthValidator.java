@@ -123,14 +123,7 @@ public class SamlOAuthValidator {
     
     private boolean validateAuthenticationSubject(Message m, 
                                                   Conditions cs,
-<<<<<<< HEAD
                                                   org.opensaml.saml2.core.Subject subject) {
-        if (subject.getSubjectConfirmations() == null) {
-            return false;
-        }
-=======
-                                                  org.opensaml.saml.saml2.core.Subject subject) {
->>>>>>> 6b35529... Avoid a bug that a bearer subject conf is not enforced if the subject conf list is not empty
         // We need to find a Bearer Subject Confirmation method
         boolean bearerSubjectConfFound = false;
         if (subject.getSubjectConfirmations() != null) {
