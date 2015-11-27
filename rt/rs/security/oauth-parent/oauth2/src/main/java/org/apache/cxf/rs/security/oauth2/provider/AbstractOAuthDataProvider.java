@@ -86,21 +86,17 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider {
     public void revokeToken(Client client, String tokenKey, String tokenTypeHint) throws OAuthServiceException {
         ServerAccessToken accessToken = revokeAccessToken(tokenKey);
         if (accessToken == null) {
+            // Revoke refresh token            
             doRevokeRefreshAndAccessTokens(client, tokenKey, true);
         } else {
+            // Revoke access token
             if (accessToken.getRefreshToken() != null) {
                 RefreshToken rt = getRefreshToken(client, accessToken.getRefreshToken());
                 if (rt == null) {
                     return;
                 }
                 
-                List<String> accessTokenKeys = rt.getAccessTokens();
-                for (int i = 0; i < accessTokenKeys.size(); i++) {
-                    if (accessTokenKeys.get(i).equals(accessToken.getTokenKey())) {
-                        accessTokenKeys.remove(i);
-                        break;
-                    }
-                }
+                unlinkRefreshAccessToken(rt, accessToken.getTokenKey());
                 if (rt.getAccessTokens().isEmpty()) {
                     revokeRefreshToken(client, rt.getTokenKey());
                 } else {
@@ -109,6 +105,16 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider {
             }
         }
     }
+    protected void unlinkRefreshAccessToken(RefreshToken rt, String tokenKey) {
+        List<String> accessTokenKeys = rt.getAccessTokens();
+        for (int i = 0; i < accessTokenKeys.size(); i++) {
+            if (accessTokenKeys.get(i).equals(tokenKey)) {
+                accessTokenKeys.remove(i);
+                break;
+            }
+        }
+    }
+
     protected RefreshToken revokeRefreshAndAccessTokens(Client client, String tokenKey) {
         return doRevokeRefreshAndAccessTokens(client, tokenKey, recycleRefreshTokens);
     }
@@ -119,11 +125,10 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider {
             || OAuthUtils.isExpired(currentRefreshToken.getIssuedAt(), currentRefreshToken.getExpiresIn())) {
             throw new OAuthServiceException(OAuthConstants.ACCESS_DENIED);
         }
-        for (String accessTokenKey : currentRefreshToken.getAccessTokens()) {
-            revokeAccessToken(accessTokenKey);
-        }
         if (recycle) {
-            currentRefreshToken.getAccessTokens().clear();
+            for (String accessTokenKey : currentRefreshToken.getAccessTokens()) {
+                revokeAccessToken(accessTokenKey);
+            }
         }
         return currentRefreshToken;
     }
