@@ -92,7 +92,9 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
         
         // Get the access token
         AccessTokenValidation accessTokenV = getAccessTokenValidation(authScheme, authSchemeData, null); 
-        
+        if (!accessTokenV.isInitialValidationSuccessful()) {
+            throw ExceptionUtils.toNotAuthorizedException(null, null);
+        }
         // Find the scopes which match the current request
         
         List<OAuthPermission> permissions = accessTokenV.getTokenScopes();
