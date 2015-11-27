@@ -36,6 +36,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 // (introduce default constructors, etc) 
 @XmlRootElement
 public class AccessTokenValidation {
+    private boolean initialValidationSuccessful = true;
     private String clientId;
     private String clientIpAddress;
     private UserSubject clientSubject;
@@ -166,6 +167,14 @@ public class AccessTokenValidation {
 
     public void setClientCodeVerifier(String clientCodeVerifier) {
         this.clientCodeVerifier = clientCodeVerifier;
+    }
+
+    public boolean isInitialValidationSuccessful() {
+        return initialValidationSuccessful;
+    }
+
+    public void setInitialValidationSuccessful(boolean localValidationSuccessful) {
+        this.initialValidationSuccessful = localValidationSuccessful;
     }
     
 }

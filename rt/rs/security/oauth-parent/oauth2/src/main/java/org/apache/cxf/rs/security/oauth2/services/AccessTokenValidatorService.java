@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Encoded;
+import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -46,7 +47,15 @@ public class AccessTokenValidatorService extends AbstractAccessTokenValidator {
         checkSecurityContext();
         String authScheme = params.getFirst(OAuthConstants.AUTHORIZATION_SCHEME_TYPE);
         String authSchemeData  = params.getFirst(OAuthConstants.AUTHORIZATION_SCHEME_DATA);
-        return super.getAccessTokenValidation(authScheme, authSchemeData, params);
+        try {
+            return super.getAccessTokenValidation(authScheme, authSchemeData, params);
+        } catch (NotAuthorizedException ex) {
+            // at this point it does not mean that RS failed to authenticate but that the basic
+            // local or chained token validation has failed
+            AccessTokenValidation v = new AccessTokenValidation();
+            v.setInitialValidationSuccessful(false);
+            return v;
+        }
     }
 
     private void checkSecurityContext() {
