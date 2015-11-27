@@ -62,6 +62,7 @@ public class SamlOAuthValidator {
     }
     
     public void validate(Message message, SamlAssertionWrapper wrapper) {
+        validateSAMLVersion(wrapper);
         
         Conditions cs = wrapper.getSaml2().getConditions();
         validateAudience(message, cs);
@@ -75,6 +76,12 @@ public class SamlOAuthValidator {
             }
         }
         if (!validateAuthenticationSubject(message, cs, wrapper.getSaml2().getSubject())) {
+            throw ExceptionUtils.toNotAuthorizedException(null, null);
+        }
+    }
+    
+    private void validateSAMLVersion(SamlAssertionWrapper assertionW) {
+        if (assertionW.getSaml2() == null) {
             throw ExceptionUtils.toNotAuthorizedException(null, null);
         }
     }
