@@ -40,6 +40,11 @@ import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.opensaml.saml.saml1.core.AttributeStatement;
+import org.opensaml.saml.saml1.core.AuthenticationStatement;
+import org.opensaml.saml.saml1.core.AuthorizationDecisionStatement;
+import org.opensaml.saml.saml1.core.NameIdentifier;
+import org.opensaml.saml.saml1.core.Statement;
 import org.opensaml.saml.saml2.core.NameID;
 
 public final class SAMLUtils {
@@ -51,18 +56,55 @@ public final class SAMLUtils {
     }
     
     public static Subject getSubject(Message message, SamlAssertionWrapper assertionW) {
-        org.opensaml.saml.saml2.core.Subject s = assertionW.getSaml2().getSubject();
-        Subject subject = new Subject();
-        NameID nameId = s.getNameID();
-        subject.setNameQualifier(nameId.getNameQualifier());
-        // if format is transient then we may need to use STSClient
-        // to request an alternate name from IDP
-        subject.setNameFormat(nameId.getFormat());
-        
-        subject.setName(nameId.getValue());
-        subject.setSpId(nameId.getSPProvidedID());
-        subject.setSpQualifier(nameId.getSPNameQualifier());
-        return subject;
+        if (assertionW.getSaml2() != null) {
+            org.opensaml.saml.saml2.core.Subject s = assertionW.getSaml2().getSubject();
+            Subject subject = new Subject();
+            NameID nameId = s.getNameID();
+            subject.setNameQualifier(nameId.getNameQualifier());
+            // if format is transient then we may need to use STSClient
+            // to request an alternate name from IDP
+            subject.setNameFormat(nameId.getFormat());
+            
+            subject.setName(nameId.getValue());
+            subject.setSpId(nameId.getSPProvidedID());
+            subject.setSpQualifier(nameId.getSPNameQualifier());
+            return subject;
+        } else if (assertionW.getSaml1() != null) {
+            org.opensaml.saml.saml1.core.Subject s = getSaml1Subject(assertionW);
+            if (s != null) {
+                Subject subject = new Subject();
+                NameIdentifier nameId = s.getNameIdentifier();
+                subject.setNameQualifier(nameId.getNameQualifier());
+                // if format is transient then we may need to use STSClient
+                // to request an alternate name from IDP
+                subject.setNameFormat(nameId.getFormat());
+                
+                subject.setName(nameId.getValue());
+                return subject;
+            }
+        }
+        return null;
+    }
+    
+    private static org.opensaml.saml.saml1.core.Subject getSaml1Subject(SamlAssertionWrapper assertionW) {
+        for (Statement stmt : ((org.opensaml.saml.saml1.core.Assertion)assertionW.getSaml1()).getStatements()) {
+            org.opensaml.saml.saml1.core.Subject samlSubject = null;
+            if (stmt instanceof AttributeStatement) {
+                AttributeStatement attrStmt = (AttributeStatement) stmt;
+                samlSubject = attrStmt.getSubject();
+            } else if (stmt instanceof AuthenticationStatement) {
+                AuthenticationStatement authStmt = (AuthenticationStatement) stmt;
+                samlSubject = authStmt.getSubject();
+            } else {
+                AuthorizationDecisionStatement authzStmt = 
+                    (AuthorizationDecisionStatement)stmt;
+                samlSubject = authzStmt.getSubject();
+            }
+            if (samlSubject != null) {
+                return samlSubject;
+            }
+        }
+        return null;
     }
     
     public static SamlAssertionWrapper createAssertion(Message message) throws Fault {
