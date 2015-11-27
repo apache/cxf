@@ -54,9 +54,14 @@ public class DefaultEHCacheCodeDataProvider extends DefaultEHCacheOAuthDataProvi
     @Override
     public ServerAuthorizationCodeGrant createCodeGrant(AuthorizationCodeRegistration reg)
         throws OAuthServiceException {
-        ServerAuthorizationCodeGrant grant = AbstractCodeDataProvider.initCodeGrant(reg, codeLifetime);
+        ServerAuthorizationCodeGrant grant = doCreateCodeGrant(reg);
         saveCodeGrant(grant);
         return grant;
+    }
+    
+    protected ServerAuthorizationCodeGrant doCreateCodeGrant(AuthorizationCodeRegistration reg)
+        throws OAuthServiceException {
+        return AbstractCodeDataProvider.initCodeGrant(reg, codeLifetime);
     }
 
     @Override

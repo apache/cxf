@@ -31,9 +31,14 @@ public abstract class AbstractCodeDataProvider extends AbstractOAuthDataProvider
     @Override
     public ServerAuthorizationCodeGrant createCodeGrant(AuthorizationCodeRegistration reg) 
         throws OAuthServiceException {
-        ServerAuthorizationCodeGrant grant = initCodeGrant(reg, codeLifetime);
+        ServerAuthorizationCodeGrant grant = doCreateCodeGrant(reg);
         saveCodeGrant(grant);
         return grant;
+    }
+    
+    protected ServerAuthorizationCodeGrant doCreateCodeGrant(AuthorizationCodeRegistration reg)
+        throws OAuthServiceException {
+        return AbstractCodeDataProvider.initCodeGrant(reg, codeLifetime);
     }
     
     public void setCodeLifetime(long codeLifetime) {

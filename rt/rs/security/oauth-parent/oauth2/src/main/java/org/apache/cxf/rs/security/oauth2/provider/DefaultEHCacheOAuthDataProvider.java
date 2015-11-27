@@ -102,17 +102,20 @@ public class DefaultEHCacheOAuthDataProvider extends AbstractOAuthDataProvider
         return getCacheValue(accessTokenCache, accessToken, ServerAccessToken.class);
     }
 
-    @Override
-    public void removeAccessToken(ServerAccessToken accessToken) throws OAuthServiceException {
-        revokeAccessToken(accessToken.getTokenKey());
+    protected ServerAccessToken revokeAccessToken(String accessTokenKey) {
+        ServerAccessToken at = getAccessToken(accessTokenKey);
+        if (at != null) {
+            accessTokenCache.remove(accessTokenKey);
+        }
+        return at;
     }
-
-    protected boolean revokeAccessToken(String accessTokenKey) {
-        return accessTokenCache.remove(accessTokenKey);
+    
+    protected RefreshToken getRefreshToken(Client client, String refreshTokenKey) { 
+        return getCacheValue(refreshTokenCache, refreshTokenKey, RefreshToken.class);
     }
     
     protected RefreshToken revokeRefreshToken(Client client, String refreshTokenKey) { 
-        RefreshToken refreshToken = getCacheValue(refreshTokenCache, refreshTokenKey, RefreshToken.class);
+        RefreshToken refreshToken = getRefreshToken(client, refreshTokenKey);
         if (refreshToken != null) {
             refreshTokenCache.remove(refreshTokenKey);
         }
