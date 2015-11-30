@@ -23,7 +23,20 @@
           "in": "formData",
           "name": "password",
           "type": "string"
-         }
+         },
+         {
+          "name": "type",
+          "in": "matrix",
+          "required": true,
+          "type": "string",
+          "enum": [
+            "PROPAGATION",
+            "NOTIFICATION",
+            "SCHEDULED",
+            "SYNCHRONIZATION",
+            "PUSH"
+          ]
+        }
         ]
       }
     }
