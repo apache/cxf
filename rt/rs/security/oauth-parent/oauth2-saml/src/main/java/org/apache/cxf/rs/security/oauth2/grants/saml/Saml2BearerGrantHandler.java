@@ -38,7 +38,6 @@ import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.rs.security.common.CryptoLoader;
 import org.apache.cxf.rs.security.common.RSSecurityUtils;
@@ -64,7 +63,6 @@ import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.saml.WSSSAMLKeyInfoProcessor;
 import org.apache.wss4j.dom.validate.Credential;
 import org.apache.wss4j.dom.validate.SamlAssertionValidator;
@@ -187,8 +185,15 @@ public class Saml2BearerGrantHandler extends AbstractGrantHandler {
                 } catch (IOException ex) {
                     throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
                 }
-                data.setEnableRevocation(MessageUtils.isTrue(
-                    message.getContextualProperty(WSHandlerConstants.ENABLE_REVOCATION)));
+                
+                boolean enableRevocation = false;
+                String enableRevocationStr = 
+                    (String)org.apache.cxf.rt.security.utils.SecurityUtils.getSecurityPropertyValue(
+                        SecurityConstants.ENABLE_REVOCATION, message);
+                if (enableRevocationStr != null) {
+                    enableRevocation = Boolean.parseBoolean(enableRevocationStr);
+                }
+                data.setEnableRevocation(enableRevocation);
                 
                 Signature sig = assertion.getSignature();
                 WSDocInfo docInfo = new WSDocInfo(sig.getDOM().getOwnerDocument());
@@ -200,7 +205,10 @@ public class Saml2BearerGrantHandler extends AbstractGrantHandler {
                         data.getSigVerCrypto()
                     );
                 assertion.verifySignature(samlKeyInfo);
-                
+                assertion.parseSubject(
+                    new WSSSAMLKeyInfoProcessor(data, null), data.getSigVerCrypto(), 
+                    data.getCallbackHandler()
+                );
             } else if (getTLSCertificates(message) == null) {
                 throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
             }
