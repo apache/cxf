@@ -20,6 +20,7 @@ package org.apache.cxf.rs.security.jose.jaxrs;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.security.Principal;
 
 import javax.annotation.Priority;
 import javax.ws.rs.HttpMethod;
@@ -32,6 +33,8 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.rs.security.jose.common.JoseUtils;
 import org.apache.cxf.rs.security.jose.jws.JwsCompactConsumer;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
+import org.apache.cxf.rs.security.jose.jws.PublicKeyJwsSignatureVerifier;
+import org.apache.cxf.security.SecurityContext;
 
 @PreMatching
 @Priority(Priorities.JWS_SERVER_READ_PRIORITY)
@@ -56,6 +59,29 @@ public class JwsContainerRequestFilter extends AbstractJwsReaderProvider impleme
         if (ct != null) {
             context.getHeaders().putSingle("Content-Type", ct);
         }
+        
+        SecurityContext securityContext = configureSecurityContext(theSigVerifier);
+        if (securityContext != null) {
+            JAXRSUtils.getCurrentMessage().put(SecurityContext.class, securityContext);
+        }
     }
     
+    protected SecurityContext configureSecurityContext(JwsSignatureVerifier sigVerifier) {
+        if (sigVerifier instanceof PublicKeyJwsSignatureVerifier
+            && ((PublicKeyJwsSignatureVerifier)sigVerifier).getX509Certificate() != null) {
+            final Principal principal = 
+                ((PublicKeyJwsSignatureVerifier)sigVerifier).getX509Certificate().getSubjectX500Principal();
+            return new SecurityContext() {
+
+                public Principal getUserPrincipal() {
+                    return principal;
+                }
+
+                public boolean isUserInRole(String arg0) {
+                    return false;
+                }
+            };
+        }
+        return null;
+    }
 }
