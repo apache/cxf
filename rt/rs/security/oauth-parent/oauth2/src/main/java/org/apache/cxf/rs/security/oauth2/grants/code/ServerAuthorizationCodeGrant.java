@@ -39,7 +39,6 @@ public class ServerAuthorizationCodeGrant extends AuthorizationCodeGrant {
     private List<String> requestedScopes = Collections.emptyList();
     private UserSubject subject;
     private String audience;
-    private String nonce;
     private String clientCodeChallenge;
     
     public ServerAuthorizationCodeGrant() {
@@ -165,13 +164,5 @@ public class ServerAuthorizationCodeGrant extends AuthorizationCodeGrant {
 
     public void setRequestedScopes(List<String> requestedScopes) {
         this.requestedScopes = requestedScopes;
-    }
-
-    public String getNonce() {
-        return nonce;
-    }
-
-    public void setNonce(String nonce) {
-        this.nonce = nonce;
     }
 }

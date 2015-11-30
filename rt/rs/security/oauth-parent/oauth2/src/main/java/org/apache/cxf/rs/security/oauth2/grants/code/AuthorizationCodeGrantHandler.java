@@ -84,8 +84,7 @@ public class AuthorizationCodeGrantHandler extends AbstractGrantHandler {
                                    grant.getRequestedScopes(),
                                    grant.getApprovedScopes(),
                                    grant.getAudience(),
-                                   clientCodeVerifier,
-                                   grant.getNonce());
+                                   clientCodeVerifier);
     }
     
     private boolean compareCodeVerifierWithChallenge(Client c, String clientCodeVerifier, 
