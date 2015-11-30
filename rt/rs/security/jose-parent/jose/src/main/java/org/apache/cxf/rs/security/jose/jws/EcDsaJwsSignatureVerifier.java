@@ -19,6 +19,7 @@
 package org.apache.cxf.rs.security.jose.jws;
 
 import java.security.PublicKey;
+import java.security.cert.X509Certificate;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.HashMap;
 import java.util.Map;
@@ -39,6 +40,14 @@ public class EcDsaJwsSignatureVerifier extends PublicKeyJwsSignatureVerifier {
     }
     public EcDsaJwsSignatureVerifier(PublicKey key, AlgorithmParameterSpec spec, SignatureAlgorithm supportedAlgo) {
         super(key, spec, supportedAlgo);
+    }
+    public EcDsaJwsSignatureVerifier(X509Certificate cert, SignatureAlgorithm supportedAlgo) {
+        this(cert, null, supportedAlgo);
+    }
+    public EcDsaJwsSignatureVerifier(X509Certificate cert, 
+                                     AlgorithmParameterSpec spec, 
+                                     SignatureAlgorithm supportedAlgo) {
+        super(cert, spec, supportedAlgo);
     }
     @Override
     public boolean verify(JwsHeaders headers, String unsignedText, byte[] signature) {
