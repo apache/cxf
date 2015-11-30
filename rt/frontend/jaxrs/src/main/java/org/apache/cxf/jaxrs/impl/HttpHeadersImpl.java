@@ -57,6 +57,10 @@ public class HttpHeadersImpl implements HttpHeaders {
     private static final String COOKIE_SEPARATOR_CRLF = "crlf";
     private static final String DEFAULT_SEPARATOR = ",";
     private static final String DEFAULT_COOKIE_SEPARATOR = ";";
+    private static final String DOLLAR_CHAR = "$";
+    private static final String COOKIE_VERSION_PARAM = DOLLAR_CHAR + "Version";
+    private static final String COOKIE_PATH_PARAM = DOLLAR_CHAR + "Path";
+    private static final String COOKIE_DOMAIN_PARAM = DOLLAR_CHAR + "Domain";
     
     private static final String COMPLEX_HEADER_EXPRESSION = 
         "(([\\w]+=\"[^\"]*\")|([\\w]+=[\\w]+)|([\\w]+))(;(([\\w]+=\"[^\"]*\")|([\\w]+=[\\w]+)|([\\w]+)))?";
@@ -110,9 +114,10 @@ public class HttpHeadersImpl implements HttpHeaders {
             if (value == null) {
                 continue;
             }
-            List<String> cs = value.contains("$")
-                ? Collections.singletonList(value)
-                : getHeaderValues(HttpHeaders.COOKIE, value, getCookieSeparator());
+            
+            
+            List<String> cs = getHeaderValues(HttpHeaders.COOKIE, value, 
+                                              getCookieSeparator(value));
             for (String c : cs) {
                 Cookie cookie = Cookie.valueOf(c);
                 cl.put(cookie.getName(), cookie);
@@ -121,7 +126,22 @@ public class HttpHeadersImpl implements HttpHeaders {
         return cl;
     }
 
-    private String getCookieSeparator() {
+    private String getCookieSeparator(String value) {
+        String separator = getCookieSeparatorFromProperty();
+        if (separator != null) {
+            return separator;
+        } else {
+            if (value.contains(DOLLAR_CHAR)
+                && (value.contains(COOKIE_VERSION_PARAM)
+                    || value.contains(COOKIE_PATH_PARAM)
+                    || value.contains(COOKIE_DOMAIN_PARAM))) {
+                return DEFAULT_SEPARATOR;
+            }
+            
+            return DEFAULT_COOKIE_SEPARATOR;
+        }
+    }
+    private String getCookieSeparatorFromProperty() {
         Object cookiePropValue = message.getContextualProperty(COOKIE_SEPARATOR_PROPERTY);
         if (cookiePropValue != null) {
             String separator = cookiePropValue.toString().trim();
@@ -133,9 +153,9 @@ public class HttpHeadersImpl implements HttpHeaders {
             }
             return separator;
         } else {
-            return DEFAULT_COOKIE_SEPARATOR;
+            return null;
         }
-    }
+    }    
     
     public Locale getLanguage() {
         List<String> values = getListValues(HttpHeaders.CONTENT_LANGUAGE);
@@ -212,7 +232,7 @@ public class HttpHeadersImpl implements HttpHeaders {
             if (value == null) {
                 continue;
             }
-            String sep = HttpHeaders.COOKIE.equalsIgnoreCase(name) ? getCookieSeparator() : DEFAULT_SEPARATOR;
+            String sep = HttpHeaders.COOKIE.equalsIgnoreCase(name) ? getCookieSeparator(value) : DEFAULT_SEPARATOR;
             ls.addAll(getHeaderValues(name, value, sep));
         }
         return ls;
