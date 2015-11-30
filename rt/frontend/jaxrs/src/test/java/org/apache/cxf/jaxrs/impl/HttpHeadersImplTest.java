@@ -396,12 +396,12 @@ public class HttpHeadersImplTest extends Assert {
         Message m = new MessageImpl();
         m.setExchange(new ExchangeImpl());
         MetadataMap<String, String> headers = createHeaders();
-        headers.putSingle(HttpHeaders.COOKIE, "a=b;c=d");
+        headers.putSingle(HttpHeaders.COOKIE, "a=$b;c=d");
         m.put(Message.PROTOCOL_HEADERS, headers);
         HttpHeaders h = new HttpHeadersImpl(m);
         Map<String, Cookie> cookies = h.getCookies();
         assertEquals(2, cookies.size());
-        assertEquals("b", cookies.get("a").getValue());
+        assertEquals("$b", cookies.get("a").getValue());
         assertEquals("d", cookies.get("c").getValue());
     }
     
@@ -419,6 +419,25 @@ public class HttpHeadersImplTest extends Assert {
         Cookie cookie = cookies.get("a");
         assertEquals("b", cookie.getValue());
         assertEquals(1, cookie.getVersion());
+    }
+    
+    @Test
+    public void testGetCookiesWithAttributes() throws Exception {
+        
+        Message m = new MessageImpl();
+        m.setExchange(new ExchangeImpl());
+        MetadataMap<String, String> headers = createHeaders();
+        headers.putSingle(HttpHeaders.COOKIE, "$Version=1;a=b, $Version=1;c=d");
+        m.put(Message.PROTOCOL_HEADERS, headers);
+        HttpHeaders h = new HttpHeadersImpl(m);
+        Map<String, Cookie> cookies = h.getCookies();
+        assertEquals(2, cookies.size());
+        Cookie cookieA = cookies.get("a");
+        assertEquals("b", cookieA.getValue());
+        assertEquals(1, cookieA.getVersion());
+        Cookie cookieC = cookies.get("c");
+        assertEquals("d", cookieC.getValue());
+        assertEquals(1, cookieA.getVersion());
     }
     
     
