@@ -57,7 +57,7 @@ public class SwaggerUtilsTest extends Assert {
         assertEquals("application/x-www-form-urlencoded", op.getConsumes());
         assertEquals("application/json", op.getProduces());
         
-        assertEquals(2, op.getParameters().size());
+        assertEquals(3, op.getParameters().size());
         Parameter param1 = op.getParameters().get(0);
         assertEquals("userName", param1.getName());
         assertEquals(ParameterType.FORM, param1.getType());
@@ -66,5 +66,9 @@ public class SwaggerUtilsTest extends Assert {
         assertEquals("password", param2.getName());
         assertEquals(ParameterType.FORM, param2.getType());
         assertEquals(String.class, param2.getJavaType());
+        Parameter param3 = op.getParameters().get(2);
+        assertEquals("type", param3.getName());
+        assertEquals(ParameterType.MATRIX, param3.getType());
+        assertEquals(String.class, param3.getJavaType());
     }
 }
