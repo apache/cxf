@@ -118,25 +118,22 @@ public abstract class AbstractGrantHandler implements AccessTokenGrantHandler {
                                                     String audience) {
         
         return doCreateAccessToken(client, subject, getSingleGrantType(), requestedScope, 
-                                   approvedScope, audience, null, null);
+                                   approvedScope, audience, null);
     }
     
     protected ServerAccessToken doCreateAccessToken(Client client,
                                                     UserSubject subject,
                                                     String requestedGrant,
                                                     List<String> requestedScope) {
-        return doCreateAccessToken(client, subject, requestedGrant, requestedScope, null, null, null, null);
+        return doCreateAccessToken(client, subject, requestedGrant, requestedScope, null, null, null);
     }
-    //CHECKSTYLE:OFF
     protected ServerAccessToken doCreateAccessToken(Client client,
                                                     UserSubject subject,
                                                     String requestedGrant,
                                                     List<String> requestedScope,
                                                     List<String> approvedScope,
                                                     String audience,
-                                                    String codeVerifier,
-                                                    String nonce) {
-    //CHECKSTYLE:ON    
+                                                    String codeVerifier) {
         if (!OAuthUtils.validateScopes(requestedScope, client.getRegisteredScopes(), 
                                        partialMatchScopeValidation)) {
             throw new OAuthServiceException(new OAuthError(OAuthConstants.INVALID_SCOPE));     
@@ -164,7 +161,6 @@ public abstract class AbstractGrantHandler implements AccessTokenGrantHandler {
         reg.setApprovedScope(approvedScope);
         reg.setAudience(audience);
         reg.setClientCodeVerifier(codeVerifier);
-        reg.setNonce(nonce);
         return dataProvider.createAccessToken(reg);
     }
     
