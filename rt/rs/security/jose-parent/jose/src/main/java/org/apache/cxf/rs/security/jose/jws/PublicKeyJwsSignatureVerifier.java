@@ -19,6 +19,7 @@
 package org.apache.cxf.rs.security.jose.jws;
 
 import java.security.PublicKey;
+import java.security.cert.X509Certificate;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.logging.Logger;
 
@@ -33,12 +34,27 @@ public class PublicKeyJwsSignatureVerifier implements JwsSignatureVerifier {
     private PublicKey key;
     private AlgorithmParameterSpec signatureSpec;
     private SignatureAlgorithm supportedAlgo;
+    private X509Certificate cert;
     
     public PublicKeyJwsSignatureVerifier(PublicKey key, SignatureAlgorithm supportedAlgorithm) {
         this(key, null, supportedAlgorithm);
     }
     public PublicKeyJwsSignatureVerifier(PublicKey key, AlgorithmParameterSpec spec, SignatureAlgorithm supportedAlgo) {
         this.key = key;
+        this.signatureSpec = spec;
+        this.supportedAlgo = supportedAlgo;
+        JwsUtils.checkSignatureKeySize(key);
+    }
+    public PublicKeyJwsSignatureVerifier(X509Certificate cert, SignatureAlgorithm supportedAlgorithm) {
+        this(cert, null, supportedAlgorithm);
+    }
+    public PublicKeyJwsSignatureVerifier(X509Certificate cert, 
+                                         AlgorithmParameterSpec spec, 
+                                         SignatureAlgorithm supportedAlgo) {
+        if (cert != null) {
+            this.key = cert.getPublicKey();
+        }
+        this.cert = cert;
         this.signatureSpec = spec;
         this.supportedAlgo = supportedAlgo;
         JwsUtils.checkSignatureKeySize(key);
@@ -78,4 +94,7 @@ public class PublicKeyJwsSignatureVerifier implements JwsSignatureVerifier {
         return supportedAlgo;
     }
 
+    public X509Certificate getX509Certificate() {
+        return cert;
+    }
 }

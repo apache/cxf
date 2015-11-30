@@ -151,7 +151,20 @@ public final class JwsUtils {
         return theVerifier;
     }
     public static JwsSignatureVerifier getPublicKeySignatureVerifier(X509Certificate cert, SignatureAlgorithm algo) {
-        return getPublicKeySignatureVerifier(cert.getPublicKey(), algo);
+        if (algo == null) {
+            LOG.warning("No signature algorithm was defined");
+            throw new JwsException(JwsException.Error.ALGORITHM_NOT_SET);
+        }
+        
+        if (cert != null) {
+            if (cert.getPublicKey() instanceof RSAPublicKey) {
+                return new PublicKeyJwsSignatureVerifier(cert, algo);
+            } else if (cert.getPublicKey() instanceof ECPublicKey) {
+                return new EcDsaJwsSignatureVerifier(cert, algo);
+            }
+        }
+        
+        return null;
     }
     public static JwsSignatureVerifier getPublicKeySignatureVerifier(PublicKey key, SignatureAlgorithm algo) {
         if (algo == null) {
@@ -377,7 +390,7 @@ public final class JwsUtils {
             } else if (inHeaders.getHeader(JoseConstants.HEADER_X509_CHAIN) != null) {
                 List<X509Certificate> chain = KeyManagementUtils.toX509CertificateChain(inHeaders.getX509Chain());
                 KeyManagementUtils.validateCertificateChain(props, chain);
-                return getPublicKeySignatureVerifier(chain.get(0).getPublicKey(), 
+                return getPublicKeySignatureVerifier(chain.get(0), 
                                                      inHeaders.getSignatureAlgorithm());
             } else if (inHeaders.getHeader(JoseConstants.HEADER_X509_THUMBPRINT) != null) {
                 X509Certificate foundCert = 
@@ -385,7 +398,7 @@ public final class JwsUtils {
                                                                     MessageDigestUtils.ALGO_SHA_1,
                                                                     m, props);
                 if (foundCert != null) {
-                    return getPublicKeySignatureVerifier(foundCert.getPublicKey(), 
+                    return getPublicKeySignatureVerifier(foundCert, 
                                                          inHeaders.getSignatureAlgorithm());
                 }
             }
@@ -406,9 +419,10 @@ public final class JwsUtils {
                 && SignatureAlgorithm.NONE.getJwaName().equals(inHeaders.getAlgorithm())) {
                 theVerifier = new NoneJwsSignatureVerifier();
             } else {
-                theVerifier = getPublicKeySignatureVerifier(
-                              KeyManagementUtils.loadPublicKey(m, props), 
-                              signatureAlgo);
+                X509Certificate[] certs = KeyManagementUtils.loadX509CertificateOrChain(m, props);
+                if (certs != null && certs.length > 0) {
+                    theVerifier = getPublicKeySignatureVerifier(certs[0], signatureAlgo);
+                }
             }
         }
         if (theVerifier == null && !ignoreNullVerifier) {
