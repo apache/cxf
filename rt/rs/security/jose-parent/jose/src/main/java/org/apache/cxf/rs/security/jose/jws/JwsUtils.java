@@ -386,16 +386,11 @@ public final class JwsUtils {
                 && SignatureAlgorithm.NONE.getJwaName().equals(inHeaders.getAlgorithm())) {
                 theVerifier = new NoneJwsSignatureVerifier();
             } else {
-<<<<<<< HEAD
-                theVerifier = getPublicKeySignatureVerifier(
-                              KeyManagementUtils.loadPublicKey(m, props), 
-                              SignatureAlgorithm.getAlgorithm(signatureAlgo));
-=======
                 X509Certificate[] certs = KeyManagementUtils.loadX509CertificateOrChain(m, props);
                 if (certs != null && certs.length > 0) {
-                    theVerifier = getPublicKeySignatureVerifier(certs[0], signatureAlgo);
+                    theVerifier = getPublicKeySignatureVerifier(certs[0],
+                        SignatureAlgorithm.getAlgorithm(signatureAlgo));
                 }
->>>>>>> a400eaa... Set a security context up from the JWS cert
             }
         }
         if (theVerifier == null && !ignoreNullVerifier) {
