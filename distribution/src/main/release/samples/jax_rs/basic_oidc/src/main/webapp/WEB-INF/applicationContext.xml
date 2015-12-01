@@ -112,7 +112,7 @@
         </jaxrsclient:features>
      </jaxrsclient:client>
      <bean id="consumer" class="org.apache.cxf.rs.security.oauth2.client.Consumer">
-         <property name="key" value="${client_id}"/> 
+         <property name="clientId" value="${client_id}"/> 
      </bean>
           
 </beans>
