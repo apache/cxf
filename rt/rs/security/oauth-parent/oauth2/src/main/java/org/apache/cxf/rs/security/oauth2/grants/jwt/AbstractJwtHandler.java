@@ -25,6 +25,7 @@ import org.apache.cxf.rs.security.jose.jws.JwsHeaders;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
+import org.apache.cxf.rs.security.jose.jwt.JwtConstants;
 import org.apache.cxf.rs.security.jose.jwt.JwtUtils;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.grants.AbstractGrantHandler;
@@ -53,19 +54,16 @@ public abstract class AbstractJwtHandler extends AbstractGrantHandler {
     }
     
     protected void validateClaims(Client client, JwtClaims claims) {
+        JwtUtils.validateTokenClaims(claims, ttl, clockOffset);
+        
         validateIssuer(claims.getIssuer());
         validateSubject(client, claims.getSubject());
         validateAudience(client, claims.getAudience());
         
-        // If we have no issued time then we need to have an expiry
-        boolean expiredRequired = claims.getIssuedAt() == null;
-        JwtUtils.validateJwtExpiry(claims, clockOffset, expiredRequired);
-        
-        JwtUtils.validateJwtNotBefore(claims, clockOffset, false);
-        
-        // If we have no expiry then we must have an issued at
-        boolean issuedAtRequired = claims.getExpiryTime() == null;
-        JwtUtils.validateJwtIssuedAt(claims, ttl, clockOffset, issuedAtRequired);
+        // We must have an Expiry
+        if (claims.getClaim(JwtConstants.CLAIM_EXPIRY) == null) {
+            throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
+        }
     }
 
     protected void validateIssuer(String issuer) {
@@ -75,10 +73,12 @@ public abstract class AbstractJwtHandler extends AbstractGrantHandler {
     }
     
     protected void validateSubject(Client client, String subject) {
-        //TODO
+        // We must have a Subject
+        if (subject == null) {
+            throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
+        }
     }
     protected void validateAudience(Client client, String audience) {
-        //TODO
     }
     public void setSupportedIssuers(Set<String> supportedIssuers) {
         this.supportedIssuers = supportedIssuers;
