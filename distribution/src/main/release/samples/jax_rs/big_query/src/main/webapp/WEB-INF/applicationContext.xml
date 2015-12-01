@@ -189,8 +189,8 @@
      
      <!-- Client id and secret allocated in Google Developer Console -->
      <bean id="consumer" class="org.apache.cxf.rs.security.oauth2.client.Consumer">
-         <property name="key" value="${client_id}"/> 
-         <property name="secret" value="${client_secret}"/>
+         <property name="clientId" value="${client_id}"/> 
+         <property name="clientSecret" value="${client_secret}"/>
      </bean>     
 </beans>
 
