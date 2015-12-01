@@ -60,9 +60,12 @@ public class JwsContainerRequestFilter extends AbstractJwsReaderProvider impleme
             context.getHeaders().putSingle("Content-Type", ct);
         }
         
-        SecurityContext securityContext = configureSecurityContext(theSigVerifier);
-        if (securityContext != null) {
-            JAXRSUtils.getCurrentMessage().put(SecurityContext.class, securityContext);
+        Principal currentPrincipal = context.getSecurityContext().getUserPrincipal(); 
+        if (currentPrincipal != null && currentPrincipal.getName() != null) {
+            SecurityContext securityContext = configureSecurityContext(theSigVerifier);
+            if (securityContext != null) {
+                JAXRSUtils.getCurrentMessage().put(SecurityContext.class, securityContext);
+            }
         }
     }
     
