@@ -109,7 +109,6 @@ public final class JwtUtils {
             }
         }
     }
-<<<<<<< HEAD
 
     public static void validateJwtTimeClaims(JwtClaims claims, int clockOffset,
                                              int issuedAtRange, boolean claimsRequired) {
@@ -134,8 +133,6 @@ public final class JwtUtils {
         validateJwtTimeClaims(claims, 0, 0, false);
     }
 
-=======
-    
     public static void validateTokenClaims(JwtClaims claims, int timeToLive, int clockOffset) {
         // If we have no issued time then we need to have an expiry
         boolean expiredRequired = claims.getIssuedAt() == null;
@@ -148,5 +145,4 @@ public final class JwtUtils {
         validateJwtIssuedAt(claims, timeToLive, clockOffset, issuedAtRequired);
     }
     
->>>>>>> c66b1a1... Adding a filter to authenticate JWT Tokens for the JWT Bearer Client Authentication case
 }
