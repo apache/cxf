@@ -282,21 +282,21 @@ public final class OAuthClientUtils {
             }
         }
         if (consumer != null) {
-            boolean secretAvailable = !StringUtils.isEmpty(consumer.getSecret());
+            boolean secretAvailable = !StringUtils.isEmpty(consumer.getClientSecret());
             if (setAuthorizationHeader && secretAvailable) {
                 StringBuilder sb = new StringBuilder();
                 sb.append("Basic ");
                 try {
-                    String data = consumer.getKey() + ":" + consumer.getSecret();
+                    String data = consumer.getClientId() + ":" + consumer.getClientSecret();
                     sb.append(Base64Utility.encode(data.getBytes(StandardCharsets.UTF_8)));
                 } catch (Exception ex) {
                     throw new ProcessingException(ex);
                 }
                 accessTokenService.replaceHeader("Authorization", sb.toString());
             } else {
-                form.param(OAuthConstants.CLIENT_ID, consumer.getKey());
+                form.param(OAuthConstants.CLIENT_ID, consumer.getClientId());
                 if (secretAvailable) {
-                    form.param(OAuthConstants.CLIENT_SECRET, consumer.getSecret());
+                    form.param(OAuthConstants.CLIENT_SECRET, consumer.getClientSecret());
                 }
             }
         } else {

@@ -135,7 +135,7 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
         String redirectScope = redirectState != null ? redirectState.getFirst(OAuthConstants.SCOPE) : null;
         String theScope = redirectScope != null ? redirectScope : scopes;
         UriBuilder ub = OAuthClientUtils.getAuthorizationURIBuilder(authorizationServiceUri, 
-                                             consumer.getKey(), 
+                                             consumer.getClientId(), 
                                              getAbsoluteRedirectUri(ui).toString(), 
                                              theState, 
                                              theScope);
