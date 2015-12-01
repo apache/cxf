@@ -238,49 +238,57 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
     }
     
     String getResourcePath(Class<?> cls, Object o) {
+        String currentResourcePath = getPathFromMessageContext();
+        if (currentResourcePath != null) {
+            return currentResourcePath;
+        }
+        
+        if (!resourcePaths.isEmpty()) {
+            
+            String path = getRequestPath();
+            for (Map.Entry<String, String> entry : resourcePaths.entrySet()) {
+                if (path.endsWith(entry.getKey())) {
+                    return entry.getValue();
+                }
+            }
+        }
+        if (!enumResources.isEmpty() || !classResources.isEmpty()) {
+            String name = cls.getName();
+            if (cls.isEnum()) {
+                String enumResource = enumResources.get(o);
+                if (enumResource != null) {
+                    return enumResource;
+                }
+                name += "." + o.toString();     
+            }
+            
+            String clsResourcePath = classResources.get(name);
+            if (clsResourcePath != null) {
+                return clsResourcePath;
+            }
+        }
+        
         if (useClassNames) {
             return getClassResourceName(cls);     
         }
         
-        String name = cls.getName();
-        if (cls.isEnum()) {
-            String enumResource = enumResources.get(o);
-            if (enumResource != null) {
-                return enumResource;
-            }
-            name += "." + o.toString();     
-        }
-        
-        String clsResourcePath = classResources.get(name);
-        if (clsResourcePath != null) {
-            return clsResourcePath;
-        }
-        if (resourcePath != null) {
-            return resourcePath;
-        }
-        String path = getRequestPath();
-        for (Map.Entry<String, String> entry : resourcePaths.entrySet()) {
-            if (path.endsWith(entry.getKey())) {
-                return entry.getValue();
-            }
-        }
-        
-        return getPathFromMessageContext();
-        
+        return resourcePath;
     }
     
     private String getPathFromMessageContext() {
-        Object resourcePathProp = (String)mc.get(MESSAGE_RESOURCE_PATH_PROPERTY);
-        if (resourcePathProp != null) {
-            StringBuilder sb = new StringBuilder();
-            if (locationPrefix != null) {
-                sb.append(locationPrefix);
+        if (mc != null) {
+            Object resourcePathProp = (String)mc.get(MESSAGE_RESOURCE_PATH_PROPERTY);
+            if (resourcePathProp != null) {
+                StringBuilder sb = new StringBuilder();
+                if (locationPrefix != null) {
+                    sb.append(locationPrefix);
+                }
+                sb.append(resourcePathProp.toString());
+                if (resourceExtension != null) {
+                    sb.append(resourceExtension);
+                }
+                return sb.toString();
             }
-            sb.append(resourcePathProp.toString());
-            if (resourceExtension != null) {
-                sb.append(resourceExtension);
-            }
-            return sb.toString();
         }
         return null;
     }
