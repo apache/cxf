@@ -110,4 +110,16 @@ public final class JwtUtils {
         }
     }
     
+    public static void validateTokenClaims(JwtClaims claims, int timeToLive, int clockOffset) {
+        // If we have no issued time then we need to have an expiry
+        boolean expiredRequired = claims.getIssuedAt() == null;
+        validateJwtExpiry(claims, clockOffset, expiredRequired);
+        
+        validateJwtNotBefore(claims, clockOffset, false);
+        
+        // If we have no expiry then we must have an issued at
+        boolean issuedAtRequired = claims.getExpiryTime() == null;
+        validateJwtIssuedAt(claims, timeToLive, clockOffset, issuedAtRequired);
+    }
+    
 }
