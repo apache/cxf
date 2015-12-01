@@ -18,80 +18,63 @@
  */
 package org.apache.cxf.rs.security.oauth2.client;
 
-import java.util.HashSet;
-import java.util.Set;
-
 public class Consumer {
 
-    private String key;
-    private String secret;
-    private Set<String> redirectURIs;
-    private String name;
-    private String description;
-
+    private String clientId;
+    private String clientSecret;
+    
     public Consumer() {
 
     }
 
-    public Consumer(String key, String secret) {
-        this.setKey(key);
-        this.setSecret(secret);
+    public Consumer(String id, String secret) {
+        this.clientId = id;
+        this.clientSecret = secret;
     }
 
+    @Deprecated
     public String getKey() {
-        return key;
+        return getClientId();
     }
 
+    @Deprecated
     public void setKey(String key) {
-        this.key = key;
+        setClientId(key);
+    }
+    
+    public String getClientId() {
+        return clientId;
     }
 
+    public void setClientId(String id) {
+        this.clientId = id;
+    }
+
+    @Deprecated
     public String getSecret() {
-        return secret;
+        return getClientSecret();
     }
 
+    @Deprecated
     public void setSecret(String secret) {
-        this.secret = secret;
+        setClientSecret(secret);
+    }
+    public String getClientSecret() {
+        return clientSecret;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
+    public void setClientSecret(String secret) {
+        this.clientSecret = secret;
     }
 
     @Override
     public int hashCode() {
-        return key.hashCode();
+        return clientId.hashCode();
     }
 
     @Override
     public boolean equals(Object o) {
-        return o instanceof Consumer && key.equals(((Consumer)o).key);
+        return o instanceof Consumer && clientId.equals(((Consumer)o).clientId);
     }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Set<String> getRedirectURIs() {
-        return redirectURIs;
-    }
-
-    public void setRedirectURIs(Set<String> redirectUri) {
-        this.redirectURIs = redirectUri;
-    }
-
-    public boolean addRedirectURI(String redirectURI) {
-        if (this.redirectURIs == null) {
-            this.redirectURIs = new HashSet<String>();
-        }
-        return this.redirectURIs.add(redirectURI);
-    }
+    
 }
