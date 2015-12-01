@@ -96,15 +96,7 @@ public class JwtAuthenticationFilter extends AbstractJoseJwtConsumer implements 
     
     @Override
     protected void validateToken(JwtToken jwt) {
-        // If we have no issued time then we need to have an expiry
-        boolean expiredRequired = jwt.getClaims().getIssuedAt() == null;
-        JwtUtils.validateJwtExpiry(jwt.getClaims(), clockOffset, expiredRequired);
-        
-        JwtUtils.validateJwtNotBefore(jwt.getClaims(), clockOffset, false);
-        
-        // If we have no expiry then we must have an issued at
-        boolean issuedAtRequired = jwt.getClaims().getExpiryTime() == null;
-        JwtUtils.validateJwtIssuedAt(jwt.getClaims(), ttl, clockOffset, issuedAtRequired);
+        JwtUtils.validateTokenClaims(jwt.getClaims(), ttl, clockOffset);
     }
 
     public int getClockOffset() {
