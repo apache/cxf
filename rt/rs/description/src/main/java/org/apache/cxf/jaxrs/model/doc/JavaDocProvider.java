@@ -44,22 +44,35 @@ public class JavaDocProvider implements DocumentationProvider {
     public static final double JAVA_VERSION_18 = 1.8D;
 
     private ClassLoader javaDocLoader;
-    private ConcurrentHashMap<String, ClassDocs> docs = new ConcurrentHashMap<String, ClassDocs>();
+    private final ConcurrentHashMap<String, ClassDocs> docs = new ConcurrentHashMap<>();
     private double javaDocsBuiltByVersion = JAVA_VERSION;
     
-    public JavaDocProvider(URL javaDocUrl) {
-        if (javaDocUrl == null) {
-            throw new IllegalArgumentException("URL is null");
+    public JavaDocProvider(URL... javaDocUrls) {
+        if (javaDocUrls == null) {
+            throw new IllegalArgumentException("URL are null");
         }
-        javaDocLoader = new URLClassLoader(new URL[]{javaDocUrl});
+        
+        javaDocLoader = new URLClassLoader(javaDocUrls);
     }
     
     public JavaDocProvider(String path) throws Exception {
         this(BusFactory.getDefaultBus(), path);
     }
     
-    public JavaDocProvider(Bus bus, String path) throws Exception {
-        this(ResourceUtils.getResourceURL(path, bus));
+    public JavaDocProvider(String... paths) throws Exception {
+        this(BusFactory.getDefaultBus(), paths == null ? null : paths);
+    }
+    
+    public JavaDocProvider(Bus bus, String... paths) throws Exception {
+        if (paths == null) {
+            throw new IllegalArgumentException("paths are null");
+        }
+
+        URL[] javaDocUrls = new URL[paths.length];
+        for (int i = 0; i < paths.length; i++) {
+            javaDocUrls[i] = ResourceUtils.getResourceURL(paths[i], bus);
+        }
+        javaDocLoader = new URLClassLoader(javaDocUrls);
     }
     
     private static double getVersion() {
@@ -71,6 +84,7 @@ public class JavaDocProvider implements DocumentationProvider {
         }
     }
     
+    @Override
     public String getClassDoc(ClassResourceInfo cri) {
         try {
             ClassDocs doc = getClassDocInternal(cri.getServiceClass());
@@ -84,6 +98,7 @@ public class JavaDocProvider implements DocumentationProvider {
         return null;
     }
     
+    @Override
     public String getMethodDoc(OperationResourceInfo ori) {
         try {
             MethodDocs doc = getOperationDocInternal(ori);
@@ -97,6 +112,7 @@ public class JavaDocProvider implements DocumentationProvider {
         return null;
     }
     
+    @Override
     public String getMethodResponseDoc(OperationResourceInfo ori) {
         try {
             MethodDocs doc = getOperationDocInternal(ori);
@@ -110,6 +126,7 @@ public class JavaDocProvider implements DocumentationProvider {
         return null;
     }
     
+    @Override
     public String getMethodParameterDoc(OperationResourceInfo ori, int paramIndex) {
         try {
             MethodDocs doc = getOperationDocInternal(ori);
@@ -211,7 +228,7 @@ public class JavaDocProvider implements DocumentationProvider {
             String operInfoTag = getOperInfoTag();
             String operInfo = getJavaDocText(operDoc, operInfoTag, operLink, 0);
             String responseInfo = null;
-            List<String> paramDocs = new LinkedList<String>();
+            List<String> paramDocs = new LinkedList<>();
             if (!StringUtils.isEmpty(operInfo)) {
                 int returnsIndex = operDoc.indexOf("Returns:", operLink.length());
                 int nextOpIndex = operDoc.indexOf(operLink);
@@ -228,7 +245,7 @@ public class JavaDocProvider implements DocumentationProvider {
                     
                     int codeIndex = paramString.indexOf(codeTag);
                     while (codeIndex != -1) {
-                        int next = paramString.indexOf("<", codeIndex + 7);
+                        int next = paramString.indexOf('<', codeIndex + 7);
                         if (next == -1) {
                             next = paramString.length();
                         }
@@ -261,7 +278,7 @@ public class JavaDocProvider implements DocumentationProvider {
         if (tagIndex != -1) {
             int notAfterIndex = doc.indexOf(notAfterTag, index);
             if (notAfterIndex == -1 || notAfterIndex > tagIndex) {
-                int nextIndex = doc.indexOf("<", tagIndex + tag.length());
+                int nextIndex = doc.indexOf('<', tagIndex + tag.length());
                 if (nextIndex != -1) {
                     return doc.substring(tagIndex + tag.length(), nextIndex).trim();
                 }
@@ -313,9 +330,9 @@ public class JavaDocProvider implements DocumentationProvider {
     }
     
     private static class ClassDocs {
-        private String classDoc;
-        private String classInfo;
-        private ConcurrentHashMap<Method, MethodDocs> mdocs = new ConcurrentHashMap<Method, MethodDocs>(); 
+        private final String classDoc;
+        private final String classInfo;
+        private final ConcurrentHashMap<Method, MethodDocs> mdocs = new ConcurrentHashMap<>(); 
         ClassDocs(String classDoc, String classInfo) {
             this.classDoc = classDoc;
             this.classInfo = classInfo;
@@ -339,9 +356,9 @@ public class JavaDocProvider implements DocumentationProvider {
     }
     
     private static class MethodDocs {
-        private String methodInfo;
-        private List<String> paramInfo = new LinkedList<String>();
-        private String responseInfo;
+        private final String methodInfo;
+        private final List<String> paramInfo;
+        private final String responseInfo;
         MethodDocs(String methodInfo, List<String> paramInfo, String responseInfo) {
             this.methodInfo = methodInfo;
             this.paramInfo = paramInfo;
