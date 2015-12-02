@@ -47,7 +47,7 @@ public abstract class AbstractJwtHandler extends AbstractGrantHandler {
     }
     
     protected void validateSignature(JwsHeaders headers, String unsignedText, byte[] signature) {
-        JwsSignatureVerifier theSigVerifier = getInitializedSigVerifier();
+        JwsSignatureVerifier theSigVerifier = getInitializedSigVerifier(headers);
         if (!theSigVerifier.verify(headers, unsignedText, signature)) {    
             throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
         }
@@ -67,7 +67,7 @@ public abstract class AbstractJwtHandler extends AbstractGrantHandler {
     }
 
     protected void validateIssuer(String issuer) {
-        if (issuer == null || !supportedIssuers.contains(issuer)) {
+        if (issuer == null || (supportedIssuers != null && !supportedIssuers.contains(issuer))) {
             throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
         }
     }
@@ -87,11 +87,11 @@ public abstract class AbstractJwtHandler extends AbstractGrantHandler {
     public void setJwsVerifier(JwsSignatureVerifier jwsVerifier) {
         this.jwsVerifier = jwsVerifier;
     }
-    protected JwsSignatureVerifier getInitializedSigVerifier() {
+    protected JwsSignatureVerifier getInitializedSigVerifier(JwsHeaders headers) {
         if (jwsVerifier != null) {
             return jwsVerifier;    
         } 
-        return JwsUtils.loadSignatureVerifier(true);
+        return JwsUtils.loadSignatureVerifier(headers, true);
     }
     
     public int getTtl() {
