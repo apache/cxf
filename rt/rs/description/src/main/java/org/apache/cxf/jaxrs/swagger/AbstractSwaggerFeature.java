@@ -34,6 +34,7 @@ public abstract class AbstractSwaggerFeature extends AbstractFeature {
 
     protected boolean scan = true;
     protected boolean runAsFilter;
+    private boolean activateOnlyIfJaxrsSupported;
     private String resourcePackage;
     private String version = "1.0.0";
     // depending on swagger version basePath is set differently
@@ -57,7 +58,7 @@ public abstract class AbstractSwaggerFeature extends AbstractFeature {
 
     @Override
     public void initialize(Server server, Bus bus) {
-        if (SWAGGER_JAXRS_AVAILABLE) {
+        if (!activateOnlyIfJaxrsSupported || SWAGGER_JAXRS_AVAILABLE) {
             calculateDefaultResourcePackage(server);
             calculateDefaultBasePath(server);
             addSwaggerResource(server);
@@ -161,4 +162,13 @@ public abstract class AbstractSwaggerFeature extends AbstractFeature {
     public void setRunAsFilter(boolean runAsFilter) {
         this.runAsFilter = runAsFilter;
     }
+
+    public boolean isActivateOnlyIfJaxrsSupported() {
+        return activateOnlyIfJaxrsSupported;
+    }
+
+    public void setActivateOnlyIfJaxrsSupported(boolean activateOnlyIfJaxrsSupported) {
+        this.activateOnlyIfJaxrsSupported = activateOnlyIfJaxrsSupported;
+    }
+    
 }
