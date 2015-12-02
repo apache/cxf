@@ -92,8 +92,8 @@ public class Swagger2Serializers extends SwaggerSerializers {
                 new HashMap<Pair<String, String>, OperationResourceInfo>();
             for (ClassResourceInfo cri : cris) {
                 for (OperationResourceInfo ori : cri.getMethodDispatcher().getOperationResourceInfos()) {
-                    String normalizedPath = getNormalizedPath(cri.getURITemplate().getValue(), ori
-                        .getURITemplate().getValue());
+                    String normalizedPath = getNormalizedPath(
+                            cri.getURITemplate().getValue(), ori.getURITemplate().getValue());
 
                     operations.put(normalizedPath, cri);
                     methods.put(ImmutablePair.of(ori.getHttpMethod(), normalizedPath), ori);
@@ -147,13 +147,9 @@ public class Swagger2Serializers extends SwaggerSerializers {
     }
 
     private String getNormalizedPath(String classResourcePath, String operationResourcePath) {
-        StringBuilder path = new StringBuilder().
-            append(classResourcePath).
-            append(operationResourcePath);
-
         StringBuilder normalizedPath = new StringBuilder();
 
-        String[] segments = StringUtils.split(path.toString(), "/");
+        String[] segments = StringUtils.split(classResourcePath + operationResourcePath, "/");
         for (String segment : segments) {
             if (!StringUtils.isEmpty(segment)) {
                 normalizedPath.append("/").append(segment);
@@ -164,6 +160,6 @@ public class Swagger2Serializers extends SwaggerSerializers {
             normalizedPath.setLength(normalizedPath.length() - 4);
             normalizedPath.append('}');
         }
-        return normalizedPath.toString();
+        return StringUtils.EMPTY.equals(normalizedPath.toString()) ? "/" : normalizedPath.toString();
     }
 }

@@ -20,6 +20,7 @@ package org.apache.cxf.jaxrs.swagger;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -34,7 +35,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServiceFactoryBean;
@@ -160,7 +160,15 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
     }
 
     public void setJavaDocPath(final String javaDocPath) throws Exception {
-        this.javadocProvider = new JavaDocProvider(BusFactory.getDefaultBus(), javaDocPath);
+        this.javadocProvider = new JavaDocProvider(javaDocPath);
+    }
+
+    public void setJavaDocPaths(final String... javaDocPaths) throws Exception {
+        this.javadocProvider = new JavaDocProvider(javaDocPaths);
+    }
+
+    public void setJavaDocURLs(final URL[] javaDocURLs) {
+        this.javadocProvider = new JavaDocProvider(javaDocURLs);
     }
 
     @Override
