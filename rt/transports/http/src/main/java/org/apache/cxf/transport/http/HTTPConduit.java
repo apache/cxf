@@ -682,7 +682,8 @@ public abstract class HTTPConduit
                 return defaultAddress;
             }
             if (defaultAddress != null) {
-                message.put(Message.ENDPOINT_ADDRESS, defaultAddress.getString());
+                result = defaultAddress.getString();
+                message.put(Message.ENDPOINT_ADDRESS, result);
             }
         }
         
