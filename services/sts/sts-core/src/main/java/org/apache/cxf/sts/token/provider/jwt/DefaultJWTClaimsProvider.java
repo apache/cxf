@@ -263,8 +263,9 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
                 }
             }
         }
-        
-        claims.setAudiences(audiences);
+        if (!audiences.isEmpty()) {
+            claims.setAudiences(audiences);
+        }
         
     }
     
