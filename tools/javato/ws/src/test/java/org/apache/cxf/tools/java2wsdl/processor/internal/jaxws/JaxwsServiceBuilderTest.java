@@ -259,6 +259,21 @@ public class JaxwsServiceBuilderTest extends ProcessorTestBase {
         assertWsdlEquals(new File(expectedFile), file);
     }
 
+    @Test
+    public void testMultipleHeaders() throws Exception {
+        builder.setServiceClass(org.apache.cxf.tools.fortest.headers.SomeHeaders.class);
+        ServiceInfo service = builder.createService();
+
+        generator.setServiceModel(service);
+        File output = getOutputFile("someheaders.wsdl");
+        assertNotNull(output);
+        generator.generate(output);
+        assertTrue(output.exists());
+
+        URI expectedFile = this.getClass().getResource("expected/expected_someheaders.wsdl").toURI();
+        assertWsdlEquals(new File(expectedFile), output);
+    }
+    
     // TODO: assertFileEquals
     @Test
     public void testCXF188() throws Exception {
