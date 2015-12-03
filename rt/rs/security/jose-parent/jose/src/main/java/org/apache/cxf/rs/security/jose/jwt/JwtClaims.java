@@ -19,6 +19,8 @@
 
 package org.apache.cxf.rs.security.jose.jwt;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.cxf.jaxrs.json.basic.JsonMapObject;
@@ -52,11 +54,23 @@ public class JwtClaims extends JsonMapObject {
     }
     
     public void setAudience(String audience) {
-        setClaim(JwtConstants.CLAIM_AUDIENCE, audience);
+        setAudiences(Collections.singletonList(audience));
     }
     
-    public String getAudience() {
-        return (String)getClaim(JwtConstants.CLAIM_AUDIENCE);
+    public void setAudiences(List<String> audiences) {
+        setClaim(JwtConstants.CLAIM_AUDIENCE, audiences);
+    }
+    
+    @SuppressWarnings("unchecked")
+    public List<String> getAudiences() {
+        Object audiences = getClaim(JwtConstants.CLAIM_AUDIENCE);
+        if (audiences instanceof List<?>) {
+            return (List<String>)audiences;
+        } else if (audiences instanceof String) {
+            return Collections.singletonList((String)audiences);
+        }
+        
+        return Collections.emptyList();
     }
     
     public void setExpiryTime(Long expiresIn) {

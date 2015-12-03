@@ -96,7 +96,7 @@ public class JwtAuthenticationFilter extends AbstractJoseJwtConsumer implements 
     
     @Override
     protected void validateToken(JwtToken jwt) {
-        JwtUtils.validateTokenClaims(jwt.getClaims(), ttl, clockOffset);
+        JwtUtils.validateTokenClaims(jwt.getClaims(), ttl, clockOffset, true);
     }
 
     public int getClockOffset() {

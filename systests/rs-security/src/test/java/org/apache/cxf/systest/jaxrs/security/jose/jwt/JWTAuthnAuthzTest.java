@@ -84,6 +84,7 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
         claims.setIssuedAt(new Date().getTime() / 1000L);
+        claims.setAudience(address);
         
         JwtToken token = new JwtToken(claims);
 
@@ -123,6 +124,7 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
         claims.setIssuedAt(new Date().getTime() / 1000L);
+        claims.setAudience(address);
         
         JwtToken token = new JwtToken(claims);
 
@@ -160,6 +162,7 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
         claims.setIssuedAt(new Date().getTime() / 1000L);
+        claims.setAudience(address);
         // The endpoint requires a role of "boss"
         claims.setProperty("role", "boss");
         
@@ -201,6 +204,7 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
         claims.setIssuedAt(new Date().getTime() / 1000L);
+        claims.setAudience(address);
         
         JwtToken token = new JwtToken(claims);
 
@@ -237,6 +241,7 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         claims.setIssuer("DoubleItSTSIssuer");
         claims.setIssuedAt(new Date().getTime() / 1000L);
         claims.setProperty("role", "manager");
+        claims.setAudience(address);
         
         JwtToken token = new JwtToken(claims);
 

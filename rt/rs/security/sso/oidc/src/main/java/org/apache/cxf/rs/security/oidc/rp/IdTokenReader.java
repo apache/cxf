@@ -40,9 +40,18 @@ public class IdTokenReader extends AbstractTokenValidator {
         OidcUtils.validateAccessTokenHash(at, jwt, requireAtHash);
         return jwt;
     }
+<<<<<<< HEAD
     public JwtToken getIdJwtToken(String idJwtToken, OAuthClientUtils.Consumer client) {
         JwtToken jwt = getJwtToken(idJwtToken, client.getSecret());
         validateJwtClaims(jwt.getClaims(), client.getKey(), true);
+=======
+    public JwtToken getIdJwtToken(String idJwtToken, Consumer client) {
+        JwtToken jwt = getJwtToken(idJwtToken, client.getClientSecret());
+        if (jwt.getClaims().getAudiences().size() > 1) {
+            throw new SecurityException("Invalid audience");
+        }
+        validateJwtClaims(jwt.getClaims(), client.getClientId(), true);
+>>>>>>> 21bbc38... Adding support for validating audiences for JWT tokens as well as supporting multiple audiences
         return jwt;
     }
     private IdToken getIdTokenFromJwt(JwtToken jwt) {
