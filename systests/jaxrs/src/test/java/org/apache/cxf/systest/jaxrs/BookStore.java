@@ -1775,10 +1775,22 @@ public class BookStore {
                                     handler);
     }
     
-    public static class BookBean {
-        private long id;
+    public abstract static class AbstractBookBean {
         @QueryParam("id_2")
         private long id2;
+        public long getId2() {
+            return id2;
+        }
+
+        public void setId2(long id2) {
+            this.id2 = id2;
+        }
+    }
+    
+    public static class BookBean extends AbstractBookBean {
+        private long id;
+        
+        
         private long id3;
         private BookBeanNested nested;
 
@@ -1789,14 +1801,6 @@ public class BookStore {
         @PathParam("id")
         public void setId(long id) {
             this.id = id;
-        }
-        
-        public long getId2() {
-            return id2;
-        }
-
-        public void setId2(long id2) {
-            this.id2 = id2;
         }
         
         @Context
