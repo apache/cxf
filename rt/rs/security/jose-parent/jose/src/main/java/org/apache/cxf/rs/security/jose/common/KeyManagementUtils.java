@@ -95,6 +95,9 @@ public final class KeyManagementUtils {
         return loadX509CertificateOrChain(keyStore, alias);
     }
     private static X509Certificate[] loadX509CertificateOrChain(KeyStore keyStore, String alias) {
+        if (alias == null) {
+            throw new JoseException("No alias supplied");
+        }
         try {
             Certificate[] certs = keyStore.getCertificateChain(alias);
             if (certs != null) {
