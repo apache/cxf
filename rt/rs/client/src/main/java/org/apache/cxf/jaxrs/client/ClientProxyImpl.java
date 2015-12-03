@@ -537,7 +537,7 @@ public class ClientProxyImpl extends AbstractClient implements
                         }
                     } else {
                         String fieldName = StringUtils.uncapitalize(propertyName);
-                        Field f = ReflectionUtil.getDeclaredField(bean.getClass(), fieldName);
+                        Field f = getDeclaredField(bean.getClass(), fieldName);
                         if (f == null) {
                             continue;
                         }
@@ -561,6 +561,17 @@ public class ClientProxyImpl extends AbstractClient implements
             }
         }
         return values;
+    }
+    
+    private static Field getDeclaredField(Class<?> cls, String fieldName) {
+        if (cls == null || cls == Object.class) {
+            return null;
+        }
+        Field f = ReflectionUtil.getDeclaredField(cls, fieldName);
+        if (f != null) {
+            return f;
+        }
+        return getDeclaredField(cls.getSuperclass(), fieldName);
     }
     
     private void handleMatrixes(Method m,
