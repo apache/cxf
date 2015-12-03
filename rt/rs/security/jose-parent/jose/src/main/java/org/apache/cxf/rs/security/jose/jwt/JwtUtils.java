@@ -112,7 +112,6 @@ public final class JwtUtils {
             }
         }
     }
-<<<<<<< HEAD
 
     public static void validateJwtTimeClaims(JwtClaims claims, int clockOffset,
                                              int issuedAtRange, boolean claimsRequired) {
@@ -137,9 +136,6 @@ public final class JwtUtils {
         validateJwtTimeClaims(claims, 0, 0, false);
     }
 
-    public static void validateTokenClaims(JwtClaims claims, int timeToLive, int clockOffset) {
-=======
-    
     public static void validateJwtAudienceRestriction(JwtClaims claims, Message message) {
         // Get the endpoint URL
         String requestURL = null;
@@ -161,9 +157,9 @@ public final class JwtUtils {
         }
     }
     
+    
     public static void validateTokenClaims(JwtClaims claims, int timeToLive, int clockOffset,
                                            boolean validateAudienceRestriction) {
->>>>>>> 21bbc38... Adding support for validating audiences for JWT tokens as well as supporting multiple audiences
         // If we have no issued time then we need to have an expiry
         boolean expiredRequired = claims.getIssuedAt() == null;
         validateJwtExpiry(claims, clockOffset, expiredRequired);
