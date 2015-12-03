@@ -20,6 +20,7 @@ package org.apache.cxf.rs.security.oauth2.tokens.jwt;
 
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.util.List;
 
 import javax.crypto.SecretKey;
 
@@ -38,7 +39,6 @@ import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 import org.apache.cxf.rs.security.jose.jws.NoneJwsSignatureProvider;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
-import org.apache.cxf.rs.security.jose.jwt.JwtUtils;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.tokens.bearer.BearerAccessToken;
@@ -110,31 +110,28 @@ public final class JwtAccessTokenUtils {
             throw new SecurityException();
         }
     }
-    public static void validateJwtClaims(JwtClaims claims, int ttl, int clockOffset, Client c) {
-        validateJwtSubjectAndAudience(claims, c);
-        
-        // If we have no issued time then we need to have an expiry
-        boolean expiredRequired = claims.getIssuedAt() == null;
-        JwtUtils.validateJwtExpiry(claims, clockOffset, expiredRequired);
-        
-        JwtUtils.validateJwtNotBefore(claims, clockOffset, false);
-        
-        // If we have no expiry then we must have an issued at
-        boolean issuedAtRequired = claims.getExpiryTime() == null;
-        if (issuedAtRequired) {
-            JwtUtils.validateJwtIssuedAt(claims, ttl, clockOffset, issuedAtRequired);
-        }
-    }
     
     private static void validateJwtSubjectAndAudience(JwtClaims claims, Client c) {
         if (claims.getSubject() == null || !claims.getSubject().equals(c.getClientId())) {
             throw new SecurityException("Invalid subject");
         }
         // validate audience
-        String aud = claims.getAudience();
-        if (aud == null 
-            || !c.getRegisteredAudiences().isEmpty() && !c.getRegisteredAudiences().contains(aud)) {
+        List<String> audiences = claims.getAudiences();
+        if (audiences.isEmpty()) {
             throw new SecurityException("Invalid audience");
+        }
+        
+        if (!c.getRegisteredAudiences().isEmpty()) {
+            boolean match = false;
+            for (String audience : audiences) {
+                if (c.getRegisteredAudiences().contains(audience)) {
+                    match = true;
+                    break;
+                }
+            }
+            if (!match) {
+                throw new SecurityException("Invalid audience");
+            }
         }
         // TODO: the issuer is indirectly validated by validating the signature
         // but an extra check can be done

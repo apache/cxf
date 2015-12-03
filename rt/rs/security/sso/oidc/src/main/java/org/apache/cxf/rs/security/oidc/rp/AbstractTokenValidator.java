@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.rs.security.oidc.rp;
 
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.cxf.jaxrs.client.WebClient;
@@ -66,8 +67,9 @@ public abstract class AbstractTokenValidator extends AbstractOAuthJoseJwtConsume
                 throw new SecurityException("Invalid subject");
             }
             // validate audience
-            String aud = claims.getAudience();
-            if (aud == null && validateClaimsAlways || aud != null && !clientId.equals(aud)) {
+            List<String> audiences = claims.getAudiences();
+            if (audiences.isEmpty() && validateClaimsAlways 
+                || !audiences.isEmpty() && !audiences.contains(clientId)) {
                 throw new SecurityException("Invalid audience");
             }
     

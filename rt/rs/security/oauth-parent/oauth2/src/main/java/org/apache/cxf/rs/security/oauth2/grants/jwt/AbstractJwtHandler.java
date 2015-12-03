@@ -54,11 +54,10 @@ public abstract class AbstractJwtHandler extends AbstractGrantHandler {
     }
     
     protected void validateClaims(Client client, JwtClaims claims) {
-        JwtUtils.validateTokenClaims(claims, ttl, clockOffset);
+        JwtUtils.validateTokenClaims(claims, ttl, clockOffset, true);
         
         validateIssuer(claims.getIssuer());
         validateSubject(client, claims.getSubject());
-        validateAudience(client, claims.getAudience());
         
         // We must have an Expiry
         if (claims.getClaim(JwtConstants.CLAIM_EXPIRY) == null) {
@@ -77,8 +76,6 @@ public abstract class AbstractJwtHandler extends AbstractGrantHandler {
         if (subject == null) {
             throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
         }
-    }
-    protected void validateAudience(Client client, String audience) {
     }
     public void setSupportedIssuers(Set<String> supportedIssuers) {
         this.supportedIssuers = supportedIssuers;
