@@ -76,7 +76,7 @@ public final class BigQueryServer {
         JwsHeaders headers = new JwsHeaders(JoseType.JWT, SignatureAlgorithm.RS256);
         JwtClaims claims = new JwtClaims();
         claims.setIssuer(issuer);
-        claims.setAudiences(Collections.singletonList("https://www.googleapis.com/oauth2/v3/token"));
+        claims.setAudience("https://www.googleapis.com/oauth2/v3/token");
         
         long issuedAt = OAuthUtils.getIssuedAt();
         claims.setIssuedAt(issuedAt);
