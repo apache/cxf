@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.json.basic.JsonMapObject;
 
@@ -54,10 +55,40 @@ public class JwtClaims extends JsonMapObject {
         return (String)getClaim(JwtConstants.CLAIM_SUBJECT);
     }
     
+    /**
+     * Set a single audience value which will be serialized as a String
+     * @param audience the audience
+     */
+    public void setAudience(String audience) {
+        setClaim(JwtConstants.CLAIM_AUDIENCE, audience);
+    }
+    
+    /**
+     * Get a single audience value. If the audience claim value is an array then the
+     * first value will be returned.
+     * @return the audience
+     */
+    public String getAudience() {
+        List<String> audiences = getAudiences();
+        if (!StringUtils.isEmpty(audiences)) {
+            return audiences.get(0);
+        } else {
+            return null;
+        }
+    }
+    
+    /**
+     * Set an array of audiences
+     * @param audiences the audiences array
+     */
     public void setAudiences(List<String> audiences) {
         setClaim(JwtConstants.CLAIM_AUDIENCE, audiences);
     }
     
+    /**
+     * Get an array of audiences
+     * @return the audiences array
+     */
     public List<String> getAudiences() {
         Object audiences = getClaim(JwtConstants.CLAIM_AUDIENCE);
         if (audiences instanceof List<?>) {
