@@ -129,6 +129,9 @@ public final class OAuthUtils {
     public static String convertPermissionsToScope(List<OAuthPermission> perms) {
         StringBuilder sb = new StringBuilder();
         for (OAuthPermission perm : perms) {
+            if (perm.isInvisibleToClient()) {
+                continue;
+            }
             if (sb.length() > 0) {
                 sb.append(" ");
             }
@@ -255,8 +258,9 @@ public final class OAuthUtils {
         if (supportOptionalParams) {
             clientToken.setExpiresIn(serverToken.getExpiresIn());
             List<OAuthPermission> perms = serverToken.getScopes();
-            if (!perms.isEmpty()) {
-                clientToken.setApprovedScope(OAuthUtils.convertPermissionsToScope(perms));    
+            String scopeString = OAuthUtils.convertPermissionsToScope(perms);
+            if (!StringUtils.isEmpty(scopeString)) {
+                clientToken.setApprovedScope(scopeString);    
             }
             clientToken.setParameters(serverToken.getParameters());
         }

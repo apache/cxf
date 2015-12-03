@@ -29,6 +29,7 @@ public class Permission implements Serializable {
     private String permission;
     private String description;
     private boolean isDefault;
+    private boolean invisibleToClient;
     
     public Permission() {
         
@@ -87,5 +88,19 @@ public class Permission implements Serializable {
 
     public boolean isDefault() {
         return isDefault;
+    }
+
+    public boolean isInvisibleToClient() {
+        return invisibleToClient;
+    }
+
+    /**
+     * Set the visibility status; by default all the scopes approved by a user can 
+     * be optionally reported to the client in access token responses. Some scopes may need
+     * to stay 'invisible' to client.
+     * @param invisibleToClient
+     */
+    public void setInvisibleToClient(boolean invisibleToClient) {
+        this.invisibleToClient = invisibleToClient;
     }
 }
