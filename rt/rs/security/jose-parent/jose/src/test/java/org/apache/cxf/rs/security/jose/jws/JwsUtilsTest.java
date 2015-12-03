@@ -30,7 +30,6 @@ import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.rs.security.jose.common.JoseConstants;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKeys;
-import org.apache.cxf.rs.security.jose.jwk.JwkUtils;
 import org.apache.cxf.rs.security.jose.jwk.KeyType;
 
 import org.junit.Assert;
@@ -49,7 +48,6 @@ public class JwsUtilsTest extends Assert {
         List<JsonWebKey> keys = keySet.getRsaKeys();
         assertEquals(1, keys.size());
         JsonWebKey key = keys.get(0);
-        System.out.println(JwkUtils.jwkKeyToJson(key));
         assertEquals(KeyType.RSA, key.getKeyType());
         assertEquals("alice", key.getKeyId());
         assertNotNull(key.getKeyProperty(JsonWebKey.RSA_PUBLIC_EXP));
