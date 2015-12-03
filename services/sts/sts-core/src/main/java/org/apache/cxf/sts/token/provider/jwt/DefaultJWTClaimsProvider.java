@@ -31,7 +31,6 @@ import javax.security.auth.x500.X500Principal;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
-import org.apache.cxf.rs.security.jose.jwt.JwtConstants;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.claims.ClaimsUtils;
 import org.apache.cxf.sts.claims.ProcessedClaim;
@@ -265,11 +264,8 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
             }
         }
         
-        if (audiences.size() == 1) {
-            claims.setAudience(audiences.get(0));
-        } else if (!audiences.isEmpty()) {
-            claims.setProperty(JwtConstants.CLAIM_AUDIENCE, audiences);
-        }
+        claims.setAudiences(audiences);
+        
     }
     
     public boolean isUseX500CN() {
