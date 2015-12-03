@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.json.basic.JsonMapObject;
 
 
@@ -53,24 +54,19 @@ public class JwtClaims extends JsonMapObject {
         return (String)getClaim(JwtConstants.CLAIM_SUBJECT);
     }
     
-    public void setAudience(String audience) {
-        setAudiences(Collections.singletonList(audience));
-    }
-    
     public void setAudiences(List<String> audiences) {
         setClaim(JwtConstants.CLAIM_AUDIENCE, audiences);
     }
     
-    @SuppressWarnings("unchecked")
     public List<String> getAudiences() {
         Object audiences = getClaim(JwtConstants.CLAIM_AUDIENCE);
         if (audiences instanceof List<?>) {
-            return (List<String>)audiences;
+            return CastUtils.cast((List<?>)audiences);
         } else if (audiences instanceof String) {
             return Collections.singletonList((String)audiences);
         }
         
-        return Collections.emptyList();
+        return null;
     }
     
     public void setExpiryTime(Long expiresIn) {
