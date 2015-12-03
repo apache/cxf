@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.rs.security.oidc.idp;
 
+import java.util.Collections;
+
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
@@ -36,7 +38,7 @@ public class IdTokenResponseFilter extends AbstractOAuthServerJoseJwtProducer im
             IdToken token = 
                 userInfoProvider.getIdToken(st.getClient().getClientId(), st.getSubject(), st.getScopes());
             token.setIssuer(issuer);
-            token.setAudience(st.getClient().getClientId());
+            token.setAudiences(Collections.singletonList(st.getClient().getClientId()));
             
             String responseEntity = super.processJwt(new JwtToken(token), 
                                                      st.getClient());

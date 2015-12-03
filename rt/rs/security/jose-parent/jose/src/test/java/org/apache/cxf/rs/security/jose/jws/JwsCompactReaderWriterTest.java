@@ -24,6 +24,7 @@ import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -148,7 +149,7 @@ public class JwsCompactReaderWriterTest extends Assert {
         JwtClaims claims = new JwtClaims();
         claims.setIssuer("https://jwt-idp.example.com");
         claims.setSubject("mailto:mike@example.com");
-        claims.setAudience("https://jwt-rp.example.net");
+        claims.setAudiences(Collections.singletonList("https://jwt-rp.example.net"));
         claims.setNotBefore(1300815780L);
         claims.setExpiryTime(1300819380L);
         claims.setClaim("http://claims.example.com/member", true);
