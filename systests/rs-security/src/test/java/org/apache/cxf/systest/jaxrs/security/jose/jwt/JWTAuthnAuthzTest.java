@@ -107,10 +107,6 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         assertEquals(returnedBook.getId(), 123L);
     }
     
-    private List<String> toList(String address) {
-        return Collections.singletonList(address);
-    }
-    
     @org.junit.Test
     public void testAuthenticationFailure() throws Exception {
 
@@ -264,4 +260,7 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         assertNotEquals(response.getStatus(), 200);
     }
     
+    private List<String> toList(String address) {
+        return Collections.singletonList(address);
+    }
 }
