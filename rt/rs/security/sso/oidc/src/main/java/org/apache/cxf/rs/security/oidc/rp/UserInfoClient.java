@@ -60,7 +60,7 @@ public class UserInfoClient extends AbstractTokenValidator {
         JwtToken jwt = getUserInfoJwt(profileJwtToken, client);
         return getUserInfoFromJwt(jwt, idToken, client);
     }
-    public UserInfo getUserInfoFromJwt(JwtToken jwt, IdToken idToken, Consumer client) {
+    public UserInfo getUserInfoFromJwt(JwtToken jwt, IdToken idToken, OAuthClientUtils.Consumer client) {
         UserInfo profile = new UserInfo(jwt.getClaims().asMap());
         validateUserInfo(profile, idToken, client);
         return profile;
@@ -68,8 +68,8 @@ public class UserInfoClient extends AbstractTokenValidator {
     public JwtToken getUserInfoJwt(String profileJwtToken, OAuthClientUtils.Consumer client) {
         return getJwtToken(profileJwtToken);
     }
-    public void validateUserInfo(UserInfo profile, IdToken idToken, Consumer client) {
-        validateJwtClaims(profile, client.getClientId(), false);
+    public void validateUserInfo(UserInfo profile, IdToken idToken, OAuthClientUtils.Consumer client) {
+        validateJwtClaims(profile, client.getKey(), false);
         // validate subject
         if (!idToken.getSubject().equals(profile.getSubject())) {
             throw new SecurityException("Invalid subject");
