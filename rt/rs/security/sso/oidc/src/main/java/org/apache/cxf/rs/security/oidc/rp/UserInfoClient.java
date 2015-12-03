@@ -40,7 +40,7 @@ public class UserInfoClient extends AbstractTokenValidator {
                 return getUserInfoFromJwt(jwt, idToken, client);
             } else {
                 UserInfo profile = profileClient.get(UserInfo.class);
-                validateUserInfo(profile, idToken);
+                validateUserInfo(profile, idToken, client);
                 return profile;
             }
         } else {
@@ -50,7 +50,7 @@ public class UserInfoClient extends AbstractTokenValidator {
                 return getUserInfoFromJwt(jwt, idToken, client);
             } else {
                 UserInfo profile = profileClient.form(form).readEntity(UserInfo.class);
-                validateUserInfo(profile, idToken);
+                validateUserInfo(profile, idToken, client);
                 return profile;
             }
         }
@@ -59,18 +59,18 @@ public class UserInfoClient extends AbstractTokenValidator {
                                        IdToken idToken,
                                        Consumer client) {
         JwtToken jwt = getUserInfoJwt(profileJwtToken, client);
-        return getUserInfoFromJwt(jwt, idToken);
+        return getUserInfoFromJwt(jwt, idToken, client);
     }
-    public UserInfo getUserInfoFromJwt(JwtToken jwt, IdToken idToken) {
+    public UserInfo getUserInfoFromJwt(JwtToken jwt, IdToken idToken, Consumer client) {
         UserInfo profile = new UserInfo(jwt.getClaims().asMap());
-        validateUserInfo(profile, idToken);
+        validateUserInfo(profile, idToken, client);
         return profile;
     }
     public JwtToken getUserInfoJwt(String profileJwtToken, Consumer client) {
         return getJwtToken(profileJwtToken);
     }
-    public void validateUserInfo(UserInfo profile, IdToken idToken) {
-        validateJwtClaims(profile, idToken.getAudience(), false);
+    public void validateUserInfo(UserInfo profile, IdToken idToken, Consumer client) {
+        validateJwtClaims(profile, client.getClientId(), false);
         // validate subject
         if (!idToken.getSubject().equals(profile.getSubject())) {
             throw new SecurityException("Invalid subject");
