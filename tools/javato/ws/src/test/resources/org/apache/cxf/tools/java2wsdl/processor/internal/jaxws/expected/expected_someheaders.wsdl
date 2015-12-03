@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name="SomeHeadersService" targetNamespace="http://apache.org/cxf/test" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://apache.org/cxf/test" xmlns:ns1="http://schemas.xmlsoap.org/soap/http" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+  <wsdl:types>
+<xs:schema xmlns:tns="http://apache.org/cxf/test" xmlns:xs="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://apache.org/cxf/test">
+  <xs:element name="hello" type="tns:hello"/>
+  <xs:element name="helloResponse" type="tns:helloResponse"/>
+  <xs:complexType name="hello">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="body1" type="xs:string"/>
+      <xs:element minOccurs="0" name="body2" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="helloResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="someHeadersResponse" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="header1" nillable="true" type="xs:string"/>
+  <xs:element name="header2" nillable="true" type="xs:string"/>
+</xs:schema>
+  </wsdl:types>
+  <wsdl:message name="helloResponse">
+    <wsdl:part name="parameters" element="tns:helloResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="hello">
+    <wsdl:part name="parameters" element="tns:hello">
+    </wsdl:part>
+    <wsdl:part name="header1" element="tns:header1">
+    </wsdl:part>
+    <wsdl:part name="header2" element="tns:header2">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="SomeHeaders">
+    <wsdl:operation name="hello">
+      <wsdl:input name="hello" message="tns:hello">
+    </wsdl:input>
+      <wsdl:output name="helloResponse" message="tns:helloResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="SomeHeadersServiceSoapBinding" type="tns:SomeHeaders">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="hello">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="hello">
+        <soap:header message="tns:hello" part="header1" use="literal">
+        </soap:header>
+        <soap:header message="tns:hello" part="header2" use="literal">
+        </soap:header>
+        <soap:body parts="parameters" use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="helloResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="SomeHeadersService">
+    <wsdl:port name="SomeHeadersPort" binding="tns:SomeHeadersServiceSoapBinding">
+      <soap:address location="http://localhost:9090"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
