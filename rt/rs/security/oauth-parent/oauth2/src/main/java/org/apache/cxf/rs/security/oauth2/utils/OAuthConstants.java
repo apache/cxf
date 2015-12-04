@@ -55,7 +55,7 @@ public final class OAuthConstants {
     public static final String DIRECT_TOKEN_GRANT = "urn:ietf:params:oauth:grant-type:direct-token-grant";
     
     // Well-known token types
-    public static final String BEARER_TOKEN_TYPE = "bearer";
+    public static final String BEARER_TOKEN_TYPE = "Bearer";
     public static final String HAWK_TOKEN_TYPE = "hawk";
     
     // https://tools.ietf.org/html/rfc7636
