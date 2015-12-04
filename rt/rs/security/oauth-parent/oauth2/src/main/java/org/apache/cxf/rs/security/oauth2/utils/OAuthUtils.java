@@ -182,12 +182,12 @@ public final class OAuthUtils {
     }
     
     public static long getIssuedAt() {
-        return System.currentTimeMillis() / 1000;
+        return System.currentTimeMillis() / 1000L;
     }
     
     public static boolean isExpired(Long issuedAt, Long lifetime) {
         return lifetime != 0L
-            && issuedAt + lifetime < System.currentTimeMillis() / 1000;
+            && issuedAt + lifetime < System.currentTimeMillis() / 1000L;
     }
     
     public static boolean validateAudience(String audience, List<String> audiences) {
