@@ -77,75 +77,9 @@ public class OAuthPermission extends Permission {
         return uris;
     }
     
-<<<<<<< HEAD
-=======
-    /**
-     * Gets the permission description
-     * @return the description
-     */
-    public String getDescription() {
-        return description;
-    }
-
-    /**
-     * Sets the permission description
-     * @param description
-     */
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    /**
-     * Get the permission value such as "read_calendar"
-     * @return the value
-     */
-    public String getPermission() {
-        return permission;
-    }
-
-    /**
-     * Sets the permission value such as "read_calendar"
-     * @param permission the permission value
-     */
-    public void setPermission(String permission) {
-        this.permission = permission;
-    }
-
-    /**
-     * Indicates if this permission has been allocated by default or not.
-     * Authorization View handlers may use this property to optimize the way the user selects the
-     * scopes.
-     * For example, assume that read', 'add' and 'update' scopes are supported and the 
-     * 'read' scope is always allocated. This can be presented at the UI level as follows:
-     * the read-only check-box control will represent a 'read' scope and a user will be able to
-     * optionally select 'add' and/or 'update' scopes, in addition to the default 'read' one. 
-     * @param isDefault true if the permission has been allocated by default
-     */
-    public void setDefault(boolean value) {
-        this.isDefault = value;
-    }
-
-    public boolean isDefault() {
-        return isDefault;
-    }
-
-    public boolean isInvisibleToClient() {
-        return invisibleToClient;
-    }
-
-    /**
-     * Set the visibility status; by default all the scopes approved by a user can 
-     * be optionally reported to the client in access token responses. Some scopes may need
-     * to stay 'invisible' to client.
-     * @param invisibleToClient
-     */
-    public void setInvisibleToClient(boolean invisibleToClient) {
-        this.invisibleToClient = invisibleToClient;
-    }
-    
     @Override
     public boolean equals(Object object) {
-        if (!(object instanceof OAuthPermission)) {
+        if (!(object instanceof OAuthPermission) || !super.equals(object)) {
             return false;
         }
         
@@ -155,22 +89,8 @@ public class OAuthPermission extends Permission {
             || this.httpVerbs != null && !this.httpVerbs.equals(that.httpVerbs)) {
             return false;
         }
-        if (this.uris != null && that.uris == null
-            || this.uris == null && that.uris != null
-            || this.uris != null && !this.uris.equals(that.uris)) {
-            return false;
-        }
-        if (this.permission != null && that.permission == null
-            || this.permission == null && that.permission != null
-            || this.permission != null && !this.permission.equals(that.permission)) {
-            return false;
-        }
-        if (this.description != null && that.description == null
-            || this.description == null && that.description != null
-            || this.description != null && !this.description.equals(that.description)) {
-            return false;
-        }
-        if (this.invisibleToClient != that.invisibleToClient || this.isDefault != that.isDefault) { //NOPMD
+        if (this.uris != null && that.uris == null || this.uris == null && that.uris != null //NOPMD
+            || this.uris != null && !this.uris.equals(that.uris)) { //NOPMD
             return false;
         }
         
@@ -179,23 +99,14 @@ public class OAuthPermission extends Permission {
     
     @Override
     public int hashCode() {
-        int hashCode = 17;
+        int hashCode = super.hashCode();
         if (httpVerbs != null) {
             hashCode = 31 * hashCode + httpVerbs.hashCode();
         }
         if (uris != null) {
             hashCode = 31 * hashCode + uris.hashCode();
         }
-        if (permission != null) {
-            hashCode = 31 * hashCode + permission.hashCode();
-        }
-        if (description != null) {
-            hashCode = 31 * hashCode + description.hashCode();
-        }
-        hashCode = 31 * hashCode + Boolean.hashCode(invisibleToClient);
-        hashCode = 31 * hashCode + Boolean.hashCode(isDefault);
         
         return hashCode;
     }
->>>>>>> 8583a24... Add equals/hashCode methods for OAuthPermission so that the containsAll call in AbstractOAuthDataProvider.doRefreshAccessToken works
 }
