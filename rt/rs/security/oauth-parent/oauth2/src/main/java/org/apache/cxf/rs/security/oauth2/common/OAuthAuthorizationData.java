@@ -48,7 +48,7 @@ public class OAuthAuthorizationData extends OAuthRedirectionState implements Ser
     private Map<String, String> extraApplicationProperties = new HashMap<String, String>();
     private boolean implicitFlow;
     
-    private List<? extends Permission> permissions;
+    private List<? extends OAuthPermission> permissions;
     
     public OAuthAuthorizationData() {
     }
@@ -74,15 +74,15 @@ public class OAuthAuthorizationData extends OAuthRedirectionState implements Ser
      * requested by the client application
      * @return the list of scopes
      */
-    public List<? extends Permission> getPermissions() {
+    public List<? extends OAuthPermission> getPermissions() {
         return permissions;
     }
 
     /**
-     * Gets the list of scopes translated to {@link Permission} instances
-     * @return the list of scopses
+     * Gets the list of scopes translated to {@link OAuthPermission} instances
+     * @return the list of scopes
      **/
-    public void setPermissions(List<? extends Permission> permissions) {
+    public void setPermissions(List<? extends OAuthPermission> permissions) {
         this.permissions = permissions;
     }
 
