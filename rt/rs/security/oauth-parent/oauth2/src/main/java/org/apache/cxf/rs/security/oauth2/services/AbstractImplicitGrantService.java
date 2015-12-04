@@ -71,7 +71,7 @@ public abstract class AbstractImplicitGrantService extends RedirectionBasedGrant
                 reg.setGrantType(super.getSupportedGrantType());
                 reg.setSubject(userSubject);
                 reg.setRequestedScope(requestedScope);        
-                if (approvedScope != null && approvedScope.isEmpty()) {
+                if (approvedScope == null || approvedScope.isEmpty()) {
                     // no down-scoping done by a user, all of the requested scopes have been authorized
                     reg.setApprovedScope(requestedScope);
                 } else {
