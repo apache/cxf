@@ -103,4 +103,43 @@ public class Permission implements Serializable {
     public void setInvisibleToClient(boolean invisibleToClient) {
         this.invisibleToClient = invisibleToClient;
     }
+    
+    @Override
+    public boolean equals(Object object) {
+        if (!(object instanceof Permission)) {
+            return false;
+        }
+        
+        Permission that = (Permission)object;
+        if (this.permission != null && that.permission == null
+            || this.permission == null && that.permission != null
+            || this.permission != null && !this.permission.equals(that.permission)) {
+            return false;
+        }
+        if (this.description != null && that.description == null
+            || this.description == null && that.description != null
+            || this.description != null && !this.description.equals(that.description)) {
+            return false;
+        }
+        if (this.invisibleToClient != that.invisibleToClient || this.isDefault != that.isDefault) { //NOPMD
+            return false;
+        }
+        
+        return true;
+    }
+    
+    @Override
+    public int hashCode() {
+        int hashCode = 17;
+        if (permission != null) {
+            hashCode = 31 * hashCode + permission.hashCode();
+        }
+        if (description != null) {
+            hashCode = 31 * hashCode + description.hashCode();
+        }
+        hashCode = 31 * hashCode + Boolean.hashCode(invisibleToClient);
+        hashCode = 31 * hashCode + Boolean.hashCode(isDefault);
+        
+        return hashCode;
+    }
 }
