@@ -46,8 +46,8 @@ import io.swagger.converter.ModelConverters;
 import io.swagger.jaxrs.ext.AbstractSwaggerExtension;
 import io.swagger.jaxrs.ext.SwaggerExtension;
 import io.swagger.jaxrs.ext.SwaggerExtensions;
+import io.swagger.models.parameters.AbstractSerializableParameter;
 import io.swagger.models.parameters.Parameter;
-import io.swagger.models.properties.AbstractNumericProperty;
 import io.swagger.models.properties.ArrayProperty;
 import io.swagger.models.properties.Property;
 import io.swagger.models.properties.RefProperty;
@@ -80,6 +80,7 @@ public class JaxRs2Extension extends AbstractSwaggerExtension {
                 if (schema != null) {
                     mp.setProperty(schema);
                 }
+                applyBeanValidatorAnnotations(mp, annotations);
                 parameters.add(mp);
             } else if (annotation instanceof BeanParam) {
                 // Use Jackson's logic for processing Beans
@@ -163,72 +164,60 @@ public class JaxRs2Extension extends AbstractSwaggerExtension {
     /**
      * This is essentially a duplicate of {@link io.swagger.jackson.ModelResolver.applyBeanValidatorAnnotations}.
      *
-     * @param property
+     * @param parameter
      * @param annotations
      */
-    private void applyBeanValidatorAnnotations(final Parameter property, final List<Annotation> annotations) {
+    private void applyBeanValidatorAnnotations(final Parameter parameter, final List<Annotation> annotations) {
         Map<String, Annotation> annos = new HashMap<String, Annotation>();
         if (annotations != null) {
             for (Annotation annotation : annotations) {
                 annos.put(annotation.annotationType().getName(), annotation);
             }
         }
+
         if (annos.containsKey(NotNull.class.getName())) {
-            property.setRequired(true);
+            parameter.setRequired(true);
         }
-        if (annos.containsKey(Min.class.getName()) && property instanceof AbstractNumericProperty) {
-            Min min = (Min) annos.get(Min.class.getName());
-            AbstractNumericProperty ap = (AbstractNumericProperty) property;
-            ap.setMinimum(new Double(min.value()));
-        }
-        if (annos.containsKey(Max.class.getName()) && property instanceof AbstractNumericProperty) {
-            Max max = (Max) annos.get(Max.class.getName());
-            AbstractNumericProperty ap = (AbstractNumericProperty) property;
-            ap.setMaximum(new Double(max.value()));
-        }
-        if (annos.containsKey(Size.class.getName())) {
-            Size size = (Size) annos.get(Size.class.getName());
-            if (property instanceof AbstractNumericProperty) {
-                AbstractNumericProperty ap = (AbstractNumericProperty) property;
-                ap.setMinimum(new Double(size.min()));
-                ap.setMaximum(new Double(size.max()));
-            } else if (property instanceof StringProperty) {
-                StringProperty sp = (StringProperty) property;
-                sp.minLength(size.min());
-                sp.maxLength(size.max());
-            } else if (property instanceof ArrayProperty) {
-                ArrayProperty sp = (ArrayProperty) property;
-                sp.setMinItems(size.min());
-                sp.setMaxItems(size.max());
+
+        if (parameter instanceof AbstractSerializableParameter) {
+            AbstractSerializableParameter<?> serializable = (AbstractSerializableParameter<?>) parameter;
+
+            if (annos.containsKey(Min.class.getName())) {
+                Min min = (Min) annos.get(Min.class.getName());
+                serializable.setMinimum(new Double(min.value()));
             }
-        }
-        if (annos.containsKey(DecimalMin.class.getName())) {
-            DecimalMin min = (DecimalMin) annos.get(DecimalMin.class.getName());
-            if (property instanceof AbstractNumericProperty) {
-                AbstractNumericProperty ap = (AbstractNumericProperty) property;
+            if (annos.containsKey(Max.class.getName())) {
+                Max max = (Max) annos.get(Max.class.getName());
+                serializable.setMaximum(new Double(max.value()));
+            }
+            if (annos.containsKey(Size.class.getName())) {
+                Size size = (Size) annos.get(Size.class.getName());
+
+                serializable.setMinimum(new Double(size.min()));
+                serializable.setMaximum(new Double(size.max()));
+
+                serializable.setMinItems(size.min());
+                serializable.setMaxItems(size.max());
+            }
+            if (annos.containsKey(DecimalMin.class.getName())) {
+                DecimalMin min = (DecimalMin) annos.get(DecimalMin.class.getName());
                 if (min.inclusive()) {
-                    ap.setMinimum(new Double(min.value()));
+                    serializable.setMinimum(new Double(min.value()));
                 } else {
-                    ap.setExclusiveMinimum(!min.inclusive());
+                    serializable.setExclusiveMinimum(!min.inclusive());
                 }
             }
-        }
-        if (annos.containsKey(DecimalMax.class.getName())) {
-            DecimalMax max = (DecimalMax) annos.get(DecimalMax.class.getName());
-            if (property instanceof AbstractNumericProperty) {
-                AbstractNumericProperty ap = (AbstractNumericProperty) property;
+            if (annos.containsKey(DecimalMax.class.getName())) {
+                DecimalMax max = (DecimalMax) annos.get(DecimalMax.class.getName());
                 if (max.inclusive()) {
-                    ap.setMaximum(new Double(max.value()));
+                    serializable.setMaximum(new Double(max.value()));
                 } else {
-                    ap.setExclusiveMaximum(!max.inclusive());
+                    serializable.setExclusiveMaximum(!max.inclusive());
                 }
             }
-        }
-        if (annos.containsKey(Pattern.class.getName())) {
-            Pattern pattern = (Pattern) annos.get(Pattern.class.getName());
-            if (property instanceof StringProperty) {
-                StringProperty ap = (StringProperty) property;
-                ap.setPattern(pattern.regexp());
+            if (annos.containsKey(Pattern.class.getName())) {
+                Pattern pattern = (Pattern) annos.get(Pattern.class.getName());
+                serializable.setPattern(pattern.regexp());
             }
         }
     }
