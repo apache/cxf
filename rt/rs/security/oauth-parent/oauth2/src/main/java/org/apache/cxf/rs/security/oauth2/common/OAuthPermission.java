@@ -170,10 +170,7 @@ public class OAuthPermission extends Permission {
             || this.description != null && !this.description.equals(that.description)) {
             return false;
         }
-        if (this.invisibleToClient != that.invisibleToClient) {
-            return false;
-        }
-        if (this.isDefault != that.isDefault) {
+        if (this.invisibleToClient != that.invisibleToClient || this.isDefault != that.isDefault) { //NOPMD
             return false;
         }
         
