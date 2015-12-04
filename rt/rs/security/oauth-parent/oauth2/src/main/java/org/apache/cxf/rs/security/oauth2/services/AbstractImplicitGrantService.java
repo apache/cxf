@@ -59,7 +59,6 @@ public abstract class AbstractImplicitGrantService extends RedirectionBasedGrant
                                    ServerAccessToken preAuthorizedToken) {
         ServerAccessToken token = null;
         if (preAuthorizedToken == null) {
-<<<<<<< HEAD
             AccessTokenRegistration reg = new AccessTokenRegistration();
             reg.setClient(client);
             reg.setGrantType(OAuthConstants.IMPLICIT_GRANT);
@@ -70,24 +69,6 @@ public abstract class AbstractImplicitGrantService extends RedirectionBasedGrant
                 reg.setApprovedScope(requestedScope);
             } else {
                 reg.setApprovedScope(approvedScope);
-=======
-            tokenCanBeReturned = canAccessTokenBeReturned(requestedScope, approvedScope);
-            if (tokenCanBeReturned) {
-                AccessTokenRegistration reg = new AccessTokenRegistration();
-                reg.setClient(client);
-                reg.setGrantType(super.getSupportedGrantType());
-                reg.setSubject(userSubject);
-                reg.setRequestedScope(requestedScope);        
-                if (approvedScope == null || approvedScope.isEmpty()) {
-                    // no down-scoping done by a user, all of the requested scopes have been authorized
-                    reg.setApprovedScope(requestedScope);
-                } else {
-                    reg.setApprovedScope(approvedScope);
-                }
-                reg.setAudience(state.getAudience());
-                reg.setNonce(state.getNonce());
-                token = getDataProvider().createAccessToken(reg);
->>>>>>> b7d3336... Add equals/hashCode methods for OAuthPermission so that the containsAll call in AbstractOAuthDataProvider.doRefreshAccessToken works
             }
             reg.setAudience(params.getFirst(OAuthConstants.CLIENT_AUDIENCE));
             token = getDataProvider().createAccessToken(reg);
