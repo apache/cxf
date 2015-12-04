@@ -108,7 +108,7 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
             }
         }
         
-        if (permissions.size() > 0 && matchingPermissions.isEmpty() 
+        if (!permissions.isEmpty() && matchingPermissions.isEmpty() 
             || allPermissionsMatch && (matchingPermissions.size() != permissions.size())
             || !requiredScopes.isEmpty() && requiredScopes.size() != matchingPermissions.size()) {
             String message = "Client has no valid permissions";
