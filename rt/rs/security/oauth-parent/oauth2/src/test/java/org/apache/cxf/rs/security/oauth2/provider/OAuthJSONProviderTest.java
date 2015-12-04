@@ -86,7 +86,7 @@ public class OAuthJSONProviderTest extends Assert {
                           new MetadataMap<String, String>(), 
                           new ByteArrayInputStream(response.getBytes()));
         assertEquals("1234", token.getTokenKey());
-        assertEquals(expectedTokenType, token.getTokenType());
+        assertTrue(expectedTokenType.equalsIgnoreCase(token.getTokenType()));
         assertEquals("5678", token.getRefreshToken());
         assertEquals(12345, token.getExpiresIn());
         assertEquals("read", token.getApprovedScope());
