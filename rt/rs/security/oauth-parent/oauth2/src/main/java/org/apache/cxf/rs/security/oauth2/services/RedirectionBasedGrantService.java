@@ -172,8 +172,8 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         
         // Populate the authorization challenge data 
         OAuthAuthorizationData data = 
-            createAuthorizationData(client, params, redirectUri, userSubject, requestedPermissions, 
-                                    authorizationCanBeSkipped);
+            createAuthorizationData(client, params, redirectUri, userSubject, requestedScope, 
+                                    requestedPermissions, authorizationCanBeSkipped);
         
         if (authorizationCanBeSkipped) {
             List<OAuthPermission> approvedScopes = 
@@ -203,6 +203,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
                                                              MultivaluedMap<String, String> params,
                                                              String redirectUri, 
                                                              UserSubject subject,
+                                                             List<String> requestedScope,
                                                              List<OAuthPermission> perms,
                                                              boolean authorizationCanBeSkipped) {
         
@@ -213,7 +214,13 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         secData.setAudience(params.getFirst(OAuthConstants.CLIENT_AUDIENCE));
         secData.setNonce(params.getFirst(OAuthConstants.NONCE));
         secData.setClientId(client.getClientId());
-        secData.setProposedScope(params.getFirst(OAuthConstants.SCOPE));
+        if (requestedScope != null && !requestedScope.isEmpty()) {
+            StringBuilder builder = new StringBuilder();
+            for (String scope : requestedScope) {
+                builder.append(scope + " ");
+            }
+            secData.setProposedScope(builder.toString().trim());
+        }
         if (!authorizationCanBeSkipped) {
             secData.setPermissions(perms);
             secData.setApplicationName(client.getApplicationName()); 

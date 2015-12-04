@@ -55,10 +55,12 @@ public class ImplicitGrantService extends AbstractImplicitGrantService {
                                                              MultivaluedMap<String, String> params,
                                                              String redirectUri,
                                                              UserSubject subject,
+                                                             List<String> requestedScopes,
                                                              List<OAuthPermission> perms,
                                                              boolean authorizationCanBeSkipped) {
         OAuthAuthorizationData data = 
-            super.createAuthorizationData(client, params, redirectUri, subject, perms, authorizationCanBeSkipped);
+            super.createAuthorizationData(client, params, redirectUri, subject, 
+                                          requestedScopes, perms, authorizationCanBeSkipped);
         data.setImplicitFlow(true);
         return data;
     }
