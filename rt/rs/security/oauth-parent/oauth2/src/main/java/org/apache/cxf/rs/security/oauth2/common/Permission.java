@@ -137,8 +137,8 @@ public class Permission implements Serializable {
         if (description != null) {
             hashCode = 31 * hashCode + description.hashCode();
         }
-        hashCode = 31 * hashCode + Boolean.hashCode(invisibleToClient);
-        hashCode = 31 * hashCode + Boolean.hashCode(isDefault);
+        hashCode = 31 * hashCode + Boolean.valueOf(invisibleToClient).hashCode();
+        hashCode = 31 * hashCode + Boolean.valueOf(isDefault).hashCode();
         
         return hashCode;
     }
