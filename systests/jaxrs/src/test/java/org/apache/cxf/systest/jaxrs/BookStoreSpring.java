@@ -82,6 +82,16 @@ public class BookStoreSpring {
         //System.out.println("PreDestroy called");
     }
     
+    @POST
+    @Path("/bookform")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces("application/xml")
+    public Book echoBookForm(@Context HttpServletRequest req) {
+        String name = req.getParameter("name");
+        long id = Long.valueOf(req.getParameter("id"));
+        return new Book(name, id);
+    }
+    
     @GET
     @Path("/books/webex")
     public Books getBookWebEx() {
