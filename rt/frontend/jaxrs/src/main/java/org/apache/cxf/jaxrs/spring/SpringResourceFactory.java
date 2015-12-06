@@ -44,6 +44,7 @@ import org.springframework.context.ApplicationContextAware;
 public class SpringResourceFactory implements ResourceProvider, ApplicationContextAware {
 
     private Constructor<?> c;
+    private Class<?> type;
     private ApplicationContext ac;
     private String beanId;
     private Method postConstructMethod;
@@ -65,26 +66,30 @@ public class SpringResourceFactory implements ResourceProvider, ApplicationConte
     }
     
     private void init() {
-        Class<?> type = ClassHelper.getRealClassFromClass(ac.getType(beanId));
+        type = ClassHelper.getRealClassFromClass(ac.getType(beanId));
         if (Proxy.isProxyClass(type)) {
             type = ClassHelper.getRealClass(ac.getBean(beanId));
+        }
+        isSingleton = ac.isSingleton(beanId);
+        postConstructMethod = ResourceUtils.findPostConstructMethod(type, postConstructMethodName);
+        preDestroyMethod = ResourceUtils.findPreDestroyMethod(type, preDestroyMethodName);
+        
+        if (isSingleton()) {
+            try {
+                singletonInstance = ac.getBean(beanId);
+            } catch (BeansException ex) {
+                // ignore for now, try resolving resource constructor later
+            }
+            if (singletonInstance != null) {
+                return;
+            }
+        } else {
+            isPrototype = ac.isPrototype(beanId);
         }
         c = ResourceUtils.findResourceConstructor(type, !isSingleton());
         if (c == null) {
             throw new RuntimeException("Resource class " + type
                                        + " has no valid constructor");
-        }
-        postConstructMethod = ResourceUtils.findPostConstructMethod(type, postConstructMethodName);
-        preDestroyMethod = ResourceUtils.findPreDestroyMethod(type, preDestroyMethodName);
-        isSingleton = ac.isSingleton(beanId);
-        if (!isSingleton) {
-            isPrototype = ac.isPrototype(beanId);
-        } else {
-            try {
-                singletonInstance = ac.getBean(beanId);
-            } catch (BeansException ex) {
-                // ignore for now, can be to do with no default constructor available
-            }
         }
         
     }
@@ -156,7 +161,7 @@ public class SpringResourceFactory implements ResourceProvider, ApplicationConte
      * {@inheritDoc}
      */
     public Class<?> getResourceClass() {
-        return c.getDeclaringClass();
+        return type;
     }
 
     public void setCallPostConstruct(boolean callPostConstruct) {
