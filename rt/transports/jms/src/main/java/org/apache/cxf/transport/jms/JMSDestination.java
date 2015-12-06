@@ -140,8 +140,10 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
             container.setTransacted(jmsConfig.isSessionTransacted());
             container.setDurableSubscriptionName(jmsConfig.getDurableSubscriptionName());
 
-            Executor executor = JMSFactory.createExecutor(bus, "jms-destination");
-            container.setExecutor(executor);
+            Object executor = bus.getProperty(JMSFactory.JMS_DESTINATION_EXECUTOR);
+            if (executor instanceof Executor) {
+                container.setExecutor((Executor) executor);
+            }
             container.start();
             suspendedContinuations.setListenerContainer(container);
             connection.start();

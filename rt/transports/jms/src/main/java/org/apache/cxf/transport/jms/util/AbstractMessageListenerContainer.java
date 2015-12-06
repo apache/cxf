@@ -19,7 +19,9 @@
 package org.apache.cxf.transport.jms.util;
 
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import javax.jms.Connection;
@@ -40,10 +42,13 @@ public abstract class AbstractMessageListenerContainer implements JMSListenerCon
     protected int acknowledgeMode = Session.AUTO_ACKNOWLEDGE;
     protected String messageSelector;
     protected boolean running;
-    protected Executor executor;
     protected String durableSubscriptionName;
     protected boolean pubSubNoLocal;
     protected TransactionManager transactionManager;
+
+    private Executor executor;
+    private int concurrentConsumers = 1;
+    private boolean internalExecutor;
 
     public AbstractMessageListenerContainer() {
         super();
@@ -70,7 +75,8 @@ public abstract class AbstractMessageListenerContainer implements JMSListenerCon
 
     protected Executor getExecutor() {
         if (executor == null) {
-            executor = Executors.newFixedThreadPool(10);
+            executor = Executors.newFixedThreadPool(concurrentConsumers);
+            internalExecutor = true;
         }
         return executor;
     }
@@ -79,6 +85,25 @@ public abstract class AbstractMessageListenerContainer implements JMSListenerCon
         this.executor = executor;
     }
 
+    @Override
+    public void stop() {
+        // In case of using external executor, don't shutdown it
+        if ((executor == null) || !internalExecutor) {
+            return;
+        }
+        
+        ExecutorService executorService = (ExecutorService)executor;
+        executorService.shutdown();
+        try {
+            executorService.awaitTermination(10, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            // Ignore
+        }
+        executorService.shutdownNow();
+        executor = null;
+        internalExecutor = false;
+    }
+    
     public void setDurableSubscriptionName(String durableSubscriptionName) {
         this.durableSubscriptionName = durableSubscriptionName;
     }
@@ -94,6 +119,14 @@ public abstract class AbstractMessageListenerContainer implements JMSListenerCon
     
     public void setTransactionManager(TransactionManager transactionManager) {
         this.transactionManager = transactionManager;
+    }
+
+    public void setConcurrentConsumers(int concurrentConsumers) {
+        this.concurrentConsumers = concurrentConsumers;
+    }
+
+    public int getConcurrentConsumers() {
+        return concurrentConsumers;
     }
 
 }

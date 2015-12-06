@@ -37,6 +37,9 @@ import org.apache.cxf.workqueue.WorkQueueManager;
  * Factory to create jms helper objects from configuration and context information
  */
 public final class JMSFactory {
+    public static final String JMS_DESTINATION_EXECUTOR = "org.apache.cxf.extensions.jms.destination.executor";
+    public static final String JMS_CONDUIT_EXECUTOR = "org.apache.cxf.extensions.jms.conduit.executor";
+
     static final String MESSAGE_ENDPOINT_FACTORY = "MessageEndpointFactory";
     static final String MDB_TRANSACTED_METHOD = "MDBTransactedMethod";
 
@@ -116,7 +119,7 @@ public final class JMSFactory {
      * @param name
      * @return
      */
-    public static Executor createExecutor(Bus bus, String name) {
+    public static Executor createWorkQueueExecutor(Bus bus, String name) {
         WorkQueueManager manager = bus.getExtension(WorkQueueManager.class);
         if (manager != null) {
             AutomaticWorkQueue workQueue1 = manager.getNamedWorkQueue(name);

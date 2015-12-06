@@ -178,8 +178,10 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
                                                                                       staticReplyDestination, 
                                                                                       this);
                     container.setMessageSelector(messageSelector);
-                    Executor executor = JMSFactory.createExecutor(bus, "jms-conduit");
-                    container.setExecutor(executor);
+                    Object executor = bus.getProperty(JMSFactory.JMS_CONDUIT_EXECUTOR);
+                    if (executor instanceof Executor) {
+                        container.setExecutor((Executor) executor);
+                    }
                     container.start();
                     jmsListener = container;
                     addBusListener();

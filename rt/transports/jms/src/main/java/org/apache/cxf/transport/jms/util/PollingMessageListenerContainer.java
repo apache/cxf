@@ -18,9 +18,6 @@
  */
 package org.apache.cxf.transport.jms.util;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -39,10 +36,6 @@ import org.apache.cxf.common.logging.LogUtils;
 
 public class PollingMessageListenerContainer extends AbstractMessageListenerContainer {
     private static final Logger LOG = LogUtils.getL7dLogger(PollingMessageListenerContainer.class);
-
-    private ExecutorService pollers;
-
-    private int concurrentConsumers = 1;
 
     public PollingMessageListenerContainer(Connection connection, Destination destination,
                                            MessageListener listenerHandler) {
@@ -164,10 +157,9 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
             return;
         }
         running = true;
-        pollers = Executors.newFixedThreadPool(concurrentConsumers);
-        for (int c = 0; c < concurrentConsumers; c++) {
+        for (int c = 0; c < getConcurrentConsumers(); c++) {
             Runnable poller = (transactionManager != null) ? new XAPoller() : new Poller(); 
-            pollers.execute(poller);
+            getExecutor().execute(poller);
         }
     }
 
@@ -178,14 +170,7 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
             return;
         }
         running = false;
-        pollers.shutdown();
-        try {
-            pollers.awaitTermination(10, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            // Ignore
-        }
-        pollers.shutdownNow();
-        pollers = null;
+        super.stop();        
     }
 
     @Override
@@ -193,7 +178,4 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
         stop();
     }
 
-    public void setConcurrentConsumers(int concurrentConsumers) {
-        this.concurrentConsumers = concurrentConsumers;
-    }
 }
