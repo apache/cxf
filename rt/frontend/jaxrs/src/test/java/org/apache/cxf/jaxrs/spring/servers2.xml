@@ -39,7 +39,9 @@
     <bean id="sfactory2" class="org.apache.cxf.jaxrs.spring.SpringResourceFactory">
         <property name="beanId" value="bookstore2"/>
     </bean>
-    <bean id="bookstore1" class="org.apache.cxf.jaxrs.resources.BookStore"/>
+    <bean id="bookstore1" class="org.apache.cxf.jaxrs.resources.BookStoreConstructor">
+        <constructor-arg value="CXF" />
+    </bean>
     <bean id="bookstore2" class="org.apache.cxf.jaxrs.resources.BookStore" scope="prototype"/>
     <bean id="bookstore3" class="org.apache.cxf.jaxrs.resources.BookStore"/>
     <bean id="bookstore4" class="org.apache.cxf.jaxrs.resources.BookStore" scope="prototype"/>
