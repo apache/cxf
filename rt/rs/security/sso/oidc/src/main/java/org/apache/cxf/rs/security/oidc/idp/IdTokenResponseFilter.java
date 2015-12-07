@@ -18,8 +18,6 @@
  */
 package org.apache.cxf.rs.security.oidc.idp;
 
-import java.util.Collections;
-
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
@@ -30,29 +28,28 @@ import org.apache.cxf.rs.security.oidc.utils.OidcUtils;
 
 public class IdTokenResponseFilter extends AbstractOAuthServerJoseJwtProducer implements AccessTokenResponseFilter {
     private UserInfoProvider userInfoProvider;
-    private String issuer;
     @Override
     public void process(ClientAccessToken ct, ServerAccessToken st) {
         
-        // This may also be done directly inside a data provider code creating the server token
+        String idToken = getProcessedIdToken(st);
+        if (idToken != null) {
+            ct.getParameters().put(OidcUtils.ID_TOKEN, idToken);
+        } 
+        
+    }
+    private String getProcessedIdToken(ServerAccessToken st) {
         if (userInfoProvider != null) {
             IdToken token = 
                 userInfoProvider.getIdToken(st.getClient().getClientId(), st.getSubject(), st.getScopes());
-            token.setIssuer(issuer);
-            token.setAudiences(Collections.singletonList(st.getClient().getClientId()));
-            
-            String responseEntity = super.processJwt(new JwtToken(token), 
-                                                     st.getClient());
-            ct.getParameters().put(OidcUtils.ID_TOKEN, responseEntity);
-        } else if (st.getSubject().getProperties().containsKey("id_token")) {
-            ct.getParameters().put(OidcUtils.ID_TOKEN, 
-                                   st.getSubject().getProperties().get("id_token"));
+            return super.processJwt(new JwtToken(token), st.getClient());
+        } else if (st.getSubject().getProperties().containsKey(OidcUtils.ID_TOKEN)) {
+            return st.getSubject().getProperties().get(OidcUtils.ID_TOKEN);
+        } else if (st.getSubject() instanceof OidcUserSubject) {
+            OidcUserSubject sub = (OidcUserSubject)st.getSubject();
+            return super.processJwt(new JwtToken(sub.getIdToken()), st.getClient());
+        } else {
+            return null;
         }
-        
-    }
-    
-    public void setIssuer(String issuer) {
-        this.issuer = issuer;
     }
     public void setUserInfoProvider(UserInfoProvider userInfoProvider) {
         this.userInfoProvider = userInfoProvider;

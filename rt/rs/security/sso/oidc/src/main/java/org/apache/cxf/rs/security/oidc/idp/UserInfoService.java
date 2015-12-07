@@ -18,8 +18,6 @@
  */
 package org.apache.cxf.rs.security.oidc.idp;
 
-import java.util.Collections;
-
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -38,7 +36,6 @@ import org.apache.cxf.rs.security.oidc.common.UserInfo;
 public class UserInfoService extends AbstractOAuthServerJoseJwtProducer {
     private UserInfoProvider userInfoProvider;
     private OAuthDataProvider oauthDataProvider;
-    private String issuer;
     
     @Context
     private MessageContext mc;
@@ -48,10 +45,6 @@ public class UserInfoService extends AbstractOAuthServerJoseJwtProducer {
         OAuthContext oauth = OAuthContextUtils.getContext(mc);
         UserInfo userInfo = 
             userInfoProvider.getUserInfo(oauth.getClientId(), oauth.getSubject(), oauth.getPermissions());
-        if (userInfo != null) {
-            userInfo.setIssuer(issuer);
-        }
-        userInfo.setAudiences(Collections.singletonList(oauth.getClientId()));
         Object responseEntity = userInfo;
         if (super.isJwsRequired() || super.isJweRequired()) {
             responseEntity = super.processJwt(new JwtToken(userInfo),
@@ -61,9 +54,6 @@ public class UserInfoService extends AbstractOAuthServerJoseJwtProducer {
         
     }
     
-    public void setIssuer(String issuer) {
-        this.issuer = issuer;
-    }
     public void setUserInfoProvider(UserInfoProvider userInfoProvider) {
         this.userInfoProvider = userInfoProvider;
     }
