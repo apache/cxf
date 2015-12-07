@@ -25,6 +25,15 @@ public class OidcUserSubject extends UserSubject {
     
     private static final long serialVersionUID = 8806727177012442229L;
     private IdToken idToken;
+    
+    public OidcUserSubject() {
+        
+    }
+    
+    public OidcUserSubject(UserSubject sub) {
+        super(sub);
+    }
+    
     public IdToken getIdToken() {
         return idToken;
     }
