@@ -64,6 +64,13 @@ public class UserSubject implements Serializable {
         this.roles = roles;
     }
     
+    public UserSubject(UserSubject sub) {
+        this(sub.getLogin(), sub.getId(), sub.getRoles());
+        this.properties = sub.getProperties();
+        this.am = sub.getAuthenticationMethod();
+        
+    }
+    
     /**
      * Return the user login name
      * @return the login name
