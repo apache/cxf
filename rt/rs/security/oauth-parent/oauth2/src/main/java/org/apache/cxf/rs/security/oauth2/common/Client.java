@@ -50,7 +50,7 @@ public class Client implements Serializable {
     private Map<String, String> properties = new HashMap<String, String>();
     private UserSubject subject;
     private UserSubject resourceOwnerSubject;
-    private boolean registeredAt;    
+    private long registeredAt;    
     
     public Client() {
         
@@ -339,11 +339,11 @@ public class Client implements Serializable {
         this.clientIpAddress = clientIpAddress;
     }
 
-    public boolean isRegisteredAt() {
+    public long getRegisteredAt() {
         return registeredAt;
     }
 
-    public void setRegisteredAt(boolean registeredAt) {
+    public void setRegisteredAt(long registeredAt) {
         this.registeredAt = registeredAt;
     }
 }
