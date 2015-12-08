@@ -335,11 +335,6 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
         strategyTest(REPLICA_A, REPLICA_B, REPLICA_C, true);
     }
     
-    @Test
-    public void testDefaultSequentialStrategyWithCircuitBreaker() throws Exception {
-        strategyTest(REPLICA_B, REPLICA_C, REPLICA_E, false);
-    }
- 
     protected Greeter getGreeter(String type) throws Exception {
         if (REPLICA_A.equals(type)) {
             Greeter g = new ClusteredGreeterService().getReplicatedPortA();

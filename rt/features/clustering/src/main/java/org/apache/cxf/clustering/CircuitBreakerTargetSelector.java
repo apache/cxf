@@ -221,7 +221,7 @@ public class CircuitBreakerTargetSelector extends FailoverTargetSelector {
     }
     
     private synchronized CircuitBreaker getCircuitBreaker(final String alternateAddress) {
-        CircuitBreaker circuitBreaker =  NOOP_CIRCUIT_BREAKER;
+        CircuitBreaker circuitBreaker = null;
         
         if (!StringUtils.isEmpty(alternateAddress)) {
             for (Map.Entry<String, CircuitBreaker> entry: circuits.entrySet()) {
@@ -235,6 +235,10 @@ public class CircuitBreakerTargetSelector extends FailoverTargetSelector {
                 circuitBreaker = new ZestCircuitBreaker(threshold, timeout);
                 circuits.put(alternateAddress, circuitBreaker);
             }
+        }
+        
+        if (circuitBreaker == null) {
+            circuitBreaker = NOOP_CIRCUIT_BREAKER;
         }
         
         return circuitBreaker;

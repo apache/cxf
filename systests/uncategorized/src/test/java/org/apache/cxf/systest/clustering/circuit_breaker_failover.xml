@@ -22,25 +22,34 @@
     <bean id="Random" class="org.apache.cxf.clustering.RandomStrategy"/>
     <jaxws:client name="{http://cxf.apache.org/greeter_control}ReplicatedPortA" createdFromAPI="true">
         <jaxws:features>
-            <clustering:failover/>
+            <clustering:circuit-breaker-failover/>
         </jaxws:features>
     </jaxws:client>
     <jaxws:client name="{http://cxf.apache.org/greeter_control}ReplicatedPortB" createdFromAPI="true">
         <jaxws:features>
-            <clustering:failover>
+            <clustering:circuit-breaker-failover threshold="1" timeout="60000">
                 <clustering:strategy>
                     <ref bean="Sequential"/>
                 </clustering:strategy>
-            </clustering:failover>
+            </clustering:circuit-breaker-failover>
         </jaxws:features>
     </jaxws:client>
     <jaxws:client name="{http://cxf.apache.org/greeter_control}ReplicatedPortC" createdFromAPI="true">
         <jaxws:features>
-            <clustering:failover>
+            <clustering:circuit-breaker-failover threshold="1" timeout="60000">
                 <clustering:strategy>
                     <ref bean="Random"/>
                 </clustering:strategy>
-            </clustering:failover>
+            </clustering:circuit-breaker-failover>
+        </jaxws:features>
+    </jaxws:client>
+    <jaxws:client name="{http://cxf.apache.org/greeter_control}ReplicatedPortE" createdFromAPI="true">
+        <jaxws:features>
+            <clustering:circuit-breaker-failover threshold="1" timeout="60000">
+                <clustering:strategy>
+                    <ref bean="Sequential"/>
+                </clustering:strategy>
+            </clustering:circuit-breaker-failover>
         </jaxws:features>
     </jaxws:client>
     <http:conduit name="http://localhost:.*">
