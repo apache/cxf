@@ -89,6 +89,14 @@ under the License.
       <property name="dataProvider" ref="oauthProvider"/>
    </bean>
    
+   <bean id="samlGrantHandler" class="org.apache.cxf.rs.security.oauth2.grants.saml.Saml2BearerGrantHandler">
+      <property name="dataProvider" ref="oauthProvider"/>
+   </bean>
+   
+   <bean id="jwtGrantHandler" class="org.apache.cxf.rs.security.oauth2.grants.jwt.JwtBearerGrantHandler">
+      <property name="dataProvider" ref="oauthProvider"/>
+   </bean>
+   
    <bean id="tokenService" class="org.apache.cxf.rs.security.oauth2.services.AccessTokenService">
       <property name="dataProvider" ref="oauthProvider"/>
       <property name="grantHandlers">
@@ -96,6 +104,8 @@ under the License.
              <ref bean="refreshGrantHandler"/>
              <ref bean="passwordGrantHandler"/>
              <ref bean="clientCredsGrantHandler"/>
+             <ref bean="samlGrantHandler"/>
+             <ref bean="jwtGrantHandler"/>
          </list>
       </property>
    </bean>
@@ -116,6 +126,16 @@ under the License.
        <jaxrs:providers>
            <ref bean="basicAuthFilter"/>
        </jaxrs:providers>
+       <jaxrs:properties>
+           <entry key="security.signature.properties" 
+                  value="org/apache/cxf/systest/jaxrs/security/bob.properties"/>
+           <entry key="rs.security.keystore.type" value="jks" />
+           <entry key="rs.security.keystore.alias" value="alice"/>
+           <entry key="rs.security.keystore.password" value="password"/>
+           <entry key="rs.security.keystore.file" 
+                  value="org/apache/cxf/systest/jaxrs/security/certs/alice.jks" />
+           <entry key="rs.security.signature.algorithm" value="RS256" />
+       </jaxrs:properties>
    </jaxrs:server>
    
 
