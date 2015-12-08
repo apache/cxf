@@ -31,14 +31,10 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
-<<<<<<< HEAD
 import org.apache.cxf.rt.security.claims.SAMLClaim;
-=======
-import org.apache.cxf.rt.security.saml.claims.SAMLClaim;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
->>>>>>> 6d818c6... Minor test modification
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.bean.ActionBean;
 import org.apache.wss4j.common.saml.bean.AttributeBean;
@@ -49,6 +45,7 @@ import org.apache.wss4j.common.saml.bean.AuthDecisionStatementBean.Decision;
 import org.apache.wss4j.common.saml.bean.AuthenticationStatementBean;
 import org.apache.wss4j.common.saml.bean.ConditionsBean;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
+import org.apache.wss4j.common.saml.bean.Version;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.joda.time.DateTime;
 
@@ -72,12 +69,8 @@ public class SamlCallbackHandler implements CallbackHandler {
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof SAMLCallback) {
                 SAMLCallback callback = (SAMLCallback) callbacks[i];
-<<<<<<< HEAD
-                callback.setIssuer("resourceOwner");
-=======
                 callback.setSamlVersion(Version.SAML_20);
                 callback.setIssuer(issuer);
->>>>>>> 6d818c6... Minor test modification
                 
                 String subjectName = m != null ? (String)m.getContextualProperty("saml.subject.name") : null;
                 if (subjectName == null) {

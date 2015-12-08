@@ -21,11 +21,8 @@ package org.apache.cxf.systest.jaxrs.security.oauth2.grants;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
-import java.util.Properties;
 
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.Response;
@@ -33,12 +30,6 @@ import javax.ws.rs.core.Response;
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.provider.json.JSONProvider;
-import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
-import org.apache.cxf.rs.security.jose.jws.JwsHeaders;
-import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactProducer;
-import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
-import org.apache.cxf.rs.security.jose.jws.JwsUtils;
-import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.OAuthAuthorizationData;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthJSONProvider;
@@ -294,31 +285,6 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         assertNotNull(accessToken.getRefreshToken());
     }
 
-    @org.junit.Test
-    public void testJWTAuthorizationGrant() throws Exception {
-        URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
-        
-        String address = "https://localhost:" + PORT + "/services/";
-        WebClient client = WebClient.create(address, setupProviders(), "alice", "security", busFile.toString());
-        
-        // Create the JWT Token
-        String token = createToken("DoubleItSTSIssuer", "consumer-id", 
-                                   "https://localhost:" + PORT + "/services/token", true, true);
-
-        // Get Access Token
-        client.type("application/x-www-form-urlencoded").accept("application/json");
-        client.path("token");
-        
-        Form form = new Form();
-        form.param("grant_type", "urn:ietf:params:oauth:grant-type:jwt-bearer");
-        form.param("assertion", token);
-        form.param("client_id", "consumer-id");
-        Response response = client.post(form);
-        
-        ClientAccessToken accessToken = response.readEntity(ClientAccessToken.class);
-        assertNotNull(accessToken.getTokenKey());
-        assertNotNull(accessToken.getRefreshToken());
-    }
     private String getAuthorizationCode(WebClient client) {
         return getAuthorizationCode(client, null);
     }
@@ -402,46 +368,4 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         return samlAssertion.assertionToString();
     }
     
-    private String createToken(String issuer, String subject, String audience, 
-                               boolean expiry, boolean sign) {
-        // Create the JWT Token
-        JwtClaims claims = new JwtClaims();
-        claims.setSubject(subject);
-        if (issuer != null) {
-            claims.setIssuer(issuer);
-        }
-        claims.setIssuedAt(new Date().getTime() / 1000L);
-        if (expiry) {
-            Calendar cal = Calendar.getInstance();
-            cal.add(Calendar.SECOND, 60);
-            claims.setExpiryTime(cal.getTimeInMillis() / 1000L);
-        }
-        if (audience != null) {
-            claims.setAudiences(Collections.singletonList(audience));
-        }
-        
-        if (sign) {
-            // Sign the JWT Token
-            Properties signingProperties = new Properties();
-            signingProperties.put("rs.security.keystore.type", "jks");
-            signingProperties.put("rs.security.keystore.password", "password");
-            signingProperties.put("rs.security.keystore.alias", "alice");
-            signingProperties.put("rs.security.keystore.file", 
-                                  "org/apache/cxf/systest/jaxrs/security/certs/alice.jks");
-            signingProperties.put("rs.security.key.password", "password");
-            signingProperties.put("rs.security.signature.algorithm", "RS256");
-            
-            JwsHeaders jwsHeaders = new JwsHeaders(signingProperties);
-            JwsJwtCompactProducer jws = new JwsJwtCompactProducer(jwsHeaders, claims);
-            
-            JwsSignatureProvider sigProvider = 
-                JwsUtils.loadSignatureProvider(signingProperties, jwsHeaders);
-            
-            return jws.signWith(sigProvider);
-        }
-        
-        JwsHeaders jwsHeaders = new JwsHeaders(SignatureAlgorithm.NONE);
-        JwsJwtCompactProducer jws = new JwsJwtCompactProducer(jwsHeaders, claims);
-        return jws.getSignedEncodedJws();
-    }
 }

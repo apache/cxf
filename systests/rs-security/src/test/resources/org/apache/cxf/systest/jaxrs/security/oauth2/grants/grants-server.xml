@@ -127,7 +127,7 @@ under the License.
            <ref bean="basicAuthFilter"/>
        </jaxrs:providers>
        <jaxrs:properties>
-           <entry key="security.signature.properties" 
+           <entry key="ws-security.signature.properties" 
                   value="org/apache/cxf/systest/jaxrs/security/bob.properties"/>
            <entry key="rs.security.keystore.type" value="jks" />
            <entry key="rs.security.keystore.alias" value="alice"/>

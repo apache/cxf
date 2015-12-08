@@ -62,12 +62,13 @@ public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
             return Collections.emptyList();
         }
         
-        List<OAuthPermission> permissions = new ArrayList<>();
+        List<OAuthPermission> permissions = new ArrayList<OAuthPermission>();
         for (String requestedScope : requestedScopes) {
             if ("read_balance".equals(requestedScope)) {
                 OAuthPermission permission = new OAuthPermission();
+                permission.setPermission("read_balance");
                 permission.setHttpVerbs(Collections.singletonList("GET"));
-                List<String> uris = new ArrayList<>();
+                List<String> uris = new ArrayList<String>();
                 String partnerAddress = "/partners/balance/*";
                 uris.add(partnerAddress);
                 permission.setUris(uris);
@@ -75,8 +76,9 @@ public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
                 permissions.add(permission);
             } else if ("create_balance".equals(requestedScope)) {
                 OAuthPermission permission = new OAuthPermission();
+                permission.setPermission("create_balance");
                 permission.setHttpVerbs(Collections.singletonList("POST"));
-                List<String> uris = new ArrayList<>();
+                List<String> uris = new ArrayList<String>();
                 String partnerAddress = "/partners/balance/*";
                 uris.add(partnerAddress);
                 permission.setUris(uris);
@@ -84,8 +86,9 @@ public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
                 permissions.add(permission);
             } else if ("read_data".equals(requestedScope)) {
                 OAuthPermission permission = new OAuthPermission();
+                permission.setPermission("read_data");
                 permission.setHttpVerbs(Collections.singletonList("GET"));
-                List<String> uris = new ArrayList<>();
+                List<String> uris = new ArrayList<String>();
                 String partnerAddress = "/partners/data/*";
                 uris.add(partnerAddress);
                 permission.setUris(uris);

@@ -40,18 +40,6 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
-<<<<<<< HEAD
-            <artifactId>jetty-server</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-plus</artifactId>
-            <version>${cxf.jetty.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-=======
->>>>>>> 6106f46... Adding OAuth authorization grant tests
             <artifactId>jetty-webapp</artifactId>
         </dependency>
         <dependency>
