@@ -301,22 +301,7 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
      */
     protected Endpoint getFailoverTarget(Exchange exchange,
                                        InvocationContext invocation) {
-        List<String> alternateAddresses = null;
-        if (!invocation.hasAlternates()) {
-            // no previous failover attempt on this invocation
-            //
-            alternateAddresses = 
-                getStrategy().getAlternateAddresses(exchange);
-            if (alternateAddresses != null) {
-                invocation.setAlternateAddresses(alternateAddresses);
-            } else {
-                invocation.setAlternateEndpoints(
-                    getStrategy().getAlternateEndpoints(exchange));
-            }
-        } else {
-            alternateAddresses = invocation.getAlternateAddresses();
-        }
-
+        List<String> alternateAddresses = updateContextAlternatives(exchange, invocation);
         Endpoint failoverTarget = null;
         if (alternateAddresses != null) {
             String alternateAddress = 
@@ -333,6 +318,32 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
                                  invocation.getAlternateEndpoints());
         }
         return failoverTarget;
+    }
+
+    /**
+     * Fetches and updates the alternative address or/and alternative endpoints 
+     * (depending on the strategy) for current invocation context.
+     * @param exchange the current Exchange
+     * @param invocation the current InvocationContext
+     * @return alternative addresses
+     */
+    protected List<String> updateContextAlternatives(Exchange exchange, InvocationContext invocation) {
+        List<String> alternateAddresses = null;
+        if (!invocation.hasAlternates()) {
+            // no previous failover attempt on this invocation
+            //
+            alternateAddresses = 
+                getStrategy().getAlternateAddresses(exchange);
+            if (alternateAddresses != null) {
+                invocation.setAlternateAddresses(alternateAddresses);
+            } else {
+                invocation.setAlternateEndpoints(
+                    getStrategy().getAlternateEndpoints(exchange));
+            }
+        } else {
+            alternateAddresses = invocation.getAlternateAddresses();
+        }
+        return alternateAddresses;
     }
     
     /**

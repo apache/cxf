@@ -55,6 +55,7 @@ public class ControlImpl implements Control {
         implementors.put(FailoverTest.REPLICA_B, new GreeterImplB());
         implementors.put(FailoverTest.REPLICA_C, new GreeterImplC());
         implementors.put(FailoverTest.REPLICA_D, new GreeterImplD());
+        implementors.put(FailoverTest.REPLICA_E, new GreeterImplE());
         endpoints = new HashMap<String, Endpoint>();
     }
     

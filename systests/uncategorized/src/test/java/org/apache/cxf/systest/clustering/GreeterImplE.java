@@ -16,17 +16,28 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.clustering.spring;
 
-import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
+package org.apache.cxf.systest.clustering;
 
-public class NamespaceHandler extends NamespaceHandlerSupport {
-    public void init() {
-        registerBeanDefinitionParser("failover",
-                                     new FailoverBeanDefinitionParser());
-        registerBeanDefinitionParser("loadDistributor",
-                                     new LoadDistributorBeanDefinitionParser());
-        registerBeanDefinitionParser("circuit-breaker-failover",
-                                     new CircuitBreakerFailoverBeanDefinitionParser());        
+import javax.jws.WebService;
+
+import org.apache.cxf.greeter_control.AbstractGreeterImpl;
+
+@WebService(serviceName = "GreeterService",
+            portName = "ReplicatedPortE",
+            endpointInterface = "org.apache.cxf.greeter_control.Greeter",
+            targetNamespace = "http://cxf.apache.org/greeter_control",
+            wsdlLocation = "testutils/greeter_control.wsdl")
+public class GreeterImplE extends AbstractGreeterImpl {
+
+    private String address;
+    
+    GreeterImplE() {
+        address = FailoverTest.REPLICA_E;    
+    }
+    
+    public String greetMe(String s) {
+        return super.greetMe(s)
+               + " from: " + address;
     }
 }

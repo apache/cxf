@@ -19,7 +19,7 @@
 
 package org.apache.cxf.clustering;
 
-import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +44,26 @@ public class CircuitBreakerTargetSelector extends FailoverTargetSelector {
 
     private static final String IS_SELECTED = "org.apache.cxf.clustering.CircuitBreakerTargetSelector.IS_SELECTED";
     private static final Logger LOG = LogUtils.getL7dLogger(CircuitBreakerTargetSelector.class);
+
+    /**
+     * Static instance of empty (or noop) circuit breaker to handle use cases
+     * when alternative addresses or alternative endpoint addresses are nullable 
+     * (or non-valid).
+     */
+    private static final  CircuitBreaker NOOP_CIRCUIT_BREAKER = new CircuitBreaker() {
+        @Override
+        public boolean allowRequest() {
+            return true;
+        }
+        
+        @Override
+        public void markFailure(Throwable cause) {
+        }
+        
+        @Override
+        public void markSuccess() {
+        }
+    };
     
     private final int threshold;
     private final long timeout; 
@@ -65,19 +85,19 @@ public class CircuitBreakerTargetSelector extends FailoverTargetSelector {
         
         // Registering the original endpoint in the list of circuit breakers
         if (getEndpoint() != null) {
-            circuits.putIfAbsent(
-                getEndpoint().getEndpointInfo().getAddress(), 
-                new ZestCircuitBreaker(threshold, timeout)
-            );
+            final String address = getEndpoint().getEndpointInfo().getAddress();
+            if (!StringUtils.isEmpty(address)) {
+                circuits.putIfAbsent(address, new ZestCircuitBreaker(threshold, timeout));
+            }
         }
         
         if (strategy != null) {
-            for (String alternative: strategy.getAlternateAddresses(null /* no Exchange at this point */)) {
-                if (!StringUtils.isEmpty(alternative)) {
-                    circuits.putIfAbsent(
-                        alternative, 
-                        new ZestCircuitBreaker(threshold, timeout)
-                    );
+            final List<String> alternatives = strategy.getAlternateAddresses(null /* no Exchange at this point */);
+            if (alternatives != null) {
+                for (String alternative: alternatives) {
+                    if (!StringUtils.isEmpty(alternative)) {
+                        circuits.putIfAbsent(alternative, new ZestCircuitBreaker(threshold, timeout));
+                    }
                 }
             }
         }
@@ -121,15 +141,22 @@ public class CircuitBreakerTargetSelector extends FailoverTargetSelector {
             return null;
         }
         
-        final List<String> alternateAddresses = new ArrayList<>();
-        for (final Map.Entry<String, CircuitBreaker> entry: circuits.entrySet()) {
-            if (entry.getValue().allowRequest()) {
-                alternateAddresses.add(entry.getKey());
+        final List<String> alternateAddresses = updateContextAlternatives(exchange, invocation);
+        if (alternateAddresses != null) {
+            final Iterator<String> alternateAddressIterator = alternateAddresses.iterator();
+            
+            while (alternateAddressIterator.hasNext()) {
+                final String alternateAddress = alternateAddressIterator.next();
+                final CircuitBreaker circuitBreaker = getCircuitBreaker(alternateAddress);
+                
+                if (!circuitBreaker.allowRequest()) {
+                    alternateAddressIterator.remove();
+                }
             }
         }
 
         Endpoint failoverTarget = null;
-        if (!alternateAddresses.isEmpty()) {
+        if (alternateAddresses != null && !alternateAddresses.isEmpty()) {
             final String alternateAddress = getStrategy().selectAlternateAddress(alternateAddresses);
             
             // Reuse current endpoint
@@ -137,7 +164,23 @@ public class CircuitBreakerTargetSelector extends FailoverTargetSelector {
                 failoverTarget = getEndpoint();
                 failoverTarget.getEndpointInfo().setAddress(alternateAddress);
             }
-        } 
+        } else {
+            final List<Endpoint> alternateEndpoints = invocation.getAlternateEndpoints();
+            
+            if (alternateEndpoints != null) {
+                final Iterator<Endpoint> alternateEndpointIterator = alternateEndpoints.iterator();
+                
+                while (alternateEndpointIterator.hasNext()) {
+                    final Endpoint endpoint = alternateEndpointIterator.next();
+                    final CircuitBreaker circuitBreaker = getCircuitBreaker(endpoint);
+                    if (!circuitBreaker.allowRequest()) {
+                        alternateEndpointIterator.remove();
+                    }
+                }
+            }
+            
+            failoverTarget = getStrategy().selectAlternateEndpoint(alternateEndpoints);
+        }
         
         return failoverTarget;
     }
@@ -156,10 +199,7 @@ public class CircuitBreakerTargetSelector extends FailoverTargetSelector {
         
         if (requestContext != null) {
             final String address = (String)requestContext.get(Message.ENDPOINT_ADDRESS);
-            final CircuitBreaker circuitBreaker = circuits.get(address);
-            if (circuitBreaker != null) {
-                circuitBreaker.markFailure(ex);
-            }
+            getCircuitBreaker(address).markFailure(ex);
         }
     }
     
@@ -172,15 +212,36 @@ public class CircuitBreakerTargetSelector extends FailoverTargetSelector {
         
         if (requestContext != null) {
             final String address = (String)requestContext.get(Message.ENDPOINT_ADDRESS);
-            final CircuitBreaker circuitBreaker = circuits.get(address);
-            if (circuitBreaker != null) {
-                circuitBreaker.markSuccess();
-            }
+            getCircuitBreaker(address).markSuccess();
         }
     }
     
+    private CircuitBreaker getCircuitBreaker(final Endpoint endpoint) {
+        return getCircuitBreaker(endpoint.getEndpointInfo().getAddress());
+    }
+    
+    private synchronized CircuitBreaker getCircuitBreaker(final String alternateAddress) {
+        CircuitBreaker circuitBreaker =  NOOP_CIRCUIT_BREAKER;
+        
+        if (!StringUtils.isEmpty(alternateAddress)) {
+            for (Map.Entry<String, CircuitBreaker> entry: circuits.entrySet()) {
+                if (alternateAddress.startsWith(entry.getKey())) {
+                    circuitBreaker = entry.getValue();
+                    break;
+                }
+            }
+            
+            if (circuitBreaker == null) {
+                circuitBreaker = new ZestCircuitBreaker(threshold, timeout);
+                circuits.put(alternateAddress, circuitBreaker);
+            }
+        }
+        
+        return circuitBreaker;
+    }
+    
     private boolean isEndpointChanged(final String address, final Endpoint target) {
-        if (address != null) {
+        if (!StringUtils.isEmpty(address)) {
             return !address.startsWith(target.getEndpointInfo().getAddress());
         } 
         
@@ -192,8 +253,8 @@ public class CircuitBreakerTargetSelector extends FailoverTargetSelector {
             target.getEndpointInfo().getAddress());
     }
     
-    protected boolean isFailoverRequired(final String address) {
-        if (address != null) {
+    private boolean isFailoverRequired(final String address) {
+        if (!StringUtils.isEmpty(address)) {
             for (final Map.Entry<String, CircuitBreaker> entry: circuits.entrySet()) {
                 if (address.startsWith(entry.getKey())) {
                     return !entry.getValue().allowRequest();

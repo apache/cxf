@@ -348,5 +348,8 @@
         <wsdl:port binding="tns:ControlSOAPBinding" name="ReplicatedPortD">
             <soap:address location="http://localhost:9054/SoapContext/ReplicatedPortD"/>
         </wsdl:port>
+        <wsdl:port binding="tns:GreeterSOAPBinding" name="ReplicatedPortE">
+            <soap:address location="http://localhost:9055/SoapContext/ReplicatedPortE"/>
+        </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>

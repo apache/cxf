@@ -18,15 +18,21 @@
  */
 package org.apache.cxf.clustering.spring;
 
-import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
+import org.w3c.dom.Element;
 
-public class NamespaceHandler extends NamespaceHandlerSupport {
-    public void init() {
-        registerBeanDefinitionParser("failover",
-                                     new FailoverBeanDefinitionParser());
-        registerBeanDefinitionParser("loadDistributor",
-                                     new LoadDistributorBeanDefinitionParser());
-        registerBeanDefinitionParser("circuit-breaker-failover",
-                                     new CircuitBreakerFailoverBeanDefinitionParser());        
+import org.apache.cxf.clustering.circuitbreaker.CircuitBreakerFailoverFeature;
+import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.xml.ParserContext;
+
+public class CircuitBreakerFailoverBeanDefinitionParser extends AbstractBeanDefinitionParser {
+    @Override
+    protected Class<?> getBeanClass(Element element) {
+        return CircuitBreakerFailoverFeature.class;
+    }
+ 
+    @Override
+    protected void mapElement(ParserContext ctx, BeanDefinitionBuilder bean, Element e, String name) {
+        setFirstChildAsProperty(e, ctx, bean, name);
     }
 }

@@ -66,7 +66,7 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
     public static final String PORT_B = allocatePort(Server.class, 2);
     public static final String PORT_C = allocatePort(Server.class, 3);
     public static final String PORT_D = allocatePort(Server.class, 4);
-    public static final String PORT_EXTRA = allocatePort(Server.class, 99);
+    public static final String PORT_E = allocatePort(Server.class, 5);
     
     
     protected static final String REPLICA_A =
@@ -76,7 +76,9 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
     protected static final String REPLICA_C =
         "http://localhost:" + PORT_C + "/SoapContext/ReplicatedPortC"; 
     protected static final String REPLICA_D =
-        "http://localhost:" + PORT_D + "/SoapContext/ReplicatedPortD"; 
+        "http://localhost:" + PORT_D + "/SoapContext/ReplicatedPortD";
+    protected static final String REPLICA_E =
+        "http://localhost:" + PORT_E + "/SoapContext/ReplicatedPortE";
     private static final Logger LOG =
         LogUtils.getLogger(FailoverTest.class);
     private static final String FAILOVER_CONFIG =
@@ -111,6 +113,7 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
         updateWsdlExtensors("9051", PORT_A);
         updateWsdlExtensors("9052", PORT_B);
         updateWsdlExtensors("9053", PORT_C);
+        updateWsdlExtensors("9055", PORT_E);
     }
     
     @After
@@ -331,6 +334,12 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
     public void testRandomStrategy() throws Exception {
         strategyTest(REPLICA_A, REPLICA_B, REPLICA_C, true);
     }
+    
+    @Test
+    public void testDefaultSequentialStrategyWithCircuitBreaker() throws Exception {
+        strategyTest(REPLICA_B, REPLICA_C, REPLICA_E, false);
+    }
+ 
     protected Greeter getGreeter(String type) throws Exception {
         if (REPLICA_A.equals(type)) {
             Greeter g = new ClusteredGreeterService().getReplicatedPortA();
@@ -342,10 +351,16 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
             updateAddressPort(g, PORT_B);
             updateWsdlExtensors("9052", PORT_B);
             return g;
+        } else if (REPLICA_C.equals(type)) {
+            Greeter g = new ClusteredGreeterService().getReplicatedPortC();
+            updateAddressPort(g, PORT_C);
+            updateWsdlExtensors("9053", PORT_C);
+            return g;
         }
-        Greeter g = new ClusteredGreeterService().getReplicatedPortC();
-        updateAddressPort(g, PORT_C);
-        updateWsdlExtensors("9053", PORT_C);
+        
+        Greeter g = new ClusteredGreeterService().getReplicatedPortE();
+        updateAddressPort(g, PORT_E);
+        updateWsdlExtensors("9055", PORT_E);
         return g;
     }
     protected void strategyTest(String activeReplica1,
@@ -419,6 +434,7 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
         updateWsdlExtensors("9051", PORT_A);
         updateWsdlExtensors("9052", PORT_B);
         updateWsdlExtensors("9053", PORT_C);
+        updateWsdlExtensors("9055", PORT_E);
     }
         
     protected void verifyStrategy(Object proxy, Class<?> clz) {

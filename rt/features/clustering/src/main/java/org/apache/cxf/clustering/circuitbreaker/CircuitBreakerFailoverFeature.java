@@ -55,4 +55,12 @@ public class CircuitBreakerFailoverFeature extends FailoverFeature {
     public long getTimeout() {
         return timeout;
     }
+    
+    public void setThreshold(int threshold) {
+        this.threshold = threshold;
+    }
+    
+    public void setTimeout(long timeout) {
+        this.timeout = timeout;
+    }
 }
