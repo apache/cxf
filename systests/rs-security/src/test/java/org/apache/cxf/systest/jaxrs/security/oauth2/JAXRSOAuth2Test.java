@@ -67,8 +67,17 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
         Crypto crypto = new CryptoLoader().loadCrypto(CRYPTO_RESOURCE_PROPERTIES);
         SelfSignInfo signInfo = new SelfSignInfo(crypto, "alice", "password"); 
         
+<<<<<<< HEAD
         String assertion =  SAMLUtils.createAssertion(new SamlCallbackHandler(),
                                                       signInfo).assertionToString();
+=======
+        SamlAssertionWrapper assertionWrapper = SAMLUtils.createAssertion(new SamlCallbackHandler(false),
+                                                                          signInfo);
+        Document doc = DOMUtils.newDocument();
+        Element assertionElement = assertionWrapper.toDOM(doc);
+        String assertion = DOM2Writer.nodeToString(assertionElement);
+        
+>>>>>>> 6d818c6... Minor test modification
         Saml2BearerGrant grant = new Saml2BearerGrant(assertion);
         ClientAccessToken at = OAuthClientUtils.getAccessToken(wc, 
                                         new OAuthClientUtils.Consumer("alice", "alice"), 
@@ -85,8 +94,20 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
         Crypto crypto = new CryptoLoader().loadCrypto(CRYPTO_RESOURCE_PROPERTIES);
         SelfSignInfo signInfo = new SelfSignInfo(crypto, "alice", "password"); 
         
+<<<<<<< HEAD
         String assertion =  SAMLUtils.createAssertion(new SamlCallbackHandler2(),
                                                       signInfo).assertionToString();
+=======
+        SamlCallbackHandler samlCallbackHandler = new SamlCallbackHandler(true);
+        samlCallbackHandler.setIssuer("alice");
+        String audienceURI = "https://localhost:" + PORT + "/oauth2-auth/token";
+        samlCallbackHandler.setAudience(audienceURI);
+        SamlAssertionWrapper assertionWrapper = SAMLUtils.createAssertion(samlCallbackHandler,
+                                                                          signInfo);
+        Document doc = DOMUtils.newDocument();
+        Element assertionElement = assertionWrapper.toDOM(doc);
+        String assertion = DOM2Writer.nodeToString(assertionElement);
+>>>>>>> 6d818c6... Minor test modification
         
         String encodedAssertion = Base64UrlUtility.encode(assertion);
         
@@ -145,10 +166,22 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("ws-security.callback-handler", 
                        "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
+<<<<<<< HEAD
         properties.put("ws-security.saml-callback-handler", 
                        "org.apache.cxf.systest.jaxrs.security.oauth2.SamlCallbackHandler2");
         properties.put("ws-security.signature.username", "alice");
         properties.put("ws-security.signature.properties", CRYPTO_RESOURCE_PROPERTIES);
+=======
+        
+        SamlCallbackHandler samlCallbackHandler = new SamlCallbackHandler(true);
+        samlCallbackHandler.setIssuer("alice");
+        String audienceURI = "https://localhost:" + PORT + "/oauth2-auth/token";
+        samlCallbackHandler.setAudience(audienceURI);
+        properties.put("security.saml-callback-handler", samlCallbackHandler);
+        
+        properties.put("security.signature.username", "alice");
+        properties.put("security.signature.properties", CRYPTO_RESOURCE_PROPERTIES);
+>>>>>>> 6d818c6... Minor test modification
         bean.setProperties(properties);
         
         bean.getOutInterceptors().add(new Saml2BearerAuthOutInterceptor());
