@@ -45,6 +45,7 @@ public class OAuthDataProviderImpl implements OAuthDataProvider {
     public OAuthDataProviderImpl() throws Exception {
         Client client = new Client("alice", "alice", true);
         client.getAllowedGrantTypes().add(Constants.SAML2_BEARER_GRANT);
+        client.getAllowedGrantTypes().add("urn:ietf:params:oauth:grant-type:jwt-bearer");
         client.getAllowedGrantTypes().add("custom_grant");
         clients.put(client.getClientId(), client);
 
