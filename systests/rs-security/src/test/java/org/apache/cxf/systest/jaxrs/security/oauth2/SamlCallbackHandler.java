@@ -32,6 +32,9 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.rt.security.saml.claims.SAMLClaim;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.bean.ActionBean;
 import org.apache.wss4j.common.saml.bean.AttributeBean;
@@ -52,12 +55,12 @@ import org.joda.time.DateTime;
 public class SamlCallbackHandler implements CallbackHandler {
     public static final String PORT = BookServerOAuth2.PORT;
     private String confirmationMethod = SAML2Constants.CONF_BEARER;
-    
-    public SamlCallbackHandler() {
-    }
-    
-    public void setConfirmationMethod(String confirmationMethod) {
-        this.confirmationMethod = confirmationMethod;
+    private boolean signAssertion = true;
+    private String issuer = "resourceOwner";
+    private String audience = "https://localhost:" + PORT + "/oauth2/token";
+
+    public SamlCallbackHandler(boolean signAssertion) {
+        this.signAssertion = signAssertion;
     }
     
     public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
@@ -67,7 +70,7 @@ public class SamlCallbackHandler implements CallbackHandler {
             if (callbacks[i] instanceof SAMLCallback) {
                 SAMLCallback callback = (SAMLCallback) callbacks[i];
                 callback.setSamlVersion(Version.SAML_20);
-                callback.setIssuer("resourceOwner");
+                callback.setIssuer(issuer);
                 
                 String subjectName = m != null ? (String)m.getContextualProperty("saml.subject.name") : null;
                 if (subjectName == null) {
@@ -83,8 +86,7 @@ public class SamlCallbackHandler implements CallbackHandler {
                 ConditionsBean conditions = new ConditionsBean();
 
                 AudienceRestrictionBean audienceRestriction = new AudienceRestrictionBean();
-                String audienceURI = "https://localhost:" + PORT + "/oauth2/token";
-                audienceRestriction.setAudienceURIs(Collections.singletonList(audienceURI));
+                audienceRestriction.setAudienceURIs(Collections.singletonList(audience));
                 conditions.setAudienceRestrictions(Collections.singletonList(audienceRestriction));
               
                 callback.setConditions(conditions);
@@ -138,8 +140,41 @@ public class SamlCallbackHandler implements CallbackHandler {
                 
                 attrBean.setSamlAttributes(claims);
                 callback.setAttributeStatementData(Collections.singletonList(attrBean));
+                
+                if (signAssertion) {
+                    try {
+                        Crypto crypto = 
+                            CryptoFactory.getInstance("org/apache/cxf/systest/jaxrs/security/alice.properties");
+                        callback.setIssuerCrypto(crypto);
+                        callback.setIssuerKeyName("alice");
+                        callback.setIssuerKeyPassword("password");
+                        callback.setSignAssertion(true);
+                    } catch (WSSecurityException e) {
+                        throw new IOException(e);
+                    }
+                }
             }
         }
+    }
+    
+    public String getIssuer() {
+        return issuer;
+    }
+
+    public void setIssuer(String issuer) {
+        this.issuer = issuer;
+    }
+
+    public String getAudience() {
+        return audience;
+    }
+
+    public void setAudience(String audience) {
+        this.audience = audience;
+    }
+    
+    public void setConfirmationMethod(String confMethod) {
+        this.confirmationMethod = confMethod;
     }
     
 }
