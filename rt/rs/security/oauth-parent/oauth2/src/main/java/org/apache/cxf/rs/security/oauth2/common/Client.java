@@ -50,7 +50,8 @@ public class Client implements Serializable {
     private Map<String, String> properties = new HashMap<String, String>();
     private UserSubject subject;
     private UserSubject resourceOwnerSubject;
-        
+    private boolean registeredAt;    
+    
     public Client() {
         
     }
@@ -64,10 +65,17 @@ public class Client implements Serializable {
     public Client(String clientId, 
                   String clientSecret,
                   boolean isConfidential,
-                  String applicationName,
-                  String applicationWebUri) {
+                  String applicationName) {
         this(clientId, clientSecret, isConfidential);
         this.applicationName = applicationName;
+    }
+    
+    public Client(String clientId, 
+                  String clientSecret,
+                  boolean isConfidential,
+                  String applicationName,
+                  String applicationWebUri) {
+        this(clientId, clientSecret, isConfidential, applicationName);
         this.applicationWebUri = applicationWebUri;
         
     }
@@ -329,5 +337,13 @@ public class Client implements Serializable {
 
     public void setClientIpAddress(String clientIpAddress) {
         this.clientIpAddress = clientIpAddress;
+    }
+
+    public boolean isRegisteredAt() {
+        return registeredAt;
+    }
+
+    public void setRegisteredAt(boolean registeredAt) {
+        this.registeredAt = registeredAt;
     }
 }
