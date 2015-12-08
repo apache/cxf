@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.rs.security.oidc.common;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
@@ -29,6 +30,6 @@ public class UserInfo extends AbstractUserInfo {
         this(claims.asMap());
     }
     public UserInfo(Map<String, Object> claims) {
-        super(claims);
+        super(new LinkedHashMap<String, Object>(claims));
     }
 }
