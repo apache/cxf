@@ -136,8 +136,8 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
     
 
     @Override
-    public List<OAuthPermission> convertScopeToPermissions(Client client, List<String> requestedScope) {
-        if (requestedScope.isEmpty()) {
+    public List<OAuthPermission> convertScopeToPermissions(Client client, List<String> requestedScopes) {
+        if (requestedScopes.isEmpty()) {
             return Collections.emptyList();
         } else {
             throw new OAuthServiceException("Requested scopes can not be mapped");
