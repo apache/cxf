@@ -20,8 +20,12 @@
 package org.apache.cxf.systest.jaxrs.security.oauth2;
 
 import java.net.URL;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -37,11 +41,18 @@ import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.rs.security.common.CryptoLoader;
+import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
+import org.apache.cxf.rs.security.jose.jws.JwsHeaders;
+import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactProducer;
+import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
+import org.apache.cxf.rs.security.jose.jws.JwsUtils;
+import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 import org.apache.cxf.rs.security.oauth2.auth.saml.Saml2BearerAuthOutInterceptor;
 import org.apache.cxf.rs.security.oauth2.client.Consumer;
 import org.apache.cxf.rs.security.oauth2.client.OAuthClientUtils;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenGrant;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
+import org.apache.cxf.rs.security.oauth2.grants.jwt.JwtBearerGrant;
 import org.apache.cxf.rs.security.oauth2.grants.saml.Saml2BearerGrant;
 import org.apache.cxf.rs.security.oauth2.saml.Constants;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
@@ -136,6 +147,41 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
         assertNotNull(at.getTokenKey());
     }
     
+    @Test
+    public void testJWTBearerGrant() throws Exception {
+        String address = "https://localhost:" + PORT + "/oauth2/token";
+        WebClient wc = createWebClient(address);
+        
+        // Create the JWT Token
+        String token = createToken("resourceOwner", "alice", address, true, true);
+        
+        JwtBearerGrant grant = new JwtBearerGrant(token);
+        ClientAccessToken at = OAuthClientUtils.getAccessToken(wc, 
+                                        new Consumer("alice", "alice"), 
+                                        grant,
+                                        false);
+        assertNotNull(at.getTokenKey());
+    }
+    
+    @Test
+    public void testJWTBearerAuthenticationDirect() throws Exception {
+        String address = "https://localhost:" + PORT + "/oauth2-auth-jwt/token";
+        WebClient wc = createWebClient(address);
+        
+        // Create the JWT Token
+        String token = createToken("resourceOwner", "alice", address, true, true);
+        
+        Map<String, String> extraParams = new HashMap<String, String>();
+        extraParams.put(Constants.CLIENT_AUTH_ASSERTION_TYPE,
+                        "urn:ietf:params:oauth:client-assertion-type:jwt-bearer");
+        extraParams.put(Constants.CLIENT_AUTH_ASSERTION_PARAM, token);
+        
+        ClientAccessToken at = OAuthClientUtils.getAccessToken(wc, 
+                                                               new CustomGrant(),
+                                                               extraParams);
+        assertNotNull(at.getTokenKey());
+    }
+    
     private WebClient createWebClient(String address) {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         bean.setAddress(address);
@@ -178,6 +224,49 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
         WebClient wc = bean.createWebClient();
         wc.type(MediaType.APPLICATION_FORM_URLENCODED).accept(MediaType.APPLICATION_JSON);
         return wc;
+    }
+    
+    private String createToken(String issuer, String subject, String audience, 
+                               boolean expiry, boolean sign) {
+        // Create the JWT Token
+        JwtClaims claims = new JwtClaims();
+        claims.setSubject(subject);
+        if (issuer != null) {
+            claims.setIssuer(issuer);
+        }
+        claims.setIssuedAt(new Date().getTime() / 1000L);
+        if (expiry) {
+            Calendar cal = Calendar.getInstance();
+            cal.add(Calendar.SECOND, 60);
+            claims.setExpiryTime(cal.getTimeInMillis() / 1000L);
+        }
+        if (audience != null) {
+            claims.setAudiences(Collections.singletonList(audience));
+        }
+        
+        if (sign) {
+            // Sign the JWT Token
+            Properties signingProperties = new Properties();
+            signingProperties.put("rs.security.keystore.type", "jks");
+            signingProperties.put("rs.security.keystore.password", "password");
+            signingProperties.put("rs.security.keystore.alias", "alice");
+            signingProperties.put("rs.security.keystore.file", 
+                                  "org/apache/cxf/systest/jaxrs/security/certs/alice.jks");
+            signingProperties.put("rs.security.key.password", "password");
+            signingProperties.put("rs.security.signature.algorithm", "RS256");
+            
+            JwsHeaders jwsHeaders = new JwsHeaders(signingProperties);
+            JwsJwtCompactProducer jws = new JwsJwtCompactProducer(jwsHeaders, claims);
+            
+            JwsSignatureProvider sigProvider = 
+                JwsUtils.loadSignatureProvider(signingProperties, jwsHeaders);
+            
+            return jws.signWith(sigProvider);
+        }
+        
+        JwsHeaders jwsHeaders = new JwsHeaders(SignatureAlgorithm.NONE);
+        JwsJwtCompactProducer jws = new JwsJwtCompactProducer(jwsHeaders, claims);
+        return jws.getSignedEncodedJws();
     }
     
     private static class CustomGrant implements AccessTokenGrant {
