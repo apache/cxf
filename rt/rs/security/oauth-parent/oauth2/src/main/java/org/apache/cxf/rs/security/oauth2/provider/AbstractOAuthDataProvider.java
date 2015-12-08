@@ -18,9 +18,13 @@
  */
 package org.apache.cxf.rs.security.oauth2.provider;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenRegistration;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
@@ -35,6 +39,9 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
     private long accessTokenLifetime = 3600L;
     private long refreshTokenLifetime; // refresh tokens are eternal by default
     private boolean recycleRefreshTokens = true;
+    private Map<String, OAuthPermission> permissionMap = new HashMap<String, OAuthPermission>();
+    private MessageContext messageContext;
+    
     
     protected AbstractOAuthDataProvider() {
     }
@@ -133,12 +140,21 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         return currentRefreshToken;
     }
 
-    
-
     @Override
-    public List<OAuthPermission> convertScopeToPermissions(Client client, List<String> requestedScope) {
+    public List<OAuthPermission> convertScopeToPermissions(Client client, List<String> requestedScope)
+            throws OAuthServiceException {
         if (requestedScope.isEmpty()) {
             return Collections.emptyList();
+        } else if (!permissionMap.isEmpty()) {
+            List<OAuthPermission> list = new ArrayList<OAuthPermission>();
+            for (String scope : requestedScope) {
+                OAuthPermission permission = permissionMap.get(scope);
+                if (permission == null) {
+                    throw new OAuthServiceException("Unexpected scope: " + scope);
+                }
+                list.add(permission);
+            }
+            return list;
         } else {
             throw new OAuthServiceException("Requested scopes can not be mapped");
         }
@@ -217,9 +233,38 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         this.recycleRefreshTokens = recycleRefreshTokens;
     }
     
+    public void init() {
+    }
+    
+    public void close() {
+    }
+    
     protected abstract void saveAccessToken(ServerAccessToken serverToken);
     protected abstract void saveRefreshToken(ServerAccessToken at, RefreshToken refreshToken);
     protected abstract ServerAccessToken revokeAccessToken(String accessTokenKey);
     protected abstract RefreshToken revokeRefreshToken(Client client, String refreshTokenKey);
     protected abstract RefreshToken getRefreshToken(Client client, String refreshTokenKey);
+
+    public Map<String, OAuthPermission> getPermissionMap() {
+        return permissionMap;
+    }
+
+    public void setPermissionMap(Map<String, OAuthPermission> permissionMap) {
+        this.permissionMap = permissionMap;
+    }
+    
+    public void setScopes(Map<String, String> scopes) {
+        for (Map.Entry<String, String> entry : scopes.entrySet()) {
+            OAuthPermission permission = new OAuthPermission(entry.getKey(), entry.getValue());
+            permissionMap.put(entry.getKey(), permission);
+        }
+    }
+
+    public MessageContext getMessageContext() {
+        return messageContext;
+    }
+
+    public void setMessageContext(MessageContext messageContext) {
+        this.messageContext = messageContext;
+    }
 }
