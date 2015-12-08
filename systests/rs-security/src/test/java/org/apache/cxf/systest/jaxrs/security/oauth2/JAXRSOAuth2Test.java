@@ -73,7 +73,7 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
         Crypto crypto = new CryptoLoader().loadCrypto(CRYPTO_RESOURCE_PROPERTIES);
         SelfSignInfo signInfo = new SelfSignInfo(crypto, "alice", "password"); 
         
-        SamlAssertionWrapper assertionWrapper = SAMLUtils.createAssertion(new SamlCallbackHandler(),
+        SamlAssertionWrapper assertionWrapper = SAMLUtils.createAssertion(new SamlCallbackHandler(false),
                                                                           signInfo);
         Document doc = DOMUtils.newDocument();
         Element assertionElement = assertionWrapper.toDOM(doc);
@@ -95,7 +95,11 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
         Crypto crypto = new CryptoLoader().loadCrypto(CRYPTO_RESOURCE_PROPERTIES);
         SelfSignInfo signInfo = new SelfSignInfo(crypto, "alice", "password"); 
         
-        SamlAssertionWrapper assertionWrapper = SAMLUtils.createAssertion(new SamlCallbackHandler2(),
+        SamlCallbackHandler samlCallbackHandler = new SamlCallbackHandler(true);
+        samlCallbackHandler.setIssuer("alice");
+        String audienceURI = "https://localhost:" + PORT + "/oauth2-auth/token";
+        samlCallbackHandler.setAudience(audienceURI);
+        SamlAssertionWrapper assertionWrapper = SAMLUtils.createAssertion(samlCallbackHandler,
                                                                           signInfo);
         Document doc = DOMUtils.newDocument();
         Element assertionElement = assertionWrapper.toDOM(doc);
@@ -158,8 +162,13 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("security.callback-handler", 
                        "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
-        properties.put("security.saml-callback-handler", 
-                       "org.apache.cxf.systest.jaxrs.security.oauth2.SamlCallbackHandler2");
+        
+        SamlCallbackHandler samlCallbackHandler = new SamlCallbackHandler(true);
+        samlCallbackHandler.setIssuer("alice");
+        String audienceURI = "https://localhost:" + PORT + "/oauth2-auth/token";
+        samlCallbackHandler.setAudience(audienceURI);
+        properties.put("security.saml-callback-handler", samlCallbackHandler);
+        
         properties.put("security.signature.username", "alice");
         properties.put("security.signature.properties", CRYPTO_RESOURCE_PROPERTIES);
         bean.setProperties(properties);
