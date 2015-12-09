@@ -74,8 +74,11 @@ public class UserInfoService extends AbstractOAuthServerJoseJwtProducer {
     protected UserInfo createFromIdToken(IdToken idToken) {
         UserInfo userInfo = new UserInfo();
         userInfo.setSubject(idToken.getSubject());
-        userInfo.setIssuer(idToken.getIssuer());
-        userInfo.setAudience(idToken.getAudience());
+        
+        if (super.isJwsRequired()) {
+            userInfo.setIssuer(idToken.getIssuer());
+            userInfo.setAudience(idToken.getAudience());
+        }
         if (idToken.getName() != null) {
             userInfo.setName(idToken.getName());
         }
