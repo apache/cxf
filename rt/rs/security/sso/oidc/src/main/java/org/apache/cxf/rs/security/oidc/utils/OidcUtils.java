@@ -127,11 +127,13 @@ public final class OidcUtils {
         if (sigAlgo == SignatureAlgorithm.NONE) {
             throw new JwsException(JwsException.Error.INVALID_ALGORITHM);
         }
-        int algoShaSize = Integer.valueOf(sigAlgo.getJwaName().substring(2));
-        int valueHashSize = algoShaSize / 16;
+        String algoShaSizeString = sigAlgo.getJwaName().substring(2);
+        String javaShaAlgo = "SHA-" + algoShaSizeString;
+        int algoShaSize = Integer.valueOf(algoShaSizeString);
+        int valueHashSize = (algoShaSize / 8) / 2;
         try {
             byte[] atBytes = StringUtils.toBytesASCII(value);
-            byte[] digest = MessageDigestUtils.createDigest(atBytes,  MessageDigestUtils.ALGO_SHA_256);
+            byte[] digest = MessageDigestUtils.createDigest(atBytes,  javaShaAlgo);
             return Base64UrlUtility.encodeChunk(digest, 0, valueHashSize);
         } catch (NoSuchAlgorithmException ex) {
             throw new SecurityException(ex);
