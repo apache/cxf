@@ -27,17 +27,17 @@ public enum SignatureAlgorithm {
     HS384(AlgorithmUtils.HMAC_SHA_384_ALGO, AlgorithmUtils.HMAC_SHA_384_JAVA, 384),
     HS512(AlgorithmUtils.HMAC_SHA_512_ALGO, AlgorithmUtils.HMAC_SHA_512_JAVA, 512),
     
-    RS256(AlgorithmUtils.RS_SHA_256_ALGO, AlgorithmUtils.RS_SHA_256_JAVA, 256),
-    RS384(AlgorithmUtils.RS_SHA_384_ALGO, AlgorithmUtils.RS_SHA_384_JAVA, 384),
-    RS512(AlgorithmUtils.RS_SHA_512_ALGO, AlgorithmUtils.RS_SHA_512_JAVA, 512),
+    RS256(AlgorithmUtils.RS_SHA_256_ALGO, AlgorithmUtils.RS_SHA_256_JAVA, -1),
+    RS384(AlgorithmUtils.RS_SHA_384_ALGO, AlgorithmUtils.RS_SHA_384_JAVA, -1),
+    RS512(AlgorithmUtils.RS_SHA_512_ALGO, AlgorithmUtils.RS_SHA_512_JAVA, -1),
     
-    PS256(AlgorithmUtils.PS_SHA_256_ALGO, AlgorithmUtils.PS_SHA_256_JAVA, 256),
-    PS384(AlgorithmUtils.PS_SHA_384_ALGO, AlgorithmUtils.PS_SHA_384_JAVA, 384),
-    PS512(AlgorithmUtils.PS_SHA_512_ALGO, AlgorithmUtils.PS_SHA_512_JAVA, 512),
+    PS256(AlgorithmUtils.PS_SHA_256_ALGO, AlgorithmUtils.PS_SHA_256_JAVA, -1),
+    PS384(AlgorithmUtils.PS_SHA_384_ALGO, AlgorithmUtils.PS_SHA_384_JAVA, -1),
+    PS512(AlgorithmUtils.PS_SHA_512_ALGO, AlgorithmUtils.PS_SHA_512_JAVA, -1),
     
-    ES256(AlgorithmUtils.ES_SHA_256_ALGO, AlgorithmUtils.ES_SHA_256_JAVA, 256),
-    ES384(AlgorithmUtils.ES_SHA_384_ALGO, AlgorithmUtils.ES_SHA_384_JAVA, 384),
-    ES512(AlgorithmUtils.ES_SHA_512_ALGO, AlgorithmUtils.ES_SHA_512_JAVA, 512),
+    ES256(AlgorithmUtils.ES_SHA_256_ALGO, AlgorithmUtils.ES_SHA_256_JAVA, -1),
+    ES384(AlgorithmUtils.ES_SHA_384_ALGO, AlgorithmUtils.ES_SHA_384_JAVA, -1),
+    ES512(AlgorithmUtils.ES_SHA_512_ALGO, AlgorithmUtils.ES_SHA_512_JAVA, -1),
     
     NONE(AlgorithmUtils.NONE_TEXT_ALGO, null, -1);
     

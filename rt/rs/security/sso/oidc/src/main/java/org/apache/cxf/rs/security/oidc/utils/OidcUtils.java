@@ -27,6 +27,7 @@ import java.util.Map;
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
+import org.apache.cxf.rs.security.jose.jws.JwsException;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oidc.common.IdToken;
@@ -116,21 +117,22 @@ public final class OidcUtils {
             throw new SecurityException("Invalid hash");
         }
     }
-    public static String calculateAccessTokenHash(String value, SignatureAlgorithm joseAlgo) {
-        return calculateHash(value, joseAlgo);
+    public static String calculateAccessTokenHash(String value, SignatureAlgorithm sigAlgo) {
+        return calculateHash(value, sigAlgo);
     }
-    public static String calculateAuthorizationCodeHash(String value, SignatureAlgorithm joseAlgo) {
-        return calculateHash(value, joseAlgo);
+    public static String calculateAuthorizationCodeHash(String value, SignatureAlgorithm sigAlgo) {
+        return calculateHash(value, sigAlgo);
     }
-    public static String calculateHash(String value, SignatureAlgorithm joseAlgo) {
-        //TODO: map from the JOSE alg to a signature alg, 
-        // for example, RS256 -> SHA-256 
-        // and calculate the chunk size based on the algo key size
-        // for example SHA-256 -> 256/8 = 32 and 32/2 = 16 bytes
+    private static String calculateHash(String value, SignatureAlgorithm sigAlgo) {
+        if (sigAlgo == SignatureAlgorithm.NONE) {
+            throw new JwsException(JwsException.Error.INVALID_ALGORITHM);
+        }
+        int algoShaSize = Integer.valueOf(sigAlgo.getJwaName().substring(2));
+        int valueHashSize = algoShaSize / 16;
         try {
             byte[] atBytes = StringUtils.toBytesASCII(value);
             byte[] digest = MessageDigestUtils.createDigest(atBytes,  MessageDigestUtils.ALGO_SHA_256);
-            return Base64UrlUtility.encodeChunk(digest, 0, 16);
+            return Base64UrlUtility.encodeChunk(digest, 0, valueHashSize);
         } catch (NoSuchAlgorithmException ex) {
             throw new SecurityException(ex);
         }
