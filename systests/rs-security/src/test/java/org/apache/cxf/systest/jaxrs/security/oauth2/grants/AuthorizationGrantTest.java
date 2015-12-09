@@ -268,7 +268,7 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         WebClient client = WebClient.create(address, setupProviders(), "alice", "security", busFile.toString());
         
         // Create the SAML Assertion
-        String assertion = createToken(address + "token", true);
+        String assertion = createToken(address + "token");
 
         // Get Access Token
         client.type("application/x-www-form-urlencoded").accept("application/json");
@@ -346,7 +346,7 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         return providers;
     }
 
-    private String createToken(String audRestr, boolean sign) throws WSSecurityException {
+    private String createToken(String audRestr) throws WSSecurityException {
         SamlCallbackHandler samlCallbackHandler = new SamlCallbackHandler(true);
         samlCallbackHandler.setAudience(audRestr);
         

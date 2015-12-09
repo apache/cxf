@@ -58,6 +58,10 @@ public class SamlCallbackHandler implements CallbackHandler {
     private boolean signAssertion = true;
     private String issuer = "resourceOwner";
     private String audience = "https://localhost:" + PORT + "/oauth2/token";
+    private boolean saml2 = true;
+    private String cryptoPropertiesFile = "org/apache/cxf/systest/jaxrs/security/alice.properties";
+    private String issuerKeyName = "alice";
+    private String issuerKeyPassword = "password";
 
     public SamlCallbackHandler(boolean signAssertion) {
         this.signAssertion = signAssertion;
@@ -69,7 +73,11 @@ public class SamlCallbackHandler implements CallbackHandler {
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof SAMLCallback) {
                 SAMLCallback callback = (SAMLCallback) callbacks[i];
-                callback.setSamlVersion(Version.SAML_20);
+                if (saml2) {
+                    callback.setSamlVersion(Version.SAML_20);
+                } else {
+                    callback.setSamlVersion(Version.SAML_11);
+                }
                 callback.setIssuer(issuer);
                 
                 String subjectName = m != null ? (String)m.getContextualProperty("saml.subject.name") : null;
@@ -94,6 +102,8 @@ public class SamlCallbackHandler implements CallbackHandler {
                 AuthDecisionStatementBean authDecBean = new AuthDecisionStatementBean();
                 authDecBean.setDecision(Decision.INDETERMINATE);
                 authDecBean.setResource("https://sp.example.com/SAML2");
+                authDecBean.setSubject(subjectBean);
+                
                 ActionBean actionBean = new ActionBean();
                 actionBean.setContents("Read");
                 authDecBean.setActions(Collections.singletonList(actionBean));
@@ -103,6 +113,8 @@ public class SamlCallbackHandler implements CallbackHandler {
                 authBean.setSubject(subjectBean);
                 authBean.setAuthenticationInstant(new DateTime());
                 authBean.setSessionIndex("123456");
+                authBean.setSubject(subjectBean);
+                
                 // AuthnContextClassRef is not set
                 authBean.setAuthenticationMethod(
                         "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport");
@@ -143,11 +155,10 @@ public class SamlCallbackHandler implements CallbackHandler {
                 
                 if (signAssertion) {
                     try {
-                        Crypto crypto = 
-                            CryptoFactory.getInstance("org/apache/cxf/systest/jaxrs/security/alice.properties");
+                        Crypto crypto = CryptoFactory.getInstance(cryptoPropertiesFile);
                         callback.setIssuerCrypto(crypto);
-                        callback.setIssuerKeyName("alice");
-                        callback.setIssuerKeyPassword("password");
+                        callback.setIssuerKeyName(issuerKeyName);
+                        callback.setIssuerKeyPassword(issuerKeyPassword);
                         callback.setSignAssertion(true);
                     } catch (WSSecurityException e) {
                         throw new IOException(e);
@@ -157,6 +168,30 @@ public class SamlCallbackHandler implements CallbackHandler {
         }
     }
     
+    public String getCryptoPropertiesFile() {
+        return cryptoPropertiesFile;
+    }
+
+    public void setCryptoPropertiesFile(String cryptoPropertiesFile) {
+        this.cryptoPropertiesFile = cryptoPropertiesFile;
+    }
+
+    public String getIssuerKeyName() {
+        return issuerKeyName;
+    }
+
+    public void setIssuerKeyName(String issuerKeyName) {
+        this.issuerKeyName = issuerKeyName;
+    }
+
+    public String getIssuerKeyPassword() {
+        return issuerKeyPassword;
+    }
+
+    public void setIssuerKeyPassword(String issuerKeyPassword) {
+        this.issuerKeyPassword = issuerKeyPassword;
+    }
+
     public String getIssuer() {
         return issuer;
     }
@@ -175,6 +210,14 @@ public class SamlCallbackHandler implements CallbackHandler {
     
     public void setConfirmationMethod(String confMethod) {
         this.confirmationMethod = confMethod;
+    }
+    
+    public boolean isSaml2() {
+        return saml2;
+    }
+
+    public void setSaml2(boolean saml2) {
+        this.saml2 = saml2;
     }
     
 }
