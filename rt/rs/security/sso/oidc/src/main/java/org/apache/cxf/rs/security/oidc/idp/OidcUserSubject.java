@@ -20,11 +20,13 @@ package org.apache.cxf.rs.security.oidc.idp;
 
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oidc.common.IdToken;
+import org.apache.cxf.rs.security.oidc.common.UserInfo;
 
 public class OidcUserSubject extends UserSubject {
     
     private static final long serialVersionUID = 8806727177012442229L;
     private IdToken idToken;
+    private UserInfo userInfo;
     
     public OidcUserSubject() {
         
@@ -39,6 +41,14 @@ public class OidcUserSubject extends UserSubject {
     }
     public void setIdToken(IdToken idToken) {
         this.idToken = idToken;
+    }
+
+    public UserInfo getUserInfo() {
+        return userInfo;
+    }
+
+    public void setUserInfo(UserInfo userInfo) {
+        this.userInfo = userInfo;
     }
 
 }
