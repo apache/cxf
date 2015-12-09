@@ -69,7 +69,7 @@ public class RM12PolicyWsdlTest extends RMPolicyWsdlTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         TestUtil.getNewPortNumber("decoupled");
-        assertTrue("server did not launch correctly", launchServer(Server.class, false));
+        assertTrue("server did not launch correctly", launchServer(Server.class, true));
     }
          
     @Test
