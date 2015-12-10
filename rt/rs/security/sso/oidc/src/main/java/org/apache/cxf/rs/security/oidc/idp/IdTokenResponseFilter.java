@@ -33,7 +33,21 @@ public class IdTokenResponseFilter extends AbstractOAuthServerJoseJwtProducer im
     private String issuer;
     @Override
     public void process(ClientAccessToken ct, ServerAccessToken st) {
+<<<<<<< HEAD
         // This may also be done directly inside a data provider code creating the server token
+=======
+        // Only add an IdToken if the client has the "openid" scope
+        if (ct.getApprovedScope() == null || !ct.getApprovedScope().contains(OidcUtils.OPENID_SCOPE)) {
+            return;
+        }
+        String idToken = getProcessedIdToken(st);
+        if (idToken != null) {
+            ct.getParameters().put(OidcUtils.ID_TOKEN, idToken);
+        } 
+        
+    }
+    private String getProcessedIdToken(ServerAccessToken st) {
+>>>>>>> dc1a867... Only issue an IdToken if the client has the correct scope (for OpenId)
         if (userInfoProvider != null) {
             IdToken token = 
                 userInfoProvider.getIdToken(st.getClient().getClientId(), st.getSubject(), st.getScopes());
