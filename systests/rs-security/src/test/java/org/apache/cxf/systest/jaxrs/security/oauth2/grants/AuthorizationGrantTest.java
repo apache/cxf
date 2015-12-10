@@ -319,6 +319,7 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         assertNotNull(accessToken.getTokenKey());
         assertNotNull(accessToken.getRefreshToken());
     }
+    
     private String getAuthorizationCode(WebClient client) {
         return getAuthorizationCode(client, null);
     }
