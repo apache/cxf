@@ -66,6 +66,10 @@
            <artifactId>spring-boot-maven-plugin</artifactId>
            <configuration>
                <mainClass>sample.rs.service.SampleRestApplication</mainClass>
+               <!-- 
+               <mainClass>sample.rs.service.SampleScanRestApplication</mainClass>
+               <mainClass>sample.rs.service.SampleScanRestApplication2</mainClass>
+               --> 
            </configuration>  
         </plugin>
         <plugin>
