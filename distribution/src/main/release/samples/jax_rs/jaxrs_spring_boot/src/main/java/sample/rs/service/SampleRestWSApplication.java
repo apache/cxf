@@ -59,9 +59,4 @@ public class SampleRestWSApplication {
         return endpoint.create();
     }
  
-    //@Override
-    //protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-    //    return application.sources(SampleRestWSApplication.class);
-    //}
- 
 }
