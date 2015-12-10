@@ -118,7 +118,9 @@ public final class OAuthUtils {
             if (sb.length() > 0) {
                 sb.append(" ");
             }
-            sb.append(perm.getPermission());
+            if (perm.getPermission() != null) {
+                sb.append(perm.getPermission());
+            }
         }
         return sb.toString();
     }
