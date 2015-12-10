@@ -1,19 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-       <parent>
+    <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>1.2.3.RELEASE</version>
-         </parent> 
+    </parent> 
     <artifactId>spring-boot-sample-rs-cxf</artifactId>
-  <version>1.2.3.RELEASE</version>
-    <name>Spring Boot Web Services Sample</name>
-    <description>Spring Boot CXF Restful Web Services Sample</description>
-    <url>http://projects.spring.io/spring-boot/</url>
+    <name>Spring Boot CXF REST Application</name>
+    <description>Spring Boot CXF REST Application</description>
+    
     <properties>
         <cxf.version>3.2.0-SNAPSHOT</cxf.version>
-        <jackson.version>2.3.0</jackson.version>
         <jetty.version>8.1.5.v20120716</jetty.version>
     </properties>
     <dependencies>
@@ -55,68 +53,28 @@
         </dependency>
 
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.jaxrs</groupId>
-            <artifactId>jackson-jaxrs-json-provider</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-annotations</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-server</artifactId>
-            <version>${jetty.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-servlet</artifactId>
-            <version>${jetty.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-webapp</artifactId>
-            <version>${jetty.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-servlets</artifactId>
-            <version>${jetty.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-                        <version>1.2.3.RELEASE</version>
+            <version>1.2.3.RELEASE</version>
         </dependency>
 
     </dependencies>
     <build>
-           <plugins>
+      <plugins>
         <plugin>
-               <groupId>org.springframework.boot</groupId>
-               <artifactId>spring-boot-maven-plugin</artifactId>
-                           <configuration>
-                        <mainClass>sample.rs.service.SampleRestWSApplication</mainClass>
-                   </configuration>  
-            </plugin>
-                        <plugin>
+           <groupId>org.springframework.boot</groupId>
+           <artifactId>spring-boot-maven-plugin</artifactId>
+           <configuration>
+               <mainClass>sample.rs.service.SampleRestApplication</mainClass>
+           </configuration>  
+        </plugin>
+        <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>exec-maven-plugin</artifactId>
             <configuration>
               <mainClass>sample.rs.client.SampleRestClientApplication</mainClass>
             </configuration>
         </plugin>
-            </plugins>
+      </plugins>
     </build>
 </project>
