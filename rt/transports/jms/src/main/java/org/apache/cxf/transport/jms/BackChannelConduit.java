@@ -44,6 +44,11 @@ import org.apache.cxf.transport.jms.util.JMSUtil;
 import org.apache.cxf.transport.jms.util.ResourceCloser;
 import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
 
+import static org.apache.cxf.transport.jms.JMSConstants.JMS_REQUEST_MESSAGE;
+import static org.apache.cxf.transport.jms.JMSConstants.JMS_SERVER_REQUEST_HEADERS;
+import static org.apache.cxf.transport.jms.JMSConstants.JMS_SERVER_RESPONSE_HEADERS;
+
+
 /**
  * Conduit for sending the reply back to the client
  */
@@ -108,61 +113,62 @@ class BackChannelConduit extends AbstractConduit implements JMSExchangeSender {
             //Don't need to send anything
             return;
         }
-
         final Message outMessage = exchange.getOutMessage();
-
         try (ResourceCloser closer = new ResourceCloser()) {
-            Session session = closer
-                .register(connection.createSession(false, Session.AUTO_ACKNOWLEDGE));
-
-            final JMSMessageHeadersType messageProperties = (JMSMessageHeadersType)outMessage
-                .get(JMSConstants.JMS_SERVER_RESPONSE_HEADERS);
-            JMSMessageHeadersType inMessageProperties = (JMSMessageHeadersType)inMessage
-                .get(JMSConstants.JMS_SERVER_REQUEST_HEADERS);
-            initResponseMessageProperties(messageProperties, inMessageProperties);
-
-            // setup the reply message
-            final javax.jms.Message request = (javax.jms.Message)inMessage
-                .get(JMSConstants.JMS_REQUEST_MESSAGE);
-            final String msgType;
-            if (JMSMessageUtils.isMtomEnabled(outMessage) 
-                && !jmsConfig.getMessageType().equals(JMSConstants.TEXT_MESSAGE_TYPE)) {
-                //get chance to set messageType from JMSConfiguration with MTOM enabled
-                msgType = jmsConfig.getMessageType();
-            } else {
-                msgType = JMSMessageUtils.getMessageType(request);
-            }
-            if (JMSConstants.TEXT_MESSAGE_TYPE.equals(msgType) 
-                && JMSMessageUtils.isMtomEnabled(outMessage)) {
-                org.apache.cxf.common.i18n.Message msg = 
-                    new org.apache.cxf.common.i18n.Message("INVALID_MESSAGE_TYPE", LOG);
-                throw new ConfigurationException(msg);
-            }
-            
-            if (isTimedOut(request)) {
-                return;
-            }
-
-            Destination replyTo = getReplyToDestination(session, inMessage);
-            if (replyTo == null) {
-                throw new RuntimeException("No replyTo destination set");
-            }
-
-            getLogger().log(Level.FINE, "send out the message!");
-
-            String correlationId = determineCorrelationID(request);
-            javax.jms.Message reply = JMSMessageUtils.asJMSMessage(jmsConfig, 
-                                      outMessage, 
-                                      replyObj, 
-                                      msgType,
-                                      session,
-                                      correlationId, JMSConstants.JMS_SERVER_RESPONSE_HEADERS);
-            JMSSender sender = JMSFactory.createJmsSender(jmsConfig, messageProperties);
-            LOG.log(Level.FINE, "server sending reply: ", reply);
-            sender.sendMessage(session, replyTo, reply);
+            send(outMessage, replyObj, closer);
         } catch (JMSException ex) {
             throw JMSUtil.convertJmsException(ex);
         }
+    }
+
+    private void send(final Message outMessage, final Object replyObj, ResourceCloser closer)
+        throws JMSException {
+        Session session = closer.register(connection.createSession(false, Session.AUTO_ACKNOWLEDGE));
+        
+        JMSMessageHeadersType outProps = (JMSMessageHeadersType)outMessage.get(JMS_SERVER_RESPONSE_HEADERS);
+        JMSMessageHeadersType inProps = (JMSMessageHeadersType)inMessage.get(JMS_SERVER_REQUEST_HEADERS);
+        initResponseMessageProperties(outProps, inProps);
+
+        // setup the reply message
+        final javax.jms.Message request = (javax.jms.Message)inMessage.get(JMS_REQUEST_MESSAGE);
+        if (isTimedOut(request)) {
+            return;
+        }
+
+        Destination replyTo = getReplyToDestination(session, inMessage);
+        if (replyTo == null) {
+            throw new RuntimeException("No replyTo destination set");
+        }
+
+        final String msgType = getMessageType(outMessage, request);
+        String correlationId = determineCorrelationID(request);
+        javax.jms.Message reply = JMSMessageUtils.asJMSMessage(jmsConfig, 
+                                  outMessage, 
+                                  replyObj, 
+                                  msgType,
+                                  session,
+                                  correlationId, JMS_SERVER_RESPONSE_HEADERS);
+        JMSSender sender = JMSFactory.createJmsSender(jmsConfig, outProps);
+        LOG.log(Level.FINE, "server sending reply: ", reply);
+        sender.sendMessage(session, replyTo, reply);
+    }
+
+    private String getMessageType(final Message outMessage, final javax.jms.Message request) {
+        String msgType;
+        if (JMSMessageUtils.isMtomEnabled(outMessage) 
+            && !jmsConfig.getMessageType().equals(JMSConstants.TEXT_MESSAGE_TYPE)) {
+            //get chance to set messageType from JMSConfiguration with MTOM enabled
+            msgType = jmsConfig.getMessageType();
+        } else {
+            msgType = JMSMessageUtils.getMessageType(request);
+        }
+        if (JMSConstants.TEXT_MESSAGE_TYPE.equals(msgType) 
+            && JMSMessageUtils.isMtomEnabled(outMessage)) {
+            org.apache.cxf.common.i18n.Message msg = 
+                new org.apache.cxf.common.i18n.Message("INVALID_MESSAGE_TYPE", LOG);
+            throw new ConfigurationException(msg);
+        }
+        return msgType;
     }
     
     /**
