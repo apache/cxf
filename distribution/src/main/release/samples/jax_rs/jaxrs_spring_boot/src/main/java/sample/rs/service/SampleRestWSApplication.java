@@ -24,7 +24,7 @@ import org.apache.cxf.jaxrs.spring.JaxRsConfig;
 import org.apache.cxf.transport.servlet.CXFServlet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.embedded.ServletRegistrationBean;
 import org.springframework.boot.context.web.SpringBootServletInitializer;
@@ -32,9 +32,9 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 
-@EnableAutoConfiguration
+@SpringBootApplication
 @Import(JaxRsConfig.class)
-public class SampleRestWSApplication extends SpringBootServletInitializer {
+public class SampleRestWSApplication {
  
     @Autowired
     private ApplicationContext applicationContext;
@@ -59,9 +59,9 @@ public class SampleRestWSApplication extends SpringBootServletInitializer {
         return endpoint.create();
     }
  
-    @Override
-    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-        return application.sources(SampleRestWSApplication.class);
-    }
+    //@Override
+    //protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+    //    return application.sources(SampleRestWSApplication.class);
+    //}
  
 }

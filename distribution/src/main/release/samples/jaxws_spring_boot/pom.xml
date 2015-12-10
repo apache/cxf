@@ -11,6 +11,9 @@
     <description>Spring Boot CXF Web Services Sample</description>
     <groupId>org.apache.cxf.spring.boot</groupId>
     <version>1.0.0</version>
+    <properties>
+        <cxf.version>3.2.0-SNAPSHOT</cxf.version>
+    </properties> 
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -21,12 +24,12 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxws</artifactId>
-            <version>3.1.2-SNAPSHOT</version>
+            <version>${cxf.version}</version>
         </dependency>
                 <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http</artifactId>
-            <version>3.1.2-SNAPSHOT</version>
+            <version>${cxf.version}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>

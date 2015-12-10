@@ -28,7 +28,7 @@ public final class SampleRestClientApplication {
         
     }
     public static void main(String[] args) {
-        HelloService service = JAXRSClientFactory.create("http://locahost:8080/helloservice/", 
+        HelloService service = JAXRSClientFactory.create("http://localhost:8080/services/helloservice/", 
                                   HelloService.class);
         System.out.println(service.sayHello("ApacheCxfUser"));
     }  
