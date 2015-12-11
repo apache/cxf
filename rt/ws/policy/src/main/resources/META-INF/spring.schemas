@@ -26,4 +26,6 @@ http\://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.
 http\://www.w3.org/2001/xml.xsd=schemas/xml.xsd
 http\://cxf.apache.org/schemas/policy.xsd=schemas/policy.xsd
 http\://www.w3.org/TR/xmldsig-core/xmldsig-core-schema.xsd=schemas/xmldsig-core-schema.xsd
+http\://www.w3.org/2001/XMLSchema.dtd=schemas/XMLSchema.dtd
+http\://www.w3.org/2001/datatypes.dtd=schemas/datatypes.dtd
 
