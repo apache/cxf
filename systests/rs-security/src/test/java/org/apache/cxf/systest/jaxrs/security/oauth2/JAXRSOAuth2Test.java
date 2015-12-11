@@ -45,16 +45,12 @@ import org.apache.cxf.rs.security.saml.SAMLUtils;
 import org.apache.cxf.rs.security.saml.SAMLUtils.SelfSignInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.wss4j.common.crypto.Crypto;
-<<<<<<< HEAD
-=======
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
-import org.apache.wss4j.common.util.DOM2Writer;
->>>>>>> 706ddbc... Adding negative tests for SAML authentication in OAuth
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -133,43 +129,6 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
         assertNotNull(at.getTokenKey());
     }
     
-<<<<<<< HEAD
-=======
-    @Test
-    public void testJWTBearerGrant() throws Exception {
-        String address = "https://localhost:" + PORT + "/oauth2/token";
-        WebClient wc = createWebClient(address);
-        
-        // Create the JWT Token
-        String token = createToken("resourceOwner", "alice", address, true, true);
-        
-        JwtBearerGrant grant = new JwtBearerGrant(token);
-        ClientAccessToken at = OAuthClientUtils.getAccessToken(wc, 
-                                        new Consumer("alice", "alice"), 
-                                        grant,
-                                        false);
-        assertNotNull(at.getTokenKey());
-    }
-    
-    @Test
-    public void testJWTBearerAuthenticationDirect() throws Exception {
-        String address = "https://localhost:" + PORT + "/oauth2-auth-jwt/token";
-        WebClient wc = createWebClient(address);
-        
-        // Create the JWT Token
-        String token = createToken("resourceOwner", "alice", address, true, true);
-        
-        Map<String, String> extraParams = new HashMap<String, String>();
-        extraParams.put(Constants.CLIENT_AUTH_ASSERTION_TYPE,
-                        "urn:ietf:params:oauth:client-assertion-type:jwt-bearer");
-        extraParams.put(Constants.CLIENT_AUTH_ASSERTION_PARAM, token);
-        
-        ClientAccessToken at = OAuthClientUtils.getAccessToken(wc, 
-                                                               new CustomGrant(),
-                                                               extraParams);
-        assertNotNull(at.getTokenKey());
-    }
-   
     //
     // Some negative tests for authentication
     //
@@ -324,7 +283,6 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
         }
     }
     
->>>>>>> 706ddbc... Adding negative tests for SAML authentication in OAuth
     private WebClient createWebClient(String address) {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         bean.setAddress(address);
@@ -369,8 +327,6 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
         return wc;
     }
     
-<<<<<<< HEAD
-=======
     private String createToken(String audRestr, boolean saml2, boolean sign) throws WSSecurityException {
         SamlCallbackHandler samlCallbackHandler = new SamlCallbackHandler(sign);
         samlCallbackHandler.setAudience(audRestr);
@@ -397,50 +353,6 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
         return samlAssertion.assertionToString();
     }
     
-    private String createToken(String issuer, String subject, String audience, 
-                               boolean expiry, boolean sign) {
-        // Create the JWT Token
-        JwtClaims claims = new JwtClaims();
-        claims.setSubject(subject);
-        if (issuer != null) {
-            claims.setIssuer(issuer);
-        }
-        claims.setIssuedAt(new Date().getTime() / 1000L);
-        if (expiry) {
-            Calendar cal = Calendar.getInstance();
-            cal.add(Calendar.SECOND, 60);
-            claims.setExpiryTime(cal.getTimeInMillis() / 1000L);
-        }
-        if (audience != null) {
-            claims.setAudiences(Collections.singletonList(audience));
-        }
-        
-        if (sign) {
-            // Sign the JWT Token
-            Properties signingProperties = new Properties();
-            signingProperties.put("rs.security.keystore.type", "jks");
-            signingProperties.put("rs.security.keystore.password", "password");
-            signingProperties.put("rs.security.keystore.alias", "alice");
-            signingProperties.put("rs.security.keystore.file", 
-                                  "org/apache/cxf/systest/jaxrs/security/certs/alice.jks");
-            signingProperties.put("rs.security.key.password", "password");
-            signingProperties.put("rs.security.signature.algorithm", "RS256");
-            
-            JwsHeaders jwsHeaders = new JwsHeaders(signingProperties);
-            JwsJwtCompactProducer jws = new JwsJwtCompactProducer(jwsHeaders, claims);
-            
-            JwsSignatureProvider sigProvider = 
-                JwsUtils.loadSignatureProvider(signingProperties, jwsHeaders);
-            
-            return jws.signWith(sigProvider);
-        }
-        
-        JwsHeaders jwsHeaders = new JwsHeaders(SignatureAlgorithm.NONE);
-        JwsJwtCompactProducer jws = new JwsJwtCompactProducer(jwsHeaders, claims);
-        return jws.getSignedEncodedJws();
-    }
-    
->>>>>>> 706ddbc... Adding negative tests for SAML authentication in OAuth
     private static class CustomGrant implements AccessTokenGrant {
 
         private static final long serialVersionUID = -4007538779198315873L;
