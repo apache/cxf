@@ -73,6 +73,23 @@ public class JaxRsServiceTest extends CXFOSGiTestSupport {
         Assert.assertNotNull(response.getLocation());
     }
 
+    //@Ignore("this passes with Karaf 4, but not with the test rig here.")
+    @Test
+    public void postWithValidation() throws Exception {
+        Book book = new Book();
+        book.setId(-1);
+        book.setName(null);
+        Response response = wt.path("/books-validate/").request("application/xml").post(Entity.xml(book));
+        Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+
+        book = new Book();
+        book.setId(3212);
+        book.setName("A Book");
+        response = wt.path("/books-validate/").request("application/xml").post(Entity.xml(book));
+        Assert.assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
+        Assert.assertNotNull(response.getLocation());
+    }
+
     @Test
     public void testJaxRsDelete() throws Exception {
         Response response = wt.path("/books/123").request("application/xml").delete();
@@ -93,7 +110,10 @@ public class JaxRsServiceTest extends CXFOSGiTestSupport {
     public Option[] config() {
         return new Option[] {
             cxfBaseConfig(),
-            features(cxfUrl, "cxf-core", "cxf-wsdl", "cxf-jaxrs", "http"),
+            features(cxfUrl, "cxf-core", "cxf-wsdl", "cxf-jaxrs", "http",
+                    "cxf-bean-validation-core",
+                    "cxf-bean-validation",
+                    "cxf-bean-validation-hibernate-support"),
             testUtils(),
             logLevel(LogLevel.INFO),
             provision(serviceBundle())

@@ -441,6 +441,8 @@
     </feature>
 
     <feature name="cxf-bean-validation-core" version="${project.version}" resolver="(obr)">
+        <!-- This feature has the wrong name; it's hibernate-only. Fix up in 3.2.0? Move all this to the
+        hibernate-bean-validation-helper feature -->
         <bundle start-level="10" dependency="true">mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jsr303-api-${cxf.osgi.validation.api.version}/${cxf.servicemix.specs.version}</bundle>
         <bundle start-level="30" dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.hibernate-validator/${cxf.hibernate-validator.bundle.version}</bundle>
         <!-- The hibernate bundle demands 1.1.0 of javax.validator, but servicemix only provides 1.0.0. So
@@ -460,6 +462,11 @@
         <bundle start-level="30" dependency="true">mvn:org.codehaus.woodstox/woodstox-core-asl/${cxf.woodstox.core.version}</bundle>
         <bundle start-level="30" dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.cglib/${cxf.servicemix.cglib.version}</bundle>
         <bundle start-level="30" dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.aspectj/${cxf.servicemix.aspectj.version}</bundle>
+    </feature>
+
+    <feature name="cxf-bean-validation-hibernate-support" version="${project.version}" resolver="(obr)">
+        <feature>cxf-bean-validation</feature>
+        <bundle start-level="30" dependency="true">mvn:org.apache.cxf/cxf-osgi-hibernate-bean-validation-helper/${project.version}</bundle>
     </feature>
     
     <feature name="cxf-bean-validation" version="${project.version}" resolver="(obr)">

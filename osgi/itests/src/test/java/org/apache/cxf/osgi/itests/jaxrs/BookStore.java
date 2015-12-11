@@ -24,6 +24,8 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -39,6 +41,9 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+
+import org.apache.cxf.osgi.hibernate.validation.ValidationHelper;
+import org.apache.cxf.validation.BeanValidationProvider;
 
 @Path("/bookstore")
 @Produces("application/xml")
@@ -84,6 +89,26 @@ public class BookStore {
             return Response.ok().build();
         }
     }
+
+    @POST
+    @Path("/books-validate")
+    public Response createBookValidate(Book book) {
+        assertInjections();
+        try {
+            BeanValidationProvider prov = new BeanValidationProvider(ValidationHelper.getValidatorFactory());
+            prov.validateBean(book);
+        } catch (ConstraintViolationException cve) {
+            StringBuilder violationMessages = new StringBuilder();
+            for (ConstraintViolation<?> constraintViolation : cve.getConstraintViolations()) {
+                violationMessages.append(constraintViolation.getPropertyPath())
+                        .append(": ").append(constraintViolation.getMessage()).append("\n");
+            }
+            return Response.status(Response.Status.BAD_REQUEST).type("text/plain")
+                    .entity(violationMessages.toString()).build();
+        }
+        return createBook(book);
+    }
+
     
     @POST
     @Path("/books")

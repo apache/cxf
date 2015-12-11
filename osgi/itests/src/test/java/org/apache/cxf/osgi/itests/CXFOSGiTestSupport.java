@@ -138,9 +138,10 @@ public class CXFOSGiTestSupport {
                              .name("Apache Karaf")
                              .useDeployFolder(false)
                              .unpackDirectory(new File("target/paxexam/")),
-                         //DO NOT COMMIT WITH THIS LINE ENABLED!!!    
-                         //KarafDistributionOption.keepRuntimeFolder(),                         
-                         systemProperty("java.awt.headless").value("true"),
+                         //DO NOT COMMIT WITH THIS LINE ENABLED!!!
+                         //KarafDistributionOption.keepRuntimeFolder(),
+                         //debugConfiguration(), // nor this
+                systemProperty("java.awt.headless").value("true"),
                          when(localRepo != null)
                              .useOptions(editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg",
                                                                   "org.ops4j.pax.url.mvn.localRepository",
