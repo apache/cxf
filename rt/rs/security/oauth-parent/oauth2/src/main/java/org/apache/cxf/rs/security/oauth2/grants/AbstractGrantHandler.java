@@ -143,7 +143,8 @@ public abstract class AbstractGrantHandler implements AccessTokenGrantHandler {
         reg.setGrantType(requestedGrant);
         reg.setSubject(subject);
         reg.setRequestedScope(requestedScopes);
-        reg.setApprovedScope(Collections.emptyList());
+        List<String> approvedScopes = Collections.emptyList();
+        reg.setApprovedScope(approvedScopes);
         reg.setAudience(audience);
         return dataProvider.createAccessToken(reg);
     }

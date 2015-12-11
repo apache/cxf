@@ -20,6 +20,7 @@
 package org.apache.cxf.rs.security.oauth2.grants.code;
 
 import java.util.Collections;
+import java.util.List;
 
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -104,7 +105,8 @@ public class AuthorizationCodeGrantHandler extends AbstractGrantHandler {
         if (grant.getApprovedScopes() != null) {
             reg.setApprovedScope(grant.getApprovedScopes());
         } else {
-            reg.setApprovedScope(Collections.emptyList());
+            List<String> approvedScopes = Collections.emptyList();
+            reg.setApprovedScope(approvedScopes);
         }
         reg.setAudience(grant.getAudience());
         reg.setClientCodeVerifier(codeVerifier);
