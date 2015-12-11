@@ -52,7 +52,7 @@ public class DirectAuthorizationService extends AbstractOAuthService {
         SecurityContext sc = getAndValidateSecurityContext(params);
         // Create a UserSubject representing the end user 
         UserSubject userSubject = createUserSubject(sc);
-        Client client = getClient(params);
+        Client client = getClient(params.getFirst(OAuthConstants.CLIENT_ID), params);
         
         AccessTokenRegistration reg = new AccessTokenRegistration();
         reg.setClient(client);
@@ -96,6 +96,39 @@ public class DirectAuthorizationService extends AbstractOAuthService {
             return OAuthUtils.createSubject(securityContext);
         }
     }
+    
+    /**
+     * Get the {@link Client} reference
+     * @param clientId The Client Id
+     * @param params request parameters
+     * @return Client the client reference 
+     * @throws {@link javax.ws.rs.WebApplicationException} if no matching Client is found, 
+     *         the error is returned directly to the end user without 
+     *         following the redirect URI if any
+     */
+    protected Client getClient(String clientId, MultivaluedMap<String, String> params) {
+        Client client = null;
+        String state = null;
+        
+        if (params != null) {
+            state = params.getFirst(OAuthConstants.STATE);
+        }
+        
+        try {
+            client = getValidClient(clientId);
+        } catch (OAuthServiceException ex) {
+            if (ex.getError() != null) {
+                ex.getError().setState(state);
+                reportInvalidRequestError(ex.getError(), null);
+            }
+        }
+        
+        if (client == null) {
+            reportInvalidRequestError("Client ID is invalid", state, null);
+        }
+        return client;
+        
+    }
 
     public SubjectCreator getSubjectCreator() {
         return subjectCreator;
@@ -103,26 +136,6 @@ public class DirectAuthorizationService extends AbstractOAuthService {
 
     public void setSubjectCreator(SubjectCreator subjectCreator) {
         this.subjectCreator = subjectCreator;
-    }
-    protected Client getClient(MultivaluedMap<String, String> params) {
-        return getClient(params.getFirst(OAuthConstants.CLIENT_ID));
-    }
-    protected Client getClient(String clientId) {
-        Client client = null;
-        
-        try {
-            client = getValidClient(clientId);
-        } catch (OAuthServiceException ex) {
-            if (ex.getError() != null) {
-                reportInvalidRequestError(ex.getError(), null);
-            }
-        }
-        
-        if (client == null) {
-            reportInvalidRequestError("Client ID is invalid", null);
-        }
-        return client;
-        
     }
 
     public boolean isPartialMatchScopeValidation() {
