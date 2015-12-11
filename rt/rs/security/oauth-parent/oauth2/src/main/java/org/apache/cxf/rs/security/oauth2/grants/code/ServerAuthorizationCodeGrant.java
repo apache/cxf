@@ -40,6 +40,7 @@ public class ServerAuthorizationCodeGrant extends AuthorizationCodeGrant {
     private UserSubject subject;
     private String audience;
     private String clientCodeChallenge;
+    private String nonce;
     
     public ServerAuthorizationCodeGrant() {
         
@@ -164,5 +165,13 @@ public class ServerAuthorizationCodeGrant extends AuthorizationCodeGrant {
 
     public void setRequestedScopes(List<String> requestedScopes) {
         this.requestedScopes = requestedScopes;
+    }
+
+    public String getNonce() {
+        return nonce;
+    }
+
+    public void setNonce(String nonce) {
+        this.nonce = nonce;
     }
 }
