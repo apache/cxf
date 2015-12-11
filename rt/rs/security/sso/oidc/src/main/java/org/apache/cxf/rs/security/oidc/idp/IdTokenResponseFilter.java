@@ -49,6 +49,9 @@ public class IdTokenResponseFilter extends AbstractOAuthServerJoseJwtProducer im
         if (userInfoProvider != null) {
             IdToken idToken = 
                 userInfoProvider.getIdToken(st.getClient().getClientId(), st.getSubject(), st.getScopes());
+            if (st.getNonce() != null) {
+                idToken.setNonce(st.getNonce());
+            }
             setAtHash(idToken, st);
             return super.processJwt(new JwtToken(idToken), st.getClient());
         } else if (st.getSubject().getProperties().containsKey(OidcUtils.ID_TOKEN)) {
