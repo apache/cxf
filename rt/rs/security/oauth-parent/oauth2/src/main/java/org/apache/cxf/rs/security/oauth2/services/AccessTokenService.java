@@ -119,7 +119,8 @@ public class AccessTokenService extends AbstractTokenService {
             // restriction on a number of return statements 
             OAuthServiceException oauthEx = ex instanceof OAuthServiceException 
                 ? (OAuthServiceException)ex : new OAuthServiceException(ex);
-            return handleException(oauthEx, OAuthConstants.INVALID_GRANT);
+            return handleException(oauthEx, OAuthConstants.INVALID_GRANT,
+                                   params.getFirst(OAuthConstants.STATE));
         }
         if (serverToken == null) {
             return createErrorResponse(params, OAuthConstants.INVALID_GRANT);
