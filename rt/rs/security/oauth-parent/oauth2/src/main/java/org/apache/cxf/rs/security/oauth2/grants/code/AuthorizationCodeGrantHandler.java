@@ -19,8 +19,11 @@
 
 package org.apache.cxf.rs.security.oauth2.grants.code;
 
+import java.util.Collections;
+
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.apache.cxf.rs.security.oauth2.common.AccessTokenRegistration;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.grants.AbstractGrantHandler;
@@ -78,13 +81,34 @@ public class AuthorizationCodeGrantHandler extends AbstractGrantHandler {
             throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
         }
         
-        return doCreateAccessToken(client, 
-                                   grant.getSubject(), 
-                                   getSingleGrantType(),
-                                   grant.getRequestedScopes(),
-                                   grant.getApprovedScopes(),
-                                   grant.getAudience(),
-                                   clientCodeVerifier);
+        return doCreateAccessToken(client, grant, getSingleGrantType(), clientCodeVerifier);
+    }
+    
+    private ServerAccessToken doCreateAccessToken(Client client,
+                                                  ServerAuthorizationCodeGrant grant,
+                                                  String requestedGrant,
+                                                  String codeVerifier) {
+        ServerAccessToken token = getPreAuthorizedToken(client, grant.getSubject(), requestedGrant,
+                                                        grant.getRequestedScopes(), grant.getAudience());
+        if (token != null) {
+            return token;
+        }
+        
+        // Delegate to the data provider to create the one
+        AccessTokenRegistration reg = new AccessTokenRegistration();
+        reg.setClient(client);
+        reg.setGrantType(requestedGrant);
+        reg.setSubject(grant.getSubject());
+        reg.setRequestedScope(grant.getRequestedScopes());
+        reg.setNonce(grant.getNonce());
+        if (grant.getApprovedScopes() != null) {
+            reg.setApprovedScope(grant.getApprovedScopes());
+        } else {
+            reg.setApprovedScope(Collections.emptyList());
+        }
+        reg.setAudience(grant.getAudience());
+        reg.setClientCodeVerifier(codeVerifier);
+        return getDataProvider().createAccessToken(reg);
     }
     
     private boolean compareCodeVerifierWithChallenge(Client c, String clientCodeVerifier, 

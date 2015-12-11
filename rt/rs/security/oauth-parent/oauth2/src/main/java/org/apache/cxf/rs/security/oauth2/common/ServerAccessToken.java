@@ -37,6 +37,7 @@ public abstract class ServerAccessToken extends AccessToken {
     private UserSubject subject;
     private String audience;
     private String clientCodeVerifier;
+    private String nonce;
     
     protected ServerAccessToken() {
         
@@ -157,5 +158,13 @@ public abstract class ServerAccessToken extends AccessToken {
 
     public void setClientCodeVerifier(String clientCodeVerifier) {
         this.clientCodeVerifier = clientCodeVerifier;
+    }
+
+    public String getNonce() {
+        return nonce;
+    }
+
+    public void setNonce(String nonce) {
+        this.nonce = nonce;
     }
 }
