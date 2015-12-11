@@ -118,7 +118,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         SecurityContext sc = getAndValidateSecurityContext(params);
         // Create a UserSubject representing the end user 
         UserSubject userSubject = createUserSubject(sc);
-        Client client = getClient(params);
+        Client client = getClient(params.getFirst(OAuthConstants.CLIENT_ID), params);
         return startAuthorization(params, userSubject, client);
     }
         
@@ -128,7 +128,8 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         
         // Validate the provided request URI, if any, against the ones Client provided
         // during the registration
-        String redirectUri = validateRedirectUri(client, params.getFirst(OAuthConstants.REDIRECT_URI)); 
+        String redirectUri = validateRedirectUri(client, params.getFirst(OAuthConstants.REDIRECT_URI),
+                                                 params.getFirst(OAuthConstants.STATE)); 
         
         // Enforce the client confidentiality requirements
         if (!OAuthUtils.isGrantSupportedForClient(client, canSupportPublicClient(client), supportedGrantType)) {
@@ -286,8 +287,9 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         
         OAuthRedirectionState state = 
             recreateRedirectionStateFromSession(userSubject, params, sessionToken);
-        Client client = getClient(state.getClientId());
-        String redirectUri = validateRedirectUri(client, state.getRedirectUri());
+        Client client = getClient(state.getClientId(), params);
+        String redirectUri = validateRedirectUri(client, state.getRedirectUri(),
+                                                 params.getFirst(OAuthConstants.STATE));
         
         // Get the end user decision value
         String decision = params.getFirst(OAuthConstants.AUTHORIZATION_DECISION_KEY);
@@ -368,25 +370,58 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         return securityContext;
     }
     
-    protected String validateRedirectUri(Client client, String redirectUri) {
+    protected String validateRedirectUri(Client client, String redirectUri, String state) {
         
         List<String> uris = client.getRedirectUris();
         if (redirectUri != null) {
             if (!uris.contains(redirectUri)) {
-                reportInvalidRequestError("Client Redirect Uri is invalid");
+                reportInvalidRequestError("Client Redirect Uri is invalid", state);
             } 
         } else if (uris.size() == 1 && useRegisteredRedirectUriIfPossible) {
             redirectUri = uris.get(0);
         }
         if (redirectUri == null && uris.size() == 0 && !canRedirectUriBeEmpty(client)) {
-            reportInvalidRequestError("Client Redirect Uri is invalid");    
+            reportInvalidRequestError("Client Redirect Uri is invalid", state);    
         }
         if (redirectUri != null && matchRedirectUriWithApplicationUri
             && client.getApplicationWebUri() != null
             && !redirectUri.startsWith(client.getApplicationWebUri())) {
-            reportInvalidRequestError("Client Redirect Uri is invalid");
+            reportInvalidRequestError("Client Redirect Uri is invalid", state);
         }
         return redirectUri;
+    }
+    
+    /**
+     * Get the {@link Client} reference
+     * @param clientId The Client Id
+     * @param params request parameters
+     * @return Client the client reference 
+     * @throws {@link javax.ws.rs.WebApplicationException} if no matching Client is found, 
+     *         the error is returned directly to the end user without 
+     *         following the redirect URI if any
+     */
+    protected Client getClient(String clientId, MultivaluedMap<String, String> params) {
+        Client client = null;
+        String state = null;
+        
+        if (params != null) {
+            state = params.getFirst(OAuthConstants.STATE);
+        }
+        
+        try {
+            client = getValidClient(clientId);
+        } catch (OAuthServiceException ex) {
+            if (ex.getError() != null) {
+                ex.getError().setState(state);
+                reportInvalidRequestError(ex.getError(), null);
+            }
+        }
+        
+        if (client == null) {
+            reportInvalidRequestError("Client ID is invalid", state, null);
+        }
+        return client;
+        
     }
     
     private void addAuthenticityTokenToSession(OAuthAuthorizationData secData,
@@ -422,34 +457,6 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         }
     }
     
-    /**
-     * Get the {@link Client} reference
-     * @param params request parameters
-     * @return Client the client reference 
-     * @throws {@link javax.ws.rs.WebApplicationException} if no matching Client is found, 
-     *         the error is returned directly to the end user without 
-     *         following the redirect URI if any
-     */
-    protected Client getClient(String clientId) {
-        Client client = null;
-        
-        try {
-            client = getValidClient(clientId);
-        } catch (OAuthServiceException ex) {
-            if (ex.getError() != null) {
-                reportInvalidRequestError(ex.getError(), null);
-            }
-        }
-        
-        if (client == null) {
-            reportInvalidRequestError("Client ID is invalid", null);
-        }
-        return client;
-        
-    }
-    protected Client getClient(MultivaluedMap<String, String> params) {
-        return this.getClient(params.getFirst(OAuthConstants.CLIENT_ID));
-    }
     protected String getSupportedGrantType() {
         return this.supportedGrantType;
     }

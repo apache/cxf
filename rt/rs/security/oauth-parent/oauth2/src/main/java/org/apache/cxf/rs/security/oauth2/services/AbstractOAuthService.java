@@ -123,13 +123,14 @@ public abstract class AbstractOAuthService {
         }
     }
     
-    protected void reportInvalidRequestError(String errorDescription) {
-        reportInvalidRequestError(errorDescription, MediaType.APPLICATION_JSON_TYPE);
+    protected void reportInvalidRequestError(String errorDescription, String state) {
+        reportInvalidRequestError(errorDescription, state, MediaType.APPLICATION_JSON_TYPE);
     }
     
-    protected void reportInvalidRequestError(String errorDescription, MediaType mt) {
+    protected void reportInvalidRequestError(String errorDescription, String state, MediaType mt) {
         OAuthError error = 
             new OAuthError(OAuthConstants.INVALID_REQUEST, errorDescription);
+        error.setState(state);
         reportInvalidRequestError(error, mt);
     }
     
@@ -144,7 +145,7 @@ public abstract class AbstractOAuthService {
         }
         throw ExceptionUtils.toBadRequestException(null, rb.entity(entity).build());
     }
-
+    
     /**
      * HTTPS is the default transport for OAuth 2.0 services, this property 
      * can be used to block all the requests issued over HTTP
