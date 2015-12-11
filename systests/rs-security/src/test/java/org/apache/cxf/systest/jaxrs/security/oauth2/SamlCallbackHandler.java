@@ -62,6 +62,7 @@ public class SamlCallbackHandler implements CallbackHandler {
     private String cryptoPropertiesFile = "org/apache/cxf/systest/jaxrs/security/alice.properties";
     private String issuerKeyName = "alice";
     private String issuerKeyPassword = "password";
+    private String subjectName = "alice";
 
     public SamlCallbackHandler(boolean signAssertion) {
         this.signAssertion = signAssertion;
@@ -80,14 +81,14 @@ public class SamlCallbackHandler implements CallbackHandler {
                 }
                 callback.setIssuer(issuer);
                 
-                String subjectName = m != null ? (String)m.getContextualProperty("saml.subject.name") : null;
-                if (subjectName == null) {
-                    subjectName = "alice";
+                String subject = m != null ? (String)m.getContextualProperty("saml.subject.name") : null;
+                if (subject == null) {
+                    subject = subjectName;
                 }
                 String subjectQualifier = "www.mock-sts.com";
                 SubjectBean subjectBean = 
                     new SubjectBean(
-                        subjectName, subjectQualifier, confirmationMethod
+                        subject, subjectQualifier, confirmationMethod
                     );
                 callback.setSubject(subjectBean);
                 
@@ -218,6 +219,14 @@ public class SamlCallbackHandler implements CallbackHandler {
 
     public void setSaml2(boolean saml2) {
         this.saml2 = saml2;
+    }
+
+    public String getSubjectName() {
+        return subjectName;
+    }
+
+    public void setSubjectName(String subjectName) {
+        this.subjectName = subjectName;
     }
     
 }

@@ -54,13 +54,19 @@ import org.apache.cxf.rs.security.oauth2.common.AccessTokenGrant;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.grants.jwt.JwtBearerGrant;
 import org.apache.cxf.rs.security.oauth2.grants.saml.Saml2BearerGrant;
+import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.saml.Constants;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rs.security.saml.SAMLUtils;
 import org.apache.cxf.rs.security.saml.SAMLUtils.SelfSignInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.saml.SAMLCallback;
+import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.common.saml.builder.SAML1Constants;
+import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.common.util.DOM2Writer;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -75,7 +81,7 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
         assertTrue("server did not launch correctly", 
                    launchServer(BookServerOAuth2.class, true));
     }
-    
+   
     @Test
     public void testSAML2BearerGrant() throws Exception {
         String address = "https://localhost:" + PORT + "/oauth2/token";
@@ -181,6 +187,160 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
                                                                extraParams);
         assertNotNull(at.getTokenKey());
     }
+   
+    //
+    // Some negative tests for authentication
+    //
+    
+    @Test
+    public void testSAML11() throws Exception {
+        String address = "https://localhost:" + PORT + "/oauth2-auth/token";
+        WebClient wc = createWebClient(address);
+        
+        String audienceURI = "https://localhost:" + PORT + "/oauth2-auth/token";
+        String assertion = createToken(audienceURI, false, true);
+        String encodedAssertion = Base64UrlUtility.encode(assertion);
+        
+        Map<String, String> extraParams = new HashMap<String, String>();
+        extraParams.put(Constants.CLIENT_AUTH_ASSERTION_TYPE, Constants.CLIENT_AUTH_SAML2_BEARER);
+        extraParams.put(Constants.CLIENT_AUTH_ASSERTION_PARAM, encodedAssertion);
+        
+        try {
+            OAuthClientUtils.getAccessToken(wc, new CustomGrant(), extraParams);
+            fail("Failure expected on a SAML 1.1 Assertion");
+        } catch (OAuthServiceException ex) {
+            // expected
+        }
+    }
+    
+    @Test
+    public void testSAMLAudRestr() throws Exception {
+        String address = "https://localhost:" + PORT + "/oauth2-auth/token";
+        WebClient wc = createWebClient(address);
+        
+        String audienceURI = "https://localhost:" + PORT + "/oauth2-auth/token2";
+        String assertion = createToken(audienceURI, true, true);
+        String encodedAssertion = Base64UrlUtility.encode(assertion);
+        
+        Map<String, String> extraParams = new HashMap<String, String>();
+        extraParams.put(Constants.CLIENT_AUTH_ASSERTION_TYPE, Constants.CLIENT_AUTH_SAML2_BEARER);
+        extraParams.put(Constants.CLIENT_AUTH_ASSERTION_PARAM, encodedAssertion);
+        
+        try {
+            OAuthClientUtils.getAccessToken(wc, new CustomGrant(), extraParams);
+            fail("Failure expected on a bad audience restriction");
+        } catch (OAuthServiceException ex) {
+            // expected
+        }
+    }
+    
+    @Test
+    public void testSAMLBadSubjectName() throws Exception {
+        String address = "https://localhost:" + PORT + "/oauth2-auth/token";
+        WebClient wc = createWebClient(address);
+        
+        String audienceURI = "https://localhost:" + PORT + "/oauth2-auth/token";
+        
+        // Create the SAML Assertion
+        SamlCallbackHandler samlCallbackHandler = new SamlCallbackHandler(true);
+        samlCallbackHandler.setSubjectName("bob");
+        samlCallbackHandler.setAudience(audienceURI);
+        
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(samlCallbackHandler, samlCallback);
+
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
+        if (samlCallback.isSignAssertion()) {
+            samlAssertion.signAssertion(
+                samlCallback.getIssuerKeyName(),
+                samlCallback.getIssuerKeyPassword(),
+                samlCallback.getIssuerCrypto(),
+                samlCallback.isSendKeyValue(),
+                samlCallback.getCanonicalizationAlgorithm(),
+                samlCallback.getSignatureAlgorithm()
+            );
+        }
+        
+        String assertion = samlAssertion.assertionToString();
+        
+        String encodedAssertion = Base64UrlUtility.encode(assertion);
+        
+        Map<String, String> extraParams = new HashMap<String, String>();
+        extraParams.put(Constants.CLIENT_AUTH_ASSERTION_TYPE, Constants.CLIENT_AUTH_SAML2_BEARER);
+        extraParams.put(Constants.CLIENT_AUTH_ASSERTION_PARAM, encodedAssertion);
+        
+        try {
+            OAuthClientUtils.getAccessToken(wc, new CustomGrant(), extraParams);
+            fail("Failure expected on a bad subject name");
+        } catch (OAuthServiceException ex) {
+            // expected
+        }
+    }
+    
+    @Test
+    public void testSAMLUnsigned() throws Exception {
+        String address = "https://localhost:" + PORT + "/oauth2-auth/token";
+        WebClient wc = createWebClient(address);
+        
+        String audienceURI = "https://localhost:" + PORT + "/oauth2-auth/token";
+        String assertion = createToken(audienceURI, true, false);
+        String encodedAssertion = Base64UrlUtility.encode(assertion);
+        
+        Map<String, String> extraParams = new HashMap<String, String>();
+        extraParams.put(Constants.CLIENT_AUTH_ASSERTION_TYPE, Constants.CLIENT_AUTH_SAML2_BEARER);
+        extraParams.put(Constants.CLIENT_AUTH_ASSERTION_PARAM, encodedAssertion);
+        
+        try {
+            OAuthClientUtils.getAccessToken(wc, new CustomGrant(), extraParams);
+            fail("Failure expected on an unsigned token");
+        } catch (Exception ex) {
+            // expected
+        }
+    }
+    
+    @Test
+    public void testSAMLHolderOfKey() throws Exception {
+        String address = "https://localhost:" + PORT + "/oauth2-auth/token";
+        WebClient wc = createWebClient(address);
+        
+        String audienceURI = "https://localhost:" + PORT + "/oauth2-auth/token";
+        
+        // Create the SAML Assertion
+        SamlCallbackHandler samlCallbackHandler = new SamlCallbackHandler(true);
+        samlCallbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
+        samlCallbackHandler.setSubjectName("alice");
+        samlCallbackHandler.setAudience(audienceURI);
+        
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(samlCallbackHandler, samlCallback);
+
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
+        if (samlCallback.isSignAssertion()) {
+            samlAssertion.signAssertion(
+                samlCallback.getIssuerKeyName(),
+                samlCallback.getIssuerKeyPassword(),
+                samlCallback.getIssuerCrypto(),
+                samlCallback.isSendKeyValue(),
+                samlCallback.getCanonicalizationAlgorithm(),
+                samlCallback.getSignatureAlgorithm()
+            );
+        }
+        
+        String assertion = samlAssertion.assertionToString();
+        
+        String encodedAssertion = Base64UrlUtility.encode(assertion);
+        
+        Map<String, String> extraParams = new HashMap<String, String>();
+        extraParams.put(Constants.CLIENT_AUTH_ASSERTION_TYPE, Constants.CLIENT_AUTH_SAML2_BEARER);
+        extraParams.put(Constants.CLIENT_AUTH_ASSERTION_PARAM, encodedAssertion);
+        
+        try {
+            OAuthClientUtils.getAccessToken(wc, new CustomGrant(), extraParams);
+            fail("Failure expected on a bad subject confirmation method");
+        } catch (OAuthServiceException ex) {
+            // expected
+        }
+    }
     
     private WebClient createWebClient(String address) {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
@@ -224,6 +384,32 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
         WebClient wc = bean.createWebClient();
         wc.type(MediaType.APPLICATION_FORM_URLENCODED).accept(MediaType.APPLICATION_JSON);
         return wc;
+    }
+    
+    private String createToken(String audRestr, boolean saml2, boolean sign) throws WSSecurityException {
+        SamlCallbackHandler samlCallbackHandler = new SamlCallbackHandler(sign);
+        samlCallbackHandler.setAudience(audRestr);
+        if (!saml2) {
+            samlCallbackHandler.setSaml2(false);
+            samlCallbackHandler.setConfirmationMethod(SAML1Constants.CONF_BEARER);
+        }
+        
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(samlCallbackHandler, samlCallback);
+
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
+        if (samlCallback.isSignAssertion()) {
+            samlAssertion.signAssertion(
+                samlCallback.getIssuerKeyName(),
+                samlCallback.getIssuerKeyPassword(),
+                samlCallback.getIssuerCrypto(),
+                samlCallback.isSendKeyValue(),
+                samlCallback.getCanonicalizationAlgorithm(),
+                samlCallback.getSignatureAlgorithm()
+            );
+        }
+        
+        return samlAssertion.assertionToString();
     }
     
     private String createToken(String issuer, String subject, String audience, 
