@@ -156,9 +156,10 @@
         <cxf.xmlschema.version>2.2.1</cxf.xmlschema.version>
         <cxf.xpp3.bundle.version>1.1.4c_6</cxf.xpp3.bundle.version>
         <cxf.validation.api.version>1.1.0.Final</cxf.validation.api.version>
-        <!-- the Export-Package is not the same as the Maven artifact
-             version -->
-        <cxf.validation.api.package.version>1.0.0</cxf.validation.api.package.version>
+        <!-- the Export-Package is the same as the Maven artifact
+             version (with the Final), but we don't want an import package with a version
+             with a qualifier. We do want a range. -->
+        <cxf.validation.api.package.version>[1.0.0,2)</cxf.validation.api.package.version>
         <cxf.cdi.api.version>1.1</cxf.cdi.api.version>
         <cxf.json.api.version>1.0</cxf.json.api.version>
         <cxf.jboss.weld.version>2.1.2.Final</cxf.jboss.weld.version>
