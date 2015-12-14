@@ -56,8 +56,7 @@ public class TokenRevocationService extends AbstractTokenService {
         try {
             getDataProvider().revokeToken(client, token, tokenTypeHint);
         } catch (OAuthServiceException ex) {
-            return handleException(ex, OAuthConstants.UNSUPPORTED_TOKEN_TYPE,
-                                   params.getFirst(OAuthConstants.STATE));
+            return handleException(ex, OAuthConstants.UNSUPPORTED_TOKEN_TYPE);
         }
         return Response.ok().build();
     }
