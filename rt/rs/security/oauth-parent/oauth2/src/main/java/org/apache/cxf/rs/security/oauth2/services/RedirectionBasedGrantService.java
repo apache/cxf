@@ -214,6 +214,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         secData.setAudience(params.getFirst(OAuthConstants.CLIENT_AUDIENCE));
         secData.setNonce(params.getFirst(OAuthConstants.NONCE));
         secData.setClientId(client.getClientId());
+        secData.setResponseType(params.getFirst(OAuthConstants.RESPONSE_TYPE));
         if (requestedScope != null && !requestedScope.isEmpty()) {
             StringBuilder builder = new StringBuilder();
             for (String scope : requestedScope) {
@@ -256,6 +257,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
             state.setProposedScope(params.getFirst(OAuthConstants.SCOPE));
             state.setState(params.getFirst(OAuthConstants.STATE));
             state.setNonce(params.getFirst(OAuthConstants.NONCE));
+            state.setResponseType(params.getFirst(OAuthConstants.RESPONSE_TYPE));
         }
         return state;
     }

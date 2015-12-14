@@ -64,7 +64,7 @@ public abstract class AbstractImplicitGrantService extends RedirectionBasedGrant
         boolean tokenCanBeReturned = preAuthorizedToken != null;
         ServerAccessToken token = null;
         if (preAuthorizedToken == null) {
-            tokenCanBeReturned = canAccessTokenBeReturned(requestedScope, approvedScope);
+            tokenCanBeReturned = canAccessTokenBeReturned(state, requestedScope, approvedScope);
             if (tokenCanBeReturned) {
                 AccessTokenRegistration reg = new AccessTokenRegistration();
                 reg.setClient(client);
@@ -135,7 +135,9 @@ public abstract class AbstractImplicitGrantService extends RedirectionBasedGrant
         
         return Response.seeOther(URI.create(sb.toString())).build();
     }
-    protected boolean canAccessTokenBeReturned(List<String> requestedScope, List<String> approvedScope) {
+    protected boolean canAccessTokenBeReturned(OAuthRedirectionState state,
+                                               List<String> requestedScope, 
+                                               List<String> approvedScope) {
         return true;
     }
     protected void processRefreshToken(StringBuilder sb, String refreshToken) {
