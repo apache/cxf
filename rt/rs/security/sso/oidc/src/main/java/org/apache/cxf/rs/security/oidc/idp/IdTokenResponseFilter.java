@@ -49,23 +49,20 @@ public class IdTokenResponseFilter extends AbstractOAuthServerJoseJwtProducer im
         if (userInfoProvider != null) {
             IdToken idToken = 
                 userInfoProvider.getIdToken(st.getClient().getClientId(), st.getSubject(), st.getScopes());
-            if (st.getNonce() != null) {
-                idToken.setNonce(st.getNonce());
-            }
-            setAtHash(idToken, st);
+            setAtHashAndNonce(idToken, st);
             return super.processJwt(new JwtToken(idToken), st.getClient());
         } else if (st.getSubject().getProperties().containsKey(OidcUtils.ID_TOKEN)) {
             return st.getSubject().getProperties().get(OidcUtils.ID_TOKEN);
         } else if (st.getSubject() instanceof OidcUserSubject) {
             OidcUserSubject sub = (OidcUserSubject)st.getSubject();
             IdToken idToken = new IdToken(sub.getIdToken());
-            setAtHash(idToken, st);
+            setAtHashAndNonce(idToken, st);
             return super.processJwt(new JwtToken(idToken), st.getClient());
         } else {
             return null;
         }
     }
-    private void setAtHash(IdToken idToken, ServerAccessToken st) {
+    private void setAtHashAndNonce(IdToken idToken, ServerAccessToken st) {
         Properties props = JwsUtils.loadSignatureOutProperties(false);
         SignatureAlgorithm sigAlgo = null;
         if (super.isSignWithClientSecret()) {
@@ -76,6 +73,10 @@ public class IdTokenResponseFilter extends AbstractOAuthServerJoseJwtProducer im
         if (sigAlgo != SignatureAlgorithm.NONE) {
             String atHash = OidcUtils.calculateAccessTokenHash(st.getTokenKey(), sigAlgo);
             idToken.setAccessTokenHash(atHash);
+        }
+        
+        if (st.getNonce() != null) {
+            idToken.setNonce(st.getNonce());
         }
         
     }

@@ -130,15 +130,13 @@ public final class OAuthUtils {
     public static String convertPermissionsToScope(List<OAuthPermission> perms) {
         StringBuilder sb = new StringBuilder();
         for (OAuthPermission perm : perms) {
-            if (perm.isInvisibleToClient()) {
+            if (perm.isInvisibleToClient() || perm.getPermission() == null) {
                 continue;
             }
             if (sb.length() > 0) {
                 sb.append(" ");
             }
-            if (perm.getPermission() != null) {
-                sb.append(perm.getPermission());
-            }
+            sb.append(perm.getPermission());
         }
         return sb.toString();
     }
