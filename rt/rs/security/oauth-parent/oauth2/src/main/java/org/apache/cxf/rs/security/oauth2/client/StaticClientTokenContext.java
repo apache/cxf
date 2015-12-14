@@ -16,28 +16,22 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.cxf.rs.security.oauth2.client;
 
-import java.io.IOException;
-
-import javax.ws.rs.client.ClientRequestContext;
-import javax.ws.rs.client.ClientRequestFilter;
-import javax.ws.rs.core.HttpHeaders;
-
-import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
-
-public class BearerClientFilter extends AbstractAuthSupplier implements ClientRequestFilter {
-
-    public BearerClientFilter() {
-        super(OAuthConstants.BEARER_AUTHORIZATION_SCHEME);
-    }
+public final class StaticClientTokenContext {
+    private static final ThreadLocal<ClientTokenContext> STATIC_CONTEXT = new ThreadLocal<ClientTokenContext>();
     
-    @Override
-    public void filter(ClientRequestContext requestContext) throws IOException {
-        requestContext.getHeaders().putSingle(HttpHeaders.AUTHORIZATION, 
-                                              createAuthorizationHeader());
+    private StaticClientTokenContext() {
         
     }
     
+    public static void setClientTokenContext(ClientTokenContext ctx) {
+        STATIC_CONTEXT.set(ctx);
+    }
+    public static ClientTokenContext getClientTokenContext() {
+        return STATIC_CONTEXT.get();
+    }
+    public static void removeClientTokenContext() {
+        STATIC_CONTEXT.remove();
+    }
 }
