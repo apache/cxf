@@ -49,7 +49,6 @@ import org.junit.Assert;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.ProbeBuilder;
 import org.ops4j.pax.exam.TestProbeBuilder;
-import org.ops4j.pax.exam.karaf.options.KarafDistributionOption;
 import org.ops4j.pax.exam.options.MavenUrlReference;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -140,7 +139,7 @@ public class CXFOSGiTestSupport {
                              .useDeployFolder(false)
                              .unpackDirectory(new File("target/paxexam/")),
                          //DO NOT COMMIT WITH THIS LINE ENABLED!!!
-                         KarafDistributionOption.keepRuntimeFolder(),
+                         //KarafDistributionOption.keepRuntimeFolder(),
                          //debugConfiguration(), // nor this
                 systemProperty("java.awt.headless").value("true"),
                          when(localRepo != null)
