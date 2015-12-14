@@ -112,8 +112,7 @@ public class JaxRsServiceTest extends CXFOSGiTestSupport {
             cxfBaseConfig(),
             features(cxfUrl, "cxf-core", "cxf-wsdl", "cxf-jaxrs", "http",
                     "cxf-bean-validation-core",
-                    "cxf-bean-validation",
-                    "cxf-bean-validation-hibernate-support"),
+                    "cxf-bean-validation"),
             testUtils(),
             logLevel(LogLevel.INFO),
             provision(serviceBundle())
@@ -122,6 +121,7 @@ public class JaxRsServiceTest extends CXFOSGiTestSupport {
 
     private InputStream serviceBundle() {
         return TinyBundles.bundle()
+                  .set(Constants.DYNAMICIMPORT_PACKAGE, "*")
                   .add(JaxRsTestActivator.class)
                   .add(Book.class)
                   .add(BookStore.class)

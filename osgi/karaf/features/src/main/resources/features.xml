@@ -464,10 +464,7 @@
         <bundle start-level="30" dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.aspectj/${cxf.servicemix.aspectj.version}</bundle>
     </feature>
 
-    <feature name="cxf-bean-validation-hibernate-support" version="${project.version}" resolver="(obr)">
-        <feature>cxf-bean-validation</feature>
-        <bundle start-level="30" dependency="true">mvn:org.apache.cxf/cxf-osgi-hibernate-bean-validation-helper/${project.version}</bundle>
-    </feature>
+
     
     <feature name="cxf-bean-validation" version="${project.version}" resolver="(obr)">
         <feature version="${project.version}">cxf-bean-validation-core</feature>

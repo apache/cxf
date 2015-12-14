@@ -26,6 +26,8 @@ import java.util.Map;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
+import javax.validation.Validation;
+import javax.validation.ValidatorFactory;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -42,8 +44,9 @@ import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
-import org.apache.cxf.osgi.hibernate.validation.ValidationHelper;
 import org.apache.cxf.validation.BeanValidationProvider;
+import org.hibernate.validator.HibernateValidator;
+import org.hibernate.validator.HibernateValidatorConfiguration;
 
 @Path("/bookstore")
 @Produces("application/xml")
@@ -94,8 +97,20 @@ public class BookStore {
     @Path("/books-validate")
     public Response createBookValidate(Book book) {
         assertInjections();
+        BeanValidationProvider prov;
+        ClassLoader oldtccl = Thread.currentThread().getContextClassLoader();
         try {
-            BeanValidationProvider prov = new BeanValidationProvider(ValidationHelper.getValidatorFactory());
+            Thread.currentThread().setContextClassLoader(HibernateValidator.class.getClassLoader());
+            HibernateValidatorConfiguration configuration =
+                    Validation.byProvider(HibernateValidator.class)
+                            .configure();
+            ValidatorFactory factory = configuration.buildValidatorFactory();
+            prov = new BeanValidationProvider(factory);
+        } finally {
+            Thread.currentThread().setContextClassLoader(oldtccl);
+        }
+        prov.setValidateContextClassloader(getClass().getClassLoader());
+        try {
             prov.validateBean(book);
         } catch (ConstraintViolationException cve) {
             StringBuilder violationMessages = new StringBuilder();

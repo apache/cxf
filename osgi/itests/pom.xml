@@ -91,15 +91,15 @@
             <version>${cxf.karaf.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-osgi-hibernate-bean-validation-helper</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.apache.servicemix.specs</groupId>
             <artifactId>org.apache.servicemix.specs.jsr303-api-1.1.0</artifactId>
             <version>${cxf.servicemix.specs.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.servicemix.bundles</groupId>
+            <artifactId>org.apache.servicemix.bundles.hibernate-validator</artifactId>
+            <version>5.0.2.Final_1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
