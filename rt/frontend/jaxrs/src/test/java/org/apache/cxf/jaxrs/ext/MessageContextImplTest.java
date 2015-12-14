@@ -34,6 +34,7 @@ import javax.xml.bind.JAXBContext;
 
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
+import org.apache.cxf.jaxrs.impl.HttpServletRequestFilter;
 import org.apache.cxf.jaxrs.impl.HttpServletResponseFilter;
 import org.apache.cxf.jaxrs.impl.ProvidersImpl;
 import org.apache.cxf.jaxrs.impl.RequestImpl;
@@ -126,8 +127,11 @@ public class MessageContextImplTest extends Assert {
         MessageContext mc = new MessageContextImpl(m);
         HttpServletRequest request = EasyMock.createMock(HttpServletRequest.class);
         m.put(AbstractHTTPDestination.HTTP_REQUEST, request);
-        assertSame(request.getClass(), mc.getHttpServletRequest().getClass());
-        assertSame(request.getClass(), mc.getContext(HttpServletRequest.class).getClass());
+        
+        assertSame(request.getClass(), 
+                   ((HttpServletRequestFilter)mc.getHttpServletRequest()).getRequest().getClass());
+        assertSame(request.getClass(), 
+                   ((HttpServletRequestFilter)mc.getContext(HttpServletRequest.class)).getRequest().getClass());
     }
     
     @Test
