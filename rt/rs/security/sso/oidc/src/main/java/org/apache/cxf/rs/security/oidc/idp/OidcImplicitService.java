@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
+import org.apache.cxf.rs.security.oauth2.common.OAuthRedirectionState;
 import org.apache.cxf.rs.security.oauth2.services.ImplicitGrantService;
 
 
@@ -39,8 +40,11 @@ public class OidcImplicitService extends ImplicitGrantService {
     }
     
     @Override
-    protected boolean canAccessTokenBeReturned(List<String> requestedScope, List<String> approvedScope) {
-        return requestedScope.contains(ID_TOKEN_AND_AT_RESPONSE_TYPE);
+    protected boolean canAccessTokenBeReturned(OAuthRedirectionState state, 
+                                               List<String> requestedScope, 
+                                               List<String> approvedScope) {
+        return state.getResponseType() != null 
+            && state.getResponseType().contains(ID_TOKEN_AND_AT_RESPONSE_TYPE);
     }
     
     @Override

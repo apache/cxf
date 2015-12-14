@@ -39,6 +39,7 @@ public class OAuthAuthorizationData extends OAuthRedirectionState implements Ser
     private String endUserName;
     private String authenticityToken;
     private String replyTo;
+    private String responseType;
     
     private String applicationName;
     private String applicationWebUri;
@@ -200,5 +201,13 @@ public class OAuthAuthorizationData extends OAuthRedirectionState implements Ser
 
     public void setImplicitFlow(boolean implicitFlow) {
         this.implicitFlow = implicitFlow;
+    }
+
+    public String getResponseType() {
+        return responseType;
+    }
+
+    public void setResponseType(String responseType) {
+        this.responseType = responseType;
     }
 }

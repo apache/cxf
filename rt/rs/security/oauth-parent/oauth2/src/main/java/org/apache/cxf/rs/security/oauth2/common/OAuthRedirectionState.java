@@ -30,6 +30,7 @@ public class OAuthRedirectionState implements Serializable {
     private String audience;
     private String nonce;
     private String clientCodeChallenge;
+    private String responseType;
     
     public OAuthRedirectionState() {
     }
@@ -122,5 +123,15 @@ public class OAuthRedirectionState implements Serializable {
 
     public void setNonce(String nonce) {
         this.nonce = nonce;
+    }
+
+
+    public String getResponseType() {
+        return responseType;
+    }
+
+
+    public void setResponseType(String responseType) {
+        this.responseType = responseType;
     }
 }
