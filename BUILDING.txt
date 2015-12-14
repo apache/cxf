@@ -6,7 +6,7 @@ Initial Setup
 
 1) Install J2SE SDK, which can be downloaded from 
    http://www.oracle.com/technetwork/java/archive-139210.html#javase
-   CXF supports most versions newer than 1.7.0_25
+   The minimum suported Java version is 1.8.
 
 2) Make sure that your JAVA_HOME environment variable is set to the newly installed 
    JDK location, and that your PATH includes %JAVA_HOME%\bin (windows) or 
