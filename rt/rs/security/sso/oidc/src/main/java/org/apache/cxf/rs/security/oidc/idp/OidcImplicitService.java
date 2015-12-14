@@ -22,10 +22,17 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
+
 import org.apache.cxf.rs.security.oauth2.common.Client;
+import org.apache.cxf.rs.security.oauth2.common.OAuthError;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
 import org.apache.cxf.rs.security.oauth2.common.OAuthRedirectionState;
+import org.apache.cxf.rs.security.oauth2.common.UserSubject;
+import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.services.ImplicitGrantService;
+import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 
 public class OidcImplicitService extends ImplicitGrantService {
@@ -45,6 +52,17 @@ public class OidcImplicitService extends ImplicitGrantService {
                                                List<String> approvedScope) {
         return state.getResponseType() != null 
             && state.getResponseType().contains(ID_TOKEN_AND_AT_RESPONSE_TYPE);
+    }
+    
+    @Override
+    protected Response startAuthorization(MultivaluedMap<String, String> params, 
+                                          UserSubject userSubject,
+                                          Client client) {    
+        // Validate the nonce, it must be present for the Implicit flow
+        if (params.getFirst(OAuthConstants.NONCE) == null) {
+            throw new OAuthServiceException(new OAuthError(OAuthConstants.INVALID_REQUEST));
+        }
+        return super.startAuthorization(params, userSubject, client);
     }
     
     @Override
