@@ -16,27 +16,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.oidc.common;
+package org.apache.cxf.rs.security.oidc.rp;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import org.apache.cxf.jaxrs.ext.ContextProvider;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.rs.security.oauth2.client.ClientTokenContext;
+import org.apache.cxf.rs.security.oidc.common.UserInfo;
 
-import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
+public class UserInfoContextProvider implements ContextProvider<UserInfo> {
 
-public class UserInfo extends AbstractUserInfo {
-    private IdToken idToken;
-    public UserInfo() {
+    @Override
+    public UserInfo createContext(Message m) {
+        OidcClientTokenContext ctx = (OidcClientTokenContext)
+            m.getContent(ClientTokenContext.class);
+        UserInfo userInfo = ctx != null ? ctx.getUserInfo() : null;
+        if (userInfo != null) {
+            userInfo.setIdToken(ctx.getIdToken());
+        }
+        return userInfo;
     }
-    public UserInfo(JwtClaims claims) {
-        this(claims.asMap());
-    }
-    public UserInfo(Map<String, Object> claims) {
-        super(new LinkedHashMap<String, Object>(claims));
-    }
-    public IdToken getIdToken() {
-        return idToken;
-    }
-    public void setIdToken(IdToken idToken) {
-        this.idToken = idToken;
-    }
+
 }
