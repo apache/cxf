@@ -342,6 +342,111 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
         }
     }
     
+    @Test
+    public void testJWTBadSubjectName() throws Exception {
+        String address = "https://localhost:" + PORT + "/oauth2-auth-jwt/token";
+        WebClient wc = createWebClient(address);
+        
+        // Create the JWT Token
+        String token = createToken("resourceOwner", "bob", address, true, true);
+        
+        Map<String, String> extraParams = new HashMap<String, String>();
+        extraParams.put(Constants.CLIENT_AUTH_ASSERTION_TYPE,
+                        "urn:ietf:params:oauth:client-assertion-type:jwt-bearer");
+        extraParams.put(Constants.CLIENT_AUTH_ASSERTION_PARAM, token);
+        
+        try {
+            OAuthClientUtils.getAccessToken(wc, new CustomGrant(), extraParams);
+            fail("Failure expected on a bad subject name");
+        } catch (OAuthServiceException ex) {
+            // expected
+        }
+    }
+    
+    @Test
+    public void testJWTUnsigned() throws Exception {
+        String address = "https://localhost:" + PORT + "/oauth2-auth-jwt/token";
+        WebClient wc = createWebClient(address);
+        
+        // Create the JWT Token
+        String token = createToken("resourceOwner", "alice", address, true, false);
+        
+        Map<String, String> extraParams = new HashMap<String, String>();
+        extraParams.put(Constants.CLIENT_AUTH_ASSERTION_TYPE,
+                        "urn:ietf:params:oauth:client-assertion-type:jwt-bearer");
+        extraParams.put(Constants.CLIENT_AUTH_ASSERTION_PARAM, token);
+        
+        try {
+            OAuthClientUtils.getAccessToken(wc, new CustomGrant(), extraParams);
+            fail("Failure expected on an unsigned token");
+        } catch (Exception ex) {
+            // expected
+        }
+    }
+    
+    @Test
+    public void testJWTNoIssuer() throws Exception {
+        String address = "https://localhost:" + PORT + "/oauth2-auth-jwt/token";
+        WebClient wc = createWebClient(address);
+        
+        // Create the JWT Token
+        String token = createToken(null, "alice", address, true, true);
+        
+        Map<String, String> extraParams = new HashMap<String, String>();
+        extraParams.put(Constants.CLIENT_AUTH_ASSERTION_TYPE,
+                        "urn:ietf:params:oauth:client-assertion-type:jwt-bearer");
+        extraParams.put(Constants.CLIENT_AUTH_ASSERTION_PARAM, token);
+        
+        try {
+            OAuthClientUtils.getAccessToken(wc, new CustomGrant(), extraParams);
+            fail("Failure expected on no issuer");
+        } catch (Exception ex) {
+            // expected
+        }
+    }
+    
+    @Test
+    public void testJWTNoExpiry() throws Exception {
+        String address = "https://localhost:" + PORT + "/oauth2-auth-jwt/token";
+        WebClient wc = createWebClient(address);
+        
+        // Create the JWT Token
+        String token = createToken("resourceOwner", "alice", address, false, true);
+        
+        Map<String, String> extraParams = new HashMap<String, String>();
+        extraParams.put(Constants.CLIENT_AUTH_ASSERTION_TYPE,
+                        "urn:ietf:params:oauth:client-assertion-type:jwt-bearer");
+        extraParams.put(Constants.CLIENT_AUTH_ASSERTION_PARAM, token);
+        
+        try {
+            OAuthClientUtils.getAccessToken(wc, new CustomGrant(), extraParams);
+            fail("Failure expected on no expiry");
+        } catch (Exception ex) {
+            // expected
+        }
+    }
+    
+    @Test
+    public void testJWTBadAudienceRestriction() throws Exception {
+        String address = "https://localhost:" + PORT + "/oauth2-auth-jwt/token";
+        WebClient wc = createWebClient(address);
+        
+        // Create the JWT Token
+        String token = createToken("resourceOwner", "alice", address + "/badtoken", true, true);
+        
+        Map<String, String> extraParams = new HashMap<String, String>();
+        extraParams.put(Constants.CLIENT_AUTH_ASSERTION_TYPE,
+                        "urn:ietf:params:oauth:client-assertion-type:jwt-bearer");
+        extraParams.put(Constants.CLIENT_AUTH_ASSERTION_PARAM, token);
+        
+        try {
+            OAuthClientUtils.getAccessToken(wc, new CustomGrant(), extraParams);
+            fail("Failure expected on a bad audience restriction");
+        } catch (Exception ex) {
+            // expected
+        }
+    }
+    
     private WebClient createWebClient(String address) {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         bean.setAddress(address);

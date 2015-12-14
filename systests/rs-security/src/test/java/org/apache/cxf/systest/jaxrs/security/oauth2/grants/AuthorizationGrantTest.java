@@ -220,8 +220,7 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         response = client.post(form);
 
         String location = response.getHeaderString("Location"); 
-        String accessToken = location.substring(location.indexOf("access_token=") + "access_token=".length());
-        accessToken = accessToken.substring(0, accessToken.indexOf('&'));
+        String accessToken = getSubstring(location, "access_token");
         assertNotNull(accessToken);
     }
 
@@ -353,7 +352,7 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
 
         response = client.post(form);
         String location = response.getHeaderString("Location"); 
-        return location.substring(location.indexOf("code=") + "code=".length());
+        return getSubstring(location, "code");
     }
 
     private ClientAccessToken getAccessTokenWithAuthorizationCode(WebClient client, String code) {
@@ -444,5 +443,15 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         JwsHeaders jwsHeaders = new JwsHeaders(SignatureAlgorithm.NONE);
         JwsJwtCompactProducer jws = new JwsJwtCompactProducer(jwsHeaders, claims);
         return jws.getSignedEncodedJws();
+    }
+    
+    private String getSubstring(String parentString, String substringName) {
+        String foundString = 
+            parentString.substring(parentString.indexOf(substringName + "=") + (substringName + "=").length());
+        int ampersandIndex = foundString.indexOf('&');
+        if (ampersandIndex < 1) {
+            ampersandIndex = foundString.length();
+        }
+        return foundString.substring(0, ampersandIndex);
     }
 }
