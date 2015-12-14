@@ -39,6 +39,7 @@ public class BeanValidationProvider {
     private static final Logger LOG = LogUtils.getL7dLogger(BeanValidationProvider.class);
     
     private final ValidatorFactory factory;
+    private ClassLoader validateContextClassloader;
     
     public BeanValidationProvider() {
         try {
@@ -80,7 +81,7 @@ public class BeanValidationProvider {
         Class<javax.validation.spi.ValidationProvider<T>> providerType) {
         this(resolver, providerType, null);
     }
-    
+
     public <T extends Configuration<T>> BeanValidationProvider(
         ValidationProviderResolver resolver,
         Class<javax.validation.spi.ValidationProvider<T>> providerType,
@@ -96,7 +97,15 @@ public class BeanValidationProvider {
             throw ex;
         }
     }
-    
+
+    public ClassLoader getValidateContextClassloader() {
+        return validateContextClassloader;
+    }
+
+    public void setValidateContextClassloader(ClassLoader validateContextClassloader) {
+        this.validateContextClassloader = validateContextClassloader;
+    }
+
     private static void initFactoryConfig(Configuration<?> factoryCfg, ValidationConfiguration cfg) {
         if (cfg != null) {
             factoryCfg.parameterNameProvider(cfg.getParameterNameProvider());
@@ -145,7 +154,16 @@ public class BeanValidationProvider {
     }
     
     private< T > Set<ConstraintViolation< T > > doValidateBean(final T bean) {
-        return factory.getValidator().validate(bean);
+        ClassLoader oldTccl = Thread.currentThread().getContextClassLoader();
+        try {
+            // In OSGi, hibernate's hunt for an EL provided can fail without this.
+            if (validateContextClassloader != null) {
+                Thread.currentThread().setContextClassLoader(validateContextClassloader);
+            }
+            return factory.getValidator().validate(bean);
+        } finally {
+            Thread.currentThread().setContextClassLoader(oldTccl);
+        }
     }
     
     private ExecutableValidator getExecutableValidator() {
