@@ -19,11 +19,15 @@
 
 package org.apache.cxf.osgi.itests.jaxrs;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "Book")
 public class Book {
+    @NotNull
     private String name;
+    @Min(0)
     private long id;
     
     public Book() {
