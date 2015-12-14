@@ -103,6 +103,7 @@ import org.apache.cxf.jaxrs.impl.AsyncResponseImpl;
 import org.apache.cxf.jaxrs.impl.ContainerRequestContextImpl;
 import org.apache.cxf.jaxrs.impl.ContainerResponseContextImpl;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
+import org.apache.cxf.jaxrs.impl.HttpServletRequestFilter;
 import org.apache.cxf.jaxrs.impl.HttpServletResponseFilter;
 import org.apache.cxf.jaxrs.impl.MediaTypeHeaderProvider;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
@@ -1155,7 +1156,8 @@ public final class JAXRSUtils {
         
         Object value = null; 
         if (clazz == HttpServletRequest.class) {
-            value = m.get(AbstractHTTPDestination.HTTP_REQUEST);
+            HttpServletRequest request = (HttpServletRequest)m.get(AbstractHTTPDestination.HTTP_REQUEST);
+            value = request != null ? new HttpServletRequestFilter(request, m) : null;
         } else if (clazz == HttpServletResponse.class) {
             HttpServletResponse response = (HttpServletResponse)m.get(AbstractHTTPDestination.HTTP_RESPONSE);
             value = response != null ? new HttpServletResponseFilter(response, m) : null;
