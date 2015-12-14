@@ -235,15 +235,8 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         //TODO: additionally we can check that the Principal that got authenticated
         // in startAuthorization is the same that got authenticated in completeAuthorization
         
-<<<<<<< HEAD
         Client client = getClient(params);
         String redirectUri = validateRedirectUri(client, params.getFirst(OAuthConstants.REDIRECT_URI));
-=======
-        OAuthRedirectionState state = 
-            recreateRedirectionStateFromSession(userSubject, params, sessionToken);
-        Client client = getClient(state.getClientId());
-        String redirectUri = validateRedirectUri(client, state.getRedirectUri());
->>>>>>> f3646c6... Revert "Make sure the State is always returned to the client on an error"
         
         // Get the end user decision value
         String decision = params.getFirst(OAuthConstants.AUTHORIZATION_DECISION_KEY);
@@ -332,11 +325,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         List<String> uris = client.getRedirectUris();
         if (redirectUri != null) {
             if (!uris.contains(redirectUri)) {
-<<<<<<< HEAD
                 redirectUri = null;
-=======
-                reportInvalidRequestError("Client Redirect Uri is invalid");
->>>>>>> f3646c6... Revert "Make sure the State is always returned to the client on an error"
             } 
         } else if (uris.size() == 1 && useRegisteredRedirectUriIfPossible) {
             redirectUri = uris.get(0);
@@ -398,19 +387,11 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
      *         the error is returned directly to the end user without 
      *         following the redirect URI if any
      */
-<<<<<<< HEAD
     protected Client getClient(MultivaluedMap<String, String> params) {
         Client client = null;
         
         try {
             client = getValidClient(params);
-=======
-    protected Client getClient(String clientId) {
-        Client client = null;
-        
-        try {
-            client = getValidClient(clientId);
->>>>>>> f3646c6... Revert "Make sure the State is always returned to the client on an error"
         } catch (OAuthServiceException ex) {
             if (ex.getError() != null) {
                 reportInvalidRequestError(ex.getError(), null);
@@ -423,12 +404,6 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         return client;
         
     }
-<<<<<<< HEAD
-=======
-    protected Client getClient(MultivaluedMap<String, String> params) {
-        return this.getClient(params.getFirst(OAuthConstants.CLIENT_ID));
-    }
->>>>>>> f3646c6... Revert "Make sure the State is always returned to the client on an error"
     protected String getSupportedGrantType() {
         return this.supportedGrantType;
     }
