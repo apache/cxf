@@ -68,11 +68,18 @@ public final class OAuthClientUtils {
                                           String redirectUri,
                                           String state,
                                           String scope) {
-        return getAuthorizationURIBuilder(authorizationServiceURI, 
+        UriBuilder ub = getAuthorizationURIBuilder(authorizationServiceURI, 
                                                    clientId,
                                                    redirectUri,
                                                    state,
-                                                   scope).build();
+                                                   scope);
+        if (redirectUri != null) {
+            ub.queryParam(OAuthConstants.REDIRECT_URI, redirectUri);
+        }
+        if (state != null) {
+            ub.queryParam(OAuthConstants.STATE, state);
+        }
+        return ub.build();
     }
     
     public static UriBuilder getAuthorizationURIBuilder(String authorizationServiceURI, 
