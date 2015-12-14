@@ -38,12 +38,16 @@ public class OAuthInvoker extends JAXRSInvoker {
     @Override
     protected Object performInvocation(Exchange exchange, final Object serviceObject, Method m,
                                        Object[] paramArray) throws Exception {
+        Message inMessage = exchange.getInMessage();
+        ClientTokenContext tokenContext = inMessage.getContent(ClientTokenContext.class);
         try {
+            if (tokenContext != null) {
+                StaticClientTokenContext.setClientTokenContext(tokenContext);       
+            }
+            
             return super.performInvocation(exchange, serviceObject, m, paramArray);
         } catch (InvocationTargetException ex) {
-            if (ex.getCause() instanceof NotAuthorizedException) {
-                Message inMessage = exchange.getInMessage();
-                ClientTokenContext tokenContext = inMessage.getContent(ClientTokenContext.class);
+            if (tokenContext != null && ex.getCause() instanceof NotAuthorizedException) {
                 ClientAccessToken accessToken = tokenContext.getToken();
                 String refreshToken  = accessToken.getRefreshToken();
                 if (refreshToken != null) {
@@ -57,8 +61,12 @@ public class OAuthInvoker extends JAXRSInvoker {
                     //retry
                     return super.performInvocation(exchange, serviceObject, m, paramArray);
                 }
-            }
+            } 
             throw ex;
+        } finally {
+            if (tokenContext != null) {
+                StaticClientTokenContext.removeClientTokenContext();
+            }
         }
     }
     
