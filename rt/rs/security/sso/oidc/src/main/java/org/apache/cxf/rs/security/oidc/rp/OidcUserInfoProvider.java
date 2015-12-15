@@ -23,17 +23,29 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.oauth2.client.ClientTokenContext;
 import org.apache.cxf.rs.security.oidc.common.UserInfo;
 
-public class OidcUserInfoProvider implements ContextProvider<UserInfo> {
+public class OidcUserInfoProvider implements ContextProvider<UserInfoContext> {
 
     @Override
-    public UserInfo createContext(Message m) {
+    public UserInfoContext createContext(Message m) {
         OidcClientTokenContext ctx = (OidcClientTokenContext)
             m.getContent(ClientTokenContext.class);
-        UserInfo userInfo = ctx != null ? ctx.getUserInfo() : null;
+        final UserInfo userInfo = ctx != null ? ctx.getUserInfo() : m.getContent(UserInfo.class);
         if (userInfo != null) {
-            userInfo.setIdToken(ctx.getIdToken());
+            if (ctx != null) {
+                userInfo.setIdToken(ctx.getIdToken());
+            }
+            return new UserInfoContext() {
+
+                @Override
+                public UserInfo getUserInfo() {
+                    return userInfo;
+                } 
+                
+            };
+        } else {
+            return null;
         }
-        return userInfo;
+        
     }
 
 }

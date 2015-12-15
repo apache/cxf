@@ -18,8 +18,8 @@
  */
 package org.apache.cxf.rs.security.oidc.rp;
 
-import org.apache.cxf.rs.security.oauth2.client.ClientTokenContext;
+import org.apache.cxf.rs.security.oidc.common.UserInfo;
 
-public interface OidcClientTokenContext extends ClientTokenContext,
-    IdTokenContext, UserInfoContext {
+public interface UserInfoContext {
+    UserInfo getUserInfo();
 }
