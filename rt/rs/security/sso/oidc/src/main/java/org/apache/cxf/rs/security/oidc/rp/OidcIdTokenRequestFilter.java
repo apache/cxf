@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.rs.security.oidc.rp;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
@@ -27,6 +28,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.utils.FormUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
@@ -58,6 +60,7 @@ public class OidcIdTokenRequestFilter implements ContainerRequestFilter {
             String body = FormUtils.readBody(rc.getEntityStream(), StandardCharsets.UTF_8.name());
             FormUtils.populateMapFromString(requestState, JAXRSUtils.getCurrentMessage(), body, 
                                             StandardCharsets.UTF_8.name(), false);
+            rc.setEntityStream(new ByteArrayInputStream(StringUtils.toBytesUTF8(body)));
         }
         return requestState;
     }
