@@ -29,9 +29,11 @@ import org.apache.cxf.rs.security.jose.jwk.JwkUtils;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
+import org.apache.cxf.rs.security.jose.jwt.JwtException;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rs.security.jose.jwt.JwtUtils;
 import org.apache.cxf.rs.security.oauth2.provider.AbstractOAuthJoseJwtConsumer;
+import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 
 public abstract class AbstractTokenValidator extends AbstractOAuthJoseJwtConsumer {
     private static final String SELF_ISSUED_ISSUER = "https://self-issued.me";
@@ -54,44 +56,58 @@ public abstract class AbstractTokenValidator extends AbstractOAuthJoseJwtConsume
         // validate the issuer
         String issuer = claims.getIssuer();
         if (issuer == null && validateClaimsAlways) {
-            throw new SecurityException("Invalid provider");
+            throw new OAuthServiceException("Invalid issuer");
         }
         if (supportSelfIssuedProvider && issuerId == null 
             && issuer != null && SELF_ISSUED_ISSUER.equals(issuer)) {
-            //TODO: self-issued provider token validation
+            validateSelfIssuedProvider(claims, clientId, validateClaimsAlways);
         } else {
             if (issuer != null && !issuer.equals(issuerId)) {
-                throw new SecurityException("Invalid provider");
+                throw new OAuthServiceException("Invalid issuer");
             }
             // validate subject
             if (claims.getSubject() == null) {
-                throw new SecurityException("Invalid subject");
+                throw new OAuthServiceException("Invalid subject");
             }
             // validate audience
             List<String> audiences = claims.getAudiences();
             if (StringUtils.isEmpty(audiences) && validateClaimsAlways 
                 || !StringUtils.isEmpty(audiences) && !audiences.contains(clientId)) {
-                throw new SecurityException("Invalid audience");
+                throw new OAuthServiceException("Invalid audience");
             }
     
             // If strict time validation: if no issuedTime claim is set then an expiresAt claim must be set
             // Otherwise: validate only if expiresAt claim is set
             boolean expiredRequired = 
                 validateClaimsAlways || strictTimeValidation && claims.getIssuedAt() == null;
-            JwtUtils.validateJwtExpiry(claims, clockOffset, expiredRequired);
+            try {
+                JwtUtils.validateJwtExpiry(claims, clockOffset, expiredRequired);
+            } catch (JwtException ex) {
+                throw new OAuthServiceException("ID Token has expired", ex);
+            }
             
             // If strict time validation: If no expiresAt claim is set then an issuedAt claim must be set
             // Otherwise: validate only if issuedAt claim is set
             boolean issuedAtRequired = 
                 validateClaimsAlways || strictTimeValidation && claims.getExpiryTime() == null;
-            JwtUtils.validateJwtIssuedAt(claims, ttl, clockOffset, issuedAtRequired);
-            
+            try {
+                JwtUtils.validateJwtIssuedAt(claims, ttl, clockOffset, issuedAtRequired);
+            } catch (JwtException ex) {
+                throw new OAuthServiceException("Invalid issuedAt claim", ex);
+            }
             if (strictTimeValidation) {
-                JwtUtils.validateJwtNotBefore(claims, clockOffset, strictTimeValidation);
+                try {
+                    JwtUtils.validateJwtNotBefore(claims, clockOffset, strictTimeValidation);
+                } catch (JwtException ex) {
+                    throw new OAuthServiceException("ID Token can not be used yet", ex);
+                }    
             }
         }
     }
     
+    private void validateSelfIssuedProvider(JwtClaims claims, String clientId, boolean validateClaimsAlways) {
+    }
+
     public void setIssuerId(String issuerId) {
         this.issuerId = issuerId;
     }
