@@ -23,14 +23,23 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.oauth2.client.ClientTokenContext;
 import org.apache.cxf.rs.security.oidc.common.IdToken;
 
-public class OidcIdTokenProvider implements ContextProvider<IdToken> {
+public class OidcIdTokenProvider implements ContextProvider<IdTokenContext> {
     @Override
-    public IdToken createContext(Message m) {
+    public IdTokenContext createContext(Message m) {
         
         OidcClientTokenContext ctx = (OidcClientTokenContext)m.getContent(ClientTokenContext.class);
-        if (ctx != null) {
-            return ctx.getIdToken();
+        final IdToken idToken = ctx != null ? ctx.getIdToken() : m.getContent(IdToken.class);
+        if (idToken != null) {
+            return new IdTokenContext() {
+
+                @Override
+                public IdToken getIdToken() {
+                    return idToken;
+                }
+                
+            };
+        } else {
+            return null;
         }
-        return m.getContent(IdToken.class);
     }
 }
