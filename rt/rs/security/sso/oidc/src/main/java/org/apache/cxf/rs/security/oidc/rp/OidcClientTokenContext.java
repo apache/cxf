@@ -21,5 +21,5 @@ package org.apache.cxf.rs.security.oidc.rp;
 import org.apache.cxf.rs.security.oauth2.client.ClientTokenContext;
 
 public interface OidcClientTokenContext extends ClientTokenContext,
-    IdTokenContext, UserInfoContext {
+    UserInfoContext {
 }

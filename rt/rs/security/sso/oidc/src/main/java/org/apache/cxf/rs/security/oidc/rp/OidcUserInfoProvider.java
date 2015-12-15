@@ -21,24 +21,28 @@ package org.apache.cxf.rs.security.oidc.rp;
 import org.apache.cxf.jaxrs.ext.ContextProvider;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.oauth2.client.ClientTokenContext;
+import org.apache.cxf.rs.security.oidc.common.IdToken;
 import org.apache.cxf.rs.security.oidc.common.UserInfo;
 
 public class OidcUserInfoProvider implements ContextProvider<UserInfoContext> {
 
     @Override
     public UserInfoContext createContext(Message m) {
-        OidcClientTokenContext ctx = (OidcClientTokenContext)
+        final OidcClientTokenContext ctx = (OidcClientTokenContext)
             m.getContent(ClientTokenContext.class);
         final UserInfo userInfo = ctx != null ? ctx.getUserInfo() : m.getContent(UserInfo.class);
         if (userInfo != null) {
-            if (ctx != null) {
-                userInfo.setIdToken(ctx.getIdToken());
-            }
+            final IdToken idToken = ctx != null ? ctx.getIdToken() : m.getContent(IdToken.class);
             return new UserInfoContext() {
 
                 @Override
                 public UserInfo getUserInfo() {
                     return userInfo;
+                }
+
+                @Override
+                public IdToken getIdToken() {
+                    return idToken;
                 } 
                 
             };
