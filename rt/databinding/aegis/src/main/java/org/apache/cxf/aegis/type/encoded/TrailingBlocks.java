@@ -48,7 +48,6 @@ public class TrailingBlocks {
         // we only work with mapped types
         objectType = new ObjectType();
         objectType.setReadToDocument(false);
-        objectType.setSerializedWhenUnknown(false);
     }
 
     public TrailingBlocks(TypeMapping typeMapping) {
