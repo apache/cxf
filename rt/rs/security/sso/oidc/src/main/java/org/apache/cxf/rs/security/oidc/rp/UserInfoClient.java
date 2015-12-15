@@ -25,6 +25,7 @@ import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rs.security.oauth2.client.Consumer;
 import org.apache.cxf.rs.security.oauth2.client.OAuthClientUtils;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
+import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oidc.common.IdToken;
 import org.apache.cxf.rs.security.oidc.common.UserInfo;
 
@@ -73,7 +74,7 @@ public class UserInfoClient extends AbstractTokenValidator {
         validateJwtClaims(profile, client.getClientId(), false);
         // validate subject
         if (!idToken.getSubject().equals(profile.getSubject())) {
-            throw new SecurityException("Invalid subject");
+            throw new OAuthServiceException("Invalid subject");
         }
     }
     public void setUserInfoServiceClient(WebClient client) {
