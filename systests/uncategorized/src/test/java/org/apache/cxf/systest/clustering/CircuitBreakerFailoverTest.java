@@ -19,8 +19,13 @@
 
 package org.apache.cxf.systest.clustering;
 
+import javax.xml.ws.WebServiceException;
+import javax.xml.ws.soap.SOAPFaultException;
+
+import org.apache.cxf.greeter_control.Greeter;
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 
 /**
  * Tests failover within a static cluster.
@@ -34,7 +39,41 @@ public class CircuitBreakerFailoverTest extends FailoverTest {
     }
     
     @Test
-    public void testDefaultSequentialStrategyWithCircuitBreaker() throws Exception {
-        strategyTest(REPLICA_B, REPLICA_C, REPLICA_E, false);
+    public void testWithNoAlternativeEndpoints() throws Exception {
+        final Greeter g = getGreeter(REPLICA_E);
+        
+        try {
+            g.greetMe("fred");
+            fail("Expecting communication exception");
+        } catch (WebServiceException ex) {
+            assertThat(ex.getMessage(), equalTo("Could not send Message."));
+        }
+
+        try {
+            g.greetMe("fred");
+            fail("Expecting no alternative endpoints exception");
+        } catch (SOAPFaultException ex) {
+            assertThat(ex.getMessage(), equalTo("None of alternative addresses are available at the moment"));
+        }
+    }
+    
+    @Test
+    public void testWithAlternativeEnpdpoints() throws Exception {
+        final Greeter g = getGreeter(REPLICA_A);
+        startTarget(REPLICA_E);
+        
+        try {
+            final String response = g.greetMe("fred");
+            assertNotNull("expected non-null response", response);
+        } finally {
+            stopTarget(REPLICA_E);
+        }
+        
+        try {
+            g.greetMe("fred");
+            fail("Expecting no alternative endpoints exception");
+        } catch (WebServiceException ex) {
+            assertThat(ex.getMessage(), equalTo("Could not send Message."));
+        }
     }
 }
