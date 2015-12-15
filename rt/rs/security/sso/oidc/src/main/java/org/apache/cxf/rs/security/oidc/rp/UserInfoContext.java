@@ -20,6 +20,6 @@ package org.apache.cxf.rs.security.oidc.rp;
 
 import org.apache.cxf.rs.security.oidc.common.UserInfo;
 
-public interface UserInfoContext {
+public interface UserInfoContext extends IdTokenContext {
     UserInfo getUserInfo();
 }

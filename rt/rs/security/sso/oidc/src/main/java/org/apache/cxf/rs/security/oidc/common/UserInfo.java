@@ -24,7 +24,6 @@ import java.util.Map;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 
 public class UserInfo extends AbstractUserInfo {
-    private IdToken idToken;
     public UserInfo() {
     }
     public UserInfo(JwtClaims claims) {
@@ -32,11 +31,5 @@ public class UserInfo extends AbstractUserInfo {
     }
     public UserInfo(Map<String, Object> claims) {
         super(new LinkedHashMap<String, Object>(claims));
-    }
-    public IdToken getIdToken() {
-        return idToken;
-    }
-    public void setIdToken(IdToken idToken) {
-        this.idToken = idToken;
     }
 }
