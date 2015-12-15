@@ -30,6 +30,7 @@ import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jws.JwsException;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
+import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oidc.common.IdToken;
 import org.apache.cxf.rs.security.oidc.common.UserInfo;
 import org.apache.cxf.rt.security.crypto.MessageDigestUtils;
@@ -114,7 +115,7 @@ public final class OidcUtils {
     private static void validateHash(String value, String theHash, SignatureAlgorithm joseAlgo) {
         String hash = calculateHash(value, joseAlgo);
         if (!hash.equals(theHash)) {
-            throw new SecurityException("Invalid hash");
+            throw new OAuthServiceException("Invalid hash");
         }
     }
     public static String calculateAccessTokenHash(String value, SignatureAlgorithm sigAlgo) {
@@ -136,7 +137,7 @@ public final class OidcUtils {
             byte[] digest = MessageDigestUtils.createDigest(atBytes,  javaShaAlgo);
             return Base64UrlUtility.encodeChunk(digest, 0, valueHashSize);
         } catch (NoSuchAlgorithmException ex) {
-            throw new SecurityException(ex);
+            throw new OAuthServiceException(ex);
         }
     }
     
