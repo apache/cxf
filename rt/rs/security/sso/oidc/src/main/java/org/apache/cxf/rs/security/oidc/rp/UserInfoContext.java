@@ -16,20 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.oidc.common;
+package org.apache.cxf.rs.security.oidc.rp;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import org.apache.cxf.rs.security.oidc.common.UserInfo;
 
-import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
-
-public class UserInfo extends AbstractUserInfo {
-    public UserInfo() {
-    }
-    public UserInfo(JwtClaims claims) {
-        this(claims.asMap());
-    }
-    public UserInfo(Map<String, Object> claims) {
-        super(new LinkedHashMap<String, Object>(claims));
-    }
+public interface UserInfoContext extends IdTokenContext {
+    UserInfo getUserInfo();
 }
