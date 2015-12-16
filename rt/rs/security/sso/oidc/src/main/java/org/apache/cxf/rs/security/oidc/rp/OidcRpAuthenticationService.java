@@ -32,7 +32,6 @@ import javax.ws.rs.core.UriBuilder;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.rs.security.oauth2.client.ClientTokenContextManager;
-import org.apache.cxf.rs.security.oidc.common.IdToken;
 
 @Path("rp")
 public class OidcRpAuthenticationService {
@@ -44,9 +43,9 @@ public class OidcRpAuthenticationService {
     @POST
     @Path("signin")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response completeScriptAuthentication(@Context IdToken idToken) {
+    public Response completeScriptAuthentication(@Context IdTokenContext idTokenContext) {
         OidcClientTokenContextImpl ctx = new OidcClientTokenContextImpl();
-        ctx.setIdToken(idToken);
+        ctx.setIdToken(idTokenContext.getIdToken());
         return completeAuthentication(ctx);   
     }
     
