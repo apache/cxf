@@ -88,7 +88,7 @@
         <cxf.hazelcast.version>1.9.4</cxf.hazelcast.version>
         <cxf.httpcomponents.asyncclient.version>4.1</cxf.httpcomponents.asyncclient.version>
         <cxf.httpcomponents.asyncclient.version.range>[4.0,4.2)</cxf.httpcomponents.asyncclient.version.range>
-        <cxf.httpcomponents.client.version>4.4.1</cxf.httpcomponents.client.version>
+        <cxf.httpcomponents.client.version>4.5.1</cxf.httpcomponents.client.version>
         <cxf.httpcomponents.core.version>4.4.1</cxf.httpcomponents.core.version>
         <cxf.httpcomponents.core.version.range>[4.3,4.5.0)</cxf.httpcomponents.core.version.range>
         <cxf.jackson.version>2.4.6</cxf.jackson.version>
@@ -1351,6 +1351,28 @@
                  <groupId>org.springframework.osgi</groupId>
                  <artifactId>spring-osgi-core</artifactId>
                  <version>${cxf.spring.osgi.version}</version>
+                 <exclusions>
+                     <exclusion>
+                         <groupId>org.springframework</groupId>
+                         <artifactId>org.springframework.aop</artifactId>
+                     </exclusion>
+                     <exclusion>
+                         <groupId>org.springframework</groupId>
+                         <artifactId>com.springsource.org.aopalliance</artifactId>
+                     </exclusion>
+                     <exclusion>
+                         <groupId>org.springframework</groupId>
+                         <artifactId>org.springframework.core</artifactId>
+                     </exclusion>
+                     <exclusion>
+                         <groupId>org.springframework</groupId>
+                         <artifactId>org.springframework.context</artifactId>
+                     </exclusion>
+                     <exclusion>
+                         <groupId>org.springframework</groupId>
+                         <artifactId>org.springframework.beans</artifactId>
+                     </exclusion>
+                 </exclusions>
             </dependency>
             <dependency>
                 <groupId>commons-codec</groupId>

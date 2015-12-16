@@ -23,11 +23,12 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
@@ -59,15 +60,12 @@ public class BigQueryService {
     
     @POST
     @Path("/complete")
+    @Consumes("application/x-www-form-urlencoded")
     @Produces("text/html")
-    public BigQueryResponse completeBigQuerySearch() {
+    public BigQueryResponse completeBigQuerySearch(@FormParam("word") String searchWord, 
+                                                   @FormParam("maxResults") String maxResults) {
         
         ClientAccessToken accessToken = oidcContext.getToken();
-        
-        MultivaluedMap<String, String> state = oidcContext.getState();
-        
-        String searchWord = state.getFirst("word");
-        String maxResults = state.getFirst("maxResults");
         
         BigQueryResponse bigQueryResponse = new BigQueryResponse(getUserInfo(), searchWord);
         bigQueryResponse.setTexts(getMatchingTexts(bigQueryClient, accessToken, searchWord, maxResults));

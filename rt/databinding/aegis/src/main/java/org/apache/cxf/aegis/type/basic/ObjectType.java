@@ -18,8 +18,6 @@
  */
 package org.apache.cxf.aegis.type.basic;
 
-import java.io.ByteArrayInputStream;
-import java.io.ObjectInputStream;
 import java.util.Collections;
 import java.util.Set;
 
@@ -33,10 +31,6 @@ import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.type.TypeMapping;
 import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
-import org.apache.cxf.common.util.Base64Utility;
-import org.apache.ws.commons.schema.XmlSchema;
-import org.apache.ws.commons.schema.XmlSchemaSimpleType;
-import org.apache.ws.commons.schema.XmlSchemaSimpleTypeRestriction;
 import org.apache.ws.commons.schema.constants.Constants;
 
 /**
@@ -54,7 +48,6 @@ public class ObjectType extends AegisType {
     private static final QName XSI_NIL = new QName(Constants.URI_2001_SCHEMA_XSI, "nil");
 
     private Set<AegisType> dependencies;
-    private boolean serializedWhenUnknown;
     private boolean readToDocument;
 
     @SuppressWarnings("unchecked")
@@ -67,14 +60,8 @@ public class ObjectType extends AegisType {
         this(dependencies, false);
     }
 
-    @SuppressWarnings("unchecked")
-    public ObjectType(boolean serializeWhenUnknown) {
-        this(Collections.EMPTY_SET, serializeWhenUnknown);
-    }
-
     public ObjectType(Set<AegisType> dependencies, boolean serializeWhenUnknown) {
         this.dependencies = dependencies;
-        this.serializedWhenUnknown = serializeWhenUnknown;
     }
 
     @Override
@@ -132,11 +119,6 @@ public class ObjectType extends AegisType {
         }
 
         if (null == type) {
-            // TODO should check namespace as well..
-            if (serializedWhenUnknown && "serializedJavaObject".equals(typeName)) {
-                return reconstituteJavaObject(reader);
-            }
-
             throw new DatabindingException("No mapped type for '" + typeName + "' (" + typeQName + ")");
         }
 
@@ -154,16 +136,6 @@ public class ObjectType extends AegisType {
         }
     }
 
-    private Object reconstituteJavaObject(MessageReader reader) throws DatabindingException {
-
-        try {
-            ByteArrayInputStream in = new ByteArrayInputStream(Base64Utility
-                                                                   .decode(reader.getValue().trim()));
-            return new ObjectInputStream(in).readObject();
-        } catch (Exception e) {
-            throw new DatabindingException("Unable to reconstitute serialized object", e);
-        }
-    }
 
     private boolean isNil(MessageReader reader) {
         return null != reader && "true".equals(reader.getValue() == null ? "" : reader.getValue());
@@ -241,14 +213,6 @@ public class ObjectType extends AegisType {
         this.readToDocument = readToDocument;
     }
 
-    public boolean isSerializedWhenUnknown() {
-        return serializedWhenUnknown;
-    }
-
-    public void setSerializedWhenUnknown(boolean serializedWhenUnknown) {
-        this.serializedWhenUnknown = serializedWhenUnknown;
-    }
-
     public void setDependencies(Set<AegisType> dependencies) {
         this.dependencies = dependencies;
     }
@@ -263,14 +227,4 @@ public class ObjectType extends AegisType {
         return true;
     }
 
-    @Override
-    public void writeSchema(XmlSchema root) {
-        if (serializedWhenUnknown) {
-            XmlSchemaSimpleType simple = new XmlSchemaSimpleType(root, true);
-            simple.setName("serializedJavaObject");
-            XmlSchemaSimpleTypeRestriction restriction = new XmlSchemaSimpleTypeRestriction();
-            simple.setContent(restriction);
-            restriction.setBaseTypeName(Constants.XSD_BASE64);
-        }
-    }
 }

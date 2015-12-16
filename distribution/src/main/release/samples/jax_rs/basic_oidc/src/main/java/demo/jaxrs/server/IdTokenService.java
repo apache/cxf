@@ -25,21 +25,21 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
-import org.apache.cxf.rs.security.oidc.common.IdToken;
+import org.apache.cxf.rs.security.oidc.rp.IdTokenContext;
 
 @Path("/")
 public class IdTokenService {
     @POST
     @Path("/token")
     @Produces("text/html")
-    public Response getIdTokenFromForm(@Context IdToken idToken) {
-        return getIdToken(idToken);
+    public Response getIdTokenFromForm(@Context IdTokenContext idTokenContext) {
+        return getIdToken(idTokenContext);
     }
     
     @GET
     @Path("/token")
     @Produces("text/html")
-    public Response getIdToken(@Context IdToken idToken) {
-        return Response.ok(idToken).build();
+    public Response getIdToken(@Context IdTokenContext idTokenContext) {
+        return Response.ok(idTokenContext.getIdToken()).build();
     }
 }
