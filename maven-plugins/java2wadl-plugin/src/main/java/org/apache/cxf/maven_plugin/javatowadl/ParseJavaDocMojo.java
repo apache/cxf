@@ -140,7 +140,7 @@ public class ParseJavaDocMojo extends AbstractJavadocMojo {
 
             f = AbstractJavadocMojo.class.getDeclaredField("encoding");
             f.setAccessible(true);
-            f.set(mojo, encoding);
+            f.set(this, encoding);
             
             f = AbstractJavadocMojo.class.getDeclaredField("stylesheet");
             f.setAccessible(true);
