@@ -18,8 +18,6 @@
  */
 package org.apache.cxf.aegis.type.basic;
 
-import java.io.ByteArrayInputStream;
-import java.io.ObjectInputStream;
 import java.util.Collections;
 import java.util.Set;
 
@@ -33,10 +31,6 @@ import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.type.TypeMapping;
 import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
-import org.apache.cxf.common.util.Base64Utility;
-import org.apache.ws.commons.schema.XmlSchema;
-import org.apache.ws.commons.schema.XmlSchemaSimpleType;
-import org.apache.ws.commons.schema.XmlSchemaSimpleTypeRestriction;
 import org.apache.ws.commons.schema.constants.Constants;
 
 /**
@@ -142,16 +136,6 @@ public class ObjectType extends AegisType {
         }
     }
 
-    private Object reconstituteJavaObject(MessageReader reader) throws DatabindingException {
-
-        try {
-            ByteArrayInputStream in = new ByteArrayInputStream(Base64Utility
-                                                                   .decode(reader.getValue().trim()));
-            return new ObjectInputStream(in).readObject();
-        } catch (Exception e) {
-            throw new DatabindingException("Unable to reconstitute serialized object", e);
-        }
-    }
 
     private boolean isNil(MessageReader reader) {
         return null != reader && "true".equals(reader.getValue() == null ? "" : reader.getValue());
