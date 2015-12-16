@@ -48,6 +48,14 @@ import org.codehaus.plexus.archiver.manager.ArchiverManager;
 public class ParseJavaDocMojo extends AbstractJavadocMojo {
 
     /**
+     * The source encoding.
+     * 
+     * @parameter defaultValue = "${project.build.sourceEncoding}"
+     * @required
+     */
+    private String encoding;
+    
+    /**
      * @parameter expression="${project}"
      * @required
      */
@@ -130,6 +138,10 @@ public class ParseJavaDocMojo extends AbstractJavadocMojo {
             f.setAccessible(true);
             f.set(this, "org.apache.cxf.maven_plugin.javatowadl.DumpJavaDoc");
 
+            f = AbstractJavadocMojo.class.getDeclaredField("encoding");
+            f.setAccessible(true);
+            f.set(mojo, encoding);
+            
             f = AbstractJavadocMojo.class.getDeclaredField("stylesheet");
             f.setAccessible(true);
             f.set(this, "stylesheet");
