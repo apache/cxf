@@ -589,6 +589,7 @@
                         </Export-Service>
                         <Bundle-Activator>${cxf.bundle.activator}</Bundle-Activator>
                     </instructions>
+                    <niceManifest>true</niceManifest>
                 </configuration>
             </plugin>
         </plugins>

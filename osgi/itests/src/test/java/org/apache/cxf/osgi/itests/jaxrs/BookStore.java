@@ -21,13 +21,15 @@ package org.apache.cxf.osgi.itests.jaxrs;
 
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
-import javax.validation.Validation;
-import javax.validation.ValidatorFactory;
+import javax.validation.ValidationProviderResolver;
+import javax.validation.spi.ValidationProvider;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -97,19 +99,18 @@ public class BookStore {
     @Path("/books-validate")
     public Response createBookValidate(Book book) {
         assertInjections();
-        BeanValidationProvider prov;
-        ClassLoader oldtccl = Thread.currentThread().getContextClassLoader();
-        try {
-            Thread.currentThread().setContextClassLoader(HibernateValidator.class.getClassLoader());
-            HibernateValidatorConfiguration configuration =
-                    Validation.byProvider(HibernateValidator.class)
-                            .configure();
-            ValidatorFactory factory = configuration.buildValidatorFactory();
-            prov = new BeanValidationProvider(factory);
-        } finally {
-            Thread.currentThread().setContextClassLoader(oldtccl);
-        }
-        prov.setValidateContextClassloader(getClass().getClassLoader());
+
+        BeanValidationProvider prov = new BeanValidationProvider(
+                new ValidationProviderResolver() {
+                    @Override
+                    public List<ValidationProvider<?>> getValidationProviders() {
+                        ValidationProvider<HibernateValidatorConfiguration> prov = new HibernateValidator();
+                        List<ValidationProvider<?>> provs = new ArrayList<>();
+                        provs.add(prov);
+                        return provs;
+                    }
+                }, HibernateValidator.class);
+        //ClassLoader oldtccl = Thread.currentThread().getContextClassLoader();
         try {
             prov.validateBean(book);
         } catch (ConstraintViolationException cve) {

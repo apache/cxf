@@ -32,6 +32,7 @@ import javax.validation.ValidationException;
 import javax.validation.ValidationProviderResolver;
 import javax.validation.ValidatorFactory;
 import javax.validation.executable.ExecutableValidator;
+import javax.validation.spi.ValidationProvider;
 
 import org.apache.cxf.common.logging.LogUtils;
 
@@ -76,15 +77,15 @@ public class BeanValidationProvider {
         this(resolver, null);
     }
     
-    public <T extends Configuration<T>> BeanValidationProvider(
+    public <T extends Configuration<T>, U extends ValidationProvider<T>> BeanValidationProvider(
         ValidationProviderResolver resolver,
-        Class<javax.validation.spi.ValidationProvider<T>> providerType) {
+        Class<U> providerType) {
         this(resolver, providerType, null);
     }
 
-    public <T extends Configuration<T>> BeanValidationProvider(
+    public <T extends Configuration<T>, U extends ValidationProvider<T>> BeanValidationProvider(
         ValidationProviderResolver resolver,
-        Class<javax.validation.spi.ValidationProvider<T>> providerType,
+        Class<U> providerType,
         ValidationConfiguration cfg) {
         try {
             Configuration<?> factoryCfg = providerType != null 
