@@ -110,7 +110,7 @@ public class BookStore {
                         return provs;
                     }
                 }, HibernateValidator.class);
-        //ClassLoader oldtccl = Thread.currentThread().getContextClassLoader();
+        prov.setValidateContextClassloader(getClass().getClassLoader());
         try {
             prov.validateBean(book);
         } catch (ConstraintViolationException cve) {
@@ -119,8 +119,8 @@ public class BookStore {
                 violationMessages.append(constraintViolation.getPropertyPath())
                         .append(": ").append(constraintViolation.getMessage()).append("\n");
             }
-            return Response.status(Response.Status.BAD_REQUEST).type("text/plain")
-                    .entity(violationMessages.toString()).build();
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .type("text/plain").entity(violationMessages.toString()).build();
         }
         return createBook(book);
     }
