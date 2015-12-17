@@ -32,6 +32,7 @@ import javax.validation.ValidationException;
 import javax.validation.ValidationProviderResolver;
 import javax.validation.ValidatorFactory;
 import javax.validation.executable.ExecutableValidator;
+import javax.validation.spi.ValidationProvider;
 
 import org.apache.cxf.common.logging.LogUtils;
 
@@ -39,8 +40,7 @@ public class BeanValidationProvider {
     private static final Logger LOG = LogUtils.getL7dLogger(BeanValidationProvider.class);
     
     private final ValidatorFactory factory;
-    private ClassLoader validateContextClassloader;
-    
+
     public BeanValidationProvider() {
         try {
             factory = Validation.buildDefaultValidatorFactory();
@@ -76,15 +76,15 @@ public class BeanValidationProvider {
         this(resolver, null);
     }
     
-    public <T extends Configuration<T>> BeanValidationProvider(
+    public <T extends Configuration<T>, U extends ValidationProvider<T>> BeanValidationProvider(
         ValidationProviderResolver resolver,
-        Class<javax.validation.spi.ValidationProvider<T>> providerType) {
+        Class<U> providerType) {
         this(resolver, providerType, null);
     }
 
-    public <T extends Configuration<T>> BeanValidationProvider(
+    public <T extends Configuration<T>, U extends ValidationProvider<T>> BeanValidationProvider(
         ValidationProviderResolver resolver,
-        Class<javax.validation.spi.ValidationProvider<T>> providerType,
+        Class<U> providerType,
         ValidationConfiguration cfg) {
         try {
             Configuration<?> factoryCfg = providerType != null 
@@ -96,14 +96,6 @@ public class BeanValidationProvider {
             LOG.severe("Bean Validation provider can not be found, no validation will be performed");
             throw ex;
         }
-    }
-
-    public ClassLoader getValidateContextClassloader() {
-        return validateContextClassloader;
-    }
-
-    public void setValidateContextClassloader(ClassLoader validateContextClassloader) {
-        this.validateContextClassloader = validateContextClassloader;
     }
 
     private static void initFactoryConfig(Configuration<?> factoryCfg, ValidationConfiguration cfg) {
@@ -154,16 +146,7 @@ public class BeanValidationProvider {
     }
     
     private< T > Set<ConstraintViolation< T > > doValidateBean(final T bean) {
-        ClassLoader oldTccl = Thread.currentThread().getContextClassLoader();
-        try {
-            // In OSGi, hibernate's hunt for an EL provided can fail without this.
-            if (validateContextClassloader != null) {
-                Thread.currentThread().setContextClassLoader(validateContextClassloader);
-            }
-            return factory.getValidator().validate(bean);
-        } finally {
-            Thread.currentThread().setContextClassLoader(oldTccl);
-        }
+        return factory.getValidator().validate(bean);
     }
     
     private ExecutableValidator getExecutableValidator() {
