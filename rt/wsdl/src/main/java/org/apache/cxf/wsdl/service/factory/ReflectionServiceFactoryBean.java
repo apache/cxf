@@ -1485,7 +1485,7 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
         serviceInfo.addSchema(schemaInfo);
         return schemaInfo;
     }
-
+    // CHECKSTYLE:OFF
     protected void createMessageParts(InterfaceInfo intf, OperationInfo op, Method method) {
         final Class<?>[] paramClasses = method.getParameterTypes();
         // Setup the input message
@@ -1493,6 +1493,7 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
         MessageInfo inMsg = op.createMessage(this.getInputMessageName(op, method), MessageInfo.Type.INPUT);
         op.setInput(inMsg.getName().getLocalPart(), inMsg);
         final Annotation[][] parAnnotations = method.getParameterAnnotations();
+    // CHECKSTYLE:ON
         final Type[] genParTypes = method.getGenericParameterTypes();
         for (int j = 0; j < paramClasses.length; j++) {
             if (Exchange.class.equals(paramClasses[j])) {
@@ -1508,9 +1509,12 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
                     q = new QName(q.getNamespaceURI(), q.getLocalPart() + j);
                 }
                 MessagePartInfo part = inMsg.addMessagePart(partName);
-
-
-
+                
+                if (isHolder(paramClasses[j], genParTypes[j]) && !isInOutParam(method, j)) {
+                    LOG.log(Level.WARNING, "INVALID_WEBPARAM_MODE", getServiceClass().getName() + "."
+                                                                    + method.getName());
+                }
+                // CHECKSTYLE:ON
                 initializeParameter(part, paramClasses[j], genParTypes[j]);
                 //TODO:remove method param annotations
                 part.setProperty(METHOD_PARAM_ANNOTATIONS, parAnnotations);
@@ -1997,6 +2001,16 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
     protected boolean isInParam(Method method, int j) {
         for (AbstractServiceConfiguration c : serviceConfigurations) {
             Boolean b = c.isInParam(method, j);
+            if (b != null) {
+                return b.booleanValue();
+            }
+        }
+        return true;
+    }
+    
+    protected boolean isInOutParam(Method method, int j) {
+        for (AbstractServiceConfiguration c : serviceConfigurations) {
+            Boolean b = c.isInOutParam(method, j);
             if (b != null) {
                 return b.booleanValue();
             }

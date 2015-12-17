@@ -1,4 +1,4 @@
-<%@ page import="javax.servlet.http.HttpServletRequest, java.util.Map, org.apache.cxf.rs.security.oidc.common.IdToken" %>
+<%@ page import="javax.servlet.http.HttpServletRequest, org.apache.cxf.rs.security.oidc.common.IdToken" %>
 
 <%
     IdToken token = (IdToken) request.getAttribute("data");
@@ -23,11 +23,11 @@
 <table border="1">
     <tr><th><big><big>Property</big></big></th><th><big><big>Value</big></big></th></tr> 
     <%
-       for (Map.Entry<String, Object> entry : token.asMap().entrySet()) {
+       for (String key : token.asMap().keySet()) {
     %>
     <tr>
-       <td><big><%= entry.getKey() %></big></big></td>
-       <td><big><big><%= entry.getValue().toString() %></big></big></td>
+       <td><big><%= key %></big></big></td>
+       <td><big><big><%= token.asMap().get(key).toString() %></big></big></td>
     </tr>
     <%
        }
