@@ -40,8 +40,7 @@ public class BeanValidationProvider {
     private static final Logger LOG = LogUtils.getL7dLogger(BeanValidationProvider.class);
     
     private final ValidatorFactory factory;
-    private ClassLoader validateContextClassloader;
-    
+
     public BeanValidationProvider() {
         try {
             factory = Validation.buildDefaultValidatorFactory();
@@ -99,14 +98,6 @@ public class BeanValidationProvider {
         }
     }
 
-    public ClassLoader getValidateContextClassloader() {
-        return validateContextClassloader;
-    }
-
-    public void setValidateContextClassloader(ClassLoader validateContextClassloader) {
-        this.validateContextClassloader = validateContextClassloader;
-    }
-
     private static void initFactoryConfig(Configuration<?> factoryCfg, ValidationConfiguration cfg) {
         if (cfg != null) {
             factoryCfg.parameterNameProvider(cfg.getParameterNameProvider());
@@ -155,16 +146,7 @@ public class BeanValidationProvider {
     }
     
     private< T > Set<ConstraintViolation< T > > doValidateBean(final T bean) {
-        ClassLoader oldTccl = Thread.currentThread().getContextClassLoader();
-        try {
-            // In OSGi, hibernate's hunt for an EL provided can fail without this.
-            if (validateContextClassloader != null) {
-                Thread.currentThread().setContextClassLoader(validateContextClassloader);
-            }
-            return factory.getValidator().validate(bean);
-        } finally {
-            Thread.currentThread().setContextClassLoader(oldTccl);
-        }
+        return factory.getValidator().validate(bean);
     }
     
     private ExecutableValidator getExecutableValidator() {
