@@ -443,7 +443,7 @@
     <feature name="cxf-bean-validation-core" version="${project.version}" resolver="(obr)">
         <!-- This feature has the wrong name; it's hibernate-only. Fix up in 3.2.0? Move all this to the
         hibernate-bean-validation-helper feature -->
-        <bundle start-level="30" dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.hibernate-validator/${cxf.hibernate-validator.bundle.version}</bundle>
+        <bundle start-level="30" dependency="true">mvn:org.hibernate/hibernate-validator/${cxf.hibernate.validator.version}</bundle>
         <bundle start-level="30" dependency="true">mvn:javax.validation/validation-api/${cxf.validation.api.version}</bundle>
         <!-- The servicemix bundle for hibernate demands joda-time -->
         <bundle start-level="30" dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.joda-time/${cxf.servicemix.jodatime.version}</bundle>

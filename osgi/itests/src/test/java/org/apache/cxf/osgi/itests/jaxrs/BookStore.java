@@ -110,7 +110,7 @@ public class BookStore {
                         return provs;
                     }
                 }, HibernateValidator.class);
-        prov.setValidateContextClassloader(getClass().getClassLoader());
+        //prov.setValidateContextClassloader(getClass().getClassLoader());
         try {
             prov.validateBean(book);
         } catch (ConstraintViolationException cve) {
