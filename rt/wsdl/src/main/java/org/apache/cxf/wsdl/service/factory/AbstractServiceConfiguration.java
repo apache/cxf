@@ -79,6 +79,10 @@ public abstract class AbstractServiceConfiguration {
     public Boolean isInParam(Method method, int j) {
         return null;
     }
+    
+    public Boolean isInOutParam(Method method, int j) {
+        return null;
+    }
 
     public QName getInputMessageName(final OperationInfo op, Method method) {
         return null;
