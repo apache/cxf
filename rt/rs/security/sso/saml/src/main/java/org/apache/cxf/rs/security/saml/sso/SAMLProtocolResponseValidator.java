@@ -123,32 +123,15 @@ public class SAMLProtocolResponseValidator {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
             }
         }
-<<<<<<< HEAD
         
         validateResponseAgainstSchemas(samlResponse);
-=======
-
-        if (SAMLVersion.VERSION_20 != samlResponse.getVersion()) {
-            LOG.fine(
-                "SAML Version of " + samlResponse.getVersion()
-                + "does not equal " + SAMLVersion.VERSION_20
-            );
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
-        }
-
->>>>>>> 078d14e... Default to default identifier if no keyInfo is available
         validateResponseSignature(samlResponse, sigCrypto, callbackHandler);
 
         Document doc = samlResponse.getDOM().getOwnerDocument();
         // Decrypt any encrypted Assertions and add them to the Response (note that this will break any
         // signature on the Response)
-<<<<<<< HEAD
         for (org.opensaml.saml2.core.EncryptedAssertion assertion : samlResponse.getEncryptedAssertions()) {
             
-=======
-        for (org.opensaml.saml.saml2.core.EncryptedAssertion assertion : samlResponse.getEncryptedAssertions()) {
-
->>>>>>> 078d14e... Default to default identifier if no keyInfo is available
             Element decAssertion = decryptAssertion(assertion, sigCrypto, callbackHandler);
 
             SamlAssertionWrapper wrapper = new SamlAssertionWrapper(decAssertion);
@@ -198,20 +181,8 @@ public class SAMLProtocolResponseValidator {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
             }
         }
-<<<<<<< HEAD
         
         validateResponseAgainstSchemas(samlResponse);
-=======
-
-        if (SAMLVersion.VERSION_11 != samlResponse.getVersion()) {
-            LOG.fine(
-                "SAML Version of " + samlResponse.getVersion()
-                + "does not equal " + SAMLVersion.VERSION_11
-            );
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
-        }
-
->>>>>>> 078d14e... Default to default identifier if no keyInfo is available
         validateResponseSignature(samlResponse, sigCrypto, callbackHandler);
 
         // Validate Assertions
@@ -347,11 +318,7 @@ public class SAMLProtocolResponseValidator {
 
     protected SAMLKeyInfo createKeyInfoFromDefaultAlias(Crypto sigCrypto) throws WSSecurityException {
         try {
-<<<<<<< HEAD
             X509Certificate[] certs = SecurityUtils.getCertificates(sigCrypto, 
-=======
-            X509Certificate[] certs = RSSecurityUtils.getCertificates(sigCrypto,
->>>>>>> 078d14e... Default to default identifier if no keyInfo is available
                                                                     sigCrypto.getDefaultX509Identifier());
             SAMLKeyInfo samlKeyInfo = new SAMLKeyInfo(new X509Certificate[]{certs[0]});
             samlKeyInfo.setPublicKey(certs[0].getPublicKey());
@@ -469,12 +436,7 @@ public class SAMLProtocolResponseValidator {
     ) throws WSSecurityException {
         EncryptedData encryptedData = assertion.getEncryptedData();
         Element encryptedDataDOM = encryptedData.getDOM();
-<<<<<<< HEAD
         Element encKeyElement = getNode(assertion.getDOM(), WSConstants.ENC_NS, "EncryptedKey", 0);
-=======
-
-        Element encKeyElement = getNode(assertion.getDOM(), WSS4JConstants.ENC_NS, "EncryptedKey", 0);
->>>>>>> 078d14e... Default to default identifier if no keyInfo is available
         if (encKeyElement == null) {
             encKeyElement = getNode(encryptedDataDOM, WSConstants.ENC_NS, "EncryptedKey", 0);
         }
@@ -492,13 +454,8 @@ public class SAMLProtocolResponseValidator {
         // now start decrypting
         String keyEncAlgo = getEncodingMethodAlgorithm(encKeyElement);
         String digestAlgo = getDigestMethodAlgorithm(encKeyElement);
-<<<<<<< HEAD
         
         Element cipherValue = getNode(encKeyElement, WSConstants.ENC_NS, "CipherValue", 0);
-=======
-
-        Element cipherValue = getNode(encKeyElement, WSS4JConstants.ENC_NS, "CipherValue", 0);
->>>>>>> 078d14e... Default to default identifier if no keyInfo is available
         if (cipherValue == null) {
             LOG.fine("CipherValue element is not available");
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
@@ -585,7 +542,7 @@ public class SAMLProtocolResponseValidator {
         if (crypto.getDefaultX509Identifier() != null) {
             try {
                 X509Certificate[] certs =
-                    RSSecurityUtils.getCertificates(crypto, crypto.getDefaultX509Identifier());
+                    SecurityUtils.getCertificates(crypto, crypto.getDefaultX509Identifier());
                 if (certs.length > 0) {
                     return certs[0];
                 }
