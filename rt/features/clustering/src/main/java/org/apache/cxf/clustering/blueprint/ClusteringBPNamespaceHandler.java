@@ -29,7 +29,7 @@ import org.apache.aries.blueprint.Namespaces;
 import org.apache.aries.blueprint.ParserContext;
 import org.apache.cxf.clustering.FailoverFeature;
 import org.apache.cxf.clustering.LoadDistributorFeature;
-import org.apache.cxf.configuration.blueprint.SimpleBPBeanDefinitionParser;
+import org.apache.cxf.clustering.circuitbreaker.CircuitBreakerFailoverFeature;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.osgi.service.blueprint.reflect.Metadata;
 
@@ -42,9 +42,11 @@ public class ClusteringBPNamespaceHandler implements NamespaceHandler {
     public Metadata parse(Element element, ParserContext context) {
         String s = element.getLocalName();
         if ("failover".equals(s)) {
-            return new SimpleBPBeanDefinitionParser(FailoverFeature.class).parse(element, context);
+            return new ClusteringBPBeanDefinitionParser(FailoverFeature.class).parse(element, context);
         } else if ("loadDistributor".equals(s)) {
-            return new SimpleBPBeanDefinitionParser(LoadDistributorFeature.class).parse(element, context);
+            return new ClusteringBPBeanDefinitionParser(LoadDistributorFeature.class).parse(element, context);
+        } else if ("circuit-breaker-failover".equals(s)) {
+            return new ClusteringBPBeanDefinitionParser(CircuitBreakerFailoverFeature.class).parse(element, context);
         }
         return null;
     }

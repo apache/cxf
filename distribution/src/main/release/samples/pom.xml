@@ -110,6 +110,8 @@
         <module>ws_eventing</module>
         <module>throttling</module>
         <module>jax_rs/tracing_htrace</module>
+        <module>clustering/failover_jaxws_osgi</module>
+        <module>clustering/failover_server</module>
         
         <!--
          These are removed from the build as they currently don't inherit the parent from 
