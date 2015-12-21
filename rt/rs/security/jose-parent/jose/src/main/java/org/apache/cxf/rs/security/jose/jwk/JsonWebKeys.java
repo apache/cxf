@@ -29,6 +29,8 @@ import org.apache.cxf.jaxrs.json.basic.JsonMapObject;
 
 public class JsonWebKeys extends JsonMapObject {
     public static final String KEYS_PROPERTY = "keys";
+    private static final long serialVersionUID = -8002543601655429723L;
+    
     public JsonWebKeys() {
         
     }

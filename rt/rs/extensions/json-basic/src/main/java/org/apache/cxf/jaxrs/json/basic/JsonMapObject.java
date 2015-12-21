@@ -19,11 +19,13 @@
 
 package org.apache.cxf.jaxrs.json.basic;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class JsonMapObject {
+public class JsonMapObject implements Serializable {
+    private static final long serialVersionUID = 2620765136328623790L;
     Map<String, Integer> updateCount;
     Map<String, Object> values = new LinkedHashMap<String, Object>();
     public JsonMapObject() {
