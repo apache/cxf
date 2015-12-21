@@ -32,6 +32,8 @@ import org.apache.cxf.jaxrs.json.basic.JsonMapObject;
 
 public class JwtClaims extends JsonMapObject {
     
+    private static final long serialVersionUID = 6274136637301800283L;
+
     public JwtClaims() {
     }
     

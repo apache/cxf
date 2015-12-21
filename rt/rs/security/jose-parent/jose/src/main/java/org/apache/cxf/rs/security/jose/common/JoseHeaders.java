@@ -27,6 +27,8 @@ import org.apache.cxf.jaxrs.json.basic.JsonMapObject;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 
 public abstract class JoseHeaders extends JsonMapObject {
+    private static final long serialVersionUID = 1101185302425283553L;
+
     public JoseHeaders() {
     }
     
