@@ -73,7 +73,6 @@ public class JaxRsServiceTest extends CXFOSGiTestSupport {
         Assert.assertNotNull(response.getLocation());
     }
 
-    //@Ignore("this passes with Karaf 4, but not with the test rig here.")
     @Test
     public void postWithValidation() throws Exception {
         Book book = new Book();

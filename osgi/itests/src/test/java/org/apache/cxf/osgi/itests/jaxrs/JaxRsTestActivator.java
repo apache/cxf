@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.osgi.itests.jaxrs;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.osgi.framework.BundleActivator;
@@ -29,7 +31,10 @@ public class JaxRsTestActivator implements BundleActivator {
 
     @Override
     public void start(BundleContext arg0) throws Exception {
+        Bus bus = BusFactory.newInstance().createBus();
+        bus.setExtension(JaxRsTestActivator.class.getClassLoader(), ClassLoader.class);
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
+        sf.setBus(bus);
         sf.setResourceClasses(BookStore.class);
         sf.setAddress("/jaxrs");
         server = sf.create();
