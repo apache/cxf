@@ -34,6 +34,7 @@ import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 
 
 public class JweHeaders extends JoseHeaders {
+    private static final long serialVersionUID = 2405157132884168551L;
     private JweHeaders protectedHeaders;
     public JweHeaders() {
     }

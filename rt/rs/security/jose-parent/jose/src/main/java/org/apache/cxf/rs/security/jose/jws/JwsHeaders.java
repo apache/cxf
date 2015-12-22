@@ -27,6 +27,7 @@ import org.apache.cxf.rs.security.jose.common.JoseType;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 
 public class JwsHeaders extends JoseHeaders {
+    private static final long serialVersionUID = 3422779299093961672L;
     public JwsHeaders() {
     }
     public JwsHeaders(JoseType type) {

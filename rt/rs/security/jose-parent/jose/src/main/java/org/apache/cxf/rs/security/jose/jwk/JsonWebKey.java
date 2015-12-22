@@ -73,6 +73,8 @@ public class JsonWebKey extends JsonMapObject {
     public static final String KEY_OPER_DERIVE_KEY = "deriveKey";
     public static final String KEY_OPER_DERIVE_BITS = "deriveBits";
     
+    private static final long serialVersionUID = 3201315996547826368L;
+    
     public JsonWebKey() {
         
     }

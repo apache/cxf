@@ -29,13 +29,13 @@ public class JwtToken {
     private JwtClaims claims;
     
     public JwtToken(JwtClaims claims) {
-        this(new JwsHeaders() { }, new JweHeaders() { }, claims);
+        this(new JwsHeaders(), new JweHeaders(), claims);
     }
     public JwtToken(JwsHeaders jwsHeaders, JwtClaims claims) {
-        this(jwsHeaders, new JweHeaders() { }, claims);
+        this(jwsHeaders, new JweHeaders(), claims);
     }
     public JwtToken(JweHeaders jweHeaders, JwtClaims claims) {
-        this(new JwsHeaders() { }, jweHeaders, claims);
+        this(new JwsHeaders(), jweHeaders, claims);
     }
     public JwtToken(JwsHeaders jwsHeaders, JweHeaders jweHeaders, JwtClaims claims) {
         this.jwsHeaders = jwsHeaders;

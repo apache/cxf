@@ -43,6 +43,8 @@ public abstract class AbstractUserInfo extends JwtClaims {
     public static final String PHONE_VERIFIED_CLAIM = "phone_number_verified";
     public static final String ADDRESS_CLAIM = "address";
     public static final String UPDATED_AT_CLAIM = "updated_at";
+    private static final long serialVersionUID = 4554501320190745304L;
+    
     public AbstractUserInfo() {
     }
     public AbstractUserInfo(JwtClaims claims) {
