@@ -64,7 +64,7 @@ public class GZIPOutInterceptor extends AbstractPhaseInterceptor<Message> {
      * Enum giving the possible values for whether we should gzip a particular
      * message.
      */
-    enum UseGzip {
+    public enum UseGzip {
         NO, YES, FORCE
     }
     
