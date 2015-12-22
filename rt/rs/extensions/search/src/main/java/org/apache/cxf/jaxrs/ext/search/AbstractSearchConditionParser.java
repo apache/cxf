@@ -67,6 +67,16 @@ public abstract class AbstractSearchConditionParser<T> implements SearchConditio
     
     protected String getActualSetterName(String setter) {
         String beanPropertyName = beanPropertiesMap == null ? null : beanPropertiesMap.get(setter);
+        if (beanPropertyName == null) {
+            Message m = JAXRSUtils.getCurrentMessage();
+            if (m != null) {
+                Object converterProp = m.getContextualProperty(SearchUtils.BEAN_PROPERTY_CONVERTER);
+                if (converterProp != null) {
+                    PropertyNameConverter converter = (PropertyNameConverter)converterProp;
+                    beanPropertyName = converter.getPropertyName(setter);
+                }
+            }
+        }
         return beanPropertyName != null ? beanPropertyName : setter;
     }
     
