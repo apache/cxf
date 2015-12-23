@@ -78,7 +78,7 @@ public class CacheMap<K, V> implements Map<K, V> {
             || extraKeyMap.containsValue(value);
     }
 
-    public Set<java.util.Map.Entry<K, V>> entrySet() {
+    public Set<Map.Entry<K, V>> entrySet() {
         updateMainDataMap();
         return mainDataMap.entrySet();
     }

@@ -143,22 +143,22 @@ public class ResourceInjector extends AbstractAnnotationVisitor {
 
     // Implementation of org.apache.cxf.common.annotation.AnnotationVisitor
 
-    public final void visitClass(final Class<?> clz, final Annotation annotation) {
+    public final void visitClass(final Class<?> clz, final Annotation annotation) { //NOPMD
         
         assert annotation instanceof Resource || annotation instanceof Resources : annotation; 
 
         if (annotation instanceof Resource) { 
-            injectResourceClassLevel(clz, (Resource)annotation); 
+            injectResourceClassLevel((Resource)annotation); 
         } else if (annotation instanceof Resources) { 
             Resources resources = (Resources)annotation;
             for (Resource resource : resources.value()) {
-                injectResourceClassLevel(clz, resource); 
+                injectResourceClassLevel(resource); 
             }
         } 
 
     }
 
-    private void injectResourceClassLevel(Class<?> clz, Resource res) { 
+    private void injectResourceClassLevel(Resource res) { 
         if (res.name() == null || "".equals(res.name())) { 
             LOG.log(Level.INFO, "RESOURCE_NAME_NOT_SPECIFIED", target.getClass().getName());
             return;

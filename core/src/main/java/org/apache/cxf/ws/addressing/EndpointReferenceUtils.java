@@ -906,7 +906,7 @@ public final class EndpointReferenceUtils {
     }
     public static Source convertToXML(EndpointReferenceType epr) {
         try {
-            javax.xml.bind.Marshaller jm = getJAXBContextForEPR().createMarshaller();
+            Marshaller jm = getJAXBContextForEPR().createMarshaller();
             jm.setProperty(Marshaller.JAXB_FRAGMENT, true);
             QName qname = new QName("http://www.w3.org/2005/08/addressing", "EndpointReference");
             JAXBElement<EndpointReferenceType> jaxEle

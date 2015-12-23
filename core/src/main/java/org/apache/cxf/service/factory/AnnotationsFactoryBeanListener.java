@@ -142,7 +142,7 @@ public class AnnotationsFactoryBeanListener implements FactoryBeanListener {
             if (props != null) {
                 addEndpointProperties(server.getEndpoint(), bus, props.value());
             }
-            setScope(factory, server, cls);
+            setScope(server, cls);
             break;
         }
         case INTERFACE_OPERATION_BOUND: {
@@ -168,7 +168,7 @@ public class AnnotationsFactoryBeanListener implements FactoryBeanListener {
         }
     }
 
-    private void setScope(AbstractServiceFactoryBean factory, Server server, Class<?> cls) {
+    private void setScope(Server server, Class<?> cls) {
         FactoryType scope = cls.getAnnotation(FactoryType.class);
         if (scope != null) {
             Invoker i = server.getEndpoint().getService().getInvoker();

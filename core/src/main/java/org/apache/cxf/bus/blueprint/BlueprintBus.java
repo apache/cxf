@@ -42,10 +42,6 @@ public class BlueprintBus extends ExtensionManagerBus {
         super(null, null, BlueprintBus.class.getClassLoader());
     }
     
-    public void loadAdditionalFeatures() {
-        super.loadAdditionalFeatures();
-    }
-    
     public void setBundleContext(final BundleContext c) {
         context = c;
         ClassLoader bundleClassLoader =

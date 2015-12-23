@@ -256,8 +256,6 @@ class ProxyClass implements InvocationHandler {
             // Do nothing here
         } catch (Exception eBj) {
             eBj.printStackTrace();
-        } finally {
-            // Do something after the method is called ...
         }
         return result;
     }

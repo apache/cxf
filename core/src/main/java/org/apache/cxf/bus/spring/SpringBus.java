@@ -49,10 +49,6 @@ public class SpringBus extends ExtensionManagerBus
         bc.setBus(this);
     }
     
-    public void loadAdditionalFeatures() {
-        super.loadAdditionalFeatures();
-    }
-    
     /** {@inheritDoc}*/
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         ctx = (AbstractApplicationContext)applicationContext;

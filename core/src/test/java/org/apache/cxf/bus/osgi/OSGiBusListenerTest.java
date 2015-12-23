@@ -86,7 +86,7 @@ public class OSGiBusListenerTest extends Assert {
         setUpClientLifeCycleListeners(SERVICE_BUNDLE_NAMES, new String[]{null, null}, null);
         setUpServerLifeCycleListeners(SERVICE_BUNDLE_NAMES, new String[]{null, null}, null);
         Collection<Feature> lst = new ArrayList<Feature>();
-        setFeatures(SERVICE_BUNDLE_NAMES, new String[]{null, null}, null, lst);
+        setFeatures(SERVICE_BUNDLE_NAMES, new String[]{null, null}, lst);
         
         control.replay();
         new OSGIBusListener(bus, new Object[]{bundleContext});
@@ -101,7 +101,7 @@ public class OSGiBusListenerTest extends Assert {
         setUpClientLifeCycleListeners(SERVICE_BUNDLE_NAMES, new String[]{null, null}, EXCLUDES);
         setUpServerLifeCycleListeners(SERVICE_BUNDLE_NAMES, new String[]{null, null}, EXCLUDES);
         Collection<Feature> lst = new ArrayList<Feature>();
-        setFeatures(SERVICE_BUNDLE_NAMES, new String[]{null, null}, EXCLUDES, lst);
+        setFeatures(SERVICE_BUNDLE_NAMES, new String[]{null, null}, lst);
         EasyMock.expect(bus.getProperty("bus.extension.bundles.excludes")).andReturn(EXCLUDES);
         control.replay();
         new OSGIBusListener(bus, new Object[]{bundleContext});
@@ -116,7 +116,7 @@ public class OSGiBusListenerTest extends Assert {
         setUpClientLifeCycleListeners(SERVICE_BUNDLE_NAMES, new String[]{RESTRICTED, null}, EXCLUDES);
         setUpServerLifeCycleListeners(SERVICE_BUNDLE_NAMES, new String[]{RESTRICTED, null}, EXCLUDES);
         Collection<Feature> lst = new ArrayList<Feature>();
-        setFeatures(SERVICE_BUNDLE_NAMES, new String[]{RESTRICTED, null}, EXCLUDES, lst);
+        setFeatures(SERVICE_BUNDLE_NAMES, new String[]{RESTRICTED, null}, lst);
         EasyMock.expect(bus.getProperty("bus.extension.bundles.excludes")).andReturn(EXCLUDES);
         control.replay();
         new OSGIBusListener(bus, new Object[]{bundleContext});
@@ -158,7 +158,7 @@ public class OSGiBusListenerTest extends Assert {
         }
     }
 
-    private void setFeatures(String[] names, String[] restricted, String excludes, 
+    private void setFeatures(String[] names, String[] restricted, 
                              Collection<Feature> lst) throws Exception {
         ServiceReference[] svcrefs = createTestServiceReferences(names, restricted);
         EasyMock.expect(bundleContext.getServiceReferences(Feature.class.getName(), null))

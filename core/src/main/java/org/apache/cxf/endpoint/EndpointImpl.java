@@ -185,8 +185,20 @@ public class EndpointImpl extends AbstractAttributedInterceptorProvider implemen
         activeFeatures = CastUtils.cast(features);
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof EndpointImpl)) {
+            return false;
+        }
+        
+        return super.equals(obj);
+    }
+    
     /**
-     * Returns the hashCode bsed on the EndpointInfo so that this object
+     * Returns the hashCode based on the EndpointInfo so that this object
      * can be used as a map key.
      */
     @Override
