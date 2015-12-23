@@ -139,7 +139,7 @@ public class InTransformReader extends DepthXMLStreamReader {
 
             if (null != appendProp && !replaceContent) {
                 // handle one of the four append modes
-                handleAppendMode(theName, expected, appendProp);
+                handleAppendMode(expected, appendProp);
             } else if (replaceContent) {
                 replaceText = appendProp.getText();
                 if (doDebug) {
@@ -201,7 +201,7 @@ public class InTransformReader extends DepthXMLStreamReader {
     }
 
     
-    private void handleAppendMode(QName name, QName expected, ElementProperty appendProp) {
+    private void handleAppendMode(QName expected, ElementProperty appendProp) {
         final boolean doDebug = LOG.isLoggable(Level.FINE);
         if (appendProp.isChild()) {
             // ap-post-*

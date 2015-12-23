@@ -164,8 +164,8 @@ public class ServiceModelVisitor {
     }
     public void end(EndpointInfo endpointInfo) {
     }
-    private void begin(BindingInfo bindingInfo) {
+    public void begin(BindingInfo bindingInfo) {
     }
-    private void end(BindingInfo bindingInfo) {
+    public void end(BindingInfo bindingInfo) {
     }
 }
