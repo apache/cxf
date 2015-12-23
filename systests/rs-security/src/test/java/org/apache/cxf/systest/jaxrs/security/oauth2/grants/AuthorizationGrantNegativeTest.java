@@ -731,9 +731,7 @@ public class AuthorizationGrantNegativeTest extends AbstractBusClientServerTestB
         JwsJwtCompactProducer jws = new JwsJwtCompactProducer(jwsHeaders, claims);
         return jws.getSignedEncodedJws();
     }
-<<<<<<< HEAD
     */
-=======
     
     private String getAuthorizationCode(WebClient client) {
         return getAuthorizationCode(client, null);
@@ -793,5 +791,4 @@ public class AuthorizationGrantNegativeTest extends AbstractBusClientServerTestB
         }
         return foundString.substring(0, ampersandIndex);
     }
->>>>>>> d7b5336... Adding more OAuth negative tests
 }
