@@ -38,6 +38,14 @@
             <entry key="ws-security.encryption.username" value="bob"/>
         </jaxws:properties>
     </jaxws:client>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSoap12MtomPort" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+            <entry key="security.encryption.properties" value="bob.properties"/>
+            <entry key="security.encryption.username" value="bob"/>
+            <entry key="mtom-enabled" value="true"/>
+        </jaxws:properties>
+    </jaxws:client>
     
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricPort" createdFromAPI="true">
         <jaxws:properties>
