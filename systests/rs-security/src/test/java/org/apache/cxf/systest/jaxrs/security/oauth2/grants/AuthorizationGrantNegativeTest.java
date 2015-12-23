@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
+import javax.ws.rs.client.ResponseProcessingException;
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.Response;
 
@@ -63,7 +64,396 @@ public class AuthorizationGrantNegativeTest extends AbstractBusClientServerTestB
         assertTrue("server did not launch correctly", 
                    launchServer(BookServerOAuth2GrantsNegative.class, true));
     }
+    
+    //
+    // Authorization code grants
+    //
 
+    @org.junit.Test
+    public void testAuthorizationCodeBadClient() throws Exception {
+        URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
+
+        String address = "https://localhost:" + PORT + "/services/";
+        WebClient client = WebClient.create(address, setupProviders(), "alice", "security", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        // Get Authorization Code
+        // Make initial authorization request
+        client.type("application/json").accept("application/json");
+        client.query("redirect_uri", "http://www.blah.apache.org");
+        client.query("response_type", "code");
+        client.path("authorize/");
+        
+        // No client
+        Response response = client.get();
+        assertEquals(400, response.getStatus());
+        
+        // Bad client
+        client.query("client_id", "bad-consumer-id");
+        response = client.get();
+        assertEquals(400, response.getStatus());
+    }
+    
+    @org.junit.Test
+    public void testAuthorizationCodeBadRedirectionURI() throws Exception {
+        URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
+
+        String address = "https://localhost:" + PORT + "/services/";
+        WebClient client = WebClient.create(address, setupProviders(), "alice", "security", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        // Get Authorization Code
+        // Make initial authorization request
+        client.type("application/json").accept("application/json");
+        client.query("client_id", "consumer-id");
+        client.query("response_type", "code");
+        client.path("authorize/");
+        
+        // Bad redirect URI
+        client.query("redirect_uri", "http://www.blah.bad.apache.org");
+        Response response = client.get();
+        assertEquals(400, response.getStatus());
+    }
+    
+    @org.junit.Test
+    public void testResponseType() throws Exception {
+        URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
+
+        String address = "https://localhost:" + PORT + "/services/";
+        WebClient client = WebClient.create(address, setupProviders(), "alice", "security", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        // Get Authorization Code
+        // Make initial authorization request
+        client.type("application/json").accept("application/json");
+        client.query("client_id", "consumer-id");
+        client.query("redirect_uri", "http://www.blah.apache.org");
+        // client.query("response_type", "code");
+        client.path("authorize/");
+        
+        // No response type
+        Response response = client.get();
+        assertEquals(303, response.getStatus());
+        
+        client.query("response_type", "unknown");
+        response = client.get();
+        assertEquals(303, response.getStatus());
+    }
+    
+    @org.junit.Test
+    public void testAuthorizationCodeBadScope() throws Exception {
+        URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
+
+        String address = "https://localhost:" + PORT + "/services/";
+        WebClient client = WebClient.create(address, setupProviders(), "alice", "security", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        // Get Authorization Code
+        // Make initial authorization request
+        client.type("application/json").accept("application/json");
+        client.query("client_id", "consumer-id");
+        client.query("response_type", "code");
+        client.query("redirect_uri", "http://www.blah.bad.apache.org");
+        client.query("scope", "unknown-scope");
+        client.path("authorize/");
+        
+        // No redirect URI
+        Response response = client.get();
+        assertEquals(400, response.getStatus());
+    }
+    
+    // Send the authorization code twice to get an access token
+    @org.junit.Test
+    public void testRepeatAuthorizationCode() throws Exception {
+        URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
+
+        String address = "https://localhost:" + PORT + "/services/";
+        WebClient client = WebClient.create(address, setupProviders(), "alice", "security", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        // Get Authorization Code
+        String code = getAuthorizationCode(client);
+        assertNotNull(code);
+
+        // Now get the access token
+        client = WebClient.create(address, setupProviders(), "consumer-id", "this-is-a-secret", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+        
+        client.type("application/x-www-form-urlencoded").accept("application/json");
+        client.path("token");
+
+        // First invocation
+        Form form = new Form();
+        form.param("grant_type", "authorization_code");
+        form.param("code", code);
+        form.param("client_id", "consumer-id");
+        Response response = client.post(form);
+        ClientAccessToken token = response.readEntity(ClientAccessToken.class);
+        assertNotNull(token.getTokenKey());
+
+        // Now try to get a second token
+        response = client.post(form);
+        try {
+            response.readEntity(ClientAccessToken.class);
+            fail("Failure expected on trying to get a second access token");
+        } catch (ResponseProcessingException ex) {
+            //expected
+        }
+    }
+    
+    // Try to refresh the access token twice using the same refresh token
+    @org.junit.Test
+    public void testRepeatRefreshCall() throws Exception {
+        URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
+
+        String address = "https://localhost:" + PORT + "/services/";
+        WebClient client = WebClient.create(address, setupProviders(), "alice", "security", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        // Get Authorization Code
+        String code = getAuthorizationCode(client, "read_balance");
+        assertNotNull(code);
+
+        // Now get the access token
+        client = WebClient.create(address, setupProviders(), "consumer-id", "this-is-a-secret", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        ClientAccessToken accessToken = getAccessTokenWithAuthorizationCode(client, code);
+        assertNotNull(accessToken.getTokenKey());
+        assertNotNull(accessToken.getRefreshToken());
+
+        // Refresh the access token
+        client.type("application/x-www-form-urlencoded").accept("application/json");
+
+        Form form = new Form();
+        form.param("grant_type", "refresh_token");
+        form.param("refresh_token", accessToken.getRefreshToken());
+        form.param("client_id", "consumer-id");
+        form.param("scope", "read_balance");
+        Response response = client.post(form);
+
+        accessToken = response.readEntity(ClientAccessToken.class);
+        assertNotNull(accessToken.getTokenKey());
+        assertNotNull(accessToken.getRefreshToken());
+        
+        // Now try to refresh it again
+        try {
+            response = client.post(form);
+            response.readEntity(ClientAccessToken.class);
+            fail("Failure expected on trying to reuse a refresh token");
+        } catch (ResponseProcessingException ex) {
+            //expected
+        }
+    }
+    
+    @org.junit.Test
+    public void testRefreshWithBadToken() throws Exception {
+        URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
+
+        String address = "https://localhost:" + PORT + "/services/";
+        WebClient client = WebClient.create(address, setupProviders(), "alice", "security", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        // Get Authorization Code
+        String code = getAuthorizationCode(client, "read_balance");
+        assertNotNull(code);
+
+        // Now get the access token
+        client = WebClient.create(address, setupProviders(), "consumer-id", "this-is-a-secret", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        ClientAccessToken accessToken = getAccessTokenWithAuthorizationCode(client, code);
+        assertNotNull(accessToken.getTokenKey());
+        assertNotNull(accessToken.getRefreshToken());
+
+        // Refresh the access token - using a bad token
+        client.type("application/x-www-form-urlencoded").accept("application/json");
+
+        Form form = new Form();
+        form.param("grant_type", "refresh_token");
+        form.param("client_id", "consumer-id");
+        form.param("scope", "read_balance");
+        Response response = client.post(form);
+
+        // No refresh token
+        try {
+            response = client.post(form);
+            response.readEntity(ClientAccessToken.class);
+            fail("Failure expected on no refresh token");
+        } catch (ResponseProcessingException ex) {
+            //expected
+        }
+        
+        // Now specify a bad refresh token
+        form.param("refresh_token", "12345");
+        try {
+            response = client.post(form);
+            response.readEntity(ClientAccessToken.class);
+            fail("Failure expected on a bad refresh token");
+        } catch (ResponseProcessingException ex) {
+            //expected
+        }
+    }
+    
+    @org.junit.Test
+    public void testAccessTokenBadCode() throws Exception {
+        URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
+
+        String address = "https://localhost:" + PORT + "/services/";
+        WebClient client = WebClient.create(address, setupProviders(), "alice", "security", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        // Get Authorization Code
+        String code = getAuthorizationCode(client);
+        assertNotNull(code);
+
+        // Now get the access token
+        client = WebClient.create(address, setupProviders(), "consumer-id", "this-is-a-secret", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+        
+        client.type("application/x-www-form-urlencoded").accept("application/json");
+        client.path("token");
+
+        // First invocation
+        Form form = new Form();
+        form.param("grant_type", "authorization_code");
+        form.param("client_id", "consumer-id");
+        
+        // No code
+        Response response = client.post(form);
+        try {
+            response.readEntity(ClientAccessToken.class);
+            fail("Failure expected on no code");
+        } catch (ResponseProcessingException ex) {
+            //expected
+        }
+        
+        // Bad code
+        form.param("code", "123456677");
+        response = client.post(form);
+        try {
+            response.readEntity(ClientAccessToken.class);
+            fail("Failure expected on a bad code");
+        } catch (ResponseProcessingException ex) {
+            //expected
+        }
+    }
+    
+    @org.junit.Test
+    public void testUnknownGrantType() throws Exception {
+        URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
+
+        String address = "https://localhost:" + PORT + "/services/";
+        WebClient client = WebClient.create(address, setupProviders(), "consumer-id", 
+                                            "this-is-a-secret", busFile.toString());
+
+        // Get Access Token
+        client.type("application/x-www-form-urlencoded").accept("application/json");
+        client.path("token");
+
+        Form form = new Form();
+        // form.param("grant_type", "password");
+        form.param("username", "alice");
+        form.param("password", "security");
+        Response response = client.post(form);
+
+        // No grant_type
+        try {
+            response.readEntity(ClientAccessToken.class);
+            fail("Failure expected on no grant type");
+        } catch (ResponseProcessingException ex) {
+            //expected
+        }
+        
+        // Unknown grant_type
+        form.param("grant_type", "unknown");
+        response = client.post(form);
+        try {
+            response.readEntity(ClientAccessToken.class);
+            fail("Failure expected on an unknown grant type");
+        } catch (ResponseProcessingException ex) {
+            //expected
+        }
+    }
+    
+    @org.junit.Test
+    public void testPasswordCredentialsGrantUnknownUsers() throws Exception {
+        URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
+
+        String address = "https://localhost:" + PORT + "/services/";
+        WebClient client = WebClient.create(address, setupProviders(), "consumer-id", 
+                                            "this-is-a-secret", busFile.toString());
+
+        // Get Access Token
+        client.type("application/x-www-form-urlencoded").accept("application/json");
+        client.path("token");
+
+        Form form = new Form();
+        Response response = client.post(form);
+
+        // No username
+        try {
+            response.readEntity(ClientAccessToken.class);
+            fail("Failure expected on no username");
+        } catch (ResponseProcessingException ex) {
+            //expected
+        }
+        
+        // Bad username
+        form.param("username", "alice2");
+        response = client.post(form);
+        try {
+            response.readEntity(ClientAccessToken.class);
+            fail("Failure expected on a bad username");
+        } catch (ResponseProcessingException ex) {
+            //expected
+        }
+        
+        // No password
+        form.param("username", "alice");
+        response = client.post(form);
+        try {
+            response.readEntity(ClientAccessToken.class);
+            fail("Failure expected on no password");
+        } catch (ResponseProcessingException ex) {
+            //expected
+        }
+        
+        // Bad password
+        form.param("password", "security2");
+        response = client.post(form);
+        try {
+            response.readEntity(ClientAccessToken.class);
+            fail("Failure expected on a bad password");
+        } catch (ResponseProcessingException ex) {
+            //expected
+        }
+    }
+    
     //
     // SAML Authorization grants
     //
@@ -496,5 +886,64 @@ public class AuthorizationGrantNegativeTest extends AbstractBusClientServerTestB
         JwsHeaders jwsHeaders = new JwsHeaders(SignatureAlgorithm.NONE);
         JwsJwtCompactProducer jws = new JwsJwtCompactProducer(jwsHeaders, claims);
         return jws.getSignedEncodedJws();
+    }
+    
+    private String getAuthorizationCode(WebClient client) {
+        return getAuthorizationCode(client, null);
+    }
+
+    private String getAuthorizationCode(WebClient client, String scope) {
+        // Make initial authorization request
+        client.type("application/json").accept("application/json");
+        client.query("client_id", "consumer-id");
+        client.query("redirect_uri", "http://www.blah.apache.org");
+        client.query("response_type", "code");
+        if (scope != null) {
+            client.query("scope", scope);
+        }
+        client.path("authorize/");
+        Response response = client.get();
+
+        OAuthAuthorizationData authzData = response.readEntity(OAuthAuthorizationData.class);
+
+        // Now call "decision" to get the authorization code grant
+        client.path("decision");
+        client.type("application/x-www-form-urlencoded");
+
+        Form form = new Form();
+        form.param("session_authenticity_token", authzData.getAuthenticityToken());
+        form.param("client_id", authzData.getClientId());
+        form.param("redirect_uri", authzData.getRedirectUri());
+        if (authzData.getProposedScope() != null) {
+            form.param("scope", authzData.getProposedScope());
+        }
+        form.param("oauthDecision", "allow");
+
+        response = client.post(form);
+        String location = response.getHeaderString("Location"); 
+        return getSubstring(location, "code");
+    }
+
+    private ClientAccessToken getAccessTokenWithAuthorizationCode(WebClient client, String code) {
+        client.type("application/x-www-form-urlencoded").accept("application/json");
+        client.path("token");
+
+        Form form = new Form();
+        form.param("grant_type", "authorization_code");
+        form.param("code", code);
+        form.param("client_id", "consumer-id");
+        Response response = client.post(form);
+
+        return response.readEntity(ClientAccessToken.class);
+    }
+    
+    private String getSubstring(String parentString, String substringName) {
+        String foundString = 
+            parentString.substring(parentString.indexOf(substringName + "=") + (substringName + "=").length());
+        int ampersandIndex = foundString.indexOf('&');
+        if (ampersandIndex < 1) {
+            ampersandIndex = foundString.length();
+        }
+        return foundString.substring(0, ampersandIndex);
     }
 }
