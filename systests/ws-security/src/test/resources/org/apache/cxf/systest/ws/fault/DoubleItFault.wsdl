@@ -103,6 +103,9 @@
         <wsdl:port name="DoubleItSoap12DispatchPort" binding="tns:DoubleItSoap12DispatchBinding">
             <soap12:address location="http://localhost:9009/DoubleItSoap12Dispatch"/>
         </wsdl:port>
+        <wsdl:port name="DoubleItSoap12MtomPort" binding="tns:DoubleItSoap12Binding">
+            <soap12:address location="http://localhost:9009/DoubleItSoap12Mtom"/>
+        </wsdl:port>
         <wsdl:port name="DoubleItAsymmetricPort" binding="tns:DoubleItAsymmetricBinding">
             <soap12:address location="http://localhost:9009/DoubleItAsymmetric"/>
         </wsdl:port>
