@@ -26,6 +26,7 @@ import java.util.Set;
 
 import javax.crypto.SecretKey;
 
+import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.provider.DefaultEncryptingOAuthDataProvider;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
@@ -46,6 +47,18 @@ public class DefaultEncryptingCodeDataProvider extends DefaultEncryptingOAuthDat
         super(key);
     }
     @Override
+    public Client removeClient(String clientId) {
+        Client c = super.removeClient(clientId);
+        removeClientCodeGrants(c);
+        return c;
+    }
+    
+    protected void removeClientCodeGrants(Client c) {
+        for (ServerAuthorizationCodeGrant grant : getCodeGrants(c)) {
+            removeCodeGrant(grant.getCode());
+        }
+    }
+    @Override
     public ServerAuthorizationCodeGrant createCodeGrant(AuthorizationCodeRegistration reg)
         throws OAuthServiceException {
         ServerAuthorizationCodeGrant grant = doCreateCodeGrant(reg);
@@ -53,11 +66,14 @@ public class DefaultEncryptingCodeDataProvider extends DefaultEncryptingOAuthDat
         return grant;
     }
 
-    public List<ServerAuthorizationCodeGrant> getCodeGrants() {
+    public List<ServerAuthorizationCodeGrant> getCodeGrants(Client c) {
         List<ServerAuthorizationCodeGrant> list = 
             new ArrayList<ServerAuthorizationCodeGrant>(grants.size());
-        for (String grant : grants) {
-            list.add(getCodeGrant(grant));
+        for (String key : grants) {
+            ServerAuthorizationCodeGrant grant = getCodeGrant(key);
+            if (grant.getClient().getClientId().equals(c.getClientId())) {
+                list.add(grant);
+            }
         }
         return list;
     }
