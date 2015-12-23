@@ -184,7 +184,7 @@ public class AttachmentDeserializer {
         if (body instanceof DelegatingInputStream
             && !((DelegatingInputStream) body).isClosed()) {
 
-            cache((DelegatingInputStream) body, true);
+            cache((DelegatingInputStream) body);
         }
 
         List<Attachment> atts = new ArrayList<Attachment>(attachments.getLoadedAttachments());
@@ -196,14 +196,14 @@ public class AttachmentDeserializer {
                     ads.cache(message);
                 }
             } else if (s.getInputStream() instanceof DelegatingInputStream) {
-                cache((DelegatingInputStream) s.getInputStream(), false);
+                cache((DelegatingInputStream) s.getInputStream());
             } else {
                 //assume a normal stream that is already cached
             }
         }
     }
 
-    private void cache(DelegatingInputStream input, boolean deleteOnClose) throws IOException {
+    private void cache(DelegatingInputStream input) throws IOException {
         if (loaded.contains(input)) {
             return;
         }

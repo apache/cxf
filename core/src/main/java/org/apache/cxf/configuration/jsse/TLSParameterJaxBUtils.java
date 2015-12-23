@@ -132,12 +132,12 @@ public final class TLSParameterJaxBUtils {
                 }
             }
         } else if (kst.isSetResource()) {
-            final java.io.InputStream is = getResourceAsStream(kst.getResource());
+            final InputStream is = getResourceAsStream(kst.getResource());
             if (is == null) {
                 final String msg =
                     "Could not load keystore resource " + kst.getResource();
                 LOG.severe(msg);
-                throw new java.io.IOException(msg);
+                throw new IOException(msg);
             }
             keyStore.load(is, password);
         } else if (kst.isSetUrl()) {
@@ -173,12 +173,12 @@ public final class TLSParameterJaxBUtils {
             return createTrustStore(new FileInputStream(pst.getFile()));
         }
         if (pst.isSetResource()) {
-            final java.io.InputStream is = getResourceAsStream(pst.getResource());
+            final InputStream is = getResourceAsStream(pst.getResource());
             if (is == null) {
                 final String msg =
                     "Could not load truststore resource " + pst.getResource();
                 LOG.severe(msg);
-                throw new java.io.IOException(msg);
+                throw new IOException(msg);
             }
             return createTrustStore(is);
         }
@@ -205,7 +205,7 @@ public final class TLSParameterJaxBUtils {
      * Create a KeyStore containing the trusted CA certificates contained
      * in the supplied input stream.
      */
-    private static KeyStore createTrustStore(final java.io.InputStream is)
+    private static KeyStore createTrustStore(final InputStream is)
         throws IOException, CertificateException, KeyStoreException, NoSuchAlgorithmException {
 
         final Collection<? extends Certificate> certs = loadCertificates(is);
@@ -225,7 +225,7 @@ public final class TLSParameterJaxBUtils {
     /**
      * load the certificates as X.509 certificates
      */
-    private static Collection<? extends Certificate> loadCertificates(final java.io.InputStream is)
+    private static Collection<? extends Certificate> loadCertificates(final InputStream is)
         throws IOException, CertificateException {
 
         final CertificateFactory factory = CertificateFactory.getInstance("X.509");

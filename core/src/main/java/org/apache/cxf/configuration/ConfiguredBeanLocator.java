@@ -73,7 +73,7 @@ public interface ConfiguredBeanLocator {
      */
     boolean hasConfiguredPropertyValue(String beanName, String propertyName, String value);
     
-    public interface BeanLoaderListener<T> {
+    interface BeanLoaderListener<T> {
         /**
          * Return true to have the loader go ahead and load the bean.  If false, 
          * the loader will just skip to the next bean

@@ -78,9 +78,7 @@ public final class VelocityGenerator {
             }
             Velocity.init(props);
         } catch (Exception e) {
-            org.apache.cxf.common.i18n.Message msg =
-                new org.apache.cxf.common.i18n.Message("FAIL_TO_INITIALIZE_VELOCITY_ENGINE",
-                                                             LOG);
+            Message msg = new Message("FAIL_TO_INITIALIZE_VELOCITY_ENGINE", LOG);
             LOG.log(Level.SEVERE, msg.toString());
             throw new ToolException(msg, e);
         }

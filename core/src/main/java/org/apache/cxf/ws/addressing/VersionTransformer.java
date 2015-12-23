@@ -545,7 +545,7 @@ public class VersionTransformer {
         public static JAXBContext getJAXBContext() throws JAXBException {
             synchronized (Names200408.class) {
                 if (jaxbContext == null) {
-                    jaxbContext = JAXBContext.newInstance(org.apache.cxf.ws.addressing.v200408.ObjectFactory.class);
+                    jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
                 }
             }
             return jaxbContext;

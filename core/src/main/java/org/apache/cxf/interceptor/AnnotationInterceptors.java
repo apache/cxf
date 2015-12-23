@@ -64,7 +64,7 @@ public class AnnotationInterceptors {
     }
     
     @SuppressWarnings("unchecked")
-    private <T> Class<? extends T>[] getAnnotationObjectClasses(Annotation ann, Class<T> type) {
+    private <T> Class<? extends T>[] getAnnotationObjectClasses(Annotation ann, Class<T> type) { //NOPMD
         if (ann instanceof InFaultInterceptors) {
             return (Class<? extends T>[])((InFaultInterceptors)ann).classes();
         } else if (ann instanceof InInterceptors) {

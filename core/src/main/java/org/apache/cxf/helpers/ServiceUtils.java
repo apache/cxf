@@ -113,10 +113,10 @@ public final class ServiceUtils {
                 EndpointInfo ep = endpoint.getEndpointInfo();
                 
                 if (validationType == null && opInfo != null) {
-                    validationType = getSchemaValidationTypeFromModel(message, opInfo);
+                    validationType = getSchemaValidationTypeFromModel(opInfo);
                     
                     if (validationType == null && ep != null) {
-                        validationType = getSchemaValidationTypeFromModel(message, ep);
+                        validationType = getSchemaValidationTypeFromModel(ep);
                     }
                 }
                 
@@ -129,7 +129,7 @@ public final class ServiceUtils {
     }
     
     private static SchemaValidationType getSchemaValidationTypeFromModel(
-            Message message, AbstractPropertiesHolder properties) {
+        AbstractPropertiesHolder properties) {
         Object obj = properties.getProperty(Message.SCHEMA_VALIDATION_TYPE);
         if (obj != null) {
             return getSchemaValidationType(obj);

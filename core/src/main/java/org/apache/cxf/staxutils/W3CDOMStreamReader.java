@@ -146,11 +146,6 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader<Node, Node> {
         }
     }
 
-    @Override
-    protected void endElement() {
-        super.endElement();
-    }
-
     public final Node getCurrentNode() {
         return getCurrentFrame().element;
     }

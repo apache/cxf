@@ -155,7 +155,7 @@ public final class AttachmentUtil {
     }
     
     public static boolean isMtomEnabled(Message message) {
-        Object prop = message.getContextualProperty(org.apache.cxf.message.Message.MTOM_ENABLED); 
+        Object prop = message.getContextualProperty(Message.MTOM_ENABLED); 
         return MessageUtils.isTrue(prop);
     }
     
@@ -276,7 +276,7 @@ public final class AttachmentUtil {
                         public boolean hasNext() {
                             return it.hasNext();
                         }
-                        public java.util.Map.Entry<String, DataHandler> next() {
+                        public Map.Entry<String, DataHandler> next() {
                             final Attachment a = it.next();
                             return new Map.Entry<String, DataHandler>() {
                                 @Override

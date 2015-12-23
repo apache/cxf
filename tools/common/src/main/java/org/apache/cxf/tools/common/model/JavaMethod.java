@@ -161,7 +161,7 @@ public class JavaMethod implements JavaAnnotatable {
         //primitive in is being changed to an in/out
         //which would no longer be primitive
         String s = PRIMITIVE_MAP.get(c2);
-        if (s != null && c1.equals(s)) {
+        if (s != null && s.equals(c1)) {
             return true;
         }
         return c1.equals(c2);
