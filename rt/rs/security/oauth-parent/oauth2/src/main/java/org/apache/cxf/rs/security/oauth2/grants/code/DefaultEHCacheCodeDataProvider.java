@@ -26,6 +26,7 @@ import net.sf.ehcache.Ehcache;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.provider.DefaultEHCacheOAuthDataProvider;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 
@@ -56,6 +57,19 @@ public class DefaultEHCacheCodeDataProvider extends DefaultEHCacheOAuthDataProvi
     }
 
     @Override
+    public Client removeClient(String clientId) {
+        Client c = super.removeClient(clientId);
+        removeClientCodeGrants(c);
+        return c;
+    }
+    
+    protected void removeClientCodeGrants(Client c) {
+        for (ServerAuthorizationCodeGrant grant : getCodeGrants(c)) {
+            removeCodeGrant(grant.getCode());
+        }
+    }
+    
+    @Override
     public ServerAuthorizationCodeGrant createCodeGrant(AuthorizationCodeRegistration reg)
         throws OAuthServiceException {
         ServerAuthorizationCodeGrant grant = doCreateCodeGrant(reg);
@@ -68,12 +82,15 @@ public class DefaultEHCacheCodeDataProvider extends DefaultEHCacheOAuthDataProvi
         return AbstractCodeDataProvider.initCodeGrant(reg, codeLifetime);
     }
 
-    public List<ServerAuthorizationCodeGrant> getCodeGrants() {
+    public List<ServerAuthorizationCodeGrant> getCodeGrants(Client c) {
         List<String> keys = CastUtils.cast(codeGrantCache.getKeys());
         List<ServerAuthorizationCodeGrant> grants = 
             new ArrayList<ServerAuthorizationCodeGrant>(keys.size());
         for (String key : keys) {
-            grants.add(getCodeGrant(key));
+            ServerAuthorizationCodeGrant grant = getCodeGrant(key);
+            if (grant.getClient().getClientId().equals(c.getClientId())) {
+                grants.add(grant);
+            }
         }
         return grants;
     }

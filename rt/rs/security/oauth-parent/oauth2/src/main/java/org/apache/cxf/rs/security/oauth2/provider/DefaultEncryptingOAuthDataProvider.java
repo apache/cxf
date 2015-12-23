@@ -64,6 +64,7 @@ public class DefaultEncryptingOAuthDataProvider extends AbstractOAuthDataProvide
     public Client removeClient(String clientId) {
         Client client = getClient(clientId);
         clientsMap.remove(clientId);
+        removeClientTokens(client);
         return client;
     }
     @Override
@@ -75,18 +76,24 @@ public class DefaultEncryptingOAuthDataProvider extends AbstractOAuthDataProvide
         return clients;
     }
     @Override
-    protected List<ServerAccessToken> getAccessTokens() {
+    protected List<ServerAccessToken> getAccessTokens(Client c) {
         List<ServerAccessToken> list = new ArrayList<ServerAccessToken>(tokens.size());
         for (String tokenKey : tokens) {
-            list.add(getAccessToken(tokenKey));
+            ServerAccessToken token = getAccessToken(tokenKey);
+            if (token.getClient().getClientId().equals(c.getClientId())) {
+                list.add(token);
+            }
         }
         return list;
     }
     @Override
-    protected List<RefreshToken> getRefreshTokens() {
+    protected List<RefreshToken> getRefreshTokens(Client c) {
         List<RefreshToken> list = new ArrayList<RefreshToken>(refreshTokens.size());
         for (String tokenKey : tokens) {
-            list.add(getRefreshToken(null, tokenKey));
+            RefreshToken token = getRefreshToken(tokenKey);
+            if (token.getClient().getClientId().equals(c.getClientId())) {
+                list.add(token);
+            }
         }
         return list;
     }
@@ -118,10 +125,10 @@ public class DefaultEncryptingOAuthDataProvider extends AbstractOAuthDataProvide
     }
 
     @Override
-    protected RefreshToken revokeRefreshToken(Client client, String refreshTokenKey) {
+    protected RefreshToken revokeRefreshToken(String refreshTokenKey) {
         RefreshToken rt = null;
         if (refreshTokens.containsKey(refreshTokenKey)) {
-            rt = getRefreshToken(client, refreshTokenKey);
+            rt = getRefreshToken(refreshTokenKey);
             refreshTokens.remove(refreshTokenKey);
         }
         return rt;
@@ -135,7 +142,7 @@ public class DefaultEncryptingOAuthDataProvider extends AbstractOAuthDataProvide
         token.setTokenKey(encryptedToken);
     }
     @Override
-    protected RefreshToken getRefreshToken(Client client, String refreshTokenKey) {
+    protected RefreshToken getRefreshToken(String refreshTokenKey) {
         try {
             return ModelEncryptionSupport.decryptRefreshToken(this, refreshTokenKey, key);
         } catch (SecurityException ex) {
