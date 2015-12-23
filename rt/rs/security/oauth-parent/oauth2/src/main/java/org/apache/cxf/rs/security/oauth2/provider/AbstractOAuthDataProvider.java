@@ -79,7 +79,16 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
     @Override
     public ServerAccessToken refreshAccessToken(Client client, String refreshTokenKey,
                                                 List<String> restrictedScopes) throws OAuthServiceException {
-        RefreshToken currentRefreshToken = revokeRefreshAndAccessTokens(client, refreshTokenKey);
+        RefreshToken currentRefreshToken = recycleRefreshTokens 
+            ? revokeRefreshToken(client, refreshTokenKey) : getRefreshToken(client, refreshTokenKey);
+        if (currentRefreshToken == null 
+            || OAuthUtils.isExpired(currentRefreshToken.getIssuedAt(), currentRefreshToken.getExpiresIn())) {
+            throw new OAuthServiceException(OAuthConstants.ACCESS_DENIED);
+        }
+        if (recycleRefreshTokens) {
+            revokeAccessTokens(currentRefreshToken);
+        }
+        
         ServerAccessToken at = doRefreshAccessToken(client, currentRefreshToken, restrictedScopes);
         saveAccessToken(at);
         if (recycleRefreshTokens) {
@@ -92,27 +101,42 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
     
     @Override
     public void revokeToken(Client client, String tokenKey, String tokenTypeHint) throws OAuthServiceException {
-        ServerAccessToken accessToken = revokeAccessToken(tokenKey);
-        if (accessToken == null) {
-            // Revoke refresh token            
-            doRevokeRefreshAndAccessTokens(client, tokenKey, true);
-        } else {
-            // Revoke access token
-            if (accessToken.getRefreshToken() != null) {
-                RefreshToken rt = getRefreshToken(client, accessToken.getRefreshToken());
-                if (rt == null) {
-                    return;
-                }
-                
-                unlinkRefreshAccessToken(rt, accessToken.getTokenKey());
-                if (rt.getAccessTokens().isEmpty()) {
-                    revokeRefreshToken(client, rt.getTokenKey());
-                } else {
-                    saveRefreshToken(null, rt);
-                }
+        ServerAccessToken accessToken = null;
+        if (!OAuthConstants.REFRESH_TOKEN.equals(tokenTypeHint)) { 
+            accessToken = revokeAccessToken(tokenKey);
+        }
+        if (accessToken != null) {
+            handleLinkedRefreshToken(accessToken);
+        } else if (!OAuthConstants.ACCESS_TOKEN.equals(tokenTypeHint)) {
+            RefreshToken currentRefreshToken = revokeRefreshToken(client, tokenKey);
+            revokeAccessTokens(currentRefreshToken);
+        }
+    }
+    protected void handleLinkedRefreshToken(ServerAccessToken accessToken) {
+        if (accessToken != null && accessToken.getRefreshToken() != null) {
+            RefreshToken rt = getRefreshToken(accessToken.getClient(), accessToken.getRefreshToken());
+            if (rt == null) {
+                return;
+            }
+            
+            unlinkRefreshAccessToken(rt, accessToken.getTokenKey());
+            if (rt.getAccessTokens().isEmpty()) {
+                revokeRefreshToken(accessToken.getClient(), rt.getTokenKey());
+            } else {
+                saveRefreshToken(null, rt);
+            }
+        }
+        
+    }
+
+    protected void revokeAccessTokens(RefreshToken currentRefreshToken) {
+        if (currentRefreshToken != null) {
+            for (String accessTokenKey : currentRefreshToken.getAccessTokens()) {
+                revokeAccessToken(accessTokenKey);
             }
         }
     }
+
     protected void unlinkRefreshAccessToken(RefreshToken rt, String tokenKey) {
         List<String> accessTokenKeys = rt.getAccessTokens();
         for (int i = 0; i < accessTokenKeys.size(); i++) {
@@ -123,24 +147,8 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         }
     }
 
-    protected RefreshToken revokeRefreshAndAccessTokens(Client client, String tokenKey) {
-        return doRevokeRefreshAndAccessTokens(client, tokenKey, recycleRefreshTokens);
-    }
-    protected RefreshToken doRevokeRefreshAndAccessTokens(Client client, String tokenKey, boolean recycle) {
-        RefreshToken currentRefreshToken = recycle ? revokeRefreshToken(client, tokenKey)
-            : getRefreshToken(client, tokenKey);
-        if (currentRefreshToken == null 
-            || OAuthUtils.isExpired(currentRefreshToken.getIssuedAt(), currentRefreshToken.getExpiresIn())) {
-            throw new OAuthServiceException(OAuthConstants.ACCESS_DENIED);
-        }
-        if (recycle) {
-            for (String accessTokenKey : currentRefreshToken.getAccessTokens()) {
-                revokeAccessToken(accessTokenKey);
-            }
-        }
-        return currentRefreshToken;
-    }
-
+        
+    
     @Override
     public List<OAuthPermission> convertScopeToPermissions(Client client, List<String> requestedScopes) {
         if (requestedScopes.isEmpty()) {
@@ -239,12 +247,6 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
     public void close() {
     }
     
-    protected abstract void saveAccessToken(ServerAccessToken serverToken);
-    protected abstract void saveRefreshToken(ServerAccessToken at, RefreshToken refreshToken);
-    protected abstract ServerAccessToken revokeAccessToken(String accessTokenKey);
-    protected abstract RefreshToken revokeRefreshToken(Client client, String refreshTokenKey);
-    protected abstract RefreshToken getRefreshToken(Client client, String refreshTokenKey);
-
     public Map<String, OAuthPermission> getPermissionMap() {
         return permissionMap;
     }
@@ -267,4 +269,13 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
     public void setMessageContext(MessageContext messageContext) {
         this.messageContext = messageContext;
     }
+    
+    protected abstract void saveAccessToken(ServerAccessToken serverToken);
+    protected abstract void saveRefreshToken(ServerAccessToken at, RefreshToken refreshToken);
+    protected abstract ServerAccessToken revokeAccessToken(String accessTokenKey);
+    protected abstract List<ServerAccessToken> getAccessTokens();
+    protected abstract List<RefreshToken> getRefreshTokens();
+    protected abstract RefreshToken revokeRefreshToken(Client client, String refreshTokenKey);
+    protected abstract RefreshToken getRefreshToken(Client client, String refreshTokenKey);
+
 }

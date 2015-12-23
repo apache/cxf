@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.rs.security.oauth2.grants.code;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -52,10 +53,27 @@ public class DefaultEncryptingCodeDataProvider extends DefaultEncryptingOAuthDat
         return grant;
     }
 
+    public List<ServerAuthorizationCodeGrant> getCodeGrants() {
+        List<ServerAuthorizationCodeGrant> list = 
+            new ArrayList<ServerAuthorizationCodeGrant>(grants.size());
+        for (String grant : grants) {
+            list.add(getCodeGrant(grant));
+        }
+        return list;
+    }
+    
     @Override
     public ServerAuthorizationCodeGrant removeCodeGrant(String code) throws OAuthServiceException {
         grants.remove(code);
         return ModelEncryptionSupport.decryptCodeGrant(this, code, key);
+    }
+    public ServerAuthorizationCodeGrant getCodeGrant(String code) throws OAuthServiceException {
+        
+        ServerAuthorizationCodeGrant grant = ModelEncryptionSupport.decryptCodeGrant(this, code, key);
+        if (grant != null) {
+            grants.remove(code);
+        }
+        return grant;
     }
     
     protected ServerAuthorizationCodeGrant doCreateCodeGrant(AuthorizationCodeRegistration reg)

@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.rs.security.oauth2.grants.code;
 
+import java.util.List;
+
 import org.apache.cxf.rs.security.oauth2.provider.AbstractOAuthDataProvider;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 
@@ -45,8 +47,6 @@ public abstract class AbstractCodeDataProvider extends AbstractOAuthDataProvider
         this.codeLifetime = codeLifetime;
     }
     
-    protected abstract void saveCodeGrant(ServerAuthorizationCodeGrant grant);
-    
     public static ServerAuthorizationCodeGrant initCodeGrant(AuthorizationCodeRegistration reg, long lifetime) {
         ServerAuthorizationCodeGrant grant = new ServerAuthorizationCodeGrant(reg.getClient(), lifetime);
         grant.setRedirectUri(reg.getRedirectUri());
@@ -58,5 +58,6 @@ public abstract class AbstractCodeDataProvider extends AbstractOAuthDataProvider
         grant.setNonce(reg.getNonce());
         return grant;
     }
-    
+    protected abstract void saveCodeGrant(ServerAuthorizationCodeGrant grant);
+    public abstract List<ServerAuthorizationCodeGrant> getCodeGrants();
 }
