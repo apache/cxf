@@ -74,7 +74,22 @@ public class DefaultEncryptingOAuthDataProvider extends AbstractOAuthDataProvide
         }
         return clients;
     }
-    
+    @Override
+    protected List<ServerAccessToken> getAccessTokens() {
+        List<ServerAccessToken> list = new ArrayList<ServerAccessToken>(tokens.size());
+        for (String tokenKey : tokens) {
+            list.add(getAccessToken(tokenKey));
+        }
+        return list;
+    }
+    @Override
+    protected List<RefreshToken> getRefreshTokens() {
+        List<RefreshToken> list = new ArrayList<RefreshToken>(refreshTokens.size());
+        for (String tokenKey : tokens) {
+            list.add(getRefreshToken(null, tokenKey));
+        }
+        return list;
+    }
     @Override
     public ServerAccessToken getAccessToken(String accessToken) throws OAuthServiceException {
         try {
@@ -127,4 +142,5 @@ public class DefaultEncryptingOAuthDataProvider extends AbstractOAuthDataProvide
             throw new OAuthServiceException(OAuthConstants.ACCESS_DENIED, ex);
         }
     }
+    
 }

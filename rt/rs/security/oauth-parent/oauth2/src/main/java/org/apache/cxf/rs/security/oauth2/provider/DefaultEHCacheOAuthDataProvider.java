@@ -95,6 +95,26 @@ public class DefaultEHCacheOAuthDataProvider extends AbstractOAuthDataProvider {
         }
         return clients;
     }
+
+    @Override
+    protected List<ServerAccessToken> getAccessTokens() {
+        List<String> keys = CastUtils.cast(accessTokenCache.getKeys());
+        List<ServerAccessToken> tokens = new ArrayList<ServerAccessToken>(keys.size());
+        for (String key : keys) {
+            tokens.add(getAccessToken(key));
+        }
+        return tokens;
+    }
+
+    @Override
+    protected List<RefreshToken> getRefreshTokens() {
+        List<String> keys = CastUtils.cast(refreshTokenCache.getKeys());
+        List<RefreshToken> tokens = new ArrayList<RefreshToken>(keys.size());
+        for (String key : keys) {
+            tokens.add(getRefreshToken(null, key));
+        }
+        return tokens;
+    }
     
     @Override
     public ServerAccessToken getAccessToken(String accessToken) throws OAuthServiceException {

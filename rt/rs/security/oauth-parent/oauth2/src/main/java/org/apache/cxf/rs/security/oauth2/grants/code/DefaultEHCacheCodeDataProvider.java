@@ -18,10 +18,14 @@
  */
 package org.apache.cxf.rs.security.oauth2.grants.code;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.sf.ehcache.Ehcache;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.rs.security.oauth2.provider.DefaultEHCacheOAuthDataProvider;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 
@@ -64,15 +68,29 @@ public class DefaultEHCacheCodeDataProvider extends DefaultEHCacheOAuthDataProvi
         return AbstractCodeDataProvider.initCodeGrant(reg, codeLifetime);
     }
 
+    public List<ServerAuthorizationCodeGrant> getCodeGrants() {
+        List<String> keys = CastUtils.cast(codeGrantCache.getKeys());
+        List<ServerAuthorizationCodeGrant> grants = 
+            new ArrayList<ServerAuthorizationCodeGrant>(keys.size());
+        for (String key : keys) {
+            grants.add(getCodeGrant(key));
+        }
+        return grants;
+    }
+    
     @Override
     public ServerAuthorizationCodeGrant removeCodeGrant(String code) throws OAuthServiceException {
-        ServerAuthorizationCodeGrant grant = getCacheValue(codeGrantCache, 
-                                                                  code, 
-                                                                  ServerAuthorizationCodeGrant.class);
+        ServerAuthorizationCodeGrant grant = getCodeGrant(code);
         if (grant != null) {
             codeGrantCache.remove(code);
         }
         return grant;
+    }
+    
+    public ServerAuthorizationCodeGrant getCodeGrant(String code) throws OAuthServiceException {
+        return getCacheValue(codeGrantCache, 
+                             code, 
+                             ServerAuthorizationCodeGrant.class);
     }
         
     protected void saveCodeGrant(ServerAuthorizationCodeGrant grant) { 

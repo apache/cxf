@@ -205,6 +205,10 @@ public class AbstractTokenService extends AbstractOAuthService {
         return createErrorResponseFromBean(new OAuthError(error));
     }
     
+    protected Response createErrorResponseFromErrorCode(String error) {
+        return createErrorResponseFromBean(new OAuthError(error));
+    }
+    
     protected Response createErrorResponseFromBean(OAuthError errorBean) {
         return JAXRSUtils.toResponseBuilder(400).entity(errorBean).build();
     }
