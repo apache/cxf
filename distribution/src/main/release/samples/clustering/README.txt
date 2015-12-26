@@ -42,12 +42,11 @@ In order to install CXF's features, you need to add the CXF's features repo usin
 
  where 3.n.m corresponds to a valid CXF version number (e.g., 3.1.5).
 
-Install CXF's cxf-jaxws and cxf-features-clustering feature that installs 
-all the required bundles for this demo bundle.
+Install CXF's cxf-jaxws and cxf-features-clustering features:
 
-  feature:install cxf-features-clustering
+  feature:install cxf-jaxws cxf-features-clustering
 
-Install this demo bundles:
+Install the required bundles:
 
   install -s mvn:org.apache.cxf.samples/failover_server
   install -s mvn:org.apache.cxf.samples/failover_jaxws_osgi
@@ -61,6 +60,9 @@ Install this demo bundles:
   install -s mvn:org.qi4j.library/org.qi4j.library.jmx/2.1
   install -s mvn:org.qi4j.library/org.qi4j.library.circuitbreaker/2.1
   
+Install this demo bundles:
+  install -s mvn:org.apache.cxf.samples/failover_server/3.n.m
+  install -s mvn:org.apache.cxf.samples/failover_jaxws_osgi/3.n.m
 
 You can verify if the Apache CXF Blueprint Demo Server and JAX-WS
 Failover client are installed and started.
