@@ -81,8 +81,13 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
                                                 List<String> restrictedScopes) throws OAuthServiceException {
         RefreshToken currentRefreshToken = recycleRefreshTokens 
             ? revokeRefreshToken(refreshTokenKey) : getRefreshToken(refreshTokenKey);
-        if (currentRefreshToken == null 
-            || OAuthUtils.isExpired(currentRefreshToken.getIssuedAt(), currentRefreshToken.getExpiresIn())) {
+        if (currentRefreshToken == null) { 
+            throw new OAuthServiceException(OAuthConstants.ACCESS_DENIED);
+        }
+        if (OAuthUtils.isExpired(currentRefreshToken.getIssuedAt(), currentRefreshToken.getExpiresIn())) {
+            if (!recycleRefreshTokens) {
+                revokeRefreshToken(refreshTokenKey);
+            }
             throw new OAuthServiceException(OAuthConstants.ACCESS_DENIED);
         }
         if (recycleRefreshTokens) {
