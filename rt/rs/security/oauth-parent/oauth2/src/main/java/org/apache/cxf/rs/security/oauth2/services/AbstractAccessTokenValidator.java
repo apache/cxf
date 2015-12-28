@@ -131,7 +131,7 @@ public abstract class AbstractAccessTokenValidator {
         // Check if token is still valid
         if (OAuthUtils.isExpired(accessTokenV.getTokenIssuedAt(), accessTokenV.getTokenLifetime())) {
             if (localAccessToken != null) {
-                dataProvider.removeAccessToken(localAccessToken);
+                removeAccessToken(localAccessToken);
             }
             AuthorizationUtils.throwAuthorizationFailure(supportedSchemes, realm);
         }
@@ -142,6 +142,11 @@ public abstract class AbstractAccessTokenValidator {
         }
         
         return accessTokenV;
+    }
+
+    @SuppressWarnings("deprecation")
+    protected void removeAccessToken(ServerAccessToken localAccessToken) {
+        dataProvider.removeAccessToken(localAccessToken);
     }
 
     protected boolean validateAudience(String audience) {

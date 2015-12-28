@@ -147,4 +147,16 @@ public class EncryptingDataProvider implements OAuthDataProvider {
         String encryptedRefreshToken = ModelEncryptionSupport.encryptRefreshToken(refreshToken, key);
         token.setRefreshToken(encryptedRefreshToken);
     }
+
+    @Override
+    public List<ServerAccessToken> getAccessTokens(Client client) throws OAuthServiceException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<RefreshToken> getRefreshTokens(Client client) throws OAuthServiceException {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

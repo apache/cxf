@@ -29,6 +29,7 @@ import javax.crypto.SecretKey;
 
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
+import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rs.security.oauth2.utils.crypto.ModelEncryptionSupport;
@@ -68,15 +69,20 @@ public class DefaultEncryptingOAuthDataProvider extends AbstractOAuthDataProvide
         return client;
     }
     @Override
-    public List<Client> getClients() {
+    public List<Client> getClients(UserSubject resourceOwner) {
         List<Client> clients = new ArrayList<Client>(clientsMap.size());
         for (String clientKey : clientsMap.keySet()) {
-            clients.add(getClient(clientKey));
+            Client c = getClient(clientKey);
+            if (resourceOwner == null 
+                || c.getResourceOwnerSubject() != null 
+                   && c.getResourceOwnerSubject().getLogin().equals(resourceOwner.getLogin())) {
+                clients.add(c);
+            }
         }
         return clients;
     }
     @Override
-    protected List<ServerAccessToken> getAccessTokens(Client c) {
+    public List<ServerAccessToken> getAccessTokens(Client c) {
         List<ServerAccessToken> list = new ArrayList<ServerAccessToken>(tokens.size());
         for (String tokenKey : tokens) {
             ServerAccessToken token = getAccessToken(tokenKey);
@@ -87,7 +93,7 @@ public class DefaultEncryptingOAuthDataProvider extends AbstractOAuthDataProvide
         return list;
     }
     @Override
-    protected List<RefreshToken> getRefreshTokens(Client c) {
+    public List<RefreshToken> getRefreshTokens(Client c) {
         List<RefreshToken> list = new ArrayList<RefreshToken>(refreshTokens.size());
         for (String tokenKey : tokens) {
             RefreshToken token = getRefreshToken(tokenKey);

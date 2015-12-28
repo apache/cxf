@@ -38,6 +38,7 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
+import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken;
 import org.apache.cxf.rs.security.oauth2.utils.EHCacheUtil;
 
@@ -88,17 +89,22 @@ public class DefaultEHCacheOAuthDataProvider extends AbstractOAuthDataProvider {
     }
 
     @Override
-    public List<Client> getClients() {
+    public List<Client> getClients(UserSubject resourceOwner) {
         List<String> keys = CastUtils.cast(clientCache.getKeys());
         List<Client> clients = new ArrayList<Client>(keys.size());
         for (String key : keys) {
-            clients.add(getClient(key));
+            Client c = getClient(key);
+            if (resourceOwner == null 
+                || c.getResourceOwnerSubject() != null 
+                   && c.getResourceOwnerSubject().getLogin().equals(resourceOwner.getLogin())) {
+                clients.add(c);
+            }
         }
         return clients;
     }
 
     @Override
-    protected List<ServerAccessToken> getAccessTokens(Client c) {
+    public List<ServerAccessToken> getAccessTokens(Client c) {
         List<String> keys = CastUtils.cast(accessTokenCache.getKeys());
         List<ServerAccessToken> tokens = new ArrayList<ServerAccessToken>(keys.size());
         for (String key : keys) {
@@ -111,7 +117,7 @@ public class DefaultEHCacheOAuthDataProvider extends AbstractOAuthDataProvider {
     }
 
     @Override
-    protected List<RefreshToken> getRefreshTokens(Client c) {
+    public List<RefreshToken> getRefreshTokens(Client c) {
         List<String> keys = CastUtils.cast(refreshTokenCache.getKeys());
         List<RefreshToken> tokens = new ArrayList<RefreshToken>(keys.size());
         for (String key : keys) {

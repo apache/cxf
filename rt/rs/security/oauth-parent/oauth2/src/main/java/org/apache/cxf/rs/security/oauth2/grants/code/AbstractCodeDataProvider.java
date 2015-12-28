@@ -18,8 +18,6 @@
  */
 package org.apache.cxf.rs.security.oauth2.grants.code;
 
-import java.util.List;
-
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.provider.AbstractOAuthDataProvider;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
@@ -64,5 +62,4 @@ public abstract class AbstractCodeDataProvider extends AbstractOAuthDataProvider
         return grant;
     }
     protected abstract void saveCodeGrant(ServerAuthorizationCodeGrant grant);
-    public abstract List<ServerAuthorizationCodeGrant> getCodeGrants(Client c);
 }
