@@ -35,6 +35,7 @@ import org.apache.cxf.rs.security.oauth2.provider.OAuthDataProvider;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.saml.Constants;
 import org.apache.cxf.rs.security.oauth2.tokens.bearer.BearerAccessToken;
+import org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
 
 
@@ -116,6 +117,18 @@ public class OAuthDataProviderImpl implements OAuthDataProvider {
     public void revokeToken(Client client, String token, String tokenTypeHint) throws OAuthServiceException {
         // TODO Auto-generated method stub
         
+    }
+
+    @Override
+    public List<ServerAccessToken> getAccessTokens(Client client) throws OAuthServiceException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<RefreshToken> getRefreshTokens(Client client) throws OAuthServiceException {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

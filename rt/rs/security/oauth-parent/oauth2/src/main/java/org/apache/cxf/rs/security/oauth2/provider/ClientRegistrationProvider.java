@@ -21,10 +21,32 @@ package org.apache.cxf.rs.security.oauth2.provider;
 import java.util.List;
 
 import org.apache.cxf.rs.security.oauth2.common.Client;
+import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 
 public interface ClientRegistrationProvider {
+    /**
+     * Get a Client with the given id
+     * @param clientId the client id
+     * @return Client
+     */
     Client getClient(String clientId);
+    /**
+     * Set a Client
+     * @param client the client
+     */
     void setClient(Client client);
+    /**
+     * Remove a Client with the given id
+     * @param clientId the client id
+     * @return Client
+     */
     Client removeClient(String clientId);
-    List<Client> getClients();
+    
+    /**
+     * Get a list of clients registered by a resource owner.
+     *  
+     * @param resourceOwner the resource owner, can be null
+     * @return the list of clients
+     */
+    List<Client> getClients(UserSubject resourceOwner);
 }

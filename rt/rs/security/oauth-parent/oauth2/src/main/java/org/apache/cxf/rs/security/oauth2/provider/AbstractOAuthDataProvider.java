@@ -282,8 +282,6 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
     protected abstract void saveAccessToken(ServerAccessToken serverToken);
     protected abstract void saveRefreshToken(ServerAccessToken at, RefreshToken refreshToken);
     protected abstract ServerAccessToken revokeAccessToken(String accessTokenKey);
-    protected abstract List<ServerAccessToken> getAccessTokens(Client c);
-    protected abstract List<RefreshToken> getRefreshTokens(Client c);
     protected abstract RefreshToken revokeRefreshToken(String refreshTokenKey);
     protected abstract RefreshToken getRefreshToken(String refreshTokenKey);
 

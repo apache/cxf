@@ -19,6 +19,9 @@
 
 package org.apache.cxf.rs.security.oauth2.grants.code;
 
+import java.util.List;
+
+import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthDataProvider;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 
@@ -49,4 +52,13 @@ public interface AuthorizationCodeDataProvider extends OAuthDataProvider {
      * @see ServerAuthorizationCodeGrant
      */
     ServerAuthorizationCodeGrant removeCodeGrant(String code) throws OAuthServiceException;
+    
+    /**
+     * Return the list of code grants associated with a given client
+     * @param client the client
+     * @return the list of grants
+     * @throws OAuthServiceException
+     * @see ServerAuthorizationCodeGrant
+     */
+    List<ServerAuthorizationCodeGrant> getCodeGrants(Client c) throws OAuthServiceException;
 }
