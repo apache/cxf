@@ -144,9 +144,10 @@ public abstract class AbstractAccessTokenValidator {
         return accessTokenV;
     }
 
-    @SuppressWarnings("deprecation")
-    protected void removeAccessToken(ServerAccessToken localAccessToken) {
-        dataProvider.removeAccessToken(localAccessToken);
+    protected void removeAccessToken(ServerAccessToken at) {
+        dataProvider.revokeToken(at.getClient(), 
+                                 at.getTokenKey(), 
+                                 OAuthConstants.ACCESS_TOKEN);
     }
 
     protected boolean validateAudience(String audience) {

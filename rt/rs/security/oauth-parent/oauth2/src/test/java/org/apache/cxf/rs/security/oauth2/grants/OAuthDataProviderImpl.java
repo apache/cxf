@@ -66,12 +66,6 @@ public class OAuthDataProviderImpl implements OAuthDataProvider {
     }
 
     @Override
-    public void removeAccessToken(ServerAccessToken accessToken) throws OAuthServiceException {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
     public List<OAuthPermission> convertScopeToPermissions(Client client, List<String> requestedScope) {
         // TODO Auto-generated method stub
         return null;

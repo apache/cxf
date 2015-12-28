@@ -87,15 +87,6 @@ public interface OAuthDataProvider {
         throws OAuthServiceException;
 
     /**
-     * Removes the access token
-     * The runtime will call this method if it finds that a token has expired
-     * @param accessToken the token
-     * @throws OAuthServiceException
-     */
-    @Deprecated
-    void removeAccessToken(ServerAccessToken accessToken) throws OAuthServiceException;
-    
-    /**
      * Return all access tokens associated with a given client
      * @param client the client
      * @return list of access tokens

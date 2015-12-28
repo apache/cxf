@@ -88,11 +88,6 @@ public class EncryptingDataProvider implements OAuthDataProvider {
     }
 
     @Override
-    public void removeAccessToken(ServerAccessToken accessToken) throws OAuthServiceException {
-        tokens.remove(accessToken.getTokenKey());
-    }
-
-    @Override
     public void revokeToken(Client client, String token, String tokenTypeHint)
         throws OAuthServiceException {
         // the fast way: if it is the refresh token then there will be a matching value for it

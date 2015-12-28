@@ -72,11 +72,6 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
     }
     
     @Override
-    public void removeAccessToken(ServerAccessToken token) throws OAuthServiceException {
-        revokeAccessToken(token.getTokenKey());
-    }
-    
-    @Override
     public ServerAccessToken refreshAccessToken(Client client, String refreshTokenKey,
                                                 List<String> restrictedScopes) throws OAuthServiceException {
         RefreshToken currentRefreshToken = recycleRefreshTokens 
