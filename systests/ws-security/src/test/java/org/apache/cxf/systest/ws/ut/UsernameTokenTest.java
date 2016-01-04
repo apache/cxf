@@ -172,6 +172,33 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.Test
+    public void testPlaintextSupportingSP11() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = UsernameTokenTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = UsernameTokenTest.class.getResource("DoubleItUt.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItPlaintextSupportingSP11Port");
+        DoubleItPortType utPort = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(utPort, test.getPort());
+        
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(utPort);
+        }
+        
+        utPort.doubleIt(25);
+        
+        ((java.io.Closeable)utPort).close();
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
     public void testPasswordHashed() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
