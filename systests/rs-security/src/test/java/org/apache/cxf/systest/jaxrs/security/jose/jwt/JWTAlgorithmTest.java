@@ -689,6 +689,80 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
         assertEquals(returnedBook.getId(), 123L);
     }
     
+    @org.junit.Test
+    public void testHMACSignature() throws Exception {
+
+        URL busFile = JWTAlgorithmTest.class.getResource("client.xml");
+
+        List<Object> providers = new ArrayList<Object>();
+        providers.add(new JacksonJsonProvider());
+        providers.add(new JwtAuthenticationClientFilter());
+
+        String address = "https://localhost:" + PORT + "/hmacsignedjwt/bookstore/books";
+        WebClient client = 
+            WebClient.create(address, providers, busFile.toString());
+        client.type("application/json").accept("application/json");
+        
+        // Create the JWT Token
+        JwtClaims claims = new JwtClaims();
+        claims.setSubject("alice");
+        claims.setIssuer("DoubleItSTSIssuer");
+        claims.setIssuedAt(new Date().getTime() / 1000L);
+        claims.setAudiences(toList(address));
+        
+        JwtToken token = new JwtToken(claims);
+
+        Map<String, Object> properties = new HashMap<String, Object>();
+        properties.put("rs.security.keystore.type", "jwk");
+        properties.put("rs.security.keystore.alias", "HMAC512Key");
+        properties.put("rs.security.keystore.file", 
+                       "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
+        properties.put(JwtConstants.JWT_TOKEN, token);
+        WebClient.getConfig(client).getRequestContext().putAll(properties);
+
+        Response response = client.post(new Book("book", 123L));
+        assertEquals(response.getStatus(), 200);
+        
+        Book returnedBook = response.readEntity(Book.class);
+        assertEquals(returnedBook.getName(), "book");
+        assertEquals(returnedBook.getId(), 123L);
+    }
+    
+    @org.junit.Test
+    public void testBadHMACSignature() throws Exception {
+
+        URL busFile = JWTAlgorithmTest.class.getResource("client.xml");
+
+        List<Object> providers = new ArrayList<Object>();
+        providers.add(new JacksonJsonProvider());
+        providers.add(new JwtAuthenticationClientFilter());
+
+        String address = "https://localhost:" + PORT + "/hmacsignedjwt/bookstore/books";
+        WebClient client = 
+            WebClient.create(address, providers, busFile.toString());
+        client.type("application/json").accept("application/json");
+        
+        // Create the JWT Token
+        JwtClaims claims = new JwtClaims();
+        claims.setSubject("alice");
+        claims.setIssuer("DoubleItSTSIssuer");
+        claims.setIssuedAt(new Date().getTime() / 1000L);
+        claims.setAudiences(toList(address));
+        
+        JwtToken token = new JwtToken(claims);
+
+        Map<String, Object> properties = new HashMap<String, Object>();
+        properties.put("rs.security.keystore.type", "jwk");
+        properties.put("rs.security.keystore.alias", "HMACKey");
+        properties.put("rs.security.keystore.file", 
+                       "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
+        properties.put(JwtConstants.JWT_TOKEN, token);
+        WebClient.getConfig(client).getRequestContext().putAll(properties);
+
+        Response response = client.post(new Book("book", 123L));
+        assertNotEquals(response.getStatus(), 200);
+    }
+
     private List<String> toList(String address) {
         return Collections.singletonList(address);
     }
