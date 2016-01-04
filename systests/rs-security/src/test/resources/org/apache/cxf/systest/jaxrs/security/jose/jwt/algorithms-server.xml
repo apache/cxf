@@ -154,4 +154,20 @@ under the License.
         </jaxrs:properties>
     </jaxrs:server>
     
+    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jwt-algorithms}/hmacsignedjwt">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="jwtSigFilter"/>
+        </jaxrs:providers>
+        <jaxrs:properties>
+            <entry key="rs.security.keystore.type" value="jwk"/>
+            <entry key="rs.security.keystore.alias" value="HMAC512Key"/>
+            <entry key="rs.security.keystore.file" 
+                   value="org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt"/>
+            <entry key="rs.security.signature.algorithm" value="HS512"/>
+        </jaxrs:properties>
+    </jaxrs:server>
+    
 </beans>
