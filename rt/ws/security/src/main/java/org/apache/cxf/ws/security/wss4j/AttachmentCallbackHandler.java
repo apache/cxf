@@ -33,6 +33,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 
 import org.apache.cxf.attachment.AttachmentDataSource;
 import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.message.Attachment;
 import org.apache.wss4j.common.ext.AttachmentRequestCallback;
 import org.apache.wss4j.common.ext.AttachmentResultCallback;
 
@@ -64,6 +65,10 @@ public class AttachmentCallbackHandler implements CallbackHandler {
                 loadAttachments(attachmentList, attachmentId);
             } else if (callback instanceof AttachmentResultCallback) {
                 AttachmentResultCallback attachmentResultCallback = (AttachmentResultCallback) callback;
+                
+                if (soapMessage.getAttachments() == null) {
+                    soapMessage.setAttachments(new ArrayList<Attachment>());
+                }
 
                 final Collection<org.apache.cxf.message.Attachment> attachments = soapMessage.getAttachments();
 
