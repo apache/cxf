@@ -396,6 +396,7 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
 
         sb.getOutFaultInterceptors().add(new StaxOutInterceptor());
         sb.getOutFaultInterceptors().add(new SoapOutInterceptor(getBus()));
+        sb.getOutFaultInterceptors().add(new AttachmentOutInterceptor());
 
         sb.getInInterceptors().add(new AttachmentInInterceptor());
         sb.getInInterceptors().add(new StaxInInterceptor());
