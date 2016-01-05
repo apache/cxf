@@ -199,8 +199,8 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             storeBytesInAttachment = true;
             if (binding instanceof AbstractSymmetricAsymmetricBinding
                 && (ProtectionOrder.EncryptBeforeSigning 
-                    == ((AbstractSymmetricAsymmetricBinding)binding).getProtectionOrder())
-                    || ((AbstractSymmetricAsymmetricBinding)binding).isProtectTokens()) {
+                    == ((AbstractSymmetricAsymmetricBinding)binding).getProtectionOrder()
+                    || ((AbstractSymmetricAsymmetricBinding)binding).isProtectTokens())) {
                 LOG.fine("Disabling SecurityConstants.STORE_BYTES_IN_ATTACHMENT due to "
                          + "EncryptBeforeSigning or ProtectTokens policy.");
                 storeBytesInAttachment = false;
