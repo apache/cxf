@@ -203,6 +203,35 @@ public class X509SymmetricBindingTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)symmetricSaml2Port).close();
         bus.shutdown(true);
     }
+    
+    @org.junit.Test
+    public void testX509SAML2Supporting() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = X509SymmetricBindingTest.class.getResource("cxf-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = X509SymmetricBindingTest.class.getResource("DoubleIt.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSymmetricSAML2SupportingPort");
+        DoubleItPortType symmetricSaml2Port = 
+            service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(symmetricSaml2Port, test.getPort());
+        
+        TokenTestUtils.updateSTSPort((BindingProvider)symmetricSaml2Port, test.getStsPort());
+        
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(symmetricSaml2Port);
+        }
+        
+        doubleIt(symmetricSaml2Port, 30);
+        
+        ((java.io.Closeable)symmetricSaml2Port).close();
+        bus.shutdown(true);
+    }
 
     private static void doubleIt(DoubleItPortType port, int numToDouble) {
         int resp = port.doubleIt(numToDouble);
