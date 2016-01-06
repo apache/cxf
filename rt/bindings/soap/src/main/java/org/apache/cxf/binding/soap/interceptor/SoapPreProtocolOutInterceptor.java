@@ -118,9 +118,7 @@ public class SoapPreProtocolOutInterceptor extends AbstractSoapInterceptor {
                 message.put(Message.PROTOCOL_HEADERS, reqHeaders);
             }
             
-            if (!reqHeaders.containsKey(SoapBindingConstants.SOAP_ACTION)) {            
-                reqHeaders.put(SoapBindingConstants.SOAP_ACTION, Collections.singletonList(action));
-            }
+            reqHeaders.put(SoapBindingConstants.SOAP_ACTION, Collections.singletonList(action));
         } else if (message.getVersion() instanceof Soap12 && !"\"\"".equals(action)) {
             String ct = (String) message.get(Message.CONTENT_TYPE);
             
