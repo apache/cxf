@@ -50,4 +50,10 @@
             <entry key="mtom-enabled" value="true"/>
         </jaxws:properties>
     </jaxws:endpoint>
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Soap11PolicyWithParts" address="http://localhost:${testutil.ports.fault.Server}/DoubleItSoap11PolicyWithParts" serviceName="s:DoubleItService" endpointName="s:DoubleItSoap11PolicyWithPartsPort" implementor="org.apache.cxf.systest.ws.fault.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/fault/DoubleItFault.wsdl">
+        <jaxws:properties>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+            <entry key="security.signature.properties" value="bob.properties"/>
+        </jaxws:properties>
+    </jaxws:endpoint>
 </beans>
