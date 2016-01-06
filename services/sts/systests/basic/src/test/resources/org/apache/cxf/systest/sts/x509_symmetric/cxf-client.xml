@@ -58,9 +58,9 @@
     
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSymmetricSAML2SupportingPort" createdFromAPI="true">
         <jaxws:properties>
-            <entry key="security.encryption.properties" value="clientKeystore.properties"/>
-            <entry key="security.encryption.username" value="myservicekey"/>
-            <entry key="security.sts.client" value-ref="stsClient"/>
+            <entry key="ws-security.encryption.properties" value="clientKeystore.properties"/>
+            <entry key="ws-security.encryption.username" value="myservicekey"/>
+            <entry key="ws-security.sts.client" value-ref="stsClient"/>
         </jaxws:properties>
     </jaxws:client>
 </beans>
