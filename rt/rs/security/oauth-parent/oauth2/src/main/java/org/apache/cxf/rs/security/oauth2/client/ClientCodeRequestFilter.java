@@ -111,6 +111,7 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
             throw ExceptionUtils.toNotAuthorizedException(null, null);
         }
     }
+    
     private void checkSecurityContextEnd(ContainerRequestContext rc,
                                          MultivaluedMap<String, String> requestParams) {
         String codeParam = requestParams.getFirst(OAuthConstants.AUTHORIZATION_CODE_VALUE);
@@ -153,6 +154,7 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
             ub.queryParam("response_mode", "form_post");
         }
     }
+    
     protected void setCodeVerifier(UriBuilder ub, MultivaluedMap<String, String> redirectState) {
         if (codeVerifierTransformer != null) {
             String codeVerifier = redirectState.getFirst(OAuthConstants.AUTHORIZATION_CODE_VERIFIER);
@@ -162,9 +164,9 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
                           codeVerifierTransformer.getChallengeMethod());
         }
     }
+    
     protected void setAdditionalCodeRequestParams(UriBuilder ub, MultivaluedMap<String, String> redirectState) {
     }
-    
     
     private URI getAbsoluteRedirectUri(UriInfo ui) {
         if (redirectUri != null) {
@@ -176,6 +178,7 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
             return ui.getAbsolutePath();
         }
     }
+    
     protected void processCodeResponse(ContainerRequestContext rc, 
                                        UriInfo ui,
                                        MultivaluedMap<String, String> requestParams) {
@@ -237,6 +240,7 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
         }
         return redirectState;
     }
+    
     protected MultivaluedMap<String, String> toCodeRequestState(ContainerRequestContext rc, UriInfo ui) {
         MultivaluedMap<String, String> state = toRequestState(rc, ui);
         if (state == null) {
@@ -244,6 +248,7 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
         }
         return state;
     }
+    
     protected MultivaluedMap<String, String> toRequestState(ContainerRequestContext rc, UriInfo ui) {
         MultivaluedMap<String, String> requestState = new MetadataMap<String, String>();
         requestState.putAll(ui.getQueryParameters(decodeRequestParameters));
@@ -265,6 +270,7 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
         }
         setScopes(sb.toString());
     }
+    
     public void setScopes(String scopes) {
         this.scopes = scopes.trim();
     }
@@ -295,6 +301,7 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
     public void setConsumer(Consumer consumer) {
         this.consumer = consumer;
     }
+    
     public Consumer getConsumer() {
         return consumer;
     }

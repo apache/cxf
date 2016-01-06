@@ -39,8 +39,9 @@ import org.apache.cxf.rs.security.oidc.common.IdToken;
 public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
     
     private static final String ACR_PARAMETER = "acr_values";
-    private static final String PROMPT_PARAMETER = "prompt";
+    private static final String LOGIN_HINT_PARAMETER = "login_hint";
     private static final String MAX_AGE_PARAMETER = "max_age";
+    private static final String PROMPT_PARAMETER = "prompt";
     private static final List<String> PROMPTS = Arrays.asList("none", "consent", "login", "select_account");
     private IdTokenReader idTokenReader;
     private UserInfoClient userInfoClient;
@@ -53,6 +54,7 @@ public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
     public void setAuthenticationContextRef(String acr) {
         this.authenticationContextRef = Arrays.asList(StringUtils.split(acr, " "));
     }
+
     @Override
     protected ClientTokenContext createTokenContext(ContainerRequestContext rc, 
                                                     ClientAccessToken at,
@@ -77,6 +79,18 @@ public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
         
         return ctx;
     }
+    
+    @Override
+    protected MultivaluedMap<String, String> createRedirectState(ContainerRequestContext rc, UriInfo ui) {
+        MultivaluedMap<String, String> redirectState = super.createRedirectState(rc, ui);
+        MultivaluedMap<String, String> codeRequestState = toRequestState(rc, ui);
+        String loginHint = codeRequestState.getFirst(LOGIN_HINT_PARAMETER);
+        if (loginHint != null) {
+            redirectState.putSingle(LOGIN_HINT_PARAMETER, loginHint);
+        }
+        return redirectState;
+    }
+
     @Override
     protected MultivaluedMap<String, String> toCodeRequestState(ContainerRequestContext rc, UriInfo ui) {
         MultivaluedMap<String, String> state = super.toCodeRequestState(rc, ui);
@@ -85,6 +99,7 @@ public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
         }
         return state;
     }
+
     private void validateIdToken(IdToken idToken, MultivaluedMap<String, String> state) {
         
         String nonce = state.getFirst(IdToken.NONCE_CLAIM);
@@ -110,6 +125,7 @@ public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
     public void setIdTokenReader(IdTokenReader idTokenReader) {
         this.idTokenReader = idTokenReader;
     }
+
     public void setUserInfoClient(UserInfoClient userInfoClient) {
         this.userInfoClient = userInfoClient; 
     }
@@ -121,6 +137,7 @@ public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
             throw ExceptionUtils.toNotAuthorizedException(null, null);
         }
     }
+
     @Override
     protected void setAdditionalCodeRequestParams(UriBuilder ub, MultivaluedMap<String, String> redirectState) {
         if (claims != null) {
@@ -143,6 +160,10 @@ public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
         if (promptLogin != null) {
             ub.queryParam(PROMPT_PARAMETER, promptLogin);
         }
+        String loginHint = redirectState.getFirst(LOGIN_HINT_PARAMETER);
+        if (loginHint != null) {
+            ub.queryParam(LOGIN_HINT_PARAMETER, loginHint);
+        }
     }
     
     public void setPromptLogin(String promptLogin) {
@@ -152,12 +173,15 @@ public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
             throw new IllegalArgumentException("Illegal prompt value");
         }
     }
+
     public void setMaxAgeOffset(Long maxAgeOffset) {
         this.maxAgeOffset = maxAgeOffset;
     }
+
     public void setClaims(String claims) {
         this.claims = claims;
     }
+
     public void setClaimsLocales(String claimsLocales) {
         this.claimsLocales = claimsLocales;
     }
