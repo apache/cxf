@@ -135,9 +135,7 @@ public class FaultTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
-    // TODO
     @org.junit.Test
-    @org.junit.Ignore
     public void testSoap12Mtom() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = FaultTest.class.getResource("client.xml");

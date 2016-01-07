@@ -107,6 +107,13 @@ public class XkmsCryptoProvider extends CryptoBase {
     }
 
     @Override
+    public PrivateKey getPrivateKey(PublicKey publicKey, CallbackHandler callbackHandler)
+        throws WSSecurityException {
+        assertDefaultCryptoProvider();
+        return fallbackCrypto.getPrivateKey(publicKey, callbackHandler);
+    }
+
+    @Override
     public PrivateKey getPrivateKey(String identifier, String password) throws WSSecurityException {
         assertDefaultCryptoProvider();
         return fallbackCrypto.getPrivateKey(identifier, password);
