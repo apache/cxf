@@ -135,7 +135,7 @@ public class FaultTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
-    // TODO
+    // TODO - Enable when WSS4J 2.1.5 is released
     @org.junit.Test
     @org.junit.Ignore
     public void testSoap12Mtom() throws Exception {
