@@ -795,8 +795,8 @@ public abstract class AbstractHTTPDestination
                 }
             }
             if (wrappedStream != null) {
+                // closing the stream should indirectly call the servlet response's flushBuffer
                 wrappedStream.close();
-                response.flushBuffer();
             }
             /*
             try {
