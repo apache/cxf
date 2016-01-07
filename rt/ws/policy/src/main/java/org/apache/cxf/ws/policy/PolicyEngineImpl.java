@@ -194,19 +194,22 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
 
     public EffectivePolicy getEffectiveClientRequestPolicy(EndpointInfo ei, BindingOperationInfo boi, 
                                                            Conduit c, Message m) {
-        synchronized (ei) {
-            EffectivePolicy effectivePolicy = (EffectivePolicy)boi.getProperty(POLICY_INFO_REQUEST_CLIENT);
-            if (null == effectivePolicy) {
-                EffectivePolicyImpl epi = createOutPolicyInfo();
-                Assertor assertor = PolicyUtils.createAsserter(c);
-                if (m != null) {
-                    boi.setProperty(POLICY_INFO_REQUEST_CLIENT, epi);
+        EffectivePolicy effectivePolicy = (EffectivePolicy)boi.getProperty(POLICY_INFO_REQUEST_CLIENT);
+        if (effectivePolicy == null) {
+            synchronized (ei) {
+                effectivePolicy = (EffectivePolicy)boi.getProperty(POLICY_INFO_REQUEST_CLIENT);
+                if (null == effectivePolicy) {
+                    EffectivePolicyImpl epi = createOutPolicyInfo();
+                    Assertor assertor = PolicyUtils.createAsserter(c);
+                    epi.initialise(ei, boi, this, assertor, true, true, m);
+                    if (m != null) {
+                        boi.setProperty(POLICY_INFO_REQUEST_CLIENT, epi);
+                    }
+                    effectivePolicy = epi;
                 }
-                epi.initialise(ei, boi, this, assertor, true, true, m);
-                effectivePolicy = epi;
             }
-            return effectivePolicy;
         }
+        return effectivePolicy;
     }
 
     public void setEffectiveClientRequestPolicy(EndpointInfo ei, BindingOperationInfo boi, 
@@ -220,19 +223,22 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
                                                             List<List<Assertion>> incoming, 
                                                             Message m) {
         if (incoming == null) {
-            synchronized (ei) {
-                EffectivePolicy effectivePolicy = (EffectivePolicy)boi.getProperty(POLICY_INFO_RESPONSE_SERVER);
-                if (null == effectivePolicy) {
-                    EffectivePolicyImpl epi = createOutPolicyInfo();
-                    Assertor assertor = PolicyUtils.createAsserter(d);
-                    if (m != null) {
-                        boi.setProperty(POLICY_INFO_RESPONSE_SERVER, epi);
+            EffectivePolicy effectivePolicy = (EffectivePolicy)boi.getProperty(POLICY_INFO_RESPONSE_SERVER);
+            if (effectivePolicy == null) {
+                synchronized (ei) {
+                    effectivePolicy = (EffectivePolicy)boi.getProperty(POLICY_INFO_RESPONSE_SERVER);
+                    if (null == effectivePolicy) {
+                        EffectivePolicyImpl epi = createOutPolicyInfo();
+                        Assertor assertor = PolicyUtils.createAsserter(d);
+                        epi.initialise(ei, boi, this, assertor, false, false, null);
+                        if (m != null) {
+                            boi.setProperty(POLICY_INFO_RESPONSE_SERVER, epi);
+                        }
+                        effectivePolicy = epi;
                     }
-                    epi.initialise(ei, boi, this, assertor, false, false, null);
-                    effectivePolicy = epi;
                 }
-                return effectivePolicy;
-            } 
+            }
+            return effectivePolicy;
         }
         EffectivePolicyImpl epi = createOutPolicyInfo();
         Assertor assertor = PolicyUtils.createAsserter(d);
@@ -258,19 +264,22 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
             return epi;
         }
         bfi = mapToWrappedBindingFaultInfo(bfi);
-        synchronized (ei) {
-            EffectivePolicy effectivePolicy = (EffectivePolicy)bfi.getProperty(POLICY_INFO_FAULT_SERVER);
-            if (null == effectivePolicy) {
-                EffectivePolicyImpl epi = createOutPolicyInfo();
-                Assertor assertor = PolicyUtils.createAsserter(d);
-                if (m != null) {
-                    bfi.setProperty(POLICY_INFO_FAULT_SERVER, epi);
+        EffectivePolicy effectivePolicy = (EffectivePolicy)bfi.getProperty(POLICY_INFO_FAULT_SERVER);
+        if (effectivePolicy == null) {
+            synchronized (ei) {
+                effectivePolicy = (EffectivePolicy)bfi.getProperty(POLICY_INFO_FAULT_SERVER);
+                if (null == effectivePolicy) {
+                    EffectivePolicyImpl epi = createOutPolicyInfo();
+                    Assertor assertor = PolicyUtils.createAsserter(d);
+                    epi.initialise(ei, boi, bfi, this, assertor, m);
+                    if (m != null) {
+                        bfi.setProperty(POLICY_INFO_FAULT_SERVER, epi);
+                    }
+                    effectivePolicy = epi;
                 }
-                epi.initialise(ei, boi, bfi, this, assertor, m);
-                effectivePolicy = epi;
             }
-            return effectivePolicy;
         }
+        return effectivePolicy;
     }
 
     private BindingFaultInfo mapToWrappedBindingFaultInfo(BindingFaultInfo bfi) {
@@ -299,19 +308,23 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
         return getEndpointPolicy(ei, false, assertor, m);
     }
 
-    private EndpointPolicy getEndpointPolicy(
+    private EndpointPolicy getEndpointPolicy(//NOPMD
         EndpointInfo ei, 
         boolean isRequestor,
         Assertor assertor,
         Message m) {
-        synchronized (ei) {
-            EndpointPolicy ep = (EndpointPolicy)ei.getProperty(isRequestor ? POLICY_INFO_ENDPOINT_CLIENT 
-                            : POLICY_INFO_ENDPOINT_SERVER);
-            if (null != ep) {
-                return ep; 
+        EndpointPolicy ep = (EndpointPolicy)ei.getProperty(isRequestor
+            ? POLICY_INFO_ENDPOINT_CLIENT : POLICY_INFO_ENDPOINT_SERVER);
+        if (ep == null) {
+            synchronized (ei) {
+                ep = (EndpointPolicy)ei.getProperty(isRequestor
+                    ? POLICY_INFO_ENDPOINT_CLIENT : POLICY_INFO_ENDPOINT_SERVER);
+                if (ep == null) {
+                    ep = createEndpointPolicyInfo(ei, isRequestor, assertor, m);
+                }
             }
-            return createEndpointPolicyInfo(ei, isRequestor, assertor, m);
         }
+        return ep;
     }
 
     public void setClientEndpointPolicy(EndpointInfo ei, EndpointPolicy ep) {
@@ -325,18 +338,21 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
     public EffectivePolicy getEffectiveServerRequestPolicy(EndpointInfo ei, 
                                                            BindingOperationInfo boi, 
                                                            Message m) {
-        synchronized (ei) {
-            EffectivePolicy effectivePolicy = (EffectivePolicy)boi.getProperty(POLICY_INFO_REQUEST_SERVER);
-            if (null == effectivePolicy) {
-                EffectivePolicyImpl epi = createOutPolicyInfo();
-                if (m != null) {
-                    boi.setProperty(POLICY_INFO_REQUEST_SERVER, epi);
+        EffectivePolicy effectivePolicy = (EffectivePolicy)boi.getProperty(POLICY_INFO_REQUEST_SERVER);
+        if (effectivePolicy == null) {
+            synchronized (ei) {
+                effectivePolicy = (EffectivePolicy)boi.getProperty(POLICY_INFO_REQUEST_SERVER);
+                if (null == effectivePolicy) {
+                    EffectivePolicyImpl epi = createOutPolicyInfo();
+                    epi.initialise(ei, boi, this, false, true, m);
+                    if (m != null) {
+                        boi.setProperty(POLICY_INFO_REQUEST_SERVER, epi);
+                    }
+                    effectivePolicy = epi;
                 }
-                epi.initialise(ei, boi, this, false, true, m);
-                effectivePolicy = epi;
             }
-            return effectivePolicy;
         }
+        return effectivePolicy;
     }
 
     public void setEffectiveServerRequestPolicy(EndpointInfo ei, BindingOperationInfo boi, 
@@ -347,18 +363,21 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
     public EffectivePolicy getEffectiveClientResponsePolicy(EndpointInfo ei,
                                                             BindingOperationInfo boi,
                                                             Message m) {
-        synchronized (ei) {
-            EffectivePolicy effectivePolicy = (EffectivePolicy)boi.getProperty(POLICY_INFO_RESPONSE_CLIENT);
-            if (null == effectivePolicy) {
-                EffectivePolicyImpl epi = createOutPolicyInfo();
-                if (m != null) {
-                    boi.setProperty(POLICY_INFO_RESPONSE_CLIENT, epi);
+        EffectivePolicy effectivePolicy = (EffectivePolicy)boi.getProperty(POLICY_INFO_RESPONSE_CLIENT);
+        if (effectivePolicy == null) {
+            synchronized (ei) {
+                effectivePolicy = (EffectivePolicy)boi.getProperty(POLICY_INFO_RESPONSE_CLIENT);
+                if (null == effectivePolicy) {
+                    EffectivePolicyImpl epi = createOutPolicyInfo();
+                    epi.initialise(ei, boi, this, true, false, m);
+                    if (m != null) {
+                        boi.setProperty(POLICY_INFO_RESPONSE_CLIENT, epi);
+                    }
+                    effectivePolicy = epi;
                 }
-                epi.initialise(ei, boi, this, true, false, m);
-                effectivePolicy = epi;
             }
-            return effectivePolicy;
         }
+        return effectivePolicy;
     }
 
     public void setEffectiveClientResponsePolicy(EndpointInfo ei, BindingOperationInfo boi, 
@@ -370,21 +389,26 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
                                                          BindingOperationInfo boi,
                                                          BindingFaultInfo bfi,
                                                          Message m) {
-        synchronized (ei) {
-            EffectivePolicy effectivePolicy = null;
-            if (bfi != null) {
-                effectivePolicy = (EffectivePolicy)bfi.getProperty(POLICY_INFO_FAULT_CLIENT);
-            }
-            if (null == effectivePolicy) {
-                EffectivePolicyImpl epi = createOutPolicyInfo();
-                if (bfi != null) {
-                    bfi.setProperty(POLICY_INFO_FAULT_CLIENT, epi);
-                }
-                epi.initialisePolicy(ei, boi, bfi, this, m);
-                effectivePolicy = epi;
-            }
-            return effectivePolicy;
+        EffectivePolicy effectivePolicy = null;
+        if (bfi != null) {
+            effectivePolicy = (EffectivePolicy)bfi.getProperty(POLICY_INFO_FAULT_CLIENT);
         }
+        if (effectivePolicy == null) {
+            synchronized (ei) {
+                if (bfi != null) {
+                    effectivePolicy = (EffectivePolicy)bfi.getProperty(POLICY_INFO_FAULT_CLIENT);
+                }
+                if (null == effectivePolicy) {
+                    EffectivePolicyImpl epi = createOutPolicyInfo();
+                    epi.initialisePolicy(ei, boi, bfi, this, m);
+                    if (bfi != null) {
+                        bfi.setProperty(POLICY_INFO_FAULT_CLIENT, epi);
+                    }
+                    effectivePolicy = epi;
+                }
+            }
+        }
+        return effectivePolicy;
     }
 
     public void setEffectiveClientFaultPolicy(EndpointInfo ei, BindingFaultInfo bfi, EffectivePolicy ep) {
