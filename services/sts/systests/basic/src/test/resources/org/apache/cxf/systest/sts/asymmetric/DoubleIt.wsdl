@@ -56,6 +56,9 @@
         <wsdl:port name="DoubleItAsymmetricSAML2Port" binding="tns:DoubleItAsymmetricSAML2Binding">
             <soap:address location="http://localhost:8082/doubleit/services/doubleitasymmetricsaml2"/>
         </wsdl:port>
+        <wsdl:port name="DoubleItAsymmetricSAML2KeyValuePort" binding="tns:DoubleItAsymmetricSAML2Binding">
+            <soap:address location="http://localhost:8082/doubleit/services/doubleitasymmetricsaml2keyvalue"/>
+        </wsdl:port>
         <wsdl:port name="DoubleItAsymmetricSAML1EncryptedPort" binding="tns:DoubleItAsymmetricSAML1Binding">
             <soap:address location="http://localhost:8082/doubleit/services/doubleitasymmetricsaml1encrypted"/>
         </wsdl:port>

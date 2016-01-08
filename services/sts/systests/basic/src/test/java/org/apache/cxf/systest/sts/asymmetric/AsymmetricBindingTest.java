@@ -105,7 +105,6 @@ public class AsymmetricBindingTest extends AbstractBusClientServerTestBase {
                                                 {new TestParam(PORT, true, STSPORT2)},
                                                 {new TestParam(STAX_PORT, false, STSPORT2)},
                                                 {new TestParam(STAX_PORT, true, STSPORT2)},
-                                                
                                                 {new TestParam(PORT, false, STAX_STSPORT2)},
                                                 {new TestParam(PORT, true, STAX_STSPORT2)},
                                                 {new TestParam(STAX_PORT, false, STAX_STSPORT2)},
@@ -161,6 +160,40 @@ public class AsymmetricBindingTest extends AbstractBusClientServerTestBase {
         URL wsdl = AsymmetricBindingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSAML2Port");
+        DoubleItPortType asymmetricSaml2Port = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(asymmetricSaml2Port, test.getPort());
+        
+        TokenTestUtils.updateSTSPort((BindingProvider)asymmetricSaml2Port, test.getStsPort());
+        
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(asymmetricSaml2Port);
+        }
+        
+        doubleIt(asymmetricSaml2Port, 30);
+        TokenTestUtils.verifyToken(asymmetricSaml2Port);
+        
+        ((java.io.Closeable)asymmetricSaml2Port).close();
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testUsernameTokenSAML2KeyValue() throws Exception {
+        // TODO
+        if (test.isStreaming() || STAX_PORT.equals(test.getPort())) {
+            return;
+        }
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = AsymmetricBindingTest.class.getResource("cxf-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = AsymmetricBindingTest.class.getResource("DoubleIt.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSAML2KeyValuePort");
         DoubleItPortType asymmetricSaml2Port = 
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(asymmetricSaml2Port, test.getPort());

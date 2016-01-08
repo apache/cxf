@@ -270,6 +270,9 @@ public class IssuedTokenPolicyValidator extends AbstractSamlPolicyValidator {
             if (certs != null && certs.length > 0) {
                 token.setX509Certificate(certs[0], null);
             }
+            if (subjectKeyInfo.getPublicKey() != null) {
+                token.setKey(subjectKeyInfo.getPublicKey());
+            }
         }
         if (assertionWrapper.getSaml1() != null) {
             token.setTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
