@@ -39,18 +39,27 @@ import java.util.List;
  */
 public final class PublicSuffixList {
 
+    private final DomainType type;
     private final List<String> rules;
     private final List<String> exceptions;
 
-    public PublicSuffixList(final List<String> rules, final List<String> exceptions) {
+    public PublicSuffixList(final DomainType type, final List<String> rules, final List<String> exceptions) {
+        if (type == null) {
+            throw new IllegalArgumentException("Domain type is null");
+        }
         if (rules == null) {
             throw new IllegalArgumentException("Domain suffix rules are null");
         }
         if (exceptions == null) {
             throw new IllegalArgumentException("Domain suffix exceptions are null");
         }
+        this.type = type;
         this.rules = Collections.unmodifiableList(rules);
         this.exceptions = Collections.unmodifiableList(exceptions);
+    }
+    
+    public DomainType getType() {
+        return type;
     }
 
     public List<String> getRules() {
