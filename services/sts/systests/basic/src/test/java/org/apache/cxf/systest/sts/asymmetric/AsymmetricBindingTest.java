@@ -177,7 +177,9 @@ public class AsymmetricBindingTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
+    // TODO enable when WSS4J 2.1.5 is released, and some stuff in the AsymmetricBindingHandler
     @org.junit.Test
+    @org.junit.Ignore
     public void testUsernameTokenSAML2KeyValue() throws Exception {
         // TODO
         if (test.isStreaming() || STAX_PORT.equals(test.getPort())) {
