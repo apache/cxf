@@ -61,6 +61,36 @@
             <entry key="security.sts.client" value-ref="stsClient"/>
         </jaxws:properties>
     </jaxws:client>
+    
+     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricSAML2KeyValuePort" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="security.signature.properties" value="clientKeystore.properties"/>
+            <entry key="security.signature.username" value="myclientkey"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+            <entry key="security.encryption.properties" value="clientKeystore.properties"/>
+            <entry key="security.encryption.username" value="myservicekey"/>
+            <entry key="security.sts.client">
+                <bean class="org.apache.cxf.ws.security.trust.STSClient">
+                    <constructor-arg ref="cxf"/>
+                    <property name="wsdlLocation" value="http://localhost:8080/SecurityTokenService/UT?wsdl"/>
+                    <property name="serviceName" value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService"/>
+                    <property name="endpointName" value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}UT_Port"/>
+                    <property name="properties">
+                        <map>
+                            <entry key="security.username" value="alice"/>
+                            <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+                            <entry key="security.encryption.username" value="mystskey"/>
+                            <entry key="security.encryption.properties" value="clientKeystore.properties"/>
+                            <entry key="security.sts.token.username" value="myclientkey"/>
+                            <entry key="security.sts.token.properties" value="clientKeystore.properties"/>
+                            <entry key="ws-security.is-bsp-compliant" value="false"/>
+                       </map>
+                    </property>
+                </bean>
+            </entry>
+        </jaxws:properties>
+    </jaxws:client>
+    
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricSAML1EncryptedPort" createdFromAPI="true">
         <jaxws:properties>
             <entry key="security.signature.properties" value="clientKeystore.properties"/>
