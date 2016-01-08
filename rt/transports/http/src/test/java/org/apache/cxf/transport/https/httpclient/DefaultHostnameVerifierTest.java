@@ -50,7 +50,7 @@ public class DefaultHostnameVerifierTest {
     private DefaultHostnameVerifier implWithPublicSuffixCheck;
 
     @Before
-    public void setup() {
+    public void setUp() {
         impl = new DefaultHostnameVerifier();
         publicSuffixMatcher = new PublicSuffixMatcher(DomainType.ICANN, Arrays.asList("com", "co.jp", "gov.uk"), null);
         implWithPublicSuffixCheck = new DefaultHostnameVerifier(publicSuffixMatcher);

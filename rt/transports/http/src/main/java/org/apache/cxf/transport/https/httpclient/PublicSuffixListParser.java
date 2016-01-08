@@ -52,8 +52,8 @@ public final class PublicSuffixListParser {
      * @throws java.io.IOException on error while reading from list
      */
     public PublicSuffixList parse(final Reader reader) throws IOException {
-        final List<String> rules = new ArrayList<>();
-        final List<String> exceptions = new ArrayList<>();
+        final List<String> rules = new ArrayList<String>();
+        final List<String> exceptions = new ArrayList<String>();
         final BufferedReader r = new BufferedReader(reader);
 
         String line;
@@ -94,7 +94,7 @@ public final class PublicSuffixListParser {
      * @since 4.5
      */
     public List<PublicSuffixList> parseByType(final Reader reader) throws IOException {
-        final List<PublicSuffixList> result = new ArrayList<>(2);
+        final List<PublicSuffixList> result = new ArrayList<PublicSuffixList>(2);
 
         final BufferedReader r = new BufferedReader(reader);
 
@@ -142,12 +142,12 @@ public final class PublicSuffixListParser {
 
             if (isException) {
                 if (exceptions == null) {
-                    exceptions = new ArrayList<>();
+                    exceptions = new ArrayList<String>();
                 }
                 exceptions.add(line);
             } else {
                 if (rules == null) {
-                    rules = new ArrayList<>();
+                    rules = new ArrayList<String>();
                 }
                 rules.add(line);
             }
