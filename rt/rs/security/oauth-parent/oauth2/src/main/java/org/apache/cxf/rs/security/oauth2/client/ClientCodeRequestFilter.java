@@ -131,7 +131,8 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
     }
 
     private Response createCodeResponse(ContainerRequestContext rc, UriInfo ui) {
-        MultivaluedMap<String, String> redirectState = createRedirectState(rc, ui);
+        MultivaluedMap<String, String> codeRequestState = toCodeRequestState(rc, ui);
+        MultivaluedMap<String, String> redirectState = createRedirectState(rc, ui, codeRequestState);
         String theState = redirectState != null ? redirectState.getFirst(OAuthConstants.STATE) : null;
         String redirectScope = redirectState != null ? redirectState.getFirst(OAuthConstants.SCOPE) : null;
         String theScope = redirectScope != null ? redirectScope : scopes;
@@ -142,7 +143,7 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
                                              theScope);
         setFormPostResponseMode(ub, redirectState);
         setCodeVerifier(ub, redirectState);
-        setAdditionalCodeRequestParams(ub, redirectState);
+        setAdditionalCodeRequestParams(ub, redirectState, codeRequestState);
         URI uri = ub.build();
         return Response.seeOther(uri).build();
     }
@@ -165,7 +166,9 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
         }
     }
     
-    protected void setAdditionalCodeRequestParams(UriBuilder ub, MultivaluedMap<String, String> redirectState) {
+    protected void setAdditionalCodeRequestParams(UriBuilder ub, 
+                                                  MultivaluedMap<String, String> redirectState,
+                                                  MultivaluedMap<String, String> codeRequestState) {
     }
     
     private URI getAbsoluteRedirectUri(UriInfo ui) {
@@ -222,12 +225,13 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
         JAXRSUtils.getCurrentMessage().setContent(ClientTokenContext.class, request);
     }
 
-    protected MultivaluedMap<String, String> createRedirectState(ContainerRequestContext rc, UriInfo ui) {
+    protected MultivaluedMap<String, String> createRedirectState(ContainerRequestContext rc, 
+                                                                 UriInfo ui,
+                                                                 MultivaluedMap<String, String> codeRequestState) {
         if (clientStateManager == null) {
             return new MetadataMap<String, String>();
         }
         String codeVerifier = null;
-        MultivaluedMap<String, String> codeRequestState = toCodeRequestState(rc, ui);
         if (codeVerifierTransformer != null) {
             codeVerifier = Base64UrlUtility.encode(CryptoUtils.generateSecureRandomBytes(32));
             codeRequestState.putSingle(OAuthConstants.AUTHORIZATION_CODE_VERIFIER, 

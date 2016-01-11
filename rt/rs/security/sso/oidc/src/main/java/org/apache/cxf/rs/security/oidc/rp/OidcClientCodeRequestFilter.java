@@ -81,17 +81,6 @@ public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
     }
     
     @Override
-    protected MultivaluedMap<String, String> createRedirectState(ContainerRequestContext rc, UriInfo ui) {
-        MultivaluedMap<String, String> redirectState = super.createRedirectState(rc, ui);
-        MultivaluedMap<String, String> codeRequestState = toRequestState(rc, ui);
-        String loginHint = codeRequestState.getFirst(LOGIN_HINT_PARAMETER);
-        if (loginHint != null) {
-            redirectState.putSingle(LOGIN_HINT_PARAMETER, loginHint);
-        }
-        return redirectState;
-    }
-
-    @Override
     protected MultivaluedMap<String, String> toCodeRequestState(ContainerRequestContext rc, UriInfo ui) {
         MultivaluedMap<String, String> state = super.toCodeRequestState(rc, ui);
         if (maxAgeOffset != null) {
@@ -139,13 +128,9 @@ public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
     }
 
     @Override
-    protected void setAdditionalCodeRequestParams(UriBuilder ub, MultivaluedMap<String, String> redirectState) {
-        if (claims != null) {
-            ub.queryParam("claims", claims);
-        }
-        if (claimsLocales != null) {
-            ub.queryParam("claims_locales", claimsLocales);
-        }
+    protected void setAdditionalCodeRequestParams(UriBuilder ub, 
+                                                  MultivaluedMap<String, String> redirectState,
+                                                  MultivaluedMap<String, String> codeRequestState) {
         if (redirectState != null) {
             if (redirectState.getFirst(IdToken.NONCE_CLAIM) != null) {
                 ub.queryParam(IdToken.NONCE_CLAIM, redirectState.getFirst(IdToken.NONCE_CLAIM));
@@ -154,16 +139,22 @@ public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
                 ub.queryParam(MAX_AGE_PARAMETER, redirectState.getFirst(MAX_AGE_PARAMETER));
             }
         }
+        if (codeRequestState != null && codeRequestState.getFirst(LOGIN_HINT_PARAMETER) != null) {
+            ub.queryParam(LOGIN_HINT_PARAMETER, codeRequestState.getFirst(LOGIN_HINT_PARAMETER));
+        }
+        if (claims != null) {
+            ub.queryParam("claims", claims);
+        }
+        if (claimsLocales != null) {
+            ub.queryParam("claims_locales", claimsLocales);
+        }
         if (authenticationContextRef != null) {
             ub.queryParam(ACR_PARAMETER, authenticationContextRef);
         }
         if (promptLogin != null) {
             ub.queryParam(PROMPT_PARAMETER, promptLogin);
         }
-        String loginHint = redirectState.getFirst(LOGIN_HINT_PARAMETER);
-        if (loginHint != null) {
-            ub.queryParam(LOGIN_HINT_PARAMETER, loginHint);
-        }
+        
     }
     
     public void setPromptLogin(String promptLogin) {
