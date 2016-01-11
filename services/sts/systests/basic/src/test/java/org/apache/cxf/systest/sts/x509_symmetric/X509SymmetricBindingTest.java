@@ -233,6 +233,44 @@ public class X509SymmetricBindingTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
 
+    // Here we refer to the Assertion directly, instead of creating a SecurityTokenReference and using the
+    // STR Transform
+    @org.junit.Test
+    public void testX509SAML2SupportingDirectReferenceToAssertion() throws Exception {
+        
+        // TODO Not yet supported for the client streaming code
+        if (test.isStreaming()) {
+            return;
+        }
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = X509SymmetricBindingTest.class.getResource("cxf-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = X509SymmetricBindingTest.class.getResource("DoubleIt.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSymmetricSAML2SupportingPort");
+        DoubleItPortType symmetricSaml2Port = 
+            service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(symmetricSaml2Port, test.getPort());
+        
+        TokenTestUtils.updateSTSPort((BindingProvider)symmetricSaml2Port, test.getStsPort());
+        
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(symmetricSaml2Port);
+        }
+        
+        ((BindingProvider)symmetricSaml2Port).getRequestContext().put("ws-security.use.str.transform", "false");
+        
+        doubleIt(symmetricSaml2Port, 30);
+        
+        ((java.io.Closeable)symmetricSaml2Port).close();
+        bus.shutdown(true);
+    }
+    
     private static void doubleIt(DoubleItPortType port, int numToDouble) {
         int resp = port.doubleIt(numToDouble);
         assertEquals(numToDouble * 2, resp);

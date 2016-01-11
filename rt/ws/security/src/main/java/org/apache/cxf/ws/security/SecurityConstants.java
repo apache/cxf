@@ -132,6 +132,13 @@ public final class SecurityConstants extends org.apache.cxf.rt.security.Security
      */
     public static final String USE_ATTACHMENT_ENCRYPTION_CONTENT_ONLY_TRANSFORM = 
         "ws-security.swa.encryption.attachment.transform.content";
+    
+    /**
+     * Whether to use the STR (Security Token Reference) Transform when (externally) signing a SAML Token.
+     * The default is true. Some frameworks cannot handle processing the SecurityTokenReference is created,
+     * hence set this configuration option to "false" in this case.
+     */
+    public static final String USE_STR_TRANSFORM = "ws-security.use.str.transform";
 
     //
     // Non-boolean WS-Security Configuration parameters
