@@ -182,7 +182,7 @@ public class AsymmetricBindingTest extends AbstractBusClientServerTestBase {
     @org.junit.Ignore
     public void testUsernameTokenSAML2KeyValue() throws Exception {
         // TODO
-        if (test.isStreaming() || STAX_PORT.equals(test.getPort())) {
+        if (STAX_PORT.equals(test.getPort())) {
             return;
         }
 
