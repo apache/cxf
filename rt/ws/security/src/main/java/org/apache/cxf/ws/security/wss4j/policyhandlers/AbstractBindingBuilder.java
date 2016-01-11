@@ -605,6 +605,11 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
     protected void addSignatureParts(List<SupportingToken> tokenList,
                                        List<WSEncryptionPart> sigParts) {
         
+        boolean useSTRTransform = 
+            MessageUtils.getContextualBoolean(
+                message, SecurityConstants.USE_STR_TRANSFORM, true
+            );
+        
         for (SupportingToken supportingToken : tokenList) {
             
             Object tempTok = supportingToken.getTokenImplementation();
@@ -642,14 +647,19 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
 
                 Document doc = assertionWrapper.getElement().getOwnerDocument();
                 boolean saml1 = assertionWrapper.getSaml1() != null;
-                // TODO We only support using a KeyIdentifier for the moment
-                SecurityTokenReference secRef = 
-                    createSTRForSamlAssertion(doc, assertionWrapper.getId(), saml1, false);
-                Element clone = cloneElement(secRef.getElement());
-                addSupportingElement(clone);
-                part = new WSEncryptionPart("STRTransform", null, "Element");
-                part.setId(secRef.getID());
-                part.setElement(clone);
+                if (useSTRTransform) {
+                    // TODO We only support using a KeyIdentifier for the moment
+                    SecurityTokenReference secRef = 
+                        createSTRForSamlAssertion(doc, assertionWrapper.getId(), saml1, false);
+                    Element clone = cloneElement(secRef.getElement());
+                    addSupportingElement(clone);
+                    part = new WSEncryptionPart("STRTransform", null, "Element");
+                    part.setId(secRef.getID());
+                    part.setElement(clone);
+                } else {
+                    part = new WSEncryptionPart(assertionWrapper.getId());
+                    part.setElement(assertionWrapper.getElement());
+                }
             } else if (tempTok instanceof WSSecurityTokenHolder) {
                 SecurityToken token = ((WSSecurityTokenHolder)tempTok).getToken();
                 String tokenType = token.getTokenType();
@@ -668,13 +678,18 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                             id = token.getToken().getAttributeNS(null, "ID");
                         }
                     }
-                    SecurityTokenReference secRef = 
-                        createSTRForSamlAssertion(doc, id, saml1, false);
-                    Element clone = cloneElement(secRef.getElement());
-                    addSupportingElement(clone);
-                    part = new WSEncryptionPart("STRTransform", null, "Element");
-                    part.setId(secRef.getID());
-                    part.setElement(clone);
+                    if (useSTRTransform) {
+                        SecurityTokenReference secRef = 
+                            createSTRForSamlAssertion(doc, id, saml1, false);
+                        Element clone = cloneElement(secRef.getElement());
+                        addSupportingElement(clone);
+                        part = new WSEncryptionPart("STRTransform", null, "Element");
+                        part.setId(secRef.getID());
+                        part.setElement(clone);
+                    } else {
+                        part = new WSEncryptionPart(id);
+                        part.setElement(token.getToken());
+                    }
                 } else {
                     String id = token.getId();
                     if (id != null && id.charAt(0) == '#') {
