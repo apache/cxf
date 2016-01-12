@@ -19,6 +19,7 @@
 package org.apache.cxf.systest.jaxrs;
 
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.client.AsyncInvoker;
 import javax.ws.rs.client.ClientBuilder;
@@ -81,6 +82,16 @@ public class JAXRSContinuationsServlet3Test extends AbstractJAXRSContinuationsTe
         Future<Response> cancel = invokeRequest(base + "cancelvoid?stage=1"); 
         assertString(cancel, AsyncResource.FALSE); 
     }
+
+    @org.junit.Ignore
+    @Test
+    public void testLostThrowFromSuspendedCall() throws Exception {
+        String base = "http://localhost:" + getPort() + "/async/resource/";
+        Future<Response> suspend = invokeRequest(base + "suspendthrow");
+        Response response = suspend.get(10, TimeUnit.SECONDS);
+        assertEquals(502, response.getStatus());
+    }
+
     @Test
     public void testSuspendSetTimeoutt() throws Exception { 
         final String base = "http://localhost:" + getPort() + "/async/resource2/";
