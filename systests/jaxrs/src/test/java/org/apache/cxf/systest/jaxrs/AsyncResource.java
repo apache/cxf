@@ -25,6 +25,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Response;
@@ -45,6 +46,12 @@ public class AsyncResource {
     @Path("suspend")
     public void suspend(@Suspended AsyncResponse asyncResponse) { 
         ASYNC_RESPONSES[0].add(asyncResponse); 
+    }
+
+    @GET
+    @Path("suspendthrow")
+    public void suspendthrow(@Suspended AsyncResponse asyncResponse) {
+        throw new WebApplicationException("Oh Dear", 502);
     }
     
     @GET
