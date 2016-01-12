@@ -181,10 +181,6 @@ public class AsymmetricBindingTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     @org.junit.Ignore
     public void testUsernameTokenSAML2KeyValue() throws Exception {
-        // TODO
-        if (STAX_PORT.equals(test.getPort())) {
-            return;
-        }
 
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = AsymmetricBindingTest.class.getResource("cxf-client.xml");
