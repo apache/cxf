@@ -117,15 +117,10 @@ public class SAMLSSOResponseValidator {
             // Check for AuthnStatements and validate the Subject accordingly
             if (assertion.getAuthnStatements() != null
                 && !assertion.getAuthnStatements().isEmpty()) {
-<<<<<<< HEAD
                 org.opensaml.saml2.core.Subject subject = assertion.getSubject();
-                if (validateAuthenticationSubject(subject, assertion.getID(), postBinding)) {
-=======
-                org.opensaml.saml.saml2.core.Subject subject = assertion.getSubject();
-                org.opensaml.saml.saml2.core.SubjectConfirmation subjectConf = 
+                org.opensaml.saml2.core.SubjectConfirmation subjectConf = 
                     validateAuthenticationSubject(subject, assertion.getID(), postBinding);
                 if (subjectConf != null) {
->>>>>>> ebc5032... Fallback to the SubjectConfirmationData NotOnOrAfter if there is no Session NotOnOrAfter value
                     validateAudienceRestrictionCondition(assertion.getConditions());
                     validAssertion = assertion;
                     // Store Session NotOnOrAfter
@@ -190,19 +185,14 @@ public class SAMLSSOResponseValidator {
     /**
      * Validate the Subject (of an Authentication Statement).
      */
-<<<<<<< HEAD
-    private boolean validateAuthenticationSubject(
+    private org.opensaml.saml2.core.SubjectConfirmation validateAuthenticationSubject(
         org.opensaml.saml2.core.Subject subject, String id, boolean postBinding
-=======
-    private org.opensaml.saml.saml2.core.SubjectConfirmation validateAuthenticationSubject(
-        org.opensaml.saml.saml2.core.Subject subject, String id, boolean postBinding
->>>>>>> ebc5032... Fallback to the SubjectConfirmationData NotOnOrAfter if there is no Session NotOnOrAfter value
     ) throws WSSecurityException {
         if (subject.getSubjectConfirmations() == null) {
             return null;
         }
         
-        org.opensaml.saml.saml2.core.SubjectConfirmation validSubjectConf = null;
+        org.opensaml.saml2.core.SubjectConfirmation validSubjectConf = null;
         // We need to find a Bearer Subject Confirmation method
         for (org.opensaml.saml2.core.SubjectConfirmation subjectConf 
             : subject.getSubjectConfirmations()) {
