@@ -186,7 +186,7 @@ public class SCTCanceller implements TokenCanceller {
             (List<SecurityEvent>) messageContext.get(SecurityEvent.class.getName() + ".in");
         if (incomingEventList != null) {
             for (SecurityEvent incomingEvent : incomingEventList) {
-                if (WSSecurityEventConstants.SignedPart == incomingEvent.getSecurityEventType()
+                if (WSSecurityEventConstants.SIGNED_PART == incomingEvent.getSecurityEventType()
                     || WSSecurityEventConstants.SignedElement 
                         == incomingEvent.getSecurityEventType()) {
                     org.apache.xml.security.stax.securityToken.SecurityToken token = 
