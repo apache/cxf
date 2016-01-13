@@ -37,6 +37,9 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
     private static final String SECURE = "Secure";
     private static final String EXPIRES = "Expires";
     private static final String HTTP_ONLY = "HttpOnly";
+    
+    /** from RFC 2068, token special case characters */
+    private static final String TSPECIALS = "\"()<>@,;:\\/[]?={} \t";
         
     public NewCookie fromString(String c) {
         
@@ -63,6 +66,9 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
             String paramName = sepIndex != -1 ? theToken.substring(0, sepIndex) : theToken;
             String paramValue = sepIndex == -1 || sepIndex == theToken.length() - 1 
                 ? null : theToken.substring(sepIndex + 1);
+            if (paramValue != null && paramValue.startsWith("\"")) {
+                paramValue = paramValue.substring(1, paramValue.length() - 1);
+            }
             
             if (paramName.equalsIgnoreCase(MAX_AGE)) {
                 maxAge = Integer.parseInt(paramValue);
@@ -92,21 +98,27 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
         
         return new NewCookie(name, value, path, domain, version, comment, maxAge, expires, isSecure, httpOnly);
     }
-
+    
+    @Override
     public String toString(NewCookie value) {
+
+        if (null == value) {
+            throw new NullPointerException("Null cookie input");
+        }
+
         StringBuilder sb = new StringBuilder();
-        sb.append(value.getName()).append('=').append(value.getValue());
+        sb.append(value.getName()).append('=').append(maybeQuote(value.getValue()));
         if (value.getComment() != null) {
-            sb.append(';').append(COMMENT).append('=').append(value.getComment());
+            sb.append(';').append(COMMENT).append('=').append(maybeQuote(value.getComment()));
         }
         if (value.getDomain() != null) {
-            sb.append(';').append(DOMAIN).append('=').append(value.getDomain());
+            sb.append(';').append(DOMAIN).append('=').append(maybeQuote(value.getDomain()));
         }
         if (value.getMaxAge() != -1) {
             sb.append(';').append(MAX_AGE).append('=').append(value.getMaxAge());
         }
         if (value.getPath() != null) {
-            sb.append(';').append(PATH).append('=').append(value.getPath());
+            sb.append(';').append(PATH).append('=').append(maybeQuote(value.getPath()));
         }
         if (value.getExpiry() != null) {
             sb.append(';').append(EXPIRES).append('=').append(HttpUtils.toHttpDate(value.getExpiry()));
@@ -119,6 +131,58 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
         }
         sb.append(';').append(VERSION).append('=').append(value.getVersion());
         return sb.toString();
+
     }
 
+    /**
+     * Append the input value string to the given buffer, wrapping it with
+     * quotes if need be.
+     * 
+     * @param value
+     * @return String
+     */
+    private static String maybeQuote(String value) {
+        
+        StringBuilder buff = new StringBuilder();
+        // handle a null value as well as an empty one, attr=
+        if (null == value || 0 == value.length()) {
+            buff.append("");
+        } else if (needsQuote(value)) {
+            buff.append('"');
+            buff.append(value);
+            buff.append('"');
+        } else {
+            buff.append(value);
+        }
+        return buff.toString();
+    }
+
+    /**
+     * Return true iff the string contains special characters that need to be
+     * quoted.
+     * 
+     * @param value
+     * @return boolean
+     */
+    private static boolean needsQuote(String value) {
+        if (null == value) {
+            return true;
+        }
+        int len = value.length();
+        if (0 == len) {
+            return true;
+        }
+        if ('"' == value.charAt(0) & '"' == value.charAt(len - 1)) {
+            // already wrapped with quotes
+            return false;         
+        } 
+
+        for (int i = 0; i < len; i++) {
+            char c = value.charAt(i);
+            if (c < 0x20 || c >= 0x7f || TSPECIALS.indexOf(c) != -1) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
