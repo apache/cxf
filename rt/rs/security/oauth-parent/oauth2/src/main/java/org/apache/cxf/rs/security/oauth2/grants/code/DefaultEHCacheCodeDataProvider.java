@@ -88,7 +88,7 @@ public class DefaultEHCacheCodeDataProvider extends DefaultEHCacheOAuthDataProvi
             new ArrayList<ServerAuthorizationCodeGrant>(keys.size());
         for (String key : keys) {
             ServerAuthorizationCodeGrant grant = getCodeGrant(key);
-            if (grant.getClient().getClientId().equals(c.getClientId())) {
+            if (c == null || grant.getClient().getClientId().equals(c.getClientId())) {
                 grants.add(grant);
             }
         }
