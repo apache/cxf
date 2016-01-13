@@ -207,7 +207,7 @@ public class JAXRSInvoker extends AbstractInvoker {
             }
         } catch (Fault ex) {
             Object faultResponse;
-            if (asyncResponse != null && !asyncResponse.suspendContinuationIfNeeded()) {
+            if (asyncResponse != null) {
                 faultResponse = handleAsyncFault(exchange, asyncResponse, ex.getCause());    
             } else {
                 faultResponse = handleFault(ex, inMessage, cri, methodToInvoke);
