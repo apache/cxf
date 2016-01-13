@@ -91,7 +91,7 @@
         <cxf.httpcomponents.client.version>4.5.1</cxf.httpcomponents.client.version>
         <cxf.httpcomponents.core.version>4.4.1</cxf.httpcomponents.core.version>
         <cxf.httpcomponents.core.version.range>[4.3,4.5.0)</cxf.httpcomponents.core.version.range>
-        <cxf.jackson.version>2.4.6</cxf.jackson.version>
+        <cxf.jackson.version>2.6.4</cxf.jackson.version>
         <cxf.james.mim4j.version>0.7.2</cxf.james.mim4j.version>
         <cxf.logback.classic.version>1.0.13</cxf.logback.classic.version>
         <cxf.log4j.version>1.2.17</cxf.log4j.version>
@@ -1413,6 +1413,11 @@
                 <artifactId>jackson-jaxrs-json-provider</artifactId>
                 <version>${cxf.jackson.version}</version>
             </dependency>
+            <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>${cxf.jackson.version}</version>
+        </dependency> 
             <dependency>
                 <groupId>${cxf.asm.groupId}</groupId>
                 <artifactId>${cxf.asm.artifactId}</artifactId>
