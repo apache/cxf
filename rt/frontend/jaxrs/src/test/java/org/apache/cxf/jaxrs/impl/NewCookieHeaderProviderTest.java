@@ -110,11 +110,31 @@ public class NewCookieHeaderProviderTest extends Assert {
     }
     
     @Test
+    public void testFromStringWithSpecialChar() {
+        NewCookie c = NewCookie.valueOf(
+                      "foo=\"bar (space)<>[]\"; Comment=\"comment@comment:,\"; Path=\"/path?path\"; Max-Age=10; "
+                      + "Domain=\"domain.com\"; Secure; Version=1");
+        assertTrue("bar (space)<>[]".equals(c.getValue())
+                   && "foo".equals(c.getName())
+                   && 1 == c.getVersion()
+                   && "/path?path".equals(c.getPath())
+                   && "domain.com".equals(c.getDomain())
+                   && "comment@comment:,".equals(c.getComment())
+                   && 10 == c.getMaxAge());
+    }
+    
+    @Test
     public void testToString() {
         NewCookie c = new NewCookie("foo", "bar", "path", "domain", "comment", 2, true);
         assertEquals("foo=bar;Comment=comment;Domain=domain;Max-Age=2;Path=path;Secure;Version=1", 
-                     c.toString());
-               
+                     c.toString());               
+    }
+    
+    @Test
+    public void testToStringWithSpecialChar() {
+        NewCookie c = new NewCookie("foo", "bar (space)<>[]", "/path?path", "domain.com", "comment@comment:,", 2, true);
+        assertEquals("foo=\"bar (space)<>[]\";Comment=\"comment@comment:,\";Domain=domain.com;Max-Age=2;"
+                     + "Path=\"/path?path\";Secure;Version=1", c.toString());
     }
     
 }
