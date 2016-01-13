@@ -41,11 +41,8 @@ public class IdTokenReader extends AbstractTokenValidator {
         return jwt;
     }
     public JwtToken getIdJwtToken(String idJwtToken, OAuthClientUtils.Consumer client) {
-        JwtToken jwt = getJwtToken(idJwtToken, client.getClientSecret());
-        if (jwt.getClaims().getAudiences().size() > 1) {
-            throw new SecurityException("Invalid audience");
-        }
-        validateJwtClaims(jwt.getClaims(), client.getClientId(), true);
+        JwtToken jwt = getJwtToken(idJwtToken, client.getSecret());
+        validateJwtClaims(jwt.getClaims(), client.getKey(), true);
         return jwt;
     }
     private IdToken getIdTokenFromJwt(JwtToken jwt) {

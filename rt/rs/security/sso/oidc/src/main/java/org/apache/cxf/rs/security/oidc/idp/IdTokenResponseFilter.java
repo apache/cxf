@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.rs.security.oidc.idp;
 
+import java.util.Collections;
+
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
@@ -31,12 +33,17 @@ public class IdTokenResponseFilter extends AbstractOAuthServerJoseJwtProducer im
     private String issuer;
     @Override
     public void process(ClientAccessToken ct, ServerAccessToken st) {
+        // Only add an IdToken if the client has the "openid" scope
+        if (ct.getApprovedScope() == null || !ct.getApprovedScope().contains(OidcUtils.OPENID_SCOPE)) {
+            return;
+        }
+
         // This may also be done directly inside a data provider code creating the server token
         if (userInfoProvider != null) {
             IdToken token = 
                 userInfoProvider.getIdToken(st.getClient().getClientId(), st.getSubject(), st.getScopes());
             token.setIssuer(issuer);
-            token.setAudience(st.getClient().getClientId());
+            token.setAudiences(Collections.singletonList(st.getClient().getClientId()));
             
             String responseEntity = super.processJwt(new JwtToken(token), 
                                                      st.getClient());

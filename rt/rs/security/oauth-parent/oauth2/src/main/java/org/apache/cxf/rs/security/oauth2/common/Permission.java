@@ -29,6 +29,7 @@ public class Permission implements Serializable {
     private String permission;
     private String description;
     private boolean isDefault;
+    private boolean invisibleToClient;
     
     public Permission() {
         
@@ -87,5 +88,58 @@ public class Permission implements Serializable {
 
     public boolean isDefault() {
         return isDefault;
+    }
+
+    public boolean isInvisibleToClient() {
+        return invisibleToClient;
+    }
+
+    /**
+     * Set the visibility status; by default all the scopes approved by a user can 
+     * be optionally reported to the client in access token responses. Some scopes may need
+     * to stay 'invisible' to client.
+     * @param invisibleToClient
+     */
+    public void setInvisibleToClient(boolean invisibleToClient) {
+        this.invisibleToClient = invisibleToClient;
+    }
+    
+    @Override
+    public boolean equals(Object object) {
+        if (!(object instanceof Permission)) {
+            return false;
+        }
+        
+        Permission that = (Permission)object;
+        if (this.permission != null && that.permission == null
+            || this.permission == null && that.permission != null
+            || this.permission != null && !this.permission.equals(that.permission)) {
+            return false;
+        }
+        if (this.description != null && that.description == null
+            || this.description == null && that.description != null
+            || this.description != null && !this.description.equals(that.description)) {
+            return false;
+        }
+        if (this.invisibleToClient != that.invisibleToClient || this.isDefault != that.isDefault) { //NOPMD
+            return false;
+        }
+        
+        return true;
+    }
+    
+    @Override
+    public int hashCode() {
+        int hashCode = 17;
+        if (permission != null) {
+            hashCode = 31 * hashCode + permission.hashCode();
+        }
+        if (description != null) {
+            hashCode = 31 * hashCode + description.hashCode();
+        }
+        hashCode = 31 * hashCode + Boolean.valueOf(invisibleToClient).hashCode();
+        hashCode = 31 * hashCode + Boolean.valueOf(isDefault).hashCode();
+        
+        return hashCode;
     }
 }

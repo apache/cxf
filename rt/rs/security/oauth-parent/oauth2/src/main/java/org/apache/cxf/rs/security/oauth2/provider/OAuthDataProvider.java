@@ -103,9 +103,9 @@ public interface OAuthDataProvider {
 
     /**
      * Converts the requested scope to the list of permissions  
-     * @param requestedScope
+     * @param requestedScopes
      * @return list of permissions
      */
     List<OAuthPermission> convertScopeToPermissions(Client client,
-                                                    List<String> requestedScope);
+                                                    List<String> requestedScopes);
 }

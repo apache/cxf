@@ -62,7 +62,13 @@ under the License.
     <bean id="samlGrantHandler" class="org.apache.cxf.rs.security.oauth2.grants.saml.Saml2BearerGrantHandler">
         <property name="dataProvider" ref="dataProvider"/>
     </bean>
+    <bean id="jwtGrantHandler" class="org.apache.cxf.rs.security.oauth2.grants.jwt.JwtBearerGrantHandler">
+        <property name="dataProvider" ref="dataProvider"/>
+    </bean>
+   
     <bean id="samlAuthHandler" class="org.apache.cxf.rs.security.oauth2.auth.saml.Saml2BearerAuthHandler"/>
+    <bean id="jwtAuthHandler" class="org.apache.cxf.rs.security.oauth2.grants.jwt.JwtBearerAuthHandler"/>
+    
     <bean id="customGrantHandler" class="org.apache.cxf.systest.jaxrs.security.oauth2.CustomGrantHandler">
         <property name="dataProvider" ref="dataProvider"/>
     </bean>
@@ -72,6 +78,7 @@ under the License.
         <property name="grantHandlers">
             <list>
                 <ref bean="samlGrantHandler"/>
+                <ref bean="jwtGrantHandler"/>
                 <ref bean="customGrantHandler"/>
             </list>
         </property>
@@ -82,6 +89,12 @@ under the License.
         </jaxrs:serviceBeans>
         <jaxrs:properties>
             <entry key="ws-security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/alice.properties"/>
+            <entry key="rs.security.keystore.type" value="jks" />
+            <entry key="rs.security.keystore.alias" value="alice"/>
+            <entry key="rs.security.keystore.password" value="password"/>
+            <entry key="rs.security.keystore.file" 
+                   value="org/apache/cxf/systest/jaxrs/security/certs/alice.jks" />
+            <entry key="rs.security.signature.algorithm" value="RS256" />
         </jaxrs:properties>
     </jaxrs:server>
     <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-oauth2}/oauth2-auth">
@@ -93,6 +106,22 @@ under the License.
         </jaxrs:providers>
         <jaxrs:properties>
             <entry key="ws-security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/alice.properties"/>
+        </jaxrs:properties>
+    </jaxrs:server>
+    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-oauth2}/oauth2-auth-jwt">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="jwtAuthHandler"/>
+        </jaxrs:providers>
+        <jaxrs:properties>
+            <entry key="rs.security.keystore.type" value="jks" />
+            <entry key="rs.security.keystore.alias" value="alice"/>
+            <entry key="rs.security.keystore.password" value="password"/>
+            <entry key="rs.security.keystore.file" 
+                   value="org/apache/cxf/systest/jaxrs/security/certs/alice.jks" />
+            <entry key="rs.security.signature.algorithm" value="RS256" />
         </jaxrs:properties>
     </jaxrs:server>
 </beans>

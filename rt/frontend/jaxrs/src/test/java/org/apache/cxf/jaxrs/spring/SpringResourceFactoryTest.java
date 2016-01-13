@@ -21,10 +21,12 @@ package org.apache.cxf.jaxrs.spring;
 import java.lang.reflect.Constructor;
 import java.util.List;
 
+
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.resources.BookStore;
+import org.apache.cxf.jaxrs.resources.BookStoreConstructor;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -56,8 +58,8 @@ public class SpringResourceFactoryTest extends Assert {
         List<ClassResourceInfo> list = factoryBean.getServiceFactory().getClassResourceInfo();
         assertNotNull(list);
         assertEquals(4, list.size());
-        assertSame(BookStore.class, list.get(0).getServiceClass());
-        assertSame(BookStore.class, list.get(0).getResourceClass());
+        assertSame(BookStoreConstructor.class, list.get(0).getServiceClass());
+        assertSame(BookStoreConstructor.class, list.get(0).getResourceClass());
         assertSame(BookStore.class, list.get(1).getServiceClass());
         assertSame(BookStore.class, list.get(1).getResourceClass());
     }
@@ -68,10 +70,13 @@ public class SpringResourceFactoryTest extends Assert {
         assertNotNull(bean);
         SpringResourceFactory sf = (SpringResourceFactory)bean;
         assertNotNull(sf.getApplicationContext());
-        Constructor<?> c = sf.getBeanConstructor();
-        Constructor<BookStore> c2 = BookStore.class.getConstructor(new Class[]{});
-                
-        assertEquals(c.getParameterTypes().length, c2.getParameterTypes().length);
         assertEquals(isSingleton, sf.isSingleton());
+        if (!isSingleton) {
+            Constructor<?> c = sf.getBeanConstructor();
+            Constructor<BookStore> c2 = BookStore.class.getConstructor(new Class[]{});
+                    
+            assertEquals(c.getParameterTypes().length, c2.getParameterTypes().length);
+        }
+        
     }
 }

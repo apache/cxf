@@ -25,6 +25,7 @@
     xsi:schemaLocation=" http://www.springframework.org/schema/beans  http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util  http://www.springframework.org/schema/util/spring-util.xsd http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
     <import resource="classpath:META-INF/cxf/cxf.xml"/>
     <import resource="classpath:META-INF/cxf/cxf-servlet.xml"/>
+    
     <bean class="org.apache.cxf.systest.jaxrs.BookStoreSpring" id="serviceBean"/>
     <jaxrs:server id="bookservice" address="/bookstore">
         <jaxrs:serviceBeans>
@@ -52,6 +53,11 @@
             <ref bean="jsonProvider"/>
             <bean class="org.apache.cxf.systest.jaxrs.CustomWebApplicationExceptionMapper"/>
         </jaxrs:providers>
+    </jaxrs:server>
+    <jaxrs:server id="bookform" bus="cxf2" address="/thebooksform">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
     </jaxrs:server>
     <jaxrs:server id="bookservice3" address="/thebooks%203/bookstore">
         <jaxrs:serviceBeans>
@@ -134,6 +140,7 @@
     <cxf:bus name="cxf2" id="cxf2">
        <cxf:properties>
            <entry key="skip.default.json.provider.registration" value="true"/>
+           <entry key="cache.http.request.parameters" value="true"/>
        </cxf:properties>
     </cxf:bus>
     <jaxrs:server id="bookJsonp2" address="/jsonp2" bus="cxf2">

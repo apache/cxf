@@ -77,4 +77,36 @@ public class OAuthPermission extends Permission {
         return uris;
     }
     
+    @Override
+    public boolean equals(Object object) {
+        if (!(object instanceof OAuthPermission) || !super.equals(object)) {
+            return false;
+        }
+        
+        OAuthPermission that = (OAuthPermission)object;
+        if (this.httpVerbs != null && that.httpVerbs == null
+            || this.httpVerbs == null && that.httpVerbs != null
+            || this.httpVerbs != null && !this.httpVerbs.equals(that.httpVerbs)) {
+            return false;
+        }
+        if (this.uris != null && that.uris == null || this.uris == null && that.uris != null //NOPMD
+            || this.uris != null && !this.uris.equals(that.uris)) { //NOPMD
+            return false;
+        }
+        
+        return true;
+    }
+    
+    @Override
+    public int hashCode() {
+        int hashCode = super.hashCode();
+        if (httpVerbs != null) {
+            hashCode = 31 * hashCode + httpVerbs.hashCode();
+        }
+        if (uris != null) {
+            hashCode = 31 * hashCode + uris.hashCode();
+        }
+        
+        return hashCode;
+    }
 }

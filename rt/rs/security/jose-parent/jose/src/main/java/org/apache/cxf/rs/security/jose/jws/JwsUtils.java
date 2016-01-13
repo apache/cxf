@@ -50,6 +50,7 @@ import org.apache.cxf.rs.security.jose.jwk.JsonWebKeys;
 import org.apache.cxf.rs.security.jose.jwk.JwkUtils;
 import org.apache.cxf.rs.security.jose.jwk.KeyOperation;
 import org.apache.cxf.rs.security.jose.jwk.KeyType;
+import org.apache.cxf.rs.security.jose.jwk.PublicKeyUse;
 import org.apache.cxf.rt.security.crypto.MessageDigestUtils;
 
 public final class JwsUtils {
@@ -483,6 +484,7 @@ public final class JwsUtils {
             //TODO: consider loading all the public keys in the store
             PublicKey key = KeyManagementUtils.loadPublicKey(m, props);
             JsonWebKey jwk = JwkUtils.fromPublicKey(key, props, JoseConstants.RSSEC_SIGNATURE_ALGORITHM);
+            jwk.setPublicKeyUse(PublicKeyUse.SIGN);
             return new JsonWebKeys(jwk);
         }
     }

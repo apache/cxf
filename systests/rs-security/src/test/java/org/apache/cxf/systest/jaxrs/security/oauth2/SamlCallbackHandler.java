@@ -32,6 +32,9 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.rt.security.claims.SAMLClaim;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.bean.ActionBean;
 import org.apache.wss4j.common.saml.bean.AttributeBean;
@@ -42,6 +45,7 @@ import org.apache.wss4j.common.saml.bean.AuthDecisionStatementBean.Decision;
 import org.apache.wss4j.common.saml.bean.AuthenticationStatementBean;
 import org.apache.wss4j.common.saml.bean.ConditionsBean;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
+import org.apache.wss4j.common.saml.bean.Version;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.joda.time.DateTime;
 
@@ -51,12 +55,17 @@ import org.joda.time.DateTime;
 public class SamlCallbackHandler implements CallbackHandler {
     public static final String PORT = BookServerOAuth2.PORT;
     private String confirmationMethod = SAML2Constants.CONF_BEARER;
-    
-    public SamlCallbackHandler() {
-    }
-    
-    public void setConfirmationMethod(String confirmationMethod) {
-        this.confirmationMethod = confirmationMethod;
+    private boolean signAssertion = true;
+    private String issuer = "resourceOwner";
+    private String audience = "https://localhost:" + PORT + "/oauth2/token";
+    private boolean saml2 = true;
+    private String cryptoPropertiesFile = "org/apache/cxf/systest/jaxrs/security/alice.properties";
+    private String issuerKeyName = "alice";
+    private String issuerKeyPassword = "password";
+    private String subjectName = "alice";
+
+    public SamlCallbackHandler(boolean signAssertion) {
+        this.signAssertion = signAssertion;
     }
     
     public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
@@ -65,24 +74,28 @@ public class SamlCallbackHandler implements CallbackHandler {
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof SAMLCallback) {
                 SAMLCallback callback = (SAMLCallback) callbacks[i];
-                callback.setIssuer("resourceOwner");
+                if (saml2) {
+                    callback.setSamlVersion(Version.SAML_20);
+                } else {
+                    callback.setSamlVersion(Version.SAML_11);
+                }
+                callback.setIssuer(issuer);
                 
-                String subjectName = m != null ? (String)m.getContextualProperty("saml.subject.name") : null;
-                if (subjectName == null) {
-                    subjectName = "alice";
+                String subject = m != null ? (String)m.getContextualProperty("saml.subject.name") : null;
+                if (subject == null) {
+                    subject = subjectName;
                 }
                 String subjectQualifier = "www.mock-sts.com";
                 SubjectBean subjectBean = 
                     new SubjectBean(
-                        subjectName, subjectQualifier, confirmationMethod
+                        subject, subjectQualifier, confirmationMethod
                     );
                 callback.setSubject(subjectBean);
                 
                 ConditionsBean conditions = new ConditionsBean();
 
                 AudienceRestrictionBean audienceRestriction = new AudienceRestrictionBean();
-                String audienceURI = "https://localhost:" + PORT + "/oauth2/token";
-                audienceRestriction.setAudienceURIs(Collections.singletonList(audienceURI));
+                audienceRestriction.setAudienceURIs(Collections.singletonList(audience));
                 conditions.setAudienceRestrictions(Collections.singletonList(audienceRestriction));
               
                 callback.setConditions(conditions);
@@ -90,6 +103,8 @@ public class SamlCallbackHandler implements CallbackHandler {
                 AuthDecisionStatementBean authDecBean = new AuthDecisionStatementBean();
                 authDecBean.setDecision(Decision.INDETERMINATE);
                 authDecBean.setResource("https://sp.example.com/SAML2");
+                authDecBean.setSubject(subjectBean);
+                
                 ActionBean actionBean = new ActionBean();
                 actionBean.setContents("Read");
                 authDecBean.setActions(Collections.singletonList(actionBean));
@@ -99,6 +114,8 @@ public class SamlCallbackHandler implements CallbackHandler {
                 authBean.setSubject(subjectBean);
                 authBean.setAuthenticationInstant(new DateTime());
                 authBean.setSessionIndex("123456");
+                authBean.setSubject(subjectBean);
+                
                 // AuthnContextClassRef is not set
                 authBean.setAuthenticationMethod(
                         "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport");
@@ -136,8 +153,80 @@ public class SamlCallbackHandler implements CallbackHandler {
                 
                 attrBean.setSamlAttributes(claims);
                 callback.setAttributeStatementData(Collections.singletonList(attrBean));
+                
+                if (signAssertion) {
+                    try {
+                        Crypto crypto = CryptoFactory.getInstance(cryptoPropertiesFile);
+                        callback.setIssuerCrypto(crypto);
+                        callback.setIssuerKeyName(issuerKeyName);
+                        callback.setIssuerKeyPassword(issuerKeyPassword);
+                        callback.setSignAssertion(true);
+                    } catch (WSSecurityException e) {
+                        throw new IOException(e);
+                    }
+                }
             }
         }
+    }
+    
+    public String getCryptoPropertiesFile() {
+        return cryptoPropertiesFile;
+    }
+
+    public void setCryptoPropertiesFile(String cryptoPropertiesFile) {
+        this.cryptoPropertiesFile = cryptoPropertiesFile;
+    }
+
+    public String getIssuerKeyName() {
+        return issuerKeyName;
+    }
+
+    public void setIssuerKeyName(String issuerKeyName) {
+        this.issuerKeyName = issuerKeyName;
+    }
+
+    public String getIssuerKeyPassword() {
+        return issuerKeyPassword;
+    }
+
+    public void setIssuerKeyPassword(String issuerKeyPassword) {
+        this.issuerKeyPassword = issuerKeyPassword;
+    }
+
+    public String getIssuer() {
+        return issuer;
+    }
+
+    public void setIssuer(String issuer) {
+        this.issuer = issuer;
+    }
+
+    public String getAudience() {
+        return audience;
+    }
+
+    public void setAudience(String audience) {
+        this.audience = audience;
+    }
+    
+    public void setConfirmationMethod(String confMethod) {
+        this.confirmationMethod = confMethod;
+    }
+    
+    public boolean isSaml2() {
+        return saml2;
+    }
+
+    public void setSaml2(boolean saml2) {
+        this.saml2 = saml2;
+    }
+
+    public String getSubjectName() {
+        return subjectName;
+    }
+
+    public void setSubjectName(String subjectName) {
+        this.subjectName = subjectName;
     }
     
 }

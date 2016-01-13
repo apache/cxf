@@ -52,7 +52,7 @@ public class DefaultHostnameVerifierTest {
     @Before
     public void setUp() {
         impl = new DefaultHostnameVerifier();
-        publicSuffixMatcher = new PublicSuffixMatcher(Arrays.asList("com", "co.jp", "gov.uk"), null);
+        publicSuffixMatcher = new PublicSuffixMatcher(DomainType.ICANN, Arrays.asList("com", "co.jp", "gov.uk"), null);
         implWithPublicSuffixCheck = new DefaultHostnameVerifier(publicSuffixMatcher);
     }
 
@@ -190,6 +190,16 @@ public class DefaultHostnameVerifierTest {
         } catch (final SSLException e) {
             // whew!  we're okay!
         }
+    }
+    
+    @Test
+    public void testDomainRootMatching() {
+
+        Assert.assertFalse(DefaultHostnameVerifier.matchDomainRoot("a.b.c", null));
+        Assert.assertTrue(DefaultHostnameVerifier.matchDomainRoot("a.b.c", "a.b.c"));
+        Assert.assertFalse(DefaultHostnameVerifier.matchDomainRoot("aa.b.c", "a.b.c"));
+        Assert.assertFalse(DefaultHostnameVerifier.matchDomainRoot("a.b.c", "aa.b.c"));
+        Assert.assertTrue(DefaultHostnameVerifier.matchDomainRoot("a.a.b.c", "a.b.c"));
     }
 
     @Test

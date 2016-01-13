@@ -57,6 +57,11 @@
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
         </jaxws:properties>
     </jaxws:endpoint>
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="PlaintextSupportingSP11" address="https://localhost:${testutil.ports.ut.Server}/DoubleItUTPlaintextSupportingSP11" serviceName="s:DoubleItService" endpointName="s:DoubleItPlaintextSupportingSP11Port" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl" depends-on="tls-settings">
+        <jaxws:properties>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
+        </jaxws:properties>
+    </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Hashed" address="https://localhost:${testutil.ports.ut.Server}/DoubleItUTHashed" serviceName="s:DoubleItService" endpointName="s:DoubleItHashedPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>

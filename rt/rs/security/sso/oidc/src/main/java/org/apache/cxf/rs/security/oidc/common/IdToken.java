@@ -24,7 +24,7 @@ import java.util.Map;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 
-public class IdToken extends UserInfo {
+public class IdToken extends AbstractUserInfo {
     public static final String AUTH_TIME_CLAIM = "auth_time";
     public static final String NONCE_CLAIM = "nonce";
     public static final String ACR_CLAIM = "acr";

@@ -544,9 +544,24 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
         if (webParam != null && (webParam.mode().equals(Mode.OUT) || webParam.mode().equals(Mode.INOUT))) {
             return Boolean.TRUE;
         }
-        
         return method.getParameterTypes()[j] == Holder.class;
     }
+    
+    @Override
+    public Boolean isInOutParam(Method method, int j) {
+        method = getDeclaredMethod(method);
+        if (j == -1) {
+            return !method.getReturnType().equals(void.class);
+        }
+
+        WebParam webParam = getWebParam(method, j);
+
+        if (webParam != null && webParam.mode().equals(Mode.INOUT)) {
+            return Boolean.TRUE;
+        }
+        return Boolean.FALSE;
+    }
+    
 
     @Override
     public QName getRequestWrapperName(OperationInfo op, Method method) {

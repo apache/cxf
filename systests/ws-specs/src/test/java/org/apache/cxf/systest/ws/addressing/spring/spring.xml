@@ -17,7 +17,7 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:http="http://cxf.apache.org/transports/http/configuration" xmlns:wsa="http://cxf.apache.org/ws/addressing" xmlns:jaxws="http://cxf.apache.org/jaxws" xsi:schemaLocation=" http://cxf.apache.org/ws/addressing http://cxf.apache.org/schema/ws/addressing.xsd http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schema/transports/http.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:http="http://cxf.apache.org/transports/http/configuration" xmlns:wsa="http://cxf.apache.org/ws/addressing" xmlns:jaxws="http://cxf.apache.org/jaxws" xsi:schemaLocation=" http://cxf.apache.org/ws/addressing http://cxf.apache.org/schemas/ws/addressing.xsd http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schema/transports/http.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     <jaxws:server id="server" abstract="true">
         <jaxws:features>
             <wsa:addressing allowDuplicates="false" messageIdCache="#cache"/>

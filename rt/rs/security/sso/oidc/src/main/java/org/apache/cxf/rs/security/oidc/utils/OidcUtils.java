@@ -33,6 +33,7 @@ import org.apache.cxf.rt.security.crypto.MessageDigestUtils;
 
 public final class OidcUtils {
     public static final String ID_TOKEN = "id_token";
+    public static final String OPENID_SCOPE = "openid";
     public static final String OIDC_SCOPE = "oidc";
     public static final String PROFILE_SCOPE = "profile";
     public static final String EMAIL_SCOPE = "email";

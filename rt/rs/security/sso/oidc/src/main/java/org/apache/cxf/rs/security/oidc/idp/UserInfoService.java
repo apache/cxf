@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.rs.security.oidc.idp;
 
+import java.util.Collections;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -49,7 +51,7 @@ public class UserInfoService extends AbstractOAuthServerJoseJwtProducer {
         if (userInfo != null) {
             userInfo.setIssuer(issuer);
         }
-        userInfo.setAudience(oauth.getClientId());
+        userInfo.setAudiences(Collections.singletonList(oauth.getClientId()));
         Object responseEntity = userInfo;
         if (super.isJwsRequired() || super.isJweRequired()) {
             responseEntity = super.processJwt(new JwtToken(userInfo),
