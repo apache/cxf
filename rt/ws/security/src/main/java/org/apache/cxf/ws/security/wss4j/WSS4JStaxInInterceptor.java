@@ -189,7 +189,7 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
         final SecurityEventListener securityEventListener = new SecurityEventListener() {
             @Override
             public void registerSecurityEvent(SecurityEvent securityEvent) throws WSSecurityException {
-                if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.Timestamp
+                if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.TIMESTAMP
                     || securityEvent.getSecurityEventType() == WSSecurityEventConstants.SignatureValue
                     || securityEvent instanceof TokenSecurityEvent
                     || securityEvent instanceof AbstractSecuredElementSecurityEvent) {

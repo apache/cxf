@@ -73,10 +73,10 @@ public class StaxActionInInterceptor extends AbstractPhaseInterceptor<SoapMessag
         
         // First check for a SOAP Fault with no security header if we are the client
         if (MessageUtils.isRequestor(soapMessage)
-            && isEventInResults(WSSecurityEventConstants.NoSecurity, incomingSecurityEventList)) {
+            && isEventInResults(WSSecurityEventConstants.NO_SECURITY, incomingSecurityEventList)) {
             OperationSecurityEvent securityEvent = 
                 (OperationSecurityEvent)findEvent(
-                    WSSecurityEventConstants.Operation, incomingSecurityEventList
+                    WSSecurityEventConstants.OPERATION, incomingSecurityEventList
                 );
             if (securityEvent != null 
                 && soapMessage.getVersion().getFault().equals(securityEvent.getOperation())) {
@@ -88,14 +88,14 @@ public class StaxActionInInterceptor extends AbstractPhaseInterceptor<SoapMessag
         for (XMLSecurityConstants.Action action : inActions) {
             Event requiredEvent = null;
             if (WSSConstants.TIMESTAMP.equals(action)) {
-                requiredEvent = WSSecurityEventConstants.Timestamp;
+                requiredEvent = WSSecurityEventConstants.TIMESTAMP;
             } else if (WSSConstants.USERNAMETOKEN.equals(action)) {
-                requiredEvent = WSSecurityEventConstants.UsernameToken;
+                requiredEvent = WSSecurityEventConstants.USERNAME_TOKEN;
             } else if (WSSConstants.SIGNATURE.equals(action)) {
                 requiredEvent = WSSecurityEventConstants.SignatureValue;
             } else if (WSSConstants.SAML_TOKEN_SIGNED.equals(action)
                 || WSSConstants.SAML_TOKEN_UNSIGNED.equals(action)) {
-                requiredEvent = WSSecurityEventConstants.SamlToken;
+                requiredEvent = WSSecurityEventConstants.SAML_TOKEN;
             }
             
             if (requiredEvent != null 
@@ -108,7 +108,7 @@ public class StaxActionInInterceptor extends AbstractPhaseInterceptor<SoapMessag
             
             if (WSSConstants.ENCRYPT.equals(action)) {
                 boolean foundEncryptionPart = 
-                    isEventInResults(WSSecurityEventConstants.EncryptedPart, incomingSecurityEventList);
+                    isEventInResults(WSSecurityEventConstants.ENCRYPTED_PART, incomingSecurityEventList);
                 if (!foundEncryptionPart) {
                     foundEncryptionPart =
                         isEventInResults(WSSecurityEventConstants.EncryptedElement, incomingSecurityEventList);
