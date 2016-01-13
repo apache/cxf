@@ -19,7 +19,11 @@
 
 package org.apache.cxf.jaxrs.impl;
 
+import java.util.Date;
+
 import javax.ws.rs.core.NewCookie;
+
+import org.apache.cxf.jaxrs.utils.HttpUtils;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -60,6 +64,25 @@ public class NewCookieHeaderProviderTest extends Assert {
     }
     
     @Test
+    public void testFromComplexStringWithExpiresAndHttpOnly() {
+        NewCookie c = NewCookie.valueOf(
+                      "foo=bar;Comment=comment;Path=path;Max-Age=10;Domain=domain;Secure;"
+                      + "Expires=Wed, 09 Jun 2021 10:18:14 GMT;HttpOnly;Version=1");
+        assertTrue("bar".equals(c.getValue())
+                   && "foo".equals(c.getName()));
+        assertTrue(1 == c.getVersion()
+                   && "path".equals(c.getPath())
+                   && "domain".equals(c.getDomain())
+                   && "comment".equals(c.getComment())
+                   && c.isSecure()
+                   && c.isHttpOnly()
+                   && 10 == c.getMaxAge());
+        Date d = c.getExpiry();
+        assertNotNull(d);
+        assertEquals("Wed, 09 Jun 2021 10:18:14 GMT", HttpUtils.toHttpDate(d));
+    }
+    
+    @Test
     public void testFromComplexStringLowerCase() {
         NewCookie c = NewCookie.valueOf(
                       "foo=bar;comment=comment;path=path;max-age=10;domain=domain;secure;version=1");
@@ -87,11 +110,31 @@ public class NewCookieHeaderProviderTest extends Assert {
     }
     
     @Test
+    public void testFromStringWithSpecialChar() {
+        NewCookie c = NewCookie.valueOf(
+                      "foo=\"bar (space)<>[]\"; Comment=\"comment@comment:,\"; Path=\"/path?path\"; Max-Age=10; "
+                      + "Domain=\"domain.com\"; Secure; Version=1");
+        assertTrue("bar (space)<>[]".equals(c.getValue())
+                   && "foo".equals(c.getName())
+                   && 1 == c.getVersion()
+                   && "/path?path".equals(c.getPath())
+                   && "domain.com".equals(c.getDomain())
+                   && "comment@comment:,".equals(c.getComment())
+                   && 10 == c.getMaxAge());
+    }
+    
+    @Test
     public void testToString() {
         NewCookie c = new NewCookie("foo", "bar", "path", "domain", "comment", 2, true);
         assertEquals("foo=bar;Comment=comment;Domain=domain;Max-Age=2;Path=path;Secure;Version=1", 
-                     c.toString());
-               
+                     c.toString());               
+    }
+    
+    @Test
+    public void testToStringWithSpecialChar() {
+        NewCookie c = new NewCookie("foo", "bar (space)<>[]", "/path?path", "domain.com", "comment@comment:,", 2, true);
+        assertEquals("foo=\"bar (space)<>[]\";Comment=\"comment@comment:,\";Domain=domain.com;Max-Age=2;"
+                     + "Path=\"/path?path\";Secure;Version=1", c.toString());
     }
     
 }
