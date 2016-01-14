@@ -78,7 +78,7 @@ import org.springframework.util.Assert;
 
 @CreateLdapServer(
     transports = {
-        @CreateTransport(protocol = "LDAP")
+        @CreateTransport(protocol = "LDAP", address = "127.0.0.1")
         }
     )
 
