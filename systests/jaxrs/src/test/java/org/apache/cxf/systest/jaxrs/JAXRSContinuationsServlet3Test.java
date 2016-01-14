@@ -83,7 +83,6 @@ public class JAXRSContinuationsServlet3Test extends AbstractJAXRSContinuationsTe
         assertString(cancel, AsyncResource.FALSE); 
     }
 
-    @org.junit.Ignore
     @Test
     public void testLostThrowFromSuspendedCall() throws Exception {
         String base = "http://localhost:" + getPort() + "/async/resource/";

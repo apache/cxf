@@ -211,7 +211,7 @@ final class NegotiationUtils {
                 (List<SecurityEvent>) message.getExchange().get(SecurityEvent.class.getName() + ".in");
             if (incomingEventList != null) {
                 for (SecurityEvent incomingEvent : incomingEventList) {
-                    if (WSSecurityEventConstants.SecurityContextToken 
+                    if (WSSecurityEventConstants.SECURITY_CONTEXT_TOKEN 
                         == incomingEvent.getSecurityEventType()) {
                         return true;
                     }
