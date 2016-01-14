@@ -83,8 +83,12 @@ public class DefaultEHCacheOAuthDataProvider extends AbstractOAuthDataProvider {
     @Override
     public Client removeClient(String clientId) {
         Client c = getClient(clientId);
-        clientCache.remove(clientId);
+        return doRemoveClient(c);
+    }
+    
+    protected Client doRemoveClient(Client c) {
         removeClientTokens(c);
+        clientCache.remove(c.getClientId());
         return c;
     }
 
