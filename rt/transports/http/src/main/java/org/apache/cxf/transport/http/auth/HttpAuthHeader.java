@@ -84,7 +84,13 @@ public final class HttpAuthHeader {
                 if (!first) {
                     builder.append(", ");
                 }
-                builder.append(entry.getKey() + "=\"" + param + "\"");
+                if (entry.getKey().equals("nc") 
+                    || entry.getKey().equals("qop")
+                    || entry.getKey().equals("algorithm")) {
+                    builder.append(entry.getKey() + "=" + param + "");
+                } else {
+                    builder.append(entry.getKey() + "=\"" + param + "\"");
+                }
                 first = false;
             }
         }
@@ -99,14 +105,28 @@ public final class HttpAuthHeader {
             tok.quoteChar('\'');
             tok.whitespaceChars('=', '=');
             tok.whitespaceChars(',', ',');
-            
+
             while (tok.nextToken() != StreamTokenizer.TT_EOF) {
                 String key = tok.sval;
                 if (tok.nextToken() == StreamTokenizer.TT_EOF) {
                     map.put(key, null);
                     return map;
                 }
-                String value = tok.sval;
+                String value = null;
+                if ("nc".equals(key)) {
+                    //nc is a 8 length HEX number so need get it as number
+                    value = String.valueOf(tok.nval);
+                    if (value.indexOf(".") > 0) {
+                        value = value.substring(0, value.indexOf("."));
+                    }
+                    String pad = "";
+                    for (int i = 0; i < 8 - value.length(); i++) {
+                        pad = pad + "0";
+                    }
+                    value = pad + value;
+                } else {
+                    value = tok.sval;
+                }
                 map.put(key, value);
             }
         } catch (IOException ex) {
