@@ -40,6 +40,7 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
     
     /** from RFC 2068, token special case characters */
     private static final String TSPECIALS = "\"()<>@,;:\\/[]?={} \t";
+    private static final String DOUBLE_QUOTE = "\""; 
         
     public NewCookie fromString(String c) {
         
@@ -66,8 +67,8 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
             String paramName = sepIndex != -1 ? theToken.substring(0, sepIndex) : theToken;
             String paramValue = sepIndex == -1 || sepIndex == theToken.length() - 1 
                 ? null : theToken.substring(sepIndex + 1);
-            if (paramValue != null && paramValue.startsWith("\"")) {
-                paramValue = paramValue.substring(1, paramValue.length() - 1);
+            if (paramValue != null) {
+                paramValue = stripQuotes(paramValue);
             }
             
             if (paramName.equalsIgnoreCase(MAX_AGE)) {
@@ -141,7 +142,7 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
      * @param value
      * @return String
      */
-    private static String maybeQuote(String value) {
+    static String maybeQuote(String value) {
         
         StringBuilder buff = new StringBuilder();
         // handle a null value as well as an empty one, attr=
@@ -164,7 +165,7 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
      * @param value
      * @return boolean
      */
-    private static boolean needsQuote(String value) {
+    static boolean needsQuote(String value) {
         if (null == value) {
             return true;
         }
@@ -184,5 +185,13 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
             }
         }
         return false;
+    }
+    
+    static String stripQuotes(String paramValue) {
+        if (paramValue.startsWith(DOUBLE_QUOTE)
+            && paramValue.endsWith(DOUBLE_QUOTE) && paramValue.length() > 1) {
+            paramValue = paramValue.substring(1, paramValue.length() - 1);
+        }
+        return paramValue;
     }
 }
