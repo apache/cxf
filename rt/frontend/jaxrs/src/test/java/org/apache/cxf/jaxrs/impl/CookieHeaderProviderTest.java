@@ -61,6 +61,14 @@ public class CookieHeaderProviderTest extends Assert {
     }
     
     @Test
+    public void testToStringWithQuotes() {
+        Cookie c = new Cookie("foo", "bar z", "path", "domain", 2);
+        assertEquals("$Version=2;foo=\"bar z\";$Path=path;$Domain=domain", 
+                     c.toString());
+               
+    }
+    
+    @Test
     public void testCookieWithQuotes() {
         Cookie c = Cookie.valueOf("$Version=\"1\"; foo=\"bar\"; $Path=\"/path\"");
         assertTrue("bar".equals(c.getValue())
