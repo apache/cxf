@@ -57,10 +57,9 @@ public class DefaultEHCacheCodeDataProvider extends DefaultEHCacheOAuthDataProvi
     }
 
     @Override
-    public Client removeClient(String clientId) {
-        Client c = super.removeClient(clientId);
+    protected Client doRemoveClient(Client c) {
         removeClientCodeGrants(c);
-        return c;
+        return super.doRemoveClient(c);
     }
     
     protected void removeClientCodeGrants(Client c) {
