@@ -171,7 +171,7 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
             }
         }
         
-        return new SecurePart(WSSConstants.TAG_wsse_UsernameToken, Modifier.Element);
+        return new SecurePart(WSSConstants.TAG_WSSE_USERNAME_TOKEN, Modifier.Element);
     }
     
     private static class UTCallbackHandler implements CallbackHandler {
@@ -265,7 +265,7 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
         }
         */
         
-        SecurePart securePart = new SecurePart(WSSConstants.TAG_wsse_BinarySecurityToken, Modifier.Element);
+        SecurePart securePart = new SecurePart(WSSConstants.TAG_WSSE_BINARY_SECURITY_TOKEN, Modifier.Element);
         securePart.setIdToSign(wss4jToken.getId());
         
         return securePart;
@@ -304,10 +304,10 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
         }
         properties.addAction(actionToPerform);
         
-        QName qname = WSSConstants.TAG_saml2_Assertion;
+        QName qname = WSSConstants.TAG_SAML2_ASSERTION;
         SamlTokenType tokenType = token.getSamlTokenType();
         if (tokenType == SamlTokenType.WssSamlV11Token10 || tokenType == SamlTokenType.WssSamlV11Token11) {
-            qname = WSSConstants.TAG_saml_Assertion;
+            qname = WSSConstants.TAG_SAML_ASSERTION;
         }
         
         return new SecurePart(qname, Modifier.Element);
@@ -362,9 +362,9 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
                 };
                 properties.setSamlCallbackHandler(callbackHandler);
                 
-                QName qname = WSSConstants.TAG_saml2_Assertion;
+                QName qname = WSSConstants.TAG_SAML2_ASSERTION;
                 if (WSConstants.SAML_NS.equals(el.getNamespaceURI())) {
-                    qname = WSSConstants.TAG_saml_Assertion;
+                    qname = WSSConstants.TAG_SAML_ASSERTION;
                 }
                 
                 return new SecurePart(qname, Modifier.Element);
@@ -671,7 +671,7 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
                 configureSignature(token, false);
                 if (suppTokens.isEncryptedToken()) {
                     SecurePart part = 
-                        new SecurePart(WSSConstants.TAG_wsse_BinarySecurityToken, Modifier.Element);
+                        new SecurePart(WSSConstants.TAG_WSSE_BINARY_SECURITY_TOKEN, Modifier.Element);
                     encryptedTokensList.add(part);
                 }
                 ret.put(token, new SecurePart(WSSConstants.TAG_dsig_Signature, Modifier.Element));
@@ -777,8 +777,8 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
                 List<WSSConstants.Action> actionList = properties.getActions();
     
                 // Don't add a signed SAML Token as a part, as it will be automatically signed by WSS4J
-                if (!((WSSConstants.TAG_saml_Assertion.equals(name) 
-                    || WSSConstants.TAG_saml2_Assertion.equals(name))
+                if (!((WSSConstants.TAG_SAML_ASSERTION.equals(name) 
+                    || WSSConstants.TAG_SAML2_ASSERTION.equals(name))
                     && actionList != null && actionList.contains(WSSConstants.SAML_TOKEN_SIGNED))) {
                     properties.addSignaturePart(part);
                 }
@@ -805,7 +805,7 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
         
         if (sigParts != null) {
             SecurePart securePart = 
-                new SecurePart(WSSConstants.TAG_wsse11_SignatureConfirmation, Modifier.Element);
+                new SecurePart(WSSConstants.TAG_WSSE11_SIG_CONF, Modifier.Element);
             sigParts.add(securePart);
         }
         signatureConfirmationAdded = true;
