@@ -53,7 +53,7 @@ import static org.apache.cxf.transport.jms.JMSConstants.JMS_SERVER_RESPONSE_HEAD
  * Conduit for sending the reply back to the client
  */
 class BackChannelConduit extends AbstractConduit implements JMSExchangeSender {
-    private static final Logger LOG = LogUtils.getL7dLogger(JMSDestination.class);
+    private static final Logger LOG = LogUtils.getL7dLogger(BackChannelConduit.class);
     private JMSConfiguration jmsConfig;
     private Message inMessage;
     private Connection connection;
