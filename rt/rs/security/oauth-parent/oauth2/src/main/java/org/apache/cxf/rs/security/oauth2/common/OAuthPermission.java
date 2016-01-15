@@ -41,7 +41,7 @@ public class OAuthPermission extends Permission {
     }
     
     public OAuthPermission(String permission) {
-        this.permission = permission;
+        this(permission, null);
     }
     
     public OAuthPermission(String permission, String description) {
