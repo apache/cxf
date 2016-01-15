@@ -18,8 +18,6 @@
  */
 package org.apache.cxf.transport.jms.util;
 
-import java.util.Enumeration;
-import java.util.Hashtable;
 import java.util.Properties;
 
 import javax.naming.Context;
@@ -38,25 +36,9 @@ public class JndiHelper {
         this.environment = environment;
     }
 
-    @SuppressWarnings("rawtypes")
-    protected Context createInitialContext() throws NamingException {
-        //CHECKSTYLE:OFF
-        Hashtable<Object, Object> icEnv = new Hashtable<Object, Object>(environment.size());
-        //CHECKSTYLE:ON
-        for (Enumeration en = environment.propertyNames(); en.hasMoreElements();) {
-            String key = (String)en.nextElement();
-            Object value = environment.getProperty(key);
-            if (value == null) {
-                value = environment.get(key);
-            }
-            icEnv.put(key, value);
-        }
-        return new InitialContext(icEnv);
-    }
-
     @SuppressWarnings("unchecked")
     public <T> T lookup(final String name, Class<T> requiredType) throws NamingException {
-        Context ctx = createInitialContext();
+        Context ctx = new InitialContext(this.environment);
         try {
             Object located = ctx.lookup(name);
             if (located == null) {

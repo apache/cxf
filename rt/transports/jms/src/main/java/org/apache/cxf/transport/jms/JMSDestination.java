@@ -144,6 +144,7 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
             if (executor instanceof Executor) {
                 container.setExecutor((Executor) executor);
             }
+            container.setJndiEnvironment(jmsConfig.getJndiEnvironment());
             container.start();
             suspendedContinuations.setListenerContainer(container);
             connection.start();

@@ -49,12 +49,11 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
         @Override
         public void run() {
             while (running) {
-                MessageConsumer consumer = null;
-                Session session = null;
-                try {
+                try (ResourceCloser closer = new ResourceCloser()) {
+                    closer.register(createInitialContext());
                     // Create session early to optimize performance
-                    session = connection.createSession(transacted, acknowledgeMode);
-                    consumer = createConsumer(session);
+                    Session session = closer.register(connection.createSession(transacted, acknowledgeMode));
+                    MessageConsumer consumer = closer.register(createConsumer(session));
                     while (running) {
                         Message message = consumer.receive(1000);
                         try {
@@ -71,9 +70,6 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
                     }
                 } catch (Exception e) {
                     LOG.log(Level.WARNING, "Unexpected exception. Restarting session and consumer", e);
-                } finally {
-                    ResourceCloser.close(consumer);
-                    ResourceCloser.close(session);
                 }
             }
 
@@ -96,9 +92,8 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
         @Override
         public void run() {
             while (running) {
-                MessageConsumer consumer = null;
-                Session session = null;
-                try {
+                try (ResourceCloser closer = new ResourceCloser()) {
+                    closer.register(createInitialContext());
                     final Transaction externalTransaction = transactionManager.getTransaction();
                     if ((externalTransaction != null) && (externalTransaction.getStatus() == Status.STATUS_ACTIVE)) {
                         LOG.log(Level.SEVERE, "External transactions are not supported in XAPoller");
@@ -109,8 +104,8 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
                      * Create session inside transaction to give it the 
                      * chance to enlist itself as a resource
                      */
-                    session = connection.createSession(transacted, acknowledgeMode);
-                    consumer = createConsumer(session);
+                    Session session = closer.register(connection.createSession(transacted, acknowledgeMode));
+                    MessageConsumer consumer = closer.register(createConsumer(session));
                     Message message = consumer.receive(1000);
                     try {
                         if (message != null) {
@@ -120,9 +115,6 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
                     } catch (Throwable e) {
                         LOG.log(Level.WARNING, "Exception while processing jms message in cxf. Rolling back", e);
                         safeRollBack(session);
-                    } finally {
-                        ResourceCloser.close(consumer);
-                        ResourceCloser.close(session);
                     }
                 } catch (Exception e) {
                     LOG.log(Level.WARNING, "Unexpected exception. Restarting session and consumer", e);

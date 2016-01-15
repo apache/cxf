@@ -241,6 +241,7 @@ public class JMSDestinationTest extends AbstractJMSTester {
         waitForReceiveInMessage();
         verifyReceivedMessage(inMessage);
 
+        // wait for a while for the jms session recycling
         Thread.sleep(1000);
         conduit.close();
         destination.shutdown();
