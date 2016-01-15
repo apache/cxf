@@ -41,6 +41,7 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.rs.security.oauth2.client.OAuthClientUtils;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.OAuthError;
+import org.apache.cxf.rs.security.oauth2.common.TokenIntrospection;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 @Provider
@@ -54,7 +55,7 @@ public class OAuthJSONProvider implements MessageBodyWriter<Object>,
     }
 
     public boolean isWriteable(Class<?> cls, Type t, Annotation[] anns, MediaType mt) {
-        return cls == ClientAccessToken.class || cls == OAuthError.class;
+        return cls == ClientAccessToken.class || cls == OAuthError.class || cls == TokenIntrospection.class;
     }
     
     public void writeTo(Object obj, Class<?> cls, Type t, Annotation[] anns, MediaType mt,
@@ -62,9 +63,44 @@ public class OAuthJSONProvider implements MessageBodyWriter<Object>,
         WebApplicationException {
         if (obj instanceof ClientAccessToken) {
             writeAccessToken((ClientAccessToken)obj, os);
+        } else if (obj instanceof TokenIntrospection) {
+            writeTokenIntrospection((TokenIntrospection)obj, os);
         } else {
             writeOAuthError((OAuthError)obj, os);
         }
+    }
+
+    private void writeTokenIntrospection(TokenIntrospection obj, OutputStream os) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        sb.append("{");
+        appendJsonPair(sb, "active", obj.isActive(), false);
+        if (obj.getClientId() != null) {
+            sb.append(",");
+            appendJsonPair(sb, OAuthConstants.CLIENT_ID, obj.getClientId());
+        }
+        if (obj.getUsername() != null) {
+            sb.append(",");
+            appendJsonPair(sb, "username", obj.getUsername());
+        }
+        if (obj.getTokenType() != null) {
+            sb.append(",");
+            appendJsonPair(sb, OAuthConstants.ACCESS_TOKEN_TYPE, obj.getTokenType());
+        }
+        if (obj.getScope() != null) {
+            sb.append(",");
+            appendJsonPair(sb, OAuthConstants.SCOPE, obj.getScope());
+        }
+        if (obj.getAud() != null) {
+            sb.append(",");
+            appendJsonPair(sb, "aud", obj.getAud());
+        }
+        appendJsonPair(sb, "iat", obj.getIat(), false);
+        appendJsonPair(sb, "exp", obj.getExp(), false);
+        sb.append("}");
+        String result = sb.toString();
+        os.write(result.getBytes(StandardCharsets.UTF_8));
+        os.flush();
+        
     }
 
     private void writeOAuthError(OAuthError obj, OutputStream os) throws IOException {
@@ -133,7 +169,9 @@ public class OAuthJSONProvider implements MessageBodyWriter<Object>,
     }
     
     public boolean isReadable(Class<?> cls, Type t, Annotation[] anns, MediaType mt) {
-        return Map.class.isAssignableFrom(cls) || ClientAccessToken.class.isAssignableFrom(cls);
+        return Map.class.isAssignableFrom(cls) 
+            || ClientAccessToken.class.isAssignableFrom(cls)
+            || TokenIntrospection.class.isAssignableFrom(cls);
     }
 
     public Object readFrom(Class<Object> cls, Type t, Annotation[] anns, 
@@ -142,14 +180,51 @@ public class OAuthJSONProvider implements MessageBodyWriter<Object>,
         Map<String, String> params = readJSONResponse(is);
         if (Map.class.isAssignableFrom(cls)) {
             return params;
-        }
-        ClientAccessToken token = OAuthClientUtils.fromMapToClientToken(params);
-        if (token == null) {
-            throw new WebApplicationException(500);
+        } else if (ClientAccessToken.class.isAssignableFrom(cls)) {
+            ClientAccessToken token = OAuthClientUtils.fromMapToClientToken(params);
+            if (token == null) {
+                throw new WebApplicationException(500);
+            } else {
+                return token;
+            }
         } else {
-            return token;
+            return fromMapToTokenIntrospection(params);
         }
         
+    }
+
+    private Object fromMapToTokenIntrospection(Map<String, String> params) {
+        TokenIntrospection resp = new TokenIntrospection();
+        resp.setActive(Boolean.valueOf(params.get("active")));
+        String clientId = params.get(OAuthConstants.CLIENT_ID);
+        if (clientId != null) {
+            resp.setClientId(clientId);
+        }
+        String username = params.get("username");
+        if (username != null) {
+            resp.setUsername(username);
+        }
+        String scope = params.get(OAuthConstants.SCOPE);
+        if (scope != null) {
+            resp.setScope(scope);
+        }
+        String tokenType = params.get(OAuthConstants.ACCESS_TOKEN_TYPE);
+        if (tokenType != null) {
+            resp.setTokenType(tokenType);
+        }
+        String aud = params.get("aud");
+        if (aud != null) {
+            resp.setAud(aud);
+        }
+        String iat = params.get("iat");
+        if (iat != null) {
+            resp.setIat(Long.valueOf(iat));
+        }
+        String exp = params.get("exp");
+        if (exp != null) {
+            resp.setExp(Long.valueOf(exp));
+        }
+        return resp;
     }
 
     public Map<String, String> readJSONResponse(InputStream is) throws IOException  {

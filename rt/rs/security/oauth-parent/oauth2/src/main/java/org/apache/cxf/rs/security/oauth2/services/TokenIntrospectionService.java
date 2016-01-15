@@ -22,52 +22,66 @@ import java.util.logging.Logger;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Encoded;
-import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.SecurityContext;
 
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.rs.security.oauth2.common.AccessTokenValidation;
-import org.apache.cxf.rs.security.oauth2.utils.AuthorizationUtils;
+import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
+import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
+import org.apache.cxf.rs.security.oauth2.common.TokenIntrospection;
+import org.apache.cxf.rs.security.oauth2.provider.OAuthDataProvider;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
+import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 
-@Path("validate")
-public class AccessTokenValidatorService extends AbstractAccessTokenValidator {
-    private static final Logger LOG = LogUtils.getL7dLogger(AccessTokenValidatorService.class);
+@Path("introspect")
+public class TokenIntrospectionService {
+    private static final Logger LOG = LogUtils.getL7dLogger(TokenIntrospectionService.class);
     private boolean blockUnsecureRequests;
     private boolean blockUnauthorizedRequests = true;
+    private MessageContext mc;
+    private OAuthDataProvider dataProvider;
     @POST
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_JSON })
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public AccessTokenValidation getTokenValidationInfo(@Encoded MultivaluedMap<String, String> params) {
+    public TokenIntrospection getTokenIntrospection(@Encoded MultivaluedMap<String, String> params) {
         checkSecurityContext();
-        String authScheme = params.getFirst(OAuthConstants.AUTHORIZATION_SCHEME_TYPE);
-        String authSchemeData  = params.getFirst(OAuthConstants.AUTHORIZATION_SCHEME_DATA);
-        try {
-            return super.getAccessTokenValidation(authScheme, authSchemeData, params);
-        } catch (NotAuthorizedException ex) {
-            // at this point it does not mean that RS failed to authenticate but that the basic
-            // local or chained token validation has failed
-            AccessTokenValidation v = new AccessTokenValidation();
-            v.setInitialValidationSuccessful(false);
-            return v;
+        String tokenId = params.getFirst(OAuthConstants.TOKEN_ID);
+        ServerAccessToken at = dataProvider.getAccessToken(tokenId);
+        if (at == null || OAuthUtils.isExpired(at.getIssuedAt(), at.getExpiresIn())) { 
+            return new TokenIntrospection(false);
         }
+        TokenIntrospection response = new TokenIntrospection(true);
+        response.setClientId(at.getClient().getClientId());
+        if (!at.getScopes().isEmpty()) {
+            response.setScope(OAuthUtils.convertPermissionsToScope(at.getScopes()));
+        }
+        if (at.getSubject() != null) {
+            response.setUsername(at.getSubject().getLogin());
+        }
+        if (at.getAudience() != null) {
+            response.setAud(at.getAudience());
+        }
+        response.setIat(at.getIssuedAt());
+        response.setExp(at.getIssuedAt() + at.getExpiresIn());
+        response.setTokenType(at.getTokenType());
+        return response;
     }
 
     private void checkSecurityContext() {
-        SecurityContext sc = getMessageContext().getSecurityContext();
+        SecurityContext sc = mc.getSecurityContext();
         if (!sc.isSecure() && blockUnsecureRequests) {
             LOG.warning("Unsecure HTTP, Transport Layer Security is recommended");
-            AuthorizationUtils.throwAuthorizationFailure(supportedSchemes, realm);
+            ExceptionUtils.toNotAuthorizedException(null,  null);
         }
         if (sc.getUserPrincipal() == null && blockUnauthorizedRequests) {
-            //TODO: check client certificates
             LOG.warning("Authenticated Principal is not available");
-            AuthorizationUtils.throwAuthorizationFailure(supportedSchemes, realm);
+            ExceptionUtils.toNotAuthorizedException(null, null);
         }
         
     }
@@ -78,5 +92,14 @@ public class AccessTokenValidatorService extends AbstractAccessTokenValidator {
 
     public void setBlockUnauthorizedRequests(boolean blockUnauthorizedRequests) {
         this.blockUnauthorizedRequests = blockUnauthorizedRequests;
+    }
+
+    public void setDataProvider(OAuthDataProvider dataProvider) {
+        this.dataProvider = dataProvider;
+    }
+    
+    @Context
+    public void setMessageContext(MessageContext context) {
+        this.mc = context;
     }
 }

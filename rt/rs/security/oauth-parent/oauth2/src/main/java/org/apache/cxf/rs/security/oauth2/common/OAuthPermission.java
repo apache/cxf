@@ -40,6 +40,10 @@ public class OAuthPermission extends Permission {
         
     }
     
+    public OAuthPermission(String permission) {
+        this.permission = permission;
+    }
+    
     public OAuthPermission(String permission, String description) {
         super(permission, description);
     }
