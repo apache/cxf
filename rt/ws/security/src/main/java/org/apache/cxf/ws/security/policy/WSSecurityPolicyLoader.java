@@ -107,12 +107,9 @@ public final class WSSecurityPolicyLoader implements PolicyInterceptorProviderLo
         try {
             registerProviders();
         } catch (Throwable t) {
-            //probably wss4j isn't found or something. We'll ignore this
-            //as the policy framework will then not find the providers
-            //and error out at that point.  If nothing uses ws-securitypolicy
-            //no warnings/errors will display
             String error = "Could not load or register WS-SecurityPolicy related classes. "
                 + "Please check that (the correct version of) Apache WSS4J is on the classpath";
+            LOG.log(Level.WARNING, error + ": " + t.getMessage());
             LOG.log(Level.FINE, error, t);
         }
     }
