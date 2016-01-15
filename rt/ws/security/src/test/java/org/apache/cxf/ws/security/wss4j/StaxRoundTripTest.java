@@ -896,7 +896,7 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         properties.setCallbackHandler(new KeystorePasswordCallback());
         properties.setUseSingleCert(true);
         properties.setSignatureKeyIdentifier(
-            WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference
+            WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE
         );
         
         WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(properties);

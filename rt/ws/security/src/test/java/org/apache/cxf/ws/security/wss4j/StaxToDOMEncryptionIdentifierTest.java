@@ -72,7 +72,7 @@ public class StaxToDOMEncryptionIdentifierTest extends AbstractSecurityTest {
         properties.setActions(actions);
         properties.setEncryptionUser("myalias");
         properties.setEncryptionKeyIdentifier(
-            WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference
+            WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE
         );
         properties.setEncryptionSymAlgorithm(WSSConstants.NS_XENC_AES128);
         
@@ -150,7 +150,7 @@ public class StaxToDOMEncryptionIdentifierTest extends AbstractSecurityTest {
         properties.setActions(actions);
         properties.setEncryptionUser("myalias");
         properties.setEncryptionKeyIdentifier(
-            WSSecurityTokenConstants.KeyIdentifier_ThumbprintIdentifier
+            WSSecurityTokenConstants.KEYIDENTIFIER_THUMBPRINT_IDENTIFIER
         );
         properties.setEncryptionSymAlgorithm(WSSConstants.NS_XENC_AES128);
         
@@ -229,7 +229,7 @@ public class StaxToDOMEncryptionIdentifierTest extends AbstractSecurityTest {
         properties.setActions(actions);
         properties.setEncryptionUser("myalias");
         properties.setEncryptionKeyIdentifier(
-            WSSecurityTokenConstants.KeyIdentifier_EncryptedKeySha1Identifier
+            WSSecurityTokenConstants.KEYIDENTIFIER_ENCRYPTED_KEY_SHA1_IDENTIFIER
         );
         properties.setEncryptionSymAlgorithm(WSSConstants.NS_XENC_AES128);
         

@@ -260,7 +260,7 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
                         );
                         HttpsSecurityTokenImpl httpsSecurityToken = 
                             new HttpsSecurityTokenImpl(true, policy.getUserName());
-                        httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
+                        httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
                         httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
                         PolicyUtils.assertPolicy(aim, 
                                                  new QName(token.getName().getNamespaceURI(),
@@ -278,7 +278,7 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
                         );
                         HttpsSecurityTokenImpl httpsSecurityToken = 
                             new HttpsSecurityTokenImpl(false, policy.getUserName());
-                        httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
+                        httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
                         httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
                         PolicyUtils.assertPolicy(aim, 
                                                  new QName(token.getName().getNamespaceURI(),
@@ -306,14 +306,14 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
                         );
                         HttpsSecurityTokenImpl httpsSecurityToken = 
                             new HttpsSecurityTokenImpl((X509Certificate)tlsInfo.getPeerCertificates()[0]);
-                        httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
+                        httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
                         httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
                     } else if (httpsTokenSecurityEvent.getAuthenticationType() == null) {
                         httpsTokenSecurityEvent.setAuthenticationType(
                             HttpsTokenSecurityEvent.AuthenticationType.HttpsNoAuthentication
                         );
                         HttpsSecurityTokenImpl httpsSecurityToken = new HttpsSecurityTokenImpl();
-                        httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
+                        httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
                         httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
                     }
                 } else {
@@ -339,14 +339,14 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
                     );
                     HttpsSecurityTokenImpl httpsSecurityToken = 
                         new HttpsSecurityTokenImpl((X509Certificate)tlsInfo.getPeerCertificates()[0]);
-                    httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
+                    httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
                     httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
                 } else if (httpsTokenSecurityEvent.getAuthenticationType() == null) {
                     httpsTokenSecurityEvent.setAuthenticationType(
                         HttpsTokenSecurityEvent.AuthenticationType.HttpsNoAuthentication
                     );
                     HttpsSecurityTokenImpl httpsSecurityToken = new HttpsSecurityTokenImpl();
-                    httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
+                    httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
                     httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
                 }
                 List<SecurityEvent> securityEvents = getSecurityEventList(message);

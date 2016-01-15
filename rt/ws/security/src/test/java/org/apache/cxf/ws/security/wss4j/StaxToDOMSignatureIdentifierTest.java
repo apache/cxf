@@ -71,7 +71,7 @@ public class StaxToDOMSignatureIdentifierTest extends AbstractSecurityTest {
         actions.add(WSSConstants.SIGNATURE);
         properties.setActions(actions);
         properties.setSignatureKeyIdentifier(
-            WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference
+            WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE
         );
         properties.setSignatureUser("myalias");
         
@@ -147,7 +147,7 @@ public class StaxToDOMSignatureIdentifierTest extends AbstractSecurityTest {
         actions.add(WSSConstants.SIGNATURE);
         properties.setActions(actions);
         properties.setSignatureKeyIdentifier(
-            WSSecurityTokenConstants.KeyIdentifier_ThumbprintIdentifier
+            WSSecurityTokenConstants.KEYIDENTIFIER_THUMBPRINT_IDENTIFIER
         );
         properties.setSignatureUser("myalias");
         
