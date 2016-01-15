@@ -191,7 +191,8 @@ public class DefaultLogEventMapper implements LogEventMapper {
     private String getMessageId(Message message) {
         AddressingProperties addrProp = ContextUtils.retrieveMAPs(message, false,
                                                                   MessageUtils.isOutbound(message), false);
-        return (addrProp != null) ? addrProp.getMessageID().getValue() : UUID.randomUUID().toString();
+        return addrProp != null && addrProp.getMessageID() != null
+            ? addrProp.getMessageID().getValue() : UUID.randomUUID().toString();
     }
 
     private String getOperationName(Message message) {
