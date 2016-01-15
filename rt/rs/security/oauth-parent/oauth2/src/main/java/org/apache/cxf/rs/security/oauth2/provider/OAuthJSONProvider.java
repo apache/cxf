@@ -74,30 +74,32 @@ public class OAuthJSONProvider implements MessageBodyWriter<Object>,
         StringBuilder sb = new StringBuilder();
         sb.append("{");
         appendJsonPair(sb, "active", obj.isActive(), false);
-        if (obj.getClientId() != null) {
+        if (obj.isActive()) {
+            if (obj.getClientId() != null) {
+                sb.append(",");
+                appendJsonPair(sb, OAuthConstants.CLIENT_ID, obj.getClientId());
+            }
+            if (obj.getUsername() != null) {
+                sb.append(",");
+                appendJsonPair(sb, "username", obj.getUsername());
+            }
+            if (obj.getTokenType() != null) {
+                sb.append(",");
+                appendJsonPair(sb, OAuthConstants.ACCESS_TOKEN_TYPE, obj.getTokenType());
+            }
+            if (obj.getScope() != null) {
+                sb.append(",");
+                appendJsonPair(sb, OAuthConstants.SCOPE, obj.getScope());
+            }
+            if (obj.getAud() != null) {
+                sb.append(",");
+                appendJsonPair(sb, "aud", obj.getAud());
+            }
             sb.append(",");
-            appendJsonPair(sb, OAuthConstants.CLIENT_ID, obj.getClientId());
-        }
-        if (obj.getUsername() != null) {
+            appendJsonPair(sb, "iat", obj.getIat(), false);
             sb.append(",");
-            appendJsonPair(sb, "username", obj.getUsername());
+            appendJsonPair(sb, "exp", obj.getExp(), false);
         }
-        if (obj.getTokenType() != null) {
-            sb.append(",");
-            appendJsonPair(sb, OAuthConstants.ACCESS_TOKEN_TYPE, obj.getTokenType());
-        }
-        if (obj.getScope() != null) {
-            sb.append(",");
-            appendJsonPair(sb, OAuthConstants.SCOPE, obj.getScope());
-        }
-        if (obj.getAud() != null) {
-            sb.append(",");
-            appendJsonPair(sb, "aud", obj.getAud());
-        }
-        sb.append(",");
-        appendJsonPair(sb, "iat", obj.getIat(), false);
-        sb.append(",");
-        appendJsonPair(sb, "exp", obj.getExp(), false);
         sb.append("}");
         String result = sb.toString();
         os.write(result.getBytes(StandardCharsets.UTF_8));
@@ -198,33 +200,35 @@ public class OAuthJSONProvider implements MessageBodyWriter<Object>,
     private Object fromMapToTokenIntrospection(Map<String, String> params) {
         TokenIntrospection resp = new TokenIntrospection();
         resp.setActive(Boolean.valueOf(params.get("active")));
-        String clientId = params.get(OAuthConstants.CLIENT_ID);
-        if (clientId != null) {
-            resp.setClientId(clientId);
-        }
-        String username = params.get("username");
-        if (username != null) {
-            resp.setUsername(username);
-        }
-        String scope = params.get(OAuthConstants.SCOPE);
-        if (scope != null) {
-            resp.setScope(scope);
-        }
-        String tokenType = params.get(OAuthConstants.ACCESS_TOKEN_TYPE);
-        if (tokenType != null) {
-            resp.setTokenType(tokenType);
-        }
-        String aud = params.get("aud");
-        if (aud != null) {
-            resp.setAud(aud);
-        }
-        String iat = params.get("iat");
-        if (iat != null) {
-            resp.setIat(Long.valueOf(iat));
-        }
-        String exp = params.get("exp");
-        if (exp != null) {
-            resp.setExp(Long.valueOf(exp));
+        if (resp.isActive()) {
+            String clientId = params.get(OAuthConstants.CLIENT_ID);
+            if (clientId != null) {
+                resp.setClientId(clientId);
+            }
+            String username = params.get("username");
+            if (username != null) {
+                resp.setUsername(username);
+            }
+            String scope = params.get(OAuthConstants.SCOPE);
+            if (scope != null) {
+                resp.setScope(scope);
+            }
+            String tokenType = params.get(OAuthConstants.ACCESS_TOKEN_TYPE);
+            if (tokenType != null) {
+                resp.setTokenType(tokenType);
+            }
+            String aud = params.get("aud");
+            if (aud != null) {
+                resp.setAud(aud);
+            }
+            String iat = params.get("iat");
+            if (iat != null) {
+                resp.setIat(Long.valueOf(iat));
+            }
+            String exp = params.get("exp");
+            if (exp != null) {
+                resp.setExp(Long.valueOf(exp));
+            }
         }
         return resp;
     }
