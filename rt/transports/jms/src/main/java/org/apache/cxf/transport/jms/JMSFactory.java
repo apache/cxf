@@ -24,11 +24,9 @@ import java.util.concurrent.Executors;
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
-import javax.naming.NamingException;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.transport.jms.util.JMSSender;
-import org.apache.cxf.transport.jms.util.JndiHelper;
 import org.apache.cxf.workqueue.AutomaticWorkQueue;
 import org.apache.cxf.workqueue.WorkQueue;
 import org.apache.cxf.workqueue.WorkQueueManager;
@@ -48,26 +46,6 @@ public final class JMSFactory {
     private JMSFactory() {
     }
 
-    /**
-     * Retrieve connection factory from JNDI
-     * 
-     * @param jmsConfig
-     * @param jndiConfig
-     * @return
-     */
-    static ConnectionFactory getConnectionFactoryFromJndi(JMSConfiguration jmsConfig) {
-        if (jmsConfig.getJndiEnvironment() == null || jmsConfig.getConnectionFactoryName() == null) {
-            return null;
-        }
-        try {
-            ConnectionFactory cf = new JndiHelper(jmsConfig.getJndiEnvironment()).
-                lookup(jmsConfig.getConnectionFactoryName(), ConnectionFactory.class);
-            return cf;
-        } catch (NamingException e) {
-            throw new RuntimeException(e);
-        }
-    }
-    
     /**
      * Create JmsSender from configuration information. Most settings are taken from jmsConfig. The QoS
      * settings in messageProperties override the settings from jmsConfig

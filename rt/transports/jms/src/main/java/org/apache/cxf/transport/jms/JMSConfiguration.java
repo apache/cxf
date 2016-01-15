@@ -25,11 +25,13 @@ import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
+import javax.naming.NamingException;
 import javax.transaction.TransactionManager;
 
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.transport.jms.util.DestinationResolver;
 import org.apache.cxf.transport.jms.util.JMSDestinationResolver;
+import org.apache.cxf.transport.jms.util.JndiHelper;
 
 @NoJSR250Annotations
 public class JMSConfiguration {
@@ -364,13 +366,34 @@ public class JMSConfiguration {
             synchronized (this) {
                 factory = connectionFactory;
                 if (factory == null) {
-                    factory = JMSFactory.getConnectionFactoryFromJndi(this);
+                    factory = getConnectionFactoryFromJndi();
                     connectionFactory = factory;
                 }
             }
         }
         return factory;
     }
+    
+    /**
+     * Retrieve connection factory from JNDI
+     * 
+     * @param jmsConfig
+     * @param jndiConfig
+     * @return
+     */
+    private ConnectionFactory getConnectionFactoryFromJndi() {
+        if (getJndiEnvironment() == null || getConnectionFactoryName() == null) {
+            return null;
+        }
+        try {
+            ConnectionFactory cf = new JndiHelper(getJndiEnvironment()).
+                lookup(getConnectionFactoryName(), ConnectionFactory.class);
+            return cf;
+        } catch (NamingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     
     public String getDurableSubscriptionClientId() {
         return durableSubscriptionClientId;
