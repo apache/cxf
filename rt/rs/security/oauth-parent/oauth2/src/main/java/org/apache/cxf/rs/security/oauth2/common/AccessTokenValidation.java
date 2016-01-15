@@ -26,6 +26,13 @@ import java.util.Map;
 import javax.xml.bind.annotation.XmlRootElement;
 
 // Represents the information about the validated ServerAccessToken.
+// It is returned by AccessTokenValidatorService and is checked by CXF OAuthRequestFilter
+// protecting the service resources.
+
+// If the protected resources are not CXF based then use TokenIntrospectionService which
+// returns RFC 7622 compliant TokenIntrospection response. 
+
+
 // The problem with reading specific ServerAccessToken instances is that
 // the (JAXB) reader needs to be specifically aware of the concrete token
 // classes like BearerAccessToken, etc, even though classes like BearerAccessToken

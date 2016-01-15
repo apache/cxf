@@ -45,6 +45,10 @@ public class OAuthPermission implements Serializable {
         
     }
     
+    public OAuthPermission(String permission) {
+        this.permission = permission;
+    }
+    
     public OAuthPermission(String permission, String description) {
         this.description = description;
         this.permission = permission;

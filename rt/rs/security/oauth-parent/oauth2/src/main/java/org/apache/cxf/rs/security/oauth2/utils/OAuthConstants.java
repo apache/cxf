@@ -119,9 +119,9 @@ public final class OAuthConstants {
     public static final String INVALID_SCOPE = "invalid_scope";
     public static final String ACCESS_DENIED = "access_denied";
     
-    // Token Revocation
-    public static final String REVOKED_TOKEN_ID = "token";
-    public static final String REVOKED_TOKEN_TYPE_HINT = "token_type_hint";
+    // Token Revocation, Introspection
+    public static final String TOKEN_ID = "token";
+    public static final String TOKEN_TYPE_HINT = "token_type_hint";
     public static final String UNSUPPORTED_TOKEN_TYPE = "unsupported_token_type";
     
     // Authorization scheme constants, used internally by AccessTokenValidation client and service
