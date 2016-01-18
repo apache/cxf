@@ -77,6 +77,7 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
         
         // Validate the Response
         SAMLSSOResponseValidator validator = new SAMLSSOResponseValidator();
+        validator.setEnforceAssertionsSigned(false);
         validator.setIssuerIDP("http://cxf.apache.org/issuer");
         validator.setAssertionConsumerURL("http://recipient.apache.org");
         validator.setClientAddress("http://apache.org");
@@ -97,6 +98,7 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
         
         // Validate the Response
         SAMLSSOResponseValidator validator = new SAMLSSOResponseValidator();
+        validator.setEnforceAssertionsSigned(false);
         validator.setIssuerIDP("http://cxf.apache.org/issuer");
         validator.setAssertionConsumerURL("http://recipient.apache.org");
         validator.setClientAddress("http://apache.org");
@@ -122,6 +124,7 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
         
         // Validate the Response
         SAMLSSOResponseValidator validator = new SAMLSSOResponseValidator();
+        validator.setEnforceAssertionsSigned(false);
         validator.setIssuerIDP("http://cxf.apache.org/issuer");
         validator.setAssertionConsumerURL("http://recipient.apache.org");
         validator.setClientAddress("http://apache.org");
@@ -147,6 +150,7 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
         
         // Validate the Response
         SAMLSSOResponseValidator validator = new SAMLSSOResponseValidator();
+        validator.setEnforceAssertionsSigned(false);
         validator.setIssuerIDP("http://cxf.apache.org/issuer");
         validator.setAssertionConsumerURL("http://recipient.apache.org");
         validator.setClientAddress("http://apache.org");
@@ -172,6 +176,7 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
         
         // Validate the Response
         SAMLSSOResponseValidator validator = new SAMLSSOResponseValidator();
+        validator.setEnforceAssertionsSigned(false);
         validator.setIssuerIDP("http://cxf.apache.org/issuer");
         validator.setAssertionConsumerURL("http://recipient.apache.org");
         validator.setClientAddress("http://apache.org");
@@ -198,6 +203,7 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
         
         // Validate the Response
         SAMLSSOResponseValidator validator = new SAMLSSOResponseValidator();
+        validator.setEnforceAssertionsSigned(false);
         validator.setIssuerIDP("http://cxf.apache.org/issuer");
         validator.setAssertionConsumerURL("http://recipient.apache.org");
         validator.setClientAddress("http://apache.org");
@@ -298,6 +304,7 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
         
         // Validate the Response
         SAMLSSOResponseValidator validator = new SAMLSSOResponseValidator();
+        validator.setEnforceAssertionsSigned(false);
         validator.setIssuerIDP("http://cxf.apache.org/issuer");
         validator.setAssertionConsumerURL("http://recipient.apache.org");
         validator.setClientAddress("http://apache.org");
@@ -324,6 +331,7 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
         
         // Validate the Response
         SAMLSSOResponseValidator validator = new SAMLSSOResponseValidator();
+        validator.setEnforceAssertionsSigned(false);
         validator.setIssuerIDP("http://cxf.apache.org/issuer");
         validator.setAssertionConsumerURL("http://recipient.apache.org");
         validator.setClientAddress("http://apache.org");
@@ -343,6 +351,7 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
         
         // Validate the Response
         SAMLSSOResponseValidator validator = new SAMLSSOResponseValidator();
+        validator.setEnforceAssertionsSigned(false);
         validator.setIssuerIDP("http://cxf.apache.org/issuer");
         validator.setAssertionConsumerURL("http://recipient.apache.org");
         validator.setClientAddress("http://apache.org");
@@ -372,6 +381,7 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
         
         // Validate the Response
         SAMLSSOResponseValidator validator = new SAMLSSOResponseValidator();
+        validator.setEnforceAssertionsSigned(false);
         validator.setIssuerIDP("http://cxf.apache.org/issuer");
         validator.setAssertionConsumerURL("http://recipient.apache.org");
         validator.setClientAddress("http://apache.org");
@@ -403,6 +413,7 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
         
         // Validate the Response
         SAMLSSOResponseValidator validator = new SAMLSSOResponseValidator();
+        validator.setEnforceAssertionsSigned(false);
         validator.setIssuerIDP("http://cxf.apache.org/issuer");
         validator.setAssertionConsumerURL("http://recipient.apache.org");
         validator.setClientAddress("http://apache.org");
@@ -437,6 +448,7 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
         
         // Validate the Response
         SAMLSSOResponseValidator validator = new SAMLSSOResponseValidator();
+        validator.setEnforceAssertionsSigned(false);
         validator.setIssuerIDP("http://cxf.apache.org/issuer");
         validator.setAssertionConsumerURL("http://recipient.apache.org");
         validator.setClientAddress("http://apache.org");
@@ -472,6 +484,7 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
         
         // Validate the Response
         SAMLSSOResponseValidator validator = new SAMLSSOResponseValidator();
+        validator.setEnforceAssertionsSigned(false);
         validator.setIssuerIDP("http://cxf.apache.org/issuer");
         validator.setAssertionConsumerURL("http://recipient.apache.org");
         validator.setClientAddress("http://apache.org");
@@ -515,6 +528,7 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
         
         // Validate the Response
         SAMLSSOResponseValidator validator = new SAMLSSOResponseValidator();
+        validator.setEnforceAssertionsSigned(false);
         validator.setIssuerIDP("http://cxf.apache.org/issuer");
         validator.setAssertionConsumerURL("http://recipient.apache.org");
         validator.setClientAddress("http://apache.org");
@@ -524,6 +538,41 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
         try {
             validator.validateSamlResponse(response, false);
             fail("Expected failure on bad response");
+        } catch (WSSecurityException ex) {
+            // expected
+        }
+    }
+    
+    @org.junit.Test
+    public void testEnforceAssertionsSigned() throws Exception {
+        
+        SubjectConfirmationDataBean subjectConfirmationData = new SubjectConfirmationDataBean();
+        subjectConfirmationData.setAddress("http://apache.org");
+        subjectConfirmationData.setInResponseTo("12345");
+        subjectConfirmationData.setNotAfter(new DateTime().plusMinutes(5));
+        subjectConfirmationData.setRecipient("http://recipient.apache.org");
+        
+        Response response = createResponse(subjectConfirmationData);
+        
+        Crypto issuerCrypto = new Merlin();
+        KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+        ClassLoader loader = Loader.getClassLoader(CombinedValidatorTest.class);
+        InputStream input = Merlin.loadInputStream(loader, "alice.jks");
+        keyStore.load(input, "password".toCharArray());
+        ((Merlin)issuerCrypto).setKeyStore(keyStore);
+        
+        // Test SSO validation
+        SAMLSSOResponseValidator ssoValidator = new SAMLSSOResponseValidator();
+        ssoValidator.setIssuerIDP("http://cxf.apache.org/issuer");
+        ssoValidator.setAssertionConsumerURL("http://recipient.apache.org");
+        ssoValidator.setClientAddress("http://apache.org");
+        ssoValidator.setRequestId("12345");
+        ssoValidator.setSpIdentifier("http://service.apache.org");
+        
+        // Parse the response
+        try {
+            ssoValidator.validateSamlResponse(response, false);
+            fail("Failure expected on an unsigned Assertion");
         } catch (WSSecurityException ex) {
             // expected
         }
