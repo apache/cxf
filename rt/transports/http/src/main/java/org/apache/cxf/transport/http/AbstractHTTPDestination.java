@@ -726,7 +726,7 @@ public abstract class AbstractHTTPDestination
             OutputStream os = message.getContent(OutputStream.class);
             if (os == null) {
                 message.setContent(OutputStream.class, 
-                               new WrappedOutputStream(message, response));
+                               new WrappedOutputStream(message));
             }
         }
         
@@ -758,13 +758,11 @@ public abstract class AbstractHTTPDestination
      */
     private class WrappedOutputStream extends AbstractWrappedOutputStream implements CopyingOutputStream {
 
-        protected HttpServletResponse response;
         private Message outMessage;
         
-        WrappedOutputStream(Message m, HttpServletResponse resp) {
+        WrappedOutputStream(Message m) {
             super();
             this.outMessage = m;
-            response = resp;
         }
 
         
