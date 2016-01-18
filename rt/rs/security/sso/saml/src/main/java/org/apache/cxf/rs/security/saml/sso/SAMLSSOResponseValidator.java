@@ -50,7 +50,8 @@ public class SAMLSSOResponseValidator {
     private TokenReplayCache<String> replayCache;
     
     /**
-     * Enforce that Assertions must be signed if the POST binding was used. The default is true.
+     * Enforce that Assertions contained in the Response must be signed (if the Response itself is not
+     * signed). The default is true.
      */
     public void setEnforceAssertionsSigned(boolean enforceAssertionsSigned) {
         this.enforceAssertionsSigned = enforceAssertionsSigned;
@@ -108,9 +109,8 @@ public class SAMLSSOResponseValidator {
             }
             validateIssuer(assertion.getIssuer());
             
-            if (enforceAssertionsSigned && postBinding && assertion.getSignature() == null) {
-                LOG.fine("If the HTTP Post binding is used to deliver the Response, "
-                         + "the enclosed assertions must be signed");
+            if (!enforceResponseSigned && enforceAssertionsSigned && assertion.getSignature() == null) {
+                LOG.fine("The enclosed assertions in the SAML Response must be signed");
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
             }
             

@@ -168,6 +168,7 @@ public class CombinedValidatorTest extends org.junit.Assert {
         
         // Test SSO validation
         SAMLSSOResponseValidator ssoValidator = new SAMLSSOResponseValidator();
+        ssoValidator.setEnforceAssertionsSigned(false);
         ssoValidator.setIssuerIDP("http://cxf.apache.org/issuer");
         ssoValidator.setAssertionConsumerURL("http://recipient.apache.org");
         ssoValidator.setClientAddress("http://apache.org");
