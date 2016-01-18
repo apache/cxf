@@ -38,6 +38,7 @@ import org.apache.cxf.common.util.SystemPropertyAction;
 public final class FileUtils {
     private static final int RETRY_SLEEP_MILLIS = 10;
     private static File defaultTempDir;
+    private static Thread shutdownHook;
     private static final char[] ILLEGAL_CHARACTERS 
         = {'/', '\n', '\r', '\t', '\0', '\f', '`', '?', '*', '\\', '<', '>', '|', '\"', ':'};    
     
@@ -84,13 +85,51 @@ public final class FileUtils {
             }
         }
         if (defaultTempDir == null) {
-            defaultTempDir = createTmpDir();         
+            defaultTempDir = createTmpDir(false);
+            if (shutdownHook != null) {
+                Runtime.getRuntime().removeShutdownHook(shutdownHook); 
+            }
+            shutdownHook = new Thread() {
+                @Override
+                public void run() {
+                    removeDir(defaultTempDir, true);
+                }
+            };
+            Runtime.getRuntime().addShutdownHook(shutdownHook); 
+
         }
         return defaultTempDir;
     }
     
+    public static synchronized void maybeDeleteDefaultTempDir() {
+        if (defaultTempDir != null) {
+            Runtime.getRuntime().gc(); // attempt a garbage collect to close any files
+            String files[] = defaultTempDir.list();
+            if (files != null && files.length > 0) {
+                //there are files in there, we need to attempt some more cleanup
+                
+                //HOWEVER, we don't want to just wipe out every file as something may be holding onto
+                //the files for a reason. We'll re-run the gc and run the finalizers to see if 
+                //anything gets cleaned up.
+                Runtime.getRuntime().gc(); // attempt a garbage collect to close any files
+                Runtime.getRuntime().runFinalization(); 
+                Runtime.getRuntime().gc();
+                files = defaultTempDir.list();
+            }
+            if (files == null || files.length == 0) {
+                //all the files are gone, we can remove the shutdownhook and reset
+                Runtime.getRuntime().removeShutdownHook(shutdownHook);
+                shutdownHook.run();
+                shutdownHook = null;
+                defaultTempDir = null;
+            }
+        }
+    }
+    
     public static File createTmpDir() {
-        int x = (int)(Math.random() * 1000000);
+        return createTmpDir(true);
+    }
+    public static File createTmpDir(boolean addHook) {
         String s = SystemPropertyAction.getProperty("java.io.tmpdir");
         File checkExists = new File(s);
         if (!checkExists.exists() || !checkExists.isDirectory()) {
@@ -110,6 +149,8 @@ public final class FileUtils {
                                                            + "little usable temporary space.  Operations"
                                                            + " requiring temporary files may fail.");
         }
+
+        int x = (int)(Math.random() * 1000000);
         File f = new File(checkExists, "cxf-tmp-" + x);
         int count = 0;
         while (!f.mkdir()) {
@@ -124,14 +165,16 @@ public final class FileUtils {
             count++;
         }
         File newTmpDir  = f;
-        final File f2 = f;
-        Thread hook = new Thread() {
-            @Override
-            public void run() {
-                removeDir(f2, true);
-            }
-        };
-        Runtime.getRuntime().addShutdownHook(hook); 
+        if (addHook) {
+            final File f2 = newTmpDir;
+            Thread hook = new Thread() {
+                @Override
+                public void run() {
+                    removeDir(f2, true);
+                }
+            };
+            Runtime.getRuntime().addShutdownHook(hook); 
+        }
         return newTmpDir;
     }
 
