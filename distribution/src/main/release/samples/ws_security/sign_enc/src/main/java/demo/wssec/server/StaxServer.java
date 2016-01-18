@@ -88,7 +88,7 @@ public class StaxServer {
         
         properties.setSignatureCryptoProperties(decCryptoProperties);
         properties.setSignatureKeyIdentifier(
-            WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference
+            WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE
         );
         properties.setSignatureAlgorithm("http://www.w3.org/2000/09/xmldsig#rsa-sha1");
         properties.addSignaturePart(
