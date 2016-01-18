@@ -45,6 +45,7 @@ import org.apache.cxf.security.SecurityContext;
 public class DirectAuthorizationService extends AbstractOAuthService {
     private SubjectCreator subjectCreator;
     private boolean partialMatchScopeValidation;
+    private boolean useAllClientScopes;
     @POST
     @Consumes("application/x-www-form-urlencoded")
     @Produces("text/html")
@@ -62,6 +63,7 @@ public class DirectAuthorizationService extends AbstractOAuthService {
         String providedScope = params.getFirst(OAuthConstants.SCOPE);
         List<String> requestedScope = OAuthUtils.getRequestedScopes(client, 
                                                            providedScope, 
+                                                           useAllClientScopes,
                                                            partialMatchScopeValidation);
         
         reg.setRequestedScope(requestedScope);        
@@ -131,6 +133,10 @@ public class DirectAuthorizationService extends AbstractOAuthService {
 
     public void setPartialMatchScopeValidation(boolean partialMatchScopeValidation) {
         this.partialMatchScopeValidation = partialMatchScopeValidation;
+    }
+
+    public void setUseAllClientScopes(boolean useAllClientScopes) {
+        this.useAllClientScopes = useAllClientScopes;
     }
 }
 

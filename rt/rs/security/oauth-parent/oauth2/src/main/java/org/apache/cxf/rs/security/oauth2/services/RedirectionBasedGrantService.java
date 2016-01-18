@@ -57,6 +57,7 @@ import org.apache.cxf.security.SecurityContext;
 public abstract class RedirectionBasedGrantService extends AbstractOAuthService {
     private Set<String> supportedResponseTypes;
     private String supportedGrantType;
+    private boolean useAllClientScopes;
     private boolean partialMatchScopeValidation;
     private boolean useRegisteredRedirectUriIfPossible = true;
     private SessionAuthenticityTokenProvider sessionAuthenticityTokenProvider;
@@ -145,7 +146,8 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         List<String> requestedScope = null;
         try {
             requestedScope = OAuthUtils.getRequestedScopes(client, 
-                                                           providedScope, 
+                                                           providedScope,
+                                                           useAllClientScopes,
                                                            partialMatchScopeValidation);
         } catch (OAuthServiceException ex) {
             return createErrorResponse(params, redirectUri, OAuthConstants.INVALID_SCOPE);
@@ -461,6 +463,10 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
 
     public void setPartialMatchScopeValidation(boolean partialMatchScopeValidation) {
         this.partialMatchScopeValidation = partialMatchScopeValidation;
+    }
+    
+    public void setUseAllClientScopes(boolean useAllClientScopes) {
+        this.useAllClientScopes = useAllClientScopes;
     }
     /**
      * If a client does not include a redirect_uri parameter but has an exactly one
