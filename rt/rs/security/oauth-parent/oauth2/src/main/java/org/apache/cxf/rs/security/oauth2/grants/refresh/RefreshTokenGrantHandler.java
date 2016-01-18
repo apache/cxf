@@ -35,6 +35,7 @@ public class RefreshTokenGrantHandler implements AccessTokenGrantHandler {
 
     private OAuthDataProvider dataProvider;
     private boolean partialMatchScopeValidation;
+    private boolean useAllClientScopes;
     
     public void setDataProvider(OAuthDataProvider dataProvider) {
         this.dataProvider = dataProvider;
@@ -49,6 +50,7 @@ public class RefreshTokenGrantHandler implements AccessTokenGrantHandler {
         String refreshToken = params.getFirst(OAuthConstants.REFRESH_TOKEN);
         List<String> requestedScopes = OAuthUtils.getRequestedScopes(client,
                                             params.getFirst(OAuthConstants.SCOPE),
+                                            useAllClientScopes,
                                             partialMatchScopeValidation);
         
         return dataProvider.refreshAccessToken(client, refreshToken, requestedScopes);
@@ -56,5 +58,9 @@ public class RefreshTokenGrantHandler implements AccessTokenGrantHandler {
 
     public void setPartialMatchScopeValidation(boolean partialMatchScopeValidation) {
         this.partialMatchScopeValidation = partialMatchScopeValidation;
+    }
+
+    public void setUseAllClientScopes(boolean useAllClientScopes) {
+        this.useAllClientScopes = useAllClientScopes;
     }
 }

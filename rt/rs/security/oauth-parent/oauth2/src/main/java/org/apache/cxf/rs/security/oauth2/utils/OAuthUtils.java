@@ -213,7 +213,9 @@ public final class OAuthUtils {
         return false;
     }
     
-    public static List<String> getRequestedScopes(Client client, String scopeParameter, 
+    public static List<String> getRequestedScopes(Client client, 
+                                                  String scopeParameter,
+                                                  boolean useAllClientScopes,
                                                   boolean partialMatchScopeValidation) {
         List<String> requestScopes = parseScope(scopeParameter);
         List<String> registeredScopes = client.getRegisteredScopes();
@@ -224,6 +226,14 @@ public final class OAuthUtils {
         if (!validateScopes(requestScopes, registeredScopes, partialMatchScopeValidation)) {
             throw new OAuthServiceException("Unexpected scope");
         }
+        if (useAllClientScopes) {
+            for (String registeredScope : registeredScopes) {
+                if (!requestScopes.contains(registeredScope)) {
+                    requestScopes.add(registeredScope);
+                }
+            }
+        }
+        
         return requestScopes;
     }
     
