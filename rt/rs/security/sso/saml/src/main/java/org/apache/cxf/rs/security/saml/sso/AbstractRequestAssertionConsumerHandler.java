@@ -317,7 +317,9 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
             ssoResponseValidator.setEnforceAssertionsSigned(enforceAssertionsSigned);
             ssoResponseValidator.setEnforceResponseSigned(enforceResponseSigned);
             ssoResponseValidator.setEnforceKnownIssuer(enforceKnownIssuer);
-            ssoResponseValidator.setReplayCache(getReplayCache());
+            if (postBinding) {
+                ssoResponseValidator.setReplayCache(getReplayCache());
+            }
 
             return ssoResponseValidator.validateSamlResponse(samlResponse, postBinding);
         } catch (WSSecurityException ex) {
