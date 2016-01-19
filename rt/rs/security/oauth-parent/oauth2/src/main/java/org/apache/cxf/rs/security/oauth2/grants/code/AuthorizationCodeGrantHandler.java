@@ -113,11 +113,11 @@ public class AuthorizationCodeGrantHandler extends AbstractGrantHandler {
     
     private boolean compareCodeVerifierWithChallenge(Client c, String clientCodeVerifier, 
                                                      String clientCodeChallenge) {
-        if (clientCodeChallenge == null && clientCodeChallenge == null 
+        if (clientCodeChallenge == null && clientCodeVerifier == null 
             && (c.isConfidential() || !expectCodeVerifierForPublicClients)) {
             return true;
-        } else if (clientCodeChallenge != null && clientCodeChallenge == null 
-            || clientCodeChallenge == null && clientCodeChallenge != null) {
+        } else if (clientCodeChallenge != null && clientCodeVerifier == null 
+            || clientCodeChallenge == null && clientCodeVerifier != null) {
             return false;
         } else {
             String transformedCodeVerifier = codeVerifierTransformer == null 
