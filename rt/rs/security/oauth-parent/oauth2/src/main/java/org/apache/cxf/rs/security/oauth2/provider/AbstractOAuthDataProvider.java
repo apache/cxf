@@ -269,7 +269,7 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         this.permissionMap = permissionMap;
     }
     
-    public void setScopes(Map<String, String> scopes) {
+    public void setSupportedScopes(Map<String, String> scopes) {
         for (Map.Entry<String, String> entry : scopes.entrySet()) {
             OAuthPermission permission = new OAuthPermission(entry.getKey(), entry.getValue());
             permissionMap.put(entry.getKey(), permission);
