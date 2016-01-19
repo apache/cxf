@@ -159,13 +159,12 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
     
     @Override
     public List<OAuthPermission> convertScopeToPermissions(Client client, List<String> requestedScopes) {
+        if (requiredScopes != null && !requestedScopes.containsAll(requiredScopes)) {
+            throw new OAuthServiceException("Required scopes are missing");
+        }
         if (requestedScopes.isEmpty()) {
             return Collections.emptyList();
         } else if (!permissionMap.isEmpty()) {
-            if (requiredScopes != null && !requestedScopes.containsAll(requiredScopes)) {
-                throw new OAuthServiceException("Required scopes are missing");
-            }
-            
             List<OAuthPermission> list = new ArrayList<OAuthPermission>();
             for (String scope : requestedScopes) {
                 OAuthPermission permission = permissionMap.get(scope);
