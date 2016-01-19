@@ -44,7 +44,12 @@ public final class NamespaceHandlerRegisterer {
                 LOG.info("Registered blueprint namespace handler for " + namespace);
             }
         } catch (Throwable e) {
-            LOG.log(Level.WARNING, "Aries Blueprint packages not available. So namespaces will not be registered", e);
+            String msg = "Aries Blueprint packages not available. So namespaces will not be registered";
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.log(Level.WARNING, msg, e);
+            } else {
+                LOG.log(Level.WARNING, msg);
+            }
         }
     }
 
