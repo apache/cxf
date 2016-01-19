@@ -309,12 +309,10 @@ public class MAPAggregatorImpl extends MAPAggregator {
 
         for (QName type : types) {
             assertAssertion(aim, type);
+            // ADDRESSING_ASSERTION is normalized, so check only the default namespace
             if (type.equals(MetadataConstants.ADDRESSING_ASSERTION_QNAME)) {
                 assertAssertion(aim, MetadataConstants.ANON_RESPONSES_ASSERTION_QNAME);
                 assertAssertion(aim, MetadataConstants.NON_ANON_RESPONSES_ASSERTION_QNAME);
-            } else if (type.equals(MetadataConstants.ADDRESSING_ASSERTION_QNAME_0705)) {
-                assertAssertion(aim, MetadataConstants.ANON_RESPONSES_ASSERTION_QNAME_0705);
-                assertAssertion(aim, MetadataConstants.NON_ANON_RESPONSES_ASSERTION_QNAME_0705);
             }
         }
     }
@@ -348,17 +346,12 @@ public class MAPAggregatorImpl extends MAPAggregator {
         
         for (QName type : types) {
             assertAssertion(aim, type);
+            // ADDRESSING_ASSERTION is normalized, so check only the default namespace
             if (type.equals(MetadataConstants.ADDRESSING_ASSERTION_QNAME)) {
                 if (onlyAnonymous) {
                     assertAssertion(aim, MetadataConstants.ANON_RESPONSES_ASSERTION_QNAME);
                 } else if (!hasAnonymous) {
                     assertAssertion(aim, MetadataConstants.NON_ANON_RESPONSES_ASSERTION_QNAME);
-                }        
-            } else if (type.equals(MetadataConstants.ADDRESSING_ASSERTION_QNAME_0705)) {
-                if (onlyAnonymous) {
-                    assertAssertion(aim, MetadataConstants.ANON_RESPONSES_ASSERTION_QNAME_0705);
-                } else if (!hasAnonymous) {
-                    assertAssertion(aim, MetadataConstants.NON_ANON_RESPONSES_ASSERTION_QNAME_0705);
                 }        
             }
         }
