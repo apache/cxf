@@ -33,6 +33,8 @@ import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.ws.addressing.impl.MAPAggregatorImpl;
+import org.apache.cxf.ws.addressing.soap.MAPCodec;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -82,7 +84,7 @@ public class NestedAddressingPolicyTest extends AbstractBusClientServerTestBase 
     }
          
     @Test
-    public void greetMe() throws Exception {        
+    public void greetMe() throws Exception {
         
         // use a plain client
         
@@ -108,6 +110,35 @@ public class NestedAddressingPolicyTest extends AbstractBusClientServerTestBase 
             assertTrue("Addressing Header Required message is expected",
                        e.getMessage().contains("Addressing Property is not present"));
         }
+        ((Closeable)greeter).close();
+    }
+
+    @Test
+    public void greetMeWSA() throws Exception {
+        // use a wsa-enabled client
+        
+        SpringBusFactory bf = new SpringBusFactory();
+        bus = bf.createBus();
+        BusFactory.setDefaultBus(bus);
+        
+        BasicGreeterService gs = new BasicGreeterService();
+        final Greeter greeter = gs.getGreeterPort();
+        
+        updateAddressPort(greeter, PORT);
+        LoggingInInterceptor in = new LoggingInInterceptor();
+        LoggingOutInterceptor out = new LoggingOutInterceptor();
+        MAPCodec mapCodec = new MAPCodec();
+        MAPAggregatorImpl mapAggregator = new MAPAggregatorImpl();
+
+        bus.getInInterceptors().add(in);
+        bus.getInInterceptors().add(mapCodec);
+        bus.getInInterceptors().add(mapAggregator);
+        bus.getOutInterceptors().add(out);
+        bus.getOutInterceptors().add(mapCodec);
+        bus.getOutInterceptors().add(mapAggregator);
+
+        String s = greeter.greetMe("mytest");
+        assertEquals("MYTEST", s);
         ((Closeable)greeter).close();
     }
 }
