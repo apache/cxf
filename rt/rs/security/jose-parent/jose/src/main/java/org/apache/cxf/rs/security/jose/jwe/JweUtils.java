@@ -318,7 +318,7 @@ public final class JweUtils {
         ContentEncryptionProvider ctEncryptionProvider = null;
         if (JoseConstants.HEADER_JSON_WEB_KEY.equals(props.get(JoseConstants.RSSEC_KEY_STORE_TYPE))) {
             JsonWebKey jwk = JwkUtils.loadJsonWebKey(m, props, KeyOperation.ENCRYPT);
-            if ("direct".equals(keyEncryptionAlgo)) {
+            if (KeyAlgorithm.DIRECT == keyAlgo) {
                 contentEncryptionAlgo = getContentEncryptionAlgo(m, props, jwk.getAlgorithm());
                 ctEncryptionProvider = getContentEncryptionAlgorithm(jwk, contentEncryptionAlgo);
             } else {
@@ -418,7 +418,7 @@ public final class JweUtils {
                     throw new JweException(JweException.Error.KEY_DECRYPTION_FAILURE);
                 }
                 
-                if ("direct".equals(keyEncryptionAlgo)) {
+                if (KeyAlgorithm.DIRECT.getJwaName().equals(keyEncryptionAlgo)) {
                     contentEncryptionAlgo = getContentEncryptionAlgo(m, props, jwk.getAlgorithm());
                     ctDecryptionKey = getContentDecryptionSecretKey(jwk, contentEncryptionAlgo);
                 } else {
