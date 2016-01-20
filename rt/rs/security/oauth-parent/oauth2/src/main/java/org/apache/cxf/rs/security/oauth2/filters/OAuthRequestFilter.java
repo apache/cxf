@@ -87,6 +87,9 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
         // WWW-Authenticate with the list of supported schemes will be sent back 
         // if the scheme is not accepted
         String[] authParts = getAuthorizationParts(m);
+        if (authParts.length < 2) {
+            throw ExceptionUtils.toForbiddenException(null, null);
+        }
         String authScheme = authParts[0];
         String authSchemeData = authParts[1];
         
