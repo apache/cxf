@@ -20,22 +20,12 @@
 package org.apache.cxf.systest.jaxrs.security.oauth2.grants;
 
 import java.net.URL;
-<<<<<<< HEAD
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-=======
->>>>>>> 49b2b81... Reshuffle of the tests to share some common code
 
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.Response;
 
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.jaxrs.client.WebClient;
-<<<<<<< HEAD
-import org.apache.cxf.jaxrs.provider.json.JSONProvider;
-=======
->>>>>>> 49b2b81... Reshuffle of the tests to share some common code
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.OAuthAuthorizationData;
 import org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuth2TestUtils;
@@ -225,12 +215,7 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         response = client.post(form);
 
         String location = response.getHeaderString("Location"); 
-<<<<<<< HEAD
-        String accessToken = location.substring(location.indexOf("access_token=") + "access_token=".length());
-        accessToken = accessToken.substring(0, accessToken.indexOf('&'));
-=======
         String accessToken = OAuth2TestUtils.getSubstring(location, "access_token");
->>>>>>> 49b2b81... Reshuffle of the tests to share some common code
         assertNotNull(accessToken);
     }
 
@@ -306,89 +291,7 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         assertNotNull(accessToken.getRefreshToken());
     }
 
-<<<<<<< HEAD
-    private String getAuthorizationCode(WebClient client) {
-        return getAuthorizationCode(client, null);
-    }
-
-    private String getAuthorizationCode(WebClient client, String scope) {
-        // Make initial authorization request
-        client.type("application/json").accept("application/json");
-        client.query("client_id", "consumer-id");
-        client.query("redirect_uri", "http://www.blah.apache.org");
-        client.query("response_type", "code");
-        if (scope != null) {
-            client.query("scope", scope);
-        }
-        client.path("authorize/");
-        Response response = client.get();
-
-        OAuthAuthorizationData authzData = response.readEntity(OAuthAuthorizationData.class);
-
-        // Now call "decision" to get the authorization code grant
-        client.path("decision");
-        client.type("application/x-www-form-urlencoded");
-
-        Form form = new Form();
-        form.param("session_authenticity_token", authzData.getAuthenticityToken());
-        form.param("client_id", authzData.getClientId());
-        form.param("redirect_uri", authzData.getRedirectUri());
-        if (authzData.getProposedScope() != null) {
-            form.param("scope", authzData.getProposedScope());
-        }
-        form.param("oauthDecision", "allow");
-
-        response = client.post(form);
-        String location = response.getHeaderString("Location"); 
-        return location.substring(location.indexOf("code=") + "code=".length());
-    }
-
-    private ClientAccessToken getAccessTokenWithAuthorizationCode(WebClient client, String code) {
-        client.type("application/x-www-form-urlencoded").accept("application/json");
-        client.path("token");
-
-        Form form = new Form();
-        form.param("grant_type", "authorization_code");
-        form.param("code", code);
-        form.param("client_id", "consumer-id");
-        Response response = client.post(form);
-
-        return response.readEntity(ClientAccessToken.class);
-    }
-    
-    private List<Object> setupProviders() {
-        List<Object> providers = new ArrayList<Object>();
-        JSONProvider<OAuthAuthorizationData> jsonP = new JSONProvider<OAuthAuthorizationData>();
-        jsonP.setNamespaceMap(Collections.singletonMap("http://org.apache.cxf.rs.security.oauth",
-                                                       "ns2"));
-        providers.add(jsonP);
-        OAuthJSONProvider oauthProvider = new OAuthJSONProvider();
-        providers.add(oauthProvider);
-        
-        return providers;
-    }
-
-    private String createToken(String audRestr) throws WSSecurityException {
-        SamlCallbackHandler samlCallbackHandler = new SamlCallbackHandler(true);
-        samlCallbackHandler.setAudience(audRestr);
-        
-        SAMLCallback samlCallback = new SAMLCallback();
-        SAMLUtil.doSAMLCallback(samlCallbackHandler, samlCallback);
-
-        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
-        if (samlCallback.isSignAssertion()) {
-            samlAssertion.signAssertion(
-                samlCallback.getIssuerKeyName(),
-                samlCallback.getIssuerKeyPassword(),
-                samlCallback.getIssuerCrypto(),
-                samlCallback.isSendKeyValue(),
-                samlCallback.getCanonicalizationAlgorithm(),
-                samlCallback.getSignatureAlgorithm()
-            );
-        }
-        
-        return samlAssertion.assertionToString();
-=======
+    /*
     @org.junit.Test
     public void testJWTAuthorizationGrant() throws Exception {
         URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
@@ -414,7 +317,7 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         ClientAccessToken accessToken = response.readEntity(ClientAccessToken.class);
         assertNotNull(accessToken.getTokenKey());
         assertNotNull(accessToken.getRefreshToken());
->>>>>>> 49b2b81... Reshuffle of the tests to share some common code
     }
+    */
     
 }

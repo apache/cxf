@@ -73,20 +73,11 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
         Crypto crypto = new CryptoLoader().loadCrypto(CRYPTO_RESOURCE_PROPERTIES);
         SelfSignInfo signInfo = new SelfSignInfo(crypto, "alice", "password"); 
         
-<<<<<<< HEAD:systests/rs-security/src/test/java/org/apache/cxf/systest/jaxrs/security/oauth2/JAXRSOAuth2Test.java
-        String assertion =  SAMLUtils.createAssertion(new SamlCallbackHandler(false),
-                                                      signInfo).assertionToString();
-=======
         SamlCallbackHandler samlCallbackHandler = new SamlCallbackHandler(false);
         String audienceURI = "https://localhost:" + PORT + "/oauth2/token";
         samlCallbackHandler.setAudience(audienceURI);
-        SamlAssertionWrapper assertionWrapper = SAMLUtils.createAssertion(samlCallbackHandler,
-                                                                          signInfo);
-        Document doc = DOMUtils.newDocument();
-        Element assertionElement = assertionWrapper.toDOM(doc);
-        String assertion = DOM2Writer.nodeToString(assertionElement);
+        String assertion = SAMLUtils.createAssertion(samlCallbackHandler, signInfo).assertionToString();
         
->>>>>>> 49b2b81... Reshuffle of the tests to share some common code:systests/rs-security/src/test/java/org/apache/cxf/systest/jaxrs/security/oauth2/grants/JAXRSOAuth2Test.java
         Saml2BearerGrant grant = new Saml2BearerGrant(assertion);
         ClientAccessToken at = OAuthClientUtils.getAccessToken(wc, 
                                         new OAuthClientUtils.Consumer("alice", "alice"), 
@@ -141,44 +132,6 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
         assertNotNull(at.getTokenKey());
     }
     
-<<<<<<< HEAD:systests/rs-security/src/test/java/org/apache/cxf/systest/jaxrs/security/oauth2/JAXRSOAuth2Test.java
-=======
-    @Test
-    public void testJWTBearerGrant() throws Exception {
-        String address = "https://localhost:" + PORT + "/oauth2/token";
-        WebClient wc = createWebClient(address);
-        
-        // Create the JWT Token
-        String token = OAuth2TestUtils.createToken("resourceOwner", "alice", address, true, true);
-        
-        JwtBearerGrant grant = new JwtBearerGrant(token);
-        ClientAccessToken at = OAuthClientUtils.getAccessToken(wc, 
-                                        new Consumer("alice", "alice"), 
-                                        grant,
-                                        false);
-        assertNotNull(at.getTokenKey());
-    }
-    
-    @Test
-    public void testJWTBearerAuthenticationDirect() throws Exception {
-        String address = "https://localhost:" + PORT + "/oauth2-auth-jwt/token";
-        WebClient wc = createWebClient(address);
-        
-        // Create the JWT Token
-        String token = OAuth2TestUtils.createToken("resourceOwner", "alice", address, true, true);
-        
-        Map<String, String> extraParams = new HashMap<String, String>();
-        extraParams.put(Constants.CLIENT_AUTH_ASSERTION_TYPE,
-                        "urn:ietf:params:oauth:client-assertion-type:jwt-bearer");
-        extraParams.put(Constants.CLIENT_AUTH_ASSERTION_PARAM, token);
-        
-        ClientAccessToken at = OAuthClientUtils.getAccessToken(wc, 
-                                                               new CustomGrant(),
-                                                               extraParams);
-        assertNotNull(at.getTokenKey());
-    }
-   
->>>>>>> 49b2b81... Reshuffle of the tests to share some common code:systests/rs-security/src/test/java/org/apache/cxf/systest/jaxrs/security/oauth2/grants/JAXRSOAuth2Test.java
     //
     // Some negative tests for authentication
     //
@@ -333,117 +286,6 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
         }
     }
     
-<<<<<<< HEAD:systests/rs-security/src/test/java/org/apache/cxf/systest/jaxrs/security/oauth2/JAXRSOAuth2Test.java
-=======
-    @Test
-    public void testJWTBadSubjectName() throws Exception {
-        String address = "https://localhost:" + PORT + "/oauth2-auth-jwt/token";
-        WebClient wc = createWebClient(address);
-        
-        // Create the JWT Token
-        String token = OAuth2TestUtils.createToken("resourceOwner", "bob", address, true, true);
-        
-        Map<String, String> extraParams = new HashMap<String, String>();
-        extraParams.put(Constants.CLIENT_AUTH_ASSERTION_TYPE,
-                        "urn:ietf:params:oauth:client-assertion-type:jwt-bearer");
-        extraParams.put(Constants.CLIENT_AUTH_ASSERTION_PARAM, token);
-        
-        try {
-            OAuthClientUtils.getAccessToken(wc, new CustomGrant(), extraParams);
-            fail("Failure expected on a bad subject name");
-        } catch (OAuthServiceException ex) {
-            // expected
-        }
-    }
-    
-    @Test
-    public void testJWTUnsigned() throws Exception {
-        String address = "https://localhost:" + PORT + "/oauth2-auth-jwt/token";
-        WebClient wc = createWebClient(address);
-        
-        // Create the JWT Token
-        String token = OAuth2TestUtils.createToken("resourceOwner", "alice", address,
-                                                   true, false);
-        
-        Map<String, String> extraParams = new HashMap<String, String>();
-        extraParams.put(Constants.CLIENT_AUTH_ASSERTION_TYPE,
-                        "urn:ietf:params:oauth:client-assertion-type:jwt-bearer");
-        extraParams.put(Constants.CLIENT_AUTH_ASSERTION_PARAM, token);
-        
-        try {
-            OAuthClientUtils.getAccessToken(wc, new CustomGrant(), extraParams);
-            fail("Failure expected on an unsigned token");
-        } catch (Exception ex) {
-            // expected
-        }
-    }
-    
-    @Test
-    public void testJWTNoIssuer() throws Exception {
-        String address = "https://localhost:" + PORT + "/oauth2-auth-jwt/token";
-        WebClient wc = createWebClient(address);
-        
-        // Create the JWT Token
-        String token = OAuth2TestUtils.createToken(null, "alice", address, true, true);
-        
-        Map<String, String> extraParams = new HashMap<String, String>();
-        extraParams.put(Constants.CLIENT_AUTH_ASSERTION_TYPE,
-                        "urn:ietf:params:oauth:client-assertion-type:jwt-bearer");
-        extraParams.put(Constants.CLIENT_AUTH_ASSERTION_PARAM, token);
-        
-        try {
-            OAuthClientUtils.getAccessToken(wc, new CustomGrant(), extraParams);
-            fail("Failure expected on no issuer");
-        } catch (Exception ex) {
-            // expected
-        }
-    }
-    
-    @Test
-    public void testJWTNoExpiry() throws Exception {
-        String address = "https://localhost:" + PORT + "/oauth2-auth-jwt/token";
-        WebClient wc = createWebClient(address);
-        
-        // Create the JWT Token
-        String token = OAuth2TestUtils.createToken("resourceOwner", "alice", 
-                                                   address, false, true);
-        
-        Map<String, String> extraParams = new HashMap<String, String>();
-        extraParams.put(Constants.CLIENT_AUTH_ASSERTION_TYPE,
-                        "urn:ietf:params:oauth:client-assertion-type:jwt-bearer");
-        extraParams.put(Constants.CLIENT_AUTH_ASSERTION_PARAM, token);
-        
-        try {
-            OAuthClientUtils.getAccessToken(wc, new CustomGrant(), extraParams);
-            fail("Failure expected on no expiry");
-        } catch (Exception ex) {
-            // expected
-        }
-    }
-    
-    @Test
-    public void testJWTBadAudienceRestriction() throws Exception {
-        String address = "https://localhost:" + PORT + "/oauth2-auth-jwt/token";
-        WebClient wc = createWebClient(address);
-        
-        // Create the JWT Token
-        String token = OAuth2TestUtils.createToken("resourceOwner", "alice", 
-                                                   address + "/badtoken", true, true);
-        
-        Map<String, String> extraParams = new HashMap<String, String>();
-        extraParams.put(Constants.CLIENT_AUTH_ASSERTION_TYPE,
-                        "urn:ietf:params:oauth:client-assertion-type:jwt-bearer");
-        extraParams.put(Constants.CLIENT_AUTH_ASSERTION_PARAM, token);
-        
-        try {
-            OAuthClientUtils.getAccessToken(wc, new CustomGrant(), extraParams);
-            fail("Failure expected on a bad audience restriction");
-        } catch (Exception ex) {
-            // expected
-        }
-    }
-    
->>>>>>> 49b2b81... Reshuffle of the tests to share some common code:systests/rs-security/src/test/java/org/apache/cxf/systest/jaxrs/security/oauth2/grants/JAXRSOAuth2Test.java
     private WebClient createWebClient(String address) {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         bean.setAddress(address);
@@ -488,35 +330,6 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
         return wc;
     }
     
-<<<<<<< HEAD:systests/rs-security/src/test/java/org/apache/cxf/systest/jaxrs/security/oauth2/JAXRSOAuth2Test.java
-    private String createToken(String audRestr, boolean saml2, boolean sign) throws WSSecurityException {
-        SamlCallbackHandler samlCallbackHandler = new SamlCallbackHandler(sign);
-        samlCallbackHandler.setAudience(audRestr);
-        if (!saml2) {
-            samlCallbackHandler.setSaml2(false);
-            samlCallbackHandler.setConfirmationMethod(SAML1Constants.CONF_BEARER);
-        }
-        
-        SAMLCallback samlCallback = new SAMLCallback();
-        SAMLUtil.doSAMLCallback(samlCallbackHandler, samlCallback);
-
-        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
-        if (samlCallback.isSignAssertion()) {
-            samlAssertion.signAssertion(
-                samlCallback.getIssuerKeyName(),
-                samlCallback.getIssuerKeyPassword(),
-                samlCallback.getIssuerCrypto(),
-                samlCallback.isSendKeyValue(),
-                samlCallback.getCanonicalizationAlgorithm(),
-                samlCallback.getSignatureAlgorithm()
-            );
-        }
-        
-        return samlAssertion.assertionToString();
-    }
-    
-=======
->>>>>>> 49b2b81... Reshuffle of the tests to share some common code:systests/rs-security/src/test/java/org/apache/cxf/systest/jaxrs/security/oauth2/grants/JAXRSOAuth2Test.java
     private static class CustomGrant implements AccessTokenGrant {
 
         private static final long serialVersionUID = -4007538779198315873L;

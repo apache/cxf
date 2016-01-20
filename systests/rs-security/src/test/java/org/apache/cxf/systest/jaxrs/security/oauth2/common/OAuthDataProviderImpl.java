@@ -99,8 +99,9 @@ public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
         for (String requestedScope : requestedScopes) {
             if ("read_book".equals(requestedScope)) {
                 OAuthPermission permission = new OAuthPermission();
+                permission.setPermission("read_book");
                 permission.setHttpVerbs(Collections.singletonList("GET"));
-                List<String> uris = new ArrayList<>();
+                List<String> uris = new ArrayList<String>();
                 String partnerAddress = "/secured/bookstore/books/*";
                 uris.add(partnerAddress);
                 permission.setUris(uris);
@@ -108,8 +109,9 @@ public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
                 permissions.add(permission);
             } else if ("create_book".equals(requestedScope)) {
                 OAuthPermission permission = new OAuthPermission();
+                permission.setPermission("create_book");
                 permission.setHttpVerbs(Collections.singletonList("POST"));
-                List<String> uris = new ArrayList<>();
+                List<String> uris = new ArrayList<String>();
                 String partnerAddress = "/secured/bookstore/books/*";
                 uris.add(partnerAddress);
                 permission.setUris(uris);
@@ -117,8 +119,9 @@ public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
                 permissions.add(permission);
             } else if ("create_image".equals(requestedScope)) {
                 OAuthPermission permission = new OAuthPermission();
+                permission.setPermission("create_image");
                 permission.setHttpVerbs(Collections.singletonList("POST"));
-                List<String> uris = new ArrayList<>();
+                List<String> uris = new ArrayList<String>();
                 String partnerAddress = "/secured/bookstore/image/*";
                 uris.add(partnerAddress);
                 permission.setUris(uris);

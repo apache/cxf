@@ -19,23 +19,14 @@
 package org.apache.cxf.systest.jaxrs.security.oauth2.common;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
-import java.util.Properties;
 
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.Response;
 
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.provider.json.JSONProvider;
-import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
-import org.apache.cxf.rs.security.jose.jws.JwsHeaders;
-import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactProducer;
-import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
-import org.apache.cxf.rs.security.jose.jws.JwsUtils;
-import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.OAuthAuthorizationData;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthJSONProvider;
@@ -144,49 +135,6 @@ public final class OAuth2TestUtils {
         }
         
         return samlAssertion.assertionToString();
-    }
-    
-    public static String createToken(String issuer, String subject, String audience, 
-                               boolean expiry, boolean sign) {
-        // Create the JWT Token
-        JwtClaims claims = new JwtClaims();
-        claims.setSubject(subject);
-        if (issuer != null) {
-            claims.setIssuer(issuer);
-        }
-        claims.setIssuedAt(new Date().getTime() / 1000L);
-        if (expiry) {
-            Calendar cal = Calendar.getInstance();
-            cal.add(Calendar.SECOND, 60);
-            claims.setExpiryTime(cal.getTimeInMillis() / 1000L);
-        }
-        if (audience != null) {
-            claims.setAudiences(Collections.singletonList(audience));
-        }
-        
-        if (sign) {
-            // Sign the JWT Token
-            Properties signingProperties = new Properties();
-            signingProperties.put("rs.security.keystore.type", "jks");
-            signingProperties.put("rs.security.keystore.password", "password");
-            signingProperties.put("rs.security.keystore.alias", "alice");
-            signingProperties.put("rs.security.keystore.file", 
-                                  "org/apache/cxf/systest/jaxrs/security/certs/alice.jks");
-            signingProperties.put("rs.security.key.password", "password");
-            signingProperties.put("rs.security.signature.algorithm", "RS256");
-            
-            JwsHeaders jwsHeaders = new JwsHeaders(signingProperties);
-            JwsJwtCompactProducer jws = new JwsJwtCompactProducer(jwsHeaders, claims);
-            
-            JwsSignatureProvider sigProvider = 
-                JwsUtils.loadSignatureProvider(signingProperties, jwsHeaders);
-            
-            return jws.signWith(sigProvider);
-        }
-        
-        JwsHeaders jwsHeaders = new JwsHeaders(SignatureAlgorithm.NONE);
-        JwsJwtCompactProducer jws = new JwsJwtCompactProducer(jwsHeaders, claims);
-        return jws.getSignedEncodedJws();
     }
     
     public static String getSubstring(String parentString, String substringName) {
