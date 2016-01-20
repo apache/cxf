@@ -20,25 +20,26 @@
 package org.apache.cxf.systest.jaxrs.security.oauth2.grants;
 
 import java.net.URL;
+<<<<<<< HEAD
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+=======
+>>>>>>> 49b2b81... Reshuffle of the tests to share some common code
 
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.Response;
 
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.jaxrs.client.WebClient;
+<<<<<<< HEAD
 import org.apache.cxf.jaxrs.provider.json.JSONProvider;
+=======
+>>>>>>> 49b2b81... Reshuffle of the tests to share some common code
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.OAuthAuthorizationData;
-import org.apache.cxf.rs.security.oauth2.provider.OAuthJSONProvider;
-import org.apache.cxf.systest.jaxrs.security.oauth2.SamlCallbackHandler;
+import org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuth2TestUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.saml.SAMLCallback;
-import org.apache.wss4j.common.saml.SAMLUtil;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.junit.BeforeClass;
 
 /**
@@ -58,22 +59,25 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
 
         String address = "https://localhost:" + PORT + "/services/";
-        WebClient client = WebClient.create(address, setupProviders(), "alice", "security", busFile.toString());
+        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(), 
+                                            "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
         WebClient.getConfig(client).getRequestContext().put(
             org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
 
         // Get Authorization Code
-        String code = getAuthorizationCode(client);
+        String code = OAuth2TestUtils.getAuthorizationCode(client);
         assertNotNull(code);
 
         // Now get the access token
-        client = WebClient.create(address, setupProviders(), "consumer-id", "this-is-a-secret", busFile.toString());
+        client = WebClient.create(address, OAuth2TestUtils.setupProviders(), 
+                                  "consumer-id", "this-is-a-secret", busFile.toString());
         // Save the Cookie for the second request...
         WebClient.getConfig(client).getRequestContext().put(
             org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
 
-        ClientAccessToken accessToken = getAccessTokenWithAuthorizationCode(client, code);
+        ClientAccessToken accessToken = 
+            OAuth2TestUtils.getAccessTokenWithAuthorizationCode(client, code);
         assertNotNull(accessToken.getTokenKey());
     }
 
@@ -82,22 +86,25 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
 
         String address = "https://localhost:" + PORT + "/services/";
-        WebClient client = WebClient.create(address, setupProviders(), "alice", "security", busFile.toString());
+        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(), 
+                                            "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
         WebClient.getConfig(client).getRequestContext().put(
             org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
 
         // Get Authorization Code
-        String code = getAuthorizationCode(client);
+        String code = OAuth2TestUtils.getAuthorizationCode(client);
         assertNotNull(code);
 
         // Now get the access token
-        client = WebClient.create(address, setupProviders(), "consumer-id", "this-is-a-secret", busFile.toString());
+        client = WebClient.create(address, OAuth2TestUtils.setupProviders(), 
+                                  "consumer-id", "this-is-a-secret", busFile.toString());
         // Save the Cookie for the second request...
         WebClient.getConfig(client).getRequestContext().put(
             org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
 
-        ClientAccessToken accessToken = getAccessTokenWithAuthorizationCode(client, code);
+        ClientAccessToken accessToken = 
+            OAuth2TestUtils.getAccessTokenWithAuthorizationCode(client, code);
         assertNotNull(accessToken.getTokenKey());
         assertNotNull(accessToken.getRefreshToken());
 
@@ -120,22 +127,25 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
 
         String address = "https://localhost:" + PORT + "/services/";
-        WebClient client = WebClient.create(address, setupProviders(), "alice", "security", busFile.toString());
+        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(), 
+                                            "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
         WebClient.getConfig(client).getRequestContext().put(
             org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
 
         // Get Authorization Code
-        String code = getAuthorizationCode(client, "read_balance");
+        String code = OAuth2TestUtils.getAuthorizationCode(client, "read_balance");
         assertNotNull(code);
 
         // Now get the access token
-        client = WebClient.create(address, setupProviders(), "consumer-id", "this-is-a-secret", busFile.toString());
+        client = WebClient.create(address, OAuth2TestUtils.setupProviders(), 
+                                  "consumer-id", "this-is-a-secret", busFile.toString());
         // Save the Cookie for the second request...
         WebClient.getConfig(client).getRequestContext().put(
             org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
 
-        ClientAccessToken accessToken = getAccessTokenWithAuthorizationCode(client, code);
+        ClientAccessToken accessToken = 
+            OAuth2TestUtils.getAccessTokenWithAuthorizationCode(client, code);
         assertNotNull(accessToken.getTokenKey());
         assertNotNull(accessToken.getRefreshToken());
 
@@ -159,22 +169,25 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
 
         String address = "https://localhost:" + PORT + "/services/";
-        WebClient client = WebClient.create(address, setupProviders(), "alice", "security", busFile.toString());
+        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(), 
+                                            "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
         WebClient.getConfig(client).getRequestContext().put(
             org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
 
         // Get Authorization Code
-        String code = getAuthorizationCode(client, "read_balance");
+        String code = OAuth2TestUtils.getAuthorizationCode(client, "read_balance");
         assertNotNull(code);
 
         // Now get the access token
-        client = WebClient.create(address, setupProviders(), "consumer-id", "this-is-a-secret", busFile.toString());
+        client = WebClient.create(address, OAuth2TestUtils.setupProviders(), 
+                                  "consumer-id", "this-is-a-secret", busFile.toString());
         // Save the Cookie for the second request...
         WebClient.getConfig(client).getRequestContext().put(
             org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
 
-        ClientAccessToken accessToken = getAccessTokenWithAuthorizationCode(client, code);
+        ClientAccessToken accessToken = 
+            OAuth2TestUtils.getAccessTokenWithAuthorizationCode(client, code);
         assertNotNull(accessToken.getTokenKey());
     }
 
@@ -183,7 +196,8 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
 
         String address = "https://localhost:" + PORT + "/services/";
-        WebClient client = WebClient.create(address, setupProviders(), "alice", "security", busFile.toString());
+        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(), 
+                                            "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
         WebClient.getConfig(client).getRequestContext().put(
             org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
@@ -211,8 +225,12 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         response = client.post(form);
 
         String location = response.getHeaderString("Location"); 
+<<<<<<< HEAD
         String accessToken = location.substring(location.indexOf("access_token=") + "access_token=".length());
         accessToken = accessToken.substring(0, accessToken.indexOf('&'));
+=======
+        String accessToken = OAuth2TestUtils.getSubstring(location, "access_token");
+>>>>>>> 49b2b81... Reshuffle of the tests to share some common code
         assertNotNull(accessToken);
     }
 
@@ -221,8 +239,9 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
 
         String address = "https://localhost:" + PORT + "/services/";
-        WebClient client = WebClient.create(address, setupProviders(), "consumer-id", 
-                                            "this-is-a-secret", busFile.toString());
+        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(), 
+                                            "consumer-id", "this-is-a-secret",
+                                            busFile.toString());
 
         // Get Access Token
         client.type("application/x-www-form-urlencoded").accept("application/json");
@@ -244,8 +263,9 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
 
         String address = "https://localhost:" + PORT + "/services/";
-        WebClient client = WebClient.create(address, setupProviders(), "consumer-id", 
-                                            "this-is-a-secret", busFile.toString());
+        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(), 
+                                            "consumer-id", "this-is-a-secret", 
+                                            busFile.toString());
 
         // Get Access Token
         client.type("application/x-www-form-urlencoded").accept("application/json");
@@ -265,10 +285,11 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
         
         String address = "https://localhost:" + PORT + "/services/";
-        WebClient client = WebClient.create(address, setupProviders(), "alice", "security", busFile.toString());
+        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(), 
+                                            "alice", "security", busFile.toString());
         
         // Create the SAML Assertion
-        String assertion = createToken(address + "token");
+        String assertion = OAuth2TestUtils.createToken(address + "token");
 
         // Get Access Token
         client.type("application/x-www-form-urlencoded").accept("application/json");
@@ -285,6 +306,7 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         assertNotNull(accessToken.getRefreshToken());
     }
 
+<<<<<<< HEAD
     private String getAuthorizationCode(WebClient client) {
         return getAuthorizationCode(client, null);
     }
@@ -366,6 +388,33 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         }
         
         return samlAssertion.assertionToString();
+=======
+    @org.junit.Test
+    public void testJWTAuthorizationGrant() throws Exception {
+        URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
+        
+        String address = "https://localhost:" + PORT + "/services/";
+        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(), 
+                                            "alice", "security", busFile.toString());
+        
+        // Create the JWT Token
+        String token = OAuth2TestUtils.createToken("DoubleItSTSIssuer", "consumer-id", 
+                                   "https://localhost:" + PORT + "/services/token", true, true);
+
+        // Get Access Token
+        client.type("application/x-www-form-urlencoded").accept("application/json");
+        client.path("token");
+        
+        Form form = new Form();
+        form.param("grant_type", "urn:ietf:params:oauth:grant-type:jwt-bearer");
+        form.param("assertion", token);
+        form.param("client_id", "consumer-id");
+        Response response = client.post(form);
+        
+        ClientAccessToken accessToken = response.readEntity(ClientAccessToken.class);
+        assertNotNull(accessToken.getTokenKey());
+        assertNotNull(accessToken.getRefreshToken());
+>>>>>>> 49b2b81... Reshuffle of the tests to share some common code
     }
     
 }

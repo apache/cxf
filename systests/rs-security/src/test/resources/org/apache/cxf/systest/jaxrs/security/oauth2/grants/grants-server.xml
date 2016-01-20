@@ -62,7 +62,7 @@ under the License.
         </httpj:engine>
     </httpj:engine-factory>
     
-   <bean id="oauthProvider" class="org.apache.cxf.systest.jaxrs.security.oauth2.grants.OAuthDataProviderImpl" />
+   <bean id="oauthProvider" class="org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuthDataProviderImpl" />
    
    <bean id="authorizationService" class="org.apache.cxf.rs.security.oauth2.services.AuthorizationCodeGrantService">
       <property name="dataProvider" ref="oauthProvider"/>
@@ -110,8 +110,8 @@ under the License.
       </property>
    </bean>
    
-   <bean id="callbackHandler" class="org.apache.cxf.systest.jaxrs.security.oauth2.grants.CallbackHandlerImpl"/>
-   <bean id="basicAuthFilter" class="org.apache.cxf.systest.jaxrs.security.oauth2.grants.BasicAuthFilter">
+   <bean id="callbackHandler" class="org.apache.cxf.systest.jaxrs.security.oauth2.common.CallbackHandlerImpl"/>
+   <bean id="basicAuthFilter" class="org.apache.cxf.systest.jaxrs.security.oauth2.common.BasicAuthFilter">
        <property name="callbackHandler" ref="callbackHandler"/>
    </bean>
    

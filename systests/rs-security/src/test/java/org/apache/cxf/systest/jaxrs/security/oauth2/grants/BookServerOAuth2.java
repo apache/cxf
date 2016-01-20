@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.jaxrs.security.oauth2;
+package org.apache.cxf.systest.jaxrs.security.oauth2.grants;
 
 import java.net.URL;
 

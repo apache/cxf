@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.jaxrs.security.oauth2.grants;
+package org.apache.cxf.systest.jaxrs.security.oauth2.common;
 
 import java.io.IOException;
 import java.security.Principal;
