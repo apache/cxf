@@ -23,6 +23,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.Response;
@@ -65,6 +66,194 @@ public class OAuth2FiltersTest extends AbstractBusClientServerTestBase {
             org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
 
         String code = getAuthorizationCode(oauthClient);
+        assertNotNull(code);
+        
+        // Now get the access token
+        oauthClient = WebClient.create(oauthService, setupProviders(), "consumer-id", 
+                                       "this-is-a-secret", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(oauthClient).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        ClientAccessToken accessToken = getAccessTokenWithAuthorizationCode(oauthClient, code);
+        assertNotNull(accessToken.getTokenKey());
+
+        // Now invoke on the service with the access token
+        String address = "https://localhost:" + PORT + "/secured/bookstore/books";
+        WebClient client = WebClient.create(address, setupProviders(), busFile.toString());
+        client.header("Authorization", "Bearer " + accessToken.getTokenKey());
+        
+        Response response = client.post(new Book("book", 123L));
+        assertEquals(response.getStatus(), 200);
+        
+        Book returnedBook = response.readEntity(Book.class);
+        assertEquals(returnedBook.getName(), "book");
+        assertEquals(returnedBook.getId(), 123L);
+    }
+    
+    @org.junit.Test
+    public void testServiceWithFakeToken() throws Exception {
+        URL busFile = OAuth2FiltersTest.class.getResource("client.xml");
+        
+        // Now invoke on the service with the faked access token
+        String address = "https://localhost:" + PORT + "/secured/bookstore/books";
+        WebClient client = WebClient.create(address, setupProviders(), busFile.toString());
+        client.header("Authorization", "Bearer " + UUID.randomUUID().toString());
+        
+        Response response = client.post(new Book("book", 123L));
+        assertNotEquals(response.getStatus(), 200);
+    }
+    
+    @org.junit.Test
+    public void testServiceWithNoToken() throws Exception {
+        URL busFile = OAuth2FiltersTest.class.getResource("client.xml");
+        
+        // Now invoke on the service with the faked access token
+        String address = "https://localhost:" + PORT + "/secured/bookstore/books";
+        WebClient client = WebClient.create(address, setupProviders(), busFile.toString());
+        
+        Response response = client.post(new Book("book", 123L));
+        assertNotEquals(response.getStatus(), 200);
+    }
+    
+    @org.junit.Test
+    public void testServiceWithEmptyToken() throws Exception {
+        URL busFile = OAuth2FiltersTest.class.getResource("client.xml");
+        
+        // Now invoke on the service with the faked access token
+        String address = "https://localhost:" + PORT + "/secured/bookstore/books";
+        WebClient client = WebClient.create(address, setupProviders(), busFile.toString());
+        client.header("Authorization", "Bearer ");
+        
+        Response response = client.post(new Book("book", 123L));
+        assertNotEquals(response.getStatus(), 200);
+    }
+    
+    @org.junit.Test
+    public void testServiceWithTokenAndScope() throws Exception {
+        URL busFile = OAuth2FiltersTest.class.getResource("client.xml");
+        
+        // Get Authorization Code
+        String oauthService = "https://localhost:" + OAUTH_PORT + "/services/";
+
+        WebClient oauthClient = WebClient.create(oauthService, setupProviders(), "alice", 
+                                                 "security", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(oauthClient).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        String code = getAuthorizationCode(oauthClient, "create_book");
+        assertNotNull(code);
+        
+        // Now get the access token
+        oauthClient = WebClient.create(oauthService, setupProviders(), "consumer-id", 
+                                       "this-is-a-secret", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(oauthClient).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        ClientAccessToken accessToken = getAccessTokenWithAuthorizationCode(oauthClient, code);
+        assertNotNull(accessToken.getTokenKey());
+
+        // Now invoke on the service with the access token
+        String address = "https://localhost:" + PORT + "/secured/bookstore/books";
+        WebClient client = WebClient.create(address, setupProviders(), busFile.toString());
+        client.header("Authorization", "Bearer " + accessToken.getTokenKey());
+        
+        Response response = client.post(new Book("book", 123L));
+        assertEquals(response.getStatus(), 200);
+        
+        Book returnedBook = response.readEntity(Book.class);
+        assertEquals(returnedBook.getName(), "book");
+        assertEquals(returnedBook.getId(), 123L);
+    }
+    
+    @org.junit.Test
+    public void testServiceWithTokenAndIncorrectScopeVerb() throws Exception {
+        URL busFile = OAuth2FiltersTest.class.getResource("client.xml");
+        
+        // Get Authorization Code
+        String oauthService = "https://localhost:" + OAUTH_PORT + "/services/";
+
+        WebClient oauthClient = WebClient.create(oauthService, setupProviders(), "alice", 
+                                                 "security", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(oauthClient).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        String code = getAuthorizationCode(oauthClient, "read_book");
+        assertNotNull(code);
+        
+        // Now get the access token
+        oauthClient = WebClient.create(oauthService, setupProviders(), "consumer-id", 
+                                       "this-is-a-secret", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(oauthClient).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        ClientAccessToken accessToken = getAccessTokenWithAuthorizationCode(oauthClient, code);
+        assertNotNull(accessToken.getTokenKey());
+
+        // Now invoke on the service with the access token
+        String address = "https://localhost:" + PORT + "/secured/bookstore/books";
+        WebClient client = WebClient.create(address, setupProviders(), busFile.toString());
+        client.header("Authorization", "Bearer " + accessToken.getTokenKey());
+
+        // We don't have the scope to post a book here
+        Response response = client.post(new Book("book", 123L));
+        assertNotEquals(response.getStatus(), 200);
+    }
+    
+    @org.junit.Test
+    public void testServiceWithTokenAndIncorrectScopeURI() throws Exception {
+        URL busFile = OAuth2FiltersTest.class.getResource("client.xml");
+        
+        // Get Authorization Code
+        String oauthService = "https://localhost:" + OAUTH_PORT + "/services/";
+
+        WebClient oauthClient = WebClient.create(oauthService, setupProviders(), "alice", 
+                                                 "security", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(oauthClient).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        String code = getAuthorizationCode(oauthClient, "create_image");
+        assertNotNull(code);
+        
+        // Now get the access token
+        oauthClient = WebClient.create(oauthService, setupProviders(), "consumer-id", 
+                                       "this-is-a-secret", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(oauthClient).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        ClientAccessToken accessToken = getAccessTokenWithAuthorizationCode(oauthClient, code);
+        assertNotNull(accessToken.getTokenKey());
+
+        // Now invoke on the service with the access token
+        String address = "https://localhost:" + PORT + "/secured/bookstore/books";
+        WebClient client = WebClient.create(address, setupProviders(), busFile.toString());
+        client.header("Authorization", "Bearer " + accessToken.getTokenKey());
+
+        // We don't have the scope to post a book here
+        Response response = client.post(new Book("book", 123L));
+        assertNotEquals(response.getStatus(), 200);
+    }
+    
+    @org.junit.Test
+    public void testServiceWithTokenAndMultipleScopes() throws Exception {
+        URL busFile = OAuth2FiltersTest.class.getResource("client.xml");
+        
+        // Get Authorization Code
+        String oauthService = "https://localhost:" + OAUTH_PORT + "/services/";
+
+        WebClient oauthClient = WebClient.create(oauthService, setupProviders(), "alice", 
+                                                 "security", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(oauthClient).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        String code = getAuthorizationCode(oauthClient, "read_book create_image create_book");
         assertNotNull(code);
         
         // Now get the access token

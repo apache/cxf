@@ -42,6 +42,7 @@ public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
         
         client.getRegisteredScopes().add("read_book");
         client.getRegisteredScopes().add("create_book");
+        client.getRegisteredScopes().add("create_image");
         
         this.setClient(client);
     }
@@ -73,6 +74,15 @@ public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
                 permission.setHttpVerbs(Collections.singletonList("POST"));
                 List<String> uris = new ArrayList<>();
                 String partnerAddress = "/secured/bookstore/books/*";
+                uris.add(partnerAddress);
+                permission.setUris(uris);
+                
+                permissions.add(permission);
+            } else if ("create_image".equals(requestedScope)) {
+                OAuthPermission permission = new OAuthPermission();
+                permission.setHttpVerbs(Collections.singletonList("POST"));
+                List<String> uris = new ArrayList<>();
+                String partnerAddress = "/secured/bookstore/image/*";
                 uris.add(partnerAddress);
                 permission.setUris(uris);
                 
