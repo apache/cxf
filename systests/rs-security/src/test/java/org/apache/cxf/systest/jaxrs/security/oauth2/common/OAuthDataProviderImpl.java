@@ -16,35 +16,72 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.jaxrs.security.oauth2.filters;
+package org.apache.cxf.systest.jaxrs.security.oauth2.common;
 
+import java.io.InputStream;
+import java.security.cert.Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
 import org.apache.cxf.rs.security.oauth2.grants.code.DefaultEHCacheCodeDataProvider;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
+import org.apache.cxf.rs.security.oauth2.saml.Constants;
+import org.apache.cxf.rt.security.crypto.CryptoUtils;
 
 /**
  * Extend the DefaultEHCacheCodeDataProvider to allow refreshing of tokens
  */
 public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
     
-    public OAuthDataProviderImpl() {
+    public OAuthDataProviderImpl() throws Exception {
+        // filters/grants test client
         Client client = new Client("consumer-id", "this-is-a-secret", true);
         client.setRedirectUris(Collections.singletonList("http://www.blah.apache.org"));
         
         client.getAllowedGrantTypes().add("authorization_code");
         client.getAllowedGrantTypes().add("refresh_token");
         client.getAllowedGrantTypes().add("implicit");
+        client.getAllowedGrantTypes().add("password");
+        client.getAllowedGrantTypes().add("client_credentials");
+        client.getAllowedGrantTypes().add("urn:ietf:params:oauth:grant-type:saml2-bearer");
+        client.getAllowedGrantTypes().add("urn:ietf:params:oauth:grant-type:jwt-bearer");
         
+        client.getRegisteredScopes().add("read_balance");
+        client.getRegisteredScopes().add("create_balance");
+        client.getRegisteredScopes().add("read_data");
         client.getRegisteredScopes().add("read_book");
         client.getRegisteredScopes().add("create_book");
         client.getRegisteredScopes().add("create_image");
         
         this.setClient(client);
+        
+        // JAXRSOAuth2Test clients
+        client = new Client("alice", "alice", true);
+        client.getAllowedGrantTypes().add(Constants.SAML2_BEARER_GRANT);
+        client.getAllowedGrantTypes().add("urn:ietf:params:oauth:grant-type:jwt-bearer");
+        client.getAllowedGrantTypes().add("custom_grant");
+        this.setClient(client);
+
+        Certificate cert = loadCert();
+        String encodedCert = Base64Utility.encode(cert.getEncoded());
+        
+        Client client2 = new Client("CN=whateverhost.com,OU=Morpit,O=ApacheTest,L=Syracuse,C=US", 
+                                    null,
+                                    true,
+                                    null,
+                                    null);
+        client2.getAllowedGrantTypes().add("custom_grant");
+        client2.setApplicationCertificates(Collections.singletonList(encodedCert));
+        this.setClient(client2);
+    }
+    
+    private Certificate loadCert() throws Exception {
+        InputStream is = this.getClass().getResourceAsStream("/org/apache/cxf/systest/http/resources/Truststore.jks");
+        return CryptoUtils.loadCertificate(is, new char[]{'p', 'a', 's', 's', 'w', 'o', 'r', 'd'}, "morpit", null);
     }
     
     @Override
@@ -83,6 +120,33 @@ public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
                 permission.setHttpVerbs(Collections.singletonList("POST"));
                 List<String> uris = new ArrayList<>();
                 String partnerAddress = "/secured/bookstore/image/*";
+                uris.add(partnerAddress);
+                permission.setUris(uris);
+                
+                permissions.add(permission);
+            } else if ("read_balance".equals(requestedScope)) {
+                OAuthPermission permission = new OAuthPermission();
+                permission.setHttpVerbs(Collections.singletonList("GET"));
+                List<String> uris = new ArrayList<>();
+                String partnerAddress = "/partners/balance/*";
+                uris.add(partnerAddress);
+                permission.setUris(uris);
+                
+                permissions.add(permission);
+            } else if ("create_balance".equals(requestedScope)) {
+                OAuthPermission permission = new OAuthPermission();
+                permission.setHttpVerbs(Collections.singletonList("POST"));
+                List<String> uris = new ArrayList<>();
+                String partnerAddress = "/partners/balance/*";
+                uris.add(partnerAddress);
+                permission.setUris(uris);
+                
+                permissions.add(permission);
+            } else if ("read_data".equals(requestedScope)) {
+                OAuthPermission permission = new OAuthPermission();
+                permission.setHttpVerbs(Collections.singletonList("GET"));
+                List<String> uris = new ArrayList<>();
+                String partnerAddress = "/partners/data/*";
                 uris.add(partnerAddress);
                 permission.setUris(uris);
                 

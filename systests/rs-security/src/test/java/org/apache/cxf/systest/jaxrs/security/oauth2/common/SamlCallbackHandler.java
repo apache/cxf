@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.jaxrs.security.oauth2;
+package org.apache.cxf.systest.jaxrs.security.oauth2.common;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -53,11 +53,10 @@ import org.joda.time.DateTime;
  * A CallbackHandler instance that is used by the STS to mock up a SAML Attribute Assertion.
  */
 public class SamlCallbackHandler implements CallbackHandler {
-    public static final String PORT = BookServerOAuth2.PORT;
     private String confirmationMethod = SAML2Constants.CONF_BEARER;
     private boolean signAssertion = true;
     private String issuer = "resourceOwner";
-    private String audience = "https://localhost:" + PORT + "/oauth2/token";
+    private String audience;
     private boolean saml2 = true;
     private String cryptoPropertiesFile = "org/apache/cxf/systest/jaxrs/security/alice.properties";
     private String issuerKeyName = "alice";

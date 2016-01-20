@@ -69,7 +69,7 @@ under the License.
     <bean id="samlAuthHandler" class="org.apache.cxf.rs.security.oauth2.auth.saml.Saml2BearerAuthHandler"/>
     <bean id="jwtAuthHandler" class="org.apache.cxf.rs.security.oauth2.grants.jwt.JwtBearerAuthHandler"/>
     
-    <bean id="customGrantHandler" class="org.apache.cxf.systest.jaxrs.security.oauth2.CustomGrantHandler">
+    <bean id="customGrantHandler" class="org.apache.cxf.systest.jaxrs.security.oauth2.grants.CustomGrantHandler">
         <property name="dataProvider" ref="dataProvider"/>
     </bean>
     <bean id="oauthJson" class="org.apache.cxf.rs.security.oauth2.provider.OAuthJSONProvider"/>
