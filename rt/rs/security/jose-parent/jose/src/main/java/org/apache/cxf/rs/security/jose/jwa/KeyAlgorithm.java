@@ -40,7 +40,7 @@ public enum KeyAlgorithm {
     ECDH_ES_A256KW(AlgorithmUtils.ECDH_ES_A256KW_ALGO, "AESWrap", 256),
     ECDH_ES_DIRECT(AlgorithmUtils.ECDH_ES_DIRECT_ALGO, null, -1),
     
-    DIRECT("direct", null, -1);
+    DIRECT("dir", null, -1);
         
     private final String jwaName;
     private final String javaName;
