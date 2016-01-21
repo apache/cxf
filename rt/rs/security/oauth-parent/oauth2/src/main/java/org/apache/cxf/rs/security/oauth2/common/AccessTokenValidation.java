@@ -55,7 +55,7 @@ public class AccessTokenValidation {
     private long tokenLifetime;
     private UserSubject tokenSubject;
     private List<OAuthPermission> tokenScopes = new LinkedList<OAuthPermission>();
-    private String audience;
+    private List<String> audiences = new LinkedList<String>();
     private String clientCodeVerifier;
     private Map<String, String> extraProps = new HashMap<String, String>();
     
@@ -76,7 +76,7 @@ public class AccessTokenValidation {
         
         this.tokenSubject = token.getSubject();
         this.tokenScopes = token.getScopes();
-        this.audience = token.getAudience();
+        this.setAudiences(token.getAudiences());
         this.clientCodeVerifier = token.getClientCodeVerifier();
     }
     
@@ -137,14 +137,6 @@ public class AccessTokenValidation {
         this.tokenType = tokenType;
     }
 
-    public String getAudience() {
-        return audience;
-    }
-
-    public void setAudience(String audience) {
-        this.audience = audience;
-    }
-
     public String getClientIpAddress() {
         return clientIpAddress;
     }
@@ -182,6 +174,14 @@ public class AccessTokenValidation {
 
     public void setInitialValidationSuccessful(boolean localValidationSuccessful) {
         this.initialValidationSuccessful = localValidationSuccessful;
+    }
+
+    public List<String> getAudiences() {
+        return audiences;
+    }
+
+    public void setAudiences(List<String> audiences) {
+        this.audiences = audiences;
     }
     
 }

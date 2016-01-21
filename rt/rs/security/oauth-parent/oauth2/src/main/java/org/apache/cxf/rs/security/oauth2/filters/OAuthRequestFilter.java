@@ -38,6 +38,7 @@ import javax.ws.rs.ext.Provider;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.security.SimplePrincipal;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.provider.FormEncodingProvider;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.FormUtils;
@@ -68,7 +69,9 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
     private static final Logger LOG = LogUtils.getL7dLogger(OAuthRequestFilter.class);
     
     private boolean useUserSubject;
-    private boolean audienceIsEndpointAddress;
+    private String audience;
+    private boolean completeAudienceMatch;
+    
     private boolean checkFormData;
     private List<String> requiredScopes = Collections.emptyList();
     private boolean allPermissionsMatch;
@@ -97,6 +100,10 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
         AccessTokenValidation accessTokenV = getAccessTokenValidation(authScheme, authSchemeData, null); 
         if (!accessTokenV.isInitialValidationSuccessful()) {
             throw ExceptionUtils.toNotAuthorizedException(null, null);
+        }
+        // Check audiences
+        if (!validateAudiences(accessTokenV.getAudiences())) {
+            AuthorizationUtils.throwAuthorizationFailure(supportedSchemes, realm);
         }
         // Find the scopes which match the current request
         
@@ -155,7 +162,7 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
         oauthContext.setClientId(accessTokenV.getClientId());
         oauthContext.setClientConfidential(accessTokenV.isClientConfidential());
         oauthContext.setTokenKey(accessTokenV.getTokenKey());
-        oauthContext.setTokenAudience(accessTokenV.getAudience());
+        oauthContext.setTokenAudiences(accessTokenV.getAudiences());
         oauthContext.setTokenRequestParts(authParts);
         m.setContent(OAuthContext.class, oauthContext);
     }
@@ -234,21 +241,24 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
         return MessageUtils.isTrue(m.get("local_preflight"));
     }
 
-    protected boolean validateAudience(String audience) {
-        if (audience == null) {
+    protected boolean validateAudiences(List<String> audiences) {
+        if (StringUtils.isEmpty(audiences) && audience == null) {
             return true;
         }
+        if (audience != null) {
+            return audiences.contains(audience);
+        } 
         
-        boolean isValid = super.validateAudience(audience);
-        if (isValid && audienceIsEndpointAddress) {
-            String requestPath = (String)PhaseInterceptorChain.getCurrentMessage().get(Message.REQUEST_URL);
-            isValid = requestPath.startsWith(audience);
+        boolean matched = false;
+        String requestPath = (String)PhaseInterceptorChain.getCurrentMessage().get(Message.REQUEST_URL);
+        for (String s : audiences) {
+            matched = completeAudienceMatch ? requestPath.equals(s) : requestPath.startsWith(s);
+            if (matched) {
+                break;
+            }
         }
-        return isValid;
-    }
-    
-    public void setAudienceIsEndpointAddress(boolean audienceIsEndpointAddress) {
-        this.audienceIsEndpointAddress = audienceIsEndpointAddress;
+        return matched;
+        
     }
     
     public void setCheckFormData(boolean checkFormData) {
@@ -298,6 +308,22 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
     }
     public void setTokenSubjectAuthenticationMethod(AuthenticationMethod method) {
         this.am = method;
+    }
+
+    public String getAudience() {
+        return audience;
+    }
+
+    public void setAudience(String audience) {
+        this.audience = audience;
+    }
+
+    public boolean isCompleteAudienceMatch() {
+        return completeAudienceMatch;
+    }
+
+    public void setCompleteAudienceMatch(boolean completeAudienceMatch) {
+        this.completeAudienceMatch = completeAudienceMatch;
     }
     
 }

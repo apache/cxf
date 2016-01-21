@@ -26,6 +26,8 @@ import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.Consumes;
@@ -37,6 +39,7 @@ import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.rs.security.oauth2.client.OAuthClientUtils;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
@@ -91,9 +94,24 @@ public class OAuthJSONProvider implements MessageBodyWriter<Object>,
                 sb.append(",");
                 appendJsonPair(sb, OAuthConstants.SCOPE, obj.getScope());
             }
-            if (obj.getAud() != null) {
+            if (StringUtils.isEmpty(obj.getAud())) {
                 sb.append(",");
-                appendJsonPair(sb, "aud", obj.getAud());
+                if (obj.getAud().size() == 1) {
+                    appendJsonPair(sb, "aud", obj.getAud());
+                } else {
+                    sb.append("[");
+                    StringBuilder arr = new StringBuilder();
+                    List<String> auds = obj.getAud();
+                    for (int i = 0; i < auds.size(); i++) {
+                        if (i > 0) {
+                            arr.append(",");
+                        }
+                        arr.append("\"").append(auds.get(i)).append("\"");
+                    }
+                    sb.append("]");
+                    appendJsonPair(sb, "aud", arr.toString(), false);
+                    
+                }
             }
             sb.append(",");
             appendJsonPair(sb, "iat", obj.getIat(), false);
@@ -219,7 +237,18 @@ public class OAuthJSONProvider implements MessageBodyWriter<Object>,
             }
             String aud = params.get("aud");
             if (aud != null) {
-                resp.setAud(aud);
+                if (aud.startsWith("[") && aud.endsWith("]")) {
+                    String[] auds = aud.substring(1, aud.length() - 1).split(",");
+                    List<String> list = new LinkedList<String>();
+                    for (String s : auds) {
+                        if (!s.trim().isEmpty()) {
+                            list.add(s.trim());
+                        }
+                    }
+                    resp.setAud(list);
+                } else {
+                    resp.setAud(Collections.singletonList(aud));
+                }
             }
             String iat = params.get("iat");
             if (iat != null) {

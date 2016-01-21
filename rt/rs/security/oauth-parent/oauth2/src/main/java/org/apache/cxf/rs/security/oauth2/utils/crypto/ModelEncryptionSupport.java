@@ -236,7 +236,7 @@ public final class ModelEncryptionSupport {
         
         newToken.setRefreshToken(getStringPart(parts[5]));
         newToken.setGrantType(getStringPart(parts[6]));
-        newToken.setAudience(getStringPart(parts[7]));
+        newToken.setAudiences(parseSimpleList(parts[7]));
         newToken.setParameters(parseSimpleMap(parts[8]));
         
         // Permissions
@@ -289,7 +289,7 @@ public final class ModelEncryptionSupport {
         state.append(tokenizeString(token.getGrantType()));
         // 7: audience
         state.append(SEP);
-        state.append(tokenizeString(token.getAudience()));
+        state.append(token.getAudiences().toString());
         // 8: other parameters
         state.append(SEP);
         // {key=value, key=value}

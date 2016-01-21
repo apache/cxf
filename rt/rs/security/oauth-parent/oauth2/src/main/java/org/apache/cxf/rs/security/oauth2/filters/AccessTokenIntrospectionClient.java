@@ -68,7 +68,7 @@ public class AccessTokenIntrospectionClient implements AccessTokenValidator {
         atv.setClientId(response.getClientId());
         atv.setTokenIssuedAt(response.getIat());
         atv.setTokenLifetime(response.getExp() - response.getIat());
-        atv.setAudience(response.getAud());
+        atv.setAudiences(response.getAud());
         if (response.getScope() != null) {
             String[] scopes = response.getScope().split(" ");
             List<OAuthPermission> perms = new LinkedList<OAuthPermission>();

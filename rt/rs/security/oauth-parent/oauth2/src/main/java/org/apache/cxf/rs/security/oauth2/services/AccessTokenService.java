@@ -19,8 +19,6 @@
 
 package org.apache.cxf.rs.security.oauth2.services;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -52,7 +50,6 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 public class AccessTokenService extends AbstractTokenService {
     private List<AccessTokenGrantHandler> grantHandlers = new LinkedList<AccessTokenGrantHandler>();
     private List<AccessTokenResponseFilter> responseHandlers = new LinkedList<AccessTokenResponseFilter>();
-    private List<String> audiences = new LinkedList<String>();
     
     /**
      * Sets the list of optional grant handlers
@@ -97,7 +94,7 @@ public class AccessTokenService extends AbstractTokenService {
         }
         
         try {
-            checkAudience(params);
+            checkAudience(client, params);
         } catch (OAuthServiceException ex) {
             return super.createErrorResponseFromBean(ex.getError());
         } 
@@ -139,23 +136,9 @@ public class AccessTokenService extends AbstractTokenService {
             filter.process(clientToken, serverToken); 
         }
     }
-    protected void checkAudience(MultivaluedMap<String, String> params) { 
-        if (audiences.isEmpty()) {
-            return;
-        }
-        
+    protected void checkAudience(Client c, MultivaluedMap<String, String> params) { 
         String audienceParam = params.getFirst(OAuthConstants.CLIENT_AUDIENCE);
-        if (audienceParam == null) {
-            throw new OAuthServiceException(new OAuthError(OAuthConstants.INVALID_REQUEST));
-        }
-        // must be URL
-        try {
-            new URL(audienceParam);
-        } catch (MalformedURLException ex) {
-            throw new OAuthServiceException(new OAuthError(OAuthConstants.INVALID_REQUEST));
-        }
-        
-        if (!audiences.contains(audienceParam)) {
+        if (!OAuthUtils.validateAudience(audienceParam, c.getRegisteredAudiences())) {
             throw new OAuthServiceException(new OAuthError(OAuthConstants.ACCESS_DENIED));
         }
         
@@ -184,13 +167,5 @@ public class AccessTokenService extends AbstractTokenService {
         }
         
         return null;
-    }
-
-    public List<String> getAudiences() {
-        return audiences;
-    }
-
-    public void setAudiences(List<String> audiences) {
-        this.audiences = audiences;
     }
 }

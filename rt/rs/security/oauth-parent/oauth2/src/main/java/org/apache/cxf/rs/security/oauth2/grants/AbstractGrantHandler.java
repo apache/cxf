@@ -100,7 +100,7 @@ public abstract class AbstractGrantHandler implements AccessTokenGrantHandler {
         return doCreateAccessToken(client, 
                                    subject, 
                                    OAuthUtils.parseScope(params.getFirst(OAuthConstants.SCOPE)), 
-                                   params.getFirst(OAuthConstants.CLIENT_AUDIENCE));
+                                   getAudiences(client, params.getFirst(OAuthConstants.CLIENT_AUDIENCE)));
     }
     
     protected ServerAccessToken doCreateAccessToken(Client client,
@@ -113,10 +113,10 @@ public abstract class AbstractGrantHandler implements AccessTokenGrantHandler {
     protected ServerAccessToken doCreateAccessToken(Client client,
                                                     UserSubject subject,
                                                     List<String> requestedScopes,
-                                                    String audience) {
+                                                    List<String> audiences) {
         
         return doCreateAccessToken(client, subject, getSingleGrantType(), requestedScopes, 
-                                   audience);
+                                   audiences);
     }
     
     protected ServerAccessToken doCreateAccessToken(Client client,
@@ -130,9 +130,9 @@ public abstract class AbstractGrantHandler implements AccessTokenGrantHandler {
                                                     UserSubject subject,
                                                     String requestedGrant,
                                                     List<String> requestedScopes,
-                                                    String audience) {
+                                                    List<String> audiences) {
         ServerAccessToken token = getPreAuthorizedToken(client, subject, requestedGrant,
-                                                        requestedScopes, audience);
+                                                        requestedScopes, audiences);
         if (token != null) {
             return token;
         }
@@ -144,7 +144,7 @@ public abstract class AbstractGrantHandler implements AccessTokenGrantHandler {
         reg.setSubject(subject);
         reg.setRequestedScope(requestedScopes);
         reg.setApprovedScope(Collections.emptyList());
-        reg.setAudience(audience);
+        reg.setAudiences(audiences);
         return dataProvider.createAccessToken(reg);
     }
     
@@ -152,12 +152,12 @@ public abstract class AbstractGrantHandler implements AccessTokenGrantHandler {
                                                       UserSubject subject,
                                                       String requestedGrant,
                                                       List<String> requestedScopes,
-                                                      String audience) {
+                                                      List<String> audiences) {
         if (!OAuthUtils.validateScopes(requestedScopes, client.getRegisteredScopes(), 
                                        partialMatchScopeValidation)) {
             throw new OAuthServiceException(new OAuthError(OAuthConstants.INVALID_SCOPE));     
         }
-        if (!OAuthUtils.validateAudience(audience, client.getRegisteredAudiences())) {
+        if (!OAuthUtils.validateAudiences(audiences, client.getRegisteredAudiences())) {
             throw new OAuthServiceException(new OAuthError(OAuthConstants.INVALID_GRANT));
         }
         
@@ -180,5 +180,19 @@ public abstract class AbstractGrantHandler implements AccessTokenGrantHandler {
     
     public boolean isCanSupportPublicClients() {
         return canSupportPublicClients;
+    }
+    protected List<String> getAudiences(Client client, String clientAudience) {
+        if (client.getRegisteredAudiences().isEmpty() && clientAudience == null) {
+            return Collections.emptyList();
+        }
+        if (clientAudience != null) {
+            List<String> audiences = Collections.singletonList(clientAudience);
+            if (!OAuthUtils.validateAudiences(audiences, client.getRegisteredAudiences())) {
+                throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
+            }
+            return audiences;
+        } else {
+            return client.getRegisteredAudiences();
+        }
     }
 }

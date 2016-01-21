@@ -20,6 +20,7 @@
 package org.apache.cxf.rs.security.oauth2.services;
 
 import java.net.URI;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -77,7 +78,7 @@ public abstract class AbstractImplicitGrantService extends RedirectionBasedGrant
                 } else {
                     reg.setApprovedScope(approvedScope);
                 }
-                reg.setAudience(state.getAudience());
+                reg.setAudiences(Collections.singletonList(state.getAudience()));
                 reg.setNonce(state.getNonce());
                 token = getDataProvider().createAccessToken(reg);
             }
