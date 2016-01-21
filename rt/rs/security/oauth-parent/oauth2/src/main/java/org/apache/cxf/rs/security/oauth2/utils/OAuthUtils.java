@@ -200,7 +200,7 @@ public final class OAuthUtils {
                                             List<String> allowedAudiences) {
         return StringUtils.isEmpty(providedAudiences) 
                && StringUtils.isEmpty(allowedAudiences)
-               || allowedAudiences.contains(providedAudiences);
+               || allowedAudiences.containsAll(providedAudiences);
     }
     
     public static boolean checkRequestURI(String servletPath, String uri) {
