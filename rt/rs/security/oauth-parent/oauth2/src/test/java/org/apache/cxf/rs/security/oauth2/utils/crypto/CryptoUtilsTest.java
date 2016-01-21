@@ -228,7 +228,7 @@ public class CryptoUtilsTest extends Assert {
         assertEquals(endUser1.getRoles(), endUser2.getRoles());
         
         assertEquals(token.getRefreshToken(), token2.getRefreshToken());
-        assertEquals(token.getAudience(), token2.getAudience());
+        assertEquals(token.getAudiences(), token2.getAudiences());
         assertEquals(token.getGrantType(), token2.getGrantType());
         assertEquals(token.getParameters(), token2.getParameters());
         
@@ -251,7 +251,7 @@ public class CryptoUtilsTest extends Assert {
         Client regClient = p.getClient("1");
         atr.setClient(regClient);
         atr.setGrantType("code");
-        atr.setAudience("http://localhost");
+        atr.setAudiences(Collections.singletonList("http://localhost"));
         UserSubject endUser = new UserSubject("Barry", "BarryId");
         atr.setSubject(endUser);
         endUser.setRoles(Collections.singletonList("role1"));

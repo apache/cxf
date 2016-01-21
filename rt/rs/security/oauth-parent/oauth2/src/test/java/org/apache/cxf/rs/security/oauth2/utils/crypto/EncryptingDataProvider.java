@@ -124,7 +124,7 @@ public class EncryptingDataProvider implements OAuthDataProvider {
         createRefreshToken(token);
         
         token.setGrantType(accessTokenReg.getGrantType());
-        token.setAudience(accessTokenReg.getAudience());
+        token.setAudiences(accessTokenReg.getAudiences());
         token.setParameters(Collections.singletonMap("param", "value"));
         token.setScopes(Collections.singletonList(
             new OAuthPermission("read", "read permission")));

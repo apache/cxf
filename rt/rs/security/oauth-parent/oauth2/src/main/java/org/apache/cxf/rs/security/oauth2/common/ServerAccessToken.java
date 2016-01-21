@@ -35,7 +35,7 @@ public abstract class ServerAccessToken extends AccessToken {
     private Client client;
     private List<OAuthPermission> scopes = new LinkedList<OAuthPermission>();
     private UserSubject subject;
-    private String audience;
+    private List<String> audiences = new LinkedList<String>();
     private String clientCodeVerifier;
     private String nonce;
     
@@ -69,7 +69,7 @@ public abstract class ServerAccessToken extends AccessToken {
         this.client = token.getClient();
         this.grantType = token.getGrantType();
         this.scopes = token.getScopes();
-        this.audience = token.getAudience();
+        this.audiences = token.getAudiences();
         this.subject = token.getSubject();
     }
 
@@ -137,14 +137,14 @@ public abstract class ServerAccessToken extends AccessToken {
         return grantType;
     }
 
-    public String getAudience() {
-        return audience;
+    public List<String> getAudiences() {
+        return audiences;
     }
 
-    public void setAudience(String audience) {
-        this.audience = audience;
+    public void setAudiences(List<String> audiences) {
+        this.audiences = audiences;
     }
-
+    
     protected static ServerAccessToken validateTokenType(ServerAccessToken token, String expectedType) {
         if (!token.getTokenType().equals(expectedType)) {
             throw new OAuthServiceException(OAuthConstants.SERVER_ERROR);

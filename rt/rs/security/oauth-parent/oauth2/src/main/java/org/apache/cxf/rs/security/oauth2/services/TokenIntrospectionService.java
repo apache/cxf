@@ -31,6 +31,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.SecurityContext;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
@@ -64,8 +65,8 @@ public class TokenIntrospectionService {
         if (at.getSubject() != null) {
             response.setUsername(at.getSubject().getLogin());
         }
-        if (at.getAudience() != null) {
-            response.setAud(at.getAudience());
+        if (!StringUtils.isEmpty(at.getAudiences())) {
+            response.setAud(at.getAudiences());
         }
         response.setIat(at.getIssuedAt());
         response.setExp(at.getIssuedAt() + at.getExpiresIn());

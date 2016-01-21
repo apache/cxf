@@ -19,6 +19,7 @@
 package org.apache.cxf.rs.security.oauth2.common;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 // RFC 7622 Introspection Response
@@ -32,7 +33,7 @@ public class TokenIntrospection {
     private Long exp;
     private Long nbf;
     private String sub;
-    private String aud;
+    private List<String> aud;
     private String iss;
     private String jti;
     
@@ -100,10 +101,10 @@ public class TokenIntrospection {
     public void setSub(String sub) {
         this.sub = sub;
     }
-    public String getAud() {
+    public List<String> getAud() {
         return aud;
     }
-    public void setAud(String aud) {
+    public void setAud(List<String> aud) {
         this.aud = aud;
     }
     public String getIss() {

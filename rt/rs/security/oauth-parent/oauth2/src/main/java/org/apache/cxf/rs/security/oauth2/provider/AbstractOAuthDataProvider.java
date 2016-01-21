@@ -62,7 +62,7 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
     
     protected ServerAccessToken doCreateAccessToken(AccessTokenRegistration accessToken) {
         ServerAccessToken at = createNewAccessToken(accessToken.getClient());
-        at.setAudience(accessToken.getAudience());
+        at.setAudiences(accessToken.getAudiences());
         at.setGrantType(accessToken.getGrantType());
         List<String> theScopes = accessToken.getApprovedScope();
         List<OAuthPermission> thePermissions = 
@@ -206,7 +206,7 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
     }
     protected RefreshToken doCreateNewRefreshToken(ServerAccessToken at) {
         RefreshToken rt = new RefreshToken(at.getClient(), refreshTokenLifetime);
-        rt.setAudience(at.getAudience());
+        rt.setAudiences(at.getAudiences());
         rt.setGrantType(at.getGrantType());
         rt.setScopes(at.getScopes());
         rt.setSubject(at.getSubject());
@@ -224,7 +224,7 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
                                                      RefreshToken oldRefreshToken, 
                                                      List<String> restrictedScopes) {
         ServerAccessToken at = createNewAccessToken(client);
-        at.setAudience(oldRefreshToken.getAudience());
+        at.setAudiences(oldRefreshToken.getAudiences());
         at.setGrantType(oldRefreshToken.getGrantType());
         at.setSubject(oldRefreshToken.getSubject());
         if (restrictedScopes.isEmpty()) {

@@ -81,16 +81,34 @@ public class AuthorizationCodeGrantHandler extends AbstractGrantHandler {
         if (!compareCodeVerifierWithChallenge(client, clientCodeVerifier, clientCodeChallenge)) {
             throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
         }
-        
-        return doCreateAccessToken(client, grant, getSingleGrantType(), clientCodeVerifier);
+        List<String> audiences = getAudiences(client, params, grant.getAudience());
+        return doCreateAccessToken(client, grant, getSingleGrantType(), clientCodeVerifier, audiences);
     }
     
+    protected List<String> getAudiences(Client client, MultivaluedMap<String, String> params, 
+                                        String grantAudience) {
+        String clientAudience = params.getFirst(OAuthConstants.CLIENT_AUDIENCE);
+        if (client.getRegisteredAudiences().isEmpty() && clientAudience == null && grantAudience == null) {
+            return Collections.emptyList();
+        }
+        // if the audience was approved at the grant creation time and the audience is also 
+        // sent to the token endpoint then both values must match
+        if (grantAudience != null && clientAudience != null && !grantAudience.equals(clientAudience)) {
+            throw new OAuthServiceException(OAuthConstants.INVALID_REQUEST);
+        }
+        return getAudiences(client, clientAudience == null ? grantAudience : clientAudience);
+    }
+
     private ServerAccessToken doCreateAccessToken(Client client,
                                                   ServerAuthorizationCodeGrant grant,
                                                   String requestedGrant,
-                                                  String codeVerifier) {
-        ServerAccessToken token = getPreAuthorizedToken(client, grant.getSubject(), requestedGrant,
-                                                        grant.getRequestedScopes(), grant.getAudience());
+                                                  String codeVerifier,
+                                                  List<String> audiences) {
+        ServerAccessToken token = getPreAuthorizedToken(client, 
+                                                        grant.getSubject(), 
+                                                        requestedGrant,
+                                                        grant.getRequestedScopes(), 
+                                                        getAudiences(client, grant.getAudience()));
         if (token != null) {
             return token;
         }
@@ -108,7 +126,7 @@ public class AuthorizationCodeGrantHandler extends AbstractGrantHandler {
             List<String> approvedScopes = Collections.emptyList();
             reg.setApprovedScope(approvedScopes);
         }
-        reg.setAudience(grant.getAudience());
+        reg.setAudiences(audiences);
         reg.setClientCodeVerifier(codeVerifier);
         return getDataProvider().createAccessToken(reg);
     }

@@ -191,8 +191,16 @@ public final class OAuthUtils {
             && issuedAt + lifetime < System.currentTimeMillis() / 1000L;
     }
     
-    public static boolean validateAudience(String audience, List<String> audiences) {
-        return audience == null || !audiences.isEmpty() && audiences.contains(audience);
+    public static boolean validateAudience(String providedAudience, 
+                                           List<String> allowedAudiences) {
+        return providedAudience == null 
+            || validateAudiences(Collections.singletonList(providedAudience), allowedAudiences);
+    }
+    public static boolean validateAudiences(List<String> providedAudiences, 
+                                            List<String> allowedAudiences) {
+        return StringUtils.isEmpty(providedAudiences) 
+               && StringUtils.isEmpty(allowedAudiences)
+               || allowedAudiences.contains(providedAudiences);
     }
     
     public static boolean checkRequestURI(String servletPath, String uri) {

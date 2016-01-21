@@ -160,8 +160,10 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
             return createErrorResponse(params, redirectUri, OAuthConstants.INVALID_SCOPE);
         }
         // Validate the audience
-        if (!OAuthUtils.validateAudience(params.getFirst(OAuthConstants.CLIENT_AUDIENCE), 
-                                         client.getRegisteredAudiences())) {
+        String clientAudience = params.getFirst(OAuthConstants.CLIENT_AUDIENCE);
+        // Right now if the audience parameter is set it is expected to be contained
+        // in the list of Client audiences set at the Client registration time.
+        if (!OAuthUtils.validateAudience(clientAudience, client.getRegisteredAudiences())) {
             throw new OAuthServiceException(new OAuthError(OAuthConstants.INVALID_REQUEST));
         }
     
@@ -256,6 +258,8 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
             state.setClientId(params.getFirst(OAuthConstants.CLIENT_ID));
             state.setRedirectUri(params.getFirst(OAuthConstants.REDIRECT_URI));
             state.setAudience(params.getFirst(OAuthConstants.CLIENT_AUDIENCE));
+            // or if no audience parameter is available, set the list of client
+            // audiences for the users to see ?
             state.setProposedScope(params.getFirst(OAuthConstants.SCOPE));
             state.setState(params.getFirst(OAuthConstants.STATE));
             state.setNonce(params.getFirst(OAuthConstants.NONCE));

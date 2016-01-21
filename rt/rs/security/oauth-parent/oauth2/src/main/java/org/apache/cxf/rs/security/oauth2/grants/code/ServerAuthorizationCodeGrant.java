@@ -78,15 +78,6 @@ public class ServerAuthorizationCodeGrant extends AuthorizationCodeGrant {
      * Returns the number of seconds this grant can be valid after it was issued
      * @return the seconds this grant will be valid for
      */
-    @Deprecated
-    public long getLifetime() {
-        return expiresIn;
-    }
-    
-    /**
-     * Returns the number of seconds this grant can be valid after it was issued
-     * @return the seconds this grant will be valid for
-     */
     public long getExpiresIn() {
         return expiresIn;
     }
