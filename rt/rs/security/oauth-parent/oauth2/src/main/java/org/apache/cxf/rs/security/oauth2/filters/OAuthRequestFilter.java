@@ -71,7 +71,7 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
     private boolean useUserSubject;
     private String audience;
     private boolean completeAudienceMatch;
-    
+    private boolean audienceIsEndpointAddress = true;
     private boolean checkFormData;
     private List<String> requiredScopes = Collections.emptyList();
     private boolean allPermissionsMatch;
@@ -248,7 +248,9 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
         if (audience != null) {
             return audiences.contains(audience);
         } 
-        
+        if (!audienceIsEndpointAddress) {
+            return true;
+        }
         boolean matched = false;
         String requestPath = (String)PhaseInterceptorChain.getCurrentMessage().get(Message.REQUEST_URL);
         for (String s : audiences) {
@@ -324,6 +326,10 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
 
     public void setCompleteAudienceMatch(boolean completeAudienceMatch) {
         this.completeAudienceMatch = completeAudienceMatch;
+    }
+
+    public void setAudienceIsEndpointAddress(boolean audienceIsEndpointAddress) {
+        this.audienceIsEndpointAddress = audienceIsEndpointAddress;
     }
     
 }
