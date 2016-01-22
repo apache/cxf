@@ -29,6 +29,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
+import org.apache.cxf.rs.security.oauth2.common.TokenIntrospection;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 import org.junit.Assert;
@@ -69,6 +70,85 @@ public class OAuthJSONProviderTest extends Assert {
             + "}";
         doReadClientAccessToken(response, OAuthConstants.BEARER_TOKEN_TYPE,
                                 Collections.singletonMap("my_parameter", "http://abc"));
+    }
+    
+    
+    @Test
+    @SuppressWarnings({
+        "unchecked", "rawtypes"
+    })
+    public void testReadTokenIntrospection() throws Exception {
+        String response = 
+            "{\"active\":true,\"client_id\":\"WjcK94pnec7CyA\",\"username\":\"alice\",\"token_type\":\"Bearer\""
+            + ",\"scope\":\"a\",\"aud\":\"https://localhost:8082/service\","
+                + "\"iat\":1453472181,\"exp\":1453475781}";
+        OAuthJSONProvider provider = new OAuthJSONProvider();
+        TokenIntrospection t = (TokenIntrospection)provider.readFrom((Class)TokenIntrospection.class, 
+                                                                     TokenIntrospection.class, 
+                          new Annotation[]{}, 
+                          MediaType.APPLICATION_JSON_TYPE, 
+                          new MetadataMap<String, String>(), 
+                          new ByteArrayInputStream(response.getBytes()));
+        assertTrue(t.isActive());
+        assertEquals("WjcK94pnec7CyA", t.getClientId());
+        assertEquals("alice", t.getUsername());
+        assertEquals("a", t.getScope());
+        assertEquals(1, t.getAud().size());
+        assertEquals("https://localhost:8082/service", t.getAud().get(0));
+        assertEquals(1453472181L, t.getIat().longValue());
+        assertEquals(1453475781L, t.getExp().longValue());
+    }
+    @Test
+    @SuppressWarnings({
+        "unchecked", "rawtypes"
+    })
+    public void testReadTokenIntrospectionMultipleAuds() throws Exception {
+        String response = 
+            "{\"active\":true,\"client_id\":\"WjcK94pnec7CyA\",\"username\":\"alice\",\"token_type\":\"Bearer\""
+            + ",\"scope\":\"a\",\"aud\":[\"https://localhost:8082/service\",\"https://localhost:8083/service\"],"
+                + "\"iat\":1453472181,\"exp\":1453475781}";
+        OAuthJSONProvider provider = new OAuthJSONProvider();
+        TokenIntrospection t = (TokenIntrospection)provider.readFrom((Class)TokenIntrospection.class,
+                                                                     TokenIntrospection.class, 
+                          new Annotation[]{}, 
+                          MediaType.APPLICATION_JSON_TYPE, 
+                          new MetadataMap<String, String>(), 
+                          new ByteArrayInputStream(response.getBytes()));
+        assertTrue(t.isActive());
+        assertEquals("WjcK94pnec7CyA", t.getClientId());
+        assertEquals("alice", t.getUsername());
+        assertEquals("a", t.getScope());
+        assertEquals(2, t.getAud().size());
+        assertEquals("https://localhost:8082/service", t.getAud().get(0));
+        assertEquals("https://localhost:8083/service", t.getAud().get(1));
+        assertEquals(1453472181L, t.getIat().longValue());
+        assertEquals(1453475781L, t.getExp().longValue());
+    }
+    
+    @Test
+    @SuppressWarnings({
+        "unchecked", "rawtypes"
+    })
+    public void testReadTokenIntrospectionSingleAudAsArray() throws Exception {
+        String response = 
+            "{\"active\":false,\"client_id\":\"WjcK94pnec7CyA\",\"username\":\"alice\",\"token_type\":\"Bearer\""
+            + ",\"scope\":\"a\",\"aud\":[\"https://localhost:8082/service\"],"
+                + "\"iat\":1453472181,\"exp\":1453475781}";
+        OAuthJSONProvider provider = new OAuthJSONProvider();
+        TokenIntrospection t = (TokenIntrospection)provider.readFrom((Class)TokenIntrospection.class,
+                                                                     TokenIntrospection.class, 
+                          new Annotation[]{}, 
+                          MediaType.APPLICATION_JSON_TYPE, 
+                          new MetadataMap<String, String>(), 
+                          new ByteArrayInputStream(response.getBytes()));
+        assertFalse(t.isActive());
+        assertEquals("WjcK94pnec7CyA", t.getClientId());
+        assertEquals("alice", t.getUsername());
+        assertEquals("a", t.getScope());
+        assertEquals(1, t.getAud().size());
+        assertEquals("https://localhost:8082/service", t.getAud().get(0));
+        assertEquals(1453472181L, t.getIat().longValue());
+        assertEquals(1453475781L, t.getExp().longValue());
     }
     
     @SuppressWarnings({
