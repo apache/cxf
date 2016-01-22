@@ -34,6 +34,7 @@ public abstract class AccessToken implements Serializable {
     private String refreshToken;
     private long expiresIn = -1;
     private long issuedAt = -1;
+    private String issuer;
     
     
     private Map<String, String> parameters = new LinkedHashMap<String, String>();
@@ -139,5 +140,13 @@ public abstract class AccessToken implements Serializable {
      */
     public void setParameters(Map<String, String> parameters) {
         this.parameters = parameters;
+    }
+
+    public String getIssuer() {
+        return issuer;
+    }
+
+    public void setIssuer(String issuer) {
+        this.issuer = issuer;
     }
 }

@@ -73,8 +73,15 @@ public class TokenIntrospectionService {
         if (!StringUtils.isEmpty(at.getAudiences())) {
             response.setAud(at.getAudiences());
         }
+        if (at.getIssuer() != null) {
+            response.setIss(at.getIssuer());
+        }
+        
         response.setIat(at.getIssuedAt());
-        response.setExp(at.getIssuedAt() + at.getExpiresIn());
+        if (at.getExpiresIn() > 0) {
+            response.setExp(at.getIssuedAt() + at.getExpiresIn());
+        }
+        
         response.setTokenType(at.getTokenType());
         return response;
     }
