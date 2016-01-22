@@ -26,7 +26,6 @@ import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -41,6 +40,7 @@ import javax.ws.rs.ext.Provider;
 
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.jaxrs.json.basic.JsonMapObjectReaderWriter;
 import org.apache.cxf.rs.security.oauth2.client.OAuthClientUtils;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.OAuthError;
@@ -205,70 +205,66 @@ public class OAuthJSONProvider implements MessageBodyWriter<Object>,
     public Object readFrom(Class<Object> cls, Type t, Annotation[] anns, 
                            MediaType mt, MultivaluedMap<String, String> headers, InputStream is) 
         throws IOException, WebApplicationException {
+        if (TokenIntrospection.class.isAssignableFrom(cls)) {
+            return fromMapToTokenIntrospection(is);
+        }
         Map<String, String> params = readJSONResponse(is);
         if (Map.class.isAssignableFrom(cls)) {
             return params;
-        } else if (ClientAccessToken.class.isAssignableFrom(cls)) {
+        } else {
             ClientAccessToken token = OAuthClientUtils.fromMapToClientToken(params);
             if (token == null) {
                 throw new WebApplicationException(500);
             } else {
                 return token;
             }
-        } else {
-            return fromMapToTokenIntrospection(params);
-        }
+        } 
         
     }
 
-    private Object fromMapToTokenIntrospection(Map<String, String> params) {
+    private Object fromMapToTokenIntrospection(InputStream is) throws IOException {
         TokenIntrospection resp = new TokenIntrospection();
-        resp.setActive(Boolean.valueOf(params.get("active")));
-        if (resp.isActive()) {
-            String clientId = params.get(OAuthConstants.CLIENT_ID);
-            if (clientId != null) {
-                resp.setClientId(clientId);
-            }
-            String username = params.get("username");
-            if (username != null) {
-                resp.setUsername(username);
-            }
-            String scope = params.get(OAuthConstants.SCOPE);
-            if (scope != null) {
-                resp.setScope(scope);
-            }
-            String tokenType = params.get(OAuthConstants.ACCESS_TOKEN_TYPE);
-            if (tokenType != null) {
-                resp.setTokenType(tokenType);
-            }
-            String aud = params.get("aud");
-            if (aud != null) {
-                if (aud.startsWith("[") && aud.endsWith("]")) {
-                    String[] auds = aud.substring(1, aud.length() - 1).split(",");
-                    List<String> list = new LinkedList<String>();
-                    for (String s : auds) {
-                        if (!s.trim().isEmpty()) {
-                            list.add(s.trim());
-                        }
-                    }
-                    resp.setAud(list);
-                } else {
-                    resp.setAud(Collections.singletonList(aud));
-                }
-            }
-            String iss = params.get("iss");
-            if (iss != null) {
-                resp.setIss(iss);
-            }
-            String iat = params.get("iat");
-            if (iat != null) {
-                resp.setIat(Long.valueOf(iat));
-            }
-            String exp = params.get("exp");
-            if (exp != null) {
-                resp.setExp(Long.valueOf(exp));
+        Map<String, Object> params = new JsonMapObjectReaderWriter().fromJson(is);
+        resp.setActive((Boolean)params.get("active"));
+        String clientId = (String)params.get(OAuthConstants.CLIENT_ID);
+        if (clientId != null) {
+            resp.setClientId(clientId);
+        }
+        String username = (String)params.get("username");
+        if (username != null) {
+            resp.setUsername(username);
+        }
+        String scope = (String)params.get(OAuthConstants.SCOPE);
+        if (scope != null) {
+            resp.setScope(scope);
+        }
+        String tokenType = (String)params.get(OAuthConstants.ACCESS_TOKEN_TYPE);
+        if (tokenType != null) {
+            resp.setTokenType(tokenType);
+        }
+        Object aud = params.get("aud");
+        if (aud != null) {
+            if (aud.getClass() == String.class) {
+                resp.setAud(Collections.singletonList((String)aud));
+            } else {
+                @SuppressWarnings("unchecked")
+                List<String> auds = (List<String>)aud;
+                resp.setAud(auds);
             }
         }
+        String iss = (String)params.get("iss");
+        if (iss != null) {
+            resp.setIss(iss);
+        }
+        Long iat = (Long)params.get("iat");
+        if (iat != null) {
+            resp.setIat(iat);
+        }
+        Long exp = (Long)params.get("exp");
+        if (exp != null) {
+            resp.setExp(exp);
+        }
+        
         return resp;
     }
 
