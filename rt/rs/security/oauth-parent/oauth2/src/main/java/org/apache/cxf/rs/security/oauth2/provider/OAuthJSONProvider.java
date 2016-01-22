@@ -99,8 +99,8 @@ public class OAuthJSONProvider implements MessageBodyWriter<Object>,
                 if (obj.getAud().size() == 1) {
                     appendJsonPair(sb, "aud", obj.getAud().get(0));
                 } else {
-                    sb.append("[");
                     StringBuilder arr = new StringBuilder();
+                    arr.append("[");
                     List<String> auds = obj.getAud();
                     for (int i = 0; i < auds.size(); i++) {
                         if (i > 0) {
@@ -108,15 +108,21 @@ public class OAuthJSONProvider implements MessageBodyWriter<Object>,
                         }
                         arr.append("\"").append(auds.get(i)).append("\"");
                     }
-                    sb.append("]");
+                    arr.append("]");
                     appendJsonPair(sb, "aud", arr.toString(), false);
                     
                 }
             }
+            if (obj.getIss() != null) {
+                sb.append(",");
+                appendJsonPair(sb, "iss", obj.getExp(), false);
+            }
             sb.append(",");
             appendJsonPair(sb, "iat", obj.getIat(), false);
-            sb.append(",");
-            appendJsonPair(sb, "exp", obj.getExp(), false);
+            if (obj.getExp() != null) {
+                sb.append(",");
+                appendJsonPair(sb, "exp", obj.getExp(), false);
+            }
         }
         sb.append("}");
         String result = sb.toString();
@@ -249,6 +255,10 @@ public class OAuthJSONProvider implements MessageBodyWriter<Object>,
                 } else {
                     resp.setAud(Collections.singletonList(aud));
                 }
+            }
+            String iss = params.get("iss");
+            if (iss != null) {
+                resp.setIss(iss);
             }
             String iat = params.get("iat");
             if (iat != null) {

@@ -70,6 +70,7 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
     
     private boolean useUserSubject;
     private String audience;
+    private String issuer;
     private boolean completeAudienceMatch;
     private boolean audienceIsEndpointAddress = true;
     private boolean checkFormData;
@@ -99,10 +100,13 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
         // Get the access token
         AccessTokenValidation accessTokenV = getAccessTokenValidation(authScheme, authSchemeData, null); 
         if (!accessTokenV.isInitialValidationSuccessful()) {
-            throw ExceptionUtils.toNotAuthorizedException(null, null);
+            AuthorizationUtils.throwAuthorizationFailure(supportedSchemes, realm);
         }
         // Check audiences
-        if (!validateAudiences(accessTokenV.getAudiences())) {
+        String validAudience = validateAudiences(accessTokenV.getAudiences());
+        
+        // Check if token was issued by the supported issuer
+        if (issuer != null && issuer.equals(accessTokenV.getTokenIssuer())) {
             AuthorizationUtils.throwAuthorizationFailure(supportedSchemes, realm);
         }
         // Find the scopes which match the current request
@@ -162,7 +166,8 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
         oauthContext.setClientId(accessTokenV.getClientId());
         oauthContext.setClientConfidential(accessTokenV.isClientConfidential());
         oauthContext.setTokenKey(accessTokenV.getTokenKey());
-        oauthContext.setTokenAudiences(accessTokenV.getAudiences());
+        oauthContext.setTokenAudience(validAudience);
+        oauthContext.setTokenIssuer(accessTokenV.getTokenIssuer());
         oauthContext.setTokenRequestParts(authParts);
         m.setContent(OAuthContext.class, oauthContext);
     }
@@ -241,26 +246,28 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
         return MessageUtils.isTrue(m.get("local_preflight"));
     }
 
-    protected boolean validateAudiences(List<String> audiences) {
+    protected String validateAudiences(List<String> audiences) {
         if (StringUtils.isEmpty(audiences) && audience == null) {
-            return true;
+            return null;
         }
         if (audience != null) {
-            return audiences.contains(audience);
+            if (audiences.contains(audience)) {
+                return audience;
+            }
+            AuthorizationUtils.throwAuthorizationFailure(supportedSchemes, realm);
         } 
         if (!audienceIsEndpointAddress) {
-            return true;
+            return null;
         }
-        boolean matched = false;
         String requestPath = (String)PhaseInterceptorChain.getCurrentMessage().get(Message.REQUEST_URL);
         for (String s : audiences) {
-            matched = completeAudienceMatch ? requestPath.equals(s) : requestPath.startsWith(s);
+            boolean matched = completeAudienceMatch ? requestPath.equals(s) : requestPath.startsWith(s);
             if (matched) {
-                break;
+                return s;
             }
         }
-        return matched;
-        
+        AuthorizationUtils.throwAuthorizationFailure(supportedSchemes, realm);
+        return null;
     }
     
     public void setCheckFormData(boolean checkFormData) {
@@ -330,6 +337,10 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
 
     public void setAudienceIsEndpointAddress(boolean audienceIsEndpointAddress) {
         this.audienceIsEndpointAddress = audienceIsEndpointAddress;
+    }
+
+    public void setIssuer(String issuer) {
+        this.issuer = issuer;
     }
     
 }

@@ -62,13 +62,21 @@ public class AccessTokenIntrospectionClient implements AccessTokenValidator {
     private AccessTokenValidation convertIntrospectionToValidation(TokenIntrospection response) {
         AccessTokenValidation atv = new AccessTokenValidation();
         atv.setInitialValidationSuccessful(response.isActive());
-        if (!response.isActive()) {
-            return atv;
+        if (response.getClientId() != null) {
+            atv.setClientId(response.getClientId());
         }
-        atv.setClientId(response.getClientId());
-        atv.setTokenIssuedAt(response.getIat());
-        atv.setTokenLifetime(response.getExp() - response.getIat());
-        atv.setAudiences(response.getAud());
+        if (response.getIat() != null) {
+            atv.setTokenIssuedAt(response.getIat());
+        }
+        if (response.getExp() != null) {
+            atv.setTokenLifetime(response.getExp() - response.getIat());
+        }
+        if (!StringUtils.isEmpty(response.getAud())) {
+            atv.setAudiences(response.getAud());
+        }
+        if (response.getIss() != null) {
+            atv.setTokenIssuer(response.getIss());
+        }
         if (response.getScope() != null) {
             String[] scopes = response.getScope().split(" ");
             List<OAuthPermission> perms = new LinkedList<OAuthPermission>();

@@ -53,6 +53,7 @@ public class AccessTokenValidation {
     private String tokenGrantType;
     private long tokenIssuedAt;
     private long tokenLifetime;
+    private String tokenIssuer;
     private UserSubject tokenSubject;
     private List<OAuthPermission> tokenScopes = new LinkedList<OAuthPermission>();
     private List<String> audiences = new LinkedList<String>();
@@ -73,7 +74,7 @@ public class AccessTokenValidation {
         this.tokenGrantType = token.getGrantType();
         this.tokenIssuedAt = token.getIssuedAt();
         this.tokenLifetime = token.getExpiresIn();
-        
+        this.tokenIssuer = token.getIssuer();
         this.tokenSubject = token.getSubject();
         this.tokenScopes = token.getScopes();
         this.setAudiences(token.getAudiences());
@@ -182,6 +183,14 @@ public class AccessTokenValidation {
 
     public void setAudiences(List<String> audiences) {
         this.audiences = audiences;
+    }
+
+    public String getTokenIssuer() {
+        return tokenIssuer;
+    }
+
+    public void setTokenIssuer(String tokenIssuer) {
+        this.tokenIssuer = tokenIssuer;
     }
     
 }
