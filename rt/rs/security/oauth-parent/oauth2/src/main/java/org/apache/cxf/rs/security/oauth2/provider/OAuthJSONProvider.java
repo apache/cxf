@@ -97,7 +97,7 @@ public class OAuthJSONProvider implements MessageBodyWriter<Object>,
             if (!StringUtils.isEmpty(obj.getAud())) {
                 sb.append(",");
                 if (obj.getAud().size() == 1) {
-                    appendJsonPair(sb, "aud", obj.getAud());
+                    appendJsonPair(sb, "aud", obj.getAud().get(0));
                 } else {
                     sb.append("[");
                     StringBuilder arr = new StringBuilder();

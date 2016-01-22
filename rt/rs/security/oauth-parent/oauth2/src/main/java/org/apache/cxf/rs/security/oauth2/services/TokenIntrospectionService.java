@@ -36,6 +36,7 @@ import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.TokenIntrospection;
+import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthDataProvider;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
@@ -62,8 +63,12 @@ public class TokenIntrospectionService {
         if (!at.getScopes().isEmpty()) {
             response.setScope(OAuthUtils.convertPermissionsToScope(at.getScopes()));
         }
-        if (at.getSubject() != null) {
+        UserSubject userSubject = at.getSubject();
+        if (userSubject != null) {
             response.setUsername(at.getSubject().getLogin());
+            if (userSubject.getId() != null) {
+                response.setSub(userSubject.getId());
+            }
         }
         if (!StringUtils.isEmpty(at.getAudiences())) {
             response.setAud(at.getAudiences());
