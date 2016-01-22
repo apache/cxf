@@ -106,7 +106,7 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
         String validAudience = validateAudiences(accessTokenV.getAudiences());
         
         // Check if token was issued by the supported issuer
-        if (issuer != null && issuer.equals(accessTokenV.getTokenIssuer())) {
+        if (issuer != null && !issuer.equals(accessTokenV.getTokenIssuer())) {
             AuthorizationUtils.throwAuthorizationFailure(supportedSchemes, realm);
         }
         // Find the scopes which match the current request
