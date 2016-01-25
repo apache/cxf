@@ -41,6 +41,7 @@ public class ServerAuthorizationCodeGrant extends AuthorizationCodeGrant {
     private String audience;
     private String clientCodeChallenge;
     private String nonce;
+    private boolean preauthorizedTokenAvailable;
     
     public ServerAuthorizationCodeGrant() {
         
@@ -164,5 +165,13 @@ public class ServerAuthorizationCodeGrant extends AuthorizationCodeGrant {
 
     public void setNonce(String nonce) {
         this.nonce = nonce;
+    }
+
+    public boolean isPreauthorizedTokenAvailable() {
+        return preauthorizedTokenAvailable;
+    }
+
+    public void setPreauthorizedTokenAvailable(boolean preauthorizedTokenAvailable) {
+        this.preauthorizedTokenAvailable = preauthorizedTokenAvailable;
     }
 }

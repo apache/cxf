@@ -103,7 +103,7 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
         // in this flow the code is still created, the preauthorized token
         // will be retrieved by the authorization code grant handler
         AuthorizationCodeRegistration codeReg = new AuthorizationCodeRegistration(); 
-        
+        codeReg.setPreauthorizedTokenAvailable(preauthorizedToken != null);
         codeReg.setClient(client);
         codeReg.setRedirectUri(state.getRedirectUri());
         codeReg.setRequestedScope(requestedScope);

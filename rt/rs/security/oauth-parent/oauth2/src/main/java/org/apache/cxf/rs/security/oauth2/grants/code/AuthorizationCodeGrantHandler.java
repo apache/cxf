@@ -111,6 +111,11 @@ public class AuthorizationCodeGrantHandler extends AbstractGrantHandler {
                                                         getAudiences(client, grant.getAudience()));
         if (token != null) {
             return token;
+        } else if (grant.isPreauthorizedTokenAvailable()) {
+            // the grant was issued based on the authorization time check confirming the
+            // token was available but it has expired by now or been removed then
+            // creating a completely new token can be wrong - though this needs to be reviewed 
+            throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
         }
         
         // Delegate to the data provider to create the one

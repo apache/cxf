@@ -44,6 +44,7 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
     private List<String> defaultScopes;
     private List<String> requiredScopes;
     private List<String> invisibleToClientScopes;
+    private boolean supportPreauthorizedTokens;
     
     
     protected AbstractOAuthDataProvider() {
@@ -175,10 +176,31 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
     }
 
     @Override
-    public ServerAccessToken getPreauthorizedToken(Client client, List<String> requestedScopes,
-                                                   UserSubject subject, String grantType)
-        throws OAuthServiceException {
+    public ServerAccessToken getPreauthorizedToken(Client client, 
+                                                   List<String> requestedScopes,
+                                                   UserSubject sub, 
+                                                   String grantType) throws OAuthServiceException {
+        if (!supportPreauthorizedTokens) {
+            return null;
+        }
+
+        ServerAccessToken token = null;
+        for (ServerAccessToken at : getAccessTokens(client, sub)) {
+            if (at.getClient().getClientId().equals(client.getClientId())
+                && at.getGrantType().equals(grantType)
+                && (sub == null || at.getSubject().getLogin().equals(sub.getLogin()))
+                && OAuthUtils.convertPermissionsToScopeList(
+                    at.getScopes()).containsAll(requestedScopes)) {
+                token = at;
+                break;
+            }
+        }
+        if (token != null 
+            && OAuthUtils.isExpired(token.getIssuedAt(), token.getExpiresIn())) {
+            revokeToken(client, token.getTokenKey(), OAuthConstants.ACCESS_TOKEN);
+        }
         return null;
+        
     }
     
     protected boolean isRefreshTokenSupported(List<String> theScopes) {
@@ -321,6 +343,14 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
 
     public void setInvisibleToClientScopes(List<String> invisibleToClientScopes) {
         this.invisibleToClientScopes = invisibleToClientScopes;
+    }
+
+    public void setSupportPreauthorizedTokens(boolean supportPreauthorizedTokens) {
+        // This property can be enabled by default as it is generally a good thing to check
+        // if a token for a given client (+ user) pair exists but doing the queries on every
+        // authorization request for all the client-user combinations might be not cheap,
+        // hence this property is currently disabled by default
+        this.supportPreauthorizedTokens = supportPreauthorizedTokens;
     }
 
 }
