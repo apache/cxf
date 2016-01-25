@@ -165,6 +165,7 @@ public abstract class AbstractGrantHandler implements AccessTokenGrantHandler {
         // Get a pre-authorized token if available
         return dataProvider.getPreauthorizedToken(
                                      client, requestedScopes, subject, requestedGrant);
+        
     }
     
     public boolean isPartialMatchScopeValidation() {

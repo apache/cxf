@@ -54,6 +54,7 @@ public abstract class AbstractCodeDataProvider extends AbstractOAuthDataProvider
         ServerAuthorizationCodeGrant grant = new ServerAuthorizationCodeGrant(reg.getClient(), lifetime);
         grant.setRedirectUri(reg.getRedirectUri());
         grant.setSubject(reg.getSubject());
+        grant.setPreauthorizedTokenAvailable(reg.isPreauthorizedTokenAvailable());
         grant.setRequestedScopes(reg.getRequestedScope());
         grant.setApprovedScopes(reg.getApprovedScope());
         grant.setAudience(reg.getAudience());
