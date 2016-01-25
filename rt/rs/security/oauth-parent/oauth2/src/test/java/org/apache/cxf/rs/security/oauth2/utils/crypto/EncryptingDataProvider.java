@@ -144,13 +144,13 @@ public class EncryptingDataProvider implements OAuthDataProvider {
     }
 
     @Override
-    public List<ServerAccessToken> getAccessTokens(Client client) throws OAuthServiceException {
+    public List<ServerAccessToken> getAccessTokens(Client client, UserSubject sub) throws OAuthServiceException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public List<RefreshToken> getRefreshTokens(Client client) throws OAuthServiceException {
+    public List<RefreshToken> getRefreshTokens(Client client, UserSubject sub) throws OAuthServiceException {
         // TODO Auto-generated method stub
         return null;
     }

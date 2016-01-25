@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
+import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.services.AuthorizationCodeGrantService;
 
 public class OidcAuthorizationCodeService extends AuthorizationCodeGrantService {
@@ -29,6 +30,7 @@ public class OidcAuthorizationCodeService extends AuthorizationCodeGrantService 
     private boolean skipAuthorizationWithOidcScope;
     @Override
     protected boolean canAuthorizationBeSkipped(Client client,
+                                                UserSubject userSubject,
                                                 List<String> requestedScope,
                                                 List<OAuthPermission> permissions) {
         // No need to challenge the authenticated user with the authorization form 

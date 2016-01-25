@@ -67,6 +67,7 @@ public class OidcImplicitService extends ImplicitGrantService {
     
     @Override
     protected boolean canAuthorizationBeSkipped(Client client,
+                                                UserSubject userSubject,
                                                 List<String> requestedScope,
                                                 List<OAuthPermission> permissions) {
         // No need to challenge the authenticated user with the authorization form 

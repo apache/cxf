@@ -285,10 +285,10 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
     }
     
     protected void removeClientTokens(Client c) {
-        for (RefreshToken rt : getRefreshTokens(c)) {
+        for (RefreshToken rt : getRefreshTokens(c, null)) {
             revokeRefreshToken(rt.getTokenKey());
         }
-        for (ServerAccessToken at : getAccessTokens(c)) {
+        for (ServerAccessToken at : getAccessTokens(c, null)) {
             revokeAccessToken(at.getTokenKey());
         }
     }

@@ -172,7 +172,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
             client, requestedScope, userSubject, supportedGrantType);
         final boolean authorizationCanBeSkipped = 
             preAuthorizedToken != null 
-            || canAuthorizationBeSkipped(client, requestedScope, requestedPermissions);
+            || canAuthorizationBeSkipped(client, userSubject, requestedScope, requestedPermissions);
         
         // Populate the authorization challenge data 
         OAuthAuthorizationData data = 
@@ -195,6 +195,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
     }
     
     protected boolean canAuthorizationBeSkipped(Client client, 
+                                                UserSubject userSubject,
                                                 List<String> requestedScope, 
                                                 List<OAuthPermission> permissions) {
         return false;
