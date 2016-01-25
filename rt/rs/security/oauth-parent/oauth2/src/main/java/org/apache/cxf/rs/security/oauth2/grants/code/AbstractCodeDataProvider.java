@@ -46,7 +46,7 @@ public abstract class AbstractCodeDataProvider extends AbstractOAuthDataProvider
         this.codeLifetime = codeLifetime;
     }
     protected void removeClientCodeGrants(Client c) {
-        for (ServerAuthorizationCodeGrant grant : getCodeGrants(c)) {
+        for (ServerAuthorizationCodeGrant grant : getCodeGrants(c, null)) {
             removeCodeGrant(grant.getCode());
         }
     }

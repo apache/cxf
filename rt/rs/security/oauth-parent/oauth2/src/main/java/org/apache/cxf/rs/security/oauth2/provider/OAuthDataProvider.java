@@ -98,18 +98,20 @@ public interface OAuthDataProvider {
     /**
      * Return all access tokens associated with a given client
      * @param client the client
+     * @param subject the user subject, can be null
      * @return list of access tokens
      * @throws OAuthServiceException
      */
-    List<ServerAccessToken> getAccessTokens(Client client) throws OAuthServiceException;
+    List<ServerAccessToken> getAccessTokens(Client client, UserSubject subject) throws OAuthServiceException;
     
     /**
      * Return all refresh tokens associated with a given client
      * @param client the client
+     * @param subject the user subject, can be null
      * @return list of refresh tokens
      * @throws OAuthServiceException
      */
-    List<RefreshToken> getRefreshTokens(Client client) throws OAuthServiceException;
+    List<RefreshToken> getRefreshTokens(Client client, UserSubject subject) throws OAuthServiceException;
     
     /**
      * Revokes a refresh or access token

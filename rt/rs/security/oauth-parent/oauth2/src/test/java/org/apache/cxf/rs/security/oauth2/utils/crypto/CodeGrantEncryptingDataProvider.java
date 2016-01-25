@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.cxf.rs.security.oauth2.common.Client;
+import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.grants.code.AuthorizationCodeDataProvider;
 import org.apache.cxf.rs.security.oauth2.grants.code.AuthorizationCodeRegistration;
 import org.apache.cxf.rs.security.oauth2.grants.code.ServerAuthorizationCodeGrant;
@@ -56,7 +57,7 @@ public class CodeGrantEncryptingDataProvider extends EncryptingDataProvider
     }
 
     @Override
-    public List<ServerAuthorizationCodeGrant> getCodeGrants(Client c) throws OAuthServiceException {
+    public List<ServerAuthorizationCodeGrant> getCodeGrants(Client c, UserSubject sub) throws OAuthServiceException {
         // TODO Auto-generated method stub
         return null;
     }

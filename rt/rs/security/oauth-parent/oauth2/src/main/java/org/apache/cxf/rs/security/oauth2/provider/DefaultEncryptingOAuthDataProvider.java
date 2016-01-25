@@ -82,26 +82,36 @@ public class DefaultEncryptingOAuthDataProvider extends AbstractOAuthDataProvide
         return clients;
     }
     @Override
-    public List<ServerAccessToken> getAccessTokens(Client c) {
+    public List<ServerAccessToken> getAccessTokens(Client c, UserSubject sub) {
         List<ServerAccessToken> list = new ArrayList<ServerAccessToken>(tokens.size());
         for (String tokenKey : tokens) {
             ServerAccessToken token = getAccessToken(tokenKey);
-            if (token.getClient().getClientId().equals(c.getClientId())) {
+            if (isTokenMatched(token, c, sub)) {
                 list.add(token);
             }
         }
         return list;
     }
     @Override
-    public List<RefreshToken> getRefreshTokens(Client c) {
+    public List<RefreshToken> getRefreshTokens(Client c, UserSubject sub) {
         List<RefreshToken> list = new ArrayList<RefreshToken>(refreshTokens.size());
         for (String tokenKey : tokens) {
             RefreshToken token = getRefreshToken(tokenKey);
-            if (token.getClient().getClientId().equals(c.getClientId())) {
+            if (isTokenMatched(token, c, sub)) {
                 list.add(token);
             }
         }
         return list;
+    }
+    
+    protected static boolean isTokenMatched(ServerAccessToken token, Client c, UserSubject sub) {
+        if (c == null || token.getClient().getClientId().equals(c.getClientId())) {
+            UserSubject tokenSub = token.getSubject();
+            if (sub == null || tokenSub != null && tokenSub.getLogin().equals(sub.getLogin())) {
+                return true;
+            }
+        }
+        return false;
     }
     @Override
     public ServerAccessToken getAccessToken(String accessToken) throws OAuthServiceException {

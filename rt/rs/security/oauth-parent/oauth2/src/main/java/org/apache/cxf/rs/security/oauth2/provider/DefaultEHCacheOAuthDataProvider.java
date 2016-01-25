@@ -108,12 +108,12 @@ public class DefaultEHCacheOAuthDataProvider extends AbstractOAuthDataProvider {
     }
 
     @Override
-    public List<ServerAccessToken> getAccessTokens(Client c) {
+    public List<ServerAccessToken> getAccessTokens(Client c, UserSubject sub) {
         List<String> keys = CastUtils.cast(accessTokenCache.getKeys());
         List<ServerAccessToken> tokens = new ArrayList<ServerAccessToken>(keys.size());
         for (String key : keys) {
             ServerAccessToken token = getAccessToken(key);
-            if (c == null || token.getClient().getClientId().equals(c.getClientId())) {
+            if (isTokenMatched(token, c, sub)) {
                 tokens.add(token);
             }
         }
@@ -121,18 +121,28 @@ public class DefaultEHCacheOAuthDataProvider extends AbstractOAuthDataProvider {
     }
 
     @Override
-    public List<RefreshToken> getRefreshTokens(Client c) {
+    public List<RefreshToken> getRefreshTokens(Client c, UserSubject sub) {
         List<String> keys = CastUtils.cast(refreshTokenCache.getKeys());
         List<RefreshToken> tokens = new ArrayList<RefreshToken>(keys.size());
         for (String key : keys) {
             RefreshToken token = getRefreshToken(key);
-            if (c == null || token.getClient().getClientId().equals(c.getClientId())) {
+            if (isTokenMatched(token, c, sub)) {
                 tokens.add(token);
             }
         }
         return tokens;
     }
     
+    protected static boolean isTokenMatched(ServerAccessToken token, Client c, UserSubject sub) {
+        if (c == null || token.getClient().getClientId().equals(c.getClientId())) {
+            UserSubject tokenSub = token.getSubject();
+            if (sub == null || tokenSub != null && tokenSub.getLogin().equals(sub.getLogin())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Override
     public ServerAccessToken getAccessToken(String accessToken) throws OAuthServiceException {
         return getCacheValue(accessTokenCache, accessToken, ServerAccessToken.class);
