@@ -74,10 +74,16 @@ public class DefaultEHCacheOAuthDataProvider extends AbstractOAuthDataProvider
         return getCacheValue(clientCache, clientId, Client.class);
     }
     
-    @Override
     public void setClient(Client client) {
         putCacheValue(clientCache, client.getClientId(), client, 0);
-        
+    }
+    
+    public void setClients(List<Client> clients) {
+        if (clients != null) {
+            for (Client client : clients) {
+                setClient(client);
+            }
+        }
     }
 
     @Override
