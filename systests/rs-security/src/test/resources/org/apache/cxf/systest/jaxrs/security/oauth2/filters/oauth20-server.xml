@@ -62,7 +62,9 @@ under the License.
         </httpj:engine>
     </httpj:engine-factory>
     
-   <bean id="oauthProvider" class="org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuthDataProviderImpl" />
+   <bean id="oauthProvider" class="org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuthDataProviderImpl">
+       <constructor-arg><value>${testutil.ports.jaxrs-oauth2-filters}</value></constructor-arg>
+   </bean>
    
    <bean id="authorizationService" class="org.apache.cxf.rs.security.oauth2.services.AuthorizationCodeGrantService">
       <property name="dataProvider" ref="oauthProvider"/>

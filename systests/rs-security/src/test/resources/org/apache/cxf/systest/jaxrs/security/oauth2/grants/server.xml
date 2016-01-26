@@ -58,7 +58,9 @@ under the License.
             </httpj:tlsServerParameters>
         </httpj:engine>
     </httpj:engine-factory>
-    <bean id="dataProvider" class="org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuthDataProviderImpl"/>
+    <bean id="dataProvider" class="org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuthDataProviderImpl">
+    <constructor-arg><value>12345</value></constructor-arg>
+    </bean>
     <bean id="samlGrantHandler" class="org.apache.cxf.rs.security.oauth2.grants.saml.Saml2BearerGrantHandler">
         <property name="dataProvider" ref="dataProvider"/>
     </bean>
