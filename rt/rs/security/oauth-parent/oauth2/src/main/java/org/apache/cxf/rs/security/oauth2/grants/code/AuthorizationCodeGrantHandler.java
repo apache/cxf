@@ -104,18 +104,20 @@ public class AuthorizationCodeGrantHandler extends AbstractGrantHandler {
                                                   String requestedGrant,
                                                   String codeVerifier,
                                                   List<String> audiences) {
-        ServerAccessToken token = getPreAuthorizedToken(client, 
-                                                        grant.getSubject(), 
-                                                        requestedGrant,
-                                                        grant.getRequestedScopes(), 
-                                                        getAudiences(client, grant.getAudience()));
-        if (token != null) {
-            return token;
-        } else if (grant.isPreauthorizedTokenAvailable()) {
-            // the grant was issued based on the authorization time check confirming the
-            // token was available but it has expired by now or been removed then
-            // creating a completely new token can be wrong - though this needs to be reviewed 
-            throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
+        if (grant.isPreauthorizedTokenAvailable()) {
+            ServerAccessToken token = getPreAuthorizedToken(client, 
+                                                            grant.getSubject(), 
+                                                            requestedGrant,
+                                                            grant.getRequestedScopes(), 
+                                                            getAudiences(client, grant.getAudience()));
+            if (token != null) {
+                return token;
+            } else {
+                // the grant was issued based on the authorization time check confirming the
+                // token was available but it has expired by now or been removed then
+                // creating a completely new token can be wrong - though this needs to be reviewed 
+                throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
+            }
         }
         
         // Delegate to the data provider to create the one
