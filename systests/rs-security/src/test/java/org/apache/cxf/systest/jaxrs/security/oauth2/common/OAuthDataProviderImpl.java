@@ -37,7 +37,7 @@ import org.apache.cxf.rt.security.crypto.CryptoUtils;
  */
 public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
     
-    public OAuthDataProviderImpl() throws Exception {
+    public OAuthDataProviderImpl(String servicePort) throws Exception {
         // filters/grants test client
         Client client = new Client("consumer-id", "this-is-a-secret", true);
         client.setRedirectUris(Collections.singletonList("http://www.blah.apache.org"));
@@ -56,6 +56,31 @@ public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
         client.getRegisteredScopes().add("read_book");
         client.getRegisteredScopes().add("create_book");
         client.getRegisteredScopes().add("create_image");
+        
+        this.setClient(client);
+        
+        // Audience test client
+        client = new Client("consumer-id-aud", "this-is-a-secret", true);
+        client.setRedirectUris(Collections.singletonList("http://www.blah.apache.org"));
+        
+        client.getAllowedGrantTypes().add("authorization_code");
+        client.getAllowedGrantTypes().add("refresh_token");
+        
+        client.getRegisteredAudiences().add("https://localhost:" + servicePort 
+                                            + "/secured/bookstore/books");
+        client.getRegisteredAudiences().add("https://127.0.0.1/test");
+        
+        this.setClient(client);
+        
+        // Audience test client 2
+        client = new Client("consumer-id-aud2", "this-is-a-secret", true);
+        client.setRedirectUris(Collections.singletonList("http://www.blah.apache.org"));
+        
+        client.getAllowedGrantTypes().add("authorization_code");
+        client.getAllowedGrantTypes().add("refresh_token");
+        
+        client.getRegisteredAudiences().add("https://localhost:" + servicePort 
+                                            + "/securedxyz/bookstore/books");
         
         this.setClient(client);
         

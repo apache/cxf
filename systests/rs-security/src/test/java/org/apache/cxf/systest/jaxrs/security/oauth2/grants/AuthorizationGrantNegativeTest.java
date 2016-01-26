@@ -40,6 +40,7 @@ import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuth2TestUtils;
 import org.apache.cxf.systest.jaxrs.security.oauth2.common.SamlCallbackHandler;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
@@ -51,6 +52,7 @@ import org.junit.BeforeClass;
  */
 public class AuthorizationGrantNegativeTest extends AbstractBusClientServerTestBase {
     public static final String PORT = BookServerOAuth2GrantsNegative.PORT;
+    public static final String PORT2 = TestUtil.getPortNumber("jaxrs-oauth2-grants2-negative");
     
     @BeforeClass
     public static void startServers() throws Exception {
@@ -460,6 +462,39 @@ public class AuthorizationGrantNegativeTest extends AbstractBusClientServerTestB
             fail("Failure expected on a bad password");
         } catch (ResponseProcessingException ex) {
             //expected
+        }
+    }
+    
+    @org.junit.Test
+    public void testAuthorizationCodeGrantWithUnknownAudience() throws Exception {
+        URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
+
+        String address = "https://localhost:" + PORT + "/services/";
+        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(), 
+                                            "alice", "security", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        // Get Authorization Code
+        String code = OAuth2TestUtils.getAuthorizationCode(client, null, "consumer-id-aud");
+        assertNotNull(code);
+
+        // Now get the access token
+        client = WebClient.create(address, OAuth2TestUtils.setupProviders(), 
+                                  "consumer-id-aud", "this-is-a-secret", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        // Unknown audience (missing port number)
+        String audience = "https://localhost:/secured/bookstore/books";
+        try {
+            OAuth2TestUtils.getAccessTokenWithAuthorizationCode(client, code, 
+                                                                "consumer-id-aud", audience);
+            fail("Failure expected on an unknown audience");
+        } catch (Exception ex) {
+            // expected
         }
     }
     
