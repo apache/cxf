@@ -55,6 +55,7 @@ import org.apache.cxf.jaxrs.impl.WriterInterceptorMBW;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.provider.AbstractConfigurableProvider;
 import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
+import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
@@ -217,7 +218,14 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             return;
         }
         try {
-            responseMediaType = checkFinalContentType(responseMediaType, writers);
+            boolean checkWriters = false;
+            if (responseMediaType.isWildcardSubtype()) {
+                Produces pM = AnnotationUtils.getMethodAnnotation(ori == null ? null : ori.getAnnotatedMethod(), 
+                                                                              Produces.class);
+                Produces pC = AnnotationUtils.getClassAnnotation(serviceCls, Produces.class);
+                checkWriters = pM == null && pC == null;
+            }
+            responseMediaType = checkFinalContentType(responseMediaType, writers, checkWriters);
         } catch (Throwable ex) {
             handleWriteException(providerFactory, message, ex, firstTry);
             return;
@@ -403,8 +411,8 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
     }
     
     
-    private MediaType checkFinalContentType(MediaType mt, List<WriterInterceptor> writers) {
-        if (mt.isWildcardSubtype()) {
+    private MediaType checkFinalContentType(MediaType mt, List<WriterInterceptor> writers, boolean checkWriters) {
+        if (checkWriters) {
             int mbwIndex = writers.size() == 1 ? 0 : writers.size() - 1;
             MessageBodyWriter<Object> writer = ((WriterInterceptorMBW)writers.get(mbwIndex)).getMBW();
             Produces pm = writer.getClass().getAnnotation(Produces.class);
