@@ -96,6 +96,14 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     }
     
     @Test
+    public void testGetBookText() throws Exception {
+        final String address = "http://localhost:" + PORT + "/the/thebooks/bookstore/books/text"; 
+        WebClient wc = WebClient.create(address).accept("text/*");
+        assertEquals(406, wc.get().getStatus());
+        
+    }
+    
+    @Test
     public void testEchoBookForm() throws Exception {
         String address = "http://localhost:" + PORT + "/bus/thebooksform/bookform";
         WebClient wc = WebClient.create(address);
