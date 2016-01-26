@@ -170,8 +170,9 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         // Request a new grant only if no pre-authorized token is available
         ServerAccessToken preAuthorizedToken = getDataProvider().getPreauthorizedToken(
             client, requestedScope, userSubject, supportedGrantType);
-        final boolean authorizationCanBeSkipped = 
-            preAuthorizedToken != null 
+        final boolean preAuthorizationComplete = preAuthorizedToken != null
+            && OAuthUtils.convertPermissionsToScopeList(preAuthorizedToken.getScopes()).containsAll(requestedScope);
+        final boolean authorizationCanBeSkipped = preAuthorizationComplete 
             || canAuthorizationBeSkipped(client, userSubject, requestedScope, requestedPermissions);
         
         // Populate the authorization challenge data 
