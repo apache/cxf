@@ -199,7 +199,7 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
             && OAuthUtils.isExpired(token.getIssuedAt(), token.getExpiresIn())) {
             revokeToken(client, token.getTokenKey(), OAuthConstants.ACCESS_TOKEN);
         }
-        return null;
+        return token;
         
     }
     
