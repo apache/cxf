@@ -59,9 +59,13 @@ public final class OAuth2TestUtils {
     }
 
     public static String getAuthorizationCode(WebClient client, String scope) {
+        return getAuthorizationCode(client, scope, "consumer-id");
+    }
+    
+    public static String getAuthorizationCode(WebClient client, String scope, String consumerId) {
         // Make initial authorization request
         client.type("application/json").accept("application/json");
-        client.query("client_id", "consumer-id");
+        client.query("client_id", consumerId);
         client.query("redirect_uri", "http://www.blah.apache.org");
         client.query("response_type", "code");
         if (scope != null) {
@@ -91,13 +95,23 @@ public final class OAuth2TestUtils {
     }
 
     public static ClientAccessToken getAccessTokenWithAuthorizationCode(WebClient client, String code) {
+        return getAccessTokenWithAuthorizationCode(client, code, "consumer-id", null);
+    }
+    
+    public static ClientAccessToken getAccessTokenWithAuthorizationCode(WebClient client, 
+                                                                        String code,
+                                                                        String consumerId,
+                                                                        String audience) {
         client.type("application/x-www-form-urlencoded").accept("application/json");
         client.path("token");
 
         Form form = new Form();
         form.param("grant_type", "authorization_code");
         form.param("code", code);
-        form.param("client_id", "consumer-id");
+        form.param("client_id", consumerId);
+        if (audience != null) {
+            form.param("audience", audience);
+        }
         Response response = client.post(form);
 
         return response.readEntity(ClientAccessToken.class);

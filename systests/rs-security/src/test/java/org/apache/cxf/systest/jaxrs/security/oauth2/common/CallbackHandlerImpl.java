@@ -39,7 +39,8 @@ public class CallbackHandlerImpl implements CallbackHandler {
                 } else if ("bob".equals(pc.getIdentifier())) {
                     pc.setPassword("security");
                     break;
-                } else if ("consumer-id".equals(pc.getIdentifier())) {
+                } else if (pc.getIdentifier() != null
+                    && pc.getIdentifier().startsWith("consumer-id")) {
                     pc.setPassword("this-is-a-secret");
                     break;
                 } else if ("service".equals(pc.getIdentifier())) {
