@@ -188,9 +188,7 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         for (ServerAccessToken at : getAccessTokens(client, sub)) {
             if (at.getClient().getClientId().equals(client.getClientId())
                 && at.getGrantType().equals(grantType)
-                && (sub == null || at.getSubject().getLogin().equals(sub.getLogin()))
-                && OAuthUtils.convertPermissionsToScopeList(
-                    at.getScopes()).containsAll(requestedScopes)) {
+                && (sub == null || at.getSubject().getLogin().equals(sub.getLogin()))) {
                 token = at;
                 break;
             }
