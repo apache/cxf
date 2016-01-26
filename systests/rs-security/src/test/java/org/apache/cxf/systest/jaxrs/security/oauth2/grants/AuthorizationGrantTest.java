@@ -349,10 +349,6 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         assertNotNull(accessToken.getTokenKey());
         assertNotNull(accessToken.getRefreshToken());
     }
-<<<<<<< HEAD
     */
     
-=======
-  
->>>>>>> dacc6f8... Adding some audience system tests
 }

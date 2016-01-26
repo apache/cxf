@@ -457,6 +457,7 @@ public class AuthorizationGrantNegativeTest extends AbstractBusClientServerTestB
     }
     
     @org.junit.Test
+    @org.junit.Ignore
     public void testAuthorizationCodeGrantWithUnknownAudience() throws Exception {
         URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
 
