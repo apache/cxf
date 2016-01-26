@@ -146,6 +146,12 @@ public class BookStoreSpring {
     public Book getBookXsiType() {
         return new SuperBook("SuperBook", 999L, true);
     }
+    @GET
+    @Path("/books/text")
+    @Produces("text/*")
+    public String getBookText() {
+        return "SuperBook";
+    }
     
     @SuppressWarnings("unchecked")
     @GET
