@@ -313,18 +313,7 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
         boolean isRequestor,
         Assertor assertor,
         Message m) {
-        EndpointPolicy ep = (EndpointPolicy)ei.getProperty(isRequestor
-            ? POLICY_INFO_ENDPOINT_CLIENT : POLICY_INFO_ENDPOINT_SERVER);
-        if (ep == null) {
-            synchronized (ei) {
-                ep = (EndpointPolicy)ei.getProperty(isRequestor
-                    ? POLICY_INFO_ENDPOINT_CLIENT : POLICY_INFO_ENDPOINT_SERVER);
-                if (ep == null) {
-                    ep = createEndpointPolicyInfo(ei, isRequestor, assertor, m);
-                }
-            }
-        }
-        return ep;
+        return createEndpointPolicyInfo(ei, isRequestor, assertor, m);
     }
 
     public void setClientEndpointPolicy(EndpointInfo ei, EndpointPolicy ep) {
@@ -600,16 +589,27 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
         return vocabulary;
     } 
 
-    EndpointPolicyImpl createEndpointPolicyInfo(EndpointInfo ei, 
-                                                boolean isRequestor, 
+    EndpointPolicy createEndpointPolicyInfo(EndpointInfo ei,
+                                                boolean isRequestor,
                                                 Assertor assertor,
                                                 Message m) {
-        EndpointPolicyImpl epi = new EndpointPolicyImpl(ei, this, isRequestor, assertor);
-        epi.initialize(m);
-        if (m != null) {
-            ei.setProperty(isRequestor ? POLICY_INFO_ENDPOINT_CLIENT : POLICY_INFO_ENDPOINT_SERVER, epi);
+        EndpointPolicy ep = (EndpointPolicy)ei.getProperty(isRequestor
+                                                           ? POLICY_INFO_ENDPOINT_CLIENT : POLICY_INFO_ENDPOINT_SERVER);
+        if (ep == null) {
+            synchronized (ei) {
+                ep = (EndpointPolicy)ei.getProperty(isRequestor
+                    ? POLICY_INFO_ENDPOINT_CLIENT : POLICY_INFO_ENDPOINT_SERVER);
+                if (ep == null) {
+                    EndpointPolicyImpl epi = new EndpointPolicyImpl(ei, this, isRequestor, assertor);
+                    epi.initialize(m);
+                    if (m != null) {
+                        ei.setProperty(isRequestor ? POLICY_INFO_ENDPOINT_CLIENT : POLICY_INFO_ENDPOINT_SERVER, epi);
+                    }
+                    ep = epi;
+                }
+            }
         }
-        return epi;
+        return ep;
     }
 
 
