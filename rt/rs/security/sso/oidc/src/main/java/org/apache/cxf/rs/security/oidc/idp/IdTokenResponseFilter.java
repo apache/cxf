@@ -63,7 +63,7 @@ public class IdTokenResponseFilter extends AbstractOAuthServerJoseJwtProducer im
         }
     }
     private void setAtHashAndNonce(IdToken idToken, ServerAccessToken st) {
-        if (idToken.getAccessTokenHash() != null) {
+        if (idToken.getAccessTokenHash() == null) {
             Properties props = JwsUtils.loadSignatureOutProperties(false);
             SignatureAlgorithm sigAlgo = null;
             if (super.isSignWithClientSecret()) {
