@@ -20,6 +20,8 @@ package org.apache.cxf.rs.security.oidc.idp;
 
 import java.util.Properties;
 
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
@@ -27,6 +29,7 @@ import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.provider.AbstractOAuthServerJoseJwtProducer;
 import org.apache.cxf.rs.security.oauth2.provider.AccessTokenResponseFilter;
+import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 import org.apache.cxf.rs.security.oidc.common.IdToken;
 import org.apache.cxf.rs.security.oidc.utils.OidcUtils;
@@ -76,7 +79,10 @@ public class IdTokenResponseFilter extends AbstractOAuthServerJoseJwtProducer im
                 idToken.setAccessTokenHash(atHash);
             }
         }
-        if (idToken.getNonce() == null && st.getNonce() != null) {
+        Message m = JAXRSUtils.getCurrentMessage();
+        if (m != null && m.getExchange().containsKey(OAuthConstants.NONCE)) {
+            idToken.setNonce((String)m.getExchange().get(OAuthConstants.NONCE));
+        } else if (st.getNonce() != null) {
             idToken.setNonce(st.getNonce());
         }
         

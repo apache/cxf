@@ -24,6 +24,7 @@ import java.util.List;
 
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenRegistration;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
@@ -111,6 +112,9 @@ public class AuthorizationCodeGrantHandler extends AbstractGrantHandler {
                                                             grant.getRequestedScopes(), 
                                                             getAudiences(client, grant.getAudience()));
             if (token != null) {
+                if (grant.getNonce() != null) {
+                    JAXRSUtils.getCurrentMessage().getExchange().put(OAuthConstants.NONCE, grant.getNonce());
+                }
                 return token;
             } else {
                 // the grant was issued based on the authorization time check confirming the
