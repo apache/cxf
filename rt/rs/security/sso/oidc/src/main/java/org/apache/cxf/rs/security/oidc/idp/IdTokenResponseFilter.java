@@ -63,19 +63,20 @@ public class IdTokenResponseFilter extends AbstractOAuthServerJoseJwtProducer im
         }
     }
     private void setAtHashAndNonce(IdToken idToken, ServerAccessToken st) {
-        Properties props = JwsUtils.loadSignatureOutProperties(false);
-        SignatureAlgorithm sigAlgo = null;
-        if (super.isSignWithClientSecret()) {
-            sigAlgo = OAuthUtils.getClientSecretSignatureAlgorithm(props);
-        } else {
-            sigAlgo = JwsUtils.getSignatureAlgorithm(props, SignatureAlgorithm.RS256);
+        if (idToken.getAccessTokenHash() != null) {
+            Properties props = JwsUtils.loadSignatureOutProperties(false);
+            SignatureAlgorithm sigAlgo = null;
+            if (super.isSignWithClientSecret()) {
+                sigAlgo = OAuthUtils.getClientSecretSignatureAlgorithm(props);
+            } else {
+                sigAlgo = JwsUtils.getSignatureAlgorithm(props, SignatureAlgorithm.RS256);
+            }
+            if (sigAlgo != SignatureAlgorithm.NONE) {
+                String atHash = OidcUtils.calculateAccessTokenHash(st.getTokenKey(), sigAlgo);
+                idToken.setAccessTokenHash(atHash);
+            }
         }
-        if (sigAlgo != SignatureAlgorithm.NONE) {
-            String atHash = OidcUtils.calculateAccessTokenHash(st.getTokenKey(), sigAlgo);
-            idToken.setAccessTokenHash(atHash);
-        }
-        
-        if (st.getNonce() != null) {
+        if (idToken.getNonce() == null && st.getNonce() != null) {
             idToken.setNonce(st.getNonce());
         }
         

@@ -79,7 +79,7 @@ public class DefaultEHCacheCodeDataProvider extends DefaultEHCacheOAuthDataProvi
     
     protected ServerAuthorizationCodeGrant doCreateCodeGrant(AuthorizationCodeRegistration reg)
         throws OAuthServiceException {
-        return AbstractCodeDataProvider.initCodeGrant(reg, codeLifetime);
+        return AbstractCodeDataProvider.initCodeGrant(reg, codeLifetime, !isSupportPreauthorizedTokens());
     }
 
     public List<ServerAuthorizationCodeGrant> getCodeGrants(Client c, UserSubject sub) {
