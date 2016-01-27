@@ -19,7 +19,6 @@
 
 package org.apache.cxf.sts.operation;
 
-import java.net.URI;
 import java.security.Principal;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -39,7 +38,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.rt.security.claims.Claim;
 import org.apache.cxf.rt.security.claims.ClaimCollection;
 import org.apache.cxf.sts.IdentityMapper;
 import org.apache.cxf.sts.QNameConstants;
@@ -671,6 +669,7 @@ public abstract class AbstractOperation {
         }
     }
     
+<<<<<<< HEAD
     protected void checkClaimsSupport(ClaimCollection requestedClaims) {
         if (requestedClaims != null) {
             List<URI> unhandledClaimTypes = new ArrayList<URI>();
@@ -692,6 +691,8 @@ public abstract class AbstractOperation {
         }
     }
 
+=======
+>>>>>>> 60166cf... [CXF-6763] - STS requires ClaimHandler even in ClaimMapping only scenarios
     protected void processValidToken(TokenProviderParameters providerParameters,
             ReceivedToken validatedToken, TokenValidatorResponse tokenResponse) {
         // Map the principal (if it exists)

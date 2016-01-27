@@ -27,7 +27,11 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.ws.WebServiceContext;
 
 import org.apache.cxf.common.logging.LogUtils;
+<<<<<<< HEAD
 import org.apache.cxf.rt.security.claims.ClaimCollection;
+=======
+import org.apache.cxf.helpers.DOMUtils;
+>>>>>>> 60166cf... [CXF-6763] - STS requires ClaimHandler even in ClaimMapping only scenarios
 import org.apache.cxf.sts.QNameConstants;
 import org.apache.cxf.sts.RealmParser;
 import org.apache.cxf.sts.STSConstants;
@@ -125,10 +129,6 @@ public class TokenValidateOperation extends AbstractOperation implements Validat
                 processValidToken(providerParameters, validateTarget, tokenResponse);
                 
                 // Check if the requested claims can be handled by the configured claim handlers
-                ClaimCollection requestedClaims = providerParameters.getRequestedPrimaryClaims();
-                checkClaimsSupport(requestedClaims);
-                requestedClaims = providerParameters.getRequestedSecondaryClaims();
-                checkClaimsSupport(requestedClaims);
                 providerParameters.setClaimsManager(claimsManager);
                 
                 Map<String, Object> additionalProperties = tokenResponse.getAdditionalProperties();

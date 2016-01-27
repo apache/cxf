@@ -145,92 +145,7 @@ public class ClaimsManager {
         if (relationship == null || relationship.getType().equals(Relationship.FED_TYPE_IDENTITY)) {
             // Federate identity. Identity already mapped.
             // Call all configured claims handlers to retrieve the required claims
-            if (claimHandlers == null || claimHandlers.size() == 0) {
-                return null;
-            }
-            Principal originalPrincipal = parameters.getPrincipal();
-            ProcessedClaimCollection returnCollection = new ProcessedClaimCollection();
-            for (ClaimsHandler handler : claimHandlers) {
-                
-                ClaimCollection supportedClaims = 
-                    filterHandlerClaims(claims, handler.getSupportedClaimTypes());
-                if (supportedClaims.isEmpty()) {
-                    continue;
-                }
-                
-                if (handler instanceof RealmSupport) {
-                    RealmSupport handlerRealmSupport = (RealmSupport)handler;
-                    // Check whether the handler supports the current realm
-                    if (handlerRealmSupport.getSupportedRealms() != null
-                            && handlerRealmSupport.getSupportedRealms().size() > 0
-                            && handlerRealmSupport.getSupportedRealms().indexOf(parameters.getRealm()) == -1) {
-                        if (LOG.isLoggable(Level.FINER)) {
-                            LOG.finer("Handler '" + handler.getClass().getName() + "' doesn't support"
-                                    + " realm '" + parameters.getRealm()  + "'");
-                        }
-                        continue;
-                    }
-                    
-                    // If handler realm is configured and different from current realm
-                    // do an identity mapping
-                    if (handlerRealmSupport.getHandlerRealm() != null
-                            && !handlerRealmSupport.getHandlerRealm().equalsIgnoreCase(parameters.getRealm())) {
-                        Principal targetPrincipal = null;
-                        try {
-                            if (LOG.isLoggable(Level.FINE)) {
-                                LOG.fine("Mapping user '" + parameters.getPrincipal().getName()
-                                        + "' [" + parameters.getRealm() + "] to realm '"
-                                        + handlerRealmSupport.getHandlerRealm() + "'");
-                            }
-                            targetPrincipal = doMapping(parameters.getRealm(), parameters.getPrincipal(),
-                                    handlerRealmSupport.getHandlerRealm());
-                        } catch (Exception ex) {
-                            LOG.log(Level.WARNING, "Failed to map user '" + parameters.getPrincipal().getName()
-                                    + "' [" + parameters.getRealm() + "] to realm '"
-                                    + handlerRealmSupport.getHandlerRealm() + "'", ex);
-                            throw new STSException("Failed to map user for claims handler",
-                                    STSException.REQUEST_FAILED);
-                        }
-                        
-                        if (targetPrincipal == null || targetPrincipal.getName() == null) {
-                            LOG.log(Level.WARNING, "Null. Failed to map user '" + parameters.getPrincipal().getName()
-                                    + "' [" + parameters.getRealm() + "] to realm '"
-                                    + handlerRealmSupport.getHandlerRealm() + "'");
-                            continue;
-                        }
-                        if (LOG.isLoggable(Level.INFO)) {
-                            LOG.info("Principal '" + targetPrincipal.getName()
-                                    + "' passed to handler '" + handler.getClass().getName() + "'");
-                        }
-                        parameters.setPrincipal(targetPrincipal);
-                    } else {
-                        if (LOG.isLoggable(Level.FINER)) {
-                            LOG.finer("Handler '" + handler.getClass().getName() + "' doesn't require"
-                                    + " identity mapping '" + parameters.getRealm()  + "'");
-                        }
-                        
-                    }
-                }
-                
-                ProcessedClaimCollection claimCollection = null;
-                try {
-                    claimCollection = handler.retrieveClaimValues(supportedClaims, parameters);
-                } catch (RuntimeException ex) {
-                    LOG.log(Level.INFO, "Failed retrieving claims from ClaimsHandler "
-                            + handler.getClass().getName(), ex);
-                    if (this.isStopProcessingOnException()) {
-                        throw ex;
-                    }
-                } finally {
-                    // set original principal again, otherwise wrong principal passed to next claim handler in the list
-                    // if no mapping required or wrong source principal used for next identity mapping
-                    parameters.setPrincipal(originalPrincipal);
-                }
-                
-                if (claimCollection != null && claimCollection.size() != 0) {
-                    returnCollection.addAll(claimCollection);
-                }
-            }
+            ProcessedClaimCollection returnCollection = handleClaims(claims, parameters);
             validateClaimValues(claims, returnCollection);
             return returnCollection;
             
@@ -262,6 +177,95 @@ public class ClaimsManager {
             return targetClaims;
         }
 
+    }
+    
+    private ProcessedClaimCollection handleClaims(ClaimCollection claims, ClaimsParameters parameters) {
+        ProcessedClaimCollection returnCollection = new ProcessedClaimCollection();
+        Principal originalPrincipal = parameters.getPrincipal();
+        
+        for (ClaimsHandler handler : claimHandlers) {
+            
+            ClaimCollection supportedClaims = 
+                filterHandlerClaims(claims, handler.getSupportedClaimTypes());
+            if (supportedClaims.isEmpty()) {
+                continue;
+            }
+            
+            if (handler instanceof RealmSupport) {
+                RealmSupport handlerRealmSupport = (RealmSupport)handler;
+                // Check whether the handler supports the current realm
+                if (handlerRealmSupport.getSupportedRealms() != null
+                        && handlerRealmSupport.getSupportedRealms().size() > 0
+                        && handlerRealmSupport.getSupportedRealms().indexOf(parameters.getRealm()) == -1) {
+                    if (LOG.isLoggable(Level.FINER)) {
+                        LOG.finer("Handler '" + handler.getClass().getName() + "' doesn't support"
+                                + " realm '" + parameters.getRealm()  + "'");
+                    }
+                    continue;
+                }
+                
+                // If handler realm is configured and different from current realm
+                // do an identity mapping
+                if (handlerRealmSupport.getHandlerRealm() != null
+                        && !handlerRealmSupport.getHandlerRealm().equalsIgnoreCase(parameters.getRealm())) {
+                    Principal targetPrincipal = null;
+                    try {
+                        if (LOG.isLoggable(Level.FINE)) {
+                            LOG.fine("Mapping user '" + parameters.getPrincipal().getName()
+                                    + "' [" + parameters.getRealm() + "] to realm '"
+                                    + handlerRealmSupport.getHandlerRealm() + "'");
+                        }
+                        targetPrincipal = doMapping(parameters.getRealm(), parameters.getPrincipal(),
+                                handlerRealmSupport.getHandlerRealm());
+                    } catch (Exception ex) {
+                        LOG.log(Level.WARNING, "Failed to map user '" + parameters.getPrincipal().getName()
+                                + "' [" + parameters.getRealm() + "] to realm '"
+                                + handlerRealmSupport.getHandlerRealm() + "'", ex);
+                        throw new STSException("Failed to map user for claims handler",
+                                STSException.REQUEST_FAILED);
+                    }
+                    
+                    if (targetPrincipal == null || targetPrincipal.getName() == null) {
+                        LOG.log(Level.WARNING, "Null. Failed to map user '" + parameters.getPrincipal().getName()
+                                + "' [" + parameters.getRealm() + "] to realm '"
+                                + handlerRealmSupport.getHandlerRealm() + "'");
+                        continue;
+                    }
+                    if (LOG.isLoggable(Level.INFO)) {
+                        LOG.info("Principal '" + targetPrincipal.getName()
+                                + "' passed to handler '" + handler.getClass().getName() + "'");
+                    }
+                    parameters.setPrincipal(targetPrincipal);
+                } else {
+                    if (LOG.isLoggable(Level.FINER)) {
+                        LOG.finer("Handler '" + handler.getClass().getName() + "' doesn't require"
+                                + " identity mapping '" + parameters.getRealm()  + "'");
+                    }
+                    
+                }
+            }
+            
+            ProcessedClaimCollection claimCollection = null;
+            try {
+                claimCollection = handler.retrieveClaimValues(supportedClaims, parameters);
+            } catch (RuntimeException ex) {
+                LOG.log(Level.INFO, "Failed retrieving claims from ClaimsHandler "
+                        + handler.getClass().getName(), ex);
+                if (this.isStopProcessingOnException()) {
+                    throw ex;
+                }
+            } finally {
+                // set original principal again, otherwise wrong principal passed to next claim handler in the list
+                // if no mapping required or wrong source principal used for next identity mapping
+                parameters.setPrincipal(originalPrincipal);
+            }
+            
+            if (claimCollection != null && claimCollection.size() != 0) {
+                returnCollection.addAll(claimCollection);
+            }
+        }
+        
+        return returnCollection;
     }
 
     private ClaimCollection filterHandlerClaims(ClaimCollection claims,
