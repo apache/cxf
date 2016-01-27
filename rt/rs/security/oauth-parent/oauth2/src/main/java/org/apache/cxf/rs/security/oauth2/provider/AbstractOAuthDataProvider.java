@@ -61,17 +61,22 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         return at;
     }
     
-    protected ServerAccessToken doCreateAccessToken(AccessTokenRegistration accessToken) {
-        ServerAccessToken at = createNewAccessToken(accessToken.getClient());
-        at.setAudiences(accessToken.getAudiences());
-        at.setGrantType(accessToken.getGrantType());
-        List<String> theScopes = accessToken.getApprovedScope();
+    protected ServerAccessToken doCreateAccessToken(AccessTokenRegistration atReg) {
+        ServerAccessToken at = createNewAccessToken(atReg.getClient());
+        at.setAudiences(atReg.getAudiences());
+        at.setGrantType(atReg.getGrantType());
+        List<String> theScopes = atReg.getApprovedScope();
         List<OAuthPermission> thePermissions = 
-            convertScopeToPermissions(accessToken.getClient(), theScopes);
+            convertScopeToPermissions(atReg.getClient(), theScopes);
         at.setScopes(thePermissions);
-        at.setSubject(accessToken.getSubject());
-        at.setClientCodeVerifier(accessToken.getClientCodeVerifier());
-        at.setNonce(accessToken.getNonce());
+        at.setSubject(atReg.getSubject());
+        at.setClientCodeVerifier(atReg.getClientCodeVerifier());
+        if (!isSupportPreauthorizedTokens()) {
+            // if the nonce is persisted and the same token is reused then in some cases
+            // (when ID token is returned) the old nonce will be copied to ID token which
+            // may cause the validation failure at the cliend side
+            at.setNonce(atReg.getNonce());
+        }
         return at;
     }
     
@@ -185,7 +190,7 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
                                                    List<String> requestedScopes,
                                                    UserSubject sub, 
                                                    String grantType) throws OAuthServiceException {
-        if (!supportPreauthorizedTokens) {
+        if (!isSupportPreauthorizedTokens()) {
             return null;
         }
 
@@ -201,6 +206,7 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         if (token != null 
             && OAuthUtils.isExpired(token.getIssuedAt(), token.getExpiresIn())) {
             revokeToken(client, token.getTokenKey(), OAuthConstants.ACCESS_TOKEN);
+            token = null;
         }
         return token;
         
@@ -348,12 +354,14 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         this.invisibleToClientScopes = invisibleToClientScopes;
     }
 
+    public boolean isSupportPreauthorizedTokens() {
+        return supportPreauthorizedTokens;
+    }
+
     public void setSupportPreauthorizedTokens(boolean supportPreauthorizedTokens) {
-        // This property can be enabled by default as it is generally a good thing to check
-        // if a token for a given client (+ user) pair exists but doing the queries on every
-        // authorization request for all the client-user combinations might be not cheap,
-        // hence this property is currently disabled by default
         this.supportPreauthorizedTokens = supportPreauthorizedTokens;
     }
+
+    
 
 }
