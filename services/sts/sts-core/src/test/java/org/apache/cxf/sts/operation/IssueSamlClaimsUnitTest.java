@@ -33,6 +33,7 @@ import javax.xml.namespace.QName;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxws.context.WebServiceContextImpl;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
@@ -272,6 +273,57 @@ public class IssueSamlClaimsUnitTest extends org.junit.Assert {
         String tokenString = DOM2Writer.nodeToString(assertion);
         assertTrue(tokenString.contains("AttributeStatement"));
         assertTrue(tokenString.contains("bob@custom"));
+    }
+    
+    @org.junit.Test
+    public void testIssueTokenUnknownClaim() throws Exception {
+        TokenIssueOperation issueOperation = new TokenIssueOperation();
+        
+        // Add Token Provider
+        addTokenProvider(issueOperation);
+        
+        // Add Service
+        addService(issueOperation);
+        
+        // Add STSProperties object
+        addSTSProperties(issueOperation);
+        
+        // Set the ClaimsManager
+        ClaimsManager claimsManager = new ClaimsManager();
+        ClaimsHandler claimsHandler = new CustomClaimsHandler();
+        claimsManager.setClaimHandlers(Collections.singletonList(claimsHandler));
+        issueOperation.setClaimsManager(claimsManager);
+        
+        // Mock up a request
+        RequestSecurityTokenType request = new RequestSecurityTokenType();
+        JAXBElement<String> tokenType = 
+            new JAXBElement<String>(
+                QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
+            );
+        request.getAny().add(tokenType);
+        
+        // Add a custom claim (unknown to the CustomClaimsHandler)
+        Element secondaryParameters = createSecondaryParameters();
+        Node claims = 
+            secondaryParameters.getElementsByTagNameNS(STSConstants.WST_NS_05_12, "Claims").item(0);
+        Element claimType = claims.getOwnerDocument().createElementNS(STSConstants.IDT_NS_05_05, "ClaimType");
+        claimType.setAttributeNS(
+            null, "Uri", ClaimTypes.COUNTRY.toString()
+        );
+        claimType.setAttributeNS(WSConstants.XMLNS_NS, "xmlns", STSConstants.IDT_NS_05_05);
+        claims.appendChild(claimType);
+        
+        request.getAny().add(secondaryParameters);
+        request.getAny().add(createAppliesToElement("http://dummy-service.com/dummy"));
+        
+        WebServiceContextImpl webServiceContext = setupMessageContext();
+        
+        try {
+            issueToken(issueOperation, request, webServiceContext);
+            fail("Failure expected on an unknown non-optional claims type");
+        } catch (Exception ex) {
+            // expected
+        }
     }
 
     /**

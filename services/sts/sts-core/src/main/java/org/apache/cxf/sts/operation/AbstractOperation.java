@@ -19,7 +19,6 @@
 
 package org.apache.cxf.sts.operation;
 
-import java.net.URI;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Date;
@@ -37,7 +36,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.rt.security.claims.Claim;
 import org.apache.cxf.rt.security.claims.ClaimCollection;
 import org.apache.cxf.sts.IdentityMapper;
 import org.apache.cxf.sts.QNameConstants;
@@ -556,27 +554,6 @@ public abstract class AbstractOperation {
         }
     }
     
-    protected void checkClaimsSupport(ClaimCollection requestedClaims) {
-        if (requestedClaims != null) {
-            List<URI> unhandledClaimTypes = new ArrayList<>();
-            for (Claim requestedClaim : requestedClaims) {
-                if (!claimsManager.getSupportedClaimTypes().contains(requestedClaim.getClaimType()) 
-                        && !requestedClaim.isOptional()) {
-                    unhandledClaimTypes.add(requestedClaim.getClaimType());
-                }
-            }
-
-            if (unhandledClaimTypes.size() > 0) {
-                LOG.log(Level.WARNING, "The requested claim " + unhandledClaimTypes.toString() 
-                        + " cannot be fulfilled by the STS.");
-                throw new STSException(
-                        "The requested claim " + unhandledClaimTypes.toString() 
-                        + " cannot be fulfilled by the STS."
-                );
-            }
-        }
-    }
-
     protected void processValidToken(TokenProviderParameters providerParameters,
             ReceivedToken validatedToken, TokenValidatorResponse tokenResponse) {
         // Map the principal (if it exists)
