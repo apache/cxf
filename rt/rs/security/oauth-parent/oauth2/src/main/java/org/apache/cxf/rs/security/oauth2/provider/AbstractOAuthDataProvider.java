@@ -71,12 +71,7 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         at.setScopes(thePermissions);
         at.setSubject(atReg.getSubject());
         at.setClientCodeVerifier(atReg.getClientCodeVerifier());
-        if (!isSupportPreauthorizedTokens()) {
-            // if the nonce is persisted and the same token is reused then in some cases
-            // (when ID token is returned) the old nonce will be copied to ID token which
-            // may cause the validation failure at the cliend side
-            at.setNonce(atReg.getNonce());
-        }
+        at.setNonce(atReg.getNonce());
         return at;
     }
     

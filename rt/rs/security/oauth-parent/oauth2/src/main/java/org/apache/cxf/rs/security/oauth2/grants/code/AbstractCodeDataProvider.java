@@ -39,7 +39,7 @@ public abstract class AbstractCodeDataProvider extends AbstractOAuthDataProvider
     
     protected ServerAuthorizationCodeGrant doCreateCodeGrant(AuthorizationCodeRegistration reg)
         throws OAuthServiceException {
-        return AbstractCodeDataProvider.initCodeGrant(reg, codeLifetime, !isSupportPreauthorizedTokens());
+        return AbstractCodeDataProvider.initCodeGrant(reg, codeLifetime);
     }
     
     public void setCodeLifetime(long codeLifetime) {
@@ -51,8 +51,7 @@ public abstract class AbstractCodeDataProvider extends AbstractOAuthDataProvider
         }
     }
     public static ServerAuthorizationCodeGrant initCodeGrant(AuthorizationCodeRegistration reg, 
-                                                             long lifetime,
-                                                             boolean useNonce) {
+                                                             long lifetime) {
         ServerAuthorizationCodeGrant grant = new ServerAuthorizationCodeGrant(reg.getClient(), lifetime);
         grant.setRedirectUri(reg.getRedirectUri());
         grant.setSubject(reg.getSubject());
@@ -61,9 +60,7 @@ public abstract class AbstractCodeDataProvider extends AbstractOAuthDataProvider
         grant.setApprovedScopes(reg.getApprovedScope());
         grant.setAudience(reg.getAudience());
         grant.setClientCodeChallenge(reg.getClientCodeChallenge());
-        if (useNonce) {
-            grant.setNonce(reg.getNonce());
-        }
+        grant.setNonce(reg.getNonce());
         return grant;
     }
     protected abstract void saveCodeGrant(ServerAuthorizationCodeGrant grant);
