@@ -282,7 +282,8 @@ public class ClientImpl implements Client {
             // TLS
             TLSClientParameters tlsParams = secConfig.getTlsClientParams();
             if (tlsParams.getSSLSocketFactory() != null 
-                || tlsParams.getTrustManagers() != null) {
+                || tlsParams.getTrustManagers() != null
+                || tlsParams.getHostnameVerifier() != null) {
                 clientCfg.getHttpConduit().setTlsClientParameters(tlsParams);
             }
             
