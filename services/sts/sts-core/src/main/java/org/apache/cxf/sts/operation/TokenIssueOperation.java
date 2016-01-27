@@ -37,7 +37,6 @@ import org.w3c.dom.Element;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.rt.security.claims.ClaimCollection;
 import org.apache.cxf.sts.QNameConstants;
 import org.apache.cxf.sts.event.STSIssueFailureEvent;
 import org.apache.cxf.sts.event.STSIssueSuccessEvent;
@@ -118,12 +117,6 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
             RequestRequirements requestRequirements = parseRequest(request, context);
     
             providerParameters = createTokenProviderParameters(requestRequirements, context);
-    
-            // Check if the requested claims can be handled by the configured claim handlers
-            ClaimCollection requestedClaims = providerParameters.getRequestedPrimaryClaims();
-            checkClaimsSupport(requestedClaims);
-            requestedClaims = providerParameters.getRequestedSecondaryClaims();
-            checkClaimsSupport(requestedClaims);
             providerParameters.setClaimsManager(claimsManager);
             
             String realm = providerParameters.getRealm();

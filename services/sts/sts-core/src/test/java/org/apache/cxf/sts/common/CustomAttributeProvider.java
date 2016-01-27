@@ -24,8 +24,7 @@ import java.util.List;
 
 import org.w3c.dom.Element;
 
-import org.apache.cxf.sts.claims.ClaimsManager;
-import org.apache.cxf.sts.claims.ClaimsParameters;
+import org.apache.cxf.sts.claims.ClaimsUtils;
 import org.apache.cxf.sts.claims.ProcessedClaim;
 import org.apache.cxf.sts.claims.ProcessedClaimCollection;
 import org.apache.cxf.sts.request.ReceivedToken;
@@ -57,27 +56,7 @@ public class CustomAttributeProvider implements AttributeStatementProvider {
         String tokenType = tokenRequirements.getTokenType();
         
         // Handle Claims
-        ClaimsManager claimsManager = providerParameters.getClaimsManager();
-        ProcessedClaimCollection retrievedClaims = new ProcessedClaimCollection();
-        if (claimsManager != null) {
-            ClaimsParameters params = new ClaimsParameters();
-            params.setAdditionalProperties(providerParameters.getAdditionalProperties());
-            params.setAppliesToAddress(providerParameters.getAppliesToAddress());
-            params.setEncryptionProperties(providerParameters.getEncryptionProperties());
-            params.setKeyRequirements(providerParameters.getKeyRequirements());
-            params.setPrincipal(providerParameters.getPrincipal());
-            params.setRealm(providerParameters.getRealm());
-            params.setStsProperties(providerParameters.getStsProperties());
-            params.setTokenRequirements(providerParameters.getTokenRequirements());
-            params.setTokenStore(providerParameters.getTokenStore());
-            params.setWebServiceContext(providerParameters.getWebServiceContext());
-            retrievedClaims = 
-                claimsManager.retrieveClaimValues(
-                    providerParameters.getRequestedPrimaryClaims(),
-                    providerParameters.getRequestedSecondaryClaims(),
-                    params
-                );
-        }
+        ProcessedClaimCollection retrievedClaims = ClaimsUtils.processClaims(providerParameters);
         
         AttributeStatementBean attrBean = new AttributeStatementBean();
         Iterator<ProcessedClaim> claimIterator = retrievedClaims.iterator();
