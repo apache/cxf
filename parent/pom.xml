@@ -151,11 +151,7 @@
         <cxf.servlet-api.version>1.0</cxf.servlet-api.version>
         <cxf.servlet-api-2.5.artifact>geronimo-servlet_2.5_spec</cxf.servlet-api-2.5.artifact>
         <cxf.servlet-api-2.5.version>1.1.2</cxf.servlet-api-2.5.version>
-<<<<<<< HEAD
-        <cxf.slf4j.version>1.7.9</cxf.slf4j.version>
-=======
         <cxf.slf4j.version>1.7.14</cxf.slf4j.version>
->>>>>>> cc2a8d6... Updating BouncyCastle + SLF4J
         <cxf.specs.jaxws.api.version>1.2</cxf.specs.jaxws.api.version>
         <cxf.spring.version>3.2.14.RELEASE</cxf.spring.version>
         <cxf.spring.security.version>3.1.7.RELEASE</cxf.spring.security.version>
