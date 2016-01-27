@@ -669,30 +669,6 @@ public abstract class AbstractOperation {
         }
     }
     
-<<<<<<< HEAD
-    protected void checkClaimsSupport(ClaimCollection requestedClaims) {
-        if (requestedClaims != null) {
-            List<URI> unhandledClaimTypes = new ArrayList<URI>();
-            for (Claim requestedClaim : requestedClaims) {
-                if (!claimsManager.getSupportedClaimTypes().contains(requestedClaim.getClaimType()) 
-                        && !requestedClaim.isOptional()) {
-                    unhandledClaimTypes.add(requestedClaim.getClaimType());
-                }
-            }
-
-            if (unhandledClaimTypes.size() > 0) {
-                LOG.log(Level.WARNING, "The requested claim " + unhandledClaimTypes.toString() 
-                        + " cannot be fulfilled by the STS.");
-                throw new STSException(
-                        "The requested claim " + unhandledClaimTypes.toString() 
-                        + " cannot be fulfilled by the STS."
-                );
-            }
-        }
-    }
-
-=======
->>>>>>> 60166cf... [CXF-6763] - STS requires ClaimHandler even in ClaimMapping only scenarios
     protected void processValidToken(TokenProviderParameters providerParameters,
             ReceivedToken validatedToken, TokenValidatorResponse tokenResponse) {
         // Map the principal (if it exists)

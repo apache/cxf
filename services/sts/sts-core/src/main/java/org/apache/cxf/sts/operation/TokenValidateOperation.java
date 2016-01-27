@@ -27,11 +27,6 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.ws.WebServiceContext;
 
 import org.apache.cxf.common.logging.LogUtils;
-<<<<<<< HEAD
-import org.apache.cxf.rt.security.claims.ClaimCollection;
-=======
-import org.apache.cxf.helpers.DOMUtils;
->>>>>>> 60166cf... [CXF-6763] - STS requires ClaimHandler even in ClaimMapping only scenarios
 import org.apache.cxf.sts.QNameConstants;
 import org.apache.cxf.sts.RealmParser;
 import org.apache.cxf.sts.STSConstants;
