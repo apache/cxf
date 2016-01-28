@@ -19,12 +19,15 @@
 package org.apache.cxf.rs.security.oauth2.common;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import javax.xml.bind.annotation.XmlRootElement;
+
+import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 
 /**
  * This bean represents a resource owner authorization challenge.
@@ -227,5 +230,30 @@ public class OAuthAuthorizationData extends OAuthRedirectionState implements Ser
     public void setHidePreauthorizedScopesInForm(boolean hidePreauthorizedScopesInForm) {
         this.hidePreauthorizedScopesInForm = hidePreauthorizedScopesInForm;
     }
-
+    public List<String> getPermissionsAsStrings() {
+        return permissions != null ? OAuthUtils.convertPermissionsToScopeList(permissions) 
+            : Collections.emptyList();
+    }
+    public List<String> getAlreadyAuthorizedPermissionsAsStrings() {
+        return alreadyAuthorizedPermissions != null 
+            ? OAuthUtils.convertPermissionsToScopeList(alreadyAuthorizedPermissions) 
+            : Collections.emptyList();
+    }
+    public List<OAuthPermission> getAllPermissions() {
+        List<OAuthPermission> allPerms = new LinkedList<OAuthPermission>();
+        if (alreadyAuthorizedPermissions != null) {
+            allPerms.addAll(alreadyAuthorizedPermissions);
+            if (permissions != null) {
+                List<String> list = getAlreadyAuthorizedPermissionsAsStrings();
+                for (OAuthPermission perm : permissions) {
+                    if (!list.contains(perm.getPermission())) {
+                        allPerms.add(perm);
+                    }
+                }
+            }
+        } else if (permissions != null) {
+            allPerms.addAll(permissions);
+        }
+        return allPerms;
+    }
 }
