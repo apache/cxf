@@ -50,6 +50,7 @@ public class OAuthAuthorizationData extends OAuthRedirectionState implements Ser
     
     private List<OAuthPermission> permissions;
     private List<OAuthPermission> alreadyAuthorizedPermissions;
+    private boolean hidePreauthorizedScopesInForm;
     
     public OAuthAuthorizationData() {
     }
@@ -217,6 +218,14 @@ public class OAuthAuthorizationData extends OAuthRedirectionState implements Ser
 
     public void setImplicitFlow(boolean implicitFlow) {
         this.implicitFlow = implicitFlow;
+    }
+
+    public boolean isHidePreauthorizedScopesInForm() {
+        return hidePreauthorizedScopesInForm;
+    }
+
+    public void setHidePreauthorizedScopesInForm(boolean hidePreauthorizedScopesInForm) {
+        this.hidePreauthorizedScopesInForm = hidePreauthorizedScopesInForm;
     }
 
 }

@@ -65,6 +65,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
     private ResourceOwnerNameProvider resourceOwnerNameProvider;
     private int maxDefaultSessionInterval;
     private boolean matchRedirectUriWithApplicationUri;
+    private boolean hidePreauthorizedScopesInForm;
     
     protected RedirectionBasedGrantService(String supportedResponseType,
                                            String supportedGrantType) {
@@ -177,6 +178,9 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
             alreadyAuthorizedPerms = preAuthorizedToken.getScopes();
             preAuthorizationComplete = 
                 OAuthUtils.convertPermissionsToScopeList(alreadyAuthorizedPerms).containsAll(requestedScope);
+            if (!preAuthorizationComplete) {
+                preAuthorizedToken = null;
+            }
         }
         final boolean authorizationCanBeSkipped = preAuthorizationComplete 
             || canAuthorizationBeSkipped(client, userSubject, requestedScope, requestedPermissions);
@@ -190,7 +194,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         
         if (authorizationCanBeSkipped) {
             List<OAuthPermission> approvedScopes = 
-                preAuthorizedToken != null ? preAuthorizedToken.getScopes() : requestedPermissions; 
+                preAuthorizationComplete ? preAuthorizedToken.getScopes() : requestedPermissions; 
             return createGrant(data,
                                client, 
                                requestedScope,
@@ -239,6 +243,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         if (!authorizationCanBeSkipped) {
             secData.setPermissions(requestedPerms);
             secData.setAlreadyAuthorizedPermissions(alreadyAuthorizedPerms);
+            secData.setHidePreauthorizedScopesInForm(hidePreauthorizedScopesInForm);
             secData.setApplicationName(client.getApplicationName()); 
             secData.setApplicationWebUri(client.getApplicationWebUri());
             secData.setApplicationDescription(client.getApplicationDescription());
@@ -502,5 +507,8 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
 
     public void setMatchRedirectUriWithApplicationUri(boolean matchRedirectUriWithApplicationUri) {
         this.matchRedirectUriWithApplicationUri = matchRedirectUriWithApplicationUri;
+    }
+    public void setHidePreauthorizedScopesInForm(boolean hidePreauthorizedScopesInForm) {
+        this.hidePreauthorizedScopesInForm = hidePreauthorizedScopesInForm;
     }
 }
