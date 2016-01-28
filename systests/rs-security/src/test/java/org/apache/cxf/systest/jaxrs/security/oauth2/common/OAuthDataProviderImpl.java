@@ -123,7 +123,7 @@ public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
         List<OAuthPermission> permissions = new ArrayList<>();
         for (String requestedScope : requestedScopes) {
             if ("read_book".equals(requestedScope)) {
-                OAuthPermission permission = new OAuthPermission();
+                OAuthPermission permission = new OAuthPermission("read_book");
                 permission.setHttpVerbs(Collections.singletonList("GET"));
                 List<String> uris = new ArrayList<>();
                 String partnerAddress = "/secured/bookstore/books/*";
@@ -132,7 +132,7 @@ public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
                 
                 permissions.add(permission);
             } else if ("create_book".equals(requestedScope)) {
-                OAuthPermission permission = new OAuthPermission();
+                OAuthPermission permission = new OAuthPermission("create_book");
                 permission.setHttpVerbs(Collections.singletonList("POST"));
                 List<String> uris = new ArrayList<>();
                 String partnerAddress = "/secured/bookstore/books/*";
@@ -141,7 +141,7 @@ public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
                 
                 permissions.add(permission);
             } else if ("create_image".equals(requestedScope)) {
-                OAuthPermission permission = new OAuthPermission();
+                OAuthPermission permission = new OAuthPermission("create_image");
                 permission.setHttpVerbs(Collections.singletonList("POST"));
                 List<String> uris = new ArrayList<>();
                 String partnerAddress = "/secured/bookstore/image/*";
@@ -150,7 +150,7 @@ public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
                 
                 permissions.add(permission);
             } else if ("read_balance".equals(requestedScope)) {
-                OAuthPermission permission = new OAuthPermission();
+                OAuthPermission permission = new OAuthPermission("read_balance");
                 permission.setHttpVerbs(Collections.singletonList("GET"));
                 List<String> uris = new ArrayList<>();
                 String partnerAddress = "/partners/balance/*";
@@ -159,7 +159,7 @@ public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
                 
                 permissions.add(permission);
             } else if ("create_balance".equals(requestedScope)) {
-                OAuthPermission permission = new OAuthPermission();
+                OAuthPermission permission = new OAuthPermission("create_balance");
                 permission.setHttpVerbs(Collections.singletonList("POST"));
                 List<String> uris = new ArrayList<>();
                 String partnerAddress = "/partners/balance/*";
@@ -168,7 +168,7 @@ public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
                 
                 permissions.add(permission);
             } else if ("read_data".equals(requestedScope)) {
-                OAuthPermission permission = new OAuthPermission();
+                OAuthPermission permission = new OAuthPermission("read_data");
                 permission.setHttpVerbs(Collections.singletonList("GET"));
                 List<String> uris = new ArrayList<>();
                 String partnerAddress = "/partners/data/*";
