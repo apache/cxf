@@ -184,6 +184,35 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.Test
+    public void testAuthorizationCodeGrantWithState() throws Exception {
+        URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
+
+        String address = "https://localhost:" + PORT + "/services/";
+        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(), 
+                                            "alice", "security", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        // Get Authorization Code
+        String state = "1234566789";
+        String code = OAuth2TestUtils.getAuthorizationCode(client, "read_balance", "consumer-id",
+                                                           null, state);
+        assertNotNull(code);
+
+        // Now get the access token
+        client = WebClient.create(address, OAuth2TestUtils.setupProviders(), 
+                                  "consumer-id", "this-is-a-secret", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        ClientAccessToken accessToken = 
+            OAuth2TestUtils.getAccessTokenWithAuthorizationCode(client, code);
+        assertNotNull(accessToken.getTokenKey());
+    }
+    
+    @org.junit.Test
     public void testAuthorizationCodeGrantWithAudience() throws Exception {
         URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
 

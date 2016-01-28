@@ -35,6 +35,7 @@ import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
+import org.junit.Assert;
 
 /**
  * Some test utils for the OAuth 2.0 tests
@@ -54,6 +55,11 @@ public final class OAuth2TestUtils {
     }
     
     public static String getAuthorizationCode(WebClient client, String scope, String consumerId) {
+        return getAuthorizationCode(client, scope, consumerId, null, null);
+    }
+    
+    public static String getAuthorizationCode(WebClient client, String scope, String consumerId,
+                                              String nonce, String state) {
         // Make initial authorization request
         client.type("application/json").accept("application/json");
         client.query("client_id", consumerId);
@@ -62,6 +68,13 @@ public final class OAuth2TestUtils {
         if (scope != null) {
             client.query("scope", scope);
         }
+        if (nonce != null) {
+            client.query("nonce", nonce);
+        }
+        if (state != null) {
+            client.query("state", state);
+        }
+
         client.path("authorize/");
         Response response = client.get();
 
@@ -78,10 +91,17 @@ public final class OAuth2TestUtils {
         if (authzData.getProposedScope() != null) {
             form.param("scope", authzData.getProposedScope());
         }
+        if (authzData.getState() != null) {
+            form.param("state", authzData.getState());
+        }
         form.param("oauthDecision", "allow");
 
         response = client.post(form);
-        String location = response.getHeaderString("Location"); 
+        String location = response.getHeaderString("Location");
+        if (state != null) {
+            Assert.assertTrue(location.contains("state=" + state));
+        }
+
         return getSubstring(location, "code");
     }
 
