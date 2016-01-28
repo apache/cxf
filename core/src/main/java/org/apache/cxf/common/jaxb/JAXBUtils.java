@@ -74,6 +74,7 @@ import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ASMHelper;
 import org.apache.cxf.common.util.ASMHelper.ClassWriter;
 import org.apache.cxf.common.util.ASMHelper.FieldVisitor;
@@ -91,6 +92,7 @@ import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.helpers.JavaUtils;
 
 public final class JAXBUtils {
+    public static final Logger LOG = LogUtils.getL7dLogger(JAXBUtils.class);
     
     public enum IdentifierType {
         CLASS,
@@ -623,15 +625,17 @@ public final class JAXBUtils {
     public static Object setNamespaceMapper(final Map<String, String> nspref,
                                            Marshaller marshaller) throws PropertyException {
         Object mapper = createNamespaceWrapper(marshaller.getClass(), nspref);
-        if (marshaller.getClass().getName().contains(".internal.")) {
-            marshaller.setProperty("com.sun.xml.internal.bind.namespacePrefixMapper",
-                                   mapper);
-        } else if (marshaller.getClass().getName().contains("com.sun")) {
-            marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper",
-                                   mapper);
-        } else if (marshaller.getClass().getName().contains("eclipse")) {
-            marshaller.setProperty("eclipselink.namespace-prefix-mapper",
-                                   mapper);
+        if (mapper != null) {
+            if (marshaller.getClass().getName().contains(".internal.")) {
+                marshaller.setProperty("com.sun.xml.internal.bind.namespacePrefixMapper",
+                                       mapper);
+            } else if (marshaller.getClass().getName().contains("com.sun")) {
+                marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper",
+                                       mapper);
+            } else if (marshaller.getClass().getName().contains("eclipse")) {
+                marshaller.setProperty("eclipselink.namespace-prefix-mapper",
+                                       mapper);
+            }
         }
         return mapper;
     }
@@ -1084,6 +1088,7 @@ public final class JAXBUtils {
         String className = "org.apache.cxf.jaxb.NamespaceMapper";
         className += postFix;
         Class<?> cls = helper.findClass(className, JAXBUtils.class);
+        Throwable t = null;
         if (cls == null) {
             try {
                 ClassWriter cw = helper.createClassWriter();
@@ -1092,15 +1097,17 @@ public final class JAXBUtils {
                 }
             } catch (RuntimeException ex) {
                 // continue
+                t = ex;
             }
         }
         if (cls == null
-            && (mcls.getName().contains(".internal.") || mcls.getName().contains("com.sun"))) {
+            && (!mcls.getName().contains(".internal.") && mcls.getName().contains("com.sun"))) {
             try {
                 cls = ClassLoaderUtils.loadClass("org.apache.cxf.common.jaxb.NamespaceMapper", 
                                                  JAXBUtils.class);
-            } catch (ClassNotFoundException ex2) {
+            } catch (Throwable ex2) {
                 // ignore
+                t = ex2;
             }
         }
         if (cls != null) {
@@ -1108,8 +1115,10 @@ public final class JAXBUtils {
                 return cls.getConstructor(Map.class).newInstance(map);
             } catch (Exception e) {
                 // ignore
+                t = e;
             }
         }
+        LOG.log(Level.INFO, "Could not create a NamespaceMapper compatible with Marshaller class " + mcls.getName(), t);
         return null;
     }
     /*
