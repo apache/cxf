@@ -232,12 +232,12 @@ public class OAuthAuthorizationData extends OAuthRedirectionState implements Ser
     }
     public List<String> getPermissionsAsStrings() {
         return permissions != null ? OAuthUtils.convertPermissionsToScopeList(permissions) 
-            : Collections.emptyList();
+            : Collections.<String>emptyList();
     }
     public List<String> getAlreadyAuthorizedPermissionsAsStrings() {
         return alreadyAuthorizedPermissions != null 
             ? OAuthUtils.convertPermissionsToScopeList(alreadyAuthorizedPermissions) 
-            : Collections.emptyList();
+            : Collections.<String>emptyList();
     }
     public List<OAuthPermission> getAllPermissions() {
         List<OAuthPermission> allPerms = new LinkedList<OAuthPermission>();
