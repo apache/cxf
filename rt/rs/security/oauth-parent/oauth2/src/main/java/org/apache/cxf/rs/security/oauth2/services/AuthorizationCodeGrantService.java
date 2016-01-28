@@ -68,12 +68,12 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
                                                              MultivaluedMap<String, String> params,
                                                              String redirectUri,
                                                              UserSubject subject,
-                                                             List<String> requestedScopes,
-                                                             List<OAuthPermission> perms,
+                                                             List<OAuthPermission> requestedPerms,
+                                                             List<OAuthPermission> alreadyAuthorizedPerms,
                                                              boolean authorizationCanBeSkipped) {
         OAuthAuthorizationData data = 
             super.createAuthorizationData(client, params, redirectUri, subject, 
-                                          requestedScopes, perms, authorizationCanBeSkipped);
+                                          requestedPerms, alreadyAuthorizedPerms, authorizationCanBeSkipped);
         setCodeQualifier(data, params);
         return data;
     }
