@@ -123,12 +123,8 @@ public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
         List<OAuthPermission> permissions = new ArrayList<OAuthPermission>();
         for (String requestedScope : requestedScopes) {
             if ("read_book".equals(requestedScope)) {
-<<<<<<< HEAD
                 OAuthPermission permission = new OAuthPermission();
                 permission.setPermission("read_book");
-=======
-                OAuthPermission permission = new OAuthPermission("read_book");
->>>>>>> 39c2acb... Adding names for the permissions
                 permission.setHttpVerbs(Collections.singletonList("GET"));
                 List<String> uris = new ArrayList<String>();
                 String partnerAddress = "/secured/bookstore/books/*";
@@ -137,12 +133,8 @@ public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
                 
                 permissions.add(permission);
             } else if ("create_book".equals(requestedScope)) {
-<<<<<<< HEAD
                 OAuthPermission permission = new OAuthPermission();
                 permission.setPermission("create_book");
-=======
-                OAuthPermission permission = new OAuthPermission("create_book");
->>>>>>> 39c2acb... Adding names for the permissions
                 permission.setHttpVerbs(Collections.singletonList("POST"));
                 List<String> uris = new ArrayList<String>();
                 String partnerAddress = "/secured/bookstore/books/*";
@@ -151,12 +143,8 @@ public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
                 
                 permissions.add(permission);
             } else if ("create_image".equals(requestedScope)) {
-<<<<<<< HEAD
                 OAuthPermission permission = new OAuthPermission();
                 permission.setPermission("create_image");
-=======
-                OAuthPermission permission = new OAuthPermission("create_image");
->>>>>>> 39c2acb... Adding names for the permissions
                 permission.setHttpVerbs(Collections.singletonList("POST"));
                 List<String> uris = new ArrayList<String>();
                 String partnerAddress = "/secured/bookstore/image/*";
@@ -165,12 +153,8 @@ public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
                 
                 permissions.add(permission);
             } else if ("read_balance".equals(requestedScope)) {
-<<<<<<< HEAD
                 OAuthPermission permission = new OAuthPermission();
                 permission.setPermission("read_balance");
-=======
-                OAuthPermission permission = new OAuthPermission("read_balance");
->>>>>>> 39c2acb... Adding names for the permissions
                 permission.setHttpVerbs(Collections.singletonList("GET"));
                 List<String> uris = new ArrayList<String>();
                 String partnerAddress = "/partners/balance/*";
@@ -179,12 +163,8 @@ public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
                 
                 permissions.add(permission);
             } else if ("create_balance".equals(requestedScope)) {
-<<<<<<< HEAD
                 OAuthPermission permission = new OAuthPermission();
                 permission.setPermission("create_balance");
-=======
-                OAuthPermission permission = new OAuthPermission("create_balance");
->>>>>>> 39c2acb... Adding names for the permissions
                 permission.setHttpVerbs(Collections.singletonList("POST"));
                 List<String> uris = new ArrayList<String>();
                 String partnerAddress = "/partners/balance/*";
@@ -193,12 +173,8 @@ public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
                 
                 permissions.add(permission);
             } else if ("read_data".equals(requestedScope)) {
-<<<<<<< HEAD
                 OAuthPermission permission = new OAuthPermission();
                 permission.setPermission("read_data");
-=======
-                OAuthPermission permission = new OAuthPermission("read_data");
->>>>>>> 39c2acb... Adding names for the permissions
                 permission.setHttpVerbs(Collections.singletonList("GET"));
                 List<String> uris = new ArrayList<String>();
                 String partnerAddress = "/partners/data/*";
