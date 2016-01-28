@@ -38,6 +38,7 @@ import javax.wsdl.Definition;
 import javax.wsdl.Service;
 import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLReader;
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
@@ -54,6 +55,8 @@ import org.w3c.dom.Node;
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.BindingFactoryManager;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.ASMHelper;
+import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.databinding.DataReader;
 import org.apache.cxf.databinding.DataWriter;
 import org.apache.cxf.helpers.CastUtils;
@@ -205,31 +208,91 @@ public class JAXBDataBindingTest extends Assert {
         assertTrue(xml, xml.contains("uri:ultima:thule"));
     }
     
-    @Test
-    public void testDeclaredNamespaceMapping() throws Exception {
+    JAXBDataBinding createJaxbContext(boolean internal) throws Exception {
         JAXBDataBinding db = new JAXBDataBinding();
         Map<String, String> nsMap = new HashMap<String, String>();
         nsMap.put("uri:ultima:thule", "greenland");
         db.setNamespaceMap(nsMap);
         Map<String, Object> contextProperties = new HashMap<String, Object>();
-        //contextProperties.put("com.sun.xml.bind.defaultNamespaceRemap", "uri:ultima:thule");
         db.setContextProperties(contextProperties);
         Set<Class<?>> classes = new HashSet<Class<?>>();
         classes.add(QualifiedBean.class);
-        db.setContext(db.createJAXBContext(classes));
-        DataWriter<XMLStreamWriter> writer = db.createWriter(XMLStreamWriter.class);
-        XMLOutputFactory writerFactory = XMLOutputFactory.newInstance();
-        StringWriter stringWriter = new StringWriter();
-        XMLStreamWriter xmlWriter = writerFactory.createXMLStreamWriter(stringWriter);
-        QualifiedBean bean = new QualifiedBean();
-        bean.setAriadne("spider");
-        writer.write(bean, xmlWriter);
-        xmlWriter.flush();
-        String xml = stringWriter.toString();
-        assertTrue(xml, xml.contains("greenland=\"uri:ultima:thule"));
+
+        //have to fastboot to avoid conflicts of generated accessors
+        System.setProperty("com.sun.xml.bind.v2.runtime.JAXBContextImpl.fastBoot", "true");
+        System.setProperty("com.sun.xml.internal.bind.v2.runtime.JAXBContextImpl.fastBoot", "true");        
+        if (internal) {
+            System.setProperty(JAXBContext.JAXB_CONTEXT_FACTORY, "com.sun.xml.internal.bind.v2.ContextFactory");
+            db.setContext(db.createJAXBContext(classes));
+            System.clearProperty(JAXBContext.JAXB_CONTEXT_FACTORY);
+        } else {
+            db.setContext(db.createJAXBContext(classes));
+        }
+        System.clearProperty("com.sun.xml.bind.v2.runtime.JAXBContextImpl.fastBoot");
+        System.clearProperty("com.sun.xml.internal.bind.v2.runtime.JAXBContextImpl.fastBoot");
+        return db;
     }
     
+    void doNamespaceMappingTest(boolean internal, boolean asm) throws Exception {
+        if (internal) {
+            try { 
+                Class.forName("com.sun.xml.internal.bind.v2.ContextFactory");
+            } catch (Throwable t) {
+                //on a JVM (likely IBM's) that doesn't rename the ContextFactory package to include "internal"
+                return;
+            }
+        }
+        try {
+            if (!asm) {
+                ReflectionUtil.setAccessible(ReflectionUtil.getDeclaredField(ASMHelper.class, "badASM"))
+                    .set(null, Boolean.TRUE);
+            }
+            
+            JAXBDataBinding db = createJaxbContext(internal);
+            
+            DataWriter<XMLStreamWriter> writer = db.createWriter(XMLStreamWriter.class);
+            XMLOutputFactory writerFactory = XMLOutputFactory.newInstance();
+            StringWriter stringWriter = new StringWriter();
+            XMLStreamWriter xmlWriter = writerFactory.createXMLStreamWriter(stringWriter);
+            QualifiedBean bean = new QualifiedBean();
+            bean.setAriadne("spider");
+            writer.write(bean, xmlWriter);
+            xmlWriter.flush();
+            String xml = stringWriter.toString();
+            assertTrue("Failed to map namespace " + xml, xml.contains("greenland=\"uri:ultima:thule"));
+        } finally {
+            if (!asm) {
+                ReflectionUtil.setAccessible(ReflectionUtil.getDeclaredField(ASMHelper.class, "badASM"))
+                    .set(null, Boolean.FALSE);
+            }
+        }
+    }
     
+    @Test
+    public void testDeclaredNamespaceMappingRI() throws Exception {
+        doNamespaceMappingTest(false, true);
+    }
+    
+    @Test
+    public void testDeclaredNamespaceMappingInternal() throws Exception {
+        doNamespaceMappingTest(true, true);
+    }
+    @Test
+    public void testDeclaredNamespaceMappingRINoAsm() throws Exception {
+        doNamespaceMappingTest(false, false);
+    }
+    
+    @Test
+    public void testDeclaredNamespaceMappingInternalNoAsm() throws Exception {
+        try {
+            doNamespaceMappingTest(true, false);
+            fail("Internal needs ASM");
+        } catch (AssertionError er) {
+            er.getMessage().contains("Failed to map namespace");
+        }
+    }
+    
+
     @Test
     public void testResursiveType() throws Exception {
         Set<Class<?>> classes = new HashSet<Class<?>>();
