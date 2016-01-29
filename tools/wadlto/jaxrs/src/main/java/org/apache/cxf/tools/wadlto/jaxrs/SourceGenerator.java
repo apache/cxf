@@ -505,7 +505,10 @@ public class SourceGenerator {
         writeImplementsInterface(sbCode, qname.getLocalPart(), info.isInterfaceGenerated());              
         sbCode.append(" {" + getLineSep() + getLineSep());
         
-        writeMethods(rElement, classPackage, imports, sbCode, info, resourceId, isRoot, "");
+        Map<String, Integer> methodNameMap = new HashMap<String, Integer>();
+        writeMethods(rElement, classPackage, imports, sbCode, 
+                     info, resourceId, isRoot, "",
+                     methodNameMap);
         
         sbCode.append("}");
         writeImports(sbImports, imports, classPackage);
@@ -610,14 +613,15 @@ public class SourceGenerator {
                               ContextInfo info,
                               String resourceId,
                               boolean isRoot,
-                              String currentPath) {
+                              String currentPath,
+                              Map<String, Integer> methodNameMap) {
     //CHECKSTYLE:ON    
         List<Element> methodEls = getWadlElements(rElement, "method");
         
         List<Element> currentInheritedParams = inheritResourceParams 
             ? new LinkedList<Element>(info.getInheritedParams()) : Collections.<Element>emptyList();
         for (Element methodEl : methodEls) {
-            writeResourceMethod(methodEl, classPackage, imports, sbCode, info, isRoot, currentPath);    
+            writeResourceMethod(methodEl, classPackage, imports, sbCode, info, isRoot, currentPath, methodNameMap);    
         }
         if (inheritResourceParams && methodEls.isEmpty()) {
             info.getInheritedParams().addAll(getWadlElements(rElement, "param"));
@@ -632,9 +636,9 @@ public class SourceGenerator {
             String newPath = currentPath + path.replace("//", "/");
             String id = childEl.getAttribute("id");
             if (id.length() == 0) {
-                writeMethods(childEl, classPackage, imports, sbCode, info, id, false, newPath);
+                writeMethods(childEl, classPackage, imports, sbCode, info, id, false, newPath, methodNameMap);
             } else {
-                writeResourceMethod(childEl, classPackage, imports, sbCode, info, false, newPath);
+                writeResourceMethod(childEl, classPackage, imports, sbCode, info, false, newPath, methodNameMap);
             }
         }
         info.getInheritedParams().clear();
@@ -678,13 +682,16 @@ public class SourceGenerator {
         }
     }
     
+    //CHECKSTYLE:OFF
     private void writeResourceMethod(Element methodEl,
                                      String classPackage,
                                      Set<String> imports,
                                      StringBuilder sbCode,
                                      ContextInfo info,
                                      boolean isRoot,
-                                     String currentPath) {
+                                     String currentPath,
+                                     Map<String, Integer> methodNameMap) {
+    //CHECKSTYLE:ON    
         StringBuilder sbMethodCode = sbCode;
         StringBuilder sbMethodDocs = null;
         StringBuilder sbMethodRespDocs = null;
@@ -792,7 +799,18 @@ public class SourceGenerator {
                     }
                     genMethodName += firstCharToUpperCase(sb.toString());
                 }
-                sbMethodCode.append(genMethodName.replace("-", ""));
+                genMethodName = genMethodName.replace("-", "");
+                
+                Integer value = methodNameMap.get(genMethodName);
+                if (value == null) {
+                    value = 0;
+                }
+                methodNameMap.put(genMethodName, ++value);
+                if (value > 1) { 
+                    genMethodName = genMethodName + value.toString();
+                }
+                
+                sbMethodCode.append(genMethodName);
             } else {
                 writeSubresourceMethod(resourceEl, imports, sbMethodCode, info, id, suffixName);
             }

@@ -431,26 +431,29 @@ public class JAXRSContainerTest extends ProcessorTestBase {
             
             Class<?> test1 = loader.loadClass("application.Resource");
             Method[] test1Methods = test1.getDeclaredMethods();
-            assertEquals(1, test1Methods.length);
+            assertEquals(2, test1Methods.length);
             assertEquals(2, test1Methods[0].getAnnotations().length);
-            assertNotNull(test1Methods[0].getAnnotation(GET.class));            
-            Path path = test1Methods[0].getAnnotation(Path.class);
-            assertNotNull(path);
-            assertEquals("/get-add-method", path.value());
-            
-            assertEquals("getGetaddmethod", test1Methods[0].getName());
-            Class<?>[] paramTypes = test1Methods[0].getParameterTypes();
-            assertEquals(1, paramTypes.length);
-            Annotation[][] paramAnns = test1Methods[0].getParameterAnnotations();
-            assertEquals(String.class, paramTypes[0]);
-            assertEquals(1, paramAnns[0].length);
-            PathParam test1PathParam1 = (PathParam)paramAnns[0][0];
-            assertEquals("id", test1PathParam1.value());
-            
+            checkComplexPathMethod(test1Methods[0], "");
+            checkComplexPathMethod(test1Methods[1], "2");
         } catch (Exception e) {
             e.printStackTrace();
             fail();
         }
+    }
+    
+    private void checkComplexPathMethod(Method m, String suffix) {
+        assertNotNull(m.getAnnotation(GET.class));            
+        Path path = m.getAnnotation(Path.class);
+        assertNotNull(path);
+        assertEquals("/get-add-method", path.value());
+        assertEquals("getGetaddmethod" + suffix, m.getName());
+        Class<?>[] paramTypes = m.getParameterTypes();
+        assertEquals(1, paramTypes.length);
+        Annotation[][] paramAnns = m.getParameterAnnotations();
+        assertEquals(String.class, paramTypes[0]);
+        assertEquals(1, paramAnns[0].length);
+        PathParam methodPathParam1 = (PathParam)paramAnns[0][0];
+        assertEquals("id", methodPathParam1.value());
     }
     
     @Test    

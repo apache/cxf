@@ -7,6 +7,9 @@
         <method name="GET">
           <response/>
         </method>
+        <method name="GET">
+          <response/>
+        </method>
       </resource>
      </resource>
 	</resources>
