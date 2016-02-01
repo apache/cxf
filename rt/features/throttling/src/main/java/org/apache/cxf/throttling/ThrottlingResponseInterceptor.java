@@ -69,5 +69,9 @@ public class ThrottlingResponseInterceptor extends AbstractPhaseInterceptor<Mess
                 headers.put("Retry-After", Collections.singletonList(retryAfter));
             }
         }
+        ThrottlingCounter tCounter = message.getExchange().get(ThrottlingCounter.class);
+        if (tCounter != null) {
+            tCounter.decrementAndGet();
+        }
     }
 }
