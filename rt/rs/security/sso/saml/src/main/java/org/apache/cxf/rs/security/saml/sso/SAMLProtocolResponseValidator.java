@@ -50,7 +50,6 @@ import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.saml.WSSSAMLKeyInfoProcessor;
 import org.apache.wss4j.dom.validate.Credential;
-import org.apache.wss4j.dom.validate.SamlAssertionValidator;
 import org.apache.wss4j.dom.validate.SignatureTrustValidator;
 import org.apache.wss4j.dom.validate.Validator;
 import org.apache.xml.security.encryption.XMLCipher;
@@ -79,7 +78,6 @@ public class SAMLProtocolResponseValidator {
 
     private static final Logger LOG = LogUtils.getL7dLogger(SAMLProtocolResponseValidator.class);
 
-    private Validator assertionValidator = new SamlAssertionValidator();
     private Validator signatureValidator = new SignatureTrustValidator();
     private boolean keyInfoMustBeAvailable = true;
 
@@ -141,7 +139,7 @@ public class SAMLProtocolResponseValidator {
         // Validate Assertions
         for (org.opensaml.saml2.core.Assertion assertion : samlResponse.getAssertions()) {
             SamlAssertionWrapper wrapper = new SamlAssertionWrapper(assertion);
-            validateAssertion(wrapper, sigCrypto, callbackHandler, doc);
+            validateAssertion(wrapper, sigCrypto, callbackHandler, doc, samlResponse.isSigned());
         }
     }
 
@@ -189,7 +187,8 @@ public class SAMLProtocolResponseValidator {
         for (org.opensaml.saml1.core.Assertion assertion : samlResponse.getAssertions()) {
             SamlAssertionWrapper wrapper = new SamlAssertionWrapper(assertion);
             validateAssertion(
-                wrapper, sigCrypto, callbackHandler, samlResponse.getDOM().getOwnerDocument()
+                wrapper, sigCrypto, callbackHandler, samlResponse.getDOM().getOwnerDocument(),
+                samlResponse.isSigned()
             );
         }
     }
@@ -370,7 +369,8 @@ public class SAMLProtocolResponseValidator {
         SamlAssertionWrapper assertion,
         Crypto sigCrypto,
         CallbackHandler callbackHandler,
-        Document doc
+        Document doc,
+        boolean signedResponse
     ) throws WSSecurityException {
         Credential credential = new Credential();
         credential.setSamlAssertion(assertion);
@@ -424,6 +424,7 @@ public class SAMLProtocolResponseValidator {
 
         // Validate the Assertion & verify trust in the signature
         try {
+            SamlSSOAssertionValidator assertionValidator = new SamlSSOAssertionValidator(signedResponse);
             assertionValidator.validate(credential, requestData);
         } catch (WSSecurityException ex) {
             LOG.log(Level.FINE, "Assertion validation failed: " + ex.getMessage(), ex);
