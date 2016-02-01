@@ -24,7 +24,9 @@ import java.util.logging.Logger;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.continuations.Continuation;
 import org.apache.cxf.continuations.ContinuationProvider;
+import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.interceptor.OutgoingChainInterceptor;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 
@@ -47,6 +49,13 @@ public class ThrottlingInterceptor extends AbstractPhaseInterceptor<Message> {
             return;
         }
         message.getExchange().put(ThrottleResponse.class, rsp);
+        if (rsp.getResponseCode() >= 300) {
+            createOutMessage(message);
+            message.getInterceptorChain().doInterceptStartingAt(message,
+                                                                OutgoingChainInterceptor.class.getName());
+            return;
+        }
+        
         long l = rsp.getDelay();
         if (l > 0) {
             ContinuationProvider cp = message.get(ContinuationProvider.class);
@@ -63,5 +72,14 @@ public class ThrottlingInterceptor extends AbstractPhaseInterceptor<Message> {
             c.suspend(l);
         }
     }
-
+    private Message createOutMessage(Message inMessage) {
+        Endpoint e = inMessage.getExchange().getEndpoint();
+        Message mout = e.getBinding().createMessage();
+        mout.setExchange(inMessage.getExchange());
+        mout.setInterceptorChain(
+             OutgoingChainInterceptor.getOutInterceptorChain(inMessage.getExchange()));
+        inMessage.getExchange().setOutMessage(mout);
+        inMessage.getExchange().put("cxf.io.cacheinput", Boolean.FALSE);
+        return mout;
+    }
 }
