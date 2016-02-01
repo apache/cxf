@@ -109,7 +109,7 @@ public class SAMLSSOResponseValidator {
             }
             validateIssuer(assertion.getIssuer());
             
-            if (!enforceResponseSigned && enforceAssertionsSigned && assertion.getSignature() == null) {
+            if (!samlResponse.isSigned() && enforceAssertionsSigned && assertion.getSignature() == null) {
                 LOG.fine("The enclosed assertions in the SAML Response must be signed");
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
             }
