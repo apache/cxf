@@ -166,18 +166,7 @@ public class JAXRSInvoker extends AbstractInvoker {
         }
         
         
-        Method resourceMethod = cri.getMethodDispatcher().getMethod(ori);
-        
-        Method methodToInvoke = null;
-        if (Proxy.class.isInstance(resourceObject)) {
-            methodToInvoke = cri.getMethodDispatcher().getProxyMethod(resourceMethod);
-            if (methodToInvoke == null) {
-                methodToInvoke = InjectionUtils.checkProxy(resourceMethod, resourceObject);
-                cri.getMethodDispatcher().addProxyMethod(resourceMethod, methodToInvoke);
-            }
-        } else {
-            methodToInvoke = resourceMethod;
-        }
+        Method methodToInvoke = getMethodToInvoke(cri, ori, resourceObject);
         
         List<Object> params = null;
         if (request instanceof List) {
@@ -289,6 +278,22 @@ public class JAXRSInvoker extends AbstractInvoker {
         }
         setResponseContentTypeIfNeeded(inMessage, result);
         return result;
+    }
+
+    protected Method getMethodToInvoke(ClassResourceInfo cri, OperationResourceInfo ori, Object resourceObject) {
+        Method resourceMethod = cri.getMethodDispatcher().getMethod(ori);
+        
+        Method methodToInvoke = null;
+        if (Proxy.class.isInstance(resourceObject)) {
+            methodToInvoke = cri.getMethodDispatcher().getProxyMethod(resourceMethod);
+            if (methodToInvoke == null) {
+                methodToInvoke = InjectionUtils.checkProxy(resourceMethod, resourceObject);
+                cri.getMethodDispatcher().addProxyMethod(resourceMethod, methodToInvoke);
+            }
+        } else {
+            methodToInvoke = resourceMethod;
+        }
+        return methodToInvoke;
     }
     
     private MessageContentsList checkExchangeForResponse(Exchange exchange) {
