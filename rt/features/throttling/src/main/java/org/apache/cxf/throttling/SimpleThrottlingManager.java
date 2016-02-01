@@ -43,9 +43,9 @@ public class SimpleThrottlingManager extends ThrottleResponse implements Throttl
         if (m.containsKey(THROTTLED_KEY)) {
             return null;
         }
-        m.put(ThrottlingCounter.class, counter);
+        m.getExchange().put(ThrottlingCounter.class, counter);
         if (counter.incrementAndGet() >= threshold) {
-            m.getExchange().put(THROTTLED_KEY, true);
+            m.put(THROTTLED_KEY, true);
             return this;
         } else {
             return null;
