@@ -46,9 +46,9 @@ for this demo bundle.
 
   feature:install cxf-rs-description-swagger2
 
-Install this demo bundle
+Install this demo bundle (using the appropriate bundle version number)
 
-  install -s mvn:org.apache.cxf.samples/jax_rs_description_swagger2_osgi
+  install -s mvn:org.apache.cxf.samples/jax_rs_description_swagger2_osgi/3.n.m
 
 You can verify if the CXF JAX-RS Swagger2 Blueprint Demo is installed and started.
 
