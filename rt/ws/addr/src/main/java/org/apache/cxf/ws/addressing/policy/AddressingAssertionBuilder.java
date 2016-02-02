@@ -20,12 +20,14 @@
 package org.apache.cxf.ws.addressing.policy;
 
 import java.util.Map;
+import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
 import org.apache.neethi.Assertion;
@@ -39,6 +41,8 @@ import org.apache.neethi.builders.xml.XMLPrimitiveAssertionBuilder;
  * 
  */
 public class AddressingAssertionBuilder implements AssertionBuilder<Element> {
+    private static final Logger LOG = 
+        LogUtils.getL7dLogger(AddressingAssertionBuilder.class);
 
     private static final QName[] KNOWN_ELEMENTS = {
         MetadataConstants.ADDRESSING_ASSERTION_QNAME,
@@ -80,7 +84,11 @@ public class AddressingAssertionBuilder implements AssertionBuilder<Element> {
                                                   mp,
                                                   policy);
                 }
-            }.build(elem, factory); 
+            }.build(elem, factory);
+            if (!MetadataConstants.ADDRESSING_ASSERTION_QNAME.equals(nap.getName())) {
+                // this happens when neethi fails to recognize the specified addressing policy
+                LOG.warning("Unable to recognize the addressing policy");
+            }
             return nap;
         } else if (MetadataConstants.ANON_RESPONSES_ASSERTION_QNAME.equals(qn)
             || MetadataConstants.ANON_RESPONSES_ASSERTION_QNAME_0705.equals(qn)) {
