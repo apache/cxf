@@ -19,12 +19,12 @@
 
 package org.apache.cxf.sts.operation;
 
+import java.security.Principal;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBElement;
-import javax.xml.ws.WebServiceContext;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -65,19 +65,20 @@ public class TokenValidateOperation extends AbstractOperation implements Validat
    
     public RequestSecurityTokenResponseType validate(
         RequestSecurityTokenType request, 
-        WebServiceContext context
+        Principal principal,
+        Map<String, Object> messageContext
     ) {
         long start = System.currentTimeMillis();
         TokenValidatorParameters validatorParameters = new TokenValidatorParameters();
         
         try {
-            RequestRequirements requestRequirements = parseRequest(request, context);
+            RequestRequirements requestRequirements = parseRequest(request, messageContext);
             
             TokenRequirements tokenRequirements = requestRequirements.getTokenRequirements();
             
             validatorParameters.setStsProperties(stsProperties);
-            validatorParameters.setPrincipal(context.getUserPrincipal());
-            validatorParameters.setMessageContext(context.getMessageContext());
+            validatorParameters.setPrincipal(principal);
+            validatorParameters.setMessageContext(messageContext);
             validatorParameters.setTokenStore(getTokenStore());
             
             //validatorParameters.setKeyRequirements(keyRequirements);
@@ -101,12 +102,12 @@ public class TokenValidateOperation extends AbstractOperation implements Validat
             String realm = null;
             if (stsProperties.getRealmParser() != null) {
                 RealmParser realmParser = stsProperties.getRealmParser();
-                realm = realmParser.parseRealm(context.getMessageContext());
+                realm = realmParser.parseRealm(messageContext);
             }
             validatorParameters.setRealm(realm);
             
             TokenValidatorResponse tokenResponse = validateReceivedToken(
-                    context, realm, tokenRequirements, validateTarget);
+                    principal, messageContext, realm, tokenRequirements, validateTarget);
             
             if (tokenResponse == null) {
                 LOG.fine("No Token Validator has been found that can handle this token");
@@ -123,7 +124,7 @@ public class TokenValidateOperation extends AbstractOperation implements Validat
             if (tokenResponse.getToken().getState() == STATE.VALID 
                 && !STSConstants.STATUS.equals(tokenType)) {
                 TokenProviderParameters providerParameters = 
-                     createTokenProviderParameters(requestRequirements, context);
+                     createTokenProviderParameters(requestRequirements, principal, messageContext);
                 
                 processValidToken(providerParameters, validateTarget, tokenResponse);
                 

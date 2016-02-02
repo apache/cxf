@@ -23,14 +23,13 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
-import javax.xml.ws.WebServiceContext;
-import javax.xml.ws.handler.MessageContext;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -169,9 +168,9 @@ public abstract class AbstractOperation {
      */
     protected RequestRequirements parseRequest(
         RequestSecurityTokenType request,
-        WebServiceContext context
+        Map<String, Object> messageContext
     ) {
-        if (context == null || context.getMessageContext() == null) {
+        if (messageContext == null) {
             throw new STSException("No message context found");
         }
         
@@ -181,7 +180,7 @@ public abstract class AbstractOperation {
         stsProperties.configureProperties();
         
         RequestParser requestParser = new RequestParser();
-        return requestParser.parseRequest(request, context.getMessageContext(), stsProperties, 
+        return requestParser.parseRequest(request, messageContext, stsProperties, 
                                           claimsManager.getClaimParsers());
     }
     
@@ -381,15 +380,16 @@ public abstract class AbstractOperation {
     }
 
     /**
-     * Create a TokenProviderParameters object given a RequestParser and WebServiceContext object
+     * Create a TokenProviderParameters object
      */
     protected TokenProviderParameters createTokenProviderParameters(
-        RequestRequirements requestRequirements, WebServiceContext context
+        RequestRequirements requestRequirements, Principal principal,
+        Map<String, Object> messageContext
     ) {
         TokenProviderParameters providerParameters = new TokenProviderParameters();
         providerParameters.setStsProperties(stsProperties);
-        providerParameters.setPrincipal(context.getUserPrincipal());
-        providerParameters.setMessageContext(context.getMessageContext());
+        providerParameters.setPrincipal(principal);
+        providerParameters.setMessageContext(messageContext);
         providerParameters.setTokenStore(getTokenStore());
         providerParameters.setEncryptToken(encryptIssuedToken);
         
@@ -408,7 +408,7 @@ public abstract class AbstractOperation {
         // Get the realm of the request
         if (stsProperties.getRealmParser() != null) {
             RealmParser realmParser = stsProperties.getRealmParser();
-            String realm = realmParser.parseRealm(context.getMessageContext());
+            String realm = realmParser.parseRealm(messageContext);
             providerParameters.setRealm(realm);
         }
         
@@ -460,7 +460,8 @@ public abstract class AbstractOperation {
     }
     
     protected TokenValidatorResponse validateReceivedToken(
-            WebServiceContext context, String realm,
+            Principal principal,
+            Map<String, Object> messageContext, String realm,
             TokenRequirements tokenRequirements, ReceivedToken token) {
         token.setState(STATE.NONE);
         
@@ -469,8 +470,8 @@ public abstract class AbstractOperation {
         
         TokenValidatorParameters validatorParameters = new TokenValidatorParameters();
         validatorParameters.setStsProperties(stsProperties);
-        validatorParameters.setPrincipal(context.getUserPrincipal());
-        validatorParameters.setMessageContext(context.getMessageContext());
+        validatorParameters.setPrincipal(principal);
+        validatorParameters.setMessageContext(messageContext);
         validatorParameters.setTokenStore(getTokenStore());
         validatorParameters.setKeyRequirements(null);
         validatorParameters.setTokenRequirements(validateRequirements);
@@ -511,13 +512,14 @@ public abstract class AbstractOperation {
     }
     
     protected void performDelegationHandling(
-        RequestRequirements requestRequirements, WebServiceContext context, ReceivedToken token,
+        RequestRequirements requestRequirements, Principal principal,
+        Map<String, Object> messageContext, ReceivedToken token,
         Principal tokenPrincipal, Set<Principal> tokenRoles
     ) {
         TokenDelegationParameters delegationParameters = new TokenDelegationParameters();
         delegationParameters.setStsProperties(stsProperties);
-        delegationParameters.setPrincipal(context.getUserPrincipal());
-        delegationParameters.setMessageContext(context.getMessageContext());
+        delegationParameters.setPrincipal(principal);
+        delegationParameters.setMessageContext(messageContext);
         delegationParameters.setTokenStore(getTokenStore());
         delegationParameters.setTokenPrincipal(tokenPrincipal);
         delegationParameters.setTokenRoles(tokenRoles);
@@ -617,7 +619,7 @@ public abstract class AbstractOperation {
     
     protected static org.apache.xml.security.stax.securityToken.SecurityToken 
     findInboundSecurityToken(SecurityEventConstants.Event event,
-                             MessageContext messageContext) throws XMLSecurityException {
+                             Map<String, Object> messageContext) throws XMLSecurityException {
         @SuppressWarnings("unchecked")
         final List<SecurityEvent> incomingEventList = 
             (List<SecurityEvent>) messageContext.get(SecurityEvent.class.getName() + ".in");

@@ -19,6 +19,9 @@
 
 package org.apache.cxf.ws.security.sts.provider;
 
+import java.security.Principal;
+import java.util.Map;
+
 import javax.annotation.Resource;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPFault;
@@ -88,7 +91,7 @@ public class SecurityTokenServiceImpl implements SecurityTokenService {
         if (validateOperation == null) {
             throwUnsupportedOperation("Validate");
         }
-        return validateOperation.validate(request, context);
+        return validateOperation.validate(request, getPrincipal(), getMessageContext());
     }
 
 
@@ -97,7 +100,7 @@ public class SecurityTokenServiceImpl implements SecurityTokenService {
         if (requestCollectionOperation == null) {
             throwUnsupportedOperation("RequestCollection");
         }
-        return requestCollectionOperation.requestCollection(requestCollection, context);
+        return requestCollectionOperation.requestCollection(requestCollection, getPrincipal(), getMessageContext());
     }
 
     public RequestSecurityTokenResponseType keyExchangeToken(
@@ -105,7 +108,7 @@ public class SecurityTokenServiceImpl implements SecurityTokenService {
         if (keyExchangeTokenOperation == null) {
             throwUnsupportedOperation("KeyExchangeToken");
         }
-        return keyExchangeTokenOperation.keyExchangeToken(request, context);
+        return keyExchangeTokenOperation.keyExchangeToken(request, getPrincipal(), getMessageContext());
     }
 
     public RequestSecurityTokenResponseCollectionType issue(
@@ -113,7 +116,7 @@ public class SecurityTokenServiceImpl implements SecurityTokenService {
         if (issueOperation == null) {
             throwUnsupportedOperation("Issue");
         }
-        return issueOperation.issue(request, context);
+        return issueOperation.issue(request, getPrincipal(), getMessageContext());
     }
     
     public RequestSecurityTokenResponseType issueSingle(
@@ -121,7 +124,7 @@ public class SecurityTokenServiceImpl implements SecurityTokenService {
         if (issueSingleOperation == null) {
             throwUnsupportedOperation("IssueSingle");
         }
-        return issueSingleOperation.issueSingle(request, context);
+        return issueSingleOperation.issueSingle(request, getPrincipal(), getMessageContext());
     }
 
     public RequestSecurityTokenResponseType cancel(
@@ -129,7 +132,7 @@ public class SecurityTokenServiceImpl implements SecurityTokenService {
         if (cancelOperation == null) {
             throwUnsupportedOperation("Cancel");
         }
-        return cancelOperation.cancel(request, context);
+        return cancelOperation.cancel(request, getPrincipal(), getMessageContext());
     }
 
     public RequestSecurityTokenResponseType renew(
@@ -137,9 +140,16 @@ public class SecurityTokenServiceImpl implements SecurityTokenService {
         if (renewOperation == null) {
             throwUnsupportedOperation("Renew");
         }
-        return renewOperation.renew(request, context);
+        return renewOperation.renew(request, getPrincipal(), getMessageContext());
     }
     
+    protected Principal getPrincipal() {
+        return context.getUserPrincipal();
+    }
+    
+    protected Map<String, Object> getMessageContext() {
+        return context.getMessageContext();
+    }
     
     private void throwUnsupportedOperation(String string) {
         try {

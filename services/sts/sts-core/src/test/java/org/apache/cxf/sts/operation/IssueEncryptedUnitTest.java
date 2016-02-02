@@ -29,7 +29,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.jaxws.context.WebServiceContextImpl;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.sts.QNameConstants;
@@ -103,11 +102,10 @@ public class IssueEncryptedUnitTest extends org.junit.Assert {
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
-        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
         
         // Issue a token
         RequestSecurityTokenResponseCollectionType response = 
-            issueOperation.issue(request, webServiceContext);
+            issueOperation.issue(request, null, msgCtx);
         List<RequestSecurityTokenResponseType> securityTokenResponse = 
             response.getRequestSecurityTokenResponse();
         assertTrue(!securityTokenResponse.isEmpty());
@@ -155,11 +153,10 @@ public class IssueEncryptedUnitTest extends org.junit.Assert {
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
-        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
         
         // Issue a token - as no encryption name has been specified the token will not be encrypted
         RequestSecurityTokenResponseCollectionType response = 
-            issueOperation.issue(request, webServiceContext);
+            issueOperation.issue(request, null, msgCtx);
         List<RequestSecurityTokenResponseType> securityTokenResponse = 
             response.getRequestSecurityTokenResponse();
         assertTrue(!securityTokenResponse.isEmpty());
@@ -168,7 +165,7 @@ public class IssueEncryptedUnitTest extends org.junit.Assert {
         service.setEncryptionProperties(encryptionProperties);
         
         // Issue a (encrypted) token
-        response = issueOperation.issue(request, webServiceContext);
+        response = issueOperation.issue(request, null, msgCtx);
         securityTokenResponse = response.getRequestSecurityTokenResponse();
         assertTrue(!securityTokenResponse.isEmpty());
     }
@@ -215,18 +212,17 @@ public class IssueEncryptedUnitTest extends org.junit.Assert {
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
-        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
         
         // Issue a token - this should use a (new) default encryption algorithm as configured
         RequestSecurityTokenResponseCollectionType response = 
-            issueOperation.issue(request, webServiceContext);
+            issueOperation.issue(request, null, msgCtx);
         List<RequestSecurityTokenResponseType> securityTokenResponse = 
             response.getRequestSecurityTokenResponse();
         assertTrue(!securityTokenResponse.isEmpty());
         
         encryptionProperties.setEncryptionAlgorithm(WSConstants.KEYTRANSPORT_RSA15);
         try {
-            issueOperation.issue(request, webServiceContext);
+            issueOperation.issue(request, null, msgCtx);
             fail("Failure expected on a bad encryption algorithm");
         } catch (STSException ex) {
             // expected
@@ -278,11 +274,10 @@ public class IssueEncryptedUnitTest extends org.junit.Assert {
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
-        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
         
         // Issue a token
         RequestSecurityTokenResponseCollectionType response = 
-            issueOperation.issue(request, webServiceContext);
+            issueOperation.issue(request, null, msgCtx);
         List<RequestSecurityTokenResponseType> securityTokenResponse = 
             response.getRequestSecurityTokenResponse();
         assertTrue(!securityTokenResponse.isEmpty());
@@ -297,7 +292,7 @@ public class IssueEncryptedUnitTest extends org.junit.Assert {
             );
         request.getAny().add(encryptionAlgorithmType);
         try {
-            issueOperation.issue(request, webServiceContext);
+            issueOperation.issue(request, null, msgCtx);
             fail("Failure expected on a bad encryption algorithm");
         } catch (STSException ex) {
             // expected
@@ -357,18 +352,17 @@ public class IssueEncryptedUnitTest extends org.junit.Assert {
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
-        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
         
         // Issue a token - this should use a (new) default key-wrap algorithm as configured
         RequestSecurityTokenResponseCollectionType response = 
-            issueOperation.issue(request, webServiceContext);
+            issueOperation.issue(request, null, msgCtx);
         List<RequestSecurityTokenResponseType> securityTokenResponse = 
             response.getRequestSecurityTokenResponse();
         assertTrue(!securityTokenResponse.isEmpty());
         
         encryptionProperties.setKeyWrapAlgorithm(WSConstants.AES_128);
         try {
-            issueOperation.issue(request, webServiceContext);
+            issueOperation.issue(request, null, msgCtx);
             fail("Failure expected on a bad key-wrap algorithm");
         } catch (STSException ex) {
             // expected
@@ -431,11 +425,10 @@ public class IssueEncryptedUnitTest extends org.junit.Assert {
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
-        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
         
         // Issue a token
         RequestSecurityTokenResponseCollectionType response = 
-            issueOperation.issue(request, webServiceContext);
+            issueOperation.issue(request, null, msgCtx);
         List<RequestSecurityTokenResponseType> securityTokenResponse = 
             response.getRequestSecurityTokenResponse();
         assertTrue(!securityTokenResponse.isEmpty());
@@ -451,7 +444,7 @@ public class IssueEncryptedUnitTest extends org.junit.Assert {
             );
         request.getAny().add(encryptionAlgorithmType);
         try {
-            issueOperation.issue(request, webServiceContext);
+            issueOperation.issue(request, null, msgCtx);
             fail("Failure expected on a bad key-wrap algorithm");
         } catch (STSException ex) {
             // expected
@@ -502,27 +495,26 @@ public class IssueEncryptedUnitTest extends org.junit.Assert {
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
-        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
         
         // Issue a token - use various KeyIdentifiers
         RequestSecurityTokenResponseCollectionType response = 
-            issueOperation.issue(request, webServiceContext);
+            issueOperation.issue(request, null, msgCtx);
         List<RequestSecurityTokenResponseType> securityTokenResponse = 
             response.getRequestSecurityTokenResponse();
         assertTrue(!securityTokenResponse.isEmpty());
         
         encryptionProperties.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER);
-        issueOperation.issue(request, webServiceContext);
+        issueOperation.issue(request, null, msgCtx);
         
         encryptionProperties.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
-        issueOperation.issue(request, webServiceContext);
+        issueOperation.issue(request, null, msgCtx);
         
         encryptionProperties.setKeyIdentifierType(WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER);
-        issueOperation.issue(request, webServiceContext);
+        issueOperation.issue(request, null, msgCtx);
         
         try {
             encryptionProperties.setKeyIdentifierType(WSConstants.BST);
-            issueOperation.issue(request, webServiceContext);
+            issueOperation.issue(request, null, msgCtx);
             fail("Failure expected on a bad key identifier");
         } catch (STSException ex) {
             // expected

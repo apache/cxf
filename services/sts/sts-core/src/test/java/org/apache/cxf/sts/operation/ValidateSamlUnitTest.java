@@ -30,7 +30,6 @@ import javax.xml.namespace.QName;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import org.apache.cxf.jaxws.context.WebServiceContextImpl;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.security.SecurityContext;
@@ -117,15 +116,15 @@ public class ValidateSamlUnitTest extends org.junit.Assert {
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
+        Principal principal = new CustomTokenPrincipal("alice");
         msgCtx.put(
             SecurityContext.class.getName(), 
-            createSecurityContext(new CustomTokenPrincipal("alice"))
+            createSecurityContext(principal)
         );
-        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
         
         // Validate a token
         RequestSecurityTokenResponseType response = 
-            validateOperation.validate(request, webServiceContext);
+            validateOperation.validate(request, principal, msgCtx);
         assertTrue(validateResponse(response));
     }
     
@@ -178,15 +177,15 @@ public class ValidateSamlUnitTest extends org.junit.Assert {
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
+        Principal principal = new CustomTokenPrincipal("alice");
         msgCtx.put(
             SecurityContext.class.getName(), 
-            createSecurityContext(new CustomTokenPrincipal("alice"))
+            createSecurityContext(principal)
         );
-        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
         
         // Validate a token
         RequestSecurityTokenResponseType response = 
-            validateOperation.validate(request, webServiceContext);
+            validateOperation.validate(request, principal, msgCtx);
         assertTrue(validateResponse(response));
     }
     

@@ -31,7 +31,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.jaxws.context.WebServiceContextImpl;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.security.SecurityContext;
@@ -120,15 +119,15 @@ public class IssueSCTUnitTest extends org.junit.Assert {
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
+        Principal principal = new CustomTokenPrincipal("alice");
         msgCtx.put(
             SecurityContext.class.getName(), 
-            createSecurityContext(new CustomTokenPrincipal("alice"))
+            createSecurityContext(principal)
         );
-        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
         
         // Issue a token
         RequestSecurityTokenResponseCollectionType response = 
-            issueOperation.issue(request, webServiceContext);
+            issueOperation.issue(request, principal, msgCtx);
         List<RequestSecurityTokenResponseType> securityTokenResponse = 
             response.getRequestSecurityTokenResponse();
         assertTrue(!securityTokenResponse.isEmpty());
@@ -198,15 +197,15 @@ public class IssueSCTUnitTest extends org.junit.Assert {
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
+        Principal principal = new CustomTokenPrincipal("alice");
         msgCtx.put(
             SecurityContext.class.getName(), 
-            createSecurityContext(new CustomTokenPrincipal("alice"))
+            createSecurityContext(principal)
         );
-        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
         
         // Issue a token
         RequestSecurityTokenResponseCollectionType response = 
-            issueOperation.issue(request, webServiceContext);
+            issueOperation.issue(request, principal, msgCtx);
         List<RequestSecurityTokenResponseType> securityTokenResponse = 
             response.getRequestSecurityTokenResponse();
         assertTrue(!securityTokenResponse.isEmpty());
@@ -272,15 +271,15 @@ public class IssueSCTUnitTest extends org.junit.Assert {
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
+        Principal principal = new CustomTokenPrincipal("alice");
         msgCtx.put(
             SecurityContext.class.getName(), 
-            createSecurityContext(new CustomTokenPrincipal("alice"))
+            createSecurityContext(principal)
         );
-        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
         
         // Issue a token
         RequestSecurityTokenResponseCollectionType response = 
-            issueOperation.issue(request, webServiceContext);
+            issueOperation.issue(request, principal, msgCtx);
         List<RequestSecurityTokenResponseType> securityTokenResponse = 
             response.getRequestSecurityTokenResponse();
         assertTrue(!securityTokenResponse.isEmpty());

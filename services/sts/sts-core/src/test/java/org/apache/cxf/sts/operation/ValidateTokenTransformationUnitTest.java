@@ -33,7 +33,6 @@ import javax.xml.namespace.QName;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.jaxws.context.WebServiceContextImpl;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.rt.security.claims.Claim;
@@ -145,15 +144,15 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
+        Principal principal = new CustomTokenPrincipal("alice");
         msgCtx.put(
             SecurityContext.class.getName(), 
-            createSecurityContext(new CustomTokenPrincipal("alice"))
+            createSecurityContext(principal)
         );
-        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
         
         // Validate a token
         RequestSecurityTokenResponseType response = 
-            validateOperation.validate(request, webServiceContext);
+            validateOperation.validate(request, principal, msgCtx);
         assertTrue(validateResponse(response));
         
         // Test the generated token.
@@ -231,23 +230,23 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
+        Principal principal = new CustomTokenPrincipal("alice");
         msgCtx.put(
             SecurityContext.class.getName(), 
-            createSecurityContext(new CustomTokenPrincipal("alice"))
+            createSecurityContext(principal)
         );
         msgCtx.put("url", "https");
-        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
         
         // Validate a token - this will fail as the tokenProvider doesn't understand how to handle
         // realm "B"
         try {
-            validateOperation.validate(request, webServiceContext);
+            validateOperation.validate(request, principal, msgCtx);
         } catch (STSException ex) {
             // expected
         }
         
         samlTokenProvider.setRealmMap(createSamlRealms());
-        RequestSecurityTokenResponseType response = validateOperation.validate(request, webServiceContext);
+        RequestSecurityTokenResponseType response = validateOperation.validate(request, principal, msgCtx);
         assertTrue(validateResponse(response));
         
         // Test the generated token.
@@ -419,11 +418,10 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
         msgCtx.put("url", "https");
-        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
         
-        // run the test
+        // Validate a token
         RequestSecurityTokenResponseType response = 
-            validateOperation.validate(request, webServiceContext);
+            validateOperation.validate(request, null, msgCtx);
         assertTrue(validateResponse(response));
         
         // Test the generated token.
@@ -513,15 +511,15 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
+        Principal principal = new CustomTokenPrincipal("ted");
         msgCtx.put(
             SecurityContext.class.getName(), 
-            createSecurityContext(new CustomTokenPrincipal("ted"))
+            createSecurityContext(principal)
         );
-        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
         
         // Validate a token
         RequestSecurityTokenResponseType response = 
-            validateOperation.validate(request, webServiceContext);
+            validateOperation.validate(request, principal, msgCtx);
         assertTrue(validateResponse(response));
         
         // Test the generated token.
@@ -648,11 +646,10 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
         msgCtx.put("url", "https");
-        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
         
-        // run the test
+        // Validate a token
         RequestSecurityTokenResponseType response = 
-            validateOperation.validate(request, webServiceContext);
+            validateOperation.validate(request, null, msgCtx);
         assertTrue(validateResponse(response));
         
         // Test the generated token.

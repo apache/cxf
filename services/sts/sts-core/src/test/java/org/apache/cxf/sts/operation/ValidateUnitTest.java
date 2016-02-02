@@ -24,7 +24,6 @@ import java.util.List;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
-import org.apache.cxf.jaxws.context.WebServiceContextImpl;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.sts.QNameConstants;
@@ -85,11 +84,10 @@ public class ValidateUnitTest extends org.junit.Assert {
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
-        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
         
         // Validate a token
         RequestSecurityTokenResponseType response = 
-            validateOperation.validate(request, webServiceContext);
+            validateOperation.validate(request, null, msgCtx);
         assertTrue(validateResponse(response));
     }
     
@@ -150,11 +148,10 @@ public class ValidateUnitTest extends org.junit.Assert {
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
-        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
         
         // Validate a token
         RequestSecurityTokenResponseCollectionType response = 
-            requestCollectionOperation.requestCollection(requestCollection, webServiceContext);
+            requestCollectionOperation.requestCollection(requestCollection, null, msgCtx);
         List<RequestSecurityTokenResponseType> securityTokenResponse = 
             response.getRequestSecurityTokenResponse();
         assertEquals(securityTokenResponse.size(), 2);
@@ -189,11 +186,10 @@ public class ValidateUnitTest extends org.junit.Assert {
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
-        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
         
         // Validate a token
         try {
-            validateOperation.validate(request, webServiceContext);
+            validateOperation.validate(request, null, msgCtx);
             fail("Failure expected when no element is presented for validation");
         } catch (STSException ex) {
             // expected
@@ -235,11 +231,10 @@ public class ValidateUnitTest extends org.junit.Assert {
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
-        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
         
         // Validate a token - failure expected on an unknown token type
         try {
-            validateOperation.validate(request, webServiceContext);
+            validateOperation.validate(request, null, msgCtx);
             fail("Failure expected on an unknown token type");
         } catch (STSException ex) {
             // expected
@@ -248,7 +243,7 @@ public class ValidateUnitTest extends org.junit.Assert {
         // Validate a token - no token type is sent, so it defaults to status
         request.getAny().remove(0);
         RequestSecurityTokenResponseType response = 
-            validateOperation.validate(request, webServiceContext);
+            validateOperation.validate(request, null, msgCtx);
         assertTrue(validateResponse(response));
     }
     
@@ -290,11 +285,10 @@ public class ValidateUnitTest extends org.junit.Assert {
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
-        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
         
         // Validate a token
         RequestSecurityTokenResponseType response = 
-            validateOperation.validate(request, webServiceContext);
+            validateOperation.validate(request, null, msgCtx);
         assertTrue(validateResponse(response));
         assertTrue("AuthenticationContext".equals(response.getContext()));
     }

@@ -34,7 +34,6 @@ import javax.xml.namespace.QName;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.jaxws.context.WebServiceContextImpl;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactConsumer;
@@ -131,10 +130,11 @@ public class IssueJWTClaimsUnitTest extends org.junit.Assert {
         request.getAny().add(secondaryParameters);
         request.getAny().add(createAppliesToElement("http://dummy-service.com/dummy"));
         
-        WebServiceContextImpl webServiceContext = setupMessageContext();
+        Map<String, Object> messageContext = setupMessageContext();
         
         List<RequestSecurityTokenResponseType> securityTokenResponse = issueToken(issueOperation, request,
-                webServiceContext);
+                                                                                  new CustomTokenPrincipal("alice"),
+                                                                                  messageContext);
         
         // Test the generated token.
         Element token = null;
@@ -165,9 +165,9 @@ public class IssueJWTClaimsUnitTest extends org.junit.Assert {
      * @return
      */
     private List<RequestSecurityTokenResponseType> issueToken(TokenIssueOperation issueOperation,
-            RequestSecurityTokenType request, WebServiceContextImpl webServiceContext) {
+            RequestSecurityTokenType request, Principal principal, Map<String, Object> msgCtx) {
         RequestSecurityTokenResponseCollectionType response = 
-            issueOperation.issue(request, webServiceContext);
+            issueOperation.issue(request, principal, msgCtx);
         List<RequestSecurityTokenResponseType> securityTokenResponse = 
             response.getRequestSecurityTokenResponse();
         assertTrue(!securityTokenResponse.isEmpty());
@@ -177,14 +177,14 @@ public class IssueJWTClaimsUnitTest extends org.junit.Assert {
     /**
      * @return
      */
-    private WebServiceContextImpl setupMessageContext() {
+    private Map<String, Object> setupMessageContext() {
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
         msgCtx.put(
             SecurityContext.class.getName(), 
             createSecurityContext(new CustomTokenPrincipal("alice"))
         );
-        return new WebServiceContextImpl(msgCtx);
+        return msgCtx;
     }
 
     /**
@@ -258,10 +258,11 @@ public class IssueJWTClaimsUnitTest extends org.junit.Assert {
         
         request.getAny().add(createAppliesToElement("http://dummy-service.com/dummy"));
         
-        WebServiceContextImpl webServiceContext = setupMessageContext();
+        Map<String, Object> messageContext = setupMessageContext();
         
         List<RequestSecurityTokenResponseType> securityTokenResponse = issueToken(issueOperation, request,
-                webServiceContext);
+                                                                                  new CustomTokenPrincipal("alice"),
+                                                                                  messageContext);
         
         // Test the generated token.
         Element token = null;
@@ -384,10 +385,9 @@ public class IssueJWTClaimsUnitTest extends org.junit.Assert {
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
         msgCtx.put("url", "https");
-        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
         
         List<RequestSecurityTokenResponseType> securityTokenResponseList = issueToken(issueOperation,
-                request, webServiceContext);       
+                request, new CustomTokenPrincipal("alice"), msgCtx);       
         
         // Test the generated token.
         Element token = null;
@@ -537,10 +537,9 @@ public class IssueJWTClaimsUnitTest extends org.junit.Assert {
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
         msgCtx.put("url", "https");
-        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
         
         List<RequestSecurityTokenResponseType> securityTokenResponseList = issueToken(issueOperation,
-                request, webServiceContext);       
+                request, new CustomTokenPrincipal("alice"), msgCtx);       
         
         // Test the generated token.
         Element token = null;
