@@ -101,7 +101,7 @@ public class TokenValidateOperation extends AbstractOperation implements Validat
             String realm = null;
             if (stsProperties.getRealmParser() != null) {
                 RealmParser realmParser = stsProperties.getRealmParser();
-                realm = realmParser.parseRealm(context);
+                realm = realmParser.parseRealm(context.getMessageContext());
             }
             validatorParameters.setRealm(realm);
             

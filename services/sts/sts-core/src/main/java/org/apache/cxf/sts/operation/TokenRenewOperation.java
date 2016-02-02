@@ -105,7 +105,7 @@ public class TokenRenewOperation extends AbstractOperation implements RenewOpera
             String realm = null;
             if (stsProperties.getRealmParser() != null) {
                 RealmParser realmParser = stsProperties.getRealmParser();
-                realm = realmParser.parseRealm(context);
+                realm = realmParser.parseRealm(context.getMessageContext());
             }
             renewerParameters.setRealm(realm);
             

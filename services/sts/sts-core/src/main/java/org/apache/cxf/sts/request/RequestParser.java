@@ -30,6 +30,7 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -40,8 +41,6 @@ import javax.xml.crypto.dsig.keyinfo.KeyInfo;
 import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
 import javax.xml.crypto.dsig.keyinfo.KeyValue;
 import javax.xml.crypto.dsig.keyinfo.X509Data;
-import javax.xml.ws.WebServiceContext;
-import javax.xml.ws.handler.MessageContext;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -97,7 +96,7 @@ public class RequestParser {
     private static final Logger LOG = LogUtils.getL7dLogger(RequestParser.class);
     
     public RequestRequirements parseRequest(
-        RequestSecurityTokenType request, WebServiceContext wsContext, STSPropertiesMBean stsProperties, 
+        RequestSecurityTokenType request, Map<String, Object> messageContext, STSPropertiesMBean stsProperties, 
         List<ClaimsParser> claimsParsers
     ) throws STSException {
         LOG.fine("Parsing RequestSecurityToken");
@@ -114,9 +113,9 @@ public class RequestParser {
                 }
                 try {
                     boolean found = 
-                        parseTokenRequirements(jaxbElement, tokenRequirements, wsContext, claimsParsers);
+                        parseTokenRequirements(jaxbElement, tokenRequirements, messageContext, claimsParsers);
                     if (!found) {
-                        found = parseKeyRequirements(jaxbElement, keyRequirements, wsContext, stsProperties);
+                        found = parseKeyRequirements(jaxbElement, keyRequirements, messageContext, stsProperties);
                     }
                     if (!found) {
                         LOG.log(
@@ -180,7 +179,7 @@ public class RequestParser {
      */
     private static boolean parseKeyRequirements(
         JAXBElement<?> jaxbElement, KeyRequirements keyRequirements, 
-        WebServiceContext wsContext, STSPropertiesMBean stsProperties
+        Map<String, Object> messageContext, STSPropertiesMBean stsProperties
     ) {
         if (QNameConstants.AUTHENTICATION_TYPE.equals(jaxbElement.getName())) {
             String authenticationType = (String)jaxbElement.getValue();
@@ -208,7 +207,7 @@ public class RequestParser {
             keyRequirements.setKeywrapAlgorithm(keywrapAlgorithm);
         } else if (QNameConstants.USE_KEY.equals(jaxbElement.getName())) {
             UseKeyType useKey = (UseKeyType)jaxbElement.getValue();
-            ReceivedKey receivedKey = parseUseKey(useKey, wsContext);
+            ReceivedKey receivedKey = parseUseKey(useKey, messageContext);
             keyRequirements.setReceivedKey(receivedKey);
         } else if (QNameConstants.ENTROPY.equals(jaxbElement.getName())) {
             EntropyType entropyType = (EntropyType)jaxbElement.getValue();
@@ -234,7 +233,7 @@ public class RequestParser {
     private static boolean parseTokenRequirements(
         JAXBElement<?> jaxbElement, 
         TokenRequirements tokenRequirements,
-        WebServiceContext wsContext,
+        Map<String, Object> messageContext,
         List<ClaimsParser> claimsParsers
     ) {
         if (QNameConstants.TOKEN_TYPE.equals(jaxbElement.getName())) {
@@ -262,7 +261,7 @@ public class RequestParser {
             ValidateTargetType validateTargetType = (ValidateTargetType)jaxbElement.getValue();
             ReceivedToken validateTarget = new ReceivedToken(validateTargetType.getAny());
             if (isTokenReferenced(validateTarget.getToken())) {
-                Element target = fetchTokenElementFromReference(validateTarget.getToken(), wsContext);
+                Element target = fetchTokenElementFromReference(validateTarget.getToken(), messageContext);
                 validateTarget = new ReceivedToken(target);
             }  
             tokenRequirements.setValidateTarget(validateTarget);
@@ -270,7 +269,7 @@ public class RequestParser {
             CancelTargetType cancelTargetType = (CancelTargetType)jaxbElement.getValue();
             ReceivedToken cancelTarget = new ReceivedToken(cancelTargetType.getAny());
             if (isTokenReferenced(cancelTarget.getToken())) {
-                Element target = fetchTokenElementFromReference(cancelTarget.getToken(), wsContext);
+                Element target = fetchTokenElementFromReference(cancelTarget.getToken(), messageContext);
                 cancelTarget = new ReceivedToken(target);
             }          
             tokenRequirements.setCancelTarget(cancelTarget);
@@ -278,7 +277,7 @@ public class RequestParser {
             RenewTargetType renewTargetType = (RenewTargetType)jaxbElement.getValue();
             ReceivedToken renewTarget = new ReceivedToken(renewTargetType.getAny());
             if (isTokenReferenced(renewTarget.getToken())) {
-                Element target = fetchTokenElementFromReference(renewTarget.getToken(), wsContext);
+                Element target = fetchTokenElementFromReference(renewTarget.getToken(), messageContext);
                 renewTarget = new ReceivedToken(target);
             }          
             tokenRequirements.setRenewTarget(renewTarget);
@@ -310,13 +309,13 @@ public class RequestParser {
     /**
      * Parse the UseKey structure to get a ReceivedKey containing a cert/public-key/secret-key.
      * @param useKey The UseKey object
-     * @param wsContext The WebServiceContext object
+     * @param messageContext The message context object
      * @return the ReceivedKey that has been parsed
      * @throws STSException
      */
     private static ReceivedKey parseUseKey(
         UseKeyType useKey, 
-        WebServiceContext wsContext
+        Map<String, Object> messageContext
     ) throws STSException {
         byte[] x509 = null;
         if (useKey.getAny() instanceof JAXBElement<?>) {
@@ -343,7 +342,7 @@ public class RequestParser {
                 || obj instanceof SecurityTokenReferenceType) {
                 SecurityTokenReferenceType strType = 
                     SecurityTokenReferenceType.class.cast(useKeyJaxb.getValue());
-                Element token = fetchTokenElementFromReference(strType, wsContext);
+                Element token = fetchTokenElementFromReference(strType, messageContext);
                 try {
                     x509 = Base64Utility.decode(token.getTextContent().trim());
                     LOG.fine("Found X509Certificate UseKey type via reference");
@@ -354,7 +353,7 @@ public class RequestParser {
             }
         } else if (useKey.getAny() instanceof Element) {
             if (isTokenReferenced(useKey.getAny())) {
-                Element token = fetchTokenElementFromReference(useKey.getAny(), wsContext);
+                Element token = fetchTokenElementFromReference(useKey.getAny(), messageContext);
                 try {
                     x509 = Base64Utility.decode(token.getTextContent().trim());
                     LOG.fine("Found X509Certificate UseKey type via reference");
@@ -685,7 +684,7 @@ public class RequestParser {
      * Method to fetch token from the SecurityTokenReference
      */
     private static Element fetchTokenElementFromReference(
-        Object targetToken, WebServiceContext wsContext
+        Object targetToken, Map<String, Object> messageContext
     ) {
         // Get the reference URI
         String referenceURI = null;
@@ -723,7 +722,6 @@ public class RequestParser {
         // Find processed token corresponding to the URI
         referenceURI = XMLUtils.getIDFromReference(referenceURI);
 
-        MessageContext messageContext = wsContext.getMessageContext();
         final List<WSHandlerResult> handlerResults = 
             CastUtils.cast((List<?>) messageContext.get(WSHandlerConstants.RECV_RESULTS));
         
