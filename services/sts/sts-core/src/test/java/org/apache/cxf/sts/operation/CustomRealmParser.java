@@ -18,8 +18,7 @@
  */
 package org.apache.cxf.sts.operation;
 
-import javax.xml.ws.WebServiceContext;
-import javax.xml.ws.handler.MessageContext;
+import java.util.Map;
 
 import org.apache.cxf.sts.RealmParser;
 import org.apache.cxf.ws.security.sts.provider.STSException;
@@ -29,8 +28,7 @@ import org.apache.cxf.ws.security.sts.provider.STSException;
  */
 public class CustomRealmParser implements RealmParser {
 
-    public String parseRealm(WebServiceContext context) throws STSException {
-        MessageContext messageContext = context.getMessageContext();
+    public String parseRealm(Map<String, Object> messageContext) throws STSException {
         String endpoint = (String)messageContext.get("url");
         if (endpoint.contains("ldap")) {
             return "A";

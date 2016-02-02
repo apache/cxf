@@ -181,7 +181,8 @@ public abstract class AbstractOperation {
         stsProperties.configureProperties();
         
         RequestParser requestParser = new RequestParser();
-        return requestParser.parseRequest(request, context, stsProperties, claimsManager.getClaimParsers());
+        return requestParser.parseRequest(request, context.getMessageContext(), stsProperties, 
+                                          claimsManager.getClaimParsers());
     }
     
     /**
@@ -407,7 +408,7 @@ public abstract class AbstractOperation {
         // Get the realm of the request
         if (stsProperties.getRealmParser() != null) {
             RealmParser realmParser = stsProperties.getRealmParser();
-            String realm = realmParser.parseRealm(context);
+            String realm = realmParser.parseRealm(context.getMessageContext());
             providerParameters.setRealm(realm);
         }
         

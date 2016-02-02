@@ -18,9 +18,8 @@
  */
 package org.apache.cxf.systest.sts.common;
 
+import java.util.Map;
 import java.util.StringTokenizer;
-
-import javax.xml.ws.WebServiceContext;
 
 import org.apache.cxf.sts.RealmParser;
 import org.apache.cxf.ws.security.sts.provider.STSException;
@@ -28,12 +27,12 @@ import org.apache.cxf.ws.security.sts.provider.STSException;
 public class UriRealmParser implements RealmParser {
 
     @Override
-    public String parseRealm(WebServiceContext context) throws STSException {
+    public String parseRealm(Map<String, Object> messageContext) throws STSException {
         
 
         String realm = null;
         try {
-            String url = (String)context.getMessageContext().get("org.apache.cxf.request.url");
+            String url = (String)messageContext.get("org.apache.cxf.request.url");
             
             StringTokenizer st = new StringTokenizer(url, "/");
             

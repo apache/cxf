@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.systest.sts.realms;
 
-import javax.xml.ws.WebServiceContext;
+import java.util.Map;
 
 import org.apache.cxf.sts.RealmParser;
 import org.apache.cxf.ws.security.sts.provider.STSException;
@@ -29,8 +29,8 @@ import org.apache.cxf.ws.security.sts.provider.STSException;
  */
 public class URLRealmParser implements RealmParser {
 
-    public String parseRealm(WebServiceContext context) throws STSException {
-        String url = (String)context.getMessageContext().get("org.apache.cxf.request.url");
+    public String parseRealm(Map<String, Object> messageContext) throws STSException {
+        String url = (String)messageContext.get("org.apache.cxf.request.url");
         if (url.contains("realmA")) {
             return "A";
         } else if (url.contains("realmB")) {
