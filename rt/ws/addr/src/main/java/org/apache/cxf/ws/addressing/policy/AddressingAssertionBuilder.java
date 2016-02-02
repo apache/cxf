@@ -85,8 +85,8 @@ public class AddressingAssertionBuilder implements AssertionBuilder<Element> {
                                                   policy);
                 }
             }.build(elem, factory);
-            if (!MetadataConstants.ADDRESSING_ASSERTION_QNAME.equals(nap.getName())) {
-                // this happens when neethi fails to recognize the specified addressing policy
+            if (!(nap instanceof PolicyContainingPrimitiveAssertion || nap instanceof PrimitiveAssertion)) {
+                // this happens when neethi fails to recognize the specified addressing policy element
                 LOG.warning("Unable to recognize the addressing policy");
             }
             return nap;
