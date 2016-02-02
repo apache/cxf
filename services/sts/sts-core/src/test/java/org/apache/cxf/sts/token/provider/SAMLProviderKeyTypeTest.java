@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Properties;
 
 import org.w3c.dom.Element;
-import org.apache.cxf.jaxws.context.WebServiceContextImpl;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.sts.STSConstants;
@@ -619,8 +618,7 @@ public class SAMLProviderKeyTypeTest extends org.junit.Assert {
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
-        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
-        parameters.setWebServiceContext(webServiceContext);
+        parameters.setMessageContext(msgCtx);
         
         parameters.setAppliesToAddress("http://dummy-service.com/dummy");
         
@@ -657,8 +655,7 @@ public class SAMLProviderKeyTypeTest extends org.junit.Assert {
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
-        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
-        parameters.setWebServiceContext(webServiceContext);
+        parameters.setMessageContext(msgCtx);
 
         parameters.setAppliesToAddress("http://dummy-service.com/dummy");
 

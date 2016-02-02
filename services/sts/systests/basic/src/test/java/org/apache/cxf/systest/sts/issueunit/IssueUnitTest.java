@@ -34,7 +34,6 @@ import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
-import org.apache.cxf.jaxws.context.WebServiceContextImpl;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.sts.STSConstants;
@@ -593,8 +592,7 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
-        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
-        parameters.setWebServiceContext(webServiceContext);
+        parameters.setMessageContext(msgCtx);
 
         parameters.setAppliesToAddress(
             "https://localhost:" + STSPORT + "/SecurityTokenService/b-issuer/Transport");

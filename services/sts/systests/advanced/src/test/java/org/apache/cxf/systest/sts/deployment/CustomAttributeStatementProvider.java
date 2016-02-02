@@ -54,7 +54,7 @@ public class CustomAttributeStatementProvider implements AttributeStatementProvi
             params.setStsProperties(providerParameters.getStsProperties());
             params.setTokenRequirements(providerParameters.getTokenRequirements());
             params.setTokenStore(providerParameters.getTokenStore());
-            params.setWebServiceContext(providerParameters.getWebServiceContext());
+            params.setMessageContext(providerParameters.getMessageContext());
             retrievedClaims = 
                 claimsManager.retrieveClaimValues(
                     providerParameters.getRequestedPrimaryClaims(),

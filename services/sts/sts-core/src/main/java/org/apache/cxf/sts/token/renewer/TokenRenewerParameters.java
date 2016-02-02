@@ -22,8 +22,6 @@ package org.apache.cxf.sts.token.renewer;
 import java.security.Principal;
 import java.util.Map;
 
-import javax.xml.ws.WebServiceContext;
-
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.ReceivedToken;
@@ -41,7 +39,7 @@ public class TokenRenewerParameters {
     private STSPropertiesMBean stsProperties;
     private EncryptionProperties encryptionProperties;
     private Principal principal;
-    private WebServiceContext webServiceContext;
+    private Map<String, Object> messageContext;
     private KeyRequirements keyRequirements;
     private TokenRequirements tokenRequirements;
     private String appliesToAddress;
@@ -107,14 +105,6 @@ public class TokenRenewerParameters {
         this.encryptionProperties = encryptionProperties;
     }
     
-    public WebServiceContext getWebServiceContext() {
-        return webServiceContext;
-    }
-
-    public void setWebServiceContext(WebServiceContext webServiceContext) {
-        this.webServiceContext = webServiceContext;
-    }
-    
     public void setPrincipal(Principal principal) {
         this.principal = principal;
     }
@@ -137,6 +127,14 @@ public class TokenRenewerParameters {
     
     public String getRealm() {
         return realm;
+    }
+
+    public Map<String, Object> getMessageContext() {
+        return messageContext;
+    }
+
+    public void setMessageContext(Map<String, Object> messageContext) {
+        this.messageContext = messageContext;
     }
     
 }

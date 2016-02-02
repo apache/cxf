@@ -22,14 +22,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.security.auth.callback.CallbackHandler;
-import javax.xml.ws.WebServiceContext;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.apache.cxf.jaxws.context.WebServiceContextImpl;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.sts.STSConstants;
@@ -114,7 +113,7 @@ public class SAMLTokenRenewerPOPTest extends org.junit.Assert {
         renewerParameters.setAppliesToAddress("http://dummy-service.com/dummy");
         renewerParameters.setStsProperties(validatorParameters.getStsProperties());
         renewerParameters.setPrincipal(new CustomTokenPrincipal("alice"));
-        renewerParameters.setWebServiceContext(validatorParameters.getWebServiceContext());
+        renewerParameters.setMessageContext(validatorParameters.getMessageContext());
         renewerParameters.setKeyRequirements(validatorParameters.getKeyRequirements());
         renewerParameters.setTokenRequirements(validatorParameters.getTokenRequirements());
         renewerParameters.setTokenStore(validatorParameters.getTokenStore());
@@ -145,8 +144,8 @@ public class SAMLTokenRenewerPOPTest extends org.junit.Assert {
                                 Collections.singletonMap(WSConstants.SIGN, signedResults));
         handlerResults.add(handlerResult);
         
-        WebServiceContext context = validatorParameters.getWebServiceContext();
-        context.getMessageContext().put(WSHandlerConstants.RECV_RESULTS, handlerResults);
+        Map<String, Object> messageContext = validatorParameters.getMessageContext();
+        messageContext.put(WSHandlerConstants.RECV_RESULTS, handlerResults);
 
         // Now successfully renew the token
         TokenRenewerResponse renewerResponse = 
@@ -191,7 +190,7 @@ public class SAMLTokenRenewerPOPTest extends org.junit.Assert {
         renewerParameters.setAppliesToAddress("http://dummy-service.com/dummy");
         renewerParameters.setStsProperties(validatorParameters.getStsProperties());
         renewerParameters.setPrincipal(new CustomTokenPrincipal("alice"));
-        renewerParameters.setWebServiceContext(validatorParameters.getWebServiceContext());
+        renewerParameters.setMessageContext(validatorParameters.getMessageContext());
         renewerParameters.setKeyRequirements(validatorParameters.getKeyRequirements());
         renewerParameters.setTokenRequirements(validatorParameters.getTokenRequirements());
         renewerParameters.setTokenStore(validatorParameters.getTokenStore());
@@ -222,8 +221,8 @@ public class SAMLTokenRenewerPOPTest extends org.junit.Assert {
                                 Collections.singletonMap(WSConstants.SIGN, signedResults));
         handlerResults.add(handlerResult);
         
-        WebServiceContext context = validatorParameters.getWebServiceContext();
-        context.getMessageContext().put(WSHandlerConstants.RECV_RESULTS, handlerResults);
+        Map<String, Object> messageContext = validatorParameters.getMessageContext();
+        messageContext.put(WSHandlerConstants.RECV_RESULTS, handlerResults);
 
         try {
             samlTokenRenewer.renewToken(renewerParameters);
@@ -247,8 +246,7 @@ public class SAMLTokenRenewerPOPTest extends org.junit.Assert {
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
-        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
-        parameters.setWebServiceContext(webServiceContext);
+        parameters.setMessageContext(msgCtx);
         
         // Add STSProperties object
         StaticSTSProperties stsProperties = new StaticSTSProperties();
@@ -327,8 +325,7 @@ public class SAMLTokenRenewerPOPTest extends org.junit.Assert {
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
-        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
-        parameters.setWebServiceContext(webServiceContext);
+        parameters.setMessageContext(msgCtx);
 
         parameters.setAppliesToAddress("http://dummy-service.com/dummy");
 

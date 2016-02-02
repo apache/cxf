@@ -22,8 +22,6 @@ package org.apache.cxf.sts.token.provider;
 import java.security.Principal;
 import java.util.Map;
 
-import javax.xml.ws.WebServiceContext;
-
 import org.apache.cxf.rt.security.claims.ClaimCollection;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.claims.ClaimsManager;
@@ -42,7 +40,7 @@ public class TokenProviderParameters {
     private STSPropertiesMBean stsProperties;
     private EncryptionProperties encryptionProperties;
     private Principal principal;
-    private WebServiceContext webServiceContext;
+    private Map<String, Object> messageContext;
     private ClaimCollection requestedPrimaryClaims;
     private ClaimCollection requestedSecondaryClaims;
     private KeyRequirements keyRequirements;
@@ -110,14 +108,6 @@ public class TokenProviderParameters {
         this.encryptionProperties = encryptionProperties;
     }
     
-    public WebServiceContext getWebServiceContext() {
-        return webServiceContext;
-    }
-
-    public void setWebServiceContext(WebServiceContext webServiceContext) {
-        this.webServiceContext = webServiceContext;
-    }
-    
     public void setPrincipal(Principal principal) {
         this.principal = principal;
     }
@@ -164,6 +154,14 @@ public class TokenProviderParameters {
 
     public void setEncryptToken(boolean encryptToken) {
         this.encryptToken = encryptToken;
+    }
+
+    public Map<String, Object> getMessageContext() {
+        return messageContext;
+    }
+
+    public void setMessageContext(Map<String, Object> messageContext) {
+        this.messageContext = messageContext;
     }
     
 }

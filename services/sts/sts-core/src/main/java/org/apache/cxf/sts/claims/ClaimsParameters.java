@@ -24,8 +24,6 @@ import java.security.Principal;
 import java.util.Map;
 import java.util.Set;
 
-import javax.xml.ws.WebServiceContext;
-
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.TokenRequirements;
@@ -43,7 +41,7 @@ public class ClaimsParameters {
     private EncryptionProperties encryptionProperties;
     private Principal principal;
     private Set<Principal> roles;
-    private WebServiceContext webServiceContext;
+    private Map<String, Object> messageContext;
     private KeyRequirements keyRequirements;
     private TokenRequirements tokenRequirements;
     private String appliesToAddress;
@@ -99,14 +97,6 @@ public class ClaimsParameters {
         this.encryptionProperties = encryptionProperties;
     }
     
-    public WebServiceContext getWebServiceContext() {
-        return webServiceContext;
-    }
-
-    public void setWebServiceContext(WebServiceContext webServiceContext) {
-        this.webServiceContext = webServiceContext;
-    }
-    
     public void setPrincipal(Principal principal) {
         this.principal = principal;
     }
@@ -137,6 +127,14 @@ public class ClaimsParameters {
     
     public String getRealm() {
         return realm;
+    }
+
+    public Map<String, Object> getMessageContext() {
+        return messageContext;
+    }
+
+    public void setMessageContext(Map<String, Object> messageContext) {
+        this.messageContext = messageContext;
     }
     
 }

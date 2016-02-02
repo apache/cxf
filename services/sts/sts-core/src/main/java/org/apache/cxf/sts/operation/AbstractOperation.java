@@ -388,7 +388,7 @@ public abstract class AbstractOperation {
         TokenProviderParameters providerParameters = new TokenProviderParameters();
         providerParameters.setStsProperties(stsProperties);
         providerParameters.setPrincipal(context.getUserPrincipal());
-        providerParameters.setWebServiceContext(context);
+        providerParameters.setMessageContext(context.getMessageContext());
         providerParameters.setTokenStore(getTokenStore());
         providerParameters.setEncryptToken(encryptIssuedToken);
         
@@ -469,7 +469,7 @@ public abstract class AbstractOperation {
         TokenValidatorParameters validatorParameters = new TokenValidatorParameters();
         validatorParameters.setStsProperties(stsProperties);
         validatorParameters.setPrincipal(context.getUserPrincipal());
-        validatorParameters.setWebServiceContext(context);
+        validatorParameters.setMessageContext(context.getMessageContext());
         validatorParameters.setTokenStore(getTokenStore());
         validatorParameters.setKeyRequirements(null);
         validatorParameters.setTokenRequirements(validateRequirements);
@@ -516,7 +516,7 @@ public abstract class AbstractOperation {
         TokenDelegationParameters delegationParameters = new TokenDelegationParameters();
         delegationParameters.setStsProperties(stsProperties);
         delegationParameters.setPrincipal(context.getUserPrincipal());
-        delegationParameters.setWebServiceContext(context);
+        delegationParameters.setMessageContext(context.getMessageContext());
         delegationParameters.setTokenStore(getTokenStore());
         delegationParameters.setTokenPrincipal(tokenPrincipal);
         delegationParameters.setTokenRoles(tokenRoles);

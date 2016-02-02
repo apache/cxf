@@ -180,7 +180,7 @@ public class SCTProvider implements TokenProvider {
                                                         tokenParameters.getStsProperties(), 
                                                         tokenParameters.getEncryptionProperties(), 
                                                         tokenParameters.getKeyRequirements(),
-                                                        tokenParameters.getWebServiceContext());
+                                                        tokenParameters.getMessageContext());
                 response.setToken(el);
             } else {
                 response.setToken(sct.getElement());

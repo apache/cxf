@@ -31,7 +31,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.security.auth.callback.CallbackHandler;
-import javax.xml.ws.handler.MessageContext;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -479,7 +478,7 @@ public class SAMLTokenRenewer extends AbstractSAMLTokenProvider implements Token
         providerParameters.setStsProperties(renewerParameters.getStsProperties());
         providerParameters.setTokenRequirements(renewerParameters.getTokenRequirements());
         providerParameters.setTokenStore(renewerParameters.getTokenStore());
-        providerParameters.setWebServiceContext(renewerParameters.getWebServiceContext());
+        providerParameters.setMessageContext(renewerParameters.getMessageContext());
         
         // Store token to renew in the additional properties in case you want to base some
         // Conditions on the token
@@ -549,7 +548,7 @@ public class SAMLTokenRenewer extends AbstractSAMLTokenProvider implements Token
             TokenRenewerParameters tokenParameters,
             SAMLKeyInfo subjectKeyInfo
         ) {
-            MessageContext messageContext = tokenParameters.getWebServiceContext().getMessageContext();
+            Map<String, Object> messageContext = tokenParameters.getMessageContext();
             final List<WSHandlerResult> handlerResults = 
                 CastUtils.cast((List<?>) messageContext.get(WSHandlerConstants.RECV_RESULTS));
 
