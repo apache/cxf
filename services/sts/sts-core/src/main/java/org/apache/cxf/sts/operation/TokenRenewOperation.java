@@ -85,7 +85,7 @@ public class TokenRenewOperation extends AbstractOperation implements RenewOpera
             
             renewerParameters.setStsProperties(stsProperties);
             renewerParameters.setPrincipal(context.getUserPrincipal());
-            renewerParameters.setWebServiceContext(context);
+            renewerParameters.setMessageContext(context.getMessageContext());
             renewerParameters.setTokenStore(getTokenStore());
             
             renewerParameters.setKeyRequirements(keyRequirements);
@@ -292,7 +292,7 @@ public class TokenRenewOperation extends AbstractOperation implements RenewOpera
         renewerParameters.setStsProperties(providerParameters.getStsProperties());
         renewerParameters.setTokenRequirements(providerParameters.getTokenRequirements());
         renewerParameters.setTokenStore(providerParameters.getTokenStore());
-        renewerParameters.setWebServiceContext(providerParameters.getWebServiceContext());
+        renewerParameters.setMessageContext(providerParameters.getMessageContext());
         
         return renewerParameters;
     }

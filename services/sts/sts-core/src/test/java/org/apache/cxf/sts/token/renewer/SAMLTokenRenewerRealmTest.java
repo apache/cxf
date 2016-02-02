@@ -28,7 +28,6 @@ import javax.security.auth.callback.CallbackHandler;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import org.apache.cxf.jaxws.context.WebServiceContextImpl;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.sts.STSConstants;
@@ -119,7 +118,7 @@ public class SAMLTokenRenewerRealmTest extends org.junit.Assert {
         renewerParameters.setAppliesToAddress("http://dummy-service.com/dummy");
         renewerParameters.setStsProperties(validatorParameters.getStsProperties());
         renewerParameters.setPrincipal(new CustomTokenPrincipal("alice"));
-        renewerParameters.setWebServiceContext(validatorParameters.getWebServiceContext());
+        renewerParameters.setMessageContext(validatorParameters.getMessageContext());
         renewerParameters.setKeyRequirements(validatorParameters.getKeyRequirements());
         renewerParameters.setTokenRequirements(validatorParameters.getTokenRequirements());
         renewerParameters.setTokenStore(validatorParameters.getTokenStore());
@@ -192,7 +191,7 @@ public class SAMLTokenRenewerRealmTest extends org.junit.Assert {
         renewerParameters.setAppliesToAddress("http://dummy-service.com/dummy");
         renewerParameters.setStsProperties(validatorParameters.getStsProperties());
         renewerParameters.setPrincipal(new CustomTokenPrincipal("alice"));
-        renewerParameters.setWebServiceContext(validatorParameters.getWebServiceContext());
+        renewerParameters.setMessageContext(validatorParameters.getMessageContext());
         renewerParameters.setKeyRequirements(validatorParameters.getKeyRequirements());
         renewerParameters.setTokenRequirements(validatorParameters.getTokenRequirements());
         renewerParameters.setTokenStore(validatorParameters.getTokenStore());
@@ -235,8 +234,7 @@ public class SAMLTokenRenewerRealmTest extends org.junit.Assert {
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
-        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
-        parameters.setWebServiceContext(webServiceContext);
+        parameters.setMessageContext(msgCtx);
         
         // Add STSProperties object
         StaticSTSProperties stsProperties = new StaticSTSProperties();
@@ -327,8 +325,7 @@ public class SAMLTokenRenewerRealmTest extends org.junit.Assert {
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
-        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
-        parameters.setWebServiceContext(webServiceContext);
+        parameters.setMessageContext(msgCtx);
 
         parameters.setAppliesToAddress("http://dummy-service.com/dummy");
 

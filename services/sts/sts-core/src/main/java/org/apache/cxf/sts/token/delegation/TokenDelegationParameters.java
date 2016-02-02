@@ -20,9 +20,8 @@
 package org.apache.cxf.sts.token.delegation;
 
 import java.security.Principal;
+import java.util.Map;
 import java.util.Set;
-
-import javax.xml.ws.WebServiceContext;
 
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.request.KeyRequirements;
@@ -39,7 +38,7 @@ public class TokenDelegationParameters {
 
     private STSPropertiesMBean stsProperties;
     private Principal principal;
-    private WebServiceContext webServiceContext;
+    private Map<String, Object> messageContext;
     private KeyRequirements keyRequirements;
     private TokenRequirements tokenRequirements;
     private TokenStore tokenStore;
@@ -88,14 +87,6 @@ public class TokenDelegationParameters {
         this.stsProperties = stsProperties;
     }
     
-    public WebServiceContext getWebServiceContext() {
-        return webServiceContext;
-    }
-
-    public void setWebServiceContext(WebServiceContext webServiceContext) {
-        this.webServiceContext = webServiceContext;
-    }
-    
     public void setPrincipal(Principal principal) {
         this.principal = principal;
     }
@@ -126,6 +117,14 @@ public class TokenDelegationParameters {
 
     public void setTokenRoles(Set<Principal> tokenRoles) {
         this.tokenRoles = tokenRoles;
+    }
+
+    public Map<String, Object> getMessageContext() {
+        return messageContext;
+    }
+
+    public void setMessageContext(Map<String, Object> messageContext) {
+        this.messageContext = messageContext;
     }
     
 }

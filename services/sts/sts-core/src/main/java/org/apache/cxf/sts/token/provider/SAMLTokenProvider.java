@@ -151,7 +151,7 @@ public class SAMLTokenProvider extends AbstractSAMLTokenProvider implements Toke
                                                         tokenParameters.getStsProperties(), 
                                                         tokenParameters.getEncryptionProperties(), 
                                                         keyRequirements,
-                                                        tokenParameters.getWebServiceContext());
+                                                        tokenParameters.getMessageContext());
             }
             response.setToken(token);
             

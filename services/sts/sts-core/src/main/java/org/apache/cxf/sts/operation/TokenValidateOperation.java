@@ -77,7 +77,7 @@ public class TokenValidateOperation extends AbstractOperation implements Validat
             
             validatorParameters.setStsProperties(stsProperties);
             validatorParameters.setPrincipal(context.getUserPrincipal());
-            validatorParameters.setWebServiceContext(context);
+            validatorParameters.setMessageContext(context.getMessageContext());
             validatorParameters.setTokenStore(getTokenStore());
             
             //validatorParameters.setKeyRequirements(keyRequirements);

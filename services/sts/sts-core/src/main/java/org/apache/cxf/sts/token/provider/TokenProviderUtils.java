@@ -21,13 +21,12 @@ package org.apache.cxf.sts.token.provider;
 import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
-import javax.xml.ws.WebServiceContext;
-import javax.xml.ws.handler.MessageContext;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -108,7 +107,7 @@ public final class TokenProviderUtils {
         STSPropertiesMBean stsProperties,
         EncryptionProperties encryptionProperties,
         KeyRequirements keyRequirements,
-        WebServiceContext context
+        Map<String, Object> messageContext
     ) throws WSSecurityException {
         String name = encryptionProperties.getEncryptionName();
         if (name == null) {
@@ -152,7 +151,7 @@ public final class TokenProviderUtils {
         
         WSSecEncrypt builder = new WSSecEncrypt();
         if (WSHandlerConstants.USE_REQ_SIG_CERT.equals(name)) {
-            X509Certificate cert = getReqSigCert(context.getMessageContext());
+            X509Certificate cert = getReqSigCert(messageContext);
             builder.setUseThisCert(cert);
         } else {
             builder.setUserInfo(name);
@@ -178,10 +177,10 @@ public final class TokenProviderUtils {
      * Get the X509Certificate associated with the signature that was received. This cert is to be used
      * for encrypting the issued token.
      */
-    public static X509Certificate getReqSigCert(MessageContext context) {
+    public static X509Certificate getReqSigCert(Map<String, Object> messageContext) {
         @SuppressWarnings("unchecked")
         List<WSHandlerResult> results = 
-            (List<WSHandlerResult>) context.get(WSHandlerConstants.RECV_RESULTS);
+            (List<WSHandlerResult>) messageContext.get(WSHandlerConstants.RECV_RESULTS);
         // DOM
         X509Certificate cert = WSS4JUtils.getReqSigCert(results);
         if (cert != null) {
@@ -191,7 +190,7 @@ public final class TokenProviderUtils {
         // Streaming
         @SuppressWarnings("unchecked")
         final List<SecurityEvent> incomingEventList = 
-            (List<SecurityEvent>) context.get(SecurityEvent.class.getName() + ".in");
+            (List<SecurityEvent>) messageContext.get(SecurityEvent.class.getName() + ".in");
         if (incomingEventList != null) {
             for (SecurityEvent incomingEvent : incomingEventList) {
                 if (WSSecurityEventConstants.SignedPart == incomingEvent.getSecurityEventType()

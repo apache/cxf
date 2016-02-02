@@ -21,7 +21,6 @@ package org.apache.cxf.sts.token.provider;
 import java.util.Date;
 import java.util.Properties;
 
-import org.apache.cxf.jaxws.context.WebServiceContextImpl;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactConsumer;
@@ -372,8 +371,7 @@ public class JWTProviderLifetimeTest extends org.junit.Assert {
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
-        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
-        parameters.setWebServiceContext(webServiceContext);
+        parameters.setMessageContext(msgCtx);
 
         parameters.setAppliesToAddress("http://dummy-service.com/dummy");
 

@@ -71,7 +71,7 @@ public class DummyTokenProvider implements TokenProvider {
                                                         tokenParameters.getStsProperties(), 
                                                         tokenParameters.getEncryptionProperties(), 
                                                         tokenParameters.getKeyRequirements(),
-                                                        tokenParameters.getWebServiceContext());
+                                                        tokenParameters.getMessageContext());
                 response.setToken(el);
             } else {
                 response.setToken(bst.getElement());

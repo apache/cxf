@@ -268,8 +268,7 @@ public class ValidateSamlUnitTest extends org.junit.Assert {
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
-        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
-        parameters.setWebServiceContext(webServiceContext);
+        parameters.setMessageContext(msgCtx);
 
         parameters.setAppliesToAddress("http://dummy-service.com/dummy");
 
