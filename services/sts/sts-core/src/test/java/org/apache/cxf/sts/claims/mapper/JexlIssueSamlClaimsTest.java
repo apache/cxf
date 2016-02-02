@@ -20,6 +20,7 @@ package org.apache.cxf.sts.claims.mapper;
 
 import java.io.IOException;
 import java.net.URI;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -35,7 +36,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.jaxws.context.WebServiceContextImpl;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.rt.security.claims.Claim;
@@ -100,8 +100,9 @@ public class JexlIssueSamlClaimsTest extends org.junit.Assert {
      * @return
      */
     private List<RequestSecurityTokenResponseType> issueToken(TokenIssueOperation issueOperation,
-        RequestSecurityTokenType request, WebServiceContextImpl webServiceContext) {
-        RequestSecurityTokenResponseCollectionType response = issueOperation.issue(request, webServiceContext);
+        RequestSecurityTokenType request, Principal principal, Map<String, Object> messageContext) {
+        RequestSecurityTokenResponseCollectionType response = 
+            issueOperation.issue(request, principal, messageContext);
         List<RequestSecurityTokenResponseType> securityTokenResponse = response.getRequestSecurityTokenResponse();
         assertTrue(!securityTokenResponse.isEmpty());
         return securityTokenResponse;
@@ -173,10 +174,9 @@ public class JexlIssueSamlClaimsTest extends org.junit.Assert {
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
         msgCtx.put("url", "https");
-        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
 
         List<RequestSecurityTokenResponseType> securityTokenResponseList = issueToken(issueOperation, request,
-                                                                                      webServiceContext);
+                                                                                      null, msgCtx);
         RequestSecurityTokenResponseType securityTokenResponse = securityTokenResponseList.get(0);
 
         // Test the generated token.

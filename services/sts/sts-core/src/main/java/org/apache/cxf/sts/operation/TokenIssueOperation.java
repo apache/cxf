@@ -28,8 +28,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBElement;
-import javax.xml.ws.WebServiceContext;
-import javax.xml.ws.handler.MessageContext;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -85,9 +83,10 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
 
     public RequestSecurityTokenResponseCollectionType issue(
             RequestSecurityTokenType request,
-            WebServiceContext context
+            Principal principal,
+            Map<String, Object> messageContext
     ) {
-        RequestSecurityTokenResponseType response = issueSingle(request, context);
+        RequestSecurityTokenResponseType response = issueSingle(request, principal, messageContext);
         RequestSecurityTokenResponseCollectionType responseCollection = 
             QNameConstants.WS_TRUST_FACTORY.createRequestSecurityTokenResponseCollectionType();
         responseCollection.getRequestSecurityTokenResponse().add(response);
@@ -96,12 +95,13 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
     
     public RequestSecurityTokenResponseCollectionType issue(
             RequestSecurityTokenCollectionType requestCollection,
-            WebServiceContext context
+            Principal principal,
+            Map<String, Object> messageContext
     ) {
         RequestSecurityTokenResponseCollectionType responseCollection = 
             QNameConstants.WS_TRUST_FACTORY.createRequestSecurityTokenResponseCollectionType();
         for (RequestSecurityTokenType request : requestCollection.getRequestSecurityToken()) {
-            RequestSecurityTokenResponseType response = issueSingle(request, context);
+            RequestSecurityTokenResponseType response = issueSingle(request, principal, messageContext);
             responseCollection.getRequestSecurityTokenResponse().add(response);
         }
         return responseCollection;
@@ -109,14 +109,15 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
 
     public RequestSecurityTokenResponseType issueSingle(
             RequestSecurityTokenType request,
-            WebServiceContext context
+            Principal principal,
+            Map<String, Object> messageContext
     ) {
         long start = System.currentTimeMillis();
         TokenProviderParameters providerParameters = new TokenProviderParameters();
         try {
-            RequestRequirements requestRequirements = parseRequest(request, context);
+            RequestRequirements requestRequirements = parseRequest(request, messageContext);
     
-            providerParameters = createTokenProviderParameters(requestRequirements, context);
+            providerParameters = createTokenProviderParameters(requestRequirements, principal, messageContext);
             providerParameters.setClaimsManager(claimsManager);
             
             String realm = providerParameters.getRealm();
@@ -125,7 +126,7 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
             String tokenType = tokenRequirements.getTokenType();
     
             if (stsProperties.getSamlRealmCodec() != null) {
-                SamlAssertionWrapper assertion = fetchSAMLAssertionFromWSSecuritySAMLToken(context);
+                SamlAssertionWrapper assertion = fetchSAMLAssertionFromWSSecuritySAMLToken(messageContext);
 
                 if (assertion != null) {
                     String wssecRealm = stsProperties.getSamlRealmCodec().getRealmFromToken(assertion);
@@ -149,14 +150,14 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
             // Validate OnBehalfOf token if present
             if (providerParameters.getTokenRequirements().getOnBehalfOf() != null) {
                 ReceivedToken validateTarget = providerParameters.getTokenRequirements().getOnBehalfOf();
-                handleDelegationToken(validateTarget, providerParameters, context, 
+                handleDelegationToken(validateTarget, providerParameters, principal, messageContext, 
                                       realm, requestRequirements);
             }
             
             // See whether ActAs is allowed or not
             if (providerParameters.getTokenRequirements().getActAs() != null) {
                 ReceivedToken validateTarget = providerParameters.getTokenRequirements().getActAs();
-                handleDelegationToken(validateTarget, providerParameters, context, 
+                handleDelegationToken(validateTarget, providerParameters, principal, messageContext, 
                                       realm, requestRequirements);
             }
     
@@ -195,7 +196,7 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
                 EncryptionProperties encryptionProperties = providerParameters.getEncryptionProperties();
                 RequestSecurityTokenResponseType response = 
                     createResponse(
-                            encryptionProperties, tokenResponse, tokenRequirements, keyRequirements, context
+                            encryptionProperties, tokenResponse, tokenRequirements, keyRequirements
                     );
                 STSIssueSuccessEvent event = new STSIssueSuccessEvent(providerParameters,
                         System.currentTimeMillis() - start);
@@ -218,12 +219,13 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
     private void handleDelegationToken(
         ReceivedToken validateTarget,
         TokenProviderParameters providerParameters,
-        WebServiceContext context,
+        Principal principal,
+        Map<String, Object> messageContext,
         String realm,
         RequestRequirements requestRequirements
     ) {
         TokenValidatorResponse tokenResponse = validateReceivedToken(
-                context, realm, requestRequirements.getTokenRequirements(), validateTarget);
+                principal, messageContext, realm, requestRequirements.getTokenRequirements(), validateTarget);
 
         if (tokenResponse == null) {
             LOG.fine("No Token Validator has been found that can handle this token");
@@ -251,15 +253,15 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
         }
         
         // See whether OnBehalfOf/ActAs is allowed or not
-        performDelegationHandling(requestRequirements, context, validateTarget, tokenPrincipal, tokenRoles);
+        performDelegationHandling(requestRequirements, principal, messageContext, 
+                                  validateTarget, tokenPrincipal, tokenRoles);
     }
 
     private RequestSecurityTokenResponseType createResponse(
             EncryptionProperties encryptionProperties,
             TokenProviderResponse tokenResponse, 
             TokenRequirements tokenRequirements,
-            KeyRequirements keyRequirements,
-            WebServiceContext webServiceContext
+            KeyRequirements keyRequirements
     ) throws WSSecurityException {
         RequestSecurityTokenResponseType response = 
             QNameConstants.WS_TRUST_FACTORY.createRequestSecurityTokenResponseType();
@@ -392,9 +394,8 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
      * Method to fetch SAML assertion from the WS-Security header
      */
     private static SamlAssertionWrapper fetchSAMLAssertionFromWSSecuritySAMLToken(
-        WebServiceContext wsContext
+        Map<String, Object> messageContext
     ) {
-        MessageContext messageContext = wsContext.getMessageContext();
         final List<WSHandlerResult> handlerResults = 
             CastUtils.cast((List<?>) messageContext.get(WSHandlerConstants.RECV_RESULTS));
 

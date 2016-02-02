@@ -22,6 +22,7 @@ package org.apache.cxf.ws.security.sts.provider;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -89,32 +90,38 @@ public class SecurityTokenServiceProvider implements Provider<Source> {
         try {
             Method m = IssueOperation.class.getDeclaredMethod("issue", 
                                                               RequestSecurityTokenType.class, 
-                                                              WebServiceContext.class);
+                                                              Principal.class,
+                                                              Map.class);
             OPERATION_METHODS.put(WSTRUST_REQUESTTYPE_ISSUE, m);
             
             m = CancelOperation.class.getDeclaredMethod("cancel", 
                                                        RequestSecurityTokenType.class, 
-                                                       WebServiceContext.class);
+                                                       Principal.class,
+                                                       Map.class);
             OPERATION_METHODS.put(WSTRUST_REQUESTTYPE_CANCEL, m);
             
             m = RenewOperation.class.getDeclaredMethod("renew", 
                                                        RequestSecurityTokenType.class, 
-                                                       WebServiceContext.class);
+                                                       Principal.class,
+                                                       Map.class);
             OPERATION_METHODS.put(WSTRUST_REQUESTTYPE_RENEW, m);
             
             m = ValidateOperation.class.getDeclaredMethod("validate", 
                                                        RequestSecurityTokenType.class, 
-                                                       WebServiceContext.class);
+                                                       Principal.class,
+                                                       Map.class);
             OPERATION_METHODS.put(WSTRUST_REQUESTTYPE_VALIDATE, m);
             
             m = KeyExchangeTokenOperation.class.getDeclaredMethod("keyExchangeToken", 
                                                        RequestSecurityTokenType.class, 
-                                                       WebServiceContext.class);
+                                                       Principal.class,
+                                                       Map.class);
             OPERATION_METHODS.put(WSTRUST_REQUESTTYPE_KEYEXCHANGETOKEN, m);
             
             m = RequestCollectionOperation.class.getDeclaredMethod("requestCollection", 
                                                        RequestSecurityTokenCollectionType.class, 
-                                                       WebServiceContext.class);
+                                                       Principal.class,
+                                                       Map.class);
             OPERATION_METHODS.put(WSTRUST_REQUESTTYPE_REQUESTCOLLECTION, m);
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -169,7 +176,8 @@ public class SecurityTokenServiceProvider implements Provider<Source> {
         try {
             m = IssueSingleOperation.class.getDeclaredMethod("issueSingle", 
                     RequestSecurityTokenType.class, 
-                    WebServiceContext.class);
+                    Principal.class,
+                    Map.class);
             OPERATION_METHODS.put(WSTRUST_REQUESTTYPE_ISSUE, m);
             operationMap.put(WSTRUST_REQUESTTYPE_ISSUE, issueSingleOperation);
         } catch (Exception e) {
@@ -233,7 +241,7 @@ public class SecurityTokenServiceProvider implements Provider<Source> {
                 throw new Exception(
                         "Implementation for this operation not found.");
             }
-            obj = method.invoke(operationImpl, obj, context);
+            obj = method.invoke(operationImpl, obj, context.getUserPrincipal(), context.getMessageContext());
             if (obj == null) {
                 throw new Exception("Error in implementation class.");
             }

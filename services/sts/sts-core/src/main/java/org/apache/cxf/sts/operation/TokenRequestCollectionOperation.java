@@ -19,13 +19,14 @@
 
 package org.apache.cxf.sts.operation;
 
+import java.security.Principal;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
-import javax.xml.ws.WebServiceContext;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.sts.QNameConstants;
@@ -66,7 +67,8 @@ public class TokenRequestCollectionOperation extends AbstractOperation
 
     public RequestSecurityTokenResponseCollectionType requestCollection(
         RequestSecurityTokenCollectionType requestCollection,
-        WebServiceContext context) {
+        Principal principal,
+        Map<String, Object> messageContext) {
         RequestSecurityTokenResponseCollectionType responseCollection = 
             QNameConstants.WS_TRUST_FACTORY.createRequestSecurityTokenResponseCollectionType();
         
@@ -95,7 +97,8 @@ public class TokenRequestCollectionOperation extends AbstractOperation
                 }
             }
             
-            RequestSecurityTokenResponseType response = handleRequest(request, context, requestType);
+            RequestSecurityTokenResponseType response = 
+                handleRequest(request, principal, messageContext, requestType);
             responseCollection.getRequestSecurityTokenResponse().add(response);
         }
         return responseCollection;
@@ -103,7 +106,8 @@ public class TokenRequestCollectionOperation extends AbstractOperation
     
     public RequestSecurityTokenResponseType handleRequest(
             RequestSecurityTokenType request,
-            WebServiceContext context,
+            Principal principal,
+            Map<String, Object> messageContext,
             String requestType
     ) {
         if (WSTRUST_REQUESTTYPE_BATCH_ISSUE.equals(requestType)) {
@@ -113,7 +117,7 @@ public class TokenRequestCollectionOperation extends AbstractOperation
                     "Error in requesting a token", STSException.REQUEST_FAILED
                 );
             }
-            return issueSingleOperation.issueSingle(request, context);
+            return issueSingleOperation.issueSingle(request, principal, messageContext);
         } else if (WSTRUST_REQUESTTYPE_BATCH_VALIDATE.equals(requestType)) {
             if (validateOperation == null) {
                 LOG.log(Level.WARNING, "ValidateOperation is null");
@@ -121,7 +125,7 @@ public class TokenRequestCollectionOperation extends AbstractOperation
                     "Error in requesting a token", STSException.REQUEST_FAILED
                 );
             }
-            return validateOperation.validate(request, context);
+            return validateOperation.validate(request, principal, messageContext);
         } else if (WSTRUST_REQUESTTYPE_BATCH_CANCEL.equals(requestType)) {
             if (cancelOperation == null) {
                 LOG.log(Level.WARNING, "CancelOperation is null");
@@ -129,7 +133,7 @@ public class TokenRequestCollectionOperation extends AbstractOperation
                     "Error in requesting a token", STSException.REQUEST_FAILED
                 );
             }
-            return cancelOperation.cancel(request, context);
+            return cancelOperation.cancel(request, principal, messageContext);
         } else if (WSTRUST_REQUESTTYPE_BATCH_RENEW.equals(requestType)) {
             if (renewOperation == null) {
                 LOG.log(Level.WARNING, "RenewOperation is null");
@@ -137,7 +141,7 @@ public class TokenRequestCollectionOperation extends AbstractOperation
                     "Error in requesting a token", STSException.REQUEST_FAILED
                 );
             }
-            return renewOperation.renew(request, context);
+            return renewOperation.renew(request, principal, messageContext);
         } else {
             LOG.log(Level.WARNING, "Unknown operation requested");
             throw new STSException(
