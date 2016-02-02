@@ -84,7 +84,7 @@ public class AddressingAssertionBuilder implements AssertionBuilder<Element> {
                                                   mp,
                                                   policy);
                 }
-            }.build(elem, factory);
+            } .build(elem, factory);
             if (!(nap instanceof PolicyContainingPrimitiveAssertion || nap instanceof PrimitiveAssertion)) {
                 // this happens when neethi fails to recognize the specified addressing policy element
                 LOG.warning("Unable to recognize the addressing policy");
