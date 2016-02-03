@@ -32,6 +32,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 
 public class OAuthInvoker extends JAXRSInvoker {
+    private static final String OAUTH2_CALL_RETRIED = "oauth2.call.retried";
     private WebClient accessTokenServiceClient;
     private ClientTokenContextManager clientTokenContextManager;
     private Consumer consumer;
@@ -47,7 +48,9 @@ public class OAuthInvoker extends JAXRSInvoker {
             
             return super.performInvocation(exchange, serviceObject, m, paramArray);
         } catch (InvocationTargetException ex) {
-            if (tokenContext != null && ex.getCause() instanceof NotAuthorizedException) {
+            if (tokenContext != null 
+                && ex.getCause() instanceof NotAuthorizedException
+                && !inMessage.containsKey(OAUTH2_CALL_RETRIED)) {
                 ClientAccessToken accessToken = tokenContext.getToken();
                 String refreshToken  = accessToken.getRefreshToken();
                 if (refreshToken != null) {
@@ -59,6 +62,7 @@ public class OAuthInvoker extends JAXRSInvoker {
                     clientTokenContextManager.setClientTokenContext(mc, tokenContext);
                     
                     //retry
+                    inMessage.put(OAUTH2_CALL_RETRIED, true);
                     return super.performInvocation(exchange, serviceObject, m, paramArray);
                 }
             } 
