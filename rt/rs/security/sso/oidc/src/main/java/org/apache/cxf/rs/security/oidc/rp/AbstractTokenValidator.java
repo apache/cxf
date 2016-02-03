@@ -34,6 +34,7 @@ import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rs.security.jose.jwt.JwtUtils;
 import org.apache.cxf.rs.security.oauth2.provider.AbstractOAuthJoseJwtConsumer;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
+import org.apache.cxf.rs.security.oidc.common.IdToken;
 
 public abstract class AbstractTokenValidator extends AbstractOAuthJoseJwtConsumer {
     private static final String SELF_ISSUED_ISSUER = "https://self-issued.me";
@@ -68,6 +69,12 @@ public abstract class AbstractTokenValidator extends AbstractOAuthJoseJwtConsume
             // validate subject
             if (claims.getSubject() == null) {
                 throw new OAuthServiceException("Invalid subject");
+            }
+            
+            // validate authorized party
+            String authorizedParty = (String)claims.getClaim(IdToken.AZP_CLAIM);
+            if (authorizedParty != null && !authorizedParty.equals(clientId)) {
+                throw new OAuthServiceException("Invalid authorized party");
             }
             // validate audience
             List<String> audiences = claims.getAudiences();
