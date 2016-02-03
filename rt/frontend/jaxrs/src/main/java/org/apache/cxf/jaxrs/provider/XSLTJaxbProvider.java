@@ -108,6 +108,7 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
     
     private boolean supportJaxbOnly;
     private boolean refreshTemplates;
+    private boolean secureProcessing = true;
     
     public void setSupportJaxbOnly(boolean support) {
         this.supportJaxbOnly = support;
@@ -520,7 +521,7 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
             source.setSystemId(urlStream.toExternalForm());
             if (factory == null) {
                 factory = (SAXTransformerFactory)TransformerFactory.newInstance();
-                factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
+                factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, secureProcessing);
                 if (uriResolver != null) {
                     factory.setURIResolver(uriResolver);
                 }
@@ -535,6 +536,10 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
     
     public void setRefreshTemplates(boolean refresh) {
         this.refreshTemplates = refresh;
+    }
+
+    public void setSecureProcessing(boolean secureProcessing) {
+        this.secureProcessing = secureProcessing;
     }
 
     private static class TemplatesImpl implements Templates {
