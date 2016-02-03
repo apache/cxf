@@ -36,11 +36,15 @@ import javax.ws.rs.core.UriBuilder;
 
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.jaxrs.ext.MessageContextImpl;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.utils.FormUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.rs.security.jose.jwt.JwtException;
+import org.apache.cxf.rs.security.jose.jwt.JwtUtils;
 import org.apache.cxf.rs.security.oauth2.client.ClientTokenContext;
 import org.apache.cxf.rs.security.oauth2.client.ClientTokenContextManager;
+import org.apache.cxf.rs.security.oidc.common.IdToken;
 
 @PreMatching
 @Priority(Priorities.AUTHENTICATION)
@@ -77,9 +81,17 @@ public class OidcRpAuthenticationFilter implements ContainerRequestFilter {
         if (tokenContext == null) {
             return false;
         }
+        IdToken idToken = tokenContext.getIdToken();
+        try {
+            // If ID token has expired then the context is no longer valid
+            JwtUtils.validateJwtExpiry(idToken, 0, idToken.getExpiryTime() != null);
+        } catch (JwtException ex) {
+            stateManager.removeClientTokenContext(new MessageContextImpl(JAXRSUtils.getCurrentMessage()));
+            return false;
+        }
         OidcClientTokenContextImpl newTokenContext = new OidcClientTokenContextImpl();
         newTokenContext.setToken(tokenContext.getToken());
-        newTokenContext.setIdToken(tokenContext.getIdToken());
+        newTokenContext.setIdToken(idToken);
         newTokenContext.setUserInfo(tokenContext.getUserInfo());
         newTokenContext.setState(toRequestState(rc));
         JAXRSUtils.getCurrentMessage().setContent(ClientTokenContext.class, newTokenContext);
