@@ -59,6 +59,8 @@ public class IdTokenResponseFilter extends AbstractOAuthServerJoseJwtProducer im
         } else if (st.getSubject() instanceof OidcUserSubject) {
             OidcUserSubject sub = (OidcUserSubject)st.getSubject();
             IdToken idToken = new IdToken(sub.getIdToken());
+            // if this token was refreshed then the cloned IDToken might need to have its
+            // issuedAt and expiry time properties adjusted if it proves to be necessary
             setAtHashAndNonce(idToken, st);
             return super.processJwt(new JwtToken(idToken), st.getClient());
         } else {
