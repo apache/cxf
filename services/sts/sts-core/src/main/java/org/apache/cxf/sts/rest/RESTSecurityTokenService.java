@@ -44,7 +44,7 @@ public interface RESTSecurityTokenService {
         cancel("cancel");
         private String value;
 
-        private Action(String value) {
+        Action(String value) {
             this.value = value;
         }
 
