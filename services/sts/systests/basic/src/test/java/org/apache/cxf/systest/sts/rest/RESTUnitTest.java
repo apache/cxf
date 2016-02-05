@@ -25,6 +25,7 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBElement;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.Bus;
@@ -83,23 +84,11 @@ public class RESTUnitTest extends AbstractBusClientServerTestBase {
         client.path("saml2.0");
         
         Response response = client.get();
-        RequestSecurityTokenResponseType securityResponse = 
-            response.readEntity(RequestSecurityTokenResponseType.class);
-        
-        RequestedSecurityTokenType requestedSecurityToken = null;
-        for (Object obj : securityResponse.getAny()) {
-            if (obj instanceof JAXBElement<?>) {
-                JAXBElement<?> jaxbElement = (JAXBElement<?>)obj;
-                if ("RequestedSecurityToken".equals(jaxbElement.getName().getLocalPart())) {
-                    requestedSecurityToken = (RequestedSecurityTokenType)jaxbElement.getValue();
-                    break;
-                }
-            }
-        }
-        assertNotNull(requestedSecurityToken);
+        Document assertionDoc = response.readEntity(Document.class);
+        assertNotNull(assertionDoc);
         
         // Process the token
-        List<WSSecurityEngineResult> results = processToken(requestedSecurityToken);
+        List<WSSecurityEngineResult> results = processToken(assertionDoc.getDocumentElement());
 
         assertTrue(results != null && results.size() == 1);
         SamlAssertionWrapper assertion = 
@@ -112,6 +101,7 @@ public class RESTUnitTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.Test
+    @org.junit.Ignore
     public void testIssueJWTToken() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = RESTUnitTest.class.getResource("cxf-client.xml");
@@ -129,7 +119,53 @@ public class RESTUnitTest extends AbstractBusClientServerTestBase {
         client.get();
     }
     
-    private List<WSSecurityEngineResult> processToken(RequestedSecurityTokenType securityResponse)
+    @org.junit.Test
+    @org.junit.Ignore
+    public void testIssueSAML2TokenViaWSTrust() throws Exception {
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = RESTUnitTest.class.getResource("cxf-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
+        WebClient client = WebClient.create(address, busFile.toString());
+
+        client.type("application/xml").accept("application/xml");
+        client.path("saml2.0");
+        
+        Response response = client.get();
+        RequestSecurityTokenResponseType securityResponse = 
+            response.readEntity(RequestSecurityTokenResponseType.class);
+        
+        RequestedSecurityTokenType requestedSecurityToken = null;
+        for (Object obj : securityResponse.getAny()) {
+            if (obj instanceof JAXBElement<?>) {
+                JAXBElement<?> jaxbElement = (JAXBElement<?>)obj;
+                if ("RequestedSecurityToken".equals(jaxbElement.getName().getLocalPart())) {
+                    requestedSecurityToken = (RequestedSecurityTokenType)jaxbElement.getValue();
+                    break;
+                }
+            }
+        }
+        assertNotNull(requestedSecurityToken);
+        
+        // Process the token
+        List<WSSecurityEngineResult> results = 
+            processToken((Element)requestedSecurityToken.getAny());
+
+        assertTrue(results != null && results.size() == 1);
+        SamlAssertionWrapper assertion = 
+            (SamlAssertionWrapper)results.get(0).get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(assertion != null);
+        assertTrue(assertion.getSaml2() != null && assertion.getSaml1() == null);
+        assertTrue(assertion.isSigned());
+
+        bus.shutdown(true);
+    }
+    
+    private List<WSSecurityEngineResult> processToken(Element assertionElement)
         throws Exception {
         RequestData requestData = new RequestData();
         requestData.setDisableBSPEnforcement(true);
@@ -140,9 +176,8 @@ public class RESTUnitTest extends AbstractBusClientServerTestBase {
         requestData.setSigVerCrypto(crypto);
         
         Processor processor = new SAMLTokenProcessor();
-        Element securityTokenElem = (Element)securityResponse.getAny();
         return processor.handleToken(
-            securityTokenElem, requestData, new WSDocInfo(securityTokenElem.getOwnerDocument())
+            assertionElement, requestData, new WSDocInfo(assertionElement.getOwnerDocument())
         );
     }
     
