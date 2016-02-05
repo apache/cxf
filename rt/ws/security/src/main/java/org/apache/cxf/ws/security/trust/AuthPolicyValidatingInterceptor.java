@@ -18,48 +18,35 @@
  */
 package org.apache.cxf.ws.security.trust;
 
-import java.security.Principal;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import org.w3c.dom.Document;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
-import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
-import org.apache.cxf.rt.security.claims.ClaimCollection;
-import org.apache.cxf.rt.security.saml.claims.SAMLSecurityContext;
-import org.apache.cxf.rt.security.saml.utils.SAMLUtils;
-import org.apache.cxf.rt.security.utils.SecurityUtils;
-import org.apache.cxf.security.SecurityContext;
-import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
-import org.apache.wss4j.common.principal.WSUsernameTokenPrincipalImpl;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
-import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.message.token.UsernameToken;
-import org.apache.wss4j.dom.validate.Credential;
-import org.apache.wss4j.dom.validate.Validator;
+import org.apache.cxf.phase.PhaseInterceptor;
+import org.apache.cxf.rt.security.saml.interceptor.WSS4JBasicAuthValidator;
 
-public class AuthPolicyValidatingInterceptor extends AbstractPhaseInterceptor<Message> {
+public class AuthPolicyValidatingInterceptor 
+    extends WSS4JBasicAuthValidator implements PhaseInterceptor<Message> {
 
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(AuthPolicyValidatingInterceptor.class);
     private static final Logger LOG = LogUtils.getL7dLogger(AuthPolicyValidatingInterceptor.class);
     
-    private Validator validator;
+    private String phase;
     
     public AuthPolicyValidatingInterceptor() {
         this(Phase.UNMARSHAL);
     }
     
     public AuthPolicyValidatingInterceptor(String phase) {
-        super(phase);
+        this.phase = phase;
     }
     
     public void handleMessage(Message message) throws Fault {
@@ -77,85 +64,41 @@ public class AuthPolicyValidatingInterceptor extends AbstractPhaseInterceptor<Me
             LOG.warning(errorMsg.toString());
             throw new SecurityException(errorMsg.toString());
         }
-        
+
         try {
-            UsernameToken token = convertPolicyToToken(policy);
-            Credential credential = new Credential();
-            credential.setUsernametoken(token);
-            
-            RequestData data = new RequestData();
-            data.setMsgContext(message);
-            credential = validator.validate(credential, data);
-            
-            // Create a Principal/SecurityContext
-            SecurityContext sc = null;
-            if (credential != null && credential.getPrincipal() != null) {
-                sc = createSecurityContext(message, credential);
-            } else {
-                Principal p = new WSUsernameTokenPrincipalImpl(policy.getUserName(), false);
-                ((WSUsernameTokenPrincipalImpl)p).setPassword(policy.getPassword());
-                sc = createSecurityContext(p);
-            }
-            
-            message.put(SecurityContext.class, sc);
+            super.validate(message);
         } catch (Exception ex) {
             throw new Fault(ex);
         }
     }
 
-    protected UsernameToken convertPolicyToToken(AuthorizationPolicy policy) 
-        throws Exception {
-
-        Document doc = DOMUtils.createDocument();
-        UsernameToken token = new UsernameToken(false, doc, 
-                                                WSConstants.PASSWORD_TEXT);
-        token.setName(policy.getUserName());
-        token.setPassword(policy.getPassword());
-        return token;
-    }
-    
-    protected SecurityContext createSecurityContext(final Principal p) {
-        return new SecurityContext() {
-
-            public Principal getUserPrincipal() {
-                return p;
-            }
-
-            public boolean isUserInRole(String arg0) {
-                return false;
-            }
-        };
-    }
-    
-    protected SecurityContext createSecurityContext(Message msg, Credential credential) {
-        SamlAssertionWrapper samlAssertion = credential.getTransformedToken();
-        if (samlAssertion == null) {
-            samlAssertion = credential.getSamlAssertion();
-        }
-        if (samlAssertion != null) {
-            String roleAttributeName = 
-                (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.SAML_ROLE_ATTRIBUTENAME, msg);
-            if (roleAttributeName == null || roleAttributeName.length() == 0) {
-                roleAttributeName = WSS4JInInterceptor.SAML_ROLE_ATTRIBUTENAME_DEFAULT;
-            }
-
-            ClaimCollection claims = 
-                SAMLUtils.getClaims((SamlAssertionWrapper)samlAssertion);
-            Set<Principal> roles = 
-                SAMLUtils.parseRolesFromClaims(claims, roleAttributeName, null);
-
-            SAMLSecurityContext context = 
-                new SAMLSecurityContext(credential.getPrincipal(), roles, claims);
-            context.setIssuer(SAMLUtils.getIssuer(samlAssertion));
-            context.setAssertionElement(SAMLUtils.getAssertionElement(samlAssertion));
-            return context;
-        } else {
-            return createSecurityContext(credential.getPrincipal());
-        }
+    @Override
+    public void handleFault(Message arg0) {
     }
 
-    public void setValidator(Validator validator) {
-        this.validator = validator;
+    @Override
+    public Collection<PhaseInterceptor<? extends Message>> getAdditionalInterceptors() {
+        return null;
     }
-    
+
+    @Override
+    public Set<String> getAfter() {
+        return Collections.emptySet();
+    }
+
+    @Override
+    public Set<String> getBefore() {
+        return Collections.emptySet();
+    }
+
+    @Override
+    public String getId() {
+        return getClass().getName();
+    }
+
+    @Override
+    public String getPhase() {
+        return phase;
+    }
+
 }
