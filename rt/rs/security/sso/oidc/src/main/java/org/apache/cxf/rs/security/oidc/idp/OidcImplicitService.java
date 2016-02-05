@@ -115,7 +115,7 @@ public class OidcImplicitService extends ImplicitGrantService {
             OidcUserSubject sub = (OidcUserSubject)subject;
             IdToken idToken = new IdToken(sub.getIdToken());
             idToken.setNonce(state.getNonce());
-            JoseJwtProducer processor = idTokenHandler == null ? new JoseJwtProducer() : null; 
+            JoseJwtProducer processor = idTokenHandler == null ? new JoseJwtProducer() : idTokenHandler; 
             return processor.processJwt(new JwtToken(idToken));
         } else {
             return null;
