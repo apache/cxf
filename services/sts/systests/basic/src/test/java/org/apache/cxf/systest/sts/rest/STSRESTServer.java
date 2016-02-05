@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.sts.restunit;
+package org.apache.cxf.systest.sts.rest;
 
 import java.net.URL;
 
