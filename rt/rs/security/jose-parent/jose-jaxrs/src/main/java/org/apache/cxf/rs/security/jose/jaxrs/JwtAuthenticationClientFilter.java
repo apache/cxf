@@ -33,14 +33,14 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.rs.security.jose.common.JoseException;
 import org.apache.cxf.rs.security.jose.jwe.JweHeaders;
-import org.apache.cxf.rs.security.jose.jwt.AbstractJoseJwtProducer;
+import org.apache.cxf.rs.security.jose.jwt.JoseJwtProducer;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 import org.apache.cxf.rs.security.jose.jwt.JwtConstants;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
 
 @Priority(Priorities.AUTHENTICATION)
-public class JwtAuthenticationClientFilter extends AbstractJoseJwtProducer 
+public class JwtAuthenticationClientFilter extends JoseJwtProducer 
     implements ClientRequestFilter {
 
     private static final String DEFAULT_AUTH_SCHEME = "JWT";

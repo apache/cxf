@@ -29,7 +29,7 @@ import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oidc.common.IdToken;
 import org.apache.cxf.rs.security.oidc.common.UserInfo;
 
-public class UserInfoClient extends AbstractTokenValidator {
+public class UserInfoClient extends OidcClaimsValidator {
     private boolean sendTokenAsFormParameter;
     private WebClient profileClient;
     private boolean getUserInfoFromJwt;

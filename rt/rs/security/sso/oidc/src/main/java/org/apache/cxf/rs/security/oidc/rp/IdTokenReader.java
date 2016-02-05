@@ -24,7 +24,7 @@ import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oidc.common.IdToken;
 import org.apache.cxf.rs.security.oidc.utils.OidcUtils;
 
-public class IdTokenReader extends AbstractTokenValidator {
+public class IdTokenReader extends OidcClaimsValidator {
     private boolean requireAtHash = true;
     public IdToken getIdToken(ClientAccessToken at, Consumer client) {
         JwtToken jwt = getIdJwtToken(at, client);

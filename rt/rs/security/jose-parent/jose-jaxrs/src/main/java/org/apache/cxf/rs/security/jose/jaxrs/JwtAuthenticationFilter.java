@@ -35,14 +35,14 @@ import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.rs.security.jose.common.JoseConstants;
 import org.apache.cxf.rs.security.jose.common.JoseException;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
-import org.apache.cxf.rs.security.jose.jwt.AbstractJoseJwtConsumer;
+import org.apache.cxf.rs.security.jose.jwt.JoseJwtConsumer;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rs.security.jose.jwt.JwtUtils;
 import org.apache.cxf.security.SecurityContext;
 
 @PreMatching
 @Priority(Priorities.AUTHENTICATION)
-public class JwtAuthenticationFilter extends AbstractJoseJwtConsumer implements ContainerRequestFilter {
+public class JwtAuthenticationFilter extends JoseJwtConsumer implements ContainerRequestFilter {
     protected static final Logger LOG = LogUtils.getL7dLogger(JwtAuthenticationFilter.class);
     
     private static final String DEFAULT_AUTH_SCHEME = "JWT";

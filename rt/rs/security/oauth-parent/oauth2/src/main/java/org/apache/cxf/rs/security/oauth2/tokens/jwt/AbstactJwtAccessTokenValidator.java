@@ -24,14 +24,14 @@ import java.util.List;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
-import org.apache.cxf.rs.security.jose.jwt.AbstractJoseJwtConsumer;
+import org.apache.cxf.rs.security.jose.jwt.JoseJwtConsumer;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenValidation;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.provider.AccessTokenValidator;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthDataProvider;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 
-public abstract class AbstactJwtAccessTokenValidator extends AbstractJoseJwtConsumer 
+public abstract class AbstactJwtAccessTokenValidator extends JoseJwtConsumer 
     implements AccessTokenValidator {
     private OAuthDataProvider dataProvider;
     
