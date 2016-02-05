@@ -92,7 +92,7 @@ under the License.
    </bean>
    
    <bean id="callbackHandler" class="org.apache.cxf.systest.jaxrs.security.oauth2.common.CallbackHandlerImpl"/>
-   <bean id="basicAuthFilter" class="org.apache.cxf.systest.jaxrs.security.oauth2.common.BasicAuthFilter">
+   <bean id="basicAuthFilter" class="org.apache.cxf.systest.jaxrs.security.oauth2.common.WSS4JBasicAuthFilter">
        <property name="callbackHandler" ref="callbackHandler"/>
    </bean>
    
