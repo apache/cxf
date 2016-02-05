@@ -45,6 +45,7 @@ import org.apache.cxf.ws.security.sts.provider.model.ClaimsType;
 import org.apache.cxf.ws.security.sts.provider.model.ObjectFactory;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
+import org.apache.cxf.ws.security.sts.provider.model.RequestedSecurityTokenType;
 import org.apache.cxf.ws.security.trust.STSUtils;
 import org.apache.wss4j.dom.WSConstants;
 
@@ -90,6 +91,36 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
 
     @Override
     public Response getToken(String tokenType, String keyType, List<String> requestedClaims) {
+        RequestSecurityTokenResponseType response = 
+            issueToken(tokenType, keyType, requestedClaims);
+        
+        RequestedSecurityTokenType requestedToken = getRequestedSecurityToken(response);
+        
+        return Response.ok(requestedToken.getAny()).build();
+    }
+    
+    @Override
+    public Response getTokenViaWSTrust(String tokenType, String keyType, List<String> requestedClaims) {
+        return getToken(tokenType, keyType, requestedClaims);
+    }
+    
+    private RequestedSecurityTokenType getRequestedSecurityToken(RequestSecurityTokenResponseType response) {
+        for (Object obj : response.getAny()) {
+            if (obj instanceof JAXBElement<?>) {
+                JAXBElement<?> jaxbElement = (JAXBElement<?>)obj;
+                if ("RequestedSecurityToken".equals(jaxbElement.getName().getLocalPart())) {
+                    return (RequestedSecurityTokenType)jaxbElement.getValue();
+                }
+            }
+        }
+        return null;
+    }
+    
+    private RequestSecurityTokenResponseType issueToken(
+        String tokenType,
+        String keyType,
+        List<String> requestedClaims
+    ) {
         if (tokenTypeMap != null && tokenTypeMap.containsKey(tokenType)) {
             tokenType = tokenTypeMap.get(tokenType);
         }
@@ -141,32 +172,32 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
       //  }
 
         // request.setContext(null);
-        return getToken(Action.ISSUE, request);
+        return processRequest(Action.ISSUE, request);
     }
 
     @Override
     public Response getToken(Action action, RequestSecurityTokenType request) {
-        RequestSecurityTokenResponseType response;
-        switch (action) {
-        case VALIDATE:
-            response = validate(request);
-            break;
-        case RENEW:
-            response = renew(request);
-            break;
-        case CANCEL:
-            response = cancel(request);
-            break;
-        case ISSUE:
-        default:
-            response = issueSingle(request);
-            break;
-        }
+        RequestSecurityTokenResponseType response = processRequest(action, request);
         
         JAXBElement<RequestSecurityTokenResponseType> jaxbResponse = 
             QNameConstants.WS_TRUST_FACTORY.createRequestSecurityTokenResponse(response);
 
         return Response.ok(jaxbResponse).build();
+    }
+    
+    private RequestSecurityTokenResponseType processRequest(Action action, 
+                                                            RequestSecurityTokenType request) {
+        switch (action) {
+        case VALIDATE:
+            return validate(request);
+        case RENEW:
+            return renew(request);
+        case CANCEL:
+            return cancel(request);
+        case ISSUE:
+        default:
+            return issueSingle(request);
+        }
     }
 
     @Override
