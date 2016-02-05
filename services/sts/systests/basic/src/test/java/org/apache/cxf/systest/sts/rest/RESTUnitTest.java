@@ -77,7 +77,7 @@ public class RESTUnitTest extends AbstractBusClientServerTestBase {
         SpringBusFactory.setThreadDefaultBus(bus);
         
         String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
-        WebClient client = WebClient.create(address, "alice", "clarinet", busFile.toString());
+        WebClient client = WebClient.create(address, busFile.toString());
 
         client.type("application/xml").accept("application/xml");
         client.path("saml2.0");

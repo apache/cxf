@@ -105,11 +105,6 @@
 
     <bean id="jsonProvider" class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider" />
     
-    <bean id="callbackHandler" class="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
-    <bean id="basicAuthFilter" class="org.apache.cxf.systest.sts.rest.WSS4JBasicAuthFilter">
-        <property name="callbackHandler" ref="callbackHandler"/>
-    </bean>
-   
     <jaxrs:server id="stsRESTService"
        depends-on="ClientAuthHttpsSettings" 
        address="https://localhost:${testutil.ports.STSRESTServer}/SecurityTokenService">
@@ -118,7 +113,6 @@
         </jaxrs:serviceBeans>
         <jaxrs:providers>
             <ref bean="jsonProvider" />
-            <ref bean="basicAuthFilter"/>
         </jaxrs:providers>
         <jaxrs:extensionMappings>
             <entry key="json" value="application/json;charset=UTF-8" />
@@ -135,7 +129,7 @@
                 <sec:trustManagers>
                     <sec:keyStore type="jks" password="stsspass" resource="stsstore.jks"/>
                 </sec:trustManagers>
-                <sec:clientAuthentication want="false" required="false"/>
+                <sec:clientAuthentication want="true" required="true"/>
             </httpj:tlsServerParameters>
         </httpj:engine>
     </httpj:engine-factory>

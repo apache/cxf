@@ -25,6 +25,9 @@
     </cxf:bus>
     <http:conduit name="https://localhost:.*">
         <http:tlsClientParameters disableCNCheck="true">
+            <sec:keyManagers keyPassword="ckpass">
+                <sec:keyStore type="jks" password="cspass" resource="clientstore.jks"/>
+            </sec:keyManagers>
             <sec:trustManagers>
                 <sec:keyStore type="jks" password="cspass" resource="clientstore.jks"/>
             </sec:trustManagers>

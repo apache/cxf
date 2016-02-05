@@ -20,6 +20,7 @@
 package org.apache.cxf.sts.rest;
 
 import java.security.Principal;
+import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +35,8 @@ import org.w3c.dom.Element;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.phase.PhaseInterceptorChain;
+import org.apache.cxf.security.SecurityContext;
+import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.sts.QNameConstants;
 import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.token.provider.jwt.JWTTokenProvider;
@@ -87,7 +90,6 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
 
     @Override
     public Response getToken(String tokenType, String keyType, List<String> requestedClaims) {
-
         if (tokenTypeMap != null && tokenTypeMap.containsKey(tokenType)) {
             tokenType = tokenTypeMap.get(tokenType);
         }
@@ -213,6 +215,18 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
     
     @Override
     protected Principal getPrincipal() {
+        SecurityContext sc = (SecurityContext)messageContext.get(SecurityContext.class);
+        if (sc == null || sc.getUserPrincipal() == null) {
+            // Get the TLS client principal if no security context is set up
+            TLSSessionInfo tlsInfo = 
+                (TLSSessionInfo)PhaseInterceptorChain.getCurrentMessage().get(TLSSessionInfo.class);
+            if (tlsInfo != null && tlsInfo.getPeerCertificates() != null 
+                    && tlsInfo.getPeerCertificates().length > 0
+                    && (tlsInfo.getPeerCertificates()[0] instanceof X509Certificate)
+            ) {
+                return ((X509Certificate)tlsInfo.getPeerCertificates()[0]).getSubjectX500Principal();
+            } 
+        }
         return messageContext.getSecurityContext().getUserPrincipal();
     }
     
