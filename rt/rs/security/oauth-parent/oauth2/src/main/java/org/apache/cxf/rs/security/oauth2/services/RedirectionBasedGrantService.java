@@ -169,8 +169,11 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         }
     
         // Request a new grant only if no pre-authorized token is available
-        ServerAccessToken preAuthorizedToken = getDataProvider().getPreauthorizedToken(
-            client, requestedScope, userSubject, supportedGrantType);
+        ServerAccessToken preAuthorizedToken = null;
+        if (canAccessTokenBeReturned(responseType)) {
+            preAuthorizedToken = getDataProvider().getPreauthorizedToken(client, requestedScope, userSubject, 
+                                                                         supportedGrantType);
+        }
         
         List<OAuthPermission> alreadyAuthorizedPerms = null;
         boolean preAuthorizationComplete = false;
@@ -290,6 +293,15 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         }
     }
     
+    protected List<String> getApprovedScope(List<String> requestedScope, List<String> approvedScope) {
+        if (StringUtils.isEmpty(approvedScope)) {
+            // no down-scoping done by a user, all of the requested scopes have been authorized
+            return requestedScope;
+        } else {
+            return approvedScope;
+        }
+    }
+    
     /**
      * Completes the authorization process
      */
@@ -371,6 +383,11 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
                                            String error) {
         return createErrorResponse(params.getFirst(OAuthConstants.STATE), redirectUri, error);
     }
+    
+    protected boolean canAccessTokenBeReturned(String responseType) {
+        return true;
+    }
+    
     protected abstract Response createErrorResponse(String state,
                                                     String redirectUri,
                                                     String error);
