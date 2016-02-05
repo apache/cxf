@@ -25,6 +25,8 @@ import java.util.List;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
+import org.apache.cxf.rs.security.jose.jwt.JoseJwtProducer;
+import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthError;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
@@ -43,6 +45,7 @@ public class OidcImplicitService extends ImplicitGrantService {
     private static final String ID_TOKEN_RESPONSE_TYPE = "id_token";
     private static final String ID_TOKEN_AND_AT_RESPONSE_TYPE = "id_token token";
     private boolean skipAuthorizationWithOidcScope;
+    private JoseJwtProducer idTokenHandler;
     
     public OidcImplicitService() {
         super(new HashSet<String>(Arrays.asList(ID_TOKEN_RESPONSE_TYPE,
@@ -112,10 +115,15 @@ public class OidcImplicitService extends ImplicitGrantService {
             OidcUserSubject sub = (OidcUserSubject)subject;
             IdToken idToken = new IdToken(sub.getIdToken());
             idToken.setNonce(state.getNonce());
-            return null; //super.processJwt(new JwtToken(idToken));
+            JoseJwtProducer processor = idTokenHandler == null ? new JoseJwtProducer() : null; 
+            return processor.processJwt(new JwtToken(idToken));
         } else {
             return null;
         }
+    }
+
+    public void setIdTokenJoseHandler(JoseJwtProducer idTokenJoseHandler) {
+        this.idTokenHandler = idTokenJoseHandler;
     }
     
 }
