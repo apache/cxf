@@ -139,7 +139,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         
         // Check response_type
         String responseType = params.getFirst(OAuthConstants.RESPONSE_TYPE);
-        if (responseType == null || !supportedResponseTypes.contains(responseType)) {
+        if (responseType == null || !getSupportedResponseTypes().contains(responseType)) {
             return createErrorResponse(params, redirectUri, OAuthConstants.UNSUPPORTED_RESPONSE_TYPE);
         }
         // Get the requested scopes
@@ -210,6 +210,9 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         
     }
     
+    public Set<String> getSupportedResponseTypes() {
+        return supportedResponseTypes;
+    }
     protected boolean canAuthorizationBeSkipped(Client client, 
                                                 UserSubject userSubject,
                                                 List<String> requestedScope, 
