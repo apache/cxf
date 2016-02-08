@@ -19,6 +19,7 @@
 package org.apache.cxf.rs.security.oauth2.provider;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 import org.apache.cxf.security.SecurityContext;
@@ -26,7 +27,7 @@ import org.apache.cxf.security.SecurityContext;
 public class DefaultSubjectCreator implements SubjectCreator {
 
     @Override
-    public UserSubject createUserSubject(MessageContext mc) throws OAuthServiceException {
+    public UserSubject createUserSubject(MessageContext mc, Client client) throws OAuthServiceException {
         return OAuthUtils.createSubject(mc, 
                                         (SecurityContext)mc.get(SecurityContext.class.getName()));
     }

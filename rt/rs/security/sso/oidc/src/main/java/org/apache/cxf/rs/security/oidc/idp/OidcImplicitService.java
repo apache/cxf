@@ -105,7 +105,7 @@ public class OidcImplicitService extends ImplicitGrantService {
             sb.append("&");
             sb.append(OAuthConstants.STATE).append("=").append(state.getState());   
         }
-        return finalizeResponse(sb, state);
+        return finalizeResponse(sb, client, state);
     }
     
     private String getProcessedIdToken(OAuthRedirectionState state, UserSubject subject) {

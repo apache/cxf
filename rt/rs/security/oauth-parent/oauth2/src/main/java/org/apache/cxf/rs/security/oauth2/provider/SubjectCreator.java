@@ -20,6 +20,7 @@
 package org.apache.cxf.rs.security.oauth2.provider;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 
 /**
@@ -32,8 +33,9 @@ public interface SubjectCreator {
     /**
      * Create a {@link UserSubject} 
      * @param mc the {@link MessageContext} of this request
+     * @param client the client
      * @return {@link UserSubject}
      * @throws OAuthServiceException
      */
-    UserSubject createUserSubject(MessageContext mc) throws OAuthServiceException;
+    UserSubject createUserSubject(MessageContext mc, Client client) throws OAuthServiceException;
 }

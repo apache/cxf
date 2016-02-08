@@ -39,6 +39,7 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 public class OAuthAuthorizationData extends OAuthRedirectionState implements Serializable {
     private static final long serialVersionUID = -7755998413495017637L;
     
+    private String clientId;
     private String endUserName;
     private String authenticityToken;
     private String replyTo;
@@ -58,6 +59,22 @@ public class OAuthAuthorizationData extends OAuthRedirectionState implements Ser
     public OAuthAuthorizationData() {
     }
 
+    /**
+     * Sets the client id which needs to be retained in a hidden form field
+     * @param clientId the client id
+     */
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
+    }
+
+    /**
+     * Gets the client id which needs to be retained in a hidden form field
+     * @return the client id
+     */
+    public String getClientId() {
+        return clientId;
+    }
+    
     /**
      * Get the client application name
      * @return application name

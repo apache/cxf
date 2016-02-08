@@ -108,16 +108,16 @@ public abstract class AbstractImplicitGrantService extends RedirectionBasedGrant
             processRefreshToken(sb, token.getRefreshToken());
         }
         
-        return finalizeResponse(sb, state);
+        return finalizeResponse(sb, client, state);
     }
     
-    protected Response finalizeResponse(StringBuilder sb, OAuthRedirectionState state) {
+    protected Response finalizeResponse(StringBuilder sb, Client client, OAuthRedirectionState state) {
         if (state.getState() != null) {
             sb.append("&");
             sb.append(OAuthConstants.STATE).append("=").append(state.getState());   
         }
         if (reportClientId) {
-            sb.append("&").append(OAuthConstants.CLIENT_ID).append("=").append(state.getClientId());
+            sb.append("&").append(OAuthConstants.CLIENT_ID).append("=").append(client.getClientId());
         }
         
         return Response.seeOther(URI.create(sb.toString())).build();

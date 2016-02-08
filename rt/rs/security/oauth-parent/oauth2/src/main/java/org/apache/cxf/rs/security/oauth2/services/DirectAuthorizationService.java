@@ -51,9 +51,10 @@ public class DirectAuthorizationService extends AbstractOAuthService {
     @Produces("text/html")
     public Response authorize(MultivaluedMap<String, String> params) {
         SecurityContext sc = getAndValidateSecurityContext(params);
-        // Create a UserSubject representing the end user 
-        UserSubject userSubject = createUserSubject(sc);
         Client client = getClient(params);
+        // Create a UserSubject representing the end user 
+        UserSubject userSubject = createUserSubject(sc, client);
+        
         
         AccessTokenRegistration reg = new AccessTokenRegistration();
         reg.setClient(client);
@@ -82,10 +83,10 @@ public class DirectAuthorizationService extends AbstractOAuthService {
         checkTransportSecurity();
         return securityContext;
     }
-    protected UserSubject createUserSubject(SecurityContext securityContext) {
+    protected UserSubject createUserSubject(SecurityContext securityContext, Client client) {
         UserSubject subject = null;
         if (subjectCreator != null) {
-            subject = subjectCreator.createUserSubject(getMessageContext());
+            subject = subjectCreator.createUserSubject(getMessageContext(), client);
             if (subject != null) {
                 return subject; 
             }
