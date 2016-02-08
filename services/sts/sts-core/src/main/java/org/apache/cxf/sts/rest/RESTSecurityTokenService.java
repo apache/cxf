@@ -56,6 +56,7 @@ public interface RESTSecurityTokenService {
     /**
      * @return Issues required token type with default token settings.
      */
+    
     @GET
     @Path("{tokenType}")
     @Produces({
@@ -72,7 +73,7 @@ public interface RESTSecurityTokenService {
     })
     Response getTokenViaWSTrust(@PathParam("tokenType") String tokenType, @QueryParam("keyType") String keyType,
         @QueryParam("claim") List<String> requestedClaims, @QueryParam("appliesTo") String appliesTo);
-
+    
     @POST
     @Produces({
         MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON

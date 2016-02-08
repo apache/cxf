@@ -96,15 +96,21 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
     public Response getToken(String tokenType, String keyType, List<String> requestedClaims, String appliesTo) {
         RequestSecurityTokenResponseType response = 
             issueToken(tokenType, keyType, requestedClaims, appliesTo);
-        
         RequestedSecurityTokenType requestedToken = getRequestedSecurityToken(response);
         
         return Response.ok(requestedToken.getAny()).build();
     }
     
     @Override
-    public Response getTokenViaWSTrust(String tokenType, String keyType, List<String> requestedClaims, String appliesTo) {
-        return getToken(tokenType, keyType, requestedClaims, appliesTo);
+    public Response getTokenViaWSTrust(String tokenType, String keyType, 
+                                       List<String> requestedClaims, String appliesTo) {
+        RequestSecurityTokenResponseType response = 
+            issueToken(tokenType, keyType, requestedClaims, appliesTo);
+        
+        JAXBElement<RequestSecurityTokenResponseType> jaxbResponse = 
+            QNameConstants.WS_TRUST_FACTORY.createRequestSecurityTokenResponse(response);
+        
+        return Response.ok(jaxbResponse).build();
     }
     
     private RequestedSecurityTokenType getRequestedSecurityToken(RequestSecurityTokenResponseType response) {

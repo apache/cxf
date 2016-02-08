@@ -55,6 +55,8 @@ import org.junit.BeforeClass;
  */
 public class RESTUnitTest extends AbstractBusClientServerTestBase {
     
+    static final String STSPORT = allocatePort(STSRESTServer.class);
+    
     private static final String SYMMETRIC_KEY_KEYTYPE = 
         "http://docs.oasis-open.org/ws-sx/ws-trust/200512/SymmetricKey";
     private static final String PUBLIC_KEY_KEYTYPE = 
@@ -63,8 +65,6 @@ public class RESTUnitTest extends AbstractBusClientServerTestBase {
         "http://docs.oasis-open.org/ws-sx/ws-trust/200512/Bearer";
     private static final String DEFAULT_ADDRESS = 
         "https://localhost:8081/doubleit/services/doubleittransportsaml1";
-    
-    static final String STSPORT = allocatePort(STSRESTServer.class);
     
     @BeforeClass
     public static void startServers() throws Exception {
@@ -229,7 +229,7 @@ public class RESTUnitTest extends AbstractBusClientServerTestBase {
 
         bus.shutdown(true);
     }
-    /*
+    
     @org.junit.Test
     public void testIssueBearerSAML1Token() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
@@ -391,28 +391,8 @@ public class RESTUnitTest extends AbstractBusClientServerTestBase {
         
         bus.shutdown(true);
     }
-*/
-    @org.junit.Test
-    @org.junit.Ignore
-    public void testIssueJWTToken() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = RESTUnitTest.class.getResource("cxf-client.xml");
 
-        Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
-        
-        String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
-        WebClient client = WebClient.create(address, "alice", "clarinet", busFile.toString());
-
-        client.type("application/json").accept("application/json");
-        client.path("jwt");
-        
-        client.get();
-    }
-    
     @org.junit.Test
-    @org.junit.Ignore
     public void testIssueSAML2TokenViaWSTrust() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = RESTUnitTest.class.getResource("cxf-client.xml");
@@ -421,7 +401,7 @@ public class RESTUnitTest extends AbstractBusClientServerTestBase {
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
         
-        String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
+        String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token/ws-trust";
         WebClient client = WebClient.create(address, busFile.toString());
 
         client.type("application/xml").accept("application/xml");
@@ -455,6 +435,25 @@ public class RESTUnitTest extends AbstractBusClientServerTestBase {
         assertTrue(assertion.isSigned());
 
         bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    @org.junit.Ignore
+    public void testIssueJWTToken() throws Exception {
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = RESTUnitTest.class.getResource("cxf-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
+        WebClient client = WebClient.create(address, "alice", "clarinet", busFile.toString());
+
+        client.type("application/json").accept("application/json");
+        client.path("jwt");
+        
+        client.get();
     }
     
     private List<WSSecurityEngineResult> processToken(Element assertionElement)
