@@ -58,6 +58,8 @@ public class RESTUnitTest extends AbstractBusClientServerTestBase {
         "http://docs.oasis-open.org/ws-sx/ws-trust/200512/PublicKey";
     private static final String BEARER_KEYTYPE = 
         "http://docs.oasis-open.org/ws-sx/ws-trust/200512/Bearer";
+    private static final String DEFAULT_ADDRESS = 
+        "https://localhost:8081/doubleit/services/doubleittransportsaml1";
     
     static final String STSPORT = allocatePort(STSRESTServer.class);
     
@@ -262,6 +264,66 @@ public class RESTUnitTest extends AbstractBusClientServerTestBase {
             confirmMethod = methods.get(0);
         }
         assertTrue(confirmMethod.contains("bearer"));
+
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testIssueSAML2TokenAppliesTo() throws Exception {
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = RESTUnitTest.class.getResource("cxf-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
+        WebClient client = WebClient.create(address, busFile.toString());
+
+        client.type("application/xml").accept("application/xml");
+        client.path("saml2.0");
+        client.query("appliesTo", DEFAULT_ADDRESS);
+        
+        Response response = client.get();
+        Document assertionDoc = response.readEntity(Document.class);
+        assertNotNull(assertionDoc);
+        
+        // Process the token
+        List<WSSecurityEngineResult> results = processToken(assertionDoc.getDocumentElement());
+
+        assertTrue(results != null && results.size() == 1);
+        SamlAssertionWrapper assertion = 
+            (SamlAssertionWrapper)results.get(0).get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(assertion != null);
+        assertTrue(assertion.getSaml2() != null && assertion.getSaml1() == null);
+        assertTrue(assertion.isSigned());
+
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testIssueSAML2TokenUnknownAppliesTo() throws Exception {
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = RESTUnitTest.class.getResource("cxf-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
+        WebClient client = WebClient.create(address, busFile.toString());
+
+        client.type("application/xml").accept("application/xml");
+        client.path("saml2.0");
+        client.query("appliesTo", "https://localhost:8081/tripleit/");
+        
+        Response response = client.get();
+        try {
+            response.readEntity(Document.class);
+            fail("Failure expected on an unknown AppliesTo address");
+        } catch (Exception ex) {
+            // expected
+        }
 
         bus.shutdown(true);
     }
