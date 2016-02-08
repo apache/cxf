@@ -37,6 +37,8 @@ import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenRespons
 import org.apache.cxf.ws.security.sts.provider.model.RequestedSecurityTokenType;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.saml.OpenSAMLUtil;
+import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
@@ -46,9 +48,16 @@ import org.apache.wss4j.dom.processor.SAMLTokenProcessor;
 import org.junit.BeforeClass;
 
 /**
- * Some unit tests for the CXF STSClient Issue Binding.
+ * Some unit tests for the REST interface of the CXF STS.
  */
 public class RESTUnitTest extends AbstractBusClientServerTestBase {
+    
+    private static final String SYMMETRIC_KEY_KEYTYPE = 
+        "http://docs.oasis-open.org/ws-sx/ws-trust/200512/SymmetricKey";
+    private static final String PUBLIC_KEY_KEYTYPE = 
+        "http://docs.oasis-open.org/ws-sx/ws-trust/200512/PublicKey";
+    private static final String BEARER_KEYTYPE = 
+        "http://docs.oasis-open.org/ws-sx/ws-trust/200512/Bearer";
     
     static final String STSPORT = allocatePort(STSRESTServer.class);
     
@@ -96,6 +105,163 @@ public class RESTUnitTest extends AbstractBusClientServerTestBase {
         assertTrue(assertion != null);
         assertTrue(assertion.getSaml2() != null && assertion.getSaml1() == null);
         assertTrue(assertion.isSigned());
+
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testIssueSAML1Token() throws Exception {
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = RESTUnitTest.class.getResource("cxf-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
+        WebClient client = WebClient.create(address, busFile.toString());
+
+        client.type("application/xml").accept("application/xml");
+        client.path("saml1.1");
+        
+        Response response = client.get();
+        Document assertionDoc = response.readEntity(Document.class);
+        assertNotNull(assertionDoc);
+        
+        // Process the token
+        List<WSSecurityEngineResult> results = processToken(assertionDoc.getDocumentElement());
+
+        assertTrue(results != null && results.size() == 1);
+        SamlAssertionWrapper assertion = 
+            (SamlAssertionWrapper)results.get(0).get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(assertion != null);
+        assertTrue(assertion.getSaml2() == null && assertion.getSaml1() != null);
+        assertTrue(assertion.isSigned());
+
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testIssueSymmetricKeySaml1() throws Exception {
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = RESTUnitTest.class.getResource("cxf-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
+        WebClient client = WebClient.create(address, busFile.toString());
+
+        client.type("application/xml").accept("application/xml");
+        client.path("saml1.1");
+        client.query("keyType", SYMMETRIC_KEY_KEYTYPE);
+        
+        Response response = client.get();
+        Document assertionDoc = response.readEntity(Document.class);
+        assertNotNull(assertionDoc);
+        
+        // Process the token
+        List<WSSecurityEngineResult> results = processToken(assertionDoc.getDocumentElement());
+
+        assertTrue(results != null && results.size() == 1);
+        SamlAssertionWrapper assertion = 
+            (SamlAssertionWrapper)results.get(0).get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(assertion != null);
+        assertTrue(assertion.getSaml2() == null && assertion.getSaml1() != null);
+        assertTrue(assertion.isSigned());
+        
+        List<String> methods = assertion.getConfirmationMethods();
+        String confirmMethod = null;
+        if (methods != null && methods.size() > 0) {
+            confirmMethod = methods.get(0);
+        }
+        assertTrue(OpenSAMLUtil.isMethodHolderOfKey(confirmMethod));
+        SAMLKeyInfo subjectKeyInfo = assertion.getSubjectKeyInfo();
+        assertTrue(subjectKeyInfo.getSecret() != null);
+
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    @org.junit.Ignore
+    public void testIssuePublicKeySAML2Token() throws Exception {
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = RESTUnitTest.class.getResource("cxf-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
+        WebClient client = WebClient.create(address, busFile.toString());
+
+        client.type("application/xml").accept("application/xml");
+        client.path("saml2.0");
+        client.query("keyType", PUBLIC_KEY_KEYTYPE);
+        
+        Response response = client.get();
+        Document assertionDoc = response.readEntity(Document.class);
+        assertNotNull(assertionDoc);
+        
+        // Process the token
+        List<WSSecurityEngineResult> results = processToken(assertionDoc.getDocumentElement());
+
+        assertTrue(results != null && results.size() == 1);
+        SamlAssertionWrapper assertion = 
+            (SamlAssertionWrapper)results.get(0).get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(assertion != null);
+        assertTrue(assertion.getSaml2() != null && assertion.getSaml1() == null);
+        assertTrue(assertion.isSigned());
+        
+        List<String> methods = assertion.getConfirmationMethods();
+        String confirmMethod = null;
+        if (methods != null && methods.size() > 0) {
+            confirmMethod = methods.get(0);
+        }
+        assertTrue(OpenSAMLUtil.isMethodHolderOfKey(confirmMethod));
+        SAMLKeyInfo subjectKeyInfo = assertion.getSubjectKeyInfo();
+        assertTrue(subjectKeyInfo.getCerts() != null);
+
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testIssueBearerSAML1Token() throws Exception {
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = RESTUnitTest.class.getResource("cxf-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
+        WebClient client = WebClient.create(address, busFile.toString());
+
+        client.type("application/xml").accept("application/xml");
+        client.path("saml1.1");
+        client.query("keyType", BEARER_KEYTYPE);
+        
+        Response response = client.get();
+        Document assertionDoc = response.readEntity(Document.class);
+        assertNotNull(assertionDoc);
+        
+        // Process the token
+        List<WSSecurityEngineResult> results = processToken(assertionDoc.getDocumentElement());
+
+        assertTrue(results != null && results.size() == 1);
+        SamlAssertionWrapper assertion = 
+            (SamlAssertionWrapper)results.get(0).get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(assertion != null);
+        assertTrue(assertion.getSaml2() == null && assertion.getSaml1() != null);
+        assertTrue(assertion.isSigned());
+        
+        List<String> methods = assertion.getConfirmationMethods();
+        String confirmMethod = null;
+        if (methods != null && methods.size() > 0) {
+            confirmMethod = methods.get(0);
+        }
+        assertTrue(confirmMethod.contains("bearer"));
 
         bus.shutdown(true);
     }
