@@ -90,9 +90,9 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
     private boolean requestClaimsOptional = true;
 
     @Override
-    public Response getToken(String tokenType, String keyType, List<String> requestedClaims) {
+    public Response getToken(String tokenType, String keyType, List<String> requestedClaims, String appliesTo) {
         RequestSecurityTokenResponseType response = 
-            issueToken(tokenType, keyType, requestedClaims);
+            issueToken(tokenType, keyType, requestedClaims, appliesTo);
         
         RequestedSecurityTokenType requestedToken = getRequestedSecurityToken(response);
         
@@ -100,8 +100,8 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
     }
     
     @Override
-    public Response getTokenViaWSTrust(String tokenType, String keyType, List<String> requestedClaims) {
-        return getToken(tokenType, keyType, requestedClaims);
+    public Response getTokenViaWSTrust(String tokenType, String keyType, List<String> requestedClaims, String appliesTo) {
+        return getToken(tokenType, keyType, requestedClaims, appliesTo);
     }
     
     private RequestedSecurityTokenType getRequestedSecurityToken(RequestSecurityTokenResponseType response) {
@@ -119,7 +119,8 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
     private RequestSecurityTokenResponseType issueToken(
         String tokenType,
         String keyType,
-        List<String> requestedClaims
+        List<String> requestedClaims,
+        String appliesTo
     ) {
         if (tokenTypeMap != null && tokenTypeMap.containsKey(tokenType)) {
             tokenType = tokenTypeMap.get(tokenType);
@@ -157,6 +158,22 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
                 claimsType.getAny().add(claimElement);
             }
             request.getAny().add(claims);
+        }
+        
+        if (appliesTo != null) {
+            String wspNamespace = "http://www.w3.org/ns/ws-policy";
+            Document doc = DOMUtils.createDocument();
+            Element appliesToElement = doc.createElementNS(wspNamespace, "AppliesTo");
+            
+            String addressingNamespace = "http://www.w3.org/2005/08/addressing";
+            Element eprElement = doc.createElementNS(addressingNamespace, "EndpointReference");
+            Element addressElement = doc.createElementNS(addressingNamespace, "Address");
+            addressElement.setTextContent(appliesTo);
+
+            eprElement.appendChild(addressElement);
+            appliesToElement.appendChild(eprElement);
+            
+            request.getAny().add(appliesToElement);
         }
 
         // OnBehalfOf
