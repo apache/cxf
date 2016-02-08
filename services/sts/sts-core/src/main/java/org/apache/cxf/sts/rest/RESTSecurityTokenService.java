@@ -38,10 +38,10 @@ import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
 public interface RESTSecurityTokenService {
 
     enum Action {
-        ISSUE("issue"),
-        VALIDATE("validate"),
-        RENEW("renew"),
-        CANCEL("cancel");
+        issue("issue"),
+        validate("validate"),
+        renew("renew"),
+        cancel("cancel");
         private String value;
 
         private Action(String value) {

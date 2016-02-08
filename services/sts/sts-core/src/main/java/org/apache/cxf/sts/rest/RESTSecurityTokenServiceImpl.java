@@ -220,7 +220,7 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
       //  }
 
         // request.setContext(null);
-        return processRequest(Action.ISSUE, request);
+        return processRequest(Action.issue, request);
     }
 
     @Override
@@ -236,13 +236,13 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
     private RequestSecurityTokenResponseType processRequest(Action action, 
                                                             RequestSecurityTokenType request) {
         switch (action) {
-        case VALIDATE:
+        case validate:
             return validate(request);
-        case RENEW:
+        case renew:
             return renew(request);
-        case CANCEL:
+        case cancel:
             return cancel(request);
-        case ISSUE:
+        case issue:
         default:
             return issueSingle(request);
         }
