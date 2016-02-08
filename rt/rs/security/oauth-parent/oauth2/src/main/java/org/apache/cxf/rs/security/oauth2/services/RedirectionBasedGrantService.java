@@ -118,9 +118,9 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
     protected Response startAuthorization(MultivaluedMap<String, String> params) {
         // Make sure the end user has authenticated, check if HTTPS is used
         SecurityContext sc = getAndValidateSecurityContext(params);
-        // Create a UserSubject representing the end user 
-        UserSubject userSubject = createUserSubject(sc);
         Client client = getClient(params);
+        // Create a UserSubject representing the end user 
+        UserSubject userSubject = createUserSubject(sc, client);
         return startAuthorization(params, userSubject, client);
     }
         
@@ -277,7 +277,6 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         }
         if (state == null) {
             state = new OAuthRedirectionState();
-            state.setClientId(params.getFirst(OAuthConstants.CLIENT_ID));
             state.setRedirectUri(params.getFirst(OAuthConstants.REDIRECT_URI));
             state.setAudience(params.getFirst(OAuthConstants.CLIENT_AUDIENCE));
             // or if no audience parameter is available, set the list of client
@@ -311,7 +310,9 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
     protected Response completeAuthorization(MultivaluedMap<String, String> params) {
         // Make sure the end user has authenticated, check if HTTPS is used
         SecurityContext securityContext = getAndValidateSecurityContext(params);
-        UserSubject userSubject = createUserSubject(securityContext);
+        Client client = getClient(params.getFirst(OAuthConstants.CLIENT_ID));
+        
+        UserSubject userSubject = createUserSubject(securityContext, client);
         
         // Make sure the session is valid
         String sessionTokenParamName = params.getFirst(OAuthConstants.SESSION_AUTHENTICITY_TOKEN_PARAM_NAME);
@@ -325,7 +326,6 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         
         OAuthRedirectionState state = 
             recreateRedirectionStateFromSession(userSubject, params, sessionToken);
-        Client client = getClient(state.getClientId());
         String redirectUri = validateRedirectUri(client, state.getRedirectUri());
         
         // Get the end user decision value
@@ -370,10 +370,10 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         this.subjectCreator = creator;
     }
     
-    protected UserSubject createUserSubject(SecurityContext securityContext) {
+    protected UserSubject createUserSubject(SecurityContext securityContext, Client client) {
         UserSubject subject = null;
         if (subjectCreator != null) {
-            subject = subjectCreator.createUserSubject(getMessageContext());
+            subject = subjectCreator.createUserSubject(getMessageContext(), client);
             if (subject != null) {
                 return subject; 
             }
