@@ -31,6 +31,9 @@ import org.w3c.dom.Element;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
+import org.apache.cxf.rt.security.claims.Claim;
+import org.apache.cxf.rt.security.claims.ClaimCollection;
+import org.apache.cxf.rt.security.saml.utils.SAMLUtils;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseType;
@@ -328,6 +331,68 @@ public class RESTUnitTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
+    @org.junit.Test
+    public void testIssueSAML2TokenClaims() throws Exception {
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = RESTUnitTest.class.getResource("cxf-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
+        WebClient client = WebClient.create(address, busFile.toString());
+
+        client.type("application/xml").accept("application/xml");
+        client.path("saml2.0");
+        
+        // First check that the role isn't usually in the generated token
+        
+        Response response = client.get();
+        Document assertionDoc = response.readEntity(Document.class);
+        assertNotNull(assertionDoc);
+        
+        // Process the token
+        List<WSSecurityEngineResult> results = processToken(assertionDoc.getDocumentElement());
+
+        assertTrue(results != null && results.size() == 1);
+        SamlAssertionWrapper assertion = 
+            (SamlAssertionWrapper)results.get(0).get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(assertion != null);
+        assertTrue(assertion.getSaml2() != null && assertion.getSaml1() == null);
+        assertTrue(assertion.isSigned());
+        
+        ClaimCollection claims = SAMLUtils.getClaims(assertion);
+        assertEquals(1, claims.size());
+        Claim claim = claims.get(0);
+        String role = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role";
+        assertNotEquals(claim.getClaimType().toString(), role);
+        
+        // Now get another token specifying the role
+        client.query("claim", role);
+        response = client.get();
+        assertionDoc = response.readEntity(Document.class);
+        assertNotNull(assertionDoc);
+        
+        // Process the token
+        results = processToken(assertionDoc.getDocumentElement());
+
+        assertTrue(results != null && results.size() == 1);
+        assertion = 
+            (SamlAssertionWrapper)results.get(0).get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(assertion != null);
+        assertTrue(assertion.getSaml2() != null && assertion.getSaml1() == null);
+        assertTrue(assertion.isSigned());
+        
+        claims = SAMLUtils.getClaims(assertion);
+        assertEquals(1, claims.size());
+        claim = claims.get(0);
+        assertEquals(claim.getClaimType().toString(), role);
+        assertEquals("ordinary-user", claim.getValues().get(0));
+        
+        bus.shutdown(true);
+    }
+
     @org.junit.Test
     @org.junit.Ignore
     public void testIssueJWTToken() throws Exception {
