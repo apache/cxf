@@ -51,6 +51,7 @@ public class Client implements Serializable {
     private UserSubject subject;
     private UserSubject resourceOwnerSubject;
     private long registeredAt;    
+    private String homeRealm;
     
     public Client() {
         
@@ -345,5 +346,18 @@ public class Client implements Serializable {
 
     public void setRegisteredAt(long registeredAt) {
         this.registeredAt = registeredAt;
+    }
+
+    public String getHomeRealm() {
+        return homeRealm;
+    }
+
+    /**
+     * Hint to the authentication system how the users
+     * redirected by this client need to be authenticated   
+     * @param homeRealm user home realm
+     */
+    public void setHomeRealm(String homeRealm) {
+        this.homeRealm = homeRealm;
     }
 }
