@@ -101,10 +101,6 @@ public class OidcImplicitService extends ImplicitGrantService {
         if (idToken != null) {
             sb.append(OidcUtils.ID_TOKEN).append("=").append(idToken);
         }
-        if (state.getState() != null) {
-            sb.append("&");
-            sb.append(OAuthConstants.STATE).append("=").append(state.getState());   
-        }
         return finalizeResponse(sb, client, state);
     }
     
