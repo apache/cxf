@@ -34,7 +34,8 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
-import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.rs.security.oauth2.common.OAuthError;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 @Path("authorize")
@@ -52,13 +53,23 @@ public class AuthorizationService {
     @GET
     @Produces({"application/xhtml+xml", "text/html", "application/xml", "application/json" })
     public Response authorize(@QueryParam(OAuthConstants.RESPONSE_TYPE) String responseType) {
-        return getService(responseType).authorize();
+        RedirectionBasedGrantService service = getService(responseType);
+        if (service != null) {
+            return service.authorize();
+        } else {
+            return reportInvalidResponseType();
+        }
     }
     
     @GET
     @Path("/decision")
     public Response authorizeDecision(@QueryParam(OAuthConstants.RESPONSE_TYPE) String responseType) {
-        return getService(responseType).authorizeDecision();
+        RedirectionBasedGrantService service = getService(responseType);
+        if (service != null) {
+            return service.authorizeDecision();
+        } else {
+            return reportInvalidResponseType();
+        }
     }
     
     /**
@@ -70,14 +81,16 @@ public class AuthorizationService {
     @Consumes("application/x-www-form-urlencoded")
     public Response authorizeDecisionForm(MultivaluedMap<String, String> params) {
         String responseType = params.getFirst(OAuthConstants.RESPONSE_TYPE);
-        return getService(responseType).authorizeDecisionForm(params);
+        RedirectionBasedGrantService service = getService(responseType);
+        if (service != null) {
+            return service.authorizeDecisionForm(params);
+        } else {
+            return reportInvalidResponseType();
+        }
     }
     
     private RedirectionBasedGrantService getService(String responseType) {
-        if (responseType == null || !servicesMap.containsKey(responseType)) {
-            throw new OAuthServiceException(OAuthConstants.INVALID_REQUEST);
-        }
-        return servicesMap.get(responseType);
+        return responseType == null ? null : servicesMap.get(responseType);
     }
     
     public void setServices(List<RedirectionBasedGrantService> services) {
@@ -87,5 +100,10 @@ public class AuthorizationService {
             }
         }
         
+    }
+    
+    protected Response reportInvalidResponseType() {
+        return JAXRSUtils.toResponseBuilder(400)
+            .type("application/json").entity(new OAuthError(OAuthConstants.UNSUPPORTED_RESPONSE_TYPE)).build();
     }
 }
