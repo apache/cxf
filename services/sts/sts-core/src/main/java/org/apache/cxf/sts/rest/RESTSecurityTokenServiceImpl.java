@@ -46,8 +46,11 @@ import org.apache.cxf.ws.security.sts.provider.model.ObjectFactory;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestedSecurityTokenType;
+import org.apache.cxf.ws.security.sts.provider.model.UseKeyType;
 import org.apache.cxf.ws.security.trust.STSUtils;
 import org.apache.wss4j.dom.WSConstants;
+import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.keys.content.X509Data;
 
 public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl implements RESTSecurityTokenService {
 
@@ -132,9 +135,31 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
 
         request.getAny().add(of.createRequestType("http://docs.oasis-open.org/ws-sx/ws-trust/200512/Issue"));
 
-        request.getAny().add(of.createKeyType(keyType != null
-            ? keyType
-            : defaultKeyType));
+        String desiredKeyType = keyType != null ? keyType : defaultKeyType;
+        request.getAny().add(of.createKeyType(desiredKeyType));
+        
+        // Add the TLS client Certificate as the UseKey Element if the KeyType is PublicKey
+        if (STSConstants.PUBLIC_KEY_KEYTYPE.equals(desiredKeyType)) {
+            X509Certificate clientCert = getTLSClientCertificate();
+            if (clientCert != null) {
+                Document doc = DOMUtils.createDocument();
+                Element keyInfoElement = doc.createElementNS("http://www.w3.org/2000/09/xmldsig#", "KeyInfo");
+                
+                try {
+                    X509Data certElem = new X509Data(doc);
+                    certElem.addCertificate(clientCert);
+                    keyInfoElement.appendChild(certElem.getElement());
+                    
+                    UseKeyType useKeyType = of.createUseKeyType();
+                    useKeyType.setAny(keyInfoElement);
+                    
+                    JAXBElement<UseKeyType> useKey = of.createUseKey(useKeyType);
+                    request.getAny().add(useKey);
+                } catch (XMLSecurityException ex) {
+                    // TODO
+                }
+            }
+        }
 
         // Claims
         if (requestedClaims == null) {
@@ -266,16 +291,21 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
         SecurityContext sc = (SecurityContext)messageContext.get(SecurityContext.class);
         if (sc == null || sc.getUserPrincipal() == null) {
             // Get the TLS client principal if no security context is set up
-            TLSSessionInfo tlsInfo = 
-                (TLSSessionInfo)PhaseInterceptorChain.getCurrentMessage().get(TLSSessionInfo.class);
-            if (tlsInfo != null && tlsInfo.getPeerCertificates() != null 
-                    && tlsInfo.getPeerCertificates().length > 0
-                    && (tlsInfo.getPeerCertificates()[0] instanceof X509Certificate)
-            ) {
-                return ((X509Certificate)tlsInfo.getPeerCertificates()[0]).getSubjectX500Principal();
-            } 
+            return getTLSClientCertificate().getSubjectX500Principal();
         }
         return messageContext.getSecurityContext().getUserPrincipal();
+    }
+    
+    private X509Certificate getTLSClientCertificate() {
+        TLSSessionInfo tlsInfo = 
+            (TLSSessionInfo)PhaseInterceptorChain.getCurrentMessage().get(TLSSessionInfo.class);
+        if (tlsInfo != null && tlsInfo.getPeerCertificates() != null 
+                && tlsInfo.getPeerCertificates().length > 0
+                && (tlsInfo.getPeerCertificates()[0] instanceof X509Certificate)
+        ) {
+            return (X509Certificate)tlsInfo.getPeerCertificates()[0];
+        }
+        return null;
     }
     
     @Override

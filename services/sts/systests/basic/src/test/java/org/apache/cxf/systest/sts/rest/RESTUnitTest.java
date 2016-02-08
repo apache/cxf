@@ -189,7 +189,6 @@ public class RESTUnitTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.Test
-    @org.junit.Ignore
     public void testIssuePublicKeySAML2Token() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = RESTUnitTest.class.getResource("cxf-client.xml");
@@ -230,7 +229,7 @@ public class RESTUnitTest extends AbstractBusClientServerTestBase {
 
         bus.shutdown(true);
     }
-    
+    /*
     @org.junit.Test
     public void testIssueBearerSAML1Token() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
@@ -392,7 +391,7 @@ public class RESTUnitTest extends AbstractBusClientServerTestBase {
         
         bus.shutdown(true);
     }
-
+*/
     @org.junit.Test
     @org.junit.Ignore
     public void testIssueJWTToken() throws Exception {
