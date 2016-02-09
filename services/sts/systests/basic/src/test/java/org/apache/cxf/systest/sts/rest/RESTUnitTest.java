@@ -35,11 +35,13 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rt.security.claims.Claim;
 import org.apache.cxf.rt.security.claims.ClaimCollection;
 import org.apache.cxf.rt.security.saml.utils.SAMLUtils;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestedSecurityTokenType;
+import org.apache.cxf.ws.security.sts.provider.model.StatusType;
 import org.apache.cxf.ws.security.trust.STSUtils;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
@@ -418,28 +420,7 @@ public class RESTUnitTest extends AbstractBusClientServerTestBase {
         RequestSecurityTokenResponseType securityResponse = 
             response.readEntity(RequestSecurityTokenResponseType.class);
         
-        RequestedSecurityTokenType requestedSecurityToken = null;
-        for (Object obj : securityResponse.getAny()) {
-            if (obj instanceof JAXBElement<?>) {
-                JAXBElement<?> jaxbElement = (JAXBElement<?>)obj;
-                if ("RequestedSecurityToken".equals(jaxbElement.getName().getLocalPart())) {
-                    requestedSecurityToken = (RequestedSecurityTokenType)jaxbElement.getValue();
-                    break;
-                }
-            }
-        }
-        assertNotNull(requestedSecurityToken);
-        
-        // Process the token
-        List<WSSecurityEngineResult> results = 
-            processToken((Element)requestedSecurityToken.getAny());
-
-        assertTrue(results != null && results.size() == 1);
-        SamlAssertionWrapper assertion = 
-            (SamlAssertionWrapper)results.get(0).get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(assertion != null);
-        assertTrue(assertion.getSaml2() != null && assertion.getSaml1() == null);
-        assertTrue(assertion.isSigned());
+        validateSAMLSecurityTokenResponse(securityResponse, true);
 
         bus.shutdown(true);
     }
@@ -479,28 +460,7 @@ public class RESTUnitTest extends AbstractBusClientServerTestBase {
         RequestSecurityTokenResponseType securityResponse = 
             response.readEntity(RequestSecurityTokenResponseType.class);
         
-        RequestedSecurityTokenType requestedSecurityToken = null;
-        for (Object obj : securityResponse.getAny()) {
-            if (obj instanceof JAXBElement<?>) {
-                JAXBElement<?> jaxbElement = (JAXBElement<?>)obj;
-                if ("RequestedSecurityToken".equals(jaxbElement.getName().getLocalPart())) {
-                    requestedSecurityToken = (RequestedSecurityTokenType)jaxbElement.getValue();
-                    break;
-                }
-            }
-        }
-        assertNotNull(requestedSecurityToken);
-        
-        // Process the token
-        List<WSSecurityEngineResult> results = 
-            processToken((Element)requestedSecurityToken.getAny());
-
-        assertTrue(results != null && results.size() == 1);
-        SamlAssertionWrapper assertion = 
-            (SamlAssertionWrapper)results.get(0).get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(assertion != null);
-        assertTrue(assertion.getSaml2() != null && assertion.getSaml1() == null);
-        assertTrue(assertion.isSigned());
+        validateSAMLSecurityTokenResponse(securityResponse, true);
 
         bus.shutdown(true);
     }
@@ -541,28 +501,7 @@ public class RESTUnitTest extends AbstractBusClientServerTestBase {
         RequestSecurityTokenResponseType securityResponse = 
             response.readEntity(RequestSecurityTokenResponseType.class);
         
-        RequestedSecurityTokenType requestedSecurityToken = null;
-        for (Object obj : securityResponse.getAny()) {
-            if (obj instanceof JAXBElement<?>) {
-                JAXBElement<?> jaxbElement = (JAXBElement<?>)obj;
-                if ("RequestedSecurityToken".equals(jaxbElement.getName().getLocalPart())) {
-                    requestedSecurityToken = (RequestedSecurityTokenType)jaxbElement.getValue();
-                    break;
-                }
-            }
-        }
-        assertNotNull(requestedSecurityToken);
-        
-        // Process the token
-        List<WSSecurityEngineResult> results = 
-            processToken((Element)requestedSecurityToken.getAny());
-
-        assertTrue(results != null && results.size() == 1);
-        SamlAssertionWrapper assertion = 
-            (SamlAssertionWrapper)results.get(0).get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(assertion != null);
-        assertTrue(assertion.getSaml2() != null && assertion.getSaml1() == null);
-        assertTrue(assertion.isSigned());
+        validateSAMLSecurityTokenResponse(securityResponse, true);
 
         bus.shutdown(true);
     }
@@ -603,28 +542,147 @@ public class RESTUnitTest extends AbstractBusClientServerTestBase {
         RequestSecurityTokenResponseType securityResponse = 
             response.readEntity(RequestSecurityTokenResponseType.class);
         
-        RequestedSecurityTokenType requestedSecurityToken = null;
+        validateSAMLSecurityTokenResponse(securityResponse, false);
+
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testValidateSAML2Token() throws Exception {
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = RESTUnitTest.class.getResource("cxf-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
+        WebClient client = WebClient.create(address, busFile.toString());
+
+        client.type("application/xml").accept("application/xml");
+        client.path("saml2.0");
+        
+        // 1. Get a token via GET
+        Response response = client.get();
+        Document assertionDoc = response.readEntity(Document.class);
+        assertNotNull(assertionDoc);
+        
+        // 2. Now validate it in the STS using POST
+        client = WebClient.create(address, busFile.toString());
+
+        client.type("application/xml").accept("application/xml");
+        client.query("action", "validate");
+        
+        // Create RequestSecurityToken
+        W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
+        String namespace = STSUtils.WST_NS_05_12;
+        writer.writeStartElement("wst", "RequestSecurityToken", namespace);
+        writer.writeNamespace("wst", namespace);
+        
+        writer.writeStartElement("wst", "RequestType", namespace);
+        writer.writeCharacters(namespace + "/Validate");
+        writer.writeEndElement();
+        
+        writer.writeStartElement("wst", "TokenType", namespace);
+        String tokenType = namespace + "/RSTR/Status";
+        writer.writeCharacters(tokenType);
+        writer.writeEndElement();
+        
+        writer.writeStartElement("wst", "ValidateTarget", namespace);
+        StaxUtils.copy(assertionDoc.getDocumentElement(), writer);
+        writer.writeEndElement();
+        
+        writer.writeEndElement();
+        
+        response = client.post(new DOMSource(writer.getDocument().getDocumentElement()));
+        
+        RequestSecurityTokenResponseType securityResponse = 
+            response.readEntity(RequestSecurityTokenResponseType.class);
+        
+        StatusType status = null;
         for (Object obj : securityResponse.getAny()) {
             if (obj instanceof JAXBElement<?>) {
                 JAXBElement<?> jaxbElement = (JAXBElement<?>)obj;
-                if ("RequestedSecurityToken".equals(jaxbElement.getName().getLocalPart())) {
-                    requestedSecurityToken = (RequestedSecurityTokenType)jaxbElement.getValue();
+                if ("Status".equals(jaxbElement.getName().getLocalPart())) {
+                    status = (StatusType)jaxbElement.getValue();
                     break;
                 }
             }
         }
-        assertNotNull(requestedSecurityToken);
+        assertNotNull(status);
         
-        // Process the token
-        List<WSSecurityEngineResult> results = 
-            processToken((Element)requestedSecurityToken.getAny());
+        // Check the token was valid
+        String validCode = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/status/valid";
+        assertEquals(validCode, status.getCode());
 
-        assertTrue(results != null && results.size() == 1);
-        SamlAssertionWrapper assertion = 
-            (SamlAssertionWrapper)results.get(0).get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(assertion != null);
-        assertTrue(assertion.getSaml2() == null && assertion.getSaml1() != null);
-        assertTrue(assertion.isSigned());
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testRenewSAML2Token() throws Exception {
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = RESTUnitTest.class.getResource("cxf-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
+        WebClient client = WebClient.create(address, busFile.toString());
+
+        client.type("application/xml").accept("application/xml");
+        client.query("action", "issue");
+        
+        // 1. Get a token via POST
+        
+        // Create RequestSecurityToken
+        W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
+        String namespace = STSUtils.WST_NS_05_12;
+        writer.writeStartElement("wst", "RequestSecurityToken", namespace);
+        writer.writeNamespace("wst", namespace);
+        
+        writer.writeStartElement("wst", "RequestType", namespace);
+        writer.writeCharacters(namespace + "/Issue");
+        writer.writeEndElement();
+        
+        writer.writeStartElement("wst", "TokenType", namespace);
+        writer.writeCharacters(SAML2_TOKEN_TYPE);
+        writer.writeEndElement();
+        
+        writer.writeEndElement();
+        
+        Response response = client.post(new DOMSource(writer.getDocument().getDocumentElement()));
+        
+        RequestSecurityTokenResponseType securityResponse = 
+            response.readEntity(RequestSecurityTokenResponseType.class);
+        Element token = validateSAMLSecurityTokenResponse(securityResponse, true);
+        
+        // 2. Now validate it in the STS using POST
+        client = WebClient.create(address, busFile.toString());
+
+        client.type("application/xml").accept("application/xml");
+        client.query("action", "renew");
+        
+        // Create RequestSecurityToken
+        writer = new W3CDOMStreamWriter();
+        writer.writeStartElement("wst", "RequestSecurityToken", namespace);
+        writer.writeNamespace("wst", namespace);
+        
+        writer.writeStartElement("wst", "RequestType", namespace);
+        writer.writeCharacters(namespace + "/Renew");
+        writer.writeEndElement();
+        
+        writer.writeStartElement("wst", "RenewTarget", namespace);
+        StaxUtils.copy(token, writer);
+        writer.writeEndElement();
+        
+        writer.writeEndElement();
+        
+        response = client.post(new DOMSource(writer.getDocument().getDocumentElement()));
+        
+        securityResponse = response.readEntity(RequestSecurityTokenResponseType.class);
+        
+        validateSAMLSecurityTokenResponse(securityResponse, true);
 
         bus.shutdown(true);
     }
@@ -646,6 +704,39 @@ public class RESTUnitTest extends AbstractBusClientServerTestBase {
         client.path("jwt");
         
         client.get();
+    }
+    
+    private Element validateSAMLSecurityTokenResponse(
+        RequestSecurityTokenResponseType securityResponse, boolean saml2
+    ) throws Exception {
+        RequestedSecurityTokenType requestedSecurityToken = null;
+        for (Object obj : securityResponse.getAny()) {
+            if (obj instanceof JAXBElement<?>) {
+                JAXBElement<?> jaxbElement = (JAXBElement<?>)obj;
+                if ("RequestedSecurityToken".equals(jaxbElement.getName().getLocalPart())) {
+                    requestedSecurityToken = (RequestedSecurityTokenType)jaxbElement.getValue();
+                    break;
+                }
+            }
+        }
+        assertNotNull(requestedSecurityToken);
+        
+        // Process the token
+        List<WSSecurityEngineResult> results = 
+            processToken((Element)requestedSecurityToken.getAny());
+
+        assertTrue(results != null && results.size() == 1);
+        SamlAssertionWrapper assertion = 
+            (SamlAssertionWrapper)results.get(0).get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(assertion != null);
+        if (saml2) {
+            assertTrue(assertion.getSaml2() != null && assertion.getSaml1() == null);
+        } else {
+            assertTrue(assertion.getSaml2() == null && assertion.getSaml1() != null);
+        }
+        assertTrue(assertion.isSigned());
+        
+        return (Element)results.get(0).get(WSSecurityEngineResult.TAG_TOKEN_ELEMENT);
     }
     
     private List<WSSecurityEngineResult> processToken(Element assertionElement)
