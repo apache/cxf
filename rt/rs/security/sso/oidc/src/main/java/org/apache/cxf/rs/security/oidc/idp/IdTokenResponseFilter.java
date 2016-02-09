@@ -59,6 +59,8 @@ public class IdTokenResponseFilter extends OAuthServerJoseJwtProducer implements
         } else if (st.getSubject() instanceof OidcUserSubject) {
             OidcUserSubject sub = (OidcUserSubject)st.getSubject();
             IdToken idToken = new IdToken(sub.getIdToken());
+            idToken.setAudience(st.getClient().getClientId());
+            idToken.setAuthorizedParty(st.getClient().getClientId());
             // if this token was refreshed then the cloned IDToken might need to have its
             // issuedAt and expiry time properties adjusted if it proves to be necessary
             setAtHashAndNonce(idToken, st);

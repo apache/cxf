@@ -21,7 +21,6 @@ package org.apache.cxf.rs.security.oauth2.provider;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
-import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 import org.apache.cxf.security.SecurityContext;
@@ -30,7 +29,6 @@ public class DefaultSubjectCreator implements SubjectCreator {
 
     @Override
     public UserSubject createUserSubject(MessageContext mc, 
-                                         Client client,
                                          MultivaluedMap<String, String> params) throws OAuthServiceException {
         return OAuthUtils.createSubject(mc, 
                                         (SecurityContext)mc.get(SecurityContext.class.getName()));
