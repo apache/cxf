@@ -120,7 +120,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         SecurityContext sc = getAndValidateSecurityContext(params);
         Client client = getClient(params);
         // Create a UserSubject representing the end user 
-        UserSubject userSubject = createUserSubject(sc, client);
+        UserSubject userSubject = createUserSubject(sc, client, params);
         return startAuthorization(params, userSubject, client);
     }
         
@@ -312,7 +312,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         SecurityContext securityContext = getAndValidateSecurityContext(params);
         Client client = getClient(params.getFirst(OAuthConstants.CLIENT_ID));
         
-        UserSubject userSubject = createUserSubject(securityContext, client);
+        UserSubject userSubject = createUserSubject(securityContext, client, params);
         
         // Make sure the session is valid
         String sessionTokenParamName = params.getFirst(OAuthConstants.SESSION_AUTHENTICITY_TOKEN_PARAM_NAME);
@@ -370,10 +370,14 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         this.subjectCreator = creator;
     }
     
-    protected UserSubject createUserSubject(SecurityContext securityContext, Client client) {
+    protected UserSubject createUserSubject(SecurityContext securityContext, 
+                                            Client client,
+                                            MultivaluedMap<String, String> params) {
         UserSubject subject = null;
         if (subjectCreator != null) {
-            subject = subjectCreator.createUserSubject(getMessageContext(), client);
+            subject = subjectCreator.createUserSubject(getMessageContext(),
+                                                       client,
+                                                       params);
             if (subject != null) {
                 return subject; 
             }
