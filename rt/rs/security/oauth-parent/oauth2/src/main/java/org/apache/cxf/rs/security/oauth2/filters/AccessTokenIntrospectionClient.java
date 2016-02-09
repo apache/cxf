@@ -32,6 +32,7 @@ import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenValidation;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
 import org.apache.cxf.rs.security.oauth2.common.TokenIntrospection;
+import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.provider.AccessTokenValidator;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
@@ -87,7 +88,9 @@ public class AccessTokenIntrospectionClient implements AccessTokenValidator {
             }
             atv.setTokenScopes(perms);
         }
-        
+        if (response.getUsername() != null) {
+            atv.setTokenSubject(new UserSubject(response.getUsername()));
+        }
         return atv;
     }
 
