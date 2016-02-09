@@ -43,10 +43,20 @@
         <property name="stsProperties" ref="transportSTSProperties"/>
         <property name="delegationHandlers" ref="delegationHandlers"/>
         <property name="claimsManager" ref="claimsManager"/>
+        <property name="tokenStore" ref="defaultTokenStore"/>
     </bean>
     <bean id="transportValidateDelegate" class="org.apache.cxf.sts.operation.TokenValidateOperation">
         <property name="tokenValidators" ref="transportTokenValidators"/>
         <property name="stsProperties" ref="transportSTSProperties"/>
+        <property name="tokenStore" ref="defaultTokenStore"/>
+    </bean>
+    <bean id="transportRenewDelegate" class="org.apache.cxf.sts.operation.TokenRenewOperation">
+        <property name="tokenRenewers" ref="transportTokenRenewers"/>
+        <property name="tokenValidators" ref="transportTokenValidators"/>
+        <property name="stsProperties" ref="transportSTSProperties"/>
+        <property name="tokenStore" ref="defaultTokenStore"/>
+    </bean>
+    <bean id="defaultTokenStore" class="org.apache.cxf.sts.cache.DefaultInMemoryTokenStore">
     </bean>
     <bean id="transportUTTokenValidator" class="org.apache.cxf.sts.token.validator.UsernameTokenValidator">
     </bean>
@@ -58,15 +68,18 @@
         <ref bean="transportSamlTokenProvider"/>
         <ref bean="transportJWTTokenProvider"/>
     </util:list>
+    <util:list id="transportTokenRenewers">
+        <ref bean="transportSamlTokenRenewer"/>
+    </util:list>
     <bean id="transportSamlTokenValidator" class="org.apache.cxf.sts.token.validator.SAMLTokenValidator">
     </bean>
     <bean id="transportSamlTokenProvider" class="org.apache.cxf.sts.token.provider.SAMLTokenProvider">
     </bean>
     <bean id="transportJWTTokenProvider" class="org.apache.cxf.sts.token.provider.jwt.JWTTokenProvider">
     </bean>
-    <bean id="transportSTSProviderBean" class="org.apache.cxf.ws.security.sts.provider.SecurityTokenServiceProvider">
-        <property name="issueOperation" ref="transportIssueDelegate"/>
-        <property name="validateOperation" ref="transportValidateDelegate"/>
+    <bean id="transportSamlTokenRenewer" class="org.apache.cxf.sts.token.renewer.SAMLTokenRenewer">
+        <property name="verifyProofOfPossession" value="false"/>
+        <property name="allowRenewalAfterExpiry" value="true"/>
     </bean>
     <bean id="transportService" class="org.apache.cxf.sts.service.StaticService">
         <property name="endpoints" ref="transportEndpoints"/>
@@ -93,6 +106,7 @@
     <bean id="restSTS" class="org.apache.cxf.sts.rest.RESTSecurityTokenServiceImpl">
         <property name="issueSingleOperation" ref="transportIssueDelegate" />
         <property name="validateOperation" ref="transportValidateDelegate" />
+        <property name="renewOperation" ref="transportRenewDelegate"/>
     </bean>
     
     <bean id="jaxbProvider" class="org.apache.cxf.jaxrs.provider.JAXBElementProvider">
