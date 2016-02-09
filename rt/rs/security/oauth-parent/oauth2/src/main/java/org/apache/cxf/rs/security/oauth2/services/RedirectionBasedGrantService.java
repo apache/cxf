@@ -274,13 +274,15 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
             state = sessionAuthenticityTokenProvider.getSessionState(super.getMessageContext(), 
                                                                      sessionToken,
                                                                      subject);
+            if (!state.getClientId().equals(params.getFirst(OAuthConstants.CLIENT_ID))) {
+                throw ExceptionUtils.toBadRequestException(null, null);
+            }
         }
         if (state == null) {
             state = new OAuthRedirectionState();
+            state.setClientId(params.getFirst(OAuthConstants.CLIENT_ID));
             state.setRedirectUri(params.getFirst(OAuthConstants.REDIRECT_URI));
             state.setAudience(params.getFirst(OAuthConstants.CLIENT_AUDIENCE));
-            // or if no audience parameter is available, set the list of client
-            // audiences for the users to see ?
             state.setProposedScope(params.getFirst(OAuthConstants.SCOPE));
             state.setState(params.getFirst(OAuthConstants.STATE));
             state.setNonce(params.getFirst(OAuthConstants.NONCE));
@@ -310,6 +312,8 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
     protected Response completeAuthorization(MultivaluedMap<String, String> params) {
         // Make sure the end user has authenticated, check if HTTPS is used
         SecurityContext securityContext = getAndValidateSecurityContext(params);
+        // Client id may also be preserved in a session but it must be set 
+        // as a authorization form parameter
         Client client = getClient(params.getFirst(OAuthConstants.CLIENT_ID));
         
         UserSubject userSubject = createUserSubject(securityContext, client, params);
