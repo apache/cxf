@@ -23,6 +23,8 @@ import java.io.Serializable;
 public class OAuthRedirectionState implements Serializable {
     
     private static final long serialVersionUID = -661649302262699347L;
+    
+    private String clientId;
     private String redirectUri;
     private String state;
     private String proposedScope;
@@ -34,6 +36,21 @@ public class OAuthRedirectionState implements Serializable {
     public OAuthRedirectionState() {
     }
 
+    /**
+     * Sets the client id which needs to be retained in a hidden form field
+     * @param clientId the client id
+     */
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
+    }
+
+    /**
+     * Gets the client id which needs to be retained in a hidden form field
+     * @return the client id
+     */
+    public String getClientId() {
+        return clientId;
+    }
     
     /**
      * Sets the redirect uri which needs to be retained in a hidden form field
@@ -117,4 +134,6 @@ public class OAuthRedirectionState implements Serializable {
     public void setResponseType(String responseType) {
         this.responseType = responseType;
     }
+    
+    
 }

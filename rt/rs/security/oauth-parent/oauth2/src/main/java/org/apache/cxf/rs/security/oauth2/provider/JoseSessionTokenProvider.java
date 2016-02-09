@@ -148,31 +148,37 @@ public class JoseSessionTokenProvider implements SessionAuthenticityTokenProvide
         String[] parts = ModelEncryptionSupport.getParts(stateString);
         OAuthRedirectionState state = new OAuthRedirectionState();
         if (!StringUtils.isEmpty(parts[0])) {
-            state.setAudience(parts[0]);
+            state.setClientId(parts[0]);
         }
         if (!StringUtils.isEmpty(parts[1])) {
-            state.setClientCodeChallenge(parts[1]);
+            state.setAudience(parts[1]);
         }
         if (!StringUtils.isEmpty(parts[2])) {
-            state.setState(parts[2]);
+            state.setClientCodeChallenge(parts[2]);
         }
         if (!StringUtils.isEmpty(parts[3])) {
-            state.setProposedScope(parts[3]);
+            state.setState(parts[3]);
         }
         if (!StringUtils.isEmpty(parts[4])) {
-            state.setRedirectUri(parts[4]);
+            state.setProposedScope(parts[4]);
         }
         if (!StringUtils.isEmpty(parts[5])) {
-            state.setNonce(parts[5]);
+            state.setRedirectUri(parts[5]);
         }
         if (!StringUtils.isEmpty(parts[6])) {
-            state.setResponseType(parts[6]);
+            state.setNonce(parts[6]);
+        }
+        if (!StringUtils.isEmpty(parts[7])) {
+            state.setResponseType(parts[7]);
         }
         return state;
     }
     protected String convertStateToString(OAuthRedirectionState secData) {
         //TODO: make it simpler, convert it to JwtClaims -> JSON
         StringBuilder state = new StringBuilder();
+        // 0: client id
+        state.append(ModelEncryptionSupport.tokenizeString(secData.getClientId()));
+        state.append(ModelEncryptionSupport.SEP);
         // 1: client audience
         state.append(ModelEncryptionSupport.tokenizeString(secData.getAudience()));
         state.append(ModelEncryptionSupport.SEP);
