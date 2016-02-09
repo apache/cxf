@@ -101,7 +101,7 @@ public class OidcImplicitService extends ImplicitGrantService {
         if (idToken != null) {
             sb.append(OidcUtils.ID_TOKEN).append("=").append(idToken);
         }
-        return finalizeResponse(sb, client, state);
+        return finalizeResponse(sb, state);
     }
     
     private String getProcessedIdToken(OAuthRedirectionState state, UserSubject subject) {
@@ -110,6 +110,8 @@ public class OidcImplicitService extends ImplicitGrantService {
         } else if (subject instanceof OidcUserSubject) {
             OidcUserSubject sub = (OidcUserSubject)subject;
             IdToken idToken = new IdToken(sub.getIdToken());
+            idToken.setAudience(state.getClientId());
+            idToken.setAuthorizedParty(state.getClientId());
             idToken.setNonce(state.getNonce());
             JoseJwtProducer processor = idTokenHandler == null ? new JoseJwtProducer() : idTokenHandler; 
             return processor.processJwt(new JwtToken(idToken));
