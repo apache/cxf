@@ -46,6 +46,7 @@
         <property name="tokenStore" ref="defaultTokenStore"/>
     </bean>
     <bean id="transportValidateDelegate" class="org.apache.cxf.sts.operation.TokenValidateOperation">
+        <property name="tokenProviders" ref="transportTokenProviders"/>
         <property name="tokenValidators" ref="transportTokenValidators"/>
         <property name="stsProperties" ref="transportSTSProperties"/>
         <property name="tokenStore" ref="defaultTokenStore"/>
