@@ -69,9 +69,9 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 
 /**
- * Some unit tests for the REST interface of the CXF STS.
+ * Some tests for the REST interface of the CXF STS.
  */
-public class RESTUnitTest extends AbstractBusClientServerTestBase {
+public class STSRESTTest extends AbstractBusClientServerTestBase {
     
     static final String STSPORT = allocatePort(STSRESTServer.class);
     
@@ -107,7 +107,7 @@ public class RESTUnitTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testIssueSAML2Token() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = RESTUnitTest.class.getResource("cxf-client.xml");
+        URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -139,7 +139,7 @@ public class RESTUnitTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testIssueSAML1Token() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = RESTUnitTest.class.getResource("cxf-client.xml");
+        URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -171,7 +171,7 @@ public class RESTUnitTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testIssueSymmetricKeySaml1() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = RESTUnitTest.class.getResource("cxf-client.xml");
+        URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -213,7 +213,7 @@ public class RESTUnitTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testIssuePublicKeySAML2Token() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = RESTUnitTest.class.getResource("cxf-client.xml");
+        URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -255,7 +255,7 @@ public class RESTUnitTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testIssueBearerSAML1Token() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = RESTUnitTest.class.getResource("cxf-client.xml");
+        URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -295,7 +295,7 @@ public class RESTUnitTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testIssueSAML2TokenAppliesTo() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = RESTUnitTest.class.getResource("cxf-client.xml");
+        URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -328,7 +328,7 @@ public class RESTUnitTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testIssueSAML2TokenUnknownAppliesTo() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = RESTUnitTest.class.getResource("cxf-client.xml");
+        URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -355,7 +355,7 @@ public class RESTUnitTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testIssueSAML2TokenClaims() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = RESTUnitTest.class.getResource("cxf-client.xml");
+        URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -417,7 +417,7 @@ public class RESTUnitTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testIssueSAML2TokenViaWSTrust() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = RESTUnitTest.class.getResource("cxf-client.xml");
+        URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -441,7 +441,7 @@ public class RESTUnitTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testIssueSAML2TokenViaPOST() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = RESTUnitTest.class.getResource("cxf-client.xml");
+        URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -481,7 +481,7 @@ public class RESTUnitTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testExplicitlyIssueSAML2TokenViaPOST() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = RESTUnitTest.class.getResource("cxf-client.xml");
+        URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -522,7 +522,7 @@ public class RESTUnitTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testExplicitlyIssueSAML1TokenViaPOST() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = RESTUnitTest.class.getResource("cxf-client.xml");
+        URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -563,7 +563,7 @@ public class RESTUnitTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testValidateSAML2Token() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = RESTUnitTest.class.getResource("cxf-client.xml");
+        URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -634,7 +634,7 @@ public class RESTUnitTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testRenewSAML2Token() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = RESTUnitTest.class.getResource("cxf-client.xml");
+        URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -703,7 +703,7 @@ public class RESTUnitTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testIssueJWTToken() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = RESTUnitTest.class.getResource("cxf-client.xml");
+        URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -725,7 +725,7 @@ public class RESTUnitTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testIssueJWTTokenAppliesTo() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = RESTUnitTest.class.getResource("cxf-client.xml");
+        URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -748,7 +748,7 @@ public class RESTUnitTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testIssueJWTTokenClaims() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = RESTUnitTest.class.getResource("cxf-client.xml");
+        URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
