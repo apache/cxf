@@ -98,7 +98,12 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
             issueToken(tokenType, keyType, requestedClaims, appliesTo);
         RequestedSecurityTokenType requestedToken = getRequestedSecurityToken(response);
         
-        return Response.ok(requestedToken.getAny()).build();
+        if ("jwt".equals(tokenType)) {
+            // Discard the wrapper here
+            return Response.ok(((Element)requestedToken.getAny()).getTextContent()).build();
+        } else {
+            return Response.ok(requestedToken.getAny()).build();
+        }
     }
     
     @Override
