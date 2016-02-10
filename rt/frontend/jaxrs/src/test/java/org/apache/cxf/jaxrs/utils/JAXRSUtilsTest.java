@@ -1711,7 +1711,7 @@ public class JAXRSUtilsTest extends Assert {
         EasyMock.replay(context);
         EasyMock.replay(config);
         
-        Message m = new MessageImpl();
+        Message m = createMessage();
         m.put(AbstractHTTPDestination.HTTP_REQUEST, request);
         m.put(AbstractHTTPDestination.HTTP_RESPONSE, response);
         m.put(AbstractHTTPDestination.HTTP_CONTEXT, context);

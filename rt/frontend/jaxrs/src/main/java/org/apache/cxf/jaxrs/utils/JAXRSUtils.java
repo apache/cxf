@@ -1103,16 +1103,15 @@ public final class JAXRSUtils {
             ProviderInfo<?> providerInfo = 
                 (ProviderInfo<?>)contextMessage.getExchange().getEndpoint().get(Application.class.getName());
             o = providerInfo == null ? null : providerInfo.getProvider();
+        } else if (contextMessage != null) {
+            ContextProvider<?> provider = 
+                ProviderFactory.getInstance(contextMessage).createContextProvider(clazz, contextMessage);
+            if (provider != null) {
+                o = provider.createContext(contextMessage);
+            }
         }
         if (o == null && contextMessage != null && !MessageUtils.isRequestor(contextMessage)) {
             o = createServletResourceValue(contextMessage, clazz);
-            if (o == null) {
-                ContextProvider<?> provider = 
-                    ServerProviderFactory.getInstance(m).createContextProvider(clazz, contextMessage);
-                if (provider != null) {
-                    o = provider.createContext(contextMessage);
-                }
-            }
         }
         return clazz.cast(o);
     }
