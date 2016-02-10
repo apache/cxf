@@ -281,21 +281,15 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
             QNameConstants.WS_TRUST_FACTORY.createRequestedSecurityTokenType();
         JAXBElement<RequestedSecurityTokenType> requestedToken = 
             QNameConstants.WS_TRUST_FACTORY.createRequestedSecurityToken(requestedTokenType);
-        LOG.fine("Encrypting Issued Token: " + encryptIssuedToken);
-        if (encryptIssuedToken) {
-            requestedTokenType.setAny(tokenResponse.getToken());
-            response.getAny().add(requestedToken);
+        if (tokenResponse.getToken() instanceof String) {
+            Document doc = DOMUtils.newDocument();
+            Element tokenWrapper = doc.createElementNS(null, "TokenWrapper");
+            tokenWrapper.setTextContent((String)tokenResponse.getToken());
+            requestedTokenType.setAny(tokenWrapper);
         } else {
-            if (tokenResponse.getToken() instanceof String) {
-                Document doc = DOMUtils.newDocument();
-                Element tokenWrapper = doc.createElementNS(null, "TokenWrapper");
-                tokenWrapper.setTextContent((String)tokenResponse.getToken());
-                requestedTokenType.setAny(tokenWrapper);
-            } else {
-                requestedTokenType.setAny(tokenResponse.getToken());
-            }
-            response.getAny().add(requestedToken);
+            requestedTokenType.setAny(tokenResponse.getToken());
         }
+        response.getAny().add(requestedToken);
 
         if (returnReferences) {
             // RequestedAttachedReference
