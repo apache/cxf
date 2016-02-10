@@ -19,6 +19,7 @@
 package org.apache.cxf.sts.operation;
 
 import java.security.Principal;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -35,6 +36,7 @@ import org.w3c.dom.Element;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactConsumer;
 import org.apache.cxf.rs.security.jose.jwt.JwtConstants;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
@@ -56,6 +58,7 @@ import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestedSecurityTokenType;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.dom.WSConstants;
 import org.junit.Assert;
@@ -142,9 +145,7 @@ public class IssueJWTRealmUnitTest extends org.junit.Assert {
         }
         
         assertNotNull(token);
-        JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token.getTextContent());
-        JwtToken jwt = jwtConsumer.getJwtToken();
-        Assert.assertEquals("A-Issuer", jwt.getClaim(JwtConstants.CLAIM_ISSUER));
+        validateToken(token.getTextContent(), "A-Issuer", stsProperties.getSignatureUsername(), crypto);
     }
     
     /**
@@ -217,9 +218,7 @@ public class IssueJWTRealmUnitTest extends org.junit.Assert {
         }
         
         assertNotNull(token);
-        JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token.getTextContent());
-        JwtToken jwt = jwtConsumer.getJwtToken();
-        Assert.assertEquals("B-Issuer", jwt.getClaim(JwtConstants.CLAIM_ISSUER));
+        validateToken(token.getTextContent(), "B-Issuer", stsProperties.getSignatureUsername(), crypto);
     }
     
     /**
@@ -292,9 +291,7 @@ public class IssueJWTRealmUnitTest extends org.junit.Assert {
         }
         
         assertNotNull(token);
-        JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token.getTextContent());
-        JwtToken jwt = jwtConsumer.getJwtToken();
-        Assert.assertEquals("STS", jwt.getClaim(JwtConstants.CLAIM_ISSUER));
+        validateToken(token.getTextContent(), "STS", stsProperties.getSignatureUsername(), crypto);
     }
     
     
@@ -374,7 +371,7 @@ public class IssueJWTRealmUnitTest extends org.junit.Assert {
             response.getRequestSecurityTokenResponse();
         assertTrue(!securityTokenResponse.isEmpty());
         
-     // Test the generated token.
+        // Test the generated token.
         Element token = null;
         for (Object tokenObject : securityTokenResponse.get(0).getAny()) {
             if (tokenObject instanceof JAXBElement<?>
@@ -387,9 +384,7 @@ public class IssueJWTRealmUnitTest extends org.junit.Assert {
         }
         
         assertNotNull(token);
-        JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token.getTextContent());
-        JwtToken jwt = jwtConsumer.getJwtToken();
-        Assert.assertEquals("B-Issuer", jwt.getClaim(JwtConstants.CLAIM_ISSUER));
+        validateToken(token.getTextContent(), "B-Issuer", stsProperties.getSignatureUsername(), crypto);
     }
     
     /**
@@ -405,6 +400,19 @@ public class IssueJWTRealmUnitTest extends org.junit.Assert {
         realms.put("B", realm);
         
         return realms;
+    }
+    
+    private void validateToken(String token, String issuer, String sigUsername, Crypto sigCrypto) throws Exception {
+        JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token);
+        JwtToken jwt = jwtConsumer.getJwtToken();
+        Assert.assertEquals(issuer, jwt.getClaim(JwtConstants.CLAIM_ISSUER));
+        
+        CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+        cryptoType.setAlias(sigUsername);
+        X509Certificate[] certs = sigCrypto.getX509Certificates(cryptoType);
+        assertNotNull(certs);
+        
+        assertTrue(jwtConsumer.verifySignatureWith(certs[0], SignatureAlgorithm.RS256));
     }
     
     /*
