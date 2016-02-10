@@ -93,9 +93,19 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
     private boolean requestClaimsOptional = true;
 
     @Override
-    public Response getToken(String tokenType, String keyType, List<String> requestedClaims, String appliesTo) {
+    public Response getToken(String tokenType, String keyType, 
+                             List<String> requestedClaims, String appliesTo,
+                             boolean wstrustResponse) {
         RequestSecurityTokenResponseType response = 
             issueToken(tokenType, keyType, requestedClaims, appliesTo);
+        
+        if (wstrustResponse) {
+            JAXBElement<RequestSecurityTokenResponseType> jaxbResponse = 
+                QNameConstants.WS_TRUST_FACTORY.createRequestSecurityTokenResponse(response);
+            
+            return Response.ok(jaxbResponse).build();
+        }
+        
         RequestedSecurityTokenType requestedToken = getRequestedSecurityToken(response);
         
         if ("jwt".equals(tokenType)) {
@@ -104,18 +114,6 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
         } else {
             return Response.ok(requestedToken.getAny()).build();
         }
-    }
-    
-    @Override
-    public Response getTokenViaWSTrust(String tokenType, String keyType, 
-                                       List<String> requestedClaims, String appliesTo) {
-        RequestSecurityTokenResponseType response = 
-            issueToken(tokenType, keyType, requestedClaims, appliesTo);
-        
-        JAXBElement<RequestSecurityTokenResponseType> jaxbResponse = 
-            QNameConstants.WS_TRUST_FACTORY.createRequestSecurityTokenResponse(response);
-        
-        return Response.ok(jaxbResponse).build();
     }
     
     private RequestedSecurityTokenType getRequestedSecurityToken(RequestSecurityTokenResponseType response) {
