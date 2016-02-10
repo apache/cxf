@@ -29,6 +29,7 @@ import java.util.logging.Logger;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.ext.search.sql.SQLPrinterVisitor;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 
 public final class SearchUtils {
@@ -42,6 +43,7 @@ public final class SearchUtils {
     public static final String BEAN_PROPERTY_CONVERTER = "search.bean.property.converter";
     public static final String SEARCH_VISITOR_PROPERTY = "search.visitor";
     public static final String DECODE_QUERY_VALUES = "search.decode.values";
+    public static final String ESCAPE_UNDESCORE_CHAR = "search.escape.underscore.char";
     
     private static final Logger LOG = LogUtils.getL7dLogger(SearchUtils.class);
     
@@ -57,6 +59,11 @@ public final class SearchUtils {
         } 
           
         return null;        
+    }
+    
+    private static boolean escapeUnderscoreChar() {
+        Message m = PhaseInterceptorChain.getCurrentMessage();
+        return MessageUtils.getContextualBoolean(m, ESCAPE_UNDESCORE_CHAR, true);
     }
     
     public static SimpleDateFormat getContextualDateFormatOrDefault(final String pattern) {
@@ -100,7 +107,7 @@ public final class SearchUtils {
         if (value.contains("\\")) {
             value = value.replaceAll("\\\\", "\\\\\\\\"); 
         }
-        if (value.contains("_")) {
+        if (value.contains("_") && escapeUnderscoreChar()) {
             value = value.replaceAll("_", "\\\\_");
         }
         if (value.contains("%")) {
