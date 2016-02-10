@@ -423,11 +423,12 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
         
-        String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token/ws-trust";
+        String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
         WebClient client = WebClient.create(address, busFile.toString());
 
         client.type("application/xml").accept("application/xml");
         client.path("saml2.0");
+        client.query("wstrustResponse", "true");
         
         Response response = client.get();
         RequestSecurityTokenResponseType securityResponse = 

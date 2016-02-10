@@ -64,15 +64,8 @@ public interface RESTSecurityTokenService {
     })
     Response getToken(@PathParam("tokenType") String tokenType, @QueryParam("keyType") String keyType,
         @QueryParam("claim") List<String> requestedClaims,
-        @QueryParam("appliesTo") String appliesTo);
-    
-    @GET
-    @Path("ws-trust/{tokenType}")
-    @Produces({
-        MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON
-    })
-    Response getTokenViaWSTrust(@PathParam("tokenType") String tokenType, @QueryParam("keyType") String keyType,
-        @QueryParam("claim") List<String> requestedClaims, @QueryParam("appliesTo") String appliesTo);
+        @QueryParam("appliesTo") String appliesTo,
+        @QueryParam("wstrustResponse") @DefaultValue("false") boolean wstrustResponse);
     
     @POST
     @Produces({
