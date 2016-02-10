@@ -79,6 +79,7 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLV1.1";
     private static final String SAML2_TOKEN_TYPE = 
         "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLV2.0";
+    private static final String JWT_TOKEN_TYPE = "urn:ietf:params:oauth:token-type:jwt";
     private static final String SYMMETRIC_KEY_KEYTYPE = 
         "http://docs.oasis-open.org/ws-sx/ws-trust/200512/SymmetricKey";
     private static final String PUBLIC_KEY_KEYTYPE = 
@@ -790,19 +791,218 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
-    private Element validateSAMLSecurityTokenResponse(
-        RequestSecurityTokenResponseType securityResponse, boolean saml2
-    ) throws Exception {
-        RequestedSecurityTokenType requestedSecurityToken = null;
+    @org.junit.Test
+    public void testIssueJWTTokenViaPOST() throws Exception {
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
+        WebClient client = WebClient.create(address, busFile.toString());
+
+        client.type("application/xml").accept("application/xml");
+        
+        // Create RequestSecurityToken
+        W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
+        String namespace = STSUtils.WST_NS_05_12;
+        writer.writeStartElement("wst", "RequestSecurityToken", namespace);
+        writer.writeNamespace("wst", namespace);
+        
+        writer.writeStartElement("wst", "RequestType", namespace);
+        writer.writeCharacters(namespace + "/Issue");
+        writer.writeEndElement();
+        
+        writer.writeStartElement("wst", "TokenType", namespace);
+        writer.writeCharacters(JWT_TOKEN_TYPE);
+        writer.writeEndElement();
+        
+        writer.writeEndElement();
+        
+        Response response = client.post(new DOMSource(writer.getDocument().getDocumentElement()));
+        
+        RequestSecurityTokenResponseType securityResponse = 
+            response.readEntity(RequestSecurityTokenResponseType.class);
+        
+        RequestedSecurityTokenType requestedSecurityToken = getRequestedSecurityToken(securityResponse);
+        assertNotNull(requestedSecurityToken);
+        
+        String token = ((Element)requestedSecurityToken.getAny()).getTextContent();
+        assertNotNull(token);
+        
+        validateJWTToken(token, null);
+
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testValidateSAMLAndIssueJWT() throws Exception {
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
+        WebClient client = WebClient.create(address, busFile.toString());
+
+        client.type("application/xml").accept("application/xml");
+        client.path("saml2.0");
+        
+        // 1. Get a token via GET
+        Response response = client.get();
+        Document assertionDoc = response.readEntity(Document.class);
+        assertNotNull(assertionDoc);
+        
+        // 2. Now validate it in the STS using POST
+        client = WebClient.create(address, busFile.toString());
+
+        client.type("application/xml").accept("application/xml");
+        client.query("action", "validate");
+        
+        // Create RequestSecurityToken
+        W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
+        String namespace = STSUtils.WST_NS_05_12;
+        writer.writeStartElement("wst", "RequestSecurityToken", namespace);
+        writer.writeNamespace("wst", namespace);
+        
+        writer.writeStartElement("wst", "RequestType", namespace);
+        writer.writeCharacters(namespace + "/Validate");
+        writer.writeEndElement();
+        
+        writer.writeStartElement("wst", "TokenType", namespace);
+        writer.writeCharacters(JWT_TOKEN_TYPE);
+        writer.writeEndElement();
+        
+        writer.writeStartElement("wst", "ValidateTarget", namespace);
+        StaxUtils.copy(assertionDoc.getDocumentElement(), writer);
+        writer.writeEndElement();
+        
+        writer.writeEndElement();
+        
+        response = client.post(new DOMSource(writer.getDocument().getDocumentElement()));
+        
+        RequestSecurityTokenResponseType securityResponse = 
+            response.readEntity(RequestSecurityTokenResponseType.class);
+        
+        StatusType status = null;
         for (Object obj : securityResponse.getAny()) {
             if (obj instanceof JAXBElement<?>) {
                 JAXBElement<?> jaxbElement = (JAXBElement<?>)obj;
-                if ("RequestedSecurityToken".equals(jaxbElement.getName().getLocalPart())) {
-                    requestedSecurityToken = (RequestedSecurityTokenType)jaxbElement.getValue();
+                if ("Status".equals(jaxbElement.getName().getLocalPart())) {
+                    status = (StatusType)jaxbElement.getValue();
                     break;
                 }
             }
         }
+        assertNotNull(status);
+        
+        // Check the token was valid
+        String validCode = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/status/valid";
+        assertEquals(validCode, status.getCode());
+        
+        // Check the token
+        RequestedSecurityTokenType requestedSecurityToken = getRequestedSecurityToken(securityResponse);
+        assertNotNull(requestedSecurityToken);
+        
+        String token = ((Element)requestedSecurityToken.getAny()).getTextContent();
+        assertNotNull(token);
+        
+        validateJWTToken(token, null);
+
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    @org.junit.Ignore
+    public void testValidateJWTAndIssueSAML() throws Exception {
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
+        WebClient client = WebClient.create(address, busFile.toString());
+
+        client.type("application/xml").accept("application/xml");
+        client.path("jwt");
+        
+        // 1. Get a token via GET
+        Response response = client.get();
+        String token = response.readEntity(String.class);
+        assertNotNull(token);
+        
+        // 2. Now validate it in the STS using POST
+        client = WebClient.create(address, busFile.toString());
+
+        client.type("application/xml").accept("application/xml");
+        client.query("action", "validate");
+        
+        // Create RequestSecurityToken
+        W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
+        String namespace = STSUtils.WST_NS_05_12;
+        writer.writeStartElement("wst", "RequestSecurityToken", namespace);
+        writer.writeNamespace("wst", namespace);
+        
+        writer.writeStartElement("wst", "RequestType", namespace);
+        writer.writeCharacters(namespace + "/Validate");
+        writer.writeEndElement();
+        
+        writer.writeStartElement("wst", "TokenType", namespace);
+        writer.writeCharacters(SAML2_TOKEN_TYPE);
+        writer.writeEndElement();
+        
+        writer.writeStartElement("wst", "ValidateTarget", namespace);
+        writer.writeStartElement(null, "TokenWrapper", null);
+        writer.writeCharacters(token);
+        writer.writeEndElement();
+        writer.writeEndElement();
+        
+        writer.writeEndElement();
+        
+        response = client.post(new DOMSource(writer.getDocument().getDocumentElement()));
+        
+        RequestSecurityTokenResponseType securityResponse = 
+            response.readEntity(RequestSecurityTokenResponseType.class);
+        
+        StatusType status = null;
+        for (Object obj : securityResponse.getAny()) {
+            if (obj instanceof JAXBElement<?>) {
+                JAXBElement<?> jaxbElement = (JAXBElement<?>)obj;
+                if ("Status".equals(jaxbElement.getName().getLocalPart())) {
+                    status = (StatusType)jaxbElement.getValue();
+                    break;
+                }
+            }
+        }
+        assertNotNull(status);
+        /*
+        // Check the token was valid
+        String validCode = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/status/valid";
+        assertEquals(validCode, status.getCode());
+        
+        // Check the token
+        RequestedSecurityTokenType requestedSecurityToken = getRequestedSecurityToken(securityResponse);
+        assertNotNull(requestedSecurityToken);
+        
+        String token = ((Element)requestedSecurityToken.getAny()).getTextContent();
+        assertNotNull(token);
+        
+        validateJWTToken(token, null);
+        */
+
+        bus.shutdown(true);
+    }
+    
+    private Element validateSAMLSecurityTokenResponse(
+        RequestSecurityTokenResponseType securityResponse, boolean saml2
+    ) throws Exception {
+        RequestedSecurityTokenType requestedSecurityToken = getRequestedSecurityToken(securityResponse);
         assertNotNull(requestedSecurityToken);
         
         // Process the token
@@ -821,6 +1021,18 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         assertTrue(assertion.isSigned());
         
         return (Element)results.get(0).get(WSSecurityEngineResult.TAG_TOKEN_ELEMENT);
+    }
+    
+    private RequestedSecurityTokenType getRequestedSecurityToken(RequestSecurityTokenResponseType securityResponse) {
+        for (Object obj : securityResponse.getAny()) {
+            if (obj instanceof JAXBElement<?>) {
+                JAXBElement<?> jaxbElement = (JAXBElement<?>)obj;
+                if ("RequestedSecurityToken".equals(jaxbElement.getName().getLocalPart())) {
+                    return (RequestedSecurityTokenType)jaxbElement.getValue();
+                }
+            }
+        }
+        return null;
     }
     
     private List<WSSecurityEngineResult> processToken(Element assertionElement)
