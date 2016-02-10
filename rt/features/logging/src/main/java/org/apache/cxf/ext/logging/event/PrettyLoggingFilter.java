@@ -66,6 +66,7 @@ public class PrettyLoggingFilter implements LogEventSender {
             // that can occur when we set a limit and cur the rest off
             XMLStreamWriter xwriter = StaxUtils.createXMLStreamWriter(swriter);
             xwriter = new PrettyPrintXMLStreamWriter(xwriter, 2);
+            encoding = encoding == null ? "UTF-8" : encoding;
             InputStream in = new ByteArrayInputStream(message.getBytes(encoding));
             try {
                 StaxUtils.copy(new StreamSource(in), xwriter);
