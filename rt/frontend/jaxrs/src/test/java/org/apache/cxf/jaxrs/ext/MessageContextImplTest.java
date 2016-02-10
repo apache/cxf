@@ -123,7 +123,7 @@ public class MessageContextImplTest extends Assert {
     
     @Test
     public void testHttpRequest() {
-        Message m = new MessageImpl();
+        Message m = createMessage();
         MessageContext mc = new MessageContextImpl(m);
         HttpServletRequest request = EasyMock.createMock(HttpServletRequest.class);
         m.put(AbstractHTTPDestination.HTTP_REQUEST, request);
@@ -136,7 +136,7 @@ public class MessageContextImplTest extends Assert {
     
     @Test
     public void testHttpResponse() {
-        Message m = new MessageImpl();
+        Message m = createMessage();
         MessageContext mc = new MessageContextImpl(m);
         HttpServletResponse request = EasyMock.createMock(HttpServletResponse.class);
         m.put(AbstractHTTPDestination.HTTP_RESPONSE, request);
@@ -148,7 +148,7 @@ public class MessageContextImplTest extends Assert {
     
     @Test
     public void testServletContext() {
-        Message m = new MessageImpl();
+        Message m = createMessage();
         MessageContext mc = new MessageContextImpl(m);
         ServletContext request = EasyMock.createMock(ServletContext.class);
         m.put(AbstractHTTPDestination.HTTP_CONTEXT, request);
@@ -158,7 +158,7 @@ public class MessageContextImplTest extends Assert {
     
     @Test
     public void testServletConfig() {
-        Message m = new MessageImpl();
+        Message m = createMessage();
         MessageContext mc = new MessageContextImpl(m);
         ServletConfig request = EasyMock.createMock(ServletConfig.class);
         m.put(AbstractHTTPDestination.HTTP_CONFIG, request);
