@@ -43,7 +43,7 @@ public final class SearchUtils {
     public static final String BEAN_PROPERTY_CONVERTER = "search.bean.property.converter";
     public static final String SEARCH_VISITOR_PROPERTY = "search.visitor";
     public static final String DECODE_QUERY_VALUES = "search.decode.values";
-    public static final String ESCAPE_UNDESCORE_CHAR = "search.escape.underscore.char";
+    public static final String ESCAPE_UNDERSCORE_CHAR = "search.escape.underscore.char";
     
     private static final Logger LOG = LogUtils.getL7dLogger(SearchUtils.class);
     
@@ -63,7 +63,7 @@ public final class SearchUtils {
     
     private static boolean escapeUnderscoreChar() {
         Message m = PhaseInterceptorChain.getCurrentMessage();
-        return MessageUtils.getContextualBoolean(m, ESCAPE_UNDESCORE_CHAR, true);
+        return MessageUtils.getContextualBoolean(m, ESCAPE_UNDERSCORE_CHAR, true);
     }
     
     public static SimpleDateFormat getContextualDateFormatOrDefault(final String pattern) {
