@@ -167,7 +167,7 @@ public class Headers {
                     createMutableList(policy.getCookie()));
         }
         if (policy.isSetBrowserType()) {
-            headers.put("BrowserType",
+            headers.put("User-Agent",
                     createMutableList(policy.getBrowserType()));
         }
         if (policy.isSetReferer()) {
