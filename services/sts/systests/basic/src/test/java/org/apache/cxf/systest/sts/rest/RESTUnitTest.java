@@ -18,7 +18,14 @@
  */
 package org.apache.cxf.systest.sts.rest;
 
+import java.io.IOException;
 import java.net.URL;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.List;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -32,6 +39,10 @@ import org.w3c.dom.Element;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
+import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
+import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactConsumer;
+import org.apache.cxf.rs.security.jose.jwt.JwtConstants;
+import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rt.security.claims.Claim;
 import org.apache.cxf.rt.security.claims.ClaimCollection;
 import org.apache.cxf.rt.security.saml.utils.SAMLUtils;
@@ -48,11 +59,13 @@ import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.saml.OpenSAMLUtil;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.common.util.Loader;
 import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.processor.Processor;
 import org.apache.wss4j.dom.processor.SAMLTokenProcessor;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 
 /**
@@ -688,7 +701,6 @@ public class RESTUnitTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.Test
-    @org.junit.Ignore
     public void testIssueJWTToken() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = RESTUnitTest.class.getResource("cxf-client.xml");
@@ -698,12 +710,83 @@ public class RESTUnitTest extends AbstractBusClientServerTestBase {
         SpringBusFactory.setThreadDefaultBus(bus);
         
         String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
-        WebClient client = WebClient.create(address, "alice", "clarinet", busFile.toString());
+        WebClient client = WebClient.create(address, busFile.toString());
 
         client.type("application/json").accept("application/json");
         client.path("jwt");
         
-        client.get();
+        Response response = client.get();
+        String token = response.readEntity(String.class);
+        assertNotNull(token);
+        
+        validateJWTToken(token, null);
+    }
+    
+    @org.junit.Test
+    public void testIssueJWTTokenAppliesTo() throws Exception {
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = RESTUnitTest.class.getResource("cxf-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
+        WebClient client = WebClient.create(address, busFile.toString());
+
+        client.type("application/json").accept("application/json");
+        client.path("jwt");
+        client.query("appliesTo", DEFAULT_ADDRESS);
+        
+        Response response = client.get();
+        String token = response.readEntity(String.class);
+        assertNotNull(token);
+        
+        validateJWTToken(token, DEFAULT_ADDRESS);
+    }
+    
+    @org.junit.Test
+    public void testIssueJWTTokenClaims() throws Exception {
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = RESTUnitTest.class.getResource("cxf-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
+        WebClient client = WebClient.create(address, busFile.toString());
+
+        client.type("application/json").accept("application/json");
+        client.path("jwt");
+        
+        // First check that the role isn't usually in the generated token
+        
+        Response response = client.get();
+        String token = response.readEntity(String.class);
+        assertNotNull(token);
+        
+        JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token);
+        JwtToken jwt = jwtConsumer.getJwtToken();
+        
+        String role = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role";
+        assertTrue(jwt.getClaim(role) == null);
+        
+        // Now get another token specifying the role
+        client.query("claim", role);
+        
+        response = client.get();
+        token = response.readEntity(String.class);
+        assertNotNull(token);
+        
+        // Process the token
+        validateJWTToken(token, null);
+        
+        jwtConsumer = new JwsJwtCompactConsumer(token);
+        jwt = jwtConsumer.getJwtToken();
+        assertEquals("ordinary-user", jwt.getClaim(role));
+        
+        bus.shutdown(true);
     }
     
     private Element validateSAMLSecurityTokenResponse(
@@ -753,6 +836,31 @@ public class RESTUnitTest extends AbstractBusClientServerTestBase {
         return processor.handleToken(
             assertionElement, requestData, new WSDocInfo(assertionElement.getOwnerDocument())
         );
+    }
+    
+    private void validateJWTToken(String token, String audience) 
+        throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException {
+        JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token);
+        JwtToken jwt = jwtConsumer.getJwtToken();
+        
+        // Validate claims
+        Assert.assertEquals("DoubleItSTSIssuer", jwt.getClaim(JwtConstants.CLAIM_ISSUER));
+        if (audience != null) {
+            @SuppressWarnings("unchecked")
+            List<String> audiences = (List<String>)jwt.getClaim(JwtConstants.CLAIM_AUDIENCE);
+            assertEquals(1, audiences.size());
+            Assert.assertEquals(audience, audiences.get(0));
+        }
+        Assert.assertNotNull(jwt.getClaim(JwtConstants.CLAIM_EXPIRY));
+        Assert.assertNotNull(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT));
+
+        KeyStore keystore = KeyStore.getInstance("JKS");
+        keystore.load(Loader.getResource("servicestore.jks").openStream(), "sspass".toCharArray());
+        Certificate cert = keystore.getCertificate("mystskey");
+        Assert.assertNotNull(cert);
+        
+        Assert.assertTrue(jwtConsumer.verifySignatureWith((X509Certificate)cert, 
+                                                          SignatureAlgorithm.RS256));
     }
     
 }
