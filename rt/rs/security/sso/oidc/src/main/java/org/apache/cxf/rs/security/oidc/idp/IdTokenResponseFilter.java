@@ -35,7 +35,7 @@ import org.apache.cxf.rs.security.oidc.common.IdToken;
 import org.apache.cxf.rs.security.oidc.utils.OidcUtils;
 
 public class IdTokenResponseFilter extends OAuthServerJoseJwtProducer implements AccessTokenResponseFilter {
-    private UserInfoProvider userInfoProvider;
+    private IdTokenProvider idTokenProvider;
     @Override
     public void process(ClientAccessToken ct, ServerAccessToken st) {
         // Only add an IdToken if the client has the "openid" scope
@@ -49,9 +49,10 @@ public class IdTokenResponseFilter extends OAuthServerJoseJwtProducer implements
         
     }
     private String getProcessedIdToken(ServerAccessToken st) {
-        if (userInfoProvider != null) {
+        if (idTokenProvider != null) {
             IdToken idToken = 
-                userInfoProvider.getIdToken(st.getClient().getClientId(), st.getSubject(), st.getScopes());
+                idTokenProvider.getIdToken(st.getClient().getClientId(), st.getSubject(), 
+                                           OAuthUtils.convertPermissionsToScopeList(st.getScopes()));
             setAtHashAndNonce(idToken, st);
             return super.processJwt(new JwtToken(idToken), st.getClient());
         } else if (st.getSubject().getProperties().containsKey(OidcUtils.ID_TOKEN)) {
@@ -91,8 +92,8 @@ public class IdTokenResponseFilter extends OAuthServerJoseJwtProducer implements
         }
         
     }
-    public void setUserInfoProvider(UserInfoProvider userInfoProvider) {
-        this.userInfoProvider = userInfoProvider;
+    public void setIdTokenProvider(IdTokenProvider idTokenProvider) {
+        this.idTokenProvider = idTokenProvider;
     }
     
 }
