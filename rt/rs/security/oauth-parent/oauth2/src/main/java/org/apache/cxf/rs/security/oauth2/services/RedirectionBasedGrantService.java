@@ -42,6 +42,7 @@ import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
 import org.apache.cxf.rs.security.oauth2.common.OAuthRedirectionState;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
+import org.apache.cxf.rs.security.oauth2.provider.AuthorizationRequestFilter;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.provider.ResourceOwnerNameProvider;
 import org.apache.cxf.rs.security.oauth2.provider.SessionAuthenticityTokenProvider;
@@ -66,6 +67,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
     private int maxDefaultSessionInterval;
     private boolean matchRedirectUriWithApplicationUri;
     private boolean hidePreauthorizedScopesInForm;
+    private AuthorizationRequestFilter authorizationFilter;
     
     protected RedirectionBasedGrantService(String supportedResponseType,
                                            String supportedGrantType) {
@@ -127,6 +129,10 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
     protected Response startAuthorization(MultivaluedMap<String, String> params, 
                                           UserSubject userSubject,
                                           Client client) {    
+        
+        if (authorizationFilter != null) {
+            params = authorizationFilter.process(params, userSubject, client);
+        }
         
         // Validate the provided request URI, if any, against the ones Client provided
         // during the registration
@@ -532,5 +538,8 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
     }
     public void setHidePreauthorizedScopesInForm(boolean hidePreauthorizedScopesInForm) {
         this.hidePreauthorizedScopesInForm = hidePreauthorizedScopesInForm;
+    }
+    public void setAuthorizationFilter(AuthorizationRequestFilter authorizationFilter) {
+        this.authorizationFilter = authorizationFilter;
     }
 }
