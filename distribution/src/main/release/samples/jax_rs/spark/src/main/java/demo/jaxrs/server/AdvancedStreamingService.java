@@ -19,7 +19,6 @@
 package demo.jaxrs.server;
 
 import java.io.InputStream;
-import java.util.Arrays;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -28,19 +27,12 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.StreamingOutput;
 
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.function.FlatMapFunction;
-import org.apache.spark.api.java.function.Function2;
-import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.streaming.Durations;
 import org.apache.spark.streaming.StreamingContext;
-import org.apache.spark.streaming.api.java.JavaDStream;
-import org.apache.spark.streaming.api.java.JavaPairDStream;
-import org.apache.spark.streaming.api.java.JavaReceiverInputDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.apache.spark.streaming.dstream.ReceiverInputDStream;
 import org.apache.spark.streaming.receiver.Receiver;
 
-import scala.Tuple2;
 import scala.reflect.ClassTag;
 
 // INCOMPLETE
@@ -48,10 +40,9 @@ import scala.reflect.ClassTag;
 @Path("/")
 public class AdvancedStreamingService {
     private JavaStreamingContext jssc;
-    private MyReceiverInputDStream receiverInputDStream;
     public AdvancedStreamingService(SparkConf sparkConf) {
         this.jssc = new JavaStreamingContext(sparkConf, Durations.seconds(1));
-        this.receiverInputDStream = new MyReceiverInputDStream(jssc.ssc(), 
+        new MyReceiverInputDStream(jssc.ssc(), 
                                    scala.reflect.ClassTag$.MODULE$.apply(String.class));
     }
     
@@ -64,34 +55,7 @@ public class AdvancedStreamingService {
         return null;
     }
 
-    @SuppressWarnings("serial")
-    private static JavaPairDStream<String, Integer> createOutputDStream(JavaReceiverInputDStream<String> receiverStream) {
-        final JavaDStream<String> words = receiverStream.flatMap(
-            new FlatMapFunction<String, String>() {
-                @Override 
-                public Iterable<String> call(String x) {
-                    return Arrays.asList(x.split(" "));
-                }
-            });
-        final JavaPairDStream<String, Integer> pairs = words.mapToPair(
-            new PairFunction<String, String, Integer>() {
-            
-                @Override 
-                public Tuple2<String, Integer> call(String s) {
-                    return new Tuple2<String, Integer>(s, 1);
-                }
-            });
-        return pairs.reduceByKey(
-            new Function2<Integer, Integer, Integer>() {
-             
-                @Override 
-                public Integer call(Integer i1, Integer i2) {
-                    return i1 + i2;
-                }
-            });
-    }
-   
-    
+     
     public static class MyReceiverInputDStream extends ReceiverInputDStream<String> {
 
         public MyReceiverInputDStream(StreamingContext ssc_, ClassTag<String> evidence$1) {
@@ -102,6 +66,7 @@ public class AdvancedStreamingService {
         }
         @Override
         public Receiver<String> getReceiver() {
+            // A receiver can be created per every String the input stream
             return new InputStreamReceiver(getInputStream());
         }
         public InputStream getInputStream() {
