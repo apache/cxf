@@ -37,7 +37,6 @@ import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.grants.code.AuthorizationCodeDataProvider;
 import org.apache.cxf.rs.security.oauth2.grants.code.AuthorizationCodeRegistration;
 import org.apache.cxf.rs.security.oauth2.grants.code.ServerAuthorizationCodeGrant;
-import org.apache.cxf.rs.security.oauth2.provider.AuthorizationCodeRequestFilter;
 import org.apache.cxf.rs.security.oauth2.provider.AuthorizationCodeResponseFilter;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.provider.OOBResponseDeliverer;
@@ -51,7 +50,6 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
  * redirect End User back to the Client, supplying 
  * the authorization code.
  */
-@SuppressWarnings("deprecation")
 @Path("/authorize")
 public class AuthorizationCodeGrantService extends RedirectionBasedGrantService {
     private static final long RECOMMENDED_CODE_EXPIRY_TIME_SECS = 10L * 60L;
@@ -183,11 +181,6 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
 
     public void setCodeResponseFilter(AuthorizationCodeResponseFilter filter) {
         this.codeResponseFilter = filter;
-    }
-
-    @Deprecated
-    public void setCodeRequestFilter(AuthorizationCodeRequestFilter codeRequestFilter) {
-        super.setAuthorizationFilter(codeRequestFilter);
     }
     public void setCanSupportEmptyRedirectForPrivateClients(boolean canSupportEmptyRedirectForPrivateClients) {
         this.canSupportEmptyRedirectForPrivateClients = canSupportEmptyRedirectForPrivateClients;
