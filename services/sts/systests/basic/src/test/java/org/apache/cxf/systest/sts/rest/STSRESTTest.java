@@ -917,7 +917,6 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.Test
-    @org.junit.Ignore
     public void testValidateJWTAndIssueSAML() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
@@ -981,21 +980,14 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
             }
         }
         assertNotNull(status);
-        /*
+        
         // Check the token was valid
         String validCode = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/status/valid";
         assertEquals(validCode, status.getCode());
         
         // Check the token
-        RequestedSecurityTokenType requestedSecurityToken = getRequestedSecurityToken(securityResponse);
-        assertNotNull(requestedSecurityToken);
+        validateSAMLSecurityTokenResponse(securityResponse, true);
         
-        String token = ((Element)requestedSecurityToken.getAny()).getTextContent();
-        assertNotNull(token);
-        
-        validateJWTToken(token, null);
-        */
-
         bus.shutdown(true);
     }
     

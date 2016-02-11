@@ -64,6 +64,7 @@
     <util:list id="transportTokenValidators">
         <ref bean="transportSamlTokenValidator"/>
         <ref bean="transportUTTokenValidator"/>
+        <ref bean="transportJWTTokenValidator"/>
     </util:list>
     <util:list id="transportTokenProviders">
         <ref bean="transportSamlTokenProvider"/>
@@ -77,6 +78,8 @@
     <bean id="transportSamlTokenProvider" class="org.apache.cxf.sts.token.provider.SAMLTokenProvider">
     </bean>
     <bean id="transportJWTTokenProvider" class="org.apache.cxf.sts.token.provider.jwt.JWTTokenProvider">
+    </bean>
+    <bean id="transportJWTTokenValidator" class="org.apache.cxf.sts.token.validator.jwt.JWTTokenValidator">
     </bean>
     <bean id="transportSamlTokenRenewer" class="org.apache.cxf.sts.token.renewer.SAMLTokenRenewer">
         <property name="verifyProofOfPossession" value="false"/>
