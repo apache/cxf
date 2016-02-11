@@ -21,8 +21,8 @@ package org.apache.cxf.rs.security.oidc.idp;
 import java.util.List;
 
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
-import org.apache.cxf.rs.security.oidc.common.UserInfo;
+import org.apache.cxf.rs.security.oidc.common.IdToken;
 
-public interface UserInfoProvider {
-    UserInfo getUserInfo(String clientId, UserSubject authenticatedUser, List<String> scopes);
+public interface IdTokenProvider {
+    IdToken getIdToken(String clientId, UserSubject authenticatedUser, List<String> scopes);
 }

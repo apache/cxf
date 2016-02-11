@@ -30,6 +30,7 @@ import org.apache.cxf.rs.security.oauth2.common.OAuthContext;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthDataProvider;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServerJoseJwtProducer;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthContextUtils;
+import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 import org.apache.cxf.rs.security.oidc.common.IdToken;
 import org.apache.cxf.rs.security.oidc.common.UserInfo;
 
@@ -46,9 +47,8 @@ public class UserInfoService extends OAuthServerJoseJwtProducer {
         OAuthContext oauth = OAuthContextUtils.getContext(mc);
         UserInfo userInfo = null;
         if (userInfoProvider != null) {
-            userInfo = userInfoProvider.getUserInfo(oauth.getClientId(), 
-                                         oauth.getSubject(), 
-                                         oauth.getPermissions());
+            userInfo = userInfoProvider.getUserInfo(oauth.getClientId(), oauth.getSubject(), 
+                OAuthUtils.convertPermissionsToScopeList(oauth.getPermissions()));
         } else if (oauth.getSubject() instanceof OidcUserSubject) {
             OidcUserSubject oidcUserSubject = (OidcUserSubject)oauth.getSubject();
             userInfo = oidcUserSubject.getUserInfo();

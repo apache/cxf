@@ -46,6 +46,7 @@ public class OidcImplicitService extends ImplicitGrantService {
     private static final String ID_TOKEN_AND_AT_RESPONSE_TYPE = "id_token token";
     private boolean skipAuthorizationWithOidcScope;
     private JoseJwtProducer idTokenHandler;
+    private IdTokenProvider idTokenProvider;
     
     public OidcImplicitService() {
         super(new HashSet<String>(Arrays.asList(ID_TOKEN_RESPONSE_TYPE,
@@ -97,31 +98,44 @@ public class OidcImplicitService extends ImplicitGrantService {
         
         StringBuilder sb = getUriWithFragment(state.getRedirectUri());
         
-        String idToken = getProcessedIdToken(state, userSubject);
+        String idToken = getProcessedIdToken(state, userSubject, 
+                                             getApprovedScope(requestedScope, approvedScope));
         if (idToken != null) {
             sb.append(OidcUtils.ID_TOKEN).append("=").append(idToken);
         }
         return finalizeResponse(sb, state);
     }
     
-    private String getProcessedIdToken(OAuthRedirectionState state, UserSubject subject) {
+    private String getProcessedIdToken(OAuthRedirectionState state, 
+                                       UserSubject subject,
+                                       List<String> scopes) {
         if (subject.getProperties().containsKey(OidcUtils.ID_TOKEN)) {
             return subject.getProperties().get(OidcUtils.ID_TOKEN);
+        } else if (idTokenProvider != null) {
+            IdToken idToken = idTokenProvider.getIdToken(state.getClientId(), subject, scopes);
+            idToken.setNonce(state.getNonce());
+            return processIdToken(idToken);
         } else if (subject instanceof OidcUserSubject) {
             OidcUserSubject sub = (OidcUserSubject)subject;
             IdToken idToken = new IdToken(sub.getIdToken());
             idToken.setAudience(state.getClientId());
             idToken.setAuthorizedParty(state.getClientId());
             idToken.setNonce(state.getNonce());
-            JoseJwtProducer processor = idTokenHandler == null ? new JoseJwtProducer() : idTokenHandler; 
-            return processor.processJwt(new JwtToken(idToken));
+            return processIdToken(idToken);
         } else {
             return null;
         }
     }
 
+    protected String processIdToken(IdToken idToken) {
+        JoseJwtProducer processor = idTokenHandler == null ? new JoseJwtProducer() : idTokenHandler; 
+        return processor.processJwt(new JwtToken(idToken));
+    }
+
     public void setIdTokenJoseHandler(JoseJwtProducer idTokenJoseHandler) {
         this.idTokenHandler = idTokenJoseHandler;
     }
-    
+    public void setIdTokenProvider(IdTokenProvider idTokenProvider) {
+        this.idTokenProvider = idTokenProvider;
+    }
 }
