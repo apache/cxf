@@ -18,6 +18,13 @@
  */
 package org.apache.cxf.rs.security.oauth2.provider;
 
-@Deprecated
-public interface AuthorizationCodeRequestFilter extends AuthorizationRequestFilter {
+import javax.ws.rs.core.MultivaluedMap;
+
+import org.apache.cxf.rs.security.oauth2.common.Client;
+import org.apache.cxf.rs.security.oauth2.common.UserSubject;
+
+public interface AuthorizationRequestFilter {
+    MultivaluedMap<String, String> process(MultivaluedMap<String, String> params, 
+                                           UserSubject endUser,
+                                           Client client);
 }

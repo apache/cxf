@@ -51,13 +51,13 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
  * redirect End User back to the Client, supplying 
  * the authorization code.
  */
+@SuppressWarnings("deprecation")
 @Path("/authorize")
 public class AuthorizationCodeGrantService extends RedirectionBasedGrantService {
     private static final long RECOMMENDED_CODE_EXPIRY_TIME_SECS = 10L * 60L;
     private boolean canSupportPublicClients;
     private boolean canSupportEmptyRedirectForPrivateClients;
     private OOBResponseDeliverer oobDeliverer;
-    private AuthorizationCodeRequestFilter codeRequestFilter;
     private AuthorizationCodeResponseFilter codeResponseFilter;
     
     public AuthorizationCodeGrantService() {
@@ -85,14 +85,6 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
     }
     private static void setCodeQualifier(OAuthRedirectionState data, MultivaluedMap<String, String> params) {
         data.setClientCodeChallenge(params.getFirst(OAuthConstants.AUTHORIZATION_CODE_CHALLENGE));
-    }
-    protected Response startAuthorization(MultivaluedMap<String, String> params, 
-                                          UserSubject userSubject,
-                                          Client client) {
-        if (codeRequestFilter != null) {
-            params = codeRequestFilter.process(params, userSubject, client);
-        }
-        return super.startAuthorization(params, userSubject, client);
     }
     protected Response createGrant(OAuthRedirectionState state,
                                    Client client,
@@ -193,8 +185,9 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
         this.codeResponseFilter = filter;
     }
 
+    @Deprecated
     public void setCodeRequestFilter(AuthorizationCodeRequestFilter codeRequestFilter) {
-        this.codeRequestFilter = codeRequestFilter;
+        super.setAuthorizationFilter(codeRequestFilter);
     }
     public void setCanSupportEmptyRedirectForPrivateClients(boolean canSupportEmptyRedirectForPrivateClients) {
         this.canSupportEmptyRedirectForPrivateClients = canSupportEmptyRedirectForPrivateClients;

@@ -36,12 +36,12 @@ import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
-import org.apache.cxf.rs.security.oauth2.provider.AuthorizationCodeRequestFilter;
+import org.apache.cxf.rs.security.oauth2.provider.AuthorizationRequestFilter;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthJoseJwtConsumer;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
 
-public class JwtRequestCodeFilter extends OAuthJoseJwtConsumer implements AuthorizationCodeRequestFilter {
+public class JwtRequestCodeFilter extends OAuthJoseJwtConsumer implements AuthorizationRequestFilter {
     private static final String REQUEST_PARAM = "request";
     private static final String REQUEST_URI_PARAM = "request_uri";
     private boolean verifyWithClientCertificates;
