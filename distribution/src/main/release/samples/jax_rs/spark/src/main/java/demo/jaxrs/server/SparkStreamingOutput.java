@@ -79,6 +79,9 @@ public class SparkStreamingOutput implements StreamingOutput {
         batchCompleted = true;
     }
     
+    
+    // This dedicated class was introduced to validate that when Spark is running it does not
+    // fail the processing due to OutputStream being one of the fields in the serializable class,
     private class OutputFunction implements VoidFunction<JavaPairRDD<String, Integer>> {
         private static final long serialVersionUID = 1L;
         private OutputStream os;
@@ -96,6 +99,8 @@ public class SparkStreamingOutput implements StreamingOutput {
                     throw new WebApplicationException(); 
                 }
             }
+            // Right now we assume by the time we call it the batch the whole InputStream has been
+            // processed
             releaseStreamingContext();
         }
         
@@ -104,6 +109,9 @@ public class SparkStreamingOutput implements StreamingOutput {
 
         @Override
         public void onBatchCompleted(StreamingListenerBatchCompleted event) {
+            // as soon as the batch is finished we let the streaming context go
+            // but this may need to be revisited if a given InputStream happens to be processed in
+            // multiple batches ?
             setBatchCompleted();
         }
 

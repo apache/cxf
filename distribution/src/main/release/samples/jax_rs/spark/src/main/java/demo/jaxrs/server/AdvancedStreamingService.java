@@ -25,29 +25,34 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 
 import org.apache.spark.SparkConf;
-import org.apache.spark.SparkException;
 import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.streaming.Durations;
+import org.apache.spark.streaming.StreamingContext;
 import org.apache.spark.streaming.api.java.JavaDStream;
 import org.apache.spark.streaming.api.java.JavaPairDStream;
 import org.apache.spark.streaming.api.java.JavaReceiverInputDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
+import org.apache.spark.streaming.dstream.ReceiverInputDStream;
+import org.apache.spark.streaming.receiver.Receiver;
 
 import scala.Tuple2;
+import scala.reflect.ClassTag;
 
+// INCOMPLETE
 
 @Path("/")
-public class StreamingService {
-    private SparkConf sparkConf;
-    public StreamingService(SparkConf sparkConf) {
-        this.sparkConf = sparkConf;
+public class AdvancedStreamingService {
+    private JavaStreamingContext jssc;
+    private MyReceiverInputDStream receiverInputDStream;
+    public AdvancedStreamingService(SparkConf sparkConf) {
+        this.jssc = new JavaStreamingContext(sparkConf, Durations.seconds(1));
+        this.receiverInputDStream = new MyReceiverInputDStream(jssc.ssc(), 
+                                   scala.reflect.ClassTag$.MODULE$.apply(String.class));
     }
     
     @POST
@@ -55,20 +60,8 @@ public class StreamingService {
     @Consumes("text/plain")
     @Produces("text/plain")
     public StreamingOutput getStream(InputStream is) {
-        try {
-            JavaStreamingContext jssc = new JavaStreamingContext(sparkConf, Durations.seconds(1));
-            JavaReceiverInputDStream<String> receiverStream = 
-                jssc.receiverStream(new InputStreamReceiver(is));
-            return new SparkStreamingOutput(jssc, 
-                                            createOutputDStream(receiverStream));
-        } catch (Exception ex) {
-            // the compiler does not allow to catch SparkException directly
-            if (ex instanceof SparkException) {
-                throw new WebApplicationException(Response.status(503).header("Retry-After", "60").build());
-            } else {
-                throw new WebApplicationException(ex);
-            }
-        }
+        
+        return null;
     }
 
     @SuppressWarnings("serial")
@@ -98,5 +91,25 @@ public class StreamingService {
             });
     }
    
+    
+    public static class MyReceiverInputDStream extends ReceiverInputDStream<String> {
+
+        public MyReceiverInputDStream(StreamingContext ssc_, ClassTag<String> evidence$1) {
+            super(ssc_, evidence$1);
+        }
+        public void putInputStream(InputStream is) {
+            
+        }
+        @Override
+        public Receiver<String> getReceiver() {
+            return new InputStreamReceiver(getInputStream());
+        }
+        public InputStream getInputStream() {
+            // TODO Auto-generated method stub
+            return null;
+        }    
+    }
+
+
     
 }

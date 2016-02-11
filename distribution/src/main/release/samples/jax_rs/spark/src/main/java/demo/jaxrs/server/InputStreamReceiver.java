@@ -21,6 +21,10 @@ public class InputStreamReceiver extends Receiver<String> {
         super(StorageLevel.MEMORY_ONLY());
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
         String userInput = null;
+        // Receiver is meant to be serializable, but it would be
+        // great if if we could avoid copying InputStream
+        // TODO: submit Spark enhancement request so that it can keep streaming from 
+        // the incoming InputStream to its processing nodes ?
         while ((userInput = readLine(reader)) != null) {
             inputStrings.add(userInput);
         }
