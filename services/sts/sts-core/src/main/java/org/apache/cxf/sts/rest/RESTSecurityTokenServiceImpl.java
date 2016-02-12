@@ -81,6 +81,9 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
 
     @Context
     private MessageContext messageContext;
+    
+    @Context
+    private javax.ws.rs.core.SecurityContext securityContext;
 
     private Map<String, String> claimTypeMap = DEFAULT_CLAIM_TYPE_MAP;
 
@@ -297,12 +300,24 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
     
     @Override
     protected Principal getPrincipal() {
-        SecurityContext sc = (SecurityContext)messageContext.get(SecurityContext.class);
-        if (sc == null || sc.getUserPrincipal() == null) {
-            // Get the TLS client principal if no security context is set up
-            return getTLSClientCertificate().getSubjectX500Principal();
+        // Try JAX-RS SecurityContext first
+        if (securityContext != null && securityContext.getUserPrincipal() != null) {
+            return securityContext.getUserPrincipal();
         }
-        return messageContext.getSecurityContext().getUserPrincipal();
+        
+        // Then try the CXF SecurityContext
+        SecurityContext sc = (SecurityContext)messageContext.get(SecurityContext.class);
+        if (sc != null && sc.getUserPrincipal() != null) {
+            return sc.getUserPrincipal();
+        }
+        
+        // Get the TLS client principal if no security context is set up
+        X509Certificate clientCert = getTLSClientCertificate();
+        if (clientCert != null) {
+            return clientCert.getSubjectX500Principal();
+        }
+        
+        return null;
     }
     
     private X509Certificate getTLSClientCertificate() {
