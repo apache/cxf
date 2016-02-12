@@ -220,11 +220,11 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
         }
 
         // Claims
-        if (requestedClaims == null) {
+        if (requestedClaims == null || requestedClaims.isEmpty()) {
             requestedClaims = defaultClaims;
         }
 
-        if (requestedClaims != null) {
+        if (requestedClaims != null && !requestedClaims.isEmpty()) {
             ClaimsType claimsType = of.createClaimsType();
             claimsType.setDialect(CLAIM_TYPE_NS);
             JAXBElement<ClaimsType> claims = of.createClaims(claimsType);
@@ -418,6 +418,7 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
             this.token = token;
         }
         
+        @SuppressWarnings("unused")
         public String getToken() {
             return token;
         }
