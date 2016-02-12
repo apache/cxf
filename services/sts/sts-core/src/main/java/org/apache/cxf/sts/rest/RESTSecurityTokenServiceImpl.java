@@ -19,11 +19,15 @@
 
 package org.apache.cxf.sts.rest;
 
+import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
+import java.util.zip.Deflater;
 
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
@@ -31,9 +35,14 @@ import javax.xml.bind.JAXBElement;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
+import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.Base64Exception;
+import org.apache.cxf.common.util.Base64Utility;
+import org.apache.cxf.common.util.CompressionUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.security.transport.TLSSessionInfo;
@@ -48,6 +57,7 @@ import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestedSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.model.UseKeyType;
 import org.apache.cxf.ws.security.trust.STSUtils;
+import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.keys.content.X509Data;
@@ -60,6 +70,7 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
 
     private static final String CLAIM_TYPE = "ClaimType";
     private static final String CLAIM_TYPE_NS = "http://schemas.xmlsoap.org/ws/2005/05/identity";
+    private static final Logger LOG = LogUtils.getL7dLogger(RESTSecurityTokenServiceImpl.class);
 
     static {
         DEFAULT_CLAIM_TYPE_MAP = new HashMap<String, String>();
@@ -94,9 +105,10 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
     private List<String> defaultClaims;
 
     private boolean requestClaimsOptional = true;
+    private boolean useDeflateEncoding = true;
 
     @Override
-    public Response getToken(String tokenType, String keyType, 
+    public Response getXMLToken(String tokenType, String keyType, 
                              List<String> requestedClaims, String appliesTo,
                              boolean wstrustResponse) {
         RequestSecurityTokenResponseType response = 
@@ -110,12 +122,46 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
         }
         
         RequestedSecurityTokenType requestedToken = getRequestedSecurityToken(response);
+        return Response.ok(requestedToken.getAny()).build();
+    }
+    
+    @Override
+    public Response getJSONToken(String tokenType, String keyType, 
+                             List<String> requestedClaims, String appliesTo) {
+        if (!"jwt".equals(tokenType)) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        RequestSecurityTokenResponseType response = 
+            issueToken(tokenType, keyType, requestedClaims, appliesTo);
+        
+        RequestedSecurityTokenType requestedToken = getRequestedSecurityToken(response);
+        
+        // Discard the XML Wrapper + create a new JSON Wrapper
+        String token = ((Element)requestedToken.getAny()).getTextContent();
+        return Response.ok(new JSONWrapper(token)).build();
+    }
+    
+    @Override
+    public Response getPlainToken(String tokenType, String keyType, 
+                             List<String> requestedClaims, String appliesTo) {
+        RequestSecurityTokenResponseType response = 
+            issueToken(tokenType, keyType, requestedClaims, appliesTo);
+        
+        RequestedSecurityTokenType requestedToken = getRequestedSecurityToken(response);
         
         if ("jwt".equals(tokenType)) {
             // Discard the wrapper here
             return Response.ok(((Element)requestedToken.getAny()).getTextContent()).build();
         } else {
-            return Response.ok(requestedToken.getAny()).build();
+            // Base-64 encode the token + return it
+            try {
+                String encodedToken = 
+                    encodeToken(DOM2Writer.nodeToString((Element)requestedToken.getAny()));
+                return Response.ok(encodedToken).build();
+            } catch (Exception ex) {
+                LOG.warning(ex.getMessage());
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+            }
         }
     }
     
@@ -168,7 +214,7 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
                     JAXBElement<UseKeyType> useKey = of.createUseKey(useKeyType);
                     request.getAny().add(useKey);
                 } catch (XMLSecurityException ex) {
-                    // TODO
+                    LOG.warning(ex.getMessage());
                 }
             }
         }
@@ -337,4 +383,43 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
         return PhaseInterceptorChain.getCurrentMessage();
     }
 
+    public void setUseDeflateEncoding(boolean deflate) {
+        useDeflateEncoding = deflate;
+    }
+    
+    protected String encodeToken(String assertion) throws Base64Exception {
+        byte[] tokenBytes = assertion.getBytes(StandardCharsets.UTF_8);
+
+        if (useDeflateEncoding) {
+            tokenBytes = CompressionUtils.deflate(tokenBytes, getDeflateLevel(), true);
+        }
+        StringWriter writer = new StringWriter();
+        Base64Utility.encode(tokenBytes, 0, tokenBytes.length, writer);
+        return writer.toString();
+    }
+    
+    private static int getDeflateLevel() {
+        Integer level = null;
+        
+        Message m = PhaseInterceptorChain.getCurrentMessage();
+        if (m != null) {
+            level = PropertyUtils.getInteger(m, "deflate.level");
+        }
+        if (level == null) {
+            level = Deflater.DEFLATED;
+        }
+        return level;
+    }
+    
+    private static class JSONWrapper {
+        private String token;
+        
+        public JSONWrapper(String token) {
+            this.token = token;
+        }
+        
+        public String getToken() {
+            return token;
+        }
+    }
 }

@@ -19,7 +19,10 @@
 package org.apache.cxf.systest.sts.rest;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -38,6 +41,8 @@ import org.w3c.dom.Element;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.common.util.Base64Utility;
+import org.apache.cxf.common.util.CompressionUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactConsumer;
@@ -117,7 +122,7 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
         WebClient client = WebClient.create(address, busFile.toString());
 
-        client.type("application/xml").accept("application/xml");
+        client.accept("application/xml");
         client.path("saml2.0");
         
         Response response = client.get();
@@ -149,7 +154,7 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
         WebClient client = WebClient.create(address, busFile.toString());
 
-        client.type("application/xml").accept("application/xml");
+        client.accept("application/xml");
         client.path("saml1.1");
         
         Response response = client.get();
@@ -181,7 +186,7 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
         WebClient client = WebClient.create(address, busFile.toString());
 
-        client.type("application/xml").accept("application/xml");
+        client.accept("application/xml");
         client.path("saml1.1");
         client.query("keyType", SYMMETRIC_KEY_KEYTYPE);
         
@@ -223,7 +228,7 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
         WebClient client = WebClient.create(address, busFile.toString());
 
-        client.type("application/xml").accept("application/xml");
+        client.accept("application/xml");
         client.path("saml2.0");
         client.query("keyType", PUBLIC_KEY_KEYTYPE);
         
@@ -265,7 +270,7 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
         WebClient client = WebClient.create(address, busFile.toString());
 
-        client.type("application/xml").accept("application/xml");
+        client.accept("application/xml");
         client.path("saml1.1");
         client.query("keyType", BEARER_KEYTYPE);
         
@@ -305,7 +310,7 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
         WebClient client = WebClient.create(address, busFile.toString());
 
-        client.type("application/xml").accept("application/xml");
+        client.accept("application/xml");
         client.path("saml2.0");
         client.query("appliesTo", DEFAULT_ADDRESS);
         
@@ -338,7 +343,7 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
         WebClient client = WebClient.create(address, busFile.toString());
 
-        client.type("application/xml").accept("application/xml");
+        client.accept("application/xml");
         client.path("saml2.0");
         client.query("appliesTo", "https://localhost:8081/tripleit/");
         
@@ -365,7 +370,7 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
         WebClient client = WebClient.create(address, busFile.toString());
 
-        client.type("application/xml").accept("application/xml");
+        client.accept("application/xml");
         client.path("saml2.0");
         
         // First check that the role isn't usually in the generated token
@@ -427,7 +432,7 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
         WebClient client = WebClient.create(address, busFile.toString());
 
-        client.type("application/xml").accept("application/xml");
+        client.accept("application/xml");
         client.path("saml2.0");
         client.query("wstrustResponse", "true");
         
@@ -703,7 +708,7 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.Test
-    public void testIssueJWTToken() throws Exception {
+    public void testIssueSAML2TokenPlain() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
 
@@ -714,7 +719,44 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
         WebClient client = WebClient.create(address, busFile.toString());
 
-        client.type("application/json").accept("application/json");
+        client.accept("text/plain");
+        client.path("saml2.0");
+        
+        Response response = client.get();
+        String encodedAssertion = response.readEntity(String.class);
+        assertNotNull(encodedAssertion);
+        
+        byte[] deflatedToken = Base64Utility.decode(encodedAssertion);
+        InputStream inputStream = CompressionUtils.inflate(deflatedToken);
+        Document doc = 
+            StaxUtils.read(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+        
+        // Process the token
+        List<WSSecurityEngineResult> results = processToken(doc.getDocumentElement());
+
+        assertTrue(results != null && results.size() == 1);
+        SamlAssertionWrapper assertion = 
+            (SamlAssertionWrapper)results.get(0).get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(assertion != null);
+        assertTrue(assertion.getSaml2() != null && assertion.getSaml1() == null);
+        assertTrue(assertion.isSigned());
+
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testIssueJWTTokenPlain() throws Exception {
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
+        WebClient client = WebClient.create(address, busFile.toString());
+
+        client.accept("text/plain");
         client.path("jwt");
         
         Response response = client.get();
@@ -736,7 +778,7 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
         WebClient client = WebClient.create(address, busFile.toString());
 
-        client.type("application/json").accept("application/json");
+        client.accept("text/plain");
         client.path("jwt");
         client.query("appliesTo", DEFAULT_ADDRESS);
         
@@ -759,7 +801,7 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
         WebClient client = WebClient.create(address, busFile.toString());
 
-        client.type("application/json").accept("application/json");
+        client.accept("text/plain");
         client.path("jwt");
         
         // First check that the role isn't usually in the generated token
@@ -849,7 +891,7 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
         WebClient client = WebClient.create(address, busFile.toString());
 
-        client.type("application/xml").accept("application/xml");
+        client.accept("application/xml");
         client.path("saml2.0");
         
         // 1. Get a token via GET
@@ -928,7 +970,7 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
         WebClient client = WebClient.create(address, busFile.toString());
 
-        client.type("application/xml").accept("application/xml");
+        client.accept("text/plain");
         client.path("jwt");
         
         // 1. Get a token via GET
@@ -988,6 +1030,115 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         // Check the token
         validateSAMLSecurityTokenResponse(securityResponse, true);
         
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testIssueJWTTokenXMLWrapper() throws Exception {
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
+        WebClient client = WebClient.create(address, busFile.toString());
+
+        client.accept("application/xml");
+        client.path("jwt");
+        
+        Response response = client.get();
+        Document assertionDoc = response.readEntity(Document.class);
+        assertNotNull(assertionDoc);
+        
+        // Discard XML wrapper
+        validateJWTToken(assertionDoc.getDocumentElement().getFirstChild().getTextContent(), null);
+    }
+    
+    @org.junit.Test
+    public void testIssueJWTTokenJSONWrapper() throws Exception {
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
+        WebClient client = WebClient.create(address, busFile.toString());
+
+        client.accept("application/json");
+        client.path("jwt");
+        
+        client.get();
+    }
+    
+    @org.junit.Test
+    public void testDefaultSAMLFormat() throws Exception {
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
+        WebClient client = WebClient.create(address, busFile.toString());
+
+        client.accept("*");
+        client.path("saml");
+        
+        Response response = client.get();
+        // It should be XML
+        Document doc = response.readEntity(Document.class);
+        assertNotNull(doc);
+    }
+    
+    @org.junit.Test
+    public void testDefaultJWTFormat() throws Exception {
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
+        WebClient client = WebClient.create(address, busFile.toString());
+
+        client.accept("*");
+        client.path("jwt");
+        
+        Response response = client.get();
+        // It should be XML
+        Document doc = response.readEntity(Document.class);
+        assertNotNull(doc);
+    }
+    
+    @org.junit.Test
+    public void testIssueSAMLTokenWithWrongAcceptType() throws Exception {
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
+        WebClient client = WebClient.create(address, busFile.toString());
+
+        client.accept("application/json");
+        client.path("saml2.0");
+        
+        Response response = client.get();
+        try {
+            response.readEntity(Document.class);
+            fail("Failure expected on an bad accept type");
+        } catch (Exception ex) {
+            // expected
+        }
+
         bus.shutdown(true);
     }
     
