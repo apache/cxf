@@ -113,14 +113,6 @@
         <property name="renewOperation" ref="transportRenewDelegate"/>
     </bean>
     
-    <bean id="jaxbProvider" class="org.apache.cxf.jaxrs.provider.JAXBElementProvider">
-        <property name="depthProperties">
-            <bean class="org.apache.cxf.staxutils.DocumentDepthProperties">
-                <property name="innerElementCountThreshold" value="500" />
-            </bean>
-        </property>
-    </bean>
-
     <bean id="jsonProvider" class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider" />
     
     <jaxrs:server id="stsRESTService"
