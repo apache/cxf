@@ -96,9 +96,9 @@ public final class SSLUtils {
         throws Exception {
         //TODO for performance reasons we should cache
         // the KeymanagerFactory and TrustManagerFactory 
-        if ((keyStorePassword != null)
-            && (keyPassword != null) 
-            && (!keyStorePassword.equals(keyPassword))) {
+        if (keyStorePassword != null
+            && keyPassword != null 
+            && !keyStorePassword.equals(keyPassword)) {
             LogUtils.log(log,
                          Level.WARNING,
                          "KEY_PASSWORD_NOT_SAME_KEYSTORE_PASSWORD");
@@ -111,30 +111,32 @@ public final class SSLUtils {
         if (keyStoreType.equalsIgnoreCase(PKCS12_TYPE)) {
             Path path = FileSystems.getDefault().getPath(keyStoreLocation);
             byte[] bytes = Files.readAllBytes(path);
-            ByteArrayInputStream bin = new ByteArrayInputStream(bytes);
+            try (ByteArrayInputStream bin = new ByteArrayInputStream(bytes)) {
             
-            if (keyStorePassword != null) {
-                keystoreManagers = loadKeyStore(kmf,
-                                                ks,
-                                                bin,
-                                                keyStoreLocation,
-                                                keyStorePassword,
-                                                log);
+                if (keyStorePassword != null) {
+                    keystoreManagers = loadKeyStore(kmf,
+                                                    ks,
+                                                    bin,
+                                                    keyStoreLocation,
+                                                    keyStorePassword,
+                                                    log);
+                }
             }
         } else {        
             byte[] sslCert = loadFile(keyStoreLocation);
             
             if (sslCert != null && sslCert.length > 0 && keyStorePassword != null) {
-                ByteArrayInputStream bin = new ByteArrayInputStream(sslCert);
-                keystoreManagers = loadKeyStore(kmf,
+                try (ByteArrayInputStream bin = new ByteArrayInputStream(sslCert)) {
+                    keystoreManagers = loadKeyStore(kmf,
                                                 ks,
                                                 bin,
                                                 keyStoreLocation,
                                                 keyStorePassword,
                                                 log);
+                }
             }  
         }
-        if ((keyStorePassword == null) && (keyStoreLocation != null)) {
+        if (keyStorePassword == null && keyStoreLocation != null) {
             LogUtils.log(log, Level.WARNING,
                          "FAILED_TO_LOAD_KEYSTORE_NULL_PASSWORD", 
                          keyStoreLocation);
@@ -151,6 +153,7 @@ public final class SSLUtils {
         }
         return defaultManagers;
     }
+    
     private static synchronized void loadDefaultKeyManagers(Logger log) {
         if (defaultManagers != null) {
             return;
@@ -233,10 +236,10 @@ public final class SSLUtils {
             byte[] caCert = loadFile(trustStoreLocation);
             try {
                 if (caCert != null) {
-                    ByteArrayInputStream cabin = new ByteArrayInputStream(caCert);
-                    X509Certificate cert = (X509Certificate)cf.generateCertificate(cabin);
-                    trustedCertStore.setCertificateEntry(cert.getIssuerDN().toString(), cert);
-                    cabin.close();
+                    try (ByteArrayInputStream cabin = new ByteArrayInputStream(caCert)) {
+                        X509Certificate cert = (X509Certificate)cf.generateCertificate(cabin);
+                        trustedCertStore.setCertificateEntry(cert.getIssuerDN().toString(), cert);
+                    }
                 }
             } catch (Exception e) {
                 LogUtils.log(log, Level.WARNING, "FAILED_TO_LOAD_TRUST_STORE", 
@@ -284,6 +287,7 @@ public final class SSLUtils {
     public static String getKeystoreType(String keyStoreType, Logger log) {
         return getKeystoreType(keyStoreType, log, DEFAULT_KEYSTORE_TYPE);
     }
+    
     public static String getKeystoreType(String keyStoreType, Logger log, String def) {
         String logMsg = null;
         if (keyStoreType != null) {
@@ -299,7 +303,8 @@ public final class SSLUtils {
         }
         LogUtils.log(log, Level.FINE, logMsg, keyStoreType);
         return keyStoreType;
-    }  
+    }
+    
     public static String getKeystoreProvider(String keyStoreProvider, Logger log) {
         String logMsg = null;
         if (keyStoreProvider != null) {
