@@ -34,7 +34,6 @@ import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.X509KeyManager;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -52,7 +51,6 @@ import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.configuration.security.ClientAuthentication;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.transport.HttpUriMapper;
-import org.apache.cxf.transport.https.AliasedX509ExtendedKeyManager;
 import org.eclipse.jetty.http.HttpStatus;
 import org.eclipse.jetty.security.SecurityHandler;
 import org.eclipse.jetty.server.AbstractConnector;
@@ -729,9 +727,9 @@ public class JettyHTTPServerEngine implements ServerEngine {
                 : SSLContext.getInstance(proto, tlsServerParameters.getJsseProvider());
             
         KeyManager keyManagers[] = tlsServerParameters.getKeyManagers();
-        if (tlsServerParameters.getCertAlias() != null) {
-            keyManagers = getKeyManagersWithCertAlias(keyManagers);
-        }
+        org.apache.cxf.transport.https.SSLUtils.configureKeyManagersWithCertAlias(
+            tlsServerParameters, keyManagers);
+        
         context.init(tlsServerParameters.getKeyManagers(), 
                      tlsServerParameters.getTrustManagers(),
                      tlsServerParameters.getSecureRandom());
@@ -760,17 +758,7 @@ public class JettyHTTPServerEngine implements ServerEngine {
         
         return context;
     }
-    protected KeyManager[] getKeyManagersWithCertAlias(KeyManager keyManagers[]) throws Exception {
-        if (tlsServerParameters.getCertAlias() != null) {
-            for (int idx = 0; idx < keyManagers.length; idx++) {
-                if (keyManagers[idx] instanceof X509KeyManager) {
-                    keyManagers[idx] = new AliasedX509ExtendedKeyManager(
-                        tlsServerParameters.getCertAlias(), (X509KeyManager)keyManagers[idx]);
-                }
-            }
-        }
-        return keyManagers;
-    }
+
     protected void setClientAuthentication(SslContextFactory con,
                                            ClientAuthentication clientAuth) {
         con.setWantClientAuth(true);

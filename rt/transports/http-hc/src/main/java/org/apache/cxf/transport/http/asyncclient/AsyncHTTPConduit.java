@@ -47,7 +47,6 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLSession;
-import javax.net.ssl.X509KeyManager;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.util.StringUtils;
@@ -65,7 +64,6 @@ import org.apache.cxf.transport.http.Address;
 import org.apache.cxf.transport.http.Headers;
 import org.apache.cxf.transport.http.URLConnectionHTTPConduit;
 import org.apache.cxf.transport.http.asyncclient.AsyncHTTPConduitFactory.UseAsyncPolicy;
-import org.apache.cxf.transport.https.AliasedX509ExtendedKeyManager;
 import org.apache.cxf.transport.https.HttpsURLConnectionInfo;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.cxf.version.Version;
@@ -878,10 +876,11 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
         SSLContext ctx = provider == null ? SSLContext.getInstance(protocol) : SSLContext
             .getInstance(protocol, provider);
         ctx.getClientSessionContext().setSessionTimeout(tlsClientParameters.getSslCacheTimeout());
+        
         KeyManager[] keyManagers = tlsClientParameters.getKeyManagers();
-        if (tlsClientParameters.getCertAlias() != null) {
-            keyManagers = getKeyManagersWithCertAlias(tlsClientParameters, keyManagers);
-        }
+        org.apache.cxf.transport.https.SSLUtils.configureKeyManagersWithCertAlias(
+            tlsClientParameters, keyManagers);
+
         ctx.init(keyManagers, tlsClientParameters.getTrustManagers(),
                  tlsClientParameters.getSecureRandom());
         
@@ -930,27 +929,5 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
         }
         return list.toArray(new String[list.size()]);
     }
-
-    protected static KeyManager[] getKeyManagersWithCertAlias(TLSClientParameters tlsClientParameters,
-                                                      KeyManager[] keyManagers) throws GeneralSecurityException {
-        if (tlsClientParameters.getCertAlias() != null) {
-            KeyManager ret[] = new KeyManager[keyManagers.length];  
-            for (int idx = 0; idx < keyManagers.length; idx++) {
-                if (keyManagers[idx] instanceof X509KeyManager) {
-                    try {
-                        ret[idx] = new AliasedX509ExtendedKeyManager(tlsClientParameters.getCertAlias(),
-                                                                             (X509KeyManager)keyManagers[idx]);
-                    } catch (Exception e) {
-                        throw new GeneralSecurityException(e);
-                    }
-                } else {
-                    ret[idx] = keyManagers[idx]; 
-                }
-            }
-            return ret;
-        }
-        return keyManagers;
-    }
-
 
 }
