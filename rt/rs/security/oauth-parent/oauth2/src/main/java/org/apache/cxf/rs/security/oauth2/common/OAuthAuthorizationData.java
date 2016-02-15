@@ -25,6 +25,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.core.MultivaluedMap;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
@@ -49,6 +50,7 @@ public class OAuthAuthorizationData extends OAuthRedirectionState implements Ser
     private String applicationLogoUri;
     private List<String> applicationCertificates = new LinkedList<String>();
     private Map<String, String> extraApplicationProperties = new HashMap<String, String>();
+    private MultivaluedMap<String, String> requestParameters;
     private boolean implicitFlow;
     
     private List<OAuthPermission> permissions;
@@ -255,5 +257,13 @@ public class OAuthAuthorizationData extends OAuthRedirectionState implements Ser
             allPerms.addAll(permissions);
         }
         return allPerms;
+    }
+
+    public MultivaluedMap<String, String> getRequestParameters() {
+        return requestParameters;
+    }
+
+    public void setRequestParameters(MultivaluedMap<String, String> requestParameters) {
+        this.requestParameters = requestParameters;
     }
 }
