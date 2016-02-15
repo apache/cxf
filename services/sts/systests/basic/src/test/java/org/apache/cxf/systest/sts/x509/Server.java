@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.sts.x509_symmetric;
+package org.apache.cxf.systest.sts.x509;
 
 import java.net.URL;
 
