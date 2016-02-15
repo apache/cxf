@@ -145,6 +145,18 @@ public class OAuthScopesFilter implements ContainerRequestFilter {
         }
         throw ExceptionUtils.toForbiddenException(null, null);
     }
+
+    public void setScopesMap(Map<String, List<String>> scopesMap) {
+        this.scopesMap = scopesMap;
+    }
+
+    public void setScopesMatchAllMap(Map<String, Boolean> scopesMatchAllMap) {
+        this.scopesMatchAllMap = scopesMatchAllMap;
+    }
+
+    public void setConfidentialClientMethods(Set<String> confidentialClientMethods) {
+        this.confidentialClientMethods = confidentialClientMethods;
+    }
     
     
 }
