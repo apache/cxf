@@ -30,6 +30,8 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.annotation.Priority;
+import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.Context;
@@ -42,7 +44,7 @@ import org.apache.cxf.rs.security.oauth2.common.OAuthContext;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthContextUtils;
 
-
+@Priority(Priorities.AUTHENTICATION + 1)
 public class OAuthScopesFilter implements ContainerRequestFilter {
 
     private static final Logger LOG = LogUtils.getL7dLogger(OAuthScopesFilter.class);
