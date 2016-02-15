@@ -183,6 +183,10 @@ public class ClaimsManager {
         ProcessedClaimCollection returnCollection = new ProcessedClaimCollection();
         Principal originalPrincipal = parameters.getPrincipal();
         
+        if (claimHandlers == null) {
+            return returnCollection;
+        }
+        
         for (ClaimsHandler handler : claimHandlers) {
             
             ClaimCollection supportedClaims = 
