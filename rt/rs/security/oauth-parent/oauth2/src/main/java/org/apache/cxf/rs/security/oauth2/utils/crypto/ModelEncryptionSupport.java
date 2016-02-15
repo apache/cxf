@@ -256,7 +256,9 @@ public final class ModelEncryptionSupport {
         newToken.setClientCodeVerifier(parts[10]);
         //UserSubject:
         newToken.setSubject(recreateUserSubject(parts[11]));
-                
+        
+        newToken.setExtraProperties(parseSimpleMap(parts[12]));
+        
         return newToken;
     }
     
@@ -322,7 +324,10 @@ public final class ModelEncryptionSupport {
         state.append(SEP);
         // 11: user subject
         tokenizeUserSubject(state, token.getSubject());
-        
+        // 13: extra properties
+        state.append(SEP);
+        // {key=value, key=value}
+        state.append(token.getExtraProperties().toString());
         return state.toString();
     }
     
@@ -402,6 +407,7 @@ public final class ModelEncryptionSupport {
         grant.setClientCodeChallenge(getStringPart(parts[6]));
         grant.setApprovedScopes(parseSimpleList(parts[7]));
         grant.setSubject(recreateUserSubject(parts[8]));
+        grant.setExtraProperties(parseSimpleMap(parts[9]));
         return grant; 
     }
     private static String tokenizeCodeGrant(ServerAuthorizationCodeGrant grant) {
@@ -432,7 +438,10 @@ public final class ModelEncryptionSupport {
         state.append(SEP);
         // 8: subject
         tokenizeUserSubject(state, grant.getSubject());
-        
+        // 9: extra properties
+        state.append(SEP);
+        // {key=value, key=value}
+        state.append(grant.getExtraProperties().toString());
         return state.toString();
     }
     
@@ -453,7 +462,7 @@ public final class ModelEncryptionSupport {
         }
     }
     
-    private static Map<String, String> parseSimpleMap(String mapStr) {
+    public static Map<String, String> parseSimpleMap(String mapStr) {
         Map<String, String> props = new HashMap<String, String>();
         List<String> entries = parseSimpleList(mapStr);
         for (String entry : entries) {

@@ -19,7 +19,9 @@
 package org.apache.cxf.rs.security.oauth2.common;
 
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -38,6 +40,7 @@ public class OAuthContext {
     private String tokenAudience;
     private String tokenIssuer;
     private String[] tokenRequestParts;
+    private Map<String, String> tokenExtraProperties = new LinkedHashMap<String, String>();
     
     public OAuthContext(UserSubject resourceOwnerSubject,
                         UserSubject clientSubject,
@@ -142,5 +145,13 @@ public class OAuthContext {
 
     public void setTokenIssuer(String tokenIssuer) {
         this.tokenIssuer = tokenIssuer;
+    }
+
+    public Map<String, String> getTokenExtraProperties() {
+        return tokenExtraProperties;
+    }
+
+    public void setTokenExtraProperties(Map<String, String> tokenExtraProperties) {
+        this.tokenExtraProperties = tokenExtraProperties;
     }
 }

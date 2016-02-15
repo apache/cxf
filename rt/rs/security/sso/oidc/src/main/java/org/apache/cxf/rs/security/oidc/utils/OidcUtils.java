@@ -24,12 +24,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.core.MultivaluedMap;
+
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jws.JwsException;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
+import org.apache.cxf.rs.security.oauth2.common.OAuthRedirectionState;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oidc.common.IdToken;
 import org.apache.cxf.rs.security.oidc.common.UserInfo;
@@ -48,6 +51,8 @@ public final class OidcUtils {
                                                                   UserInfo.EMAIL_VERIFIED_CLAIM);
     public static final List<String> ADDRESS_CLAIMS = Arrays.asList(UserInfo.ADDRESS_CLAIM);
     public static final List<String> PHONE_CLAIMS = Arrays.asList(UserInfo.PHONE_CLAIM);
+    public static final String CLAIMS_PARAM = "claims";
+    
     private static final Map<String, List<String>> SCOPES_MAP;
     static {
         SCOPES_MAP = new HashMap<String, List<String>>();
@@ -140,5 +145,11 @@ public final class OidcUtils {
             throw new OAuthServiceException(ex);
         }
     }
-    
+    public static void setStateClaimsProperty(OAuthRedirectionState state,
+                                              MultivaluedMap<String, String> params) {
+        String claims = params.getFirst(OidcUtils.CLAIMS_PARAM);
+        if (claims != null) {
+            state.getExtraProperties().put(OidcUtils.CLAIMS_PARAM, claims);
+        }
+    }
 }

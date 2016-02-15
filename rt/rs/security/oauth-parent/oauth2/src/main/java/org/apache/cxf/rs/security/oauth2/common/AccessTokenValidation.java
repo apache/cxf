@@ -79,6 +79,7 @@ public class AccessTokenValidation {
         this.tokenScopes = token.getScopes();
         this.setAudiences(token.getAudiences());
         this.clientCodeVerifier = token.getClientCodeVerifier();
+        this.extraProps.putAll(token.getExtraProperties());
     }
     
     public String getClientId() {

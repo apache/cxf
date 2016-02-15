@@ -74,16 +74,16 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
         OAuthAuthorizationData data = 
             super.createAuthorizationData(client, params, redirectUri, subject, 
                                           requestedPerms, alreadyAuthorizedPerms, authorizationCanBeSkipped);
-        setCodeQualifier(data, params);
+        setCodeChallenge(data, params);
         return data;
     }
-    protected OAuthRedirectionState recreateRedirectionStateFromSession(
-        UserSubject subject, MultivaluedMap<String, String> params, String sessionToken) {
-        OAuthRedirectionState state = super.recreateRedirectionStateFromSession(subject, params, sessionToken);
-        setCodeQualifier(state, params);
+    protected OAuthRedirectionState recreateRedirectionStateFromParams(
+        MultivaluedMap<String, String> params) {
+        OAuthRedirectionState state = super.recreateRedirectionStateFromParams(params);
+        setCodeChallenge(state, params);
         return state;
     }
-    private static void setCodeQualifier(OAuthRedirectionState data, MultivaluedMap<String, String> params) {
+    private static void setCodeChallenge(OAuthRedirectionState data, MultivaluedMap<String, String> params) {
         data.setClientCodeChallenge(params.getFirst(OAuthConstants.AUTHORIZATION_CODE_CHALLENGE));
     }
     protected Response createGrant(OAuthRedirectionState state,
@@ -94,16 +94,12 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
                                    ServerAccessToken preauthorizedToken) {
         // in this flow the code is still created, the preauthorized token
         // will be retrieved by the authorization code grant handler
-        AuthorizationCodeRegistration codeReg = new AuthorizationCodeRegistration(); 
-        codeReg.setPreauthorizedTokenAvailable(preauthorizedToken != null);
-        codeReg.setClient(client);
-        codeReg.setRedirectUri(state.getRedirectUri());
-        codeReg.setRequestedScope(requestedScope);
-        codeReg.setApprovedScope(getApprovedScope(requestedScope, approvedScope));
-        codeReg.setSubject(userSubject);
-        codeReg.setAudience(state.getAudience());
-        codeReg.setNonce(state.getNonce());
-        codeReg.setClientCodeChallenge(state.getClientCodeChallenge());
+        AuthorizationCodeRegistration codeReg = createCodeRegistration(state,
+                                                                       client,
+                                                                       requestedScope,
+                                                                       approvedScope,
+                                                                       userSubject,
+                                                                       preauthorizedToken);
         
         ServerAuthorizationCodeGrant grant = null;
         try {
@@ -129,6 +125,25 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
             ub.queryParam(OAuthConstants.AUTHORIZATION_CODE_VALUE, grantCode);
             return Response.seeOther(ub.build()).build();
         }
+    }
+    
+    protected AuthorizationCodeRegistration createCodeRegistration(OAuthRedirectionState state, 
+                                                                   Client client, 
+                                                                   List<String> requestedScope, 
+                                                                   List<String> approvedScope, 
+                                                                   UserSubject userSubject, 
+                                                                   ServerAccessToken preauthorizedToken) {
+        AuthorizationCodeRegistration codeReg = new AuthorizationCodeRegistration(); 
+        codeReg.setPreauthorizedTokenAvailable(preauthorizedToken != null);
+        codeReg.setClient(client);
+        codeReg.setRedirectUri(state.getRedirectUri());
+        codeReg.setRequestedScope(requestedScope);
+        codeReg.setApprovedScope(getApprovedScope(requestedScope, approvedScope));
+        codeReg.setSubject(userSubject);
+        codeReg.setAudience(state.getAudience());
+        codeReg.setNonce(state.getNonce());
+        codeReg.setClientCodeChallenge(state.getClientCodeChallenge());
+        return codeReg;
     }
     protected String processCodeGrant(Client client, String code, UserSubject endUser) {
         if (codeResponseFilter != null) {

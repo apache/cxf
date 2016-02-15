@@ -19,6 +19,8 @@
 package org.apache.cxf.rs.security.oauth2.common;
 
 import java.io.Serializable;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class OAuthRedirectionState implements Serializable {
     
@@ -32,6 +34,7 @@ public class OAuthRedirectionState implements Serializable {
     private String nonce;
     private String clientCodeChallenge;
     private String responseType;
+    private Map<String, String> extraProperties = new LinkedHashMap<String, String>();
     
     public OAuthRedirectionState() {
     }
@@ -133,6 +136,14 @@ public class OAuthRedirectionState implements Serializable {
 
     public void setResponseType(String responseType) {
         this.responseType = responseType;
+    }
+
+    public Map<String, String> getExtraProperties() {
+        return extraProperties;
+    }
+
+    public void setExtraProperties(Map<String, String> extraProperties) {
+        this.extraProperties = extraProperties;
     }
     
     

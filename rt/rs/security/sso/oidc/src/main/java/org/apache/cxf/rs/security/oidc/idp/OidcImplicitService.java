@@ -27,6 +27,7 @@ import javax.ws.rs.core.Response;
 
 import org.apache.cxf.rs.security.jose.jwt.JoseJwtProducer;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
+import org.apache.cxf.rs.security.oauth2.common.AccessTokenRegistration;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthError;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
@@ -127,6 +128,26 @@ public class OidcImplicitService extends ImplicitGrantService {
         }
     }
 
+    @Override
+    protected OAuthRedirectionState recreateRedirectionStateFromParams(
+        MultivaluedMap<String, String> params) {
+        OAuthRedirectionState state = super.recreateRedirectionStateFromParams(params);
+        OidcUtils.setStateClaimsProperty(state, params);
+        return state;
+    }
+    
+    @Override
+    protected AccessTokenRegistration createTokenRegistration(OAuthRedirectionState state, 
+                                                              Client client, 
+                                                              List<String> requestedScope, 
+                                                              List<String> approvedScope, 
+                                                              UserSubject userSubject) {
+        AccessTokenRegistration reg = 
+            super.createTokenRegistration(state, client, requestedScope, approvedScope, userSubject);
+        reg.getExtraProperties().putAll(state.getExtraProperties());
+        return reg;
+    }
+    
     protected String processIdToken(IdToken idToken) {
         JoseJwtProducer processor = idTokenHandler == null ? new JoseJwtProducer() : idTokenHandler; 
         return processor.processJwt(new JwtToken(idToken));

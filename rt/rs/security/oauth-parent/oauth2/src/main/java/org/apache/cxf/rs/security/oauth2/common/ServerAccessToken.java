@@ -18,8 +18,10 @@
  */
 package org.apache.cxf.rs.security.oauth2.common;
 
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
@@ -38,6 +40,7 @@ public abstract class ServerAccessToken extends AccessToken {
     private List<String> audiences = new LinkedList<String>();
     private String clientCodeVerifier;
     private String nonce;
+    private Map<String, String> extraProperties = new LinkedHashMap<String, String>();
     
     protected ServerAccessToken() {
         
@@ -166,5 +169,13 @@ public abstract class ServerAccessToken extends AccessToken {
 
     public void setNonce(String nonce) {
         this.nonce = nonce;
+    }
+
+    public Map<String, String> getExtraProperties() {
+        return extraProperties;
+    }
+
+    public void setExtraProperties(Map<String, String> extraProperties) {
+        this.extraProperties = extraProperties;
     }
 }

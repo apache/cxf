@@ -20,10 +20,16 @@ package org.apache.cxf.rs.security.oidc.idp;
 
 import java.util.List;
 
+import javax.ws.rs.core.MultivaluedMap;
+
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
+import org.apache.cxf.rs.security.oauth2.common.OAuthRedirectionState;
+import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
+import org.apache.cxf.rs.security.oauth2.grants.code.AuthorizationCodeRegistration;
 import org.apache.cxf.rs.security.oauth2.services.AuthorizationCodeGrantService;
+import org.apache.cxf.rs.security.oidc.utils.OidcUtils;
 
 public class OidcAuthorizationCodeService extends AuthorizationCodeGrantService {
     private static final String OPEN_ID_CONNECT_SCOPE = "openid";
@@ -42,5 +48,27 @@ public class OidcAuthorizationCodeService extends AuthorizationCodeGrantService 
     public void setSkipAuthorizationWithOidcScope(boolean skipAuthorizationWithOidcScope) {
         this.skipAuthorizationWithOidcScope = skipAuthorizationWithOidcScope;
     }
-    
+    protected AuthorizationCodeRegistration createCodeRegistration(OAuthRedirectionState state, 
+                                                                   Client client, 
+                                                                   List<String> requestedScope, 
+                                                                   List<String> approvedScope, 
+                                                                   UserSubject userSubject, 
+                                                                   ServerAccessToken preauthorizedToken) {
+        AuthorizationCodeRegistration codeReg = super.createCodeRegistration(state, 
+                                                                             client, 
+                                                                             requestedScope, 
+                                                                             approvedScope, 
+                                                                             userSubject, 
+                                                                             preauthorizedToken);
+        
+        codeReg.getExtraProperties().putAll(state.getExtraProperties());
+        return codeReg;
+    }
+    @Override
+    protected OAuthRedirectionState recreateRedirectionStateFromParams(
+        MultivaluedMap<String, String> params) {
+        OAuthRedirectionState state = super.recreateRedirectionStateFromParams(params);
+        OidcUtils.setStateClaimsProperty(state, params);
+        return state;
+    }
 }

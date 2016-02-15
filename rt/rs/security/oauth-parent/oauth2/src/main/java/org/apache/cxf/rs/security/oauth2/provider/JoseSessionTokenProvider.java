@@ -171,6 +171,9 @@ public class JoseSessionTokenProvider implements SessionAuthenticityTokenProvide
         if (!StringUtils.isEmpty(parts[7])) {
             state.setResponseType(parts[7]);
         }
+        if (!StringUtils.isEmpty(parts[8])) {
+            state.setExtraProperties(ModelEncryptionSupport.parseSimpleMap(parts[8]));
+        }
         return state;
     }
     protected String convertStateToString(OAuthRedirectionState secData) {
@@ -199,6 +202,9 @@ public class JoseSessionTokenProvider implements SessionAuthenticityTokenProvide
         state.append(ModelEncryptionSupport.SEP);
         // 7: response_type
         state.append(ModelEncryptionSupport.tokenizeString(secData.getResponseType()));
+        state.append(ModelEncryptionSupport.SEP);
+        // 8: extra props
+        state.append(secData.getExtraProperties().toString());
         
         return state.toString();
     }

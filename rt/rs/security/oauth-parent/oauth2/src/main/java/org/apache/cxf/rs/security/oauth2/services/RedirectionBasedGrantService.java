@@ -240,7 +240,6 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
                                                              boolean authorizationCanBeSkipped) {
         
         OAuthAuthorizationData secData = new OAuthAuthorizationData();
-        secData.setRequestParameters(params);
         
         secData.setState(params.getFirst(OAuthConstants.STATE));
         secData.setRedirectUri(redirectUri);
@@ -277,26 +276,28 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         return secData;
     }
     protected OAuthRedirectionState recreateRedirectionStateFromSession(
-        UserSubject subject, MultivaluedMap<String, String> params, String sessionToken) {
-        OAuthRedirectionState state = null; 
+        UserSubject subject, String sessionToken) {
         if (sessionAuthenticityTokenProvider != null) {
-            state = sessionAuthenticityTokenProvider.getSessionState(super.getMessageContext(), 
+            return sessionAuthenticityTokenProvider.getSessionState(super.getMessageContext(), 
                                                                      sessionToken,
                                                                      subject);
+        } else {
+            return null;
         }
-        if (state == null) {
-            state = new OAuthRedirectionState();
-            state.setClientId(params.getFirst(OAuthConstants.CLIENT_ID));
-            state.setRedirectUri(params.getFirst(OAuthConstants.REDIRECT_URI));
-            state.setAudience(params.getFirst(OAuthConstants.CLIENT_AUDIENCE));
-            state.setProposedScope(params.getFirst(OAuthConstants.SCOPE));
-            state.setState(params.getFirst(OAuthConstants.STATE));
-            state.setNonce(params.getFirst(OAuthConstants.NONCE));
-            state.setResponseType(params.getFirst(OAuthConstants.RESPONSE_TYPE));
-        }
-        return state;
     }
     
+    
+    protected OAuthRedirectionState recreateRedirectionStateFromParams(MultivaluedMap<String, String> params) {
+        OAuthRedirectionState state = new OAuthRedirectionState();
+        state.setClientId(params.getFirst(OAuthConstants.CLIENT_ID));
+        state.setRedirectUri(params.getFirst(OAuthConstants.REDIRECT_URI));
+        state.setAudience(params.getFirst(OAuthConstants.CLIENT_AUDIENCE));
+        state.setProposedScope(params.getFirst(OAuthConstants.SCOPE));
+        state.setState(params.getFirst(OAuthConstants.STATE));
+        state.setNonce(params.getFirst(OAuthConstants.NONCE));
+        state.setResponseType(params.getFirst(OAuthConstants.RESPONSE_TYPE));
+        return state;
+    }
     protected void personalizeData(OAuthAuthorizationData data, UserSubject userSubject) {
         if (resourceOwnerNameProvider != null) {
             data.setEndUserName(resourceOwnerNameProvider.getName(userSubject));
@@ -331,8 +332,10 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
             throw ExceptionUtils.toBadRequestException(null, null);     
         }
         
-        OAuthRedirectionState state = 
-            recreateRedirectionStateFromSession(userSubject, params, sessionToken);
+        OAuthRedirectionState state = recreateRedirectionStateFromSession(userSubject, sessionToken);
+        if (state == null) {
+            state = recreateRedirectionStateFromParams(params); 
+        }
         
         Client client = getClient(state.getClientId());
         String redirectUri = validateRedirectUri(client, state.getRedirectUri());

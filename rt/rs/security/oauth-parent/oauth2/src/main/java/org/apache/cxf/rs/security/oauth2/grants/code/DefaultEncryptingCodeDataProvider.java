@@ -98,14 +98,7 @@ public class DefaultEncryptingCodeDataProvider extends DefaultEncryptingOAuthDat
     
     protected ServerAuthorizationCodeGrant doCreateCodeGrant(AuthorizationCodeRegistration reg)
         throws OAuthServiceException {
-        ServerAuthorizationCodeGrant grant = 
-            new ServerAuthorizationCodeGrant(reg.getClient(), getCode(reg), getGrantLifetime(), getIssuedAt());
-        grant.setApprovedScopes(getApprovedScopes(reg));
-        grant.setAudience(reg.getAudience());
-        grant.setClientCodeChallenge(reg.getClientCodeChallenge());
-        grant.setSubject(reg.getSubject());
-        grant.setRedirectUri(reg.getRedirectUri());
-        return grant;
+        return AbstractCodeDataProvider.initCodeGrant(reg, grantLifetime);
     }
 
     protected List<String> getApprovedScopes(AuthorizationCodeRegistration reg) {
