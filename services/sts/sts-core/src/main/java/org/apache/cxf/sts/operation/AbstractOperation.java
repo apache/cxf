@@ -102,7 +102,16 @@ public abstract class AbstractOperation {
     protected ClaimsManager claimsManager = new ClaimsManager();
     protected STSEventListener eventPublisher;
     protected List<TokenDelegationHandler> delegationHandlers = new ArrayList<>();
+    protected TokenWrapper tokenWrapper = new DefaultTokenWrapper();
     
+    public TokenWrapper getTokenWrapper() {
+        return tokenWrapper;
+    }
+
+    public void setTokenWrapper(TokenWrapper tokenWrapper) {
+        this.tokenWrapper = tokenWrapper;
+    }
+
     public boolean isReturnReferences() {
         return returnReferences;
     }
