@@ -54,6 +54,7 @@ public class ClientImpl implements Client {
     private static final String HTTP_PROXY_SERVER_PORT_PROP = "http.proxy.server.port";
     private static final String HTTP_AUTOREDIRECT_PROP = "http.autoredirect";
     private static final String HTTP_RESPONSE_AUTOCLOSE_PROP = "http.response.stream.auto.close";
+    private static final String THREAD_SAFE_CLIENT_PROP = "thread.safe.client";
     
     private Configurable<Client> configImpl;
     private TLSConfiguration secConfig;
@@ -242,8 +243,9 @@ public class ClientImpl implements Client {
         @Override
         public Builder request() {
             checkClosed();
+            Map<String, Object> configProps = getConfiguration().getProperties();
             
-            initTargetClientIfNeeded(); 
+            initTargetClientIfNeeded(configProps); 
             
             ClientProviderFactory pf = 
                 ClientProviderFactory.getInstance(WebClient.getConfig(targetClient).getEndpoint());
@@ -266,7 +268,6 @@ public class ClientImpl implements Client {
             }
             
             pf.setUserProviders(providers);
-            Map<String, Object> configProps = getConfiguration().getProperties();
             ClientConfiguration clientCfg = WebClient.getConfig(targetClient);
             
             clientCfg.getRequestContext().putAll(configProps);
@@ -318,11 +319,15 @@ public class ClientImpl implements Client {
             }
         }
 
-        private void initTargetClientIfNeeded() {
+        private void initTargetClientIfNeeded(Map<String, Object> configProps) {
             URI uri = uriBuilder.build();
             if (targetClient == null) {
                 JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
                 bean.setAddress(uri.toString());
+                Boolean threadSafe = getBooleanValue(configProps.get(THREAD_SAFE_CLIENT_PROP));
+                if (threadSafe != null) {
+                    bean.setThreadSafe(threadSafe);
+                }
                 targetClient = bean.createWebClient();
                 ClientImpl.this.baseClients.add(targetClient);
             } else if (!targetClient.getCurrentURI().equals(uri)) {
