@@ -35,6 +35,7 @@
         <property name="services" ref="x509Service"/>
         <property name="stsProperties" ref="x509STSProperties"/>
         <property name="delegationHandlers" ref="utDelegationHandler"/>
+        <property name="claimsManager" ref="claimsManager"/>
     </bean>
     <bean id="x509ValidateDelegate" class="org.apache.cxf.sts.operation.TokenValidateOperation">
         <property name="tokenValidators" ref="x509SamlTokenValidator"/>
@@ -48,6 +49,12 @@
         <ref bean="x509SamlTokenValidator"/>
         <bean class="org.apache.cxf.systest.sts.username_onbehalfof.UsernameTokenValidator"/>
     </util:list>
+    <bean id="claimsManager" class="org.apache.cxf.sts.claims.ClaimsManager">
+        <property name="claimHandlers" ref="customClaimsHandler"/>
+    </bean>
+    <bean id="customClaimsHandler" class="org.apache.cxf.systest.sts.deployment.CustomClaimsHandler">
+    </bean>
+        
     <bean id="x509Service" class="org.apache.cxf.sts.service.StaticService">
         <property name="endpoints" ref="x509Endpoints"/>
     </bean>
