@@ -56,6 +56,7 @@ import org.apache.cxf.security.SecurityContext;
  * The Base Redirection-Based Grant Service
  */
 public abstract class RedirectionBasedGrantService extends AbstractOAuthService {
+    private static final String AUTHORIZATION_REQUEST_PARAMETERS = "authorization.request.parameters";
     private Set<String> supportedResponseTypes;
     private String supportedGrantType;
     private boolean useAllClientScopes;
@@ -202,6 +203,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
                                     authorizationCanBeSkipped);
         
         if (authorizationCanBeSkipped) {
+            getMessageContext().put(AUTHORIZATION_REQUEST_PARAMETERS, params);
             List<OAuthPermission> approvedScopes = 
                 preAuthorizationComplete ? preAuthorizedToken.getScopes() : requestedPermissions; 
             return createGrant(data,
@@ -238,6 +240,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
                                                              boolean authorizationCanBeSkipped) {
         
         OAuthAuthorizationData secData = new OAuthAuthorizationData();
+        secData.setRequestParameters(params);
         
         secData.setState(params.getFirst(OAuthConstants.STATE));
         secData.setRedirectUri(redirectUri);
@@ -357,7 +360,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
                                          partialMatchScopeValidation)) {
             return createErrorResponse(params, redirectUri, OAuthConstants.INVALID_SCOPE);
         }
-        
+        getMessageContext().put(AUTHORIZATION_REQUEST_PARAMETERS, params);
         // Request a new grant
         return createGrant(state,
                            client, 
