@@ -27,6 +27,7 @@ import java.util.Map;
 
 import javax.ws.rs.core.MultivaluedMap;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 
@@ -259,6 +260,7 @@ public class OAuthAuthorizationData extends OAuthRedirectionState implements Ser
         return allPerms;
     }
 
+    @XmlTransient
     public MultivaluedMap<String, String> getRequestParameters() {
         return requestParameters;
     }
