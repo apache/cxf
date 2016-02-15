@@ -18,8 +18,10 @@
  */
 package org.apache.cxf.rs.security.oauth2.common;
 
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Captures the information associated with the access token request.
@@ -33,6 +35,7 @@ public class AccessTokenRegistration {
     private List<String> audiences = new LinkedList<String>();
     private String nonce;
     private String clientCodeVerifier;
+    private Map<String, String> extraProperties = new LinkedHashMap<String, String>();
     
     /**
      * Sets the {@link Client} instance
@@ -137,5 +140,13 @@ public class AccessTokenRegistration {
 
     public void setNonce(String nonce) {
         this.nonce = nonce;
+    }
+
+    public Map<String, String> getExtraProperties() {
+        return extraProperties;
+    }
+
+    public void setExtraProperties(Map<String, String> extraProperties) {
+        this.extraProperties = extraProperties;
     }
 }

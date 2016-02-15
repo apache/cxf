@@ -61,6 +61,7 @@ public abstract class AbstractCodeDataProvider extends AbstractOAuthDataProvider
         grant.setAudience(reg.getAudience());
         grant.setClientCodeChallenge(reg.getClientCodeChallenge());
         grant.setNonce(reg.getNonce());
+        grant.getExtraProperties().putAll(reg.getExtraProperties());
         return grant;
     }
     protected abstract void saveCodeGrant(ServerAuthorizationCodeGrant grant);

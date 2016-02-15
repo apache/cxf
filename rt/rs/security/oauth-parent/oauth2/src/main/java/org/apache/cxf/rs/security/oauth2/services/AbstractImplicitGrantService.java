@@ -56,6 +56,7 @@ public abstract class AbstractImplicitGrantService extends RedirectionBasedGrant
         super(supportedResponseTypes, supportedGrantType);
     }
     
+    
     protected Response createGrant(OAuthRedirectionState state,
                                    Client client,
                                    List<String> requestedScope,
@@ -65,15 +66,11 @@ public abstract class AbstractImplicitGrantService extends RedirectionBasedGrant
         
         ServerAccessToken token = null;
         if (preAuthorizedToken == null) {
-            AccessTokenRegistration reg = new AccessTokenRegistration();
-            reg.setClient(client);
-            reg.setGrantType(super.getSupportedGrantType());
-            reg.setSubject(userSubject);
-            reg.setRequestedScope(requestedScope);        
-            reg.setApprovedScope(getApprovedScope(requestedScope, approvedScope));
-            
-            reg.setAudiences(Collections.singletonList(state.getAudience()));
-            reg.setNonce(state.getNonce());
+            AccessTokenRegistration reg = createTokenRegistration(state,
+                                                                  client,
+                                                                  requestedScope,
+                                                                  approvedScope,
+                                                                  userSubject);
             token = getDataProvider().createAccessToken(reg);
         } else {
             token = preAuthorizedToken;
@@ -111,6 +108,22 @@ public abstract class AbstractImplicitGrantService extends RedirectionBasedGrant
         return finalizeResponse(sb, state);
     }
     
+    protected AccessTokenRegistration createTokenRegistration(OAuthRedirectionState state, 
+                                                              Client client, 
+                                                              List<String> requestedScope, 
+                                                              List<String> approvedScope, 
+                                                              UserSubject userSubject) {
+        AccessTokenRegistration reg = new AccessTokenRegistration();
+        reg.setClient(client);
+        reg.setGrantType(super.getSupportedGrantType());
+        reg.setSubject(userSubject);
+        reg.setRequestedScope(requestedScope);        
+        reg.setApprovedScope(getApprovedScope(requestedScope, approvedScope));
+        
+        reg.setAudiences(Collections.singletonList(state.getAudience()));
+        reg.setNonce(state.getNonce());
+        return reg;
+    }
     protected Response finalizeResponse(StringBuilder sb, OAuthRedirectionState state) {
         if (state.getState() != null) {
             sb.append("&");
