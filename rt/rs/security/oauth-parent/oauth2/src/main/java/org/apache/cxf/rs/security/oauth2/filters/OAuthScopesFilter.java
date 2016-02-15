@@ -150,6 +150,12 @@ public class OAuthScopesFilter implements ContainerRequestFilter {
         this.scopesMap = scopesMap;
     }
 
+    public void setScopesStringMap(Map<String, String> scopesStringMap) {
+        for (Map.Entry<String, String> entry : scopesStringMap.entrySet()) {
+            scopesMap.put(entry.getKey(), Arrays.asList(entry.getValue().split(" ")));
+        }
+    }
+    
     public void setScopesMatchAllMap(Map<String, Boolean> scopesMatchAllMap) {
         this.scopesMatchAllMap = scopesMatchAllMap;
     }
