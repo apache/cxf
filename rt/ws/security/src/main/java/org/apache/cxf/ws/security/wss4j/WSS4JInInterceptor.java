@@ -294,13 +294,13 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                     doResults(msg, actor, 
                               SAAJUtils.getHeader(doc),
                               SAAJUtils.getBody(doc),
-                              wsResult);
+                              wsResult, utWithCallbacks);
                 } else {
                     checkActions(msg, reqData, wsResult.getResults(), actions, SAAJUtils.getBody(doc));
                     doResults(msg, actor,
                               SAAJUtils.getHeader(doc),
                               SAAJUtils.getBody(doc),
-                              wsResult);
+                              wsResult, utWithCallbacks);
                 }
             }
             advanceBody(msg, SAAJUtils.getBody(doc));
@@ -469,17 +469,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         String actor, 
         Element soapHeader,
         Element soapBody,
-        WSHandlerResult wsResult
-    ) throws SOAPException, XMLStreamException, WSSecurityException {
-        doResults(msg, actor, soapHeader, soapBody, wsResult, false);
-    }
-
-    protected void doResults(
-        SoapMessage msg, 
-        String actor,
-        Element soapHeader,
-        Element soapBody,
-        WSHandlerResult wsResult, 
+        WSHandlerResult wsResult,
         boolean utWithCallbacks
     ) throws SOAPException, XMLStreamException, WSSecurityException {
         
