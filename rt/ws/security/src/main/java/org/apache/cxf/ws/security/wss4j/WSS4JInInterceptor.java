@@ -22,6 +22,7 @@ import java.security.Provider;
 import java.security.cert.Certificate;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -472,6 +473,16 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         WSHandlerResult wsResult,
         boolean utWithCallbacks
     ) throws SOAPException, XMLStreamException, WSSecurityException {
+        /*
+         * All ok up to this point. Now construct and setup the security result
+         * structure. The service may fetch this and check it.
+         */
+        List<WSHandlerResult> results = CastUtils.cast((List<?>)msg.get(WSHandlerConstants.RECV_RESULTS));
+        if (results == null) {
+            results = new LinkedList<>();
+            msg.put(WSHandlerConstants.RECV_RESULTS, results);
+        }
+        results.add(0, wsResult);
         
         WSS4JSecurityContextCreator contextCreator = 
             (WSS4JSecurityContextCreator)SecurityUtils.getSecurityPropertyValue(
