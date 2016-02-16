@@ -20,6 +20,8 @@ package org.apache.cxf.ws.security.wss4j;
 
 import java.security.Principal;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -34,6 +36,7 @@ import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.security.SecurityToken;
 import org.apache.cxf.common.security.UsernameToken;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.security.DefaultSecurityContext;
 import org.apache.cxf.message.Message;
@@ -43,6 +46,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.validate.UsernameTokenValidator;
 import org.apache.wss4j.dom.validate.Validator;
@@ -115,6 +119,17 @@ public abstract class AbstractUsernameTokenAuthenticatingInterceptor extends WSS
                              WSHandlerResult wsResult, 
                              boolean utWithCallbacks
     ) throws SOAPException, XMLStreamException, WSSecurityException {
+        /*
+         * All ok up to this point. Now construct and setup the security result
+         * structure. The service may fetch this and check it.
+         */
+        List<WSHandlerResult> results = CastUtils.cast((List<?>)msg.get(WSHandlerConstants.RECV_RESULTS));
+        if (results == null) {
+            results = new LinkedList<>();
+            msg.put(WSHandlerConstants.RECV_RESULTS, results);
+        }
+        results.add(0, wsResult);
+        
         new UsernameTokenSecurityContextCreator().createSecurityContext(msg, wsResult);
     }
     

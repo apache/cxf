@@ -22,7 +22,6 @@ import java.security.Principal;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -31,7 +30,6 @@ import javax.security.auth.Subject;
 import javax.security.auth.kerberos.KerberosPrincipal;
 
 import org.apache.cxf.binding.soap.SoapMessage;
-import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.security.DefaultSecurityContext;
 import org.apache.cxf.interceptor.security.RolePrefixSecurityContextImpl;
 import org.apache.cxf.message.MessageUtils;
@@ -44,7 +42,6 @@ import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
-import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.token.KerberosSecurity;
 
@@ -69,16 +66,6 @@ public class DefaultWSS4JSecurityContextCreator implements WSS4JSecurityContextC
      * Create a SecurityContext and store it on the SoapMessage parameter
      */
     public void createSecurityContext(SoapMessage msg, WSHandlerResult handlerResult) {
-        /*
-         * All ok up to this point. Now construct and setup the security result
-         * structure. The service may fetch this and check it.
-         */
-        List<WSHandlerResult> results = CastUtils.cast((List<?>)msg.get(WSHandlerConstants.RECV_RESULTS));
-        if (results == null) {
-            results = new LinkedList<>();
-            msg.put(WSHandlerConstants.RECV_RESULTS, results);
-        }
-        results.add(0, handlerResult);
         
         String allowUnsigned = 
             (String)SecurityUtils.getSecurityPropertyValue(
