@@ -18,6 +18,7 @@
  */
 package sample.rs.service;
 import org.apache.cxf.jaxrs.spring.SpringComponentScanServer;
+import org.apache.cxf.jaxrs.swagger.Swagger2Feature;
 import org.apache.cxf.transport.servlet.CXFServlet;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -37,11 +38,13 @@ public class SampleScanRestApplication {
     public ServletRegistrationBean servletRegistrationBean(ApplicationContext context) {
         return new ServletRegistrationBean(new CXFServlet(), "/services/helloservice/*");
     }
- 
-    
     @Bean
-    public HelloService helloService() {
-        return new HelloService();
+    public Swagger2Feature swaggerFeature(ApplicationContext context) {
+        // Or create a simple Swagger2Feature @Component-annotated extension
+        // and drop this method if a default feature setup is OK
+        Swagger2Feature feature = new Swagger2Feature();
+        feature.setRunAsFilter(true);
+        return feature;
     }
- 
+    
 }
