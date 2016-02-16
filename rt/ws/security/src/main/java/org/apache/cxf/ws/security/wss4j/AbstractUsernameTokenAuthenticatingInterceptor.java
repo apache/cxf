@@ -25,6 +25,10 @@ import java.util.logging.Logger;
 
 import javax.security.auth.Subject;
 import javax.xml.namespace.QName;
+import javax.xml.soap.SOAPException;
+import javax.xml.stream.XMLStreamException;
+
+import org.w3c.dom.Element;
 
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.logging.LogUtils;
@@ -39,6 +43,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.validate.UsernameTokenValidator;
 import org.apache.wss4j.dom.validate.Validator;
 
@@ -102,12 +107,15 @@ public abstract class AbstractUsernameTokenAuthenticatingInterceptor extends WSS
     }
     
     @Override
-    protected SecurityContext createSecurityContext(final Principal p) {
-        Message msg = PhaseInterceptorChain.getCurrentMessage();
-        if (msg == null) {
-            throw new IllegalStateException("Current message is not available");
-        }
-        return doCreateSecurityContext(p, msg.get(Subject.class));
+    protected void doResults(
+                             SoapMessage msg, 
+                             String actor,
+                             Element soapHeader,
+                             Element soapBody,
+                             WSHandlerResult wsResult, 
+                             boolean utWithCallbacks
+    ) throws SOAPException, XMLStreamException, WSSecurityException {
+        new UsernameTokenSecurityContextCreator().createSecurityContext(msg, wsResult);
     }
     
     /**
@@ -233,4 +241,15 @@ public abstract class AbstractUsernameTokenAuthenticatingInterceptor extends WSS
         
     }
     
+    private static class UsernameTokenSecurityContextCreator extends DefaultWSS4JSecurityContextCreator {
+        
+        @Override
+        protected SecurityContext createSecurityContext(final Principal p) {
+            Message msg = PhaseInterceptorChain.getCurrentMessage();
+            if (msg == null) {
+                throw new IllegalStateException("Current message is not available");
+            }
+            return new DefaultSecurityContext(p, msg.get(Subject.class));
+        }
+    }
 }
