@@ -46,18 +46,27 @@
             <artifactId>cxf-rt-transports-http</artifactId>
             <version>${cxf.version}</version>
         </dependency>
-                <dependency>
+        <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-service-description</artifactId>
             <version>${cxf.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>io.swagger</groupId>
+            <artifactId>swagger-jaxrs</artifactId>
+            <version>1.5.4</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.ws.rs</groupId>
+                    <artifactId>jsr311-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
             <version>1.2.3.RELEASE</version>
         </dependency>
-
     </dependencies>
     <build>
       <plugins>
@@ -65,9 +74,11 @@
            <groupId>org.springframework.boot</groupId>
            <artifactId>spring-boot-maven-plugin</artifactId>
            <configuration>
-               <mainClass>sample.rs.service.SampleRestApplication</mainClass>
                <!-- 
+               <mainClass>sample.rs.service.SampleRestApplication</mainClass>
+               -->
                <mainClass>sample.rs.service.SampleScanRestApplication</mainClass>
+               <!--  
                <mainClass>sample.rs.service.SampleScanRestApplication2</mainClass>
                --> 
            </configuration>  

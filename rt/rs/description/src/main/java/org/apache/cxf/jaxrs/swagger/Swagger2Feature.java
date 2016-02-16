@@ -35,6 +35,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.apache.cxf.annotations.Provider;
+import org.apache.cxf.annotations.Provider.Type;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServiceFactoryBean;
@@ -50,6 +52,7 @@ import io.swagger.jaxrs.config.DefaultReaderConfig;
 import io.swagger.jaxrs.config.ReaderConfig;
 import io.swagger.jaxrs.listing.ApiListingResource;
 
+@Provider(Type.Feature)
 public class Swagger2Feature extends AbstractSwaggerFeature {
 
     private String host;

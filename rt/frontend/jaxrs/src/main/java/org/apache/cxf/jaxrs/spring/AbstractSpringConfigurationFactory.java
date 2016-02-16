@@ -65,7 +65,7 @@ public abstract class AbstractSpringConfigurationFactory
         return Collections.emptyList();
     }
     
-    protected List<Feature> getFeatures() {
+    public List<Feature> getFeatures() {
         return Collections.emptyList();
     }
     
