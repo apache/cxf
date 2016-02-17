@@ -268,7 +268,15 @@ final class InternalContextUtils {
                     exchange.put(ConduitSelector.class,
                                  new PreexistingConduitSelector(backChannel,
                                                                 exchange.getEndpoint()));
-
+                    if (ContextUtils.retrieveAsyncPostResponseDispatch(inMessage) && !robust) {
+                        //need to suck in all the data from the input stream as
+                        //the transport might discard any data on the stream when this 
+                        //thread unwinds or when the empty response is sent back
+                        DelegatingInputStream in = inMessage.getContent(DelegatingInputStream.class);
+                        if (in != null) {
+                            in.cacheInput();
+                        }
+                    }
                     if (chain != null && !chain.doIntercept(partialResponse) 
                         && partialResponse.getContent(Exception.class) != null) {
                         if (partialResponse.getContent(Exception.class) instanceof Fault) {
@@ -294,14 +302,7 @@ final class InternalContextUtils {
                          
                     
                     if (ContextUtils.retrieveAsyncPostResponseDispatch(inMessage) && !robust) {
-                        //need to suck in all the data from the input stream as
-                        //the transport might discard any data on the stream when this 
-                        //thread unwinds or when the empty response is sent back
-                        DelegatingInputStream in = inMessage.getContent(DelegatingInputStream.class);
-                        if (in != null) {
-                            in.cacheInput();
-                        }
-                        
+                                                
                         // async service invocation required *after* a response
                         // has been sent (i.e. to a oneway, or a partial response
                         // to a decoupled twoway)
