@@ -63,12 +63,26 @@ public class JwtRequestCodeFilter extends AbstractOAuthJoseJwtConsumer implement
             JwsSignatureVerifier theSigVerifier = getInitializedSigVerifier(client);
             JwtToken jwt = getJwtToken(requestToken, theDecryptor, theSigVerifier);
             JwtClaims claims = jwt.getClaims();
+            
+            // Check issuer
             String iss = issuer != null ? issuer : client.getClientId();  
-            if (!iss.equals(claims.getIssuer())
-                || claims.getClaim(OAuthConstants.CLIENT_ID) != null 
-                && claims.getStringProperty(OAuthConstants.CLIENT_ID).equals(client.getClientId())) {
+            if (!iss.equals(claims.getIssuer())) {
                 throw new SecurityException();
             }
+            
+            // Check client_id - if present it must match the client_id specified in the request
+            if (claims.getClaim(OAuthConstants.CLIENT_ID) != null 
+                && !claims.getStringProperty(OAuthConstants.CLIENT_ID).equals(client.getClientId())) {
+                throw new SecurityException();
+            }
+            
+            // Check response_type - if present it must match the response_type specified in the request
+            String tokenResponseType = (String)claims.getClaim(OAuthConstants.RESPONSE_TYPE);
+            if (tokenResponseType != null 
+                && !tokenResponseType.equals(params.getFirst(OAuthConstants.RESPONSE_TYPE))) {
+                throw new SecurityException();
+            }
+            
             MultivaluedMap<String, String> newParams = new MetadataMap<String, String>();
             Map<String, Object> claimsMap = claims.asMap();
             for (Map.Entry<String, Object> entry : claimsMap.entrySet()) {
