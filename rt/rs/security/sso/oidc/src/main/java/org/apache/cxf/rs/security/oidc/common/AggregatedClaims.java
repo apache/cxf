@@ -22,7 +22,7 @@ import java.util.Map;
 
 public class AggregatedClaims {
     private Map<String, String> claimNames;
-    private String jwtClaims;
+    private Map<String, String> claimSources;
     
     public Map<String, String> getClaimNames() {
         return claimNames;
@@ -32,11 +32,11 @@ public class AggregatedClaims {
         this.claimNames = claimNames;
     }
 
-    public String getJwtClaims() {
-        return jwtClaims;
+    public Map<String, String> getClaimSources() {
+        return claimSources;
     }
 
-    public void setJwtClaims(String jwtClaims) {
-        this.jwtClaims = jwtClaims;
+    public void setClaimSources(Map<String, String> claimSources) {
+        this.claimSources = claimSources;
     }
 }
