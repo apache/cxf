@@ -52,6 +52,11 @@ public final class OidcUtils {
     public static final List<String> ADDRESS_CLAIMS = Arrays.asList(UserInfo.ADDRESS_CLAIM);
     public static final List<String> PHONE_CLAIMS = Arrays.asList(UserInfo.PHONE_CLAIM);
     public static final String CLAIMS_PARAM = "claims";
+    public static final String CLAIM_NAMES_PROPERTY = "_claims_names";
+    public static final String CLAIM_SOURCES_PROPERTY = "_claims_sources";
+    public static final String JWT_CLAIM_SOURCE_PROPERTY = "JWT";
+    public static final String ENDPOINT_CLAIM_SOURCE_PROPERTY = "endpoint";
+    public static final String TOKEN_CLAIM_SOURCE_PROPERTY = "access_token";
     
     private static final Map<String, List<String>> SCOPES_MAP;
     static {

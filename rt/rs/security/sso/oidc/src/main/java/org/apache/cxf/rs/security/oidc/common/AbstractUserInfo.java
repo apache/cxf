@@ -18,10 +18,14 @@
  */
 package org.apache.cxf.rs.security.oidc.common;
 
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
+import org.apache.cxf.rs.security.jose.jwt.JwtException;
+import org.apache.cxf.rs.security.oidc.utils.OidcUtils;
 
 public abstract class AbstractUserInfo extends JwtClaims {
     public static final String NAME_CLAIM = "name";
@@ -177,4 +181,44 @@ public abstract class AbstractUserInfo extends JwtClaims {
         return getLongProperty(UPDATED_AT_CLAIM);
     }
     
+    public void setAggregatedClaims(AggregatedClaims claims) {
+        setProperty(OidcUtils.CLAIM_NAMES_PROPERTY, claims.getClaimNames());
+        setProperty(OidcUtils.CLAIM_SOURCES_PROPERTY, 
+            Collections.singletonMap(OidcUtils.JWT_CLAIM_SOURCE_PROPERTY, claims.getJwtClaims()));
+    }
+    public AggregatedClaims getAggregatedClaims() {
+        Map<String, Object> names = CastUtils.cast((Map<?, ?>)getProperty(OidcUtils.CLAIM_NAMES_PROPERTY));
+        Map<String, Object> sources = CastUtils.cast((Map<?, ?>)getProperty(OidcUtils.CLAIM_SOURCES_PROPERTY));
+        if (names == null || sources == null || !sources.containsKey(OidcUtils.JWT_CLAIM_SOURCE_PROPERTY)) {
+            return null;
+        }
+        AggregatedClaims claims = new AggregatedClaims();
+        claims.setClaimNames(CastUtils.cast(names));
+        claims.setJwtClaims((String)sources.get(OidcUtils.JWT_CLAIM_SOURCE_PROPERTY));
+        return claims;
+    }
+    public void setDistributedClaims(DistributedClaims claims) {
+        if (claims.getEndpoint() == null) {
+            throw new JwtException();
+        }
+        Map<String, String> sources = new LinkedHashMap<String, String>();
+        setProperty(OidcUtils.CLAIM_NAMES_PROPERTY, claims.getClaimNames());
+        sources.put(OidcUtils.ENDPOINT_CLAIM_SOURCE_PROPERTY, claims.getEndpoint());
+        if (claims.getAccessToken() != null) {
+            sources.put(OidcUtils.TOKEN_CLAIM_SOURCE_PROPERTY, claims.getAccessToken());
+        }
+        setProperty(OidcUtils.CLAIM_SOURCES_PROPERTY, sources);
+    }
+    public DistributedClaims getDistributedClaims() {
+        Map<String, Object> names = CastUtils.cast((Map<?, ?>)getProperty(OidcUtils.CLAIM_NAMES_PROPERTY));
+        Map<String, Object> sources = CastUtils.cast((Map<?, ?>)getProperty(OidcUtils.CLAIM_SOURCES_PROPERTY));
+        if (names == null || sources == null || !sources.containsKey(OidcUtils.ENDPOINT_CLAIM_SOURCE_PROPERTY)) {
+            return null;
+        }
+        DistributedClaims claims = new DistributedClaims();
+        claims.setClaimNames(CastUtils.cast(names));
+        claims.setEndpoint((String)sources.get(OidcUtils.ENDPOINT_CLAIM_SOURCE_PROPERTY));
+        claims.setAccessToken((String)sources.get(OidcUtils.TOKEN_CLAIM_SOURCE_PROPERTY));
+        return claims;
+    }
 }
