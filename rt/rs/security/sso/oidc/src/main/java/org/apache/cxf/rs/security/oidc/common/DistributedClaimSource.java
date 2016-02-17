@@ -18,25 +18,24 @@
  */
 package org.apache.cxf.rs.security.oidc.common;
 
-import java.util.Map;
-
-public class DistributedClaims {
-    private Map<String, String> claimNames;
-    private Map<String, DistributedClaimSource> claimSources;
-    public Map<String, String> getClaimNames() {
-        return claimNames;
+public class DistributedClaimSource {
+    private String endpoint;
+    private String accessToken;
+    
+    public String getEndpoint() {
+        return endpoint;
     }
 
-    public void setClaimNames(Map<String, String> claimNames) {
-        this.claimNames = claimNames;
+    public void setEndpoint(String endpoint) {
+        this.endpoint = endpoint;
     }
 
-    public Map<String, DistributedClaimSource> getClaimSources() {
-        return claimSources;
+    public String getAccessToken() {
+        return accessToken;
     }
 
-    public void setClaimSources(Map<String, DistributedClaimSource> claimSources) {
-        this.claimSources = claimSources;
+    public void setAccessToken(String accessToken) {
+        this.accessToken = accessToken;
     }
-       
+    
 }
