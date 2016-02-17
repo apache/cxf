@@ -83,7 +83,7 @@ public class JwtRequestCodeFilter extends AbstractOAuthJoseJwtConsumer implement
                 throw new SecurityException();
             }
             
-            MultivaluedMap<String, String> newParams = new MetadataMap<String, String>();
+            MultivaluedMap<String, String> newParams = new MetadataMap<String, String>(params);
             Map<String, Object> claimsMap = claims.asMap();
             for (Map.Entry<String, Object> entry : claimsMap.entrySet()) {
                 String key = entry.getKey();
