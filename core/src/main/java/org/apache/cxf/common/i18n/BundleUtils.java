@@ -19,6 +19,8 @@
 
 package org.apache.cxf.common.i18n;
 
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.MissingResourceException;
@@ -77,7 +79,7 @@ public final class BundleUtils {
     public static ResourceBundle getBundle(Class<?> cls) {
 
         try {
-            ClassLoader loader = cls.getClassLoader();
+            ClassLoader loader = getClassLoader(cls);
             if (loader == null) {
                 return ResourceBundle.getBundle(getBundleName(cls), Locale.getDefault());
             }
@@ -85,7 +87,7 @@ public final class BundleUtils {
                                         Locale.getDefault(),
                                         loader);
         } catch (MissingResourceException ex) {
-            ClassLoader loader = Thread.currentThread().getContextClassLoader();
+            ClassLoader loader = getContextClassLoader();
             if (loader == null) {
                 return ResourceBundle.getBundle(getBundleName(cls), Locale.getDefault());
             }
@@ -106,7 +108,7 @@ public final class BundleUtils {
      */
     public static ResourceBundle getBundle(Class<?> cls, String name) {
         try {
-            ClassLoader loader = cls.getClassLoader();
+            ClassLoader loader = getClassLoader(cls);
             if (loader == null) {
                 return ResourceBundle.getBundle(getBundleName(cls, name), Locale.getDefault());
             }
@@ -114,7 +116,7 @@ public final class BundleUtils {
                                             Locale.getDefault(),
                                             loader);
         } catch (MissingResourceException ex) {
-            ClassLoader loader = Thread.currentThread().getContextClassLoader();
+            ClassLoader loader = getContextClassLoader();
             if (loader == null) {
                 return ResourceBundle.getBundle(getBundleName(cls, name), Locale.getDefault());
             }
@@ -136,4 +138,29 @@ public final class BundleUtils {
     public static String getFormattedString(ResourceBundle b, String key, Object ... params) {
         return MessageFormat.format(b.getString(key), params);
     }
+
+    private static ClassLoader getContextClassLoader() {
+        final SecurityManager sm = System.getSecurityManager();
+        if (sm != null) {
+            return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+                public ClassLoader run() {
+                    return Thread.currentThread().getContextClassLoader();
+                }
+            });
+        }
+        return Thread.currentThread().getContextClassLoader();
+    }
+
+    private static ClassLoader getClassLoader(final Class<?> clazz) {
+        final SecurityManager sm = System.getSecurityManager();
+        if (sm != null) {
+            return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+                public ClassLoader run() {
+                    return clazz.getClassLoader();
+                }
+            });
+        }
+        return clazz.getClassLoader();
+    }
+
 }
