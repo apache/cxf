@@ -50,7 +50,7 @@ public class CXFAuthenticator extends Authenticator {
         if (instance == null) {
             instance = new CXFAuthenticator();
             Authenticator wrapped = null;
-            for (final Field f : Authenticator.class.getDeclaredFields()) {
+            for (final Field f : ReflectionUtil.getDeclaredFields(Authenticator.class)) {
                 if (f.getType().equals(Authenticator.class)) {
                     ReflectionUtil.setAccessible(f);
                     try {
@@ -74,9 +74,7 @@ public class CXFAuthenticator extends Authenticator {
                             return new URLClassLoader(new URL[0], ClassLoader.getSystemClassLoader());
                         }
                     }, null);
-                
-                
-                Method m = ClassLoader.class.getDeclaredMethod("defineClass", String.class, 
+                Method m = ReflectionUtil.getDeclaredMethod(ClassLoader.class, "defineClass", String.class,
                                                                byte[].class, Integer.TYPE, Integer.TYPE);
                 
                 InputStream ins = ReferencingAuthenticator.class
@@ -102,7 +100,7 @@ public class CXFAuthenticator extends Authenticator {
                 }
                 try {
                     //clear the acc field that can hold onto the webapp classloader
-                    Field f = loader.getClass().getDeclaredField("acc");
+                    Field f = ReflectionUtil.getDeclaredField(loader.getClass(), "acc");
                     ReflectionUtil.setAccessible(f).set(loader, null);
                 } catch (Throwable t) {
                     //ignore

@@ -19,6 +19,8 @@
 package org.apache.cxf.frontend;
 
 import java.io.Closeable;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -171,8 +173,7 @@ public class ClientProxyFactoryBean extends AbstractBasicInterceptorProvider {
             ClientProxy handler = clientClientProxy(c);
     
             Class<?> classes[] = getImplementingClasses();
-            
-            Object obj = ProxyHelper.getProxy(clientFactoryBean.getServiceClass().getClassLoader(),
+            Object obj = ProxyHelper.getProxy(getClassLoader(clientFactoryBean.getServiceClass()),
                                               classes,
                                               handler);
     
@@ -184,6 +185,18 @@ public class ClientProxyFactoryBean extends AbstractBasicInterceptorProvider {
                 orig.reset();
             }
         }
+    }
+
+    private static ClassLoader getClassLoader(final Class<?> clazz) {
+        final SecurityManager sm = System.getSecurityManager();
+        if (sm != null) {
+            return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+                public ClassLoader run() {
+                    return clazz.getClassLoader();
+                }
+            });
+        }
+        return clazz.getClassLoader();
     }
 
     protected Class<?>[] getImplementingClasses() {
