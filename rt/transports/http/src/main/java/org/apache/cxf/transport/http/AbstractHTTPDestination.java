@@ -341,7 +341,12 @@ public abstract class AbstractHTTPDestination
             servletPath = "";
         }
         String contextServletPath = contextPath + servletPath;
-        inMessage.put(Message.PATH_INFO, contextServletPath + req.getPathInfo());
+        String pathInfo = req.getPathInfo();
+        if (pathInfo != null) {
+            inMessage.put(Message.PATH_INFO, contextServletPath + pathInfo);
+        } else {
+            inMessage.put(Message.PATH_INFO, requestURI);
+        }
         if (!StringUtils.isEmpty(requestURI)) {
             int index = requestURL.indexOf(requestURI);
             if (index > 0) {
