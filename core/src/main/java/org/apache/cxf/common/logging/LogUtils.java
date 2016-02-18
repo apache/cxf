@@ -229,8 +229,8 @@ public final class LogUtils {
     protected static Logger createLogger(Class<?> cls, 
                                          String name, 
                                          String loggerName) {
-        ClassLoader orig = Thread.currentThread().getContextClassLoader();
-        ClassLoader n = cls.getClassLoader();
+        ClassLoader orig = getContextClassLoader();
+        ClassLoader n = getClassLoader(cls);
         if (n != null) {
             setContextClassLoader(n);
         }
@@ -307,12 +307,41 @@ public final class LogUtils {
     }
     
     private static void setContextClassLoader(final ClassLoader classLoader) {
-        AccessController.doPrivileged(new PrivilegedAction<Object>() {
-            public Object run() {
-                Thread.currentThread().setContextClassLoader(classLoader);
-                return null;
-            }
-        });
+        final SecurityManager sm = System.getSecurityManager();
+        if (sm != null) {
+            AccessController.doPrivileged(new PrivilegedAction<Object>() {
+                public Object run() {
+                    Thread.currentThread().setContextClassLoader(classLoader);
+                    return null;
+                }
+            });
+        } else {
+            Thread.currentThread().setContextClassLoader(classLoader);
+        }
+    }
+
+    private static ClassLoader getContextClassLoader() {
+        final SecurityManager sm = System.getSecurityManager();
+        if (sm != null) {
+            return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+                public ClassLoader run() {
+                    return Thread.currentThread().getContextClassLoader();
+                }
+            });
+        }
+        return Thread.currentThread().getContextClassLoader();
+    }
+
+    private static ClassLoader getClassLoader(final Class<?> clazz) {
+        final SecurityManager sm = System.getSecurityManager();
+        if (sm != null) {
+            return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+                public ClassLoader run() {
+                    return clazz.getClassLoader();
+                }
+            });
+        }
+        return clazz.getClassLoader();
     }
 
     /**

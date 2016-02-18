@@ -21,6 +21,8 @@ package org.apache.cxf.binding.soap;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -87,14 +89,15 @@ public final class SOAPBindingUtil {
          */
         Object proxy = null;
         try {
-            proxy = Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),
+            proxy = Proxy.newProxyInstance(getContextClassLoader(),
                                               new Class[] {cls}, ih);
         } catch (Throwable ex) {
-            // Using cls classloader as a fallback to make it work within OSGi  
-            ClassLoader contextLoader = Thread.currentThread().getContextClassLoader();
-            if (contextLoader != cls.getClassLoader()) {
-                proxy = Proxy.newProxyInstance(cls.getClassLoader(),
-                                              new Class[] {cls}, ih);
+            // Using cls classloader as a fallback to make it work within OSGi
+            ClassLoader contextLoader = getContextClassLoader();
+            final ClassLoader clsClassLoader = getClassLoader(cls);
+            if (contextLoader != clsClassLoader) {
+                proxy = Proxy.newProxyInstance(clsClassLoader,
+                                               new Class[] {cls}, ih);
             } else {
                 if (ex instanceof RuntimeException) {
                     throw (RuntimeException)ex;
@@ -103,6 +106,30 @@ public final class SOAPBindingUtil {
             }
         }
         return cls.cast(proxy);
+    }
+
+    private static ClassLoader getContextClassLoader() {
+        final SecurityManager sm = System.getSecurityManager();
+        if (sm != null) {
+            return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+                public ClassLoader run() {
+                    return Thread.currentThread().getContextClassLoader();
+                }
+            });
+        }
+        return Thread.currentThread().getContextClassLoader();
+    }
+
+    private static ClassLoader getClassLoader(final Class<?> clazz) {
+        final SecurityManager sm = System.getSecurityManager();
+        if (sm != null) {
+            return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+                public ClassLoader run() {
+                    return clazz.getClassLoader();
+                }
+            });
+        }
+        return clazz.getClassLoader();
     }
 
     public static boolean isSOAPBinding(Binding binding) {

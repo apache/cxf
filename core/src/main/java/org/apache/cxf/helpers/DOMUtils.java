@@ -21,6 +21,8 @@ package org.apache.cxf.helpers;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -62,9 +64,9 @@ public final class DOMUtils {
     }
 
     private static DocumentBuilder getDocumentBuilder() throws ParserConfigurationException {
-        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        ClassLoader loader = getContextClassLoader();
         if (loader == null) {
-            loader = DOMUtils.class.getClassLoader();
+            loader = getClassLoader(DOMUtils.class);
         }
         if (loader == null) {
             return DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -78,7 +80,31 @@ public final class DOMUtils {
         }
         return factory;
     }
-    
+
+    private static ClassLoader getContextClassLoader() {
+        final SecurityManager sm = System.getSecurityManager();
+        if (sm != null) {
+            return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+                public ClassLoader run() {
+                    return Thread.currentThread().getContextClassLoader();
+                }
+            });
+        }
+        return Thread.currentThread().getContextClassLoader();
+    }
+
+    private static ClassLoader getClassLoader(final Class<?> clazz) {
+        final SecurityManager sm = System.getSecurityManager();
+        if (sm != null) {
+            return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+                public ClassLoader run() {
+                    return clazz.getClassLoader();
+                }
+            });
+        }
+        return clazz.getClassLoader();
+    }
+
     /**
      * Creates a new Document object
      * @throws ParserConfigurationException

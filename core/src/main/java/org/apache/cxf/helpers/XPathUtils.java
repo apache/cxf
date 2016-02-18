@@ -19,6 +19,8 @@
 
 package org.apache.cxf.helpers;
 
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Map;
 
 import javax.xml.namespace.NamespaceContext;
@@ -58,8 +60,8 @@ public class XPathUtils {
     }
 
     public Object getValue(String xpathExpression, Node node, QName type) {
-        ClassLoaderHolder loader 
-            = ClassLoaderUtils.setThreadContextClassloader(xpath.getClass().getClassLoader());
+        ClassLoaderHolder loader
+            = ClassLoaderUtils.setThreadContextClassloader(getClassLoader(xpath.getClass()));
         try {
             return xpath.evaluate(xpathExpression, node, type);
         } catch (Exception e) {
@@ -82,6 +84,18 @@ public class XPathUtils {
 
     public boolean isExist(String xpathExpression, Node node, QName type) {
         return getValue(xpathExpression, node, type) != null;
+    }
+
+    private static ClassLoader getClassLoader(final Class<?> clazz) {
+        final SecurityManager sm = System.getSecurityManager();
+        if (sm != null) {
+            return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+                public ClassLoader run() {
+                    return clazz.getClassLoader();
+                }
+            });
+        }
+        return clazz.getClassLoader();
     }
 
 }
