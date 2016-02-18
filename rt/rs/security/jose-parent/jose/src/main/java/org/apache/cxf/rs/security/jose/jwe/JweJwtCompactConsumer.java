@@ -17,7 +17,12 @@
  * under the License.
  */
 package org.apache.cxf.rs.security.jose.jwe;
+<<<<<<< HEAD
 import java.security.interfaces.RSAPrivateKey;
+=======
+import java.nio.charset.StandardCharsets;
+import java.security.PrivateKey;
+>>>>>>> 43d17e6... Switch to use PrivateKey instead
 
 import javax.crypto.SecretKey;
 
@@ -38,7 +43,7 @@ public class JweJwtCompactConsumer  {
         return decryptWith(JweUtils.createJweDecryptionProvider(key, 
                                headers.getContentEncryptionAlgorithm()));
     }
-    public JwtToken decryptWith(RSAPrivateKey key) {
+    public JwtToken decryptWith(PrivateKey key) {
         return decryptWith(JweUtils.createJweDecryptionProvider(key, 
                                headers.getKeyEncryptionAlgorithm(),
                                headers.getContentEncryptionAlgorithm()));
