@@ -1297,9 +1297,10 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
 
         wrappedMessage.getFirstMessagePart().setXmlSchema(el);
 
-        XmlSchemaComplexType ct = new XmlSchemaComplexType(schema, true);
+        boolean anonymousType = isAnonymousWrapperTypes();
+        XmlSchemaComplexType ct = new XmlSchemaComplexType(schema, /*CXF-6783: don't create anonymous top-level types*/!anonymousType);
 
-        if (!isAnonymousWrapperTypes()) {
+        if (!anonymousType) {
             ct.setName(wrapperName.getLocalPart());
             el.setSchemaTypeName(wrapperName);
         }
