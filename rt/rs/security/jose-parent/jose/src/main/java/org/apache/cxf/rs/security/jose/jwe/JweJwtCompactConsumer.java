@@ -17,12 +17,7 @@
  * under the License.
  */
 package org.apache.cxf.rs.security.jose.jwe;
-<<<<<<< HEAD
-import java.security.interfaces.RSAPrivateKey;
-=======
-import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
->>>>>>> 43d17e6... Switch to use PrivateKey instead
 
 import javax.crypto.SecretKey;
 
