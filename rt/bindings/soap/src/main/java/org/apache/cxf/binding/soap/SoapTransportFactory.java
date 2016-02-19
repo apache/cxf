@@ -128,6 +128,10 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
             } else {
                 destinationFactory = mgr.getDestinationFactoryForUri(address);
             }
+            if (destinationFactory == null) {
+                throw new IOException("Could not find destination factory for transport " + transId);
+            }
+
             return destinationFactory.getDestination(ei, bus);
         } catch (BusException e) {
             IOException ex = new IOException("Could not find destination factory for transport " + transId);
