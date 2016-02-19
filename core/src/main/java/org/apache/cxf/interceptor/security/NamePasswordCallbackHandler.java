@@ -70,7 +70,7 @@ public class NamePasswordCallbackHandler implements CallbackHandler {
                     new org.apache.cxf.common.i18n.Message("UNSUPPORTED_CALLBACK_TYPE", 
                                                            BUNDLE, 
                                                            callbacks[i].getClass().getName());
-                LOG.severe(errorMsg.toString());
+                LOG.info(errorMsg.toString());
                 throw new UnsupportedCallbackException(callbacks[i], errorMsg.toString());  
             }  
         }  
