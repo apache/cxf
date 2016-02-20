@@ -345,13 +345,13 @@ public class JAASTest extends AbstractBusClientServerTestBase {
         doubleIt("alice", "clarinet", address, false);
     }
     
-    @org.junit.Test
+    @org.junit.Test(expected = RuntimeException.class)
     public void testJAXRSUnsuccessfulAuthentication() throws Exception {
         final String address = "https://localhost:" + PORT + "/doubleit/services/doubleit-rs";
         doubleIt("alice", "clarinet2", address, true);
     }
     
-    @org.junit.Test
+    @org.junit.Test(expected = RuntimeException.class)
     public void testJAXRSUnsuccessfulAuthorization() throws Exception {
         final String address = "https://localhost:" + PORT + "/doubleit/services/doubleit-rs";
         doubleIt("bob", "trombone", address, true);
@@ -363,13 +363,13 @@ public class JAASTest extends AbstractBusClientServerTestBase {
         doubleIt("alice", "clarinet", address, false);
     }
     
-    @org.junit.Test
+    @org.junit.Test(expected = RuntimeException.class)
     public void testJAXRSUnsuccessfulAuthenticationPassthroughInvocation() throws Exception {
         final String address = "https://localhost:" + PORT + "/doubleit/services/doubleit-rs3";
         doubleIt("alice", "clarinet2", address, true);
     }
     
-    @org.junit.Test
+    @org.junit.Test(expected = RuntimeException.class)
     public void testJAXRSUnsuccessfulAuthorizationPassthroughInvocation() throws Exception {
         final String address = "https://localhost:" + PORT + "/doubleit/services/doubleit-rs3";
         doubleIt("bob", "trombone", address, true);
