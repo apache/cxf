@@ -66,13 +66,13 @@ public class JaxrsBasicAuthTest extends AbstractBusClientServerTestBase {
         doubleIt("alice", "clarinet", false);
     }
     
-    @org.junit.Test
+    @org.junit.Test(expected = RuntimeException.class)
     public void testBadBasicAuth() throws Exception {
 
         doubleIt("alice", "trombon", true);
     }
     
-    @org.junit.Test
+    @org.junit.Test(expected = RuntimeException.class)
     public void testNoBasicAuth() throws Exception {
 
         doubleIt(null, null, true);
