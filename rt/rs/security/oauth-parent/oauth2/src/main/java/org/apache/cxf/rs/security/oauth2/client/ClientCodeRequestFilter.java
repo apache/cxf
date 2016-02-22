@@ -46,6 +46,8 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.grants.code.AuthorizationCodeGrant;
 import org.apache.cxf.rs.security.oauth2.grants.code.CodeVerifierTransformer;
+import org.apache.cxf.rs.security.oauth2.grants.code.JwtRequestCodeGrant;
+import org.apache.cxf.rs.security.oauth2.provider.OAuthJoseJwtProducer;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
@@ -71,6 +73,7 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
     private boolean faultAccessDeniedResponses;
     private boolean applicationCanHandleAccessDenied;
     private CodeVerifierTransformer codeVerifierTransformer;
+    private OAuthJoseJwtProducer codeRequestJoseProducer;
         
     @Override
     public void filter(ContainerRequestContext rc) throws IOException {
@@ -194,7 +197,7 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
         String codeParam = requestParams.getFirst(OAuthConstants.AUTHORIZATION_CODE_VALUE);
         ClientAccessToken at = null;
         if (codeParam != null) {
-            AuthorizationCodeGrant grant = new AuthorizationCodeGrant(codeParam, getAbsoluteRedirectUri(ui));
+            AuthorizationCodeGrant grant = prepareCodeGrant(codeParam, getAbsoluteRedirectUri(ui));
             grant.setCodeVerifier(state.getFirst(OAuthConstants.AUTHORIZATION_CODE_VERIFIER));
             at = OAuthClientUtils.getAccessToken(accessTokenServiceClient, consumer, grant);
         }
@@ -205,6 +208,18 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
         setClientCodeRequest(tokenContext);
     }
     
+    private AuthorizationCodeGrant prepareCodeGrant(String codeParam, URI absoluteRedirectUri) {
+        if (codeRequestJoseProducer == null) {
+            return new AuthorizationCodeGrant(codeParam, absoluteRedirectUri);
+        } else {
+            JwtRequestCodeGrant grant = 
+                new JwtRequestCodeGrant(codeParam, absoluteRedirectUri, consumer.getClientId());
+            grant.setClientSecret(consumer.getClientSecret());
+            grant.setJoseProducer(codeRequestJoseProducer);
+            return grant;
+        }
+    }
+
     protected ClientTokenContext initializeClientTokenContext(ContainerRequestContext rc, 
                                                               ClientAccessToken at, 
                                                               MultivaluedMap<String, String> state) {
@@ -361,5 +376,9 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
 
     public void setCodeVerifierTransformer(CodeVerifierTransformer codeVerifierTransformer) {
         this.codeVerifierTransformer = codeVerifierTransformer;
+    }
+
+    public void setCodeRequestJoseProducer(OAuthJoseJwtProducer codeRequestJoseProducer) {
+        this.codeRequestJoseProducer = codeRequestJoseProducer;
     }
 }
