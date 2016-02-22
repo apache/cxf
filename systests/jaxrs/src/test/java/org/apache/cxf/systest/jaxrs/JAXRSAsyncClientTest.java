@@ -253,6 +253,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         wc.close();
     }
     
+    @SuppressWarnings("rawtypes")
     @Test
     public void testGenericInvocationCallback() throws Exception {
         InvocationCallback<?> callback = createGenericInvocationCallback();
@@ -263,6 +264,9 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         assertTrue(((GenericInvocationCallback)callback).getResult().readEntity(Boolean.class));
     }
     
+    @SuppressWarnings({
+     "unchecked", "rawtypes"
+    })
     private static <T> InvocationCallback<T> createGenericInvocationCallback() {
         return new GenericInvocationCallback();
     }
