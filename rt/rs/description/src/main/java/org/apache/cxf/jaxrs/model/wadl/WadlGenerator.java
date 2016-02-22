@@ -349,7 +349,7 @@ public class WadlGenerator implements ContainerRequestFilter {
         }
     }
 
-    private String getBaseURI(Message m, UriInfo ui) {
+    protected String getBaseURI(Message m, UriInfo ui) {
         EndpointInfo ei = m.getExchange().get(Endpoint.class).getEndpointInfo();
         String publishedEndpointUrl = (String)ei.getProperty("publishedEndpointUrl");
         if (publishedEndpointUrl == null) {
