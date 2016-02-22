@@ -942,7 +942,11 @@ public class WebClient extends AbstractClient {
             if (pt.getRawType() instanceof Class) {
                 respClass = (Class<?>)pt.getRawType();
             }
-        } 
+        } else if (outType == null) { 
+            respClass = Response.class;
+        }
+        
+       
         
         return doInvokeAsync(httpMethod, body, requestClass, inType, respClass, outType, callback);
     }
