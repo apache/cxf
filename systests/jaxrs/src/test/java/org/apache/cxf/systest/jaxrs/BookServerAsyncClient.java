@@ -19,8 +19,23 @@
 
 package org.apache.cxf.systest.jaxrs;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.ext.MessageBodyReader;
+import javax.ws.rs.ext.MessageBodyWriter;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
@@ -39,7 +54,7 @@ public class BookServerAsyncClient extends AbstractBusTestServerBase {
         sf.setResourceProvider(BookStore.class,
                                new SingletonResourceProvider(new BookStore(), true));
         sf.setAddress("http://localhost:" + PORT + "/");
-
+        sf.setProvider(new BooleanReaderWriter());
         sf.getProperties(true).put("default.content.type", "*/*");
         server = sf.create();
         BusFactory.setDefaultBus(null);
@@ -62,5 +77,46 @@ public class BookServerAsyncClient extends AbstractBusTestServerBase {
         } finally {
             System.out.println("done!");
         }
+    }
+    
+    @Consumes("text/boolean")
+    @Produces("text/boolean")
+    public static class BooleanReaderWriter implements 
+        MessageBodyReader<Object>, MessageBodyWriter<Boolean> {
+
+        @Override
+        public boolean isReadable(Class<?> arg0, Type arg1, Annotation[] arg2, MediaType arg3) {
+            return true;
+        }
+
+        @Override
+        public Object readFrom(Class<Object> arg0, Type arg1, Annotation[] arg2, MediaType arg3,
+                             MultivaluedMap<String, String> arg4, InputStream is) throws IOException,
+            WebApplicationException {
+            return Boolean.valueOf(IOUtils.readStringFromStream(is));
+        }
+
+        @Override
+        public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations,
+                                   MediaType mediaType) {
+            return true;
+        }
+
+        @Override
+        public long getSize(Boolean t, Class<?> type, Type genericType, Annotation[] annotations,
+                            MediaType mediaType) {
+            return -1;
+        }
+
+        @Override
+        public void writeTo(Boolean t, Class<?> type, Type genericType, Annotation[] annotations,
+                            MediaType mediaType, MultivaluedMap<String, Object> httpHeaders,
+                            OutputStream os) throws IOException, WebApplicationException {
+            byte[] bytes = t.toString().getBytes("UTF-8");
+            os.write(bytes);
+            
+        }
+
+                
     }
 }
