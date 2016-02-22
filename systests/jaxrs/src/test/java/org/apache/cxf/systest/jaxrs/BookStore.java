@@ -540,7 +540,7 @@ public class BookStore {
     
     @GET
     @Path("books/check/{id}")
-    @Produces("text/plain")
+    @Produces("text/plain,text/boolean")
     public boolean checkBook(@PathParam("id") Long id) {
         return books.containsKey(id);
     }
