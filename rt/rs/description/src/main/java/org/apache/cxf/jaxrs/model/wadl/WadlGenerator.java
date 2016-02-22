@@ -203,6 +203,9 @@ public class WadlGenerator implements ContainerRequestFilter {
     @Override
     public void filter(ContainerRequestContext context) {
         Message m = JAXRSUtils.getCurrentMessage();
+        if (m == null) {
+            return;
+        }
         doFilter(context, m);
     }
 
