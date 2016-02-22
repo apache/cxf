@@ -20,20 +20,12 @@ package org.apache.cxf.rs.security.oauth2.grants.code;
 
 import java.net.URI;
 
-import javax.crypto.SecretKey;
 import javax.ws.rs.core.MultivaluedMap;
 
-import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
-import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
-import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
-import org.apache.cxf.rs.security.jose.jwe.JweEncryptionProvider;
-import org.apache.cxf.rs.security.jose.jwe.JweUtils;
-import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactProducer;
-import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
-import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
-import org.apache.cxf.rt.security.crypto.CryptoUtils;
+import org.apache.cxf.rs.security.jose.jwt.JwtToken;
+import org.apache.cxf.rs.security.oauth2.provider.OAuthJoseJwtProducer;
 
 
 
@@ -43,12 +35,8 @@ import org.apache.cxf.rt.security.crypto.CryptoUtils;
  */
 public class JwtRequestCodeGrant extends AuthorizationCodeGrant {
     private static final long serialVersionUID = -3738825769770411453L;
-    private JwsSignatureProvider sigProvider;
-    private JweEncryptionProvider encryptionProvider;
+    private OAuthJoseJwtProducer joseProducer = new OAuthJoseJwtProducer();
     private String clientSecret;
-    private boolean encryptWithClientSecret;
-    private boolean signWithClientSecret;
-    // can be a client id
     private String issuer;
     public JwtRequestCodeGrant() {
     }
@@ -66,24 +54,6 @@ public class JwtRequestCodeGrant extends AuthorizationCodeGrant {
         super(code, uri);
         this.issuer = issuer;
     }
-    public void setSignatureProvider(JwsSignatureProvider signatureProvider) {
-        this.sigProvider = signatureProvider;
-    }
-    public void setEncryptionProvider(JweEncryptionProvider encProvider) {
-        this.encryptionProvider = encProvider;
-    }
-    
-    protected JwsSignatureProvider getInitializedSigProvider() {
-        if (sigProvider != null) {
-            return sigProvider;    
-        } 
-        if (signWithClientSecret) {
-            byte[] hmac = CryptoUtils.decodeSequence(clientSecret);
-            return JwsUtils.getHmacSignatureProvider(hmac, SignatureAlgorithm.HS256);
-        } else {
-            return JwsUtils.loadSignatureProvider(true);
-        }
-    }
     public MultivaluedMap<String, String> toMap() {
         String request = getRequest();
         MultivaluedMap<String, String> newMap = new MetadataMap<String, String>();
@@ -94,49 +64,31 @@ public class JwtRequestCodeGrant extends AuthorizationCodeGrant {
     public String getRequest() {
         MultivaluedMap<String, String> map = super.toMap();
         JwtClaims claims = new JwtClaims();
-        claims.setIssuer(issuer);
+        if (issuer != null) {
+            claims.setIssuer(issuer);
+        }
         for (String key : map.keySet()) {
             claims.setClaim(key, map.getFirst(key));
         }
-        JwsJwtCompactProducer producer = new JwsJwtCompactProducer(claims);
-        JwsSignatureProvider theSigProvider = getInitializedSigProvider();
-        String request = producer.signWith(theSigProvider);
-        
-        JweEncryptionProvider theEncryptionProvider = getInitializedEncryptionProvider();
-        if (theEncryptionProvider != null) {
-            request = theEncryptionProvider.encrypt(StringUtils.toBytesUTF8(request), null);
-        }
-        return request;
+        return joseProducer.processJwt(new JwtToken(claims), clientSecret);
     }
-    protected JweEncryptionProvider getInitializedEncryptionProvider() {
-        if (encryptionProvider != null) {
-            return encryptionProvider;    
-        } 
-        if (encryptWithClientSecret) {
-            SecretKey key = CryptoUtils.decodeSecretKey(clientSecret);
-            return JweUtils.getDirectKeyJweEncryption(key, ContentAlgorithm.A128GCM);
-        } else {
-            return JweUtils.loadEncryptionProvider(false);
-        }
-    }
-
+    
     public void setIssuer(String issuer) {
+        // Can it be a client id ?
+        
         this.issuer = issuer;
     }
 
     public void setClientSecret(String clientSecret) {
         this.clientSecret = clientSecret;
     }
-    public void setEncryptWithClientSecret(boolean encryptWithClientSecret) {
-        if (signWithClientSecret) {
-            throw new SecurityException();
-        }
-        this.encryptWithClientSecret = encryptWithClientSecret;
+
+    public OAuthJoseJwtProducer getJoseProducer() {
+        return joseProducer;
     }
-    public void setSignWithClientSecret(boolean signWithClientSecret) {
-        if (encryptWithClientSecret) {
-            throw new SecurityException();
-        }
-        this.signWithClientSecret = signWithClientSecret;
+
+    public void setJoseProducer(OAuthJoseJwtProducer joseProducer) {
+        this.joseProducer = joseProducer;
     }
+    
 }
