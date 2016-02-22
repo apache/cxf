@@ -256,15 +256,13 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
     public void testGenericInvocationCallback() throws Exception {
         InvocationCallback<?> callback = createGenericInvocationCallback();
         String address = "http://localhost:" + PORT + "/bookstore/books/check/123";
-        Future<?> f = ClientBuilder.newBuilder().register(new BookServerAsyncClient.BooleanReaderWriter())
+        ClientBuilder.newBuilder().register(new BookServerAsyncClient.BooleanReaderWriter())
             .build().target(address)
-            .request().accept("text/boolean").async().get(callback);
-        Object o = f.get();
-        assertTrue((Boolean)o);
-        assertTrue(((GenericInvocationCallback)callback).getResult());
+            .request().accept("text/boolean").async().get(callback).get();
+        assertTrue(((GenericInvocationCallback)callback).getResult().readEntity(Boolean.class));
     }
     
-    private InvocationCallback<?> createGenericInvocationCallback() {
+    private static <T> InvocationCallback<T> createGenericInvocationCallback() {
         return new GenericInvocationCallback();
     }
 
@@ -351,7 +349,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         }
         
     }
-    private static class GenericInvocationCallback implements InvocationCallback<Object> {
+    private static class GenericInvocationCallback<T> implements InvocationCallback<T> {
         private Object result;
 
         @Override
@@ -364,8 +362,8 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
             // complete
         }
 
-        public Boolean getResult() {
-            return (Boolean)result;
+        public Response getResult() {
+            return (Response)result;
         }
 
         
