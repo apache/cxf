@@ -243,6 +243,10 @@ public class UDPConduit extends AbstractConduit {
                 socket.setSendBufferSize(this.size());
                 socket.setReceiveBufferSize(64 * 1024);
                 socket.setBroadcast(true);
+                socket.setReuseAddress(true);
+                if (multicast != null) {
+                    ((MulticastSocket)socket).setLoopbackMode(false);
+                }
                 
                 if (multicast == null) {
                     Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();

@@ -172,6 +172,7 @@ public class UDPDestination extends AbstractDestination {
                 socket.setReceiveBufferSize(64 * 1024);
                 socket.setSendBufferSize(64 * 1024);
                 socket.setTimeToLive(1);
+                socket.setLoopbackMode(false);
                 socket.bind(new InetSocketAddress(isa.getPort()));
                 socket.setNetworkInterface(findNetworkInterface());
                 socket.joinGroup(isa.getAddress());

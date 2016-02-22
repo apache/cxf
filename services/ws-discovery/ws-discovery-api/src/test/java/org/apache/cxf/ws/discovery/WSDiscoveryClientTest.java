@@ -110,6 +110,8 @@ public final class WSDiscoveryClientTest {
                     MulticastSocket s = new MulticastSocket(Integer.parseInt(PORT));
                     s.setBroadcast(true);
                     s.setNetworkInterface(findIpv4Interface());
+                    s.setLoopbackMode(false);
+                    s.setReuseAddress(true);
                     s.joinGroup(address);
                     s.setReceiveBufferSize(64 * 1024);
                     s.setSoTimeout(5000);
