@@ -40,11 +40,12 @@ public class JsonMapObjectReaderWriterTest extends Assert {
     }
     @Test
     public void testReadMap() throws Exception {
-        String json = "{\"a\":\"aValue\",\"b\":123,\"c\":[\"cValue\"]}";
+        String json = "{\"a\":\"aValue\",\"b\":123,\"c\":[\"cValue\"],\"f\":null}";
         Map<String, Object> map = new JsonMapObjectReaderWriter().fromJson(json);
-        assertEquals(3, map.size());
+        assertEquals(4, map.size());
         assertEquals("aValue", map.get("a"));
         assertEquals(123L, map.get("b"));
         assertEquals(Collections.singletonList("cValue"), map.get("c"));
+        assertNull(map.get("f"));
     }
 }
