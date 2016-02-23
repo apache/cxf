@@ -18,12 +18,19 @@
  */
 package org.apache.cxf.jaxws.interceptors;
 
-import org.apache.cxf.binding.soap.Soap12;
-import org.apache.cxf.binding.soap.SoapFault;
-import org.apache.cxf.binding.soap.SoapMessage;
-import org.apache.cxf.message.Message;
-import org.junit.Assert;
-import org.junit.Test;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+
+import javax.xml.namespace.QName;
+import javax.xml.soap.Detail;
+import javax.xml.soap.Name;
+import javax.xml.soap.SOAPElement;
+import javax.xml.soap.SOAPException;
+import javax.xml.soap.SOAPFault;
+import javax.xml.ws.soap.SOAPFaultException;
+
 import org.w3c.dom.Attr;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
@@ -33,17 +40,13 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.TypeInfo;
 import org.w3c.dom.UserDataHandler;
 
-import javax.xml.namespace.QName;
-import javax.xml.soap.Detail;
-import javax.xml.soap.Name;
-import javax.xml.soap.SOAPElement;
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPFault;
-import javax.xml.ws.soap.SOAPFaultException;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
+
+import org.apache.cxf.binding.soap.Soap12;
+import org.apache.cxf.binding.soap.SoapFault;
+import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.message.Message;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * Test case for https://bugzilla.redhat.com/show_bug.cgi?id=1177704
@@ -59,39 +62,41 @@ import java.util.Locale;
  */
 public class WebFaultOutInterceptorTestCase {
 
+    private static final QName CODE = new QName("ns", "code");
+    private static final QName SUBCODE = new QName("ns", "subcode");
+    private static final List SUBCODES = Collections.singletonList(SUBCODE);
+
     private WebFaultOutInterceptor interceptor = new WebFaultOutInterceptor();
 
-    private static final QName code = new QName("ns", "code");
-    private static final QName subcode = new QName("ns", "subcode");
-    private static final List subcodes = Collections.singletonList(subcode);
 
     @Test
     public void testSoapFaultException() {
         // create message that contains Fault that contains exception
         SOAPFaultException soapFaultException = new SOAPFaultException(new SOAPFaultStub());
-        SoapFault soapFault = new SoapFault("message", soapFaultException, code);
+        SoapFault soapFault = new SoapFault("message", soapFaultException, CODE);
         Message message = createMessage(soapFault);
 
         interceptor.handleMessage(message);
 
         Assert.assertNotNull(soapFault.getSubCodes());
         Assert.assertEquals(1, soapFault.getSubCodes().size());
-        Assert.assertEquals(subcode, soapFault.getSubCodes().get(0));
-        Assert.assertEquals(code, soapFault.getFaultCode());
+        Assert.assertEquals(SUBCODE, soapFault.getSubCodes().get(0));
+        Assert.assertEquals(CODE, soapFault.getFaultCode());
     }
 
     @Test
     public void testSoapFaultCause() {
         SOAPFaultException cause = new SOAPFaultException(new SOAPFaultStub());
         Exception exception = new Exception(cause);
-        SoapFault soapFault = new SoapFault("message", exception, code);
+        SoapFault soapFault = new SoapFault("message", exception, CODE);
         Message message = createMessage(soapFault);
 
         interceptor.handleMessage(message);
 
         Assert.assertNotNull(soapFault.getSubCodes());
-        Assert.assertEquals(1, soapFault.getSubCodes().size());Assert.assertEquals(subcode, soapFault.getSubCodes().get(0));
-        Assert.assertEquals(code, soapFault.getFaultCode());
+        Assert.assertEquals(1, soapFault.getSubCodes().size());
+        Assert.assertEquals(SUBCODE, soapFault.getSubCodes().get(0));
+        Assert.assertEquals(CODE, soapFault.getFaultCode());
     }
 
     @Test
@@ -99,27 +104,27 @@ public class WebFaultOutInterceptorTestCase {
         SOAPFaultException cause = new SOAPFaultException(new SOAPFaultStub());
         Exception innerException = new Exception(cause);
         Exception outerException = new Exception(innerException);
-        SoapFault soapFault = new SoapFault("message", outerException, code);
+        SoapFault soapFault = new SoapFault("message", outerException, CODE);
         Message message = createMessage(soapFault);
 
         interceptor.handleMessage(message);
 
         Assert.assertTrue("SoapFault.subCodes are expected to be empty.",
                 soapFault.getSubCodes() == null || soapFault.getSubCodes().size() == 0);
-        Assert.assertEquals(code, soapFault.getFaultCode());
+        Assert.assertEquals(CODE, soapFault.getFaultCode());
     }
 
     @Test
     public void testOtherException() {
         Exception exception = new Exception("test");
-        SoapFault soapFault = new SoapFault("message", exception, code);
+        SoapFault soapFault = new SoapFault("message", exception, CODE);
         Message message = createMessage(soapFault);
 
         interceptor.handleMessage(message);
 
         Assert.assertTrue("SoapFault.subCodes are expected to be empty.",
                 soapFault.getSubCodes() == null || soapFault.getSubCodes().size() == 0);
-        Assert.assertEquals(code, soapFault.getFaultCode());
+        Assert.assertEquals(CODE, soapFault.getFaultCode());
     }
 
     private Message createMessage(SoapFault soapFault) {
@@ -157,7 +162,7 @@ public class WebFaultOutInterceptorTestCase {
 
         @Override
         public Iterator getFaultSubcodes() {
-            return subcodes.iterator();
+            return SUBCODES.iterator();
         }
 
         @Override
