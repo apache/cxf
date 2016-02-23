@@ -35,6 +35,7 @@ import org.apache.cxf.helpers.IOUtils;
 
 
 public class JsonMapObjectReaderWriter {
+    private static final String NULL_VALUE = "null";
     private boolean format;
     
     public JsonMapObjectReaderWriter() {
@@ -219,6 +220,8 @@ public class JsonMapObjectReaderWriter {
             value = valueStr.substring(1, valueStr.length() - 1);
         } else if ("true".equals(valueStr) || "false".equals(valueStr)) {
             value = Boolean.valueOf(valueStr);
+        } else if (NULL_VALUE.equals(valueStr)) {
+            return null;
         } else {
             try {
                 value = Long.valueOf(valueStr);
