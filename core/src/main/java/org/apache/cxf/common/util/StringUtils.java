@@ -93,8 +93,8 @@ public final class StringUtils {
     }
     
     public static List<String> getParts(String str, String separator) {
-        List<String> ret = new ArrayList<String>();
-        List<String> parts = Arrays.asList(split(str, separator));
+        String[] parts = split(str, separator);
+        List<String> ret = new ArrayList<String>(parts.length);
         for (String part : parts) {
             if (!isEmpty(part)) {
                 ret.add(part);
