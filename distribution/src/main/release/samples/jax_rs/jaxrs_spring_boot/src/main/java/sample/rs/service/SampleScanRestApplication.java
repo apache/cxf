@@ -43,7 +43,7 @@ public class SampleScanRestApplication {
         // Or create a simple Swagger2Feature @Component-annotated extension
         // and drop this method if a default feature setup is OK
         Swagger2Feature feature = new Swagger2Feature();
-        feature.setRunAsFilter(true);
+        //feature.setRunAsFilter(true);
         return feature;
     }
     

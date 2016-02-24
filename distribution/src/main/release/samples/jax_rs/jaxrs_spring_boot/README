@@ -9,8 +9,16 @@ The sample uses Maven. It can be built and run from the command line:
 $ mvn spring-boot:run
 ----
 
-http://localhost:8080/services/helloservice/sayHello/ApacheCxfUser will now display the output in the browser
-like "Hello ApacheCxfUser, Welcome to CXF RS Spring Boot World!!!"
+http://localhost:8080/services/helloservice/sayHello/ApacheCxfUser
+
+will display "Hello ApacheCxfUser, Welcome to CXF RS Spring Boot World!!!"
+
+http://localhost:8080/services/helloservice/sayHello2/ApacheCxfUser
+
+will display "Hello2 ApacheCxfUser, Welcome to CXF RS Spring Boot World!!!"
+
+http://localhost:8080/services/helloservice/swagger.json will return a Swagger JSON
+description of services.
 
 To run the client from a command line open a new terminal window and run:
 

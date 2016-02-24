@@ -92,7 +92,7 @@ public abstract class AbstractSwaggerFeature extends AbstractFeature {
                 serviceClasses.add(cri.getServiceClass());
             }
             String sharedPackage = PackageUtils.getSharedPackageName(serviceClasses);
-            if (!StringUtils.isEmpty(getResourcePackage())) {
+            if (!StringUtils.isEmpty(sharedPackage)) {
                 setResourcePackage(sharedPackage);
             }
         }
