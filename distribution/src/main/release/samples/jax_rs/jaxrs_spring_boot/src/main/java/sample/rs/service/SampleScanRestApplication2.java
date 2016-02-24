@@ -34,6 +34,9 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 
+import sample.rs.service.hello1.HelloService;
+import sample.rs.service.hello2.HelloService2;
+
 @SpringBootApplication
 @Import(JaxRsConfig.class)
 public class SampleScanRestApplication2 {
