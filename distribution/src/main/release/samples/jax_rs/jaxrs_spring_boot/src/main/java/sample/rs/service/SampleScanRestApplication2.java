@@ -17,7 +17,8 @@
  * under the License.
  */
 package sample.rs.service;
-import java.util.Collections;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.servlet.ServletConfig;
@@ -63,7 +64,7 @@ public class SampleScanRestApplication2 {
     @ApplicationPath("/services/helloservice")
     public static class JaxrsApplication extends Application { 
         public Set<Object> getSingletons() {
-            return Collections.<Object>singleton(new HelloService());
+            return new HashSet<Object>(Arrays.asList(new HelloService(), new HelloService2()));
         }
     }
     

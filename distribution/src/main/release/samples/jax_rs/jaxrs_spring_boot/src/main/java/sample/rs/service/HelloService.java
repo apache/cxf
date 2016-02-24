@@ -22,10 +22,14 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+
 import org.springframework.stereotype.Service;
+
+import io.swagger.annotations.Api;
  
 @Path("/sayHello")
 @Service
+@Api("/sayHello")
 public class HelloService {
  
     @GET

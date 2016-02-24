@@ -17,6 +17,8 @@
  * under the License.
  */
 package sample.rs.service;
+import java.util.Arrays;
+
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.spring.JaxRsConfig;
@@ -44,7 +46,7 @@ public class SampleRestApplication {
     @Bean
     public Server rsServer() {
         JAXRSServerFactoryBean endpoint = new JAXRSServerFactoryBean();
-        endpoint.setServiceBean(new HelloService());
+        endpoint.setServiceBeans(Arrays.asList(new HelloService(), new HelloService2()));
         endpoint.setAddress("/helloservice");
         return endpoint.create();
     }
