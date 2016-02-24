@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package sample.rs.service;
+package sample.rs.service.hello2;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;

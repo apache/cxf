@@ -20,7 +20,7 @@ package sample.rs.client;
 
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 
-import sample.rs.service.HelloService;
+import sample.rs.service.hello1.HelloService;
 
 
 public final class SampleRestClientApplication {
