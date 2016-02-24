@@ -28,6 +28,7 @@ import java.net.URL;
 import java.security.Principal;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -161,10 +162,10 @@ public abstract class AbstractHTTPDestination
         if (credentials == null || StringUtils.isEmpty(credentials.trim())) {
             return null;
         }
-        String creds[] = StringUtils.split(credentials, " ");
-        String authType = creds[0];
-        if ("Basic".equals(authType)) {
-            String authEncoded = creds[1];
+        List<String> creds = StringUtils.getParts(credentials, " ");
+        String authType = creds.get(0);
+        if ("Basic".equals(authType) && creds.size() == 2) {
+            String authEncoded = creds.get(1);
             try {
                 String authDecoded = new String(Base64Utility.decode(authEncoded));
                 int idx = authDecoded.indexOf(':');
