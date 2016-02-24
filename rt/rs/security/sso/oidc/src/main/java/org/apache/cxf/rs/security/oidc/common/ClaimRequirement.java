@@ -23,7 +23,7 @@ import java.util.List;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.json.basic.JsonMapObject;
 
-public class ClaimPreference extends JsonMapObject {
+public class ClaimRequirement extends JsonMapObject {
     public static final String ESSENTIAL_PROPERTY = "essential";
     public static final String VALUE_PROPERTY = "value";
     public static final String VALUES_PROPERTY = "values";
