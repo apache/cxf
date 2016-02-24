@@ -18,11 +18,16 @@
  */
 package org.apache.cxf.jaxrs.swagger;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.jaxrs.JAXRSServiceFactoryBean;
-import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
+import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 
 public abstract class AbstractSwaggerFeature extends AbstractFeature {
 
@@ -72,13 +77,24 @@ public abstract class AbstractSwaggerFeature extends AbstractFeature {
     protected abstract void setBasePathByAddress(String address);
 
     private void calculateDefaultResourcePackage(Server server) {
+        if (!StringUtils.isEmpty(getResourcePackage())) {
+            return;
+        }
         JAXRSServiceFactoryBean serviceFactoryBean = 
             (JAXRSServiceFactoryBean)server.getEndpoint().get(JAXRSServiceFactoryBean.class.getName());
-        AbstractResourceInfo resourceInfo = serviceFactoryBean.getClassResourceInfo().get(0);
+        List<ClassResourceInfo> resourceInfos = serviceFactoryBean.getClassResourceInfo();
         
-        if ((resourceInfo != null) 
-            && (getResourcePackage() == null || getResourcePackage().length() == 0)) {
-            setResourcePackage(resourceInfo.getServiceClass().getPackage().getName());
+        if (resourceInfos.size() == 1) {
+            setResourcePackage(resourceInfos.get(0).getServiceClass().getPackage().getName());
+        } else {
+            List<Class<?>> serviceClasses = new ArrayList<Class<?>>(resourceInfos.size());
+            for (ClassResourceInfo cri : resourceInfos) {
+                serviceClasses.add(cri.getServiceClass());
+            }
+            String sharedPackage = PackageUtils.getSharedPackageName(serviceClasses);
+            if (!StringUtils.isEmpty(getResourcePackage())) {
+                setResourcePackage(sharedPackage);
+            }
         }
     }
     

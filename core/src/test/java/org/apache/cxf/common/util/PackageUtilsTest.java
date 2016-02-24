@@ -20,19 +20,61 @@
 package org.apache.cxf.common.util;
 
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Array;
+import java.util.Arrays;
+import java.util.Collections;
+
 import org.junit.Assert;
 import org.junit.Test;
 
 public class PackageUtilsTest extends Assert {
     @Test
-    public void testgetPackageName() throws Exception {
+    public void testGetClassPackageName() throws Exception {
         String packageName = PackageUtils.getPackageName(this.getClass());       
         assertEquals("Should get same packageName", this.getClass().getPackage().getName(), packageName);
     }
     
     @Test
-    public void testGetPackageName() throws Exception {
+    public void testGetEmptyPackageName() throws Exception {
         String className = "HelloWorld";
         assertEquals("Should return empty string", "", PackageUtils.getPackageName(className));
+    }
+    
+    @Test
+    public void testSharedPackageNameSingleClass() throws Exception {
+        String packageName = PackageUtils.getSharedPackageName(
+            Collections.singletonList(this.getClass()));       
+        assertEquals(this.getClass().getPackage().getName(), packageName);
+    }
+    @Test
+    public void testSharedPackageNameManyClassesInSamePackage() throws Exception {
+        String packageName = PackageUtils.getSharedPackageName(
+            Arrays.asList(Integer.class, Number.class));       
+        assertEquals("java.lang", packageName);
+    }
+    @Test
+    public void testSharedPackageNameManyClassesInDiffPackages() throws Exception {
+        String packageName = PackageUtils.getSharedPackageName(
+            Arrays.asList(Integer.class, this.getClass()));       
+        assertEquals("", packageName);
+    }
+    @Test
+    public void testSharedPackageNameManyClassesCommonRoot() throws Exception {
+        String packageName = PackageUtils.getSharedPackageName(
+            Arrays.asList(Integer.class, Annotation.class));       
+        assertEquals("java.lang", packageName);
+    }
+    @Test
+    public void testSharedPackageNameManyClassesCommonRoot2() throws Exception {
+        String packageName = PackageUtils.getSharedPackageName(
+            Arrays.asList(Annotation.class, Integer.class));       
+        assertEquals("java.lang", packageName);
+    }
+    @Test
+    public void testSharedPackageNameManyClassesCommonRoot3() throws Exception {
+        String packageName = PackageUtils.getSharedPackageName(
+            Arrays.asList(Annotation.class, Array.class));       
+        assertEquals("java.lang", packageName);
     }
 }

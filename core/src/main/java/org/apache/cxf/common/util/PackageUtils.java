@@ -20,6 +20,7 @@
 package org.apache.cxf.common.util;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -47,6 +48,33 @@ public final class PackageUtils {
             className = className.substring(2);
         }
         return getPackageName(className);
+    }
+    
+    public static String getSharedPackageName(List<Class<?>> classes) {
+        List<String> currentParts = null;
+        for (Class<?> cls : classes) {
+            List<String> parts = StringUtils.getParts(getPackageName(cls), "\\.");
+            if (currentParts == null) {
+                currentParts = parts;
+            } else {
+                List<String> subList = Collections.emptyList();
+                for (int i = parts.size() - 1; i > 0; i--) {
+                    subList = parts.subList(0, i + 1);
+                    if (currentParts.equals(subList)) {
+                        break;
+                    }
+                }
+                currentParts.retainAll(subList);
+            }
+        }
+        StringBuilder sb = new StringBuilder();
+        for (String part : currentParts) {
+            if (sb.length() > 0) {
+                sb.append(".");
+            }
+            sb.append(part);
+        }
+        return sb.toString();
     }
     
     public static String parsePackageName(String namespace, String defaultPackageName) {
