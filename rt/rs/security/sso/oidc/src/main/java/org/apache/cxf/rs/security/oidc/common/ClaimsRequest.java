@@ -30,42 +30,42 @@ public class ClaimsRequest extends JsonMapObject {
     private static final long serialVersionUID = -1356735897518391517L;
     
 
-    public void setIdTokenClaims(Map<String, ClaimPreference> claims) {
+    public void setIdTokenClaims(Map<String, ClaimRequirement> claims) {
         setProperty(ID_TOKEN_CLAIMS, claims);
     }
     
-    public Map<String, ClaimPreference> getIdTokenClaims() {
+    public Map<String, ClaimRequirement> getIdTokenClaims() {
         return getClaims(ID_TOKEN_CLAIMS);
     }
     
-    public void setUserInfoClaims(Map<String, ClaimPreference> claims) {
+    public void setUserInfoClaims(Map<String, ClaimRequirement> claims) {
         setProperty(USER_INFO_CLAIMS, claims);
     }
     
-    private Map<String, ClaimPreference> getClaims(String propertyName) {
+    private Map<String, ClaimRequirement> getClaims(String propertyName) {
         Object claimsProp = getProperty(propertyName);
         if (claimsProp instanceof Map) {
             Map<String, ?> claimsMap = CastUtils.cast((Map<?, ?>)claimsProp);
             if (!claimsMap.isEmpty()) {
-                if (claimsMap.values().iterator().next() instanceof ClaimPreference) {
+                if (claimsMap.values().iterator().next() instanceof ClaimRequirement) {
                     return CastUtils.cast((Map<?, ?>)claimsMap);
                 }
-                Map<String, ClaimPreference> claims = new LinkedHashMap<String, ClaimPreference>();
+                Map<String, ClaimRequirement> claims = new LinkedHashMap<String, ClaimRequirement>();
                 Map<String, Map<String, ?>> parsedMap = CastUtils.cast((Map<?, ?>)claimsProp);
                 for (Map.Entry<String, Map<String, ?>> entry : parsedMap.entrySet()) {
                     
-                    ClaimPreference pref = new ClaimPreference();
-                    Object essentialProp = entry.getValue().get(ClaimPreference.ESSENTIAL_PROPERTY);
+                    ClaimRequirement pref = new ClaimRequirement();
+                    Object essentialProp = entry.getValue().get(ClaimRequirement.ESSENTIAL_PROPERTY);
                     if (essentialProp != null) {
-                        pref.setProperty(ClaimPreference.ESSENTIAL_PROPERTY, essentialProp);
+                        pref.setProperty(ClaimRequirement.ESSENTIAL_PROPERTY, essentialProp);
                     }
-                    Object valueProp = entry.getValue().get(ClaimPreference.VALUE_PROPERTY);
+                    Object valueProp = entry.getValue().get(ClaimRequirement.VALUE_PROPERTY);
                     if (valueProp != null) {
-                        pref.setProperty(ClaimPreference.VALUE_PROPERTY, valueProp);
+                        pref.setProperty(ClaimRequirement.VALUE_PROPERTY, valueProp);
                     }
-                    Object valuesProp = entry.getValue().get(ClaimPreference.VALUES_PROPERTY);
+                    Object valuesProp = entry.getValue().get(ClaimRequirement.VALUES_PROPERTY);
                     if (valuesProp != null) {
-                        pref.setProperty(ClaimPreference.VALUES_PROPERTY, valuesProp);
+                        pref.setProperty(ClaimRequirement.VALUES_PROPERTY, valuesProp);
                     }
                 }
                 return claims;
