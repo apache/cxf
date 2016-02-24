@@ -96,7 +96,9 @@ public class JsonMapObjectReaderWriter {
     
     @SuppressWarnings("unchecked")
     protected void toJsonInternal(Output out, Object value, boolean hasNext) {
-        if (JsonMapObject.class.isAssignableFrom(value.getClass())) {
+        if (value == null) {
+            out.append(null);
+        } else if (JsonMapObject.class.isAssignableFrom(value.getClass())) {
             out.append(toJson((JsonMapObject)value));
         } else if (value.getClass().isArray()) {
             toJsonInternal(out, (Object[])value);
