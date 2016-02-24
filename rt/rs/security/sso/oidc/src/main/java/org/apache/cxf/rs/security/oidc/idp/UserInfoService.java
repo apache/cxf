@@ -83,6 +83,9 @@ public class UserInfoService extends OAuthServerJoseJwtProducer {
             userInfo.setIssuer(idToken.getIssuer());
             userInfo.setAudience(idToken.getAudience());
         }
+        if (idToken.getPreferredUserName() != null) {
+            userInfo.setPreferredUserName(idToken.getPreferredUserName());
+        }
         if (idToken.getName() != null) {
             userInfo.setName(idToken.getName());
         }
@@ -94,6 +97,9 @@ public class UserInfoService extends OAuthServerJoseJwtProducer {
         }
         if (idToken.getEmail() != null) {
             userInfo.setEmail(idToken.getEmail());
+        }
+        if (idToken.getNickName() != null) {
+            userInfo.setNickName(idToken.getNickName());
         }
         //etc
         return userInfo;
