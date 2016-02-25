@@ -171,7 +171,7 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
         BusFactory.setDefaultBus(null);
         BusFactory.setThreadDefaultBus(null);
         boolean server = launchServer(Server.class, null,
-                new String[] { 
+                new String[] {
                     name, 
                     addrMap.get(name),
                     serverC.toString() }, 

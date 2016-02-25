@@ -39,7 +39,7 @@ public class AsyncResource {
     public static final String FALSE = "A method returned false";
     public static final String TRUE = "A method return true";
 
-    private static final AsyncResponseQueue[] ASYNC_RESPONSES = { 
+    private static final AsyncResponseQueue[] ASYNC_RESPONSES = {
         new AsyncResponseQueue(), new AsyncResponseQueue(), new AsyncResponseQueue() };
 
     @GET
