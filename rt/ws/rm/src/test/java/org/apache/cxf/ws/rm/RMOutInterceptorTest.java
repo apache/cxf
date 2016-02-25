@@ -50,7 +50,7 @@ public class RMOutInterceptorTest extends Assert {
     
     @Test 
     public void testHandleRuntimeFault() throws NoSuchMethodException, SequenceFault, RMException {
-        Method[] mocked = new Method[] {                                                
+        Method[] mocked = new Method[] {
             RMOutInterceptor.class.getDeclaredMethod("isRuntimeFault", new Class[] {Message.class})
         };
         RMOutInterceptor interceptor = 
@@ -65,7 +65,7 @@ public class RMOutInterceptorTest extends Assert {
     
     @Test 
     public void testHandleNoMAPs() throws NoSuchMethodException, SequenceFault, RMException {
-        Method[] mocked = new Method[] {                                                
+        Method[] mocked = new Method[] {
             RMOutInterceptor.class.getDeclaredMethod("isRuntimeFault", new Class[] {Message.class})
         };
         RMOutInterceptor interceptor =

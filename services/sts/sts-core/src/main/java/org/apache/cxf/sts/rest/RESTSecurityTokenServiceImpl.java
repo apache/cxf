@@ -414,7 +414,7 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
     private static class JSONWrapper {
         private String token;
         
-        public JSONWrapper(String token) {
+        JSONWrapper(String token) {
             this.token = token;
         }
         

@@ -46,7 +46,7 @@ public abstract class AbstractJettyServer extends AbstractBusTestServerBase {
             final WebAppContext context = new WebAppContext();
             context.setContextPath(contextPath);
             
-            context.setConfigurations(new Configuration[] { 
+            context.setConfigurations(new Configuration[] {
                 new WebXmlConfiguration(), 
                 new AnnotationConfiguration()  
             });            
