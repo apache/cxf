@@ -44,13 +44,13 @@ public class PackageUtilsTest extends Assert {
     @Test
     public void testSharedPackageNameSingleClass() throws Exception {
         String packageName = PackageUtils.getSharedPackageName(
-            Collections.singletonList(this.getClass()));       
+            Collections.<Class<?>>singletonList(this.getClass()));       
         assertEquals(this.getClass().getPackage().getName(), packageName);
     }
     @Test
     public void testSharedPackageNameManyClassesInSamePackage() throws Exception {
         String packageName = PackageUtils.getSharedPackageName(
-            Arrays.asList(Integer.class, Number.class));       
+            Arrays.<Class<?>>asList(Integer.class, Number.class));       
         assertEquals("java.lang", packageName);
     }
     @Test
