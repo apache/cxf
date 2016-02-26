@@ -54,8 +54,8 @@ public class JwsJsonProducerTest extends Assert {
        
     public static final String SIGNED_JWS_JSON_FLAT_UNENCODED_DOCUMENT = "{"
         + "\"payload\":\"" + UNSIGNED_PLAIN_DOCUMENT + "\","
-        + "\"protected\":\"eyJhbGciOiJIUzI1NiIsImI2NCI6ZmFsc2V9\","
-        + "\"signature\":" + "\"GsyM6AQJbQHY8aQKCbZSPJHzMRWo3HKIlcDuXof7nqs\"}";
+        + "\"protected\":\"eyJhbGciOiJIUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19\","
+        + "\"signature\":" + "\"A5dxf2s96_n5FLueVuW1Z_vh161FwXZC4YLPff6dmDY\"}";
     
     public static final String DUAL_SIGNED_JWS_JSON_DOCUMENT = "{"
                        + "\"payload\":\""

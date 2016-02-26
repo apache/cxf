@@ -47,7 +47,7 @@ import org.junit.Test;
 public class JwsCompactReaderWriterTest extends Assert {
     
     public static final String TOKEN_WITH_DETACHED_UNENCODED_PAYLOAD =
-        "eyJhbGciOiJIUzI1NiIsImI2NCI6ZmFsc2V9..GsyM6AQJbQHY8aQKCbZSPJHzMRWo3HKIlcDuXof7nqs";
+        "eyJhbGciOiJIUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..A5dxf2s96_n5FLueVuW1Z_vh161FwXZC4YLPff6dmDY";
     public static final String UNSIGNED_PLAIN_DOCUMENT = "$.02";
     
     public static final String ENCODED_TOKEN_SIGNED_BY_MAC = 
