@@ -49,22 +49,16 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * Test case for https://bugzilla.redhat.com/show_bug.cgi?id=1177704
- *
- * Scenario:
- *
  * Let WebFaultOutInterceptor process a message containing a SoapFault.
  *
  * If SoapFault's exception or its' cause is instance of SOAPFaultException, values of SOAPFaultException.subCodes
  * should be copied to SoapFault.subCodes.
- *
- * @author Tomas Hofman (thofman@redhat.com)
  */
 public class WebFaultOutInterceptorTestCase {
 
     private static final QName CODE = new QName("ns", "code");
     private static final QName SUBCODE = new QName("ns", "subcode");
-    private static final List SUBCODES = Collections.singletonList(SUBCODE);
+    private static final List<QName> SUBCODES = Collections.singletonList(SUBCODE);
 
     private WebFaultOutInterceptor interceptor = new WebFaultOutInterceptor();
 
@@ -78,6 +72,9 @@ public class WebFaultOutInterceptorTestCase {
 
         interceptor.handleMessage(message);
 
+        
+        
+        
         Assert.assertNotNull(soapFault.getSubCodes());
         Assert.assertEquals(1, soapFault.getSubCodes().size());
         Assert.assertEquals(SUBCODE, soapFault.getSubCodes().get(0));
@@ -133,6 +130,7 @@ public class WebFaultOutInterceptorTestCase {
         return message;
     }
 
+    @SuppressWarnings("rawtypes") // old SAAJ API doesn't have generics
     private class SOAPFaultStub implements SOAPFault {
 
         @Override
@@ -161,7 +159,7 @@ public class WebFaultOutInterceptorTestCase {
         }
 
         @Override
-        public Iterator getFaultSubcodes() {
+        public Iterator<QName> getFaultSubcodes() {
             return SUBCODES.iterator();
         }
 
