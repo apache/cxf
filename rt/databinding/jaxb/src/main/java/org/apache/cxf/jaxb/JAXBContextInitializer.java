@@ -251,6 +251,21 @@ class JAXBContextInitializer extends ServiceModelVisitor {
             Type componentType = gt.getGenericComponentType();
             if (componentType instanceof Class) {
                 ct = (Class<?>)componentType;
+            } else if (componentType instanceof ParameterizedType) {
+                final ParameterizedType parameterizedType = (ParameterizedType)componentType;
+                final Type rawType = parameterizedType.getRawType();
+                if (rawType instanceof Class) {
+                    ct = (Class<?>)rawType;
+                } else {
+                    throw new IllegalArgumentException("Unable to determine type for " + rawType);
+                }
+                if (!parameterizedType.getRawType().equals(Enum.class)) {
+                    for (Type t2 : parameterizedType.getActualTypeArguments()) {
+                        if (shouldTypeBeAdded(t2, parameterizedType)) {
+                            addType(t2);
+                        }
+                    }
+                }
             } else {
                 TypeVariable<?> tv = (TypeVariable<?>)componentType;
                 Type[] bounds = tv.getBounds();
