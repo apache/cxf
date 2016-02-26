@@ -33,6 +33,7 @@
         <module>local</module>
         <module>http</module>
         <module>http-jetty</module>
+        <module>http-undertow</module>
         <module>http-hc</module>
         <module>http-netty/netty-server</module>
         <module>http-netty/netty-client</module>
