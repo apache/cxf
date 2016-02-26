@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.rs.security.jose.jws;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -64,6 +66,17 @@ public class JwsHeaders extends JoseHeaders {
     }
     public void setPayloadEncodingStatus(Boolean status) {
         super.setProperty(JoseConstants.JWS_HEADER_B64_STATUS_HEADER, status);
+        if (!status) {
+            List<String> critical = this.getCritical();
+            if (critical == null) {
+                critical = new LinkedList<String>();
+                setCritical(critical);
+            } else if (critical.contains(JoseConstants.JWS_HEADER_B64_STATUS_HEADER)) {
+                return;
+            }
+            critical.add(JoseConstants.JWS_HEADER_B64_STATUS_HEADER);
+            
+        }
     }
     public Boolean getPayloadEncodingStatus() {
         return super.getBooleanProperty(JoseConstants.JWS_HEADER_B64_STATUS_HEADER);
