@@ -21,6 +21,7 @@ package org.apache.cxf.rs.security.jose.jws;
 import java.io.InputStream;
 import java.util.List;
 
+import org.apache.cxf.rs.security.jose.common.JoseConstants;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKeys;
@@ -60,6 +61,10 @@ public class JwsJsonConsumerTest extends Assert {
         assertEquals(JwsJsonProducerTest.UNSIGNED_PLAIN_DOCUMENT, consumer.getDecodedJwsPayload());
         assertTrue(consumer.verifySignatureWith(
             new HmacJwsSignatureVerifier(JwsJsonProducerTest.ENCODED_MAC_KEY_1, SignatureAlgorithm.HS256)));
+        JwsHeaders headers = consumer.getSignatureEntries().get(0).getProtectedHeader();
+        List<String> critical = headers.getCritical();
+        assertEquals(1, critical.size());
+        assertEquals(JoseConstants.JWS_HEADER_B64_STATUS_HEADER, critical.get(0));
     }
     
     @Test

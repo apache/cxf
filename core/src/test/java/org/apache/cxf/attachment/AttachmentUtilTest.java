@@ -77,6 +77,13 @@ public class AttachmentUtilTest extends Assert {
                 AttachmentUtil.getContentDispositionFileName(
                         "filename*=UTF-8''%e4%b8%96%e7%95%8c%e3%83%bc%e3%83%95%e3%82%a1%e3%82%a4%e3%83%ab.txt"));
     }
+    
+    @Test
+    public void testContendDispositionFileNameNoRfc5987() {
+        assertEquals("демо-сервис.zip",
+            AttachmentUtil.getContentDispositionFileName(
+                "filename=\"&#1076;&#1077;&#1084;&#1086;-&#1089;&#1077;&#1088;&#1074;&#1080;&#1089;.zip\""));
+    }
 
 }
 
