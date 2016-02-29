@@ -301,7 +301,7 @@ public final class JwsUtils {
         return loadSignatureProvider(PhaseInterceptorChain.getCurrentMessage(),
                                      props, headers, false);
     }
-    public static JwsSignatureProvider loadSignatureProvider(Message m, 
+    private static JwsSignatureProvider loadSignatureProvider(Message m, 
                                                              Properties props,
                                                              JwsHeaders headers,
                                                              boolean ignoreNullProvider) {
