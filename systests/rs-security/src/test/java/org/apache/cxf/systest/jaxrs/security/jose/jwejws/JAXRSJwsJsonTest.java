@@ -36,6 +36,7 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
+import org.apache.cxf.rs.security.jose.common.JoseConstants;
 import org.apache.cxf.rs.security.jose.jaxrs.JweClientResponseFilter;
 import org.apache.cxf.rs.security.jose.jaxrs.JweWriterInterceptor;
 import org.apache.cxf.rs.security.jose.jaxrs.JwsJsonClientResponseFilter;
@@ -100,11 +101,12 @@ public class JAXRSJwsJsonTest extends AbstractBusClientServerTestBase {
         String address = "https://localhost:" + PORT + "/jwejwsjsonhmac";
         List<?> extraProviders = Arrays.asList(new JacksonJsonProvider(),
                                                new JweWriterInterceptor(),
+                                               new JwsJsonWriterInterceptor(),
                                                new JweClientResponseFilter());
         String jwkStoreProperty = "org/apache/cxf/systest/jaxrs/security/secret.jwk.properties";
         Map<String, Object> props = new HashMap<String, Object>();
-        props.put("rs.security.signature.list.properties", jwkStoreProperty);
-        props.put("rs.security.encryption.properties", jwkStoreProperty);
+        props.put(JoseConstants.RSSEC_SIGNATURE_PROPS, jwkStoreProperty);
+        props.put(JoseConstants.RSSEC_ENCRYPTION_PROPS, jwkStoreProperty);
         BookStore bs = createBookStore(address, 
                                        props,
                                        extraProviders);
@@ -165,7 +167,7 @@ public class JAXRSJwsJsonTest extends AbstractBusClientServerTestBase {
     private BookStore createBookStore(String address, Object properties,
                                       List<?> extraProviders) throws Exception {
         return createBookStore(address, 
-                               Collections.singletonMap("rs.security.signature.list.properties", properties),
+                               Collections.singletonMap(JoseConstants.RSSEC_SIGNATURE_PROPS, properties),
                                extraProviders);
     }
     private BookStore createBookStore(String address, 

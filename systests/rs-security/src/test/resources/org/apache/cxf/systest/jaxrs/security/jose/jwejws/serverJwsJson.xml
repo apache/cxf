@@ -52,7 +52,7 @@ under the License.
             <ref bean="jackson"/>
         </jaxrs:providers>
         <jaxrs:properties>
-            <entry key="rs.security.signature.list.properties" value="org/apache/cxf/systest/jaxrs/security/secret.jwk.properties"/>
+            <entry key="rs.security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/secret.jwk.properties"/>
         </jaxrs:properties>
     </jaxrs:server>
     <bean id="jweInFilter" class="org.apache.cxf.rs.security.jose.jaxrs.JweContainerRequestFilter"/>
@@ -69,7 +69,7 @@ under the License.
             <ref bean="jackson"/>
         </jaxrs:providers>
         <jaxrs:properties>
-            <entry key="rs.security.signature.list.properties" value="org/apache/cxf/systest/jaxrs/security/secret.jwk.properties"/>
+            <entry key="rs.security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/secret.jwk.properties"/>
             <entry key="rs.security.encryption.properties" value="org/apache/cxf/systest/jaxrs/security/secret.jwk.properties"/>
         </jaxrs:properties>
     </jaxrs:server>
@@ -82,7 +82,7 @@ under the License.
             <ref bean="jwsOutFilter"/>
         </jaxrs:providers>
         <jaxrs:properties>
-            <entry key="rs.security.signature.list.properties" 
+            <entry key="rs.security.signature.properties" 
             value="org/apache/cxf/systest/jaxrs/security/secret.jwk.properties,org/apache/cxf/systest/jaxrs/security/secret.jwk.hmac.properties"/>
         </jaxrs:properties>
     </jaxrs:server>
