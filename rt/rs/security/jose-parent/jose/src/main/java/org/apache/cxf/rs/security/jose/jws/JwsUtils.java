@@ -340,6 +340,11 @@ public final class JwsUtils {
         }
         return theSigProvider;
     }
+    public static JwsSignatureVerifier loadSignatureVerifier(Properties props,
+                                                             JwsHeaders inHeaders) {
+        return loadSignatureVerifier(PhaseInterceptorChain.getCurrentMessage(),
+                                     props, inHeaders, false);
+    }
     private static JwsSignatureVerifier loadSignatureVerifier(Message m, 
                                                               Properties props,
                                                               JwsHeaders inHeaders, 
