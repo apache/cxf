@@ -301,26 +301,32 @@ public class Headers {
         // If no Content-Type is set for empty requests then HttpUrlConnection:
         // - sets a form Content-Type for empty POST 
         // - replaces custom Accept value with */* if HTTP proxy is used
+        boolean contentTypeSet = headers.containsKey(Message.CONTENT_TYPE);
+        if (!contentTypeSet) {
+            // if CT is not set then assume it has to be set by default
+            boolean dropContentType = false;
+            boolean getRequest = "GET".equals(message.get(Message.HTTP_REQUEST_METHOD));
+            boolean emptyRequest = getRequest || PropertyUtils.isTrue(message.get(EMPTY_REQUEST_PROPERTY));
+            // If it is an empty request (without a request body) then check further if CT still needs be set
+            if (emptyRequest) { 
+                Object setCtForEmptyRequestProp = message.getContextualProperty(SET_EMPTY_REQUEST_CT_PROPERTY);
+                if (setCtForEmptyRequestProp != null) {
+                    // If SET_EMPTY_REQUEST_CT_PROPERTY is set then do as a user prefers.
+                    // CT will be dropped if setting CT for empty requests was explicitly disabled
+                    dropContentType = PropertyUtils.isFalse(setCtForEmptyRequestProp);
+                } else if (getRequest) {
+                    // otherwise if it is GET then just drop it
+                    dropContentType = true;
+                }
                 
-        boolean dropContentType = false;
-        boolean emptyRequest = PropertyUtils.isTrue(message.get(EMPTY_REQUEST_PROPERTY));
-        if (emptyRequest) { 
-            Object setCtForEmptyRequestProp = message.getContextualProperty(SET_EMPTY_REQUEST_CT_PROPERTY);
-            if (setCtForEmptyRequestProp != null) {
-                // If SET_EMPTY_REQUEST_CT_PROPERTY is set then do as a user prefers.
-                // CT will be dropped if setting CT for empty requests was explicitly disabled
-                dropContentType = PropertyUtils.isFalse(setCtForEmptyRequestProp);
-            } else if ("GET".equals((String)message.get(Message.HTTP_REQUEST_METHOD))) {
-                // otherwise if it is GET then just drop it
-                dropContentType = true;
             }
-            
+            if (!dropContentType) {
+                String ct = emptyRequest && !contentTypeSet ? "*/*" : determineContentType();
+                connection.setRequestProperty(HttpHeaderHelper.CONTENT_TYPE, ct);
+            }
+        } else {        
+            connection.setRequestProperty(HttpHeaderHelper.CONTENT_TYPE, determineContentType());
         }
-        if (!dropContentType) {
-            String ct = emptyRequest && !headers.containsKey(Message.CONTENT_TYPE) ? "*/*" : determineContentType();
-            connection.setRequestProperty(HttpHeaderHelper.CONTENT_TYPE, ct);
-        }
-        
          
         transferProtocolHeadersToURLConnection(connection);
         logProtocolHeaders(Level.FINE);
