@@ -48,14 +48,20 @@ public class AbstractJwsJsonReaderProvider {
         this.sigVerifiers = signatureVerifiers;
     }
 
+    @SuppressWarnings("deprecation")
     protected List<JwsSignatureVerifier> getInitializedSigVerifiers() {
         if (sigVerifiers != null) {
             return sigVerifiers;    
         }
         Message m = JAXRSUtils.getCurrentMessage();
         Object propLocsProp = 
-            MessageUtils.getContextualProperty(m, JoseConstants.RSSEC_SIGNATURE_IN_LIST_PROPS, 
-                                               JoseConstants.RSSEC_SIGNATURE_LIST_PROPS);
+            MessageUtils.getContextualProperty(m, JoseConstants.RSSEC_SIGNATURE_IN_PROPS, 
+                                               JoseConstants.RSSEC_SIGNATURE_PROPS);
+        if (propLocsProp == null) {
+            propLocsProp = 
+                MessageUtils.getContextualProperty(m, JoseConstants.DEP_RSSEC_SIGNATURE_IN_LIST_PROPS, 
+                                               JoseConstants.DEP_RSSEC_SIGNATURE_LIST_PROPS);
+        }
         if (propLocsProp == null) {
             LOG.warning("JWS JSON init properties resource is not identified");
             throw new JwsException(JwsException.Error.NO_INIT_PROPERTIES);
