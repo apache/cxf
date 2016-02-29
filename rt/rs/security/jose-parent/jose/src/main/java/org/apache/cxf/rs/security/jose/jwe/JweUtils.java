@@ -28,6 +28,7 @@ import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -461,6 +462,50 @@ public final class JweUtils {
         return createJweDecryptionProvider(keyDecryptionProvider, ctDecryptionKey, 
                                            contentAlgo);
     }
+    public static List<JweEncryptionProvider> loadJweEncryptionProviders(String propLoc, Message m) {
+        Properties props = loadJweProperties(m, propLoc);
+        JweEncryptionProvider theEncProvider = loadEncryptionProvider(props, null, false);
+        if (theEncProvider != null) {
+            return Collections.singletonList(theEncProvider);
+        }
+        List<JweEncryptionProvider> theEncProviders = null; 
+        if (JoseConstants.HEADER_JSON_WEB_KEY.equals(props.get(JoseConstants.RSSEC_KEY_STORE_TYPE))) {
+            List<JsonWebKey> jwks = JwkUtils.loadJsonWebKeys(m, props, KeyOperation.ENCRYPT);
+            if (jwks != null) {
+                theEncProviders = new ArrayList<JweEncryptionProvider>(jwks.size());
+                for (JsonWebKey jwk : jwks) {
+                    theEncProviders.add(getDirectKeyJweEncryption(jwk));
+                }
+            }
+        }
+        if (theEncProviders == null) {
+            LOG.warning("Providers are not available");
+            throw new JweException(JweException.Error.NO_ENCRYPTOR);
+        }
+        return theEncProviders;
+    }
+    public static List<JweDecryptionProvider> loadJweDecryptionProviders(String propLoc, Message m) {
+        Properties props = loadJweProperties(m, propLoc);
+        JweDecryptionProvider theDecProvider = loadDecryptionProvider(props, null, false);
+        if (theDecProvider != null) {
+            return Collections.singletonList(theDecProvider);
+        }
+        List<JweDecryptionProvider> theDecProviders = null; 
+        if (JoseConstants.HEADER_JSON_WEB_KEY.equals(props.get(JoseConstants.RSSEC_KEY_STORE_TYPE))) {
+            List<JsonWebKey> jwks = JwkUtils.loadJsonWebKeys(m, props, KeyOperation.DECRYPT);
+            if (jwks != null) {
+                theDecProviders = new ArrayList<JweDecryptionProvider>(jwks.size());
+                for (JsonWebKey jwk : jwks) {
+                    theDecProviders.add(getDirectKeyJweDecryption(jwk));
+                }
+            }
+        }
+        if (theDecProviders == null) {
+            LOG.warning("Providers are not available");
+            throw new JweException(JweException.Error.NO_ENCRYPTOR);
+        }
+        return theDecProviders;
+    }
     public static JweEncryptionProvider createJweEncryptionProvider(PublicKey key,
                                                                     KeyAlgorithm keyAlgo,
                                                                     ContentAlgorithm contentEncryptionAlgo,
@@ -794,6 +839,14 @@ public final class JweUtils {
             PublicKey key = KeyManagementUtils.loadPublicKey(m, props);
             JsonWebKey jwk = JwkUtils.fromPublicKey(key, props, JoseConstants.RSSEC_ENCRYPTION_KEY_ALGORITHM);
             return new JsonWebKeys(jwk);
+        }
+    }
+    private static Properties loadJweProperties(Message m, String propLoc) {
+        try {
+            return JoseUtils.loadProperties(propLoc, m.getExchange().getBus());
+        } catch (Exception ex) {
+            LOG.warning("JWS init properties are not available");
+            throw new JweException(JweException.Error.NO_INIT_PROPERTIES);
         }
     }
 }
