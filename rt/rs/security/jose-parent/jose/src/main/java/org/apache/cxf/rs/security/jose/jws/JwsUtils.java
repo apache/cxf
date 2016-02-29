@@ -371,7 +371,7 @@ public final class JwsUtils {
         return loadSignatureVerifier(PhaseInterceptorChain.getCurrentMessage(),
                                      props, inHeaders, false);
     }
-    public static JwsSignatureVerifier loadSignatureVerifier(Message m, 
+    private static JwsSignatureVerifier loadSignatureVerifier(Message m, 
                                                               Properties props,
                                                               JwsHeaders inHeaders, 
                                                               boolean ignoreNullVerifier) {
