@@ -51,7 +51,6 @@ public class ParseJavaDocMojo extends AbstractJavadocMojo {
      * The source encoding.
      * 
      * @parameter defaultValue = "${project.build.sourceEncoding}"
-     * @required
      */
     private String encoding;
     
