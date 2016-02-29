@@ -822,6 +822,11 @@ public final class JweUtils {
                                                       JoseConstants.RSSEC_ENCRYPTION_PROPS);
         
     }
+    
+    public static Properties loadEncryptionProperties(String propertiesName, boolean required) {
+        Message m = PhaseInterceptorChain.getCurrentMessage();
+        return KeyManagementUtils.loadStoreProperties(m, required, propertiesName, null);
+    }
 
     public static void checkEncryptionKeySize(Key key) {
         if (key instanceof RSAKey && ((RSAKey)key).getModulus().bitLength() < 2048) {

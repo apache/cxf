@@ -240,6 +240,11 @@ public final class JwsUtils {
                                                       JoseConstants.RSSEC_SIGNATURE_PROPS);
         
     }
+    public static Properties loadSignatureProperties(String propertiesName, boolean required) {
+        Message m = PhaseInterceptorChain.getCurrentMessage();
+        return KeyManagementUtils.loadStoreProperties(m, required, propertiesName, null);
+        
+    }
     public static JwsSignatureVerifier loadSignatureVerifier(boolean required) {
         return loadSignatureVerifier(null, required);
     }
