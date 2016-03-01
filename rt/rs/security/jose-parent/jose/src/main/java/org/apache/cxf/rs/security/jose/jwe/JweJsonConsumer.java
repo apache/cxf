@@ -82,12 +82,19 @@ public class JweJsonConsumer {
     }
 
     public JweJsonEncryptionEntry getJweDecryptionEntry(JweDecryptionProvider jwe) {
-        //TODO: support a similar method that will check per-recipient unprotected headers
-        // which will be needed if we have multiple entries with the same key encryption algorithm
+        return getJweDecryptionEntry(jwe, null);
+    }
+    
+    public JweJsonEncryptionEntry getJweDecryptionEntry(JweDecryptionProvider jwe,
+                                                        Map<String, Object> recipientProps) {
         for (Map.Entry<JweJsonEncryptionEntry, JweHeaders> entry : recipientsMap.entrySet()) {
             KeyAlgorithm keyAlgo = entry.getValue().getKeyEncryptionAlgorithm();
             if (keyAlgo != null && keyAlgo.equals(jwe.getKeyAlgorithm())
                 || keyAlgo == null && jwe.getKeyAlgorithm() == null) {
+                if (recipientProps != null 
+                    && !entry.getValue().asMap().entrySet().containsAll(recipientProps.entrySet())) {
+                    continue;
+                }
                 return entry.getKey();        
             }    
         }
