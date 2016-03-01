@@ -27,8 +27,10 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
 
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.rs.security.jose.common.JoseUtils;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionOutput;
+import org.apache.cxf.rs.security.jose.jwe.JweException;
 
 @PreMatching
 @Priority(Priorities.JWE_SERVER_READ_PRIORITY)
@@ -38,13 +40,18 @@ public class JweJsonContainerRequestFilter extends AbstractJweJsonDecryptingFilt
         if (HttpMethod.GET.equals(context.getMethod())) {
             return;
         }
-        JweDecryptionOutput out = decrypt(context.getEntityStream());
-        byte[] bytes = out.getContent();
-        context.setEntityStream(new ByteArrayInputStream(bytes));
-        context.getHeaders().putSingle("Content-Length", Integer.toString(bytes.length));
-        String ct = JoseUtils.checkContentType(out.getHeaders().getContentType(), getDefaultMediaType());
-        if (ct != null) {
-            context.getHeaders().putSingle("Content-Type", ct);
+        try {
+            JweDecryptionOutput out = decrypt(context.getEntityStream());
+            byte[] bytes = out.getContent();
+            context.setEntityStream(new ByteArrayInputStream(bytes));
+            context.getHeaders().putSingle("Content-Length", Integer.toString(bytes.length));
+            String ct = JoseUtils.checkContentType(out.getHeaders().getContentType(), getDefaultMediaType());
+            if (ct != null) {
+                context.getHeaders().putSingle("Content-Type", ct);
+            }
+        } catch (JweException ex) {
+            context.abortWith(JAXRSUtils.toResponse(400));
+            return;
         }
     }
 }
