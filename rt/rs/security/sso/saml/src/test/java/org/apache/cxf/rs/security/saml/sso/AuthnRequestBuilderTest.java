@@ -104,4 +104,15 @@ public class AuthnRequestBuilderTest extends org.junit.Assert {
         assertNotNull(policyElement);
     }
     
+    @org.junit.Test
+    public void testAuthnRequestID() throws Exception {
+        AuthnRequestBuilder authnRequestBuilder = new DefaultAuthnRequestBuilder();
+        AuthnRequest authnRequest = 
+            authnRequestBuilder.createAuthnRequest(
+                new MessageImpl(), "http://localhost:9001/app", "http://localhost:9001/sso"
+            );
+        assertTrue("ID must start with a letter or underscore, and can only contain letters, digits, "
+            + "underscores, hyphens, and periods.", authnRequest.getID().matches("^[_a-zA-Z][-_0-9a-zA-Z\\.]+$"));
+    }
+    
 }

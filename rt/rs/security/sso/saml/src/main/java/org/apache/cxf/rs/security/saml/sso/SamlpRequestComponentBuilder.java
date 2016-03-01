@@ -78,7 +78,7 @@ public final class SamlpRequestComponentBuilder {
         AuthnRequest authnRequest = authnRequestBuilder.buildObject();
         authnRequest.setAssertionConsumerServiceURL(serviceURL);
         authnRequest.setForceAuthn(forceAuthn);
-        authnRequest.setID(UUID.randomUUID().toString());
+        authnRequest.setID("_" + UUID.randomUUID());
         authnRequest.setIsPassive(isPassive);
         authnRequest.setIssueInstant(new DateTime());
         authnRequest.setProtocolBinding(protocolBinding);
