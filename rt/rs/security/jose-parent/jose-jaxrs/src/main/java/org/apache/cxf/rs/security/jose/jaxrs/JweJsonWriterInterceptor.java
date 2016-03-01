@@ -21,6 +21,7 @@ package org.apache.cxf.rs.security.jose.jaxrs;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Priority;
@@ -35,6 +36,7 @@ import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.rs.security.jose.common.JoseConstants;
 import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
+import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 import org.apache.cxf.rs.security.jose.jwe.JweEncryptionProvider;
 import org.apache.cxf.rs.security.jose.jwe.JweHeaders;
 import org.apache.cxf.rs.security.jose.jwe.JweJsonProducer;
@@ -65,7 +67,25 @@ public class JweJsonWriterInterceptor extends AbstractJweJsonWriterProvider impl
         if (ctString != null) {
             protectedHeaders.setContentType(ctString);
         }
-        
+        List<KeyAlgorithm> keyAlgos = new ArrayList<>();
+        for (JweEncryptionProvider p : providers) {
+            if (!keyAlgos.contains(p.getKeyAlgorithm())) {
+                keyAlgos.add(p.getKeyAlgorithm());    
+            }
+        }
+        List<JweHeaders> perRecipientUnprotectedHeaders = null;
+        if (keyAlgos.size() == 1) {
+            // Can be optionally set in shared unprotected headers 
+            // or per-recipient headers
+            protectedHeaders.setKeyEncryptionAlgorithm(keyAlgos.get(0));
+        } else {
+            perRecipientUnprotectedHeaders = new ArrayList<JweHeaders>();
+            for (KeyAlgorithm keyAlgo : keyAlgos) {
+                JweHeaders headers = new JweHeaders();
+                headers.setKeyEncryptionAlgorithm(keyAlgo);
+                perRecipientUnprotectedHeaders.add(headers);
+            }
+        }
         if (useJweOutputStream) {
             //TODO
         } else {
@@ -73,8 +93,10 @@ public class JweJsonWriterInterceptor extends AbstractJweJsonWriterProvider impl
             ctx.setOutputStream(cos);
             ctx.proceed();
             
+            
+            
             JweJsonProducer producer = new JweJsonProducer(protectedHeaders, cos.getBytes());
-            String jweContent = producer.encryptWith(providers);
+            String jweContent = producer.encryptWith(providers, perRecipientUnprotectedHeaders);
             
             setJoseMediaType(ctx);
             IOUtils.copy(new ByteArrayInputStream(StringUtils.toBytesUTF8(jweContent)), 
