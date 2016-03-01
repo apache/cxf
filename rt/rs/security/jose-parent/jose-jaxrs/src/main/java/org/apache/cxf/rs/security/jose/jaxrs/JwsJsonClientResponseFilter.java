@@ -29,7 +29,6 @@ import javax.ws.rs.client.ClientResponseFilter;
 
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.rs.security.jose.common.JoseUtils;
-import org.apache.cxf.rs.security.jose.jws.JwsException;
 import org.apache.cxf.rs.security.jose.jws.JwsJsonConsumer;
 import org.apache.cxf.rs.security.jose.jws.JwsJsonSignatureEntry;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
@@ -39,17 +38,14 @@ public class JwsJsonClientResponseFilter extends AbstractJwsJsonReaderProvider i
     @Override
     public void filter(ClientRequestContext req, ClientResponseContext res) throws IOException {
         List<JwsSignatureVerifier> theSigVerifiers = getInitializedSigVerifiers();
-        JwsJsonConsumer p = new JwsJsonConsumer(IOUtils.readStringFromStream(res.getEntityStream()));
-        if (isStrictVerification() && p.getSignatureEntries().size() != theSigVerifiers.size()
-            || !p.verifySignatureWith(theSigVerifiers)) {
-            throw new JwsException(JwsException.Error.INVALID_SIGNATURE);
-        }
-        byte[] bytes = p.getDecodedJwsPayloadBytes();
+        JwsJsonConsumer c = new JwsJsonConsumer(IOUtils.readStringFromStream(res.getEntityStream()));
+        validate(c, theSigVerifiers);
+        byte[] bytes = c.getDecodedJwsPayloadBytes();
         res.setEntityStream(new ByteArrayInputStream(bytes));
         res.getHeaders().putSingle("Content-Length", Integer.toString(bytes.length));
         
         // the list is guaranteed to be non-empty
-        JwsJsonSignatureEntry sigEntry = p.getSignatureEntries().get(0);
+        JwsJsonSignatureEntry sigEntry = c.getSignatureEntries().get(0);
         String ct = JoseUtils.checkContentType(sigEntry.getUnionHeader().getContentType(), getDefaultMediaType());
         if (ct != null) {
             res.getHeaders().putSingle("Content-Type", ct);

@@ -23,19 +23,29 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionOutput;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionProvider;
 import org.apache.cxf.rs.security.jose.jwe.JweHeaders;
 import org.apache.cxf.rs.security.jose.jwe.JweJsonConsumer;
+import org.apache.cxf.rs.security.jose.jwe.JweJsonEncryptionEntry;
 import org.apache.cxf.rs.security.jose.jwe.JweUtils;
 
 public class AbstractJweJsonDecryptingFilter {
     private JweDecryptionProvider decryption;
     private String defaultMediaType;
     protected JweDecryptionOutput decrypt(InputStream is) throws IOException {
-        JweJsonConsumer jwe = new JweJsonConsumer(new String(IOUtils.readBytesFromStream(is), 
+        JweJsonConsumer c = new JweJsonConsumer(new String(IOUtils.readBytesFromStream(is), 
                                                                    StandardCharsets.UTF_8));
-        return jwe.decryptWith(getInitializedDecryptionProvider(jwe.getProtectedHeader()));
+        JweDecryptionProvider theProvider = getInitializedDecryptionProvider(c.getProtectedHeader());
+        //TODO: support the extra properties that can be matched against per-recipient headers
+        // which will be needed if we have multiple entries with the same key encryption algorithm
+        JweJsonEncryptionEntry entry = c.getJweDecryptionEntry(theProvider);
+        JweDecryptionOutput out = c.decryptWith(theProvider, entry);
+        
+        JAXRSUtils.getCurrentMessage().put(JweJsonConsumer.class, c);
+        JAXRSUtils.getCurrentMessage().put(JweJsonEncryptionEntry.class, entry);
+        return out;
     }
 
     protected void validateHeaders(JweHeaders headers) {

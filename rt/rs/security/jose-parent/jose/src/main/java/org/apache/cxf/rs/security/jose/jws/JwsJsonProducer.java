@@ -94,12 +94,6 @@ public class JwsJsonProducer {
         return signatures;
     }
     
-    /*
-     * TODO
-    public MultivaluedMap<SignatureAlgorithm, JwsJsonSignatureEntry> getSignatureEntryMap() {
-        return JwsUtils.getJwsJsonSignatureMap(signatures);
-    }
-    */
     public String signWith(List<JwsSignatureProvider> signers) {
         for (JwsSignatureProvider signer : signers) {
             signWith(signer);    
