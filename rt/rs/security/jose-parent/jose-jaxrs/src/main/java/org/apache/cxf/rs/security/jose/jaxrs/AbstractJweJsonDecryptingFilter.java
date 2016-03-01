@@ -21,11 +21,13 @@ package org.apache.cxf.rs.security.jose.jaxrs;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionOutput;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionProvider;
+import org.apache.cxf.rs.security.jose.jwe.JweException;
 import org.apache.cxf.rs.security.jose.jwe.JweHeaders;
 import org.apache.cxf.rs.security.jose.jwe.JweJsonConsumer;
 import org.apache.cxf.rs.security.jose.jwe.JweJsonEncryptionEntry;
@@ -34,13 +36,15 @@ import org.apache.cxf.rs.security.jose.jwe.JweUtils;
 public class AbstractJweJsonDecryptingFilter {
     private JweDecryptionProvider decryption;
     private String defaultMediaType;
+    private Map<String, Object> recipientProperties;
     protected JweDecryptionOutput decrypt(InputStream is) throws IOException {
         JweJsonConsumer c = new JweJsonConsumer(new String(IOUtils.readBytesFromStream(is), 
                                                                    StandardCharsets.UTF_8));
         JweDecryptionProvider theProvider = getInitializedDecryptionProvider(c.getProtectedHeader());
-        //TODO: support the extra properties that can be matched against per-recipient headers
-        // which will be needed if we have multiple entries with the same key encryption algorithm
-        JweJsonEncryptionEntry entry = c.getJweDecryptionEntry(theProvider);
+        JweJsonEncryptionEntry entry = c.getJweDecryptionEntry(theProvider, recipientProperties);
+        if (entry == null) {
+            throw new JweException(JweException.Error.INVALID_JSON_JWE);
+        }
         JweDecryptionOutput out = c.decryptWith(theProvider, entry);
         
         JAXRSUtils.getCurrentMessage().put(JweJsonConsumer.class, c);
@@ -66,6 +70,10 @@ public class AbstractJweJsonDecryptingFilter {
 
     public void setDefaultMediaType(String defaultMediaType) {
         this.defaultMediaType = defaultMediaType;
+    }
+
+    public void setRecipientProperties(Map<String, Object> recipientProperties) {
+        this.recipientProperties = recipientProperties;
     } 
     
 }
