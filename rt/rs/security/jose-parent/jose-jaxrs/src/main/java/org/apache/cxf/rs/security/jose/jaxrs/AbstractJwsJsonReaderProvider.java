@@ -31,6 +31,8 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.rs.security.jose.common.JoseConstants;
 import org.apache.cxf.rs.security.jose.jws.JwsException;
+import org.apache.cxf.rs.security.jose.jws.JwsJsonConsumer;
+import org.apache.cxf.rs.security.jose.jws.JwsJsonSignatureEntry;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 
@@ -92,6 +94,16 @@ public class AbstractJwsJsonReaderProvider {
     }
     public void setStrictVerification(boolean strictVerification) {
         this.strictVerification = strictVerification;
+    }
+    
+    protected void validate(JwsJsonConsumer c, List<JwsSignatureVerifier> theSigVerifiers) throws JwsException {
+        
+        List<JwsJsonSignatureEntry> remaining = c.verifyAndGetNonValidated(theSigVerifiers,
+                                                                           isStrictVerification());
+        if (!remaining.isEmpty()) {
+            JAXRSUtils.getCurrentMessage().put("jws.json.remaining.entries", remaining);
+        }
+        JAXRSUtils.getCurrentMessage().put(JwsJsonConsumer.class, c);
     }
     
 }
