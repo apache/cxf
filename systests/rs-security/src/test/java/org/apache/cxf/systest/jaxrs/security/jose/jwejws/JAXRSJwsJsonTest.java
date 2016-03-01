@@ -96,7 +96,6 @@ public class JAXRSJwsJsonTest extends AbstractBusClientServerTestBase {
         String address = "https://localhost:" + PORT + "/jwejwsjsonhmac";
         List<?> extraProviders = Arrays.asList(new JacksonJsonProvider(),
                                                new JweWriterInterceptor(),
-                                               new JwsJsonWriterInterceptor(),
                                                new JweClientResponseFilter());
         String jwkStoreProperty = "org/apache/cxf/systest/jaxrs/security/secret.jwk.properties";
         Map<String, Object> props = new HashMap<String, Object>();
