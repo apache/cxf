@@ -37,6 +37,7 @@ import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.naming.Context;
 import javax.naming.InitialContext;
+import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
@@ -48,6 +49,7 @@ import org.apache.cxf.systest.jaxrs.Book;
 import org.apache.cxf.systest.jaxrs.JMSBookStore;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -91,6 +93,44 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
         Book book = client.get(Book.class);
         assertEquals("Get a wrong response code.", 200, client.getResponse().getStatus());
         assertEquals("Get a wrong book id.", 123, book.getId());
+    }
+    
+    @Test
+    public void testPutBookOneWayWithWebClient() throws Exception {
+        // setup the the client
+        String endpointAddressUrlEncoded = "jms:jndi:dynamicQueues/test.jmstransport.text"
+             + "?replyToName=dynamicQueues/test.jmstransport.response"
+             + "&jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+             + "&jndiURL=tcp://localhost:" + JMS_PORT;
+               
+        WebClient client = WebClient.create(endpointAddressUrlEncoded);
+        WebClient.getConfig(client).getRequestContext()
+            .put(org.apache.cxf.message.Message.REQUEST_URI, "/bookstore/oneway");
+        client.header("OnewayRequest", "true");
+        Response r = client.put(new Book("OneWay From WebClient", 129L));
+        assertEquals(202, r.getStatus());
+        assertFalse(r.hasEntity());
+        
+        Context ctx = getContext();
+        ConnectionFactory factory = (ConnectionFactory)ctx.lookup("ConnectionFactory");
+
+        Destination replyToDestination = (Destination)ctx.lookup("dynamicQueues/test.jmstransport.response");
+                
+        Connection connection = null;
+        try {
+            connection = factory.createConnection();
+            connection.start();
+            Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            checkBookInResponse(session, replyToDestination, 129L, "OneWay From WebClient");
+            session.close();
+        } finally {
+            try {
+                connection.stop();
+                connection.close();
+            } catch (JMSException ex) {
+                // ignore
+            }
+        }
     }
     
     @Test
