@@ -49,25 +49,20 @@ public class JwsJsonContainerRequestFilter extends AbstractJwsJsonReaderProvider
             context.abortWith(JAXRSUtils.toResponse(400));
             return;
         }
-        JwsJsonConsumer p = new JwsJsonConsumer(IOUtils.readStringFromStream(context.getEntityStream()));
-        
+        JwsJsonConsumer c = new JwsJsonConsumer(IOUtils.readStringFromStream(context.getEntityStream()));
         try {
-            List<JwsJsonSignatureEntry> remaining = p.verifyAndGetNonValidated(theSigVerifiers,
-                                                                               isStrictVerification());
-            if (!remaining.isEmpty()) {
-                JAXRSUtils.getCurrentMessage().put("jws.json.remaining.entries", remaining);
-            }
+            validate(c, theSigVerifiers);
         } catch (JwsException ex) {
             context.abortWith(JAXRSUtils.toResponse(400));
             return;
         }
         
-        byte[] bytes = p.getDecodedJwsPayloadBytes();
+        byte[] bytes = c.getDecodedJwsPayloadBytes();
         context.setEntityStream(new ByteArrayInputStream(bytes));
         context.getHeaders().putSingle("Content-Length", Integer.toString(bytes.length));
         
         // the list is guaranteed to be non-empty
-        JwsJsonSignatureEntry sigEntry = p.getSignatureEntries().get(0);
+        JwsJsonSignatureEntry sigEntry = c.getSignatureEntries().get(0);
         String ct = JoseUtils.checkContentType(sigEntry.getUnionHeader().getContentType(), getDefaultMediaType());
         if (ct != null) {
             context.getHeaders().putSingle("Content-Type", ct);
