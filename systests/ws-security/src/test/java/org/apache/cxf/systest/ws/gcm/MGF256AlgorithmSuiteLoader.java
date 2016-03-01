@@ -80,7 +80,7 @@ public class MGF256AlgorithmSuiteLoader implements AlgorithmSuiteLoader {
                     SPConstants.SHA1,
                     "http://www.w3.org/2009/xmlenc11#aes256-gcm",
                     SPConstants.KW_AES256,
-                    WSConstants.KEYTRANSPORT_RSAOEP_XENC11,
+                    WSConstants.KEYTRANSPORT_RSAOAEP_XENC11,
                     SPConstants.P_SHA1_L256,
                     SPConstants.P_SHA1_L192,
                     256, 192, 256, 256, 1024, 4096
