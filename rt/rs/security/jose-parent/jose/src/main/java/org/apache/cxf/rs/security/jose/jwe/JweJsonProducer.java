@@ -60,6 +60,11 @@ public class JweJsonProducer {
         this(protectedHeader, content, aad, canBeFlat);
         this.unprotectedHeader = unprotectedHeader;
     }
+    public JweJsonProducer(JweHeaders protectedHeader, 
+                           JweHeaders unprotectedHeader, 
+                           byte[] content) {
+        this(protectedHeader, unprotectedHeader, content, null, false);
+    }
     public String encryptWith(JweEncryptionProvider encryptor) {
         return encryptWith(Collections.singletonList(encryptor), null);
     }
