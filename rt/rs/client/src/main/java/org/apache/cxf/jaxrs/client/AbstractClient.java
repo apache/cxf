@@ -604,10 +604,13 @@ public abstract class AbstractClient implements Client {
         }
     }
     
-    private static Integer getResponseCode(Exchange exchange) {
+    private Integer getResponseCode(Exchange exchange) {
         Integer responseCode = (Integer)exchange.get(Message.RESPONSE_CODE);
         if (responseCode == null && exchange.getInMessage() != null) {
             responseCode = (Integer)exchange.getInMessage().get(Message.RESPONSE_CODE);
+        }
+        if (responseCode == null && exchange.isOneWay() && !state.getBaseURI().toString().startsWith("http")) {
+            responseCode = 202;
         }
         return responseCode;
     }
