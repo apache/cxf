@@ -140,19 +140,29 @@ public class JwsJsonConsumer {
     public boolean verifySignatureWith(byte[] key, SignatureAlgorithm algo) {
         return verifySignatureWith(JwsUtils.getHmacSignatureVerifier(key, algo));
     }
+    
     public boolean verifySignatureWith(List<JwsSignatureVerifier> validators) {
-        try {
-            if (verifyAndGetNonValidated(validators).isEmpty()) {
-                return true;
-            }
-        } catch (JwsException ex) {
-            // ignore
-        }
-        LOG.warning("One of JSON JWS signatures is invalid");
-        return false;
+        return verifySignatureWith(validators, false);
     }
+    
+    public boolean verifySignatureWith(List<JwsSignatureVerifier> validators, 
+                                       boolean validateAll) {
+        try {
+            verifyAndGetNonValidated(validators, validateAll);
+        } catch (JwsException ex) {
+            LOG.warning("One of JSON JWS signatures is invalid");
+            return false;
+        }
+        return true;
+    }
+    
     public List<JwsJsonSignatureEntry> verifyAndGetNonValidated(List<JwsSignatureVerifier> validators) {
-        // TODO: more effective approach is needed
+        return verifyAndGetNonValidated(validators, false);
+    }
+    
+        
+    public List<JwsJsonSignatureEntry> verifyAndGetNonValidated(List<JwsSignatureVerifier> validators,
+                                                                boolean validateAll) {    
         List<JwsJsonSignatureEntry> validatedSignatures = new LinkedList<JwsJsonSignatureEntry>();
         for (JwsSignatureVerifier validator : validators) {
             List<JwsJsonSignatureEntry> theSignatureEntries = 
@@ -166,24 +176,35 @@ public class JwsJsonConsumer {
                 }
             }
         }
+        if (validatedSignatures.isEmpty()) {
+            throw new JwsException(JwsException.Error.INVALID_SIGNATURE);    
+        }
         List<JwsJsonSignatureEntry> nonValidatedSignatures = new LinkedList<JwsJsonSignatureEntry>();
         for (JwsJsonSignatureEntry sigEntry : signatures) {
             if (!validatedSignatures.contains(sigEntry)) {        
                 nonValidatedSignatures.add(sigEntry);
             }
         }
+        if (validateAll && !nonValidatedSignatures.isEmpty()) {
+            throw new JwsException(JwsException.Error.INVALID_SIGNATURE);    
+        }
         return nonValidatedSignatures;
     }
-    
+    public String verifyAndProduce(List<JwsSignatureVerifier> validators) {
+        List<JwsJsonSignatureEntry> nonValidated = verifyAndGetNonValidated(validators, false);
+        if (!nonValidated.isEmpty()) {
+            JwsJsonProducer producer = new JwsJsonProducer(getDecodedJwsPayload());
+            producer.getSignatureEntries().addAll(nonValidated);
+            return producer.getJwsJsonSignedDocument();
+        } else {
+            return null;
+        }
+    }
     public boolean verifySignatureWith(JsonWebKey key) {
         return verifySignatureWith(JwsUtils.getSignatureVerifier(key));
     }
     public boolean verifySignatureWith(JsonWebKey key, SignatureAlgorithm algo) {
         return verifySignatureWith(JwsUtils.getSignatureVerifier(key, algo));
     }
-    public JwsJsonProducer toProducer() {
-        JwsJsonProducer p = new JwsJsonProducer(getDecodedJwsPayload());
-        p.getSignatureEntries().addAll(signatures);
-        return p;
-    }
+    
 }

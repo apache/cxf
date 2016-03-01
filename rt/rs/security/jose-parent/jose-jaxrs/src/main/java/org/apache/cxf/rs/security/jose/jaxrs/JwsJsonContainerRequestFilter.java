@@ -31,6 +31,7 @@ import javax.ws.rs.container.PreMatching;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.rs.security.jose.common.JoseUtils;
+import org.apache.cxf.rs.security.jose.jws.JwsException;
 import org.apache.cxf.rs.security.jose.jws.JwsJsonConsumer;
 import org.apache.cxf.rs.security.jose.jws.JwsJsonSignatureEntry;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
@@ -44,13 +45,23 @@ public class JwsJsonContainerRequestFilter extends AbstractJwsJsonReaderProvider
             return;
         }
         List<JwsSignatureVerifier> theSigVerifiers = getInitializedSigVerifiers();
-        JwsJsonConsumer p = new JwsJsonConsumer(IOUtils.readStringFromStream(context.getEntityStream()));
-        
-        if (isStrictVerification() && p.getSignatureEntries().size() != theSigVerifiers.size() 
-            || !p.verifySignatureWith(theSigVerifiers)) {
+        if (theSigVerifiers.isEmpty()) {
             context.abortWith(JAXRSUtils.toResponse(400));
             return;
         }
+        JwsJsonConsumer p = new JwsJsonConsumer(IOUtils.readStringFromStream(context.getEntityStream()));
+        
+        try {
+            List<JwsJsonSignatureEntry> remaining = p.verifyAndGetNonValidated(theSigVerifiers,
+                                                                               isStrictVerification());
+            if (!remaining.isEmpty()) {
+                JAXRSUtils.getCurrentMessage().put("jws.json.remaining.entries", remaining);
+            }
+        } catch (JwsException ex) {
+            context.abortWith(JAXRSUtils.toResponse(400));
+            return;
+        }
+        
         byte[] bytes = p.getDecodedJwsPayloadBytes();
         context.setEntityStream(new ByteArrayInputStream(bytes));
         context.getHeaders().putSingle("Content-Length", Integer.toString(bytes.length));
