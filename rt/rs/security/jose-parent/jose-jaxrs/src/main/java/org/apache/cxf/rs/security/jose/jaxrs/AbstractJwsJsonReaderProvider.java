@@ -18,18 +18,13 @@
  */
 package org.apache.cxf.rs.security.jose.jaxrs;
 
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
-import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageUtils;
-import org.apache.cxf.rs.security.jose.common.JoseConstants;
 import org.apache.cxf.rs.security.jose.jws.JwsException;
 import org.apache.cxf.rs.security.jose.jws.JwsJsonConsumer;
 import org.apache.cxf.rs.security.jose.jws.JwsJsonSignatureEntry;
@@ -39,49 +34,21 @@ import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 public class AbstractJwsJsonReaderProvider {
     protected static final Logger LOG = LogUtils.getL7dLogger(AbstractJwsJsonReaderProvider.class);
     
-    private List<JwsSignatureVerifier> sigVerifiers;
+    private JwsSignatureVerifier sigVerifier;
     private String defaultMediaType;
-    private boolean strictVerification;
+    private Map<String, Object> entryProps;
     
     public void setSignatureVerifier(JwsSignatureVerifier signatureVerifier) {
-        setSignatureVerifiers(Collections.singletonList(signatureVerifier));
-    }
-    public void setSignatureVerifiers(List<JwsSignatureVerifier> signatureVerifiers) {
-        this.sigVerifiers = signatureVerifiers;
+        this.sigVerifier = signatureVerifier;
     }
 
-    @SuppressWarnings("deprecation")
-    protected List<JwsSignatureVerifier> getInitializedSigVerifiers() {
-        if (sigVerifiers != null) {
-            return sigVerifiers;    
-        }
-        Message m = JAXRSUtils.getCurrentMessage();
-        Object propLocsProp = 
-            MessageUtils.getContextualProperty(m, JoseConstants.RSSEC_SIGNATURE_IN_PROPS, 
-                                               JoseConstants.RSSEC_SIGNATURE_PROPS);
-        if (propLocsProp == null) {
-            propLocsProp = 
-                MessageUtils.getContextualProperty(m, JoseConstants.DEP_RSSEC_SIGNATURE_IN_LIST_PROPS, 
-                                               JoseConstants.DEP_RSSEC_SIGNATURE_LIST_PROPS);
-        }
-        if (propLocsProp == null) {
-            LOG.warning("JWS JSON init properties resource is not identified");
-            throw new JwsException(JwsException.Error.NO_INIT_PROPERTIES);
-        }
-        List<String> propLocs = null;
-        if (propLocsProp instanceof String) { 
-            String[] props = ((String)propLocsProp).split(",");
-            propLocs = Arrays.asList(props);
-        } else {
-            propLocs = CastUtils.cast((List<?>)propLocsProp);
-        }
-        List<JwsSignatureVerifier> theSigVerifiers = new LinkedList<JwsSignatureVerifier>();
-        for (String propLoc : propLocs) {
-            theSigVerifiers.addAll(JwsUtils.loadSignatureVerifiers(propLoc, m));
-        }
-        return theSigVerifiers;
+    protected JwsSignatureVerifier getInitializedSigVerifier() {
+        if (sigVerifier != null) {
+            return sigVerifier;    
+        } 
+        return JwsUtils.loadSignatureVerifier(null, true);
     }
-
+    
     public String getDefaultMediaType() {
         return defaultMediaType;
     }
@@ -89,21 +56,24 @@ public class AbstractJwsJsonReaderProvider {
     public void setDefaultMediaType(String defaultMediaType) {
         this.defaultMediaType = defaultMediaType;
     }
-    public boolean isStrictVerification() {
-        return strictVerification;
-    }
-    public void setStrictVerification(boolean strictVerification) {
-        this.strictVerification = strictVerification;
-    }
     
-    protected void validate(JwsJsonConsumer c, List<JwsSignatureVerifier> theSigVerifiers) throws JwsException {
+    
+    protected void validate(JwsJsonConsumer c, JwsSignatureVerifier theSigVerifier) throws JwsException {
         
-        List<JwsJsonSignatureEntry> remaining = c.verifyAndGetNonValidated(theSigVerifiers,
-                                                                           isStrictVerification());
+        List<JwsJsonSignatureEntry> remaining = 
+            c.verifyAndGetNonValidated(Collections.singletonList(theSigVerifier), entryProps);
         if (!remaining.isEmpty()) {
             JAXRSUtils.getCurrentMessage().put("jws.json.remaining.entries", remaining);
         }
         JAXRSUtils.getCurrentMessage().put(JwsJsonConsumer.class, c);
+    }
+
+    public Map<String, Object> getEntryProps() {
+        return entryProps;
+    }
+
+    public void setEntryProps(Map<String, Object> entryProps) {
+        this.entryProps = entryProps;
     }
     
 }
