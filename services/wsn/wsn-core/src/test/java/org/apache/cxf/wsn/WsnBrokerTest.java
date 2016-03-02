@@ -130,6 +130,7 @@ public abstract class WsnBrokerTest extends Assert {
         Consumer consumer = new Consumer(callback, "http://localhost:" + port2 + "/test/consumer");
 
         Subscription subscription = notificationBroker.subscribe(consumer, "myTopic");
+        
 
         synchronized (callback.notifications) {
             notificationBroker.notify("myTopic", 
@@ -138,6 +139,38 @@ public abstract class WsnBrokerTest extends Assert {
             callback.notifications.wait(1000000);
         }
         assertEquals(1, callback.notifications.size());
+        NotificationMessageHolderType message = callback.notifications.get(0);
+        assertEquals(WSNHelper.getInstance().getWSAAddress(subscription.getEpr()), 
+                     WSNHelper.getInstance().getWSAAddress(message.getSubscriptionReference()));
+
+        subscription.unsubscribe();
+        consumer.stop();
+    }
+    
+    @Test
+    public void testRenew() throws Exception {
+        TestConsumer callback = new TestConsumer();
+        Consumer consumer = new Consumer(callback, "http://localhost:" + port2 + "/test/consumer");
+
+        //create subscription with InitialTerminationTime 20 sec, so that the 
+        //subscription would be expired after 20 sec
+        Subscription subscription = notificationBroker.subscribe(consumer, "myTopic", null, false, "PT20S");
+        Thread.sleep(30000);
+        synchronized (callback.notifications) {
+            notificationBroker.notify("myTopic", 
+                                      new JAXBElement<String>(new QName("urn:test:org", "foo"),
+                                          String.class, "bar"));
+            callback.notifications.wait(10000);
+        }
+        assertEquals(0, callback.notifications.size()); //the subscription is expired so can't get the notification
+        subscription.renew("PT60S"); //renew another 60 sec to resend the notification
+        synchronized (callback.notifications) {
+            notificationBroker.notify("myTopic", 
+                                      new JAXBElement<String>(new QName("urn:test:org", "foo"),
+                                          String.class, "bar"));
+            callback.notifications.wait(10000);
+        }
+        assertEquals(1, callback.notifications.size()); //the subscription is expired so can't get the notification
         NotificationMessageHolderType message = callback.notifications.get(0);
         assertEquals(WSNHelper.getInstance().getWSAAddress(subscription.getEpr()), 
                      WSNHelper.getInstance().getWSAAddress(message.getSubscriptionReference()));

@@ -126,6 +126,7 @@ public abstract class AbstractSubscription extends AbstractEndpoint implements P
             Renew renewRequest) throws ResourceUnknownFault, UnacceptableTerminationTimeFault {
 
         XMLGregorianCalendar time = validateTerminationTime(renewRequest.getTerminationTime());
+        this.setTerminationTime(time);
         renew(time);
         RenewResponse response = new RenewResponse();
         response.setTerminationTime(time);
@@ -401,12 +402,7 @@ public abstract class AbstractSubscription extends AbstractEndpoint implements P
             throw new InvalidMessageContentExpressionFault("Unsupported MessageContent dialect: '"
                     + contentFilter.getDialect() + "'", fault);
         }
-        if (terminationTime != null) {
-            UnacceptableInitialTerminationTimeFaultType fault 
-                = new UnacceptableInitialTerminationTimeFaultType();
-            throw new UnacceptableInitialTerminationTimeFault("InitialTerminationTime is not supported", 
-                                                              fault);
-        }
+        
     }
 
     public AbstractNotificationBroker getBroker() {
