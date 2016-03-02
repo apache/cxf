@@ -128,6 +128,37 @@ public class MediaTypeHeaderProviderTest extends Assert {
     }
     
     @Test
+    public void testIlleageMediaType() {
+        try {
+            new MediaTypeHeaderProvider().fromString("t//;*");
+            fail("Parse exception expected");
+        } catch (IllegalArgumentException pe) {
+            // expected
+        }
+        
+        try {
+            new MediaTypeHeaderProvider().fromString("s//t;type=a/b");
+            fail("Parse exception expected");
+        } catch (IllegalArgumentException pe) {
+            // expected
+        }
+        
+        try {
+            new MediaTypeHeaderProvider().fromString("s/b/t;type=a/b");
+            fail("Parse exception expected");
+        } catch (IllegalArgumentException pe) {
+            // expected
+        }
+        
+        try {
+            new MediaTypeHeaderProvider().fromString("/b;type=a/b");
+            fail("Parse exception expected");
+        } catch (IllegalArgumentException pe) {
+            // expected
+        }       
+    }
+    
+    @Test
     public void testTypeWithParameters() {
         MediaType mt = MediaType.valueOf("text/html;q=1234;b=4321");
         
