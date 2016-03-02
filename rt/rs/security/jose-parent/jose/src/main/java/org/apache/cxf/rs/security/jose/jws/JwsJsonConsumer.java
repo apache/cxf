@@ -123,10 +123,17 @@ public class JwsJsonConsumer {
         return JwsUtils.getJwsJsonSignatureMap(signatures);
     }
     public boolean verifySignatureWith(JwsSignatureVerifier validator) {
+        return verifySignatureWith(validator, null);
+    }
+    public boolean verifySignatureWith(JwsSignatureVerifier validator, Map<String, Object> entryProps) {
         List<JwsJsonSignatureEntry> theSignatureEntries = 
             getSignatureEntryMap().get(validator.getAlgorithm());
         if (theSignatureEntries != null) {
             for (JwsJsonSignatureEntry signatureEntry : theSignatureEntries) {
+                if (entryProps != null 
+                    && !signatureEntry.getUnionHeader().asMap().entrySet().containsAll(entryProps.entrySet())) {
+                    continue;
+                }
                 if (signatureEntry.verifySignatureWith(validator)) {
                     return true;
                 }
@@ -135,40 +142,56 @@ public class JwsJsonConsumer {
         return false;
     }
     public boolean verifySignatureWith(PublicKey key, SignatureAlgorithm algo) {
-        return verifySignatureWith(JwsUtils.getPublicKeySignatureVerifier(key, algo));
+        return verifySignatureWith(key, algo, null);
+    }
+    public boolean verifySignatureWith(PublicKey key, SignatureAlgorithm algo, Map<String, Object> entryProps) {
+        return verifySignatureWith(JwsUtils.getPublicKeySignatureVerifier(key, algo), entryProps);
     }
     public boolean verifySignatureWith(byte[] key, SignatureAlgorithm algo) {
-        return verifySignatureWith(JwsUtils.getHmacSignatureVerifier(key, algo));
+        return verifySignatureWith(key, algo, null);
     }
-    
+    public boolean verifySignatureWith(byte[] key, SignatureAlgorithm algo, Map<String, Object> entryProps) {
+        return verifySignatureWith(JwsUtils.getHmacSignatureVerifier(key, algo), entryProps);
+    }
+    public boolean verifySignatureWith(JsonWebKey key) {
+        return verifySignatureWith(JwsUtils.getSignatureVerifier(key));
+    }
+    public boolean verifySignatureWith(JsonWebKey key, SignatureAlgorithm algo) {
+        return verifySignatureWith(key, algo, null);
+    }
+    public boolean verifySignatureWith(JsonWebKey key, SignatureAlgorithm algo, Map<String, Object> entryProps) {
+        return verifySignatureWith(JwsUtils.getSignatureVerifier(key, algo), entryProps);
+    }
     public boolean verifySignatureWith(List<JwsSignatureVerifier> validators) {
-        return verifySignatureWith(validators, false);
+        return verifySignatureWith(validators, null);
     }
     
-    public boolean verifySignatureWith(List<JwsSignatureVerifier> validators, 
-                                       boolean validateAll) {
+    public boolean verifySignatureWith(List<JwsSignatureVerifier> validators, Map<String, Object> entryProps) {
         try {
-            verifyAndGetNonValidated(validators, validateAll);
+            verifyAndGetNonValidated(validators, entryProps);
         } catch (JwsException ex) {
             LOG.warning("One of JSON JWS signatures is invalid");
             return false;
         }
         return true;
     }
-    
+        
     public List<JwsJsonSignatureEntry> verifyAndGetNonValidated(List<JwsSignatureVerifier> validators) {
-        return verifyAndGetNonValidated(validators, false);
+        return verifyAndGetNonValidated(validators, null);
     }
     
-        
-    public List<JwsJsonSignatureEntry> verifyAndGetNonValidated(List<JwsSignatureVerifier> validators,
-                                                                boolean validateAll) {    
+    public List<JwsJsonSignatureEntry> verifyAndGetNonValidated(List<JwsSignatureVerifier> validators, 
+                                                                Map<String, Object> entryProps) {    
         List<JwsJsonSignatureEntry> validatedSignatures = new LinkedList<JwsJsonSignatureEntry>();
         for (JwsSignatureVerifier validator : validators) {
             List<JwsJsonSignatureEntry> theSignatureEntries = 
                 getSignatureEntryMap().get(validator.getAlgorithm());
             if (theSignatureEntries != null) {
                 for (JwsJsonSignatureEntry sigEntry : theSignatureEntries) {
+                    if (entryProps != null 
+                        && !sigEntry.getUnionHeader().asMap().entrySet().containsAll(entryProps.entrySet())) {
+                        continue;
+                    }
                     if (sigEntry.verifySignatureWith(validator)) {     
                         validatedSignatures.add(sigEntry);
                         break;
@@ -185,13 +208,14 @@ public class JwsJsonConsumer {
                 nonValidatedSignatures.add(sigEntry);
             }
         }
-        if (validateAll && !nonValidatedSignatures.isEmpty()) {
-            throw new JwsException(JwsException.Error.INVALID_SIGNATURE);    
-        }
         return nonValidatedSignatures;
     }
     public String verifyAndProduce(List<JwsSignatureVerifier> validators) {
-        List<JwsJsonSignatureEntry> nonValidated = verifyAndGetNonValidated(validators, false);
+        return verifyAndProduce(validators, null);
+        
+    }
+    public String verifyAndProduce(List<JwsSignatureVerifier> validators, Map<String, Object> entryProps) {
+        List<JwsJsonSignatureEntry> nonValidated = verifyAndGetNonValidated(validators, entryProps);
         if (!nonValidated.isEmpty()) {
             JwsJsonProducer producer = new JwsJsonProducer(getDecodedJwsPayload());
             producer.getSignatureEntries().addAll(nonValidated);
@@ -200,11 +224,6 @@ public class JwsJsonConsumer {
             return null;
         }
     }
-    public boolean verifySignatureWith(JsonWebKey key) {
-        return verifySignatureWith(JwsUtils.getSignatureVerifier(key));
-    }
-    public boolean verifySignatureWith(JsonWebKey key, SignatureAlgorithm algo) {
-        return verifySignatureWith(JwsUtils.getSignatureVerifier(key, algo));
-    }
+    
     
 }

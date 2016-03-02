@@ -108,24 +108,6 @@ public class JwsJsonConsumerTest extends Assert {
         assertEquals(KID_OF_THE_SECOND_SIGNER, remainingEntries.get(0).getKeyId());
         
     }
-    
-    @Test(expected = JwsException.class)
-    public void testFailVerifyAllWithSingleValidator() throws Exception {
-        JwsJsonConsumer consumer = new JwsJsonConsumer(DUAL_SIGNED_DOCUMENT); 
-        JsonWebKeys jwks = readKeySet("jwkPublicJsonConsumerSet.txt");
-        
-        List<JwsJsonSignatureEntry> sigEntries = consumer.getSignatureEntries();
-        assertEquals(2, sigEntries.size());
-        // 1st signature
-        String firstKid = (String)sigEntries.get(0).getKeyId();
-        assertEquals(KID_OF_THE_FIRST_SIGNER, firstKid);
-        JsonWebKey rsaKey = jwks.getKey(firstKid);
-        assertNotNull(rsaKey);
-        JwsSignatureVerifier jws = JwsUtils.getSignatureVerifier(rsaKey);
-        assertTrue(consumer.verifySignatureWith(jws));
-        consumer.verifyAndGetNonValidated(Collections.singletonList(jws), true);
-        fail();
-    }
     public JsonWebKeys readKeySet(String fileName) throws Exception {
         InputStream is = JwsJsonConsumerTest.class.getResourceAsStream(fileName);
         return JwkUtils.readJwkSet(is);
