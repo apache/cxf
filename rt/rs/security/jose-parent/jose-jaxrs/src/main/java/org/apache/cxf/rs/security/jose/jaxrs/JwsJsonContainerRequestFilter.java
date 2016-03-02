@@ -20,7 +20,6 @@ package org.apache.cxf.rs.security.jose.jaxrs;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.List;
 
 import javax.annotation.Priority;
 import javax.ws.rs.HttpMethod;
@@ -44,14 +43,10 @@ public class JwsJsonContainerRequestFilter extends AbstractJwsJsonReaderProvider
         if (HttpMethod.GET.equals(context.getMethod())) {
             return;
         }
-        List<JwsSignatureVerifier> theSigVerifiers = getInitializedSigVerifiers();
-        if (theSigVerifiers.isEmpty()) {
-            context.abortWith(JAXRSUtils.toResponse(400));
-            return;
-        }
+        JwsSignatureVerifier theSigVerifier = getInitializedSigVerifier();
         JwsJsonConsumer c = new JwsJsonConsumer(IOUtils.readStringFromStream(context.getEntityStream()));
         try {
-            validate(c, theSigVerifiers);
+            validate(c, theSigVerifier);
         } catch (JwsException ex) {
             context.abortWith(JAXRSUtils.toResponse(400));
             return;

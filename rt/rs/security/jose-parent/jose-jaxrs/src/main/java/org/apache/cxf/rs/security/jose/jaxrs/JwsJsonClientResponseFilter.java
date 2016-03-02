@@ -20,7 +20,6 @@ package org.apache.cxf.rs.security.jose.jaxrs;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.List;
 
 import javax.annotation.Priority;
 import javax.ws.rs.client.ClientRequestContext;
@@ -37,9 +36,9 @@ import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 public class JwsJsonClientResponseFilter extends AbstractJwsJsonReaderProvider implements ClientResponseFilter {
     @Override
     public void filter(ClientRequestContext req, ClientResponseContext res) throws IOException {
-        List<JwsSignatureVerifier> theSigVerifiers = getInitializedSigVerifiers();
+        JwsSignatureVerifier theSigVerifier = getInitializedSigVerifier();
         JwsJsonConsumer c = new JwsJsonConsumer(IOUtils.readStringFromStream(res.getEntityStream()));
-        validate(c, theSigVerifiers);
+        validate(c, theSigVerifier);
         byte[] bytes = c.getDecodedJwsPayloadBytes();
         res.setEntityStream(new ByteArrayInputStream(bytes));
         res.getHeaders().putSingle("Content-Length", Integer.toString(bytes.length));

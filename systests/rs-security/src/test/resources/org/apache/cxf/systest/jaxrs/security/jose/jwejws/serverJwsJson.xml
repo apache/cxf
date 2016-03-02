@@ -82,7 +82,9 @@ under the License.
             <ref bean="jwsOutFilter"/>
         </jaxrs:providers>
         <jaxrs:properties>
-            <entry key="rs.security.signature.properties" 
+            <entry key="rs.security.signature.in.properties" 
+            value="org/apache/cxf/systest/jaxrs/security/secret.jwk.hmac.properties"/>
+            <entry key="rs.security.signature.out.properties" 
             value="org/apache/cxf/systest/jaxrs/security/secret.jwk.properties,org/apache/cxf/systest/jaxrs/security/secret.jwk.hmac.properties"/>
         </jaxrs:properties>
     </jaxrs:server>
