@@ -68,6 +68,8 @@ public class NotificationBroker implements Referencable {
     public static final QName QNAME_TOPIC_EXPRESSION = new QName(WSN_URI, "TopicExpression");
 
     public static final QName QNAME_MESSAGE_CONTENT = new QName(WSN_URI, "MessageContent");
+    
+    public static final QName QNAME_INITIAL_TERMINATION_TIME = new QName(WSN_URI, "InitialTerminationTime");
 
     
     private org.oasis_open.docs.wsn.brw_2.NotificationBroker broker;
@@ -159,8 +161,10 @@ public class NotificationBroker implements Referencable {
         NotifyMessageNotSupportedFault, InvalidProducerPropertiesExpressionFault {
         //CHECKSTYLE:ON
         
-        return subscribe(consumer, topic, null, false);
+        return subscribe(consumer, topic, null, false, null);
     }
+    
+
 
     public Subscription subscribe(Referencable consumer, String topic, String xpath) 
         //CHECKSTYLE:OFF - WS-Notification spec throws a lot of faults
@@ -170,11 +174,11 @@ public class NotificationBroker implements Referencable {
         UnsupportedPolicyRequestFault, UnrecognizedPolicyRequestFault, NotifyMessageNotSupportedFault, 
         InvalidProducerPropertiesExpressionFault {
         //CHECKSTYLE:ON
-        return subscribe(consumer, topic, xpath, false);
+        return subscribe(consumer, topic, xpath, false, null);
     }
 
     public Subscription subscribe(Referencable consumer, String topic,
-                                  String xpath, boolean raw)
+                                  String xpath, boolean raw, String initialTerminationTime)
         //CHECKSTYLE:OFF - WS-Notification spec throws a lot of faults
         throws TopicNotSupportedFault, InvalidFilterFault, TopicExpressionDialectUnknownFault, 
         UnacceptableInitialTerminationTimeFault, SubscribeCreationFailedFault, 
@@ -184,6 +188,11 @@ public class NotificationBroker implements Referencable {
         //CHECKSTYLE:ON
 
         Subscribe subscribeRequest = new Subscribe();
+        if (initialTerminationTime != null) {
+            subscribeRequest.setInitialTerminationTime(
+                  new JAXBElement<String>(QNAME_INITIAL_TERMINATION_TIME,
+                  String.class, initialTerminationTime));
+        }
         subscribeRequest.setConsumerReference(consumer.getEpr());
         subscribeRequest.setFilter(new FilterType());
         if (topic != null) {

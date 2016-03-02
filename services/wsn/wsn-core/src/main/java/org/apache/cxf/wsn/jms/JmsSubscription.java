@@ -34,6 +34,7 @@ import javax.jms.Topic;
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.xpath.XPath;
@@ -57,7 +58,6 @@ import org.oasis_open.docs.wsn.b_2.ResumeFailedFaultType;
 import org.oasis_open.docs.wsn.b_2.Subscribe;
 import org.oasis_open.docs.wsn.b_2.SubscribeCreationFailedFaultType;
 import org.oasis_open.docs.wsn.b_2.UnableToDestroySubscriptionFaultType;
-import org.oasis_open.docs.wsn.b_2.UnacceptableTerminationTimeFaultType;
 import org.oasis_open.docs.wsn.bw_2.InvalidFilterFault;
 import org.oasis_open.docs.wsn.bw_2.InvalidMessageContentExpressionFault;
 import org.oasis_open.docs.wsn.bw_2.InvalidProducerPropertiesExpressionFault;
@@ -86,6 +86,12 @@ public abstract class JmsSubscription extends AbstractSubscription implements Me
     private Topic jmsTopic;
 
     private JAXBContext jaxbContext;
+    
+    private boolean checkTermination = true;
+    
+    private boolean isSessionActive = true;
+    
+    private Thread terminationThread;
 
     public JmsSubscription(String name) {
         super(name);
@@ -102,6 +108,12 @@ public abstract class JmsSubscription extends AbstractSubscription implements Me
             session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             MessageConsumer consumer = session.createConsumer(jmsTopic);
             consumer.setMessageListener(this);
+            checkTermination = true;
+            isSessionActive = true;
+            if (getTerminationTime() != null) {
+                terminationThread = new TerminationThread();
+                terminationThread.start();
+            }
         } catch (JMSException e) {
             SubscribeCreationFailedFaultType fault = new SubscribeCreationFailedFaultType();
             throw new SubscribeCreationFailedFault("Error starting subscription", fault, e);
@@ -134,6 +146,7 @@ public abstract class JmsSubscription extends AbstractSubscription implements Me
         } else {
             try {
                 session.close();
+                isSessionActive = false;
             } catch (JMSException e) {
                 PauseFailedFaultType fault = new PauseFailedFaultType();
                 throw new PauseFailedFault("Error pausing subscription", fault, e);
@@ -153,6 +166,7 @@ public abstract class JmsSubscription extends AbstractSubscription implements Me
                 session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
                 MessageConsumer consumer = session.createConsumer(jmsTopic);
                 consumer.setMessageListener(this);
+                isSessionActive = true;
             } catch (JMSException e) {
                 ResumeFailedFaultType fault = new ResumeFailedFaultType();
                 throw new ResumeFailedFault("Error resuming subscription", fault, e);
@@ -162,8 +176,15 @@ public abstract class JmsSubscription extends AbstractSubscription implements Me
 
     @Override
     protected void renew(XMLGregorianCalendar terminationTime) throws UnacceptableTerminationTimeFault {
-        UnacceptableTerminationTimeFaultType fault = new UnacceptableTerminationTimeFaultType();
-        throw new UnacceptableTerminationTimeFault("TerminationTime is not supported", fault);
+        try {
+            this.resume();
+            if (this.terminationThread == null) {
+                terminationThread = new TerminationThread();
+                terminationThread.start();
+            }
+        } catch (ResumeFailedFault e) {
+            LOGGER.log(Level.WARNING, "renew failed", e);
+        }
     }
 
     @Override
@@ -172,6 +193,7 @@ public abstract class JmsSubscription extends AbstractSubscription implements Me
         if (session != null) {
             try {
                 session.close();
+                checkTermination = false;
             } catch (JMSException e) {
                 UnableToDestroySubscriptionFaultType fault = new UnableToDestroySubscriptionFaultType();
                 throw new UnableToDestroySubscriptionFault("Unable to unsubscribe", fault, e);
@@ -245,5 +267,30 @@ public abstract class JmsSubscription extends AbstractSubscription implements Me
     }
 
     protected abstract void doNotify(Notify notify);
+    
+    class TerminationThread extends Thread {
+        public void run() {
+            while (checkTermination) {
+                XMLGregorianCalendar tt = getTerminationTime();
+                if (tt != null && isSessionActive) {
+                    XMLGregorianCalendar ct = getCurrentTime();
+                    int c = tt.compare(ct);
+                    if (c == DatatypeConstants.LESSER || c == DatatypeConstants.EQUAL) {
+                        LOGGER.log(Level.INFO, "Need Pause this subscribe");
+                        try {
+                            pause();
+                        } catch (PauseFailedFault e) {
+                            LOGGER.log(Level.WARNING, "Pause failed", e);
+                        }
+                    }
+                }
+                try {
+                    Thread.sleep(10000); // check if should terminate every 10 sec
+                } catch (InterruptedException e) {
+                    LOGGER.log(Level.WARNING, "TerminationThread sleep interrupted", e);
+                }
+            }
+        }
+    }
 
 }
