@@ -134,7 +134,7 @@
         <cxf.opensaml.osgi.version>3.1.1_3</cxf.opensaml.osgi.version>
         <cxf.opensaml.osgi.version.range>[3.1,4)</cxf.opensaml.osgi.version.range>
         <cxf.rhino.version>1.7R2</cxf.rhino.version>
-        <cxf.reflections.bundle.version>0.9.9_2</cxf.reflections.bundle.version>
+        <cxf.reflections.bundle.version>0.9.10_3</cxf.reflections.bundle.version>
         <cxf.servlet-api.group>org.apache.geronimo.specs</cxf.servlet-api.group>
         <cxf.servlet-api.artifact>geronimo-servlet_3.0_spec</cxf.servlet-api.artifact>
         <cxf.servlet-api.version>1.0</cxf.servlet-api.version>
