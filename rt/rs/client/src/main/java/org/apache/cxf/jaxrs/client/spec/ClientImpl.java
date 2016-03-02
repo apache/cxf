@@ -153,7 +153,7 @@ public class ClientImpl implements Client {
     
     private void checkClosed() {
         if (closed) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("client is closed");
         }
     }
 
@@ -359,12 +359,14 @@ public class ClientImpl implements Client {
 
         @Override
         public WebTarget path(String path) {
+            checkClosed();
             checkNull(path);
             return newWebTarget(getUriBuilder().path(path));
         }
 
         @Override
         public WebTarget queryParam(String name, Object... values) {
+            checkClosed();
             checkNullValues(name, values);
             UriBuilder thebuilder = getUriBuilder();
             if (values == null || values.length == 1 && values[0] == null) {
@@ -377,6 +379,7 @@ public class ClientImpl implements Client {
         
         @Override
         public WebTarget matrixParam(String name, Object... values) {
+            checkClosed();
             checkNullValues(name, values);
             
             UriBuilder thebuilder = getUriBuilder();
@@ -395,6 +398,7 @@ public class ClientImpl implements Client {
 
         @Override
         public WebTarget resolveTemplate(String name, Object value, boolean encodeSlash) {
+            checkClosed();
             checkNull(name, value);
             return newWebTarget(getUriBuilder().resolveTemplate(name, value, encodeSlash));
         }
@@ -412,6 +416,7 @@ public class ClientImpl implements Client {
 
         @Override
         public WebTarget resolveTemplates(Map<String, Object> templatesMap, boolean encodeSlash) {
+            checkClosed();
             checkNullMap(templatesMap);
             
             if (templatesMap.isEmpty()) {
@@ -422,6 +427,7 @@ public class ClientImpl implements Client {
 
         @Override
         public WebTarget resolveTemplatesFromEncoded(Map<String, Object> templatesMap) {
+            checkClosed();
             checkNullMap(templatesMap);
             if (templatesMap.isEmpty()) {
                 return this;
@@ -429,8 +435,7 @@ public class ClientImpl implements Client {
             return newWebTarget(getUriBuilder().resolveTemplatesFromEncoded(templatesMap));
         }
         
-        private WebTarget newWebTarget(UriBuilder newBuilder) {
-            checkClosed();
+        private WebTarget newWebTarget(UriBuilder newBuilder) {            
             boolean complete = false;
             if (targetClient != null) {
                 try {
