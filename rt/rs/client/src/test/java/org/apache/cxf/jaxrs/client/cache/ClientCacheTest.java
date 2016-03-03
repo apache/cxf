@@ -21,12 +21,10 @@ package org.apache.cxf.jaxrs.client.cache;
 
 import java.io.InputStream;
 import java.io.Serializable;
-import java.util.HashMap;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
@@ -160,19 +158,6 @@ public class ClientCacheTest extends Assert {
             feature.close();
         }    
     }
-
-    @Test
-    public void testClientClosed() {
-        Client client = ClientBuilder.newClient();        
-        try {
-            WebTarget target = client.target(ADDRESS);
-            client.close();
-            target.resolveTemplatesFromEncoded(new HashMap<String, Object>());
-            fail("IllegalStateException is expected");
-        } catch (java.lang.IllegalStateException e) {
-            assertTrue(e.getMessage().contains("client is closed"));
-        }
-    } 
     
     
     private static Invocation.Builder setAsLocal(final Invocation.Builder client) {
