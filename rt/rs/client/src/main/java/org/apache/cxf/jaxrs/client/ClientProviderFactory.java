@@ -87,7 +87,7 @@ public final class ClientProviderFactory extends ProviderFactory {
             }
         }
         Collections.sort(clientRequestFilters, 
-                         new BindingPriorityComparator(ClientRequestFilter.class, false));
+                         new BindingPriorityComparator(ClientRequestFilter.class, true));
         Collections.sort(clientResponseFilters, 
                          new BindingPriorityComparator(ClientResponseFilter.class, false));
         
