@@ -56,8 +56,18 @@ public abstract class AbstractImplicitGrantService extends RedirectionBasedGrant
         super(supportedResponseTypes, supportedGrantType);
     }
     
-    
     protected Response createGrant(OAuthRedirectionState state,
+                                          Client client,
+                                          List<String> requestedScope,
+                                          List<String> approvedScope,
+                                          UserSubject userSubject,
+                                          ServerAccessToken preAuthorizedToken) {
+        StringBuilder sb =
+            prepareGrant(state, client, requestedScope, approvedScope, userSubject, preAuthorizedToken);
+        return Response.seeOther(URI.create(sb.toString())).build();
+        
+    }
+    public StringBuilder prepareGrant(OAuthRedirectionState state,
                                    Client client,
                                    List<String> requestedScope,
                                    List<String> approvedScope,
@@ -105,7 +115,8 @@ public abstract class AbstractImplicitGrantService extends RedirectionBasedGrant
             processRefreshToken(sb, token.getRefreshToken());
         }
         
-        return finalizeResponse(sb, state);
+        finalizeResponse(sb, state);
+        return sb;
     }
     
     protected AccessTokenRegistration createTokenRegistration(OAuthRedirectionState state, 
@@ -124,7 +135,7 @@ public abstract class AbstractImplicitGrantService extends RedirectionBasedGrant
         reg.setNonce(state.getNonce());
         return reg;
     }
-    protected Response finalizeResponse(StringBuilder sb, OAuthRedirectionState state) {
+    protected void finalizeResponse(StringBuilder sb, OAuthRedirectionState state) {
         if (state.getState() != null) {
             sb.append("&");
             sb.append(OAuthConstants.STATE).append("=").append(state.getState());   
@@ -132,8 +143,6 @@ public abstract class AbstractImplicitGrantService extends RedirectionBasedGrant
         if (reportClientId) {
             sb.append("&").append(OAuthConstants.CLIENT_ID).append("=").append(state.getClientId());
         }
-        
-        return Response.seeOther(URI.create(sb.toString())).build();
     }
     
     protected void processRefreshToken(StringBuilder sb, String refreshToken) {

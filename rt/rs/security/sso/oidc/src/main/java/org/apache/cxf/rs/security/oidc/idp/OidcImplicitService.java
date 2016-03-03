@@ -42,21 +42,20 @@ import org.apache.cxf.rs.security.oidc.utils.OidcUtils;
 
 
 public class OidcImplicitService extends ImplicitGrantService {
-    private static final String OPEN_ID_CONNECT_SCOPE = "openid";
-    private static final String ID_TOKEN_RESPONSE_TYPE = "id_token";
-    private static final String ID_TOKEN_AND_AT_RESPONSE_TYPE = "id_token token";
+    public static final String ID_TOKEN_RESPONSE_TYPE = "id_token";
+    public static final String ID_TOKEN_AT_RESPONSE_TYPE = "id_token token";
     private boolean skipAuthorizationWithOidcScope;
     private JoseJwtProducer idTokenHandler;
     private IdTokenProvider idTokenProvider;
     
     public OidcImplicitService() {
         super(new HashSet<String>(Arrays.asList(ID_TOKEN_RESPONSE_TYPE,
-                                                ID_TOKEN_AND_AT_RESPONSE_TYPE)));
+                                                ID_TOKEN_AT_RESPONSE_TYPE)));
     }
     
     @Override
     protected boolean canAccessTokenBeReturned(String responseType) {
-        return ID_TOKEN_AND_AT_RESPONSE_TYPE.equals(responseType);
+        return ID_TOKEN_AT_RESPONSE_TYPE.equals(responseType);
     }
     
     @Override
@@ -79,13 +78,14 @@ public class OidcImplicitService extends ImplicitGrantService {
         // if all the client application redirecting a user needs is to get this user authenticated
         // with OIDC IDP
         return requestedScope.size() == 1 && permissions.size() == 1 && skipAuthorizationWithOidcScope
-            && OPEN_ID_CONNECT_SCOPE.equals(requestedScope.get(0));
+            && OidcUtils.OPENID_SCOPE.equals(requestedScope.get(0));
     }
     public void setSkipAuthorizationWithOidcScope(boolean skipAuthorizationWithOidcScope) {
         this.skipAuthorizationWithOidcScope = skipAuthorizationWithOidcScope;
     }
     
-    protected Response createGrant(OAuthRedirectionState state,
+    @Override
+    public StringBuilder prepareGrant(OAuthRedirectionState state,
                                    Client client,
                                    List<String> requestedScope,
                                    List<String> approvedScope,
@@ -93,7 +93,7 @@ public class OidcImplicitService extends ImplicitGrantService {
                                    ServerAccessToken preAuthorizedToken) {
         
         if (canAccessTokenBeReturned(state.getResponseType())) {
-            return super.createGrant(state, client, requestedScope, approvedScope, userSubject, preAuthorizedToken);
+            return super.prepareGrant(state, client, requestedScope, approvedScope, userSubject, preAuthorizedToken);
         }
         // id_token response type processing
         
@@ -104,7 +104,8 @@ public class OidcImplicitService extends ImplicitGrantService {
         if (idToken != null) {
             sb.append(OidcUtils.ID_TOKEN).append("=").append(idToken);
         }
-        return finalizeResponse(sb, state);
+        finalizeResponse(sb, state);
+        return sb;
     }
     
     private String getProcessedIdToken(OAuthRedirectionState state, 

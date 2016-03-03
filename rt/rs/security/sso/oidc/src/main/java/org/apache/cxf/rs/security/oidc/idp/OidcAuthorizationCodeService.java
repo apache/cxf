@@ -32,7 +32,6 @@ import org.apache.cxf.rs.security.oauth2.services.AuthorizationCodeGrantService;
 import org.apache.cxf.rs.security.oidc.utils.OidcUtils;
 
 public class OidcAuthorizationCodeService extends AuthorizationCodeGrantService {
-    private static final String OPEN_ID_CONNECT_SCOPE = "openid";
     private boolean skipAuthorizationWithOidcScope;
     @Override
     protected boolean canAuthorizationBeSkipped(Client client,
@@ -43,7 +42,7 @@ public class OidcAuthorizationCodeService extends AuthorizationCodeGrantService 
         // if all the client application redirecting a user needs is to get this user authenticated
         // with OIDC IDP
         return requestedScope.size() == 1 && permissions.size() == 1 && skipAuthorizationWithOidcScope
-            && OPEN_ID_CONNECT_SCOPE.equals(requestedScope.get(0));
+            && OidcUtils.OPENID_SCOPE.equals(requestedScope.get(0));
     }
     public void setSkipAuthorizationWithOidcScope(boolean skipAuthorizationWithOidcScope) {
         this.skipAuthorizationWithOidcScope = skipAuthorizationWithOidcScope;
