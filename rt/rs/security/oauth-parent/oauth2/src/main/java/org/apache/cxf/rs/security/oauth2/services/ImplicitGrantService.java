@@ -35,11 +35,9 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 /**
  * Redirection-based Implicit Grant Service
  * 
- * This resource handles the End User authorising
+ * This resource handles the End User authorizing
  * or denying the Client embedded in the Web agent.
  * 
- * We can consider having a single authorization service dealing with either
- * authorization code or implicit grant.
  */
 @Path("/authorize-implicit")
 public class ImplicitGrantService extends AbstractImplicitGrantService {

@@ -45,7 +45,7 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 
 /**
- * This resource handles the End User authorising
+ * This resource handles the End User authorizing
  * or denying the Client to access its resources.
  * If End User approves the access this resource will
  * redirect End User back to the Client, supplying 
@@ -94,21 +94,16 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
                                    ServerAccessToken preauthorizedToken) {
         // in this flow the code is still created, the preauthorized token
         // will be retrieved by the authorization code grant handler
-        AuthorizationCodeRegistration codeReg = createCodeRegistration(state,
-                                                                       client,
-                                                                       requestedScope,
-                                                                       approvedScope,
-                                                                       userSubject,
-                                                                       preauthorizedToken);
-        
         ServerAuthorizationCodeGrant grant = null;
         try {
-            grant = ((AuthorizationCodeDataProvider)getDataProvider()).createCodeGrant(codeReg);
+            grant = getGrantRepresentation(state,
+                                           client,
+                                           requestedScope,
+                                           approvedScope,
+                                           userSubject,
+                                           preauthorizedToken);
         } catch (OAuthServiceException ex) {
             return createErrorResponse(state.getState(), state.getRedirectUri(), OAuthConstants.ACCESS_DENIED);
-        }
-        if (grant.getExpiresIn() > RECOMMENDED_CODE_EXPIRY_TIME_SECS) {
-            LOG.warning("Code expiry time exceeds 10 minutes");
         }
         String grantCode = processCodeGrant(client, grant.getCode(), grant.getSubject());
         if (state.getRedirectUri() == null) {
@@ -125,6 +120,42 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
             ub.queryParam(OAuthConstants.AUTHORIZATION_CODE_VALUE, grantCode);
             return Response.seeOther(ub.build()).build();
         }
+    }
+    
+    protected ServerAuthorizationCodeGrant getGrantRepresentation(OAuthRedirectionState state,
+                           Client client,
+                           List<String> requestedScope,
+                           List<String> approvedScope,
+                           UserSubject userSubject,
+                           ServerAccessToken preauthorizedToken) {
+        AuthorizationCodeRegistration codeReg = createCodeRegistration(state,
+                                                                       client,
+                                                                       requestedScope,
+                                                                       approvedScope,
+                                                                       userSubject,
+                                                                       preauthorizedToken);
+        
+        ServerAuthorizationCodeGrant grant = 
+            ((AuthorizationCodeDataProvider)getDataProvider()).createCodeGrant(codeReg);
+        if (grant.getExpiresIn() > RECOMMENDED_CODE_EXPIRY_TIME_SECS) {
+            LOG.warning("Code expiry time exceeds 10 minutes");
+        }
+        return grant;
+    }
+    
+    public String getGrantCode(OAuthRedirectionState state,
+                               Client client,
+                               List<String> requestedScope,
+                               List<String> approvedScope,
+                               UserSubject userSubject,
+                               ServerAccessToken preauthorizedToken) {
+        ServerAuthorizationCodeGrant grant =  getGrantRepresentation(state,
+                                      client,
+                                      requestedScope,
+                                      approvedScope,
+                                      userSubject,
+                                      preauthorizedToken);
+        return processCodeGrant(client, grant.getCode(), grant.getSubject());
     }
     
     protected AuthorizationCodeRegistration createCodeRegistration(OAuthRedirectionState state, 
