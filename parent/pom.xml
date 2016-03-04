@@ -114,7 +114,7 @@
         <cxf.joda.time.version>2.7</cxf.joda.time.version>
         <cxf.jdom.version>1.0</cxf.jdom.version>
         <cxf.jettison.version>1.3.7</cxf.jettison.version>
-        <cxf.jetty8.version>8.1.17.v20150415</cxf.jetty8.version>
+        <cxf.jetty8.version>8.1.19.v20160209</cxf.jetty8.version>
         <cxf.jetty9.version>9.2.11.v20150529</cxf.jetty9.version>
         <cxf.jetty.version>${cxf.jetty9.version}</cxf.jetty.version>
         <cxf.jetty.osgi.version>[8.1,10)</cxf.jetty.osgi.version>
