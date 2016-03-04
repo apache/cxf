@@ -111,6 +111,17 @@ public class LinkBuilderImplTest extends Assert {
         assertTrue(resource.contains("<consumesappjson>"));
     }
     
+    @Test
+    public void testInvalidString() throws Exception {
+        try {
+            Link.Builder linkBuilder = Link.fromMethod(TestResource.class, "consumesAppJson");
+            linkBuilder.link("</cxf>>");
+            fail("IllegalArgumentException is expected");
+        } catch (java.lang.IllegalArgumentException e) {
+            // expected
+        }
+    }
+    
     @Path("resource")
     public static class TestResource {
         @POST
