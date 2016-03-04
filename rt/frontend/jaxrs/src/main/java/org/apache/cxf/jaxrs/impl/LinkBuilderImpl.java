@@ -84,7 +84,7 @@ public class LinkBuilderImpl implements Builder {
         
         link = link.trim();
         if (link.length() > 1 && link.startsWith("<")) {
-            int index = link.indexOf(">", 1);
+            int index = link.lastIndexOf(">", link.length());
             if (index != -1) {
                 String uri = link.substring(1, index);
                 ub = UriBuilder.fromUri(uri);
