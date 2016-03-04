@@ -21,6 +21,7 @@ package org.apache.cxf.rs.security.oidc.idp;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -52,7 +53,10 @@ public class OidcImplicitService extends ImplicitGrantService {
         super(new HashSet<String>(Arrays.asList(ID_TOKEN_RESPONSE_TYPE,
                                                 ID_TOKEN_AT_RESPONSE_TYPE)));
     }
-    
+    protected OidcImplicitService(Set<String> supportedResponseTypes,
+                                  String supportedGrantType) {
+        super(supportedResponseTypes, supportedGrantType);
+    }
     @Override
     protected boolean canAccessTokenBeReturned(String responseType) {
         return ID_TOKEN_AT_RESPONSE_TYPE.equals(responseType);
@@ -85,7 +89,7 @@ public class OidcImplicitService extends ImplicitGrantService {
     }
     
     @Override
-    public StringBuilder prepareGrant(OAuthRedirectionState state,
+    protected StringBuilder prepareGrant(OAuthRedirectionState state,
                                    Client client,
                                    List<String> requestedScope,
                                    List<String> approvedScope,

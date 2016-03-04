@@ -23,16 +23,18 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import javax.ws.rs.Path;
 
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthRedirectionState;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
-import org.apache.cxf.rs.security.oauth2.services.AbstractImplicitGrantService;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
-
-public class OidcHybridService extends AbstractImplicitGrantService {
+@Path("authorize-hybrid")
+public class OidcHybridService extends OidcImplicitService {
     public static final String CODE_AT_RESPONSE_TYPE = "code token";
     public static final String CODE_ID_TOKEN_RESPONSE_TYPE = "code id_token";
     public static final String CODE_ID_TOKEN_AT_RESPONSE_TYPE = "code id_token token";
@@ -40,22 +42,39 @@ public class OidcHybridService extends AbstractImplicitGrantService {
     static {
         IMPLICIT_RESPONSE_TYPES = new HashMap<String, String>();
         IMPLICIT_RESPONSE_TYPES.put(CODE_AT_RESPONSE_TYPE, OAuthConstants.TOKEN_RESPONSE_TYPE);
-        IMPLICIT_RESPONSE_TYPES.put(CODE_ID_TOKEN_RESPONSE_TYPE, OidcImplicitService.ID_TOKEN_RESPONSE_TYPE);
-        IMPLICIT_RESPONSE_TYPES.put(CODE_ID_TOKEN_AT_RESPONSE_TYPE, OidcImplicitService.ID_TOKEN_AT_RESPONSE_TYPE);
+        IMPLICIT_RESPONSE_TYPES.put(CODE_ID_TOKEN_RESPONSE_TYPE, ID_TOKEN_RESPONSE_TYPE);
+        IMPLICIT_RESPONSE_TYPES.put(CODE_ID_TOKEN_AT_RESPONSE_TYPE, ID_TOKEN_AT_RESPONSE_TYPE);
+        IMPLICIT_RESPONSE_TYPES.put(ID_TOKEN_RESPONSE_TYPE, ID_TOKEN_RESPONSE_TYPE);
+        IMPLICIT_RESPONSE_TYPES.put(ID_TOKEN_AT_RESPONSE_TYPE, ID_TOKEN_AT_RESPONSE_TYPE);
     }
     private OidcAuthorizationCodeService codeService;
-    private OidcImplicitService implicitService;
     
     public OidcHybridService() {
-        super(new HashSet<String>(Arrays.asList(CODE_AT_RESPONSE_TYPE,
-                                                CODE_ID_TOKEN_RESPONSE_TYPE,
-                                                CODE_ID_TOKEN_AT_RESPONSE_TYPE)), 
-                                  "Hybrid");
+        this(false);
+    }
+    public OidcHybridService(boolean hybridOnly) {
+        super(getResponseTypes(hybridOnly), "Hybrid");
     }
     
+    private static Set<String> getResponseTypes(boolean hybridOnly) {
+        List<String> types = 
+            Arrays.asList(CODE_AT_RESPONSE_TYPE, CODE_ID_TOKEN_RESPONSE_TYPE, CODE_ID_TOKEN_AT_RESPONSE_TYPE);
+        if (!hybridOnly) {
+            types.add(ID_TOKEN_RESPONSE_TYPE);
+            types.add(ID_TOKEN_AT_RESPONSE_TYPE);
+        }
+        return new HashSet<String>(types);
+    }
     
     @Override
-    public StringBuilder prepareGrant(OAuthRedirectionState state,
+    protected boolean canAccessTokenBeReturned(String responseType) {
+        return ID_TOKEN_AT_RESPONSE_TYPE.equals(responseType)
+            || CODE_AT_RESPONSE_TYPE.equals(responseType)
+            || CODE_ID_TOKEN_AT_RESPONSE_TYPE.equals(responseType);
+    }
+    
+    @Override
+    protected StringBuilder prepareGrant(OAuthRedirectionState state,
                                    Client client,
                                    List<String> requestedScope,
                                    List<String> approvedScope,
@@ -63,15 +82,18 @@ public class OidcHybridService extends AbstractImplicitGrantService {
                                    ServerAccessToken preAuthorizedToken) {
         String actualResponseType = state.getResponseType();
         
-        state.setResponseType(OAuthConstants.CODE_RESPONSE_TYPE);
-        String code = codeService.getGrantCode(state, client, requestedScope,
-                                               approvedScope, userSubject, preAuthorizedToken);
         state.setResponseType(IMPLICIT_RESPONSE_TYPES.get(actualResponseType)); 
-        StringBuilder sb = implicitService.prepareGrant(state, client, requestedScope, 
+        StringBuilder sb = super.prepareGrant(state, client, requestedScope, 
                                                           approvedScope, userSubject, preAuthorizedToken);
    
-        sb.append("&");
-        sb.append(OAuthConstants.AUTHORIZATION_CODE_VALUE).append("=").append(code);
+        if (actualResponseType.startsWith(OAuthConstants.AUTHORIZATION_CODE_VALUE)) {
+            state.setResponseType(OAuthConstants.CODE_RESPONSE_TYPE);
+            String code = codeService.getGrantCode(state, client, requestedScope,
+                                                   approvedScope, userSubject, preAuthorizedToken);
+            
+            sb.append("&");
+            sb.append(OAuthConstants.AUTHORIZATION_CODE_VALUE).append("=").append(code);
+        }
         return sb;
     }
 
@@ -81,7 +103,4 @@ public class OidcHybridService extends AbstractImplicitGrantService {
     }
 
 
-    public void setImplicitService(OidcImplicitService implicitService) {
-        this.implicitService = implicitService;
-    }
 }

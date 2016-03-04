@@ -45,8 +45,12 @@ public class ImplicitGrantService extends AbstractImplicitGrantService {
     public ImplicitGrantService() {
         super(OAuthConstants.TOKEN_RESPONSE_TYPE, OAuthConstants.IMPLICIT_GRANT);
     }
-    public ImplicitGrantService(Set<String> responseTypes) {
+    protected ImplicitGrantService(Set<String> responseTypes) {
         super(responseTypes, OAuthConstants.IMPLICIT_GRANT);
+    }
+    protected ImplicitGrantService(Set<String> supportedResponseTypes,
+                                   String supportedGrantType) {
+        super(supportedResponseTypes, supportedGrantType);
     }
     @Override
     protected OAuthAuthorizationData createAuthorizationData(Client client, 
