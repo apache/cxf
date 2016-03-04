@@ -39,6 +39,7 @@ public class ConfigurationImplTest extends Assert {
         assertTrue(c.register(filter, 
                    Collections.<Class<?>, Integer>singletonMap(ContainerResponseFilter.class, 1000)));
         assertTrue(c.isRegistered(filter));
+        assertFalse(c.isRegistered(new ContainerResponseFilterImpl()));
         assertTrue(c.isRegistered(ContainerResponseFilterImpl.class));
         assertFalse(c.isRegistered(ContainerResponseFilter.class));
         assertFalse(c.register(filter, 
