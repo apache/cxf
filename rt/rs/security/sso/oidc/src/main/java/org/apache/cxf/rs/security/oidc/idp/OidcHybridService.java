@@ -84,4 +84,4 @@ public class OidcHybridService extends AbstractImplicitGrantService {
     public void setImplicitService(OidcImplicitService implicitService) {
         this.implicitService = implicitService;
     }
- }
+}
