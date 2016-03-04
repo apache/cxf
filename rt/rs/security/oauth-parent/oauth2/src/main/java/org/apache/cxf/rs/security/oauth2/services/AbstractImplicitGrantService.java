@@ -67,7 +67,7 @@ public abstract class AbstractImplicitGrantService extends RedirectionBasedGrant
         return Response.seeOther(URI.create(sb.toString())).build();
         
     }
-    public StringBuilder prepareGrant(OAuthRedirectionState state,
+    protected StringBuilder prepareGrant(OAuthRedirectionState state,
                                    Client client,
                                    List<String> requestedScope,
                                    List<String> approvedScope,
