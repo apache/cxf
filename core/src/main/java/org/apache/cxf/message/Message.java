@@ -171,6 +171,12 @@ public interface Message extends StringMap {
      */
     String INTERCEPTOR_PROVIDERS = Message.class.getName() + ".INTERCEPTOR_PROVIDER";
     
+    /**
+     * Content-Transfer-Encoding used for MTOM attachment
+     * binary, base64, etc
+     */
+    String CONTENT_TRANSFER_ENCODING = Message.class.getName() + ".CONTENT_TRANSFER_ENCODING";
+    
     /*
      * The properties to allow configure the client timeout
      */
