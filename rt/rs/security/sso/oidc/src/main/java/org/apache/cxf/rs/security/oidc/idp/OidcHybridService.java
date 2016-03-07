@@ -71,8 +71,7 @@ public class OidcHybridService extends OidcImplicitService {
     @Override
     protected boolean canAccessTokenBeReturned(String responseType) {
         return ID_TOKEN_AT_RESPONSE_TYPE.equals(responseType)
-            || CODE_AT_RESPONSE_TYPE.equals(responseType)
-            || CODE_ID_TOKEN_AT_RESPONSE_TYPE.equals(responseType);
+            || OAuthConstants.TOKEN_RESPONSE_TYPE.equals(responseType);
     }
     
     @Override
