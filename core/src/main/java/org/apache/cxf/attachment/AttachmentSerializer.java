@@ -46,7 +46,7 @@ public class AttachmentSerializer {
     // http://tools.ietf.org/html/rfc2387
     private static final String DEFAULT_MULTIPART_TYPE = "multipart/related";
     
-    private static String contentTransferEncoding = "binary";
+    private String contentTransferEncoding = "binary";
     
     private Message message;
     private String bodyBoundary;
@@ -186,7 +186,7 @@ public class AttachmentSerializer {
         return s.indexOf('"') != 0 ? s.replace("\"", "\\\"") : s;    
     }
     
-    public static void setContentTransferEncoding(String cte) {
+    public void setContentTransferEncoding(String cte) {
         contentTransferEncoding = cte;
     }
 
@@ -205,7 +205,7 @@ public class AttachmentSerializer {
         return sb.toString();
     }
     
-    private static void writeHeaders(String contentType, String attachmentId, 
+    private void writeHeaders(String contentType, String attachmentId, 
                                      Map<String, List<String>> headers, Writer writer) throws IOException {
         writer.write("\r\nContent-Type: ");
         writer.write(contentType);
