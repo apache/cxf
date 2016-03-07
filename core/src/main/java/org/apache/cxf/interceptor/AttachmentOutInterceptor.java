@@ -70,7 +70,7 @@ public class AttachmentOutInterceptor extends AbstractPhaseInterceptor<Message> 
         String contentTransferEncoding = (String)message.getContextualProperty(
                                             org.apache.cxf.message.Message.CONTENT_TRANSFER_ENCODING);
         if (contentTransferEncoding != null) {
-            AttachmentSerializer.setContentTransferEncoding(contentTransferEncoding);
+            serializer.setContentTransferEncoding(contentTransferEncoding);
         }
         
         try {
