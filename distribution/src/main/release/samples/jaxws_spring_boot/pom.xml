@@ -12,7 +12,7 @@
     <groupId>org.apache.cxf.spring.boot</groupId>
     <version>1.0.0</version>
     <properties>
-        <cxf.version>3.1.5-SNAPSHOT</cxf.version>
+        <cxf.version>3.1.6-SNAPSHOT</cxf.version>
     </properties> 
     <dependencies>
         <dependency>
