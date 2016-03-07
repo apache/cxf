@@ -20,6 +20,7 @@
 package org.apache.cxf.attachment;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -32,12 +33,19 @@ import java.util.Map;
 
 import javax.activation.DataHandler;
 
+import org.apache.cxf.common.util.Base64Utility;
+import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Message;
+
+
+
 
 public class AttachmentSerializer {
     // http://tools.ietf.org/html/rfc2387
     private static final String DEFAULT_MULTIPART_TYPE = "multipart/related";
+    
+    private static String contentTransferEncoding = "binary";
     
     private Message message;
     private String bodyBoundary;
@@ -49,6 +57,7 @@ public class AttachmentSerializer {
     private boolean xop = true;
     private boolean writeOptionalTypeParameters = true;
     
+        
     public AttachmentSerializer(Message messageParam) {
         message = messageParam;
     }
@@ -175,6 +184,10 @@ public class AttachmentSerializer {
     private static String escapeQuotes(String s) {
         return s.indexOf('"') != 0 ? s.replace("\"", "\\\"") : s;    
     }
+    
+    public static void setContentTransferEncoding(String cte) {
+        contentTransferEncoding = cte;
+    }
 
     private String getHeaderValue(String name, String defaultValue) {
         List<String> value = rootHeaders.get(name);
@@ -195,7 +208,7 @@ public class AttachmentSerializer {
                                      Map<String, List<String>> headers, Writer writer) throws IOException {
         writer.write("\r\nContent-Type: ");
         writer.write(contentType);
-        writer.write("\r\nContent-Transfer-Encoding: binary\r\n");
+        writer.write("\r\nContent-Transfer-Encoding: " + contentTransferEncoding + "\r\n");
 
         if (attachmentId != null) {
             attachmentId = checkAngleBrackets(attachmentId);
@@ -262,7 +275,11 @@ public class AttachmentSerializer {
                 writeHeaders(handler.getContentType(), a.getId(),
                              headers, writer);
                 out.write(writer.getBuffer().toString().getBytes(encoding));
-                handler.writeTo(out);
+                if ("base64".equals(contentTransferEncoding)) {
+                    encodeBase64(handler.getInputStream(), out, IOUtils.DEFAULT_BUFFER_SIZE);
+                } else {
+                    handler.writeTo(out);
+                }
             }
         }
         StringWriter writer = new StringWriter();                
@@ -273,6 +290,29 @@ public class AttachmentSerializer {
         out.flush();
     }
 
+    private int encodeBase64(InputStream input, OutputStream output, int bufferSize) throws IOException {
+        int avail = input.available();
+        if (avail > 262144) {
+            avail = 262144;
+        }
+        if (avail > bufferSize) {
+            bufferSize = avail;
+        }
+        final byte[] buffer = new byte[bufferSize];
+        int n = 0;
+        n = input.read(buffer);
+        int total = 0;
+        while (-1 != n) {
+            if (n == 0) {
+                throw new IOException("0 bytes read in violation of InputStream.read(byte[])");
+            }
+            Base64Utility.encodeAndStream(buffer, 0, n, out);
+            total += n;
+            n = input.read(buffer);
+        }
+        return total;
+    }
+    
     public boolean isXop() {
         return xop;
     }
