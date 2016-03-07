@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.rs.security.oidc.idp;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -57,8 +58,9 @@ public class OidcHybridService extends OidcImplicitService {
     }
     
     private static Set<String> getResponseTypes(boolean hybridOnly) {
-        List<String> types = 
-            Arrays.asList(CODE_AT_RESPONSE_TYPE, CODE_ID_TOKEN_RESPONSE_TYPE, CODE_ID_TOKEN_AT_RESPONSE_TYPE);
+        List<String> types = new ArrayList<String>(); 
+        types.addAll(
+            Arrays.asList(CODE_AT_RESPONSE_TYPE, CODE_ID_TOKEN_RESPONSE_TYPE, CODE_ID_TOKEN_AT_RESPONSE_TYPE));
         if (!hybridOnly) {
             types.add(ID_TOKEN_RESPONSE_TYPE);
             types.add(ID_TOKEN_AT_RESPONSE_TYPE);
