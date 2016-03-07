@@ -201,7 +201,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
     @Test
     public void testNonExistentJaxrs20WithPost() throws Exception {
         Client client = ClientBuilder.newClient();
-        WebTarget target = client.target("http://test-test/");
+        WebTarget target = client.target("http://test.test/");
         Invocation.Builder builder = target.request();
         Entity<String> entity = Entity.entity("entity", MediaType.WILDCARD_TYPE);
         Invocation invocation = builder.buildPost(entity);
