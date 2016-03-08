@@ -111,7 +111,7 @@ public abstract class ProviderFactory {
     private boolean paramConverterContextsAvailable;
     // List of injected providers
     private Collection<ProviderInfo<?>> injectedProviders = 
-        new LinkedList<ProviderInfo<?>>();
+        new HashSet<ProviderInfo<?>>();
     
     private Bus bus;
     
