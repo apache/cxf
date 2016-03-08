@@ -20,10 +20,8 @@ package org.apache.cxf.rs.security.oidc.idp;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.ws.rs.Path;
@@ -33,21 +31,10 @@ import org.apache.cxf.rs.security.oauth2.common.OAuthRedirectionState;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
+import org.apache.cxf.rs.security.oidc.utils.OidcUtils;
 
 @Path("authorize-hybrid")
 public class OidcHybridService extends OidcImplicitService {
-    public static final String CODE_AT_RESPONSE_TYPE = "code token";
-    public static final String CODE_ID_TOKEN_RESPONSE_TYPE = "code id_token";
-    public static final String CODE_ID_TOKEN_AT_RESPONSE_TYPE = "code id_token token";
-    private static final Map<String, String> IMPLICIT_RESPONSE_TYPES;
-    static {
-        IMPLICIT_RESPONSE_TYPES = new HashMap<String, String>();
-        IMPLICIT_RESPONSE_TYPES.put(CODE_AT_RESPONSE_TYPE, OAuthConstants.TOKEN_RESPONSE_TYPE);
-        IMPLICIT_RESPONSE_TYPES.put(CODE_ID_TOKEN_RESPONSE_TYPE, ID_TOKEN_RESPONSE_TYPE);
-        IMPLICIT_RESPONSE_TYPES.put(CODE_ID_TOKEN_AT_RESPONSE_TYPE, ID_TOKEN_AT_RESPONSE_TYPE);
-        IMPLICIT_RESPONSE_TYPES.put(ID_TOKEN_RESPONSE_TYPE, ID_TOKEN_RESPONSE_TYPE);
-        IMPLICIT_RESPONSE_TYPES.put(ID_TOKEN_AT_RESPONSE_TYPE, ID_TOKEN_AT_RESPONSE_TYPE);
-    }
     private OidcAuthorizationCodeService codeService;
     
     public OidcHybridService() {
@@ -60,18 +47,21 @@ public class OidcHybridService extends OidcImplicitService {
     private static Set<String> getResponseTypes(boolean hybridOnly) {
         List<String> types = new ArrayList<String>(); 
         types.addAll(
-            Arrays.asList(CODE_AT_RESPONSE_TYPE, CODE_ID_TOKEN_RESPONSE_TYPE, CODE_ID_TOKEN_AT_RESPONSE_TYPE));
+            Arrays.asList(OidcUtils.CODE_AT_RESPONSE_TYPE, 
+                          OidcUtils.CODE_ID_TOKEN_RESPONSE_TYPE, 
+                          OidcUtils.CODE_ID_TOKEN_AT_RESPONSE_TYPE));
         if (!hybridOnly) {
-            types.add(ID_TOKEN_RESPONSE_TYPE);
-            types.add(ID_TOKEN_AT_RESPONSE_TYPE);
+            types.add(OidcUtils.ID_TOKEN_RESPONSE_TYPE);
+            types.add(OidcUtils.ID_TOKEN_AT_RESPONSE_TYPE);
         }
         return new HashSet<String>(types);
     }
     
     @Override
     protected boolean canAccessTokenBeReturned(String responseType) {
-        return ID_TOKEN_AT_RESPONSE_TYPE.equals(responseType)
-            || OAuthConstants.TOKEN_RESPONSE_TYPE.equals(responseType);
+        return OidcUtils.ID_TOKEN_AT_RESPONSE_TYPE.equals(responseType)
+            || OidcUtils.CODE_ID_TOKEN_AT_RESPONSE_TYPE.equals(responseType)
+            || OidcUtils.CODE_AT_RESPONSE_TYPE.equals(responseType);
     }
     
     @Override
@@ -81,14 +71,10 @@ public class OidcHybridService extends OidcImplicitService {
                                    List<String> approvedScope,
                                    UserSubject userSubject,
                                    ServerAccessToken preAuthorizedToken) {
-        String actualResponseType = state.getResponseType();
-        
-        state.setResponseType(IMPLICIT_RESPONSE_TYPES.get(actualResponseType)); 
         StringBuilder sb = super.prepareGrant(state, client, requestedScope, 
                                                           approvedScope, userSubject, preAuthorizedToken);
    
-        if (actualResponseType.startsWith(OAuthConstants.CODE_RESPONSE_TYPE)) {
-            state.setResponseType(OAuthConstants.CODE_RESPONSE_TYPE);
+        if (state.getResponseType().startsWith(OAuthConstants.CODE_RESPONSE_TYPE)) {
             String code = codeService.getGrantCode(state, client, requestedScope,
                                                    approvedScope, userSubject, preAuthorizedToken);
             
