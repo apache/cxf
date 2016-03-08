@@ -201,7 +201,7 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
             grant.setCodeVerifier(state.getFirst(OAuthConstants.AUTHORIZATION_CODE_VERIFIER));
             at = OAuthClientUtils.getAccessToken(accessTokenServiceClient, consumer, grant);
         }
-        ClientTokenContext tokenContext = initializeClientTokenContext(rc, at, state);
+        ClientTokenContext tokenContext = initializeClientTokenContext(rc, at, requestParams, state);
         if (at != null && clientTokenContextManager != null) {
             clientTokenContextManager.setClientTokenContext(mc, tokenContext);
         }
@@ -221,9 +221,10 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
     }
 
     protected ClientTokenContext initializeClientTokenContext(ContainerRequestContext rc, 
-                                                              ClientAccessToken at, 
+                                                              ClientAccessToken at,
+                                                              MultivaluedMap<String, String> requestParams,
                                                               MultivaluedMap<String, String> state) {
-        ClientTokenContext tokenContext = createTokenContext(rc, at, state);
+        ClientTokenContext tokenContext = createTokenContext(rc, at, requestParams, state);
         ((ClientTokenContextImpl)tokenContext).setToken(at);
         ((ClientTokenContextImpl)tokenContext).setState(state);
         return tokenContext;
@@ -232,6 +233,7 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
 
     protected ClientTokenContext createTokenContext(ContainerRequestContext rc, 
                                                     ClientAccessToken at,
+                                                    MultivaluedMap<String, String> requestParams,
                                                     MultivaluedMap<String, String> state) {
         return new ClientTokenContextImpl();
     }

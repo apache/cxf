@@ -60,13 +60,16 @@ public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
     @Override
     protected ClientTokenContext createTokenContext(ContainerRequestContext rc, 
                                                     ClientAccessToken at,
+                                                    MultivaluedMap<String, String> requestParams,
                                                     MultivaluedMap<String, String> state) {
         if (rc.getSecurityContext() instanceof OidcSecurityContext) {
             return ((OidcSecurityContext)rc.getSecurityContext()).getOidcContext();
         }
         OidcClientTokenContextImpl ctx = new OidcClientTokenContextImpl();
         if (at != null) {
-            IdToken idToken = idTokenReader.getIdToken(at, getConsumer());
+            IdToken idToken = idTokenReader.getIdToken(at, 
+                                  requestParams.getFirst(OAuthConstants.AUTHORIZATION_CODE_VALUE),
+                                  getConsumer());
             // Validate the properties set up at the redirection time.
             validateIdToken(idToken, state);
             
