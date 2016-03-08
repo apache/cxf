@@ -35,7 +35,7 @@
         <cxf.glassfish.el.version>3.0-b01</cxf.glassfish.el.version>
         <cxf.surefire.fork.vmargs>-XX:MaxPermSize=192m</cxf.surefire.fork.vmargs>
         <cxf.server.launcher.vmargs>-XX:MaxPermSize=192m</cxf.server.launcher.vmargs>
-        <cxf.tomcat.version>8.0.28</cxf.tomcat.version>
+        <cxf.tomcat.version>8.0.32</cxf.tomcat.version>
     </properties>
     <dependencies>
         <dependency>
