@@ -26,19 +26,29 @@ import org.apache.cxf.rs.security.oidc.utils.OidcUtils;
 
 public class IdTokenReader extends OidcClaimsValidator {
     private boolean requireAtHash = true;
-    public IdToken getIdToken(ClientAccessToken at, Consumer client) {
-        JwtToken jwt = getIdJwtToken(at, client);
+    private boolean requireCodeHash;
+    
+    public IdToken getIdToken(ClientAccessToken at, String code, Consumer client) {
+        JwtToken jwt = getIdJwtToken(at, code, client);
         return getIdTokenFromJwt(jwt);
+    }
+    
+    public IdToken getIdToken(ClientAccessToken at, Consumer client) {
+        return getIdToken(at, null, client);
     }
     public IdToken getIdToken(String idJwtToken, Consumer client) {
         JwtToken jwt = getIdJwtToken(idJwtToken, client);
         return getIdTokenFromJwt(jwt);
     }
-    public JwtToken getIdJwtToken(ClientAccessToken at, Consumer client) {
+    public JwtToken getIdJwtToken(ClientAccessToken at, String code, Consumer client) {
         String idJwtToken = at.getParameters().get(OidcUtils.ID_TOKEN);
         JwtToken jwt = getIdJwtToken(idJwtToken, client); 
         OidcUtils.validateAccessTokenHash(at, jwt, requireAtHash);
+        OidcUtils.validateCodeHash(code, jwt, requireCodeHash);
         return jwt;
+    }
+    public JwtToken getIdJwtToken(ClientAccessToken at, Consumer client) {
+        return getIdJwtToken(at, null, client);
     }
     public JwtToken getIdJwtToken(String idJwtToken, Consumer client) {
         JwtToken jwt = getJwtToken(idJwtToken, client.getClientSecret());
@@ -50,5 +60,8 @@ public class IdTokenReader extends OidcClaimsValidator {
     }
     public void setRequireAccessTokenHash(boolean require) {
         this.requireAtHash = require;
+    }
+    public void setRequireCodeHash(boolean require) {
+        this.requireCodeHash = require;
     }
 }
