@@ -39,6 +39,14 @@ import org.apache.cxf.rs.security.oidc.common.UserInfo;
 import org.apache.cxf.rt.security.crypto.MessageDigestUtils;
 
 public final class OidcUtils {
+    
+    public static final String ID_TOKEN_RESPONSE_TYPE = "id_token";
+    public static final String ID_TOKEN_AT_RESPONSE_TYPE = "id_token token";
+    public static final String CODE_AT_RESPONSE_TYPE = "code token";
+    public static final String CODE_ID_TOKEN_RESPONSE_TYPE = "code id_token";
+    public static final String CODE_ID_TOKEN_AT_RESPONSE_TYPE = "code id_token token";
+    
+    
     public static final String ID_TOKEN = "id_token";
     public static final String OPENID_SCOPE = "openid";
     public static final String PROFILE_SCOPE = "profile";

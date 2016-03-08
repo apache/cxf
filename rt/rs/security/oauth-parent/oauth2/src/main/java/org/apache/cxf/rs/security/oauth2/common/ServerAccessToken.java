@@ -41,6 +41,7 @@ public abstract class ServerAccessToken extends AccessToken {
     private String clientCodeVerifier;
     private String nonce;
     private String responseType;
+    private String grantCode;
     private Map<String, String> extraProperties = new LinkedHashMap<String, String>();
     
     protected ServerAccessToken() {
@@ -78,7 +79,7 @@ public abstract class ServerAccessToken extends AccessToken {
         this.responseType = token.getResponseType();
         this.clientCodeVerifier = token.getClientCodeVerifier();
         this.nonce = token.getNonce();
-        
+        this.grantCode = token.getGrantCode();
     }
 
     /**
@@ -199,5 +200,20 @@ public abstract class ServerAccessToken extends AccessToken {
 
     public void setExtraProperties(Map<String, String> extraProperties) {
         this.extraProperties = extraProperties;
+    }
+    /**
+     * Set the grant code which was used to request the token
+     * @param grantCode the grant code
+     */
+    public void setGrantCode(String grantCode) {
+        this.grantCode = grantCode;
+    }
+
+    /**
+     * Get the grant code
+     * @return the grant code, null if no authorization code grant was used
+     */
+    public String getGrantCode() {
+        return grantCode;
     }
 }

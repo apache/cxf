@@ -39,7 +39,7 @@ public class IdTokenResponseFilter extends OAuthServerJoseJwtProducer implements
     @Override
     public void process(ClientAccessToken ct, ServerAccessToken st) {
         if (st.getResponseType() != null
-            && OAuthConstants.TOKEN_RESPONSE_TYPE.equals(st.getResponseType())) {
+            && OidcUtils.CODE_AT_RESPONSE_TYPE.equals(st.getResponseType())) {
             return;
         }
         // Only add an IdToken if the client has the "openid" scope
@@ -75,7 +75,15 @@ public class IdTokenResponseFilter extends OAuthServerJoseJwtProducer implements
         }
     }
     private void setAtHashAndNonce(IdToken idToken, ServerAccessToken st) {
-        if (idToken.getAccessTokenHash() == null) {
+        String rType = st.getResponseType();
+        boolean atHashRequired = idToken.getAccessTokenHash() == null
+            && (rType == null || !rType.equals(OidcUtils.ID_TOKEN_RESPONSE_TYPE));
+        boolean cHashRequired = idToken.getAuthorizationCodeHash() == null && st.getGrantCode() != null 
+            && rType != null 
+            && (rType.equals(OidcUtils.CODE_ID_TOKEN_AT_RESPONSE_TYPE)
+                || rType.equals(OidcUtils.CODE_ID_TOKEN_RESPONSE_TYPE));
+        
+        if (atHashRequired || cHashRequired) {
             Properties props = JwsUtils.loadSignatureOutProperties(false);
             SignatureAlgorithm sigAlgo = null;
             if (super.isSignWithClientSecret()) {
@@ -84,8 +92,14 @@ public class IdTokenResponseFilter extends OAuthServerJoseJwtProducer implements
                 sigAlgo = JwsUtils.getSignatureAlgorithm(props, SignatureAlgorithm.RS256);
             }
             if (sigAlgo != SignatureAlgorithm.NONE) {
-                String atHash = OidcUtils.calculateAccessTokenHash(st.getTokenKey(), sigAlgo);
-                idToken.setAccessTokenHash(atHash);
+                if (atHashRequired) {
+                    String atHash = OidcUtils.calculateAccessTokenHash(st.getTokenKey(), sigAlgo);
+                    idToken.setAccessTokenHash(atHash);
+                }
+                if (cHashRequired) {
+                    String cHash = OidcUtils.calculateAuthorizationCodeHash(st.getGrantCode(), sigAlgo);
+                    idToken.setAuthorizationCodeHash(cHash);
+                }
             }
         }
         Message m = JAXRSUtils.getCurrentMessage();

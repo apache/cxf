@@ -43,15 +43,13 @@ import org.apache.cxf.rs.security.oidc.utils.OidcUtils;
 
 
 public class OidcImplicitService extends ImplicitGrantService {
-    public static final String ID_TOKEN_RESPONSE_TYPE = "id_token";
-    public static final String ID_TOKEN_AT_RESPONSE_TYPE = "id_token token";
     private boolean skipAuthorizationWithOidcScope;
     private JoseJwtProducer idTokenHandler;
     private IdTokenProvider idTokenProvider;
     
     public OidcImplicitService() {
-        super(new HashSet<String>(Arrays.asList(ID_TOKEN_RESPONSE_TYPE,
-                                                ID_TOKEN_AT_RESPONSE_TYPE)));
+        super(new HashSet<String>(Arrays.asList(OidcUtils.ID_TOKEN_RESPONSE_TYPE,
+                                                OidcUtils.ID_TOKEN_AT_RESPONSE_TYPE)));
     }
     protected OidcImplicitService(Set<String> supportedResponseTypes,
                                   String supportedGrantType) {
@@ -59,7 +57,7 @@ public class OidcImplicitService extends ImplicitGrantService {
     }
     @Override
     protected boolean canAccessTokenBeReturned(String responseType) {
-        return ID_TOKEN_AT_RESPONSE_TYPE.equals(responseType);
+        return OidcUtils.ID_TOKEN_AT_RESPONSE_TYPE.equals(responseType);
     }
     
     @Override
