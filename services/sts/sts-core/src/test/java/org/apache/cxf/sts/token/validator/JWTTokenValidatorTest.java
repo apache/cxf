@@ -438,7 +438,7 @@ public class JWTTokenValidatorTest extends org.junit.Assert {
         
         private String role;
         
-        public RoleJWTClaimsProvider(String role) {
+        RoleJWTClaimsProvider(String role) {
             this.role = role;
         }
         
