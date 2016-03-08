@@ -38,6 +38,10 @@ public class IdTokenResponseFilter extends OAuthServerJoseJwtProducer implements
     private IdTokenProvider idTokenProvider;
     @Override
     public void process(ClientAccessToken ct, ServerAccessToken st) {
+        if (st.getResponseType() != null
+            && OAuthConstants.TOKEN_RESPONSE_TYPE.equals(st.getResponseType())) {
+            return;
+        }
         // Only add an IdToken if the client has the "openid" scope
         if (ct.getApprovedScope() == null || !ct.getApprovedScope().contains(OidcUtils.OPENID_SCOPE)) {
             return;

@@ -35,6 +35,7 @@ public class AccessTokenRegistration {
     private List<String> audiences = new LinkedList<String>();
     private String nonce;
     private String clientCodeVerifier;
+    private String responseType;
     private Map<String, String> extraProperties = new LinkedHashMap<String, String>();
     
     /**
@@ -142,6 +143,22 @@ public class AccessTokenRegistration {
         this.nonce = nonce;
     }
 
+    /**
+     * Set the response type
+     * @param responseType the response type
+     */
+    public void setResponseType(String responseType) {
+        this.responseType = responseType;
+    }
+
+    /**
+     * Get the response type
+     * @return the response type, null if no redirection flow was used
+     */
+    public String getResponseType() {
+        return responseType;
+    }
+    
     public Map<String, String> getExtraProperties() {
         return extraProperties;
     }

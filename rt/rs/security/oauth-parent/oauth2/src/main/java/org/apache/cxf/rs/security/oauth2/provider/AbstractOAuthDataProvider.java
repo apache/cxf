@@ -72,6 +72,7 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         at.setSubject(atReg.getSubject());
         at.setClientCodeVerifier(atReg.getClientCodeVerifier());
         at.setNonce(atReg.getNonce());
+        at.setResponseType(atReg.getResponseType()); 
         at.getExtraProperties().putAll(atReg.getExtraProperties());
         return at;
     }

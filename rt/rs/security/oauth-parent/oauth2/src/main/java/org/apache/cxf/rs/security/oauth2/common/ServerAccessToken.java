@@ -40,6 +40,7 @@ public abstract class ServerAccessToken extends AccessToken {
     private List<String> audiences = new LinkedList<String>();
     private String clientCodeVerifier;
     private String nonce;
+    private String responseType;
     private Map<String, String> extraProperties = new LinkedHashMap<String, String>();
     
     protected ServerAccessToken() {
@@ -74,6 +75,10 @@ public abstract class ServerAccessToken extends AccessToken {
         this.scopes = token.getScopes();
         this.audiences = token.getAudiences();
         this.subject = token.getSubject();
+        this.responseType = token.getResponseType();
+        this.clientCodeVerifier = token.getClientCodeVerifier();
+        this.nonce = token.getNonce();
+        
     }
 
     /**
@@ -139,6 +144,23 @@ public abstract class ServerAccessToken extends AccessToken {
     public String getGrantType() {
         return grantType;
     }
+    
+    /**
+     * Set the response type
+     * @param responseType the response type
+     */
+    public void setResponseType(String responseType) {
+        this.responseType = responseType;
+    }
+
+    /**
+     * Get the response type
+     * @return the response type, null if no redirection flow was used
+     */
+    public String getResponseType() {
+        return responseType;
+    }
+    
 
     public List<String> getAudiences() {
         return audiences;

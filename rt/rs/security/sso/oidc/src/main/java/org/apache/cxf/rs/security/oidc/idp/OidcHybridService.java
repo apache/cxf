@@ -87,7 +87,7 @@ public class OidcHybridService extends OidcImplicitService {
         StringBuilder sb = super.prepareGrant(state, client, requestedScope, 
                                                           approvedScope, userSubject, preAuthorizedToken);
    
-        if (actualResponseType.startsWith(OAuthConstants.AUTHORIZATION_CODE_VALUE)) {
+        if (actualResponseType.startsWith(OAuthConstants.CODE_RESPONSE_TYPE)) {
             state.setResponseType(OAuthConstants.CODE_RESPONSE_TYPE);
             String code = codeService.getGrantCode(state, client, requestedScope,
                                                    approvedScope, userSubject, preAuthorizedToken);
