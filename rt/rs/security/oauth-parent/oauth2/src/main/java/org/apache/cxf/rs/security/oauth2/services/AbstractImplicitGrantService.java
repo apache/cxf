@@ -127,10 +127,10 @@ public abstract class AbstractImplicitGrantService extends RedirectionBasedGrant
         AccessTokenRegistration reg = new AccessTokenRegistration();
         reg.setClient(client);
         reg.setGrantType(super.getSupportedGrantType());
+        reg.setResponseType(state.getResponseType());
         reg.setSubject(userSubject);
         reg.setRequestedScope(requestedScope);        
         reg.setApprovedScope(getApprovedScope(requestedScope, approvedScope));
-        
         reg.setAudiences(Collections.singletonList(state.getAudience()));
         reg.setNonce(state.getNonce());
         return reg;
