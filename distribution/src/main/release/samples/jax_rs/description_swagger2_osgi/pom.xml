@@ -46,6 +46,7 @@ under the License.
                         <Import-Package>
                             javax.ws.rs,
                             javax.ws.rs.core,
+                            javax.ws.rs.container,
                             org.apache.cxf.jaxrs.provider,
                             org.apache.cxf.jaxrs.swagger,
                             org.osgi.service.blueprint,
@@ -53,6 +54,9 @@ under the License.
                             io.swagger.models,
                             io.swagger.jaxrs.config,
                             io.swagger.jaxrs.listing,
+                            com.fasterxml.jackson.jaxrs.base,
+                            com.fasterxml.jackson.jaxrs.json,
+                            javax.annotation;version="[1.2,2)",
                             *
                         </Import-Package>
                         <Export-Package>

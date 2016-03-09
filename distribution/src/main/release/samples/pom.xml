@@ -113,7 +113,7 @@
         <module>ws_eventing</module>
         <module>throttling</module>
         <module>jax_rs/tracing_htrace</module>
-        
+        <module>jax_rs/description_swagger2_per_path_config</module>
         <!--
          These are removed from the build as they currently don't inherit the parent from 
          this pom and thus have problems with deploys 
