@@ -113,19 +113,19 @@ public abstract class BusFactory {
             return defaultBus;
         }
     }
-    
+
     private static BusHolder getThreadBusHolder(boolean set) {
         BusHolder h = THREAD_BUS.get();
         if (h == null || h.stale) {
             Thread cur = Thread.currentThread();
-            synchronized (THREAD_BUSSES) {
-                h = THREAD_BUSSES.get(cur);
-            }
+            h = THREAD_BUSSES.get(cur);
             if (h == null || h.stale) {
-                h = new BusHolder();
-            
                 synchronized (THREAD_BUSSES) {
-                    THREAD_BUSSES.put(cur, h);
+                    h = THREAD_BUSSES.get(cur);
+                    if (h == null || h.stale) {
+                        h = new BusHolder();
+                        THREAD_BUSSES.put(cur, h);
+                    }
                 }
             }
             if (set) {
