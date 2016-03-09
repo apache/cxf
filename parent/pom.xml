@@ -176,7 +176,7 @@
         <cxf.aries.parser.version>1.3.1</cxf.aries.parser.version> 
         <cxf.aries.version.range>[1.0,2)</cxf.aries.version.range>
         <cxf.osgi.version>4.2.0</cxf.osgi.version>
-        <cxf.karaf.version>3.0.2</cxf.karaf.version>
+        <cxf.karaf.version>3.0.6</cxf.karaf.version>
         <cxf.pax.logging.version>1.6.0</cxf.pax.logging.version>
         <cxf.pax.exam.version>4.7.0</cxf.pax.exam.version>
         <cxf.felix.framework.version>2.0.5</cxf.felix.framework.version>
