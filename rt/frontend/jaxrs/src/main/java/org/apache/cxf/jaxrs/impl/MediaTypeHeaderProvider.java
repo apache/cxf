@@ -25,6 +25,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -45,16 +46,33 @@ public class MediaTypeHeaderProvider implements HeaderDelegate<MediaType> {
     private static final Pattern COMPLEX_PARAMETERS = 
         Pattern.compile("(([\\w-]+=\"[^\"]*\")|([\\w-]+=[\\w-/\\+]+))");
     
+    private static Map<String, MediaType> map = new ConcurrentHashMap<String, MediaType>();
+    private static final int MAX_MT_CACHE_SIZE = 
+        Integer.getInteger("org.apache.cxf.jaxrs.max_mediatype_cache_size", 200);
+
     public MediaType fromString(String mType) {
         
         return valueOf(mType);
     }
 
     public static MediaType valueOf(String mType) {
-        
         if (mType == null) {
             throw new IllegalArgumentException("Media type value can not be null");
         }
+        
+        MediaType result = map.get(mType);
+        if (result == null) {
+            result = internalValueOf(mType);
+            final int size = map.size();
+            if (size >= MAX_MT_CACHE_SIZE) {
+                map.clear();
+            }
+            map.put(mType, result);
+        }
+        return result;
+    }
+
+    public static MediaType internalValueOf(String mType) {
         
         int i = mType.indexOf('/');
         if (i == -1) {
