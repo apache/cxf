@@ -65,7 +65,7 @@ public abstract class AbstractGrant implements AccessTokenGrant {
             map.putSingle(OAuthConstants.SCOPE, scope);
         }
         if (audience != null) {
-            map.putSingle(OAuthConstants.CLIENT_AUDIENCE, scope);
+            map.putSingle(OAuthConstants.CLIENT_AUDIENCE, audience);
         }
         return map;
     }
