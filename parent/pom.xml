@@ -561,6 +561,7 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <obrRepository>NONE</obrRepository>
                     <instructions>
                         <Bundle-SymbolicName>${cxf.osgi.symbolic.name}</Bundle-SymbolicName>
                         <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
