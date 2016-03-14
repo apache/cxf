@@ -386,13 +386,13 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
         SecurityTokenConstants.TokenType tokenType = WSSecurityTokenConstants.EncryptedKeyToken;
         if (tok.getTokenType() != null) {
             if (tok.getTokenType().startsWith(WSSConstants.NS_KERBEROS11_TOKEN_PROFILE)) {
-                tokenType = WSSecurityTokenConstants.KERBEROS_TOKEN;
+                tokenType = WSSecurityTokenConstants.KerberosToken;
             } else if (tok.getTokenType().startsWith(WSSConstants.NS_SAML10_TOKEN_PROFILE)
                 || tok.getTokenType().startsWith(WSSConstants.NS_SAML11_TOKEN_PROFILE)) {
-                tokenType = WSSecurityTokenConstants.SAML_11_TOKEN;
+                tokenType = WSSecurityTokenConstants.Saml11Token;
             } else if (tok.getTokenType().startsWith(WSSConstants.NS_WSC_05_02)
                 || tok.getTokenType().startsWith(WSSConstants.NS_WSC_05_12)) {
-                tokenType = WSSecurityTokenConstants.SECURE_CONVERSATION_TOKEN;
+                tokenType = WSSecurityTokenConstants.SecureConversationToken;
             }
         }
         
@@ -527,8 +527,8 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
         if (token instanceof X509Token 
             && isTokenRequired(token.getIncludeTokenType())
             && (WSSecurityTokenConstants.KeyIdentifier_IssuerSerial.equals(keyIdentifier)
-                || WSSecurityTokenConstants.KEYIDENTIFIER_THUMBPRINT_IDENTIFIER.equals(keyIdentifier)
-                || WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE.equals(
+                || WSSecurityTokenConstants.KeyIdentifier_ThumbprintIdentifier.equals(keyIdentifier)
+                || WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference.equals(
                     keyIdentifier))) {
             properties.setIncludeSignatureToken(true);
         } else {
@@ -571,7 +571,7 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
             } else if (x509Token.isRequireKeyIdentifierReference()) {
                 identifier = WSSecurityTokenConstants.KeyIdentifier_SkiKeyIdentifier;
             } else if (x509Token.isRequireThumbprintReference()) {
-                identifier = WSSecurityTokenConstants.KEYIDENTIFIER_THUMBPRINT_IDENTIFIER;
+                identifier = WSSecurityTokenConstants.KeyIdentifier_ThumbprintIdentifier;
             }
         } else if (token instanceof KeyValueToken) {
             identifier = WSSecurityTokenConstants.KeyIdentifier_KeyValue;
@@ -589,7 +589,7 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
                 identifier = WSSecurityTokenConstants.KeyIdentifier_IssuerSerial;
             } else if (wss instanceof Wss11
                 && ((Wss11) wss).isMustSupportRefThumbprint()) {
-                identifier = WSSecurityTokenConstants.KEYIDENTIFIER_THUMBPRINT_IDENTIFIER;
+                identifier = WSSecurityTokenConstants.KeyIdentifier_ThumbprintIdentifier;
             }
         } else if (token.getIncludeTokenType() == IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT
             && !isRequestor() && token instanceof X509Token) {
@@ -603,7 +603,7 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
             return identifier;
         }
         
-        return WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE;
+        return WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference;
     }
     
     protected Map<AbstractToken, SecurePart> handleSupportingTokens(

@@ -165,7 +165,7 @@ public class StaxToDOMSamlTest extends AbstractSecurityTest {
         properties.setCallbackHandler(new PasswordCallbackHandler());
         
         properties.setSignatureKeyIdentifier(
-            WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE
+            WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference
         );
         
         WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(properties);
@@ -323,7 +323,7 @@ public class StaxToDOMSamlTest extends AbstractSecurityTest {
         properties.setCallbackHandler(new PasswordCallbackHandler());
         
         properties.setSignatureKeyIdentifier(
-            WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE
+            WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference
         );
         
         WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(properties);
@@ -414,7 +414,7 @@ public class StaxToDOMSamlTest extends AbstractSecurityTest {
             CryptoFactory.getProperties("alice.properties", this.getClass().getClassLoader());
         properties.setSignatureCryptoProperties(cryptoProperties);
         properties.setSignatureKeyIdentifier(
-            WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE
+            WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference
         );
         properties.setCallbackHandler(new PasswordCallbackHandler());
         
@@ -528,7 +528,7 @@ public class StaxToDOMSamlTest extends AbstractSecurityTest {
             CryptoFactory.getProperties("alice.properties", this.getClass().getClassLoader());
         properties.setSignatureCryptoProperties(cryptoProperties);
         properties.setSignatureKeyIdentifier(
-            WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE
+            WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference
         );
         
         WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(properties);

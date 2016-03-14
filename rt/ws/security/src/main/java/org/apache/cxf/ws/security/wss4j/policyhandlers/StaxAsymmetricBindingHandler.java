@@ -368,8 +368,8 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
             if (encrToken instanceof X509Token 
                 && isTokenRequired(encrToken.getIncludeTokenType())
                 && (WSSecurityTokenConstants.KeyIdentifier_IssuerSerial.equals(keyIdentifier)
-                    || WSSecurityTokenConstants.KEYIDENTIFIER_THUMBPRINT_IDENTIFIER.equals(keyIdentifier)
-                    || WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE.equals(
+                    || WSSecurityTokenConstants.KeyIdentifier_ThumbprintIdentifier.equals(keyIdentifier)
+                    || WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference.equals(
                         keyIdentifier))) {
                 properties.setIncludeEncryptionToken(true);
             } else {

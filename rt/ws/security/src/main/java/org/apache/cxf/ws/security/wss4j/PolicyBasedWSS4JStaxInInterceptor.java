@@ -136,7 +136,7 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
             );
             HttpsSecurityTokenImpl httpsSecurityToken = new HttpsSecurityTokenImpl();
             try {
-                httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
+                httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
             } catch (XMLSecurityException e) {
                 LOG.fine(e.getMessage());
             }

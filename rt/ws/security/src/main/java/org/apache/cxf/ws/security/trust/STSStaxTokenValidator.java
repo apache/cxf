@@ -290,7 +290,7 @@ public class STSStaxTokenValidator
                 usernameTokenPasswordType, username.getValue(), password, created,
                 nonceVal, salt, iteration,
                 tokenContext.getWsSecurityContext(), usernameTokenType.getId(),
-                WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE);
+                WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
         usernameSecurityToken.setElementPath(tokenContext.getElementPath());
         usernameSecurityToken.setXMLSecEvent(tokenContext.getFirstXMLSecEvent());
 
@@ -463,7 +463,7 @@ public class STSStaxTokenValidator
                     x509V3SecurityToken.setElementPath(tokenContext.getElementPath());
                     x509V3SecurityToken.setXMLSecEvent(tokenContext.getFirstXMLSecEvent());
                     return x509V3SecurityToken;
-                } else if (WSSConstants.NS_X509_PKIPATH_V1.equals(binarySecurityTokenType.getValueType())) {
+                } else if (WSSConstants.NS_X509PKIPathv1.equals(binarySecurityTokenType.getValueType())) {
                     Crypto crypto = getCrypto(tokenContext.getWssSecurityProperties());
                     X509PKIPathv1SecurityTokenImpl x509PKIPathv1SecurityToken = 
                         new X509PKIPathv1SecurityTokenImpl(
@@ -471,7 +471,7 @@ public class STSStaxTokenValidator
                             crypto,
                             tokenContext.getWssSecurityProperties().getCallbackHandler(),
                             securityTokenData, binarySecurityTokenType.getId(),
-                            WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE,
+                            WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference,
                             tokenContext.getWssSecurityProperties()
                         ) {
                             @Override
@@ -499,7 +499,7 @@ public class STSStaxTokenValidator
                             tokenContext.getWssSecurityProperties().getCallbackHandler(),
                             securityTokenData, binarySecurityTokenType.getValueType(),
                             binarySecurityTokenType.getId(),
-                            WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE
+                            WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference
                         ) {
                             @Override
                             public void verify() throws XMLSecurityException {
@@ -538,7 +538,7 @@ public class STSStaxTokenValidator
             BinarySecurity binarySecurity = null;
             if (WSSConstants.NS_X509_V3_TYPE.equals(binarySecurityTokenType.getValueType())) {
                 binarySecurity = new X509Security(doc);
-            } else if (WSSConstants.NS_X509_PKIPATH_V1.equals(binarySecurityTokenType.getValueType())) {
+            } else if (WSSConstants.NS_X509PKIPathv1.equals(binarySecurityTokenType.getValueType())) {
                 binarySecurity = new PKIPathSecurity(doc);
             } else if (WSSConstants.NS_GSS_KERBEROS5_AP_REQ.equals(binarySecurityTokenType.getValueType())) {
                 binarySecurity = new KerberosSecurity(doc);

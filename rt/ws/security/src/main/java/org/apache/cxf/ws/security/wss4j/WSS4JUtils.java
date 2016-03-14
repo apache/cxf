@@ -213,14 +213,14 @@ public final class WSS4JUtils {
             if (securityToken.getTokenType() != null) {
                 if (securityToken.getTokenType() == WSSecurityTokenConstants.EncryptedKeyToken) {
                     cachedTok.setTokenType(WSSConstants.NS_WSS_ENC_KEY_VALUE_TYPE);
-                } else if (securityToken.getTokenType() == WSSecurityTokenConstants.KERBEROS_TOKEN) {
+                } else if (securityToken.getTokenType() == WSSecurityTokenConstants.KerberosToken) {
                     cachedTok.setTokenType(WSSConstants.NS_GSS_KERBEROS5_AP_REQ);
-                } else if (securityToken.getTokenType() == WSSecurityTokenConstants.SAML_11_TOKEN) {
+                } else if (securityToken.getTokenType() == WSSecurityTokenConstants.Saml11Token) {
                     cachedTok.setTokenType(WSSConstants.NS_SAML11_TOKEN_PROFILE_TYPE);
-                } else if (securityToken.getTokenType() == WSSecurityTokenConstants.SAML_20_TOKEN) {
+                } else if (securityToken.getTokenType() == WSSecurityTokenConstants.Saml20Token) {
                     cachedTok.setTokenType(WSSConstants.NS_SAML20_TOKEN_PROFILE_TYPE);
-                } else if (securityToken.getTokenType() == WSSecurityTokenConstants.SECURE_CONVERSATION_TOKEN
-                    || securityToken.getTokenType() == WSSecurityTokenConstants.SECURITY_CONTEXT_TOKEN) {
+                } else if (securityToken.getTokenType() == WSSecurityTokenConstants.SecureConversationToken
+                    || securityToken.getTokenType() == WSSecurityTokenConstants.SecurityContextToken) {
                     cachedTok.setTokenType(WSSConstants.NS_WSC_05_02);
                 }
             }
