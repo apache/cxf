@@ -334,7 +334,7 @@ public class IssueEncryptedUnitTest extends org.junit.Assert {
         if (!unrestrictedPoliciesInstalled) {
             encryptionProperties.setEncryptionAlgorithm(WSConstants.AES_128);
         }
-        encryptionProperties.setKeyWrapAlgorithm(WSConstants.KEYTRANSPORT_RSAOAEP);
+        encryptionProperties.setKeyWrapAlgorithm(WSConstants.KEYTRANSPORT_RSAOEP);
         service.setEncryptionProperties(encryptionProperties);
         issueOperation.setServices(Collections.singletonList(service));
         
@@ -424,7 +424,7 @@ public class IssueEncryptedUnitTest extends org.junit.Assert {
         request.getAny().add(createAppliesToElement("http://dummy-service.com/dummy"));
         JAXBElement<String> encryptionAlgorithmType = 
             new JAXBElement<String>(
-                QNameConstants.KEYWRAP_ALGORITHM, String.class, WSConstants.KEYTRANSPORT_RSAOAEP
+                QNameConstants.KEYWRAP_ALGORITHM, String.class, WSConstants.KEYTRANSPORT_RSAOEP
             );
         request.getAny().add(encryptionAlgorithmType);
         

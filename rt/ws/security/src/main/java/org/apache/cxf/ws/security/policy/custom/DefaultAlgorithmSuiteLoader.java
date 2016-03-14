@@ -71,7 +71,7 @@ public class DefaultAlgorithmSuiteLoader implements AlgorithmSuiteLoader {
     public static class GCMAlgorithmSuite extends AlgorithmSuite {
         
         static {
-            ALGORITHM_SUITE_TYPES.put(
+            algorithmSuiteTypes.put(
                 "Basic128GCM", 
                 new AlgorithmSuiteType(
                     "Basic128GCM",
@@ -85,7 +85,7 @@ public class DefaultAlgorithmSuiteLoader implements AlgorithmSuiteLoader {
                 )
             );
             
-            ALGORITHM_SUITE_TYPES.put(
+            algorithmSuiteTypes.put(
                 "Basic192GCM", 
                 new AlgorithmSuiteType(
                     "Basic192GCM",
@@ -99,7 +99,7 @@ public class DefaultAlgorithmSuiteLoader implements AlgorithmSuiteLoader {
                 )
             );
             
-            ALGORITHM_SUITE_TYPES.put(
+            algorithmSuiteTypes.put(
                 "Basic256GCM", 
                 new AlgorithmSuiteType(
                     "Basic256GCM",
@@ -132,13 +132,13 @@ public class DefaultAlgorithmSuiteLoader implements AlgorithmSuiteLoader {
             }
 
             if ("Basic128GCM".equals(assertionName)) {
-                setAlgorithmSuiteType(ALGORITHM_SUITE_TYPES.get("Basic128GCM"));
+                setAlgorithmSuiteType(algorithmSuiteTypes.get("Basic128GCM"));
                 getAlgorithmSuiteType().setNamespace(assertionNamespace);
             } else if ("Basic192GCM".equals(assertionName)) {
-                setAlgorithmSuiteType(ALGORITHM_SUITE_TYPES.get("Basic192GCM"));
+                setAlgorithmSuiteType(algorithmSuiteTypes.get("Basic192GCM"));
                 getAlgorithmSuiteType().setNamespace(assertionNamespace);
             } else if ("Basic256GCM".equals(assertionName)) {
-                setAlgorithmSuiteType(ALGORITHM_SUITE_TYPES.get("Basic256GCM"));
+                setAlgorithmSuiteType(algorithmSuiteTypes.get("Basic256GCM"));
                 getAlgorithmSuiteType().setNamespace(assertionNamespace);
             }
         }

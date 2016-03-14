@@ -30,7 +30,7 @@ import org.apache.wss4j.dom.WSConstants;
  */
 public class EncryptionProperties {
     private String encryptionAlgorithm = WSConstants.AES_256;
-    private String keyWrapAlgorithm = WSConstants.KEYTRANSPORT_RSAOAEP;
+    private String keyWrapAlgorithm = WSConstants.KEYTRANSPORT_RSAOEP;
     private int keyIdentifierType = WSConstants.ISSUER_SERIAL;
     private List<String> acceptedEncryptionAlgorithms = new ArrayList<String>();
     private List<String> acceptedKeyWrapAlgorithms = new ArrayList<String>();
@@ -48,7 +48,7 @@ public class EncryptionProperties {
         
         // Default key wrap algorithms
         acceptedKeyWrapAlgorithms.add(WSConstants.KEYTRANSPORT_RSA15);
-        acceptedKeyWrapAlgorithms.add(WSConstants.KEYTRANSPORT_RSAOAEP);
+        acceptedKeyWrapAlgorithms.add(WSConstants.KEYTRANSPORT_RSAOEP);
     }
     
     /**
