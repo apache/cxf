@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
@@ -50,6 +51,10 @@ public abstract class AbstractAccessTokenValidator {
     private MessageContext mc;
     private List<AccessTokenValidator> tokenHandlers = Collections.emptyList();
     private OAuthDataProvider dataProvider;
+    
+    private int maxValidationDataCacheSize;
+    private ConcurrentHashMap<String, AccessTokenValidation> accessTokenValidations =
+        new ConcurrentHashMap<String, AccessTokenValidation>();
     
     public void setTokenValidator(AccessTokenValidator validator) {
         setTokenValidators(Collections.singletonList(validator));
@@ -96,32 +101,37 @@ public abstract class AbstractAccessTokenValidator {
             throw ExceptionUtils.toInternalServerErrorException(null, null);
         }
         
-        // Get the registered handler capable of processing the token
-        AccessTokenValidator handler = findTokenValidator(authScheme);
-        if (handler != null) {
-            try {
-                // Convert the HTTP Authorization scheme data into a token
-                accessTokenV = handler.validateAccessToken(getMessageContext(), authScheme, authSchemeData, 
-                                                           extraProps);
-            } catch (OAuthServiceException ex) {
-                AuthorizationUtils.throwAuthorizationFailure(Collections.singleton(authScheme), realm);
-            } catch (RuntimeException ex) {
-                AuthorizationUtils.throwAuthorizationFailure(Collections.singleton(authScheme), realm);
-            }
-        }
-        // Default processing if no registered providers available
+        if (maxValidationDataCacheSize > 0) {
+            accessTokenV = accessTokenValidations.get(authSchemeData);
+        } 
         ServerAccessToken localAccessToken = null;
-        if (accessTokenV == null && dataProvider != null && authScheme.equals(DEFAULT_AUTH_SCHEME)) {
-            try {
-                localAccessToken = dataProvider.getAccessToken(authSchemeData);
-            } catch (OAuthServiceException ex) {
-                // to be handled next
+        if (accessTokenV == null) {
+            // Get the registered handler capable of processing the token
+            AccessTokenValidator handler = findTokenValidator(authScheme);
+            if (handler != null) {
+                try {
+                    // Convert the HTTP Authorization scheme data into a token
+                    accessTokenV = handler.validateAccessToken(getMessageContext(), authScheme, authSchemeData, 
+                                                               extraProps);
+                } catch (OAuthServiceException ex) {
+                    AuthorizationUtils.throwAuthorizationFailure(Collections.singleton(authScheme), realm);
+                } catch (RuntimeException ex) {
+                    AuthorizationUtils.throwAuthorizationFailure(Collections.singleton(authScheme), realm);
+                }
             }
-            if (localAccessToken == null) {
-                AuthorizationUtils.throwAuthorizationFailure(
-                    Collections.singleton(authScheme), realm);
+            // Default processing if no registered providers available
+            if (accessTokenV == null && dataProvider != null && authScheme.equals(DEFAULT_AUTH_SCHEME)) {
+                try {
+                    localAccessToken = dataProvider.getAccessToken(authSchemeData);
+                } catch (OAuthServiceException ex) {
+                    // to be handled next
+                }
+                if (localAccessToken == null) {
+                    AuthorizationUtils.throwAuthorizationFailure(
+                        Collections.singleton(authScheme), realm);
+                }
+                accessTokenV = new AccessTokenValidation(localAccessToken);
             }
-            accessTokenV = new AccessTokenValidation(localAccessToken);
         }
         if (accessTokenV == null) {
             AuthorizationUtils.throwAuthorizationFailure(supportedSchemes, realm);
@@ -130,10 +140,18 @@ public abstract class AbstractAccessTokenValidator {
         if (OAuthUtils.isExpired(accessTokenV.getTokenIssuedAt(), accessTokenV.getTokenLifetime())) {
             if (localAccessToken != null) {
                 removeAccessToken(localAccessToken);
+            } else if (maxValidationDataCacheSize > 0) {
+                accessTokenValidations.remove(authSchemeData);
             }
             AuthorizationUtils.throwAuthorizationFailure(supportedSchemes, realm);
         }
-        
+        if (maxValidationDataCacheSize > 0) {
+            if (accessTokenValidations.size() >= maxValidationDataCacheSize) {
+                // or delete the ones expiring sooner than others, etc
+                accessTokenValidations.clear();
+            }
+            accessTokenValidations.put(authSchemeData, accessTokenV);
+        }
         return accessTokenV;
     }
 
@@ -145,6 +163,10 @@ public abstract class AbstractAccessTokenValidator {
 
     public void setRealm(String realm) {
         this.realm = realm;
+    }
+
+    public void setMaxValidationDataCacheSize(int maxValidationDataCacheSize) {
+        this.maxValidationDataCacheSize = maxValidationDataCacheSize;
     }
 
     
