@@ -33,16 +33,16 @@ import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 public class OidcKeysService {
 
     private volatile JsonWebKeys keySet;
-    private WebClient keySetClient;
+    private WebClient keyServiceClient;
     
     @GET
     @Produces("application/json")
     public JsonWebKeys getPublicVerificationKeys() {
         if (keySet == null) {
-            if (keySetClient == null) {
+            if (keyServiceClient == null) {
                 keySet = getFromLocalStore();
             } else {
-                keySet = keySetClient.get(JsonWebKeys.class);
+                keySet = keyServiceClient.get(JsonWebKeys.class);
             }
             
         }
@@ -54,8 +54,8 @@ public class OidcKeysService {
         return JwsUtils.loadPublicVerificationKeys(JAXRSUtils.getCurrentMessage(), props);
     }
 
-    public void setKeySetClient(WebClient keySetClient) {
-        this.keySetClient = keySetClient;
+    public void setKeyServiceClient(WebClient keyServiceClient) {
+        this.keyServiceClient = keyServiceClient;
     }
     
 }
