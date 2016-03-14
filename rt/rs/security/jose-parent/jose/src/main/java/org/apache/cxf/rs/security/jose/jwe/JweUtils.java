@@ -439,7 +439,7 @@ public final class JweUtils {
     }
     public static List<JweEncryptionProvider> loadJweEncryptionProviders(String propLoc, Message m) {
         Properties props = loadJweProperties(m, propLoc);
-        JweEncryptionProvider theEncProvider = loadEncryptionProvider(props, null, false);
+        JweEncryptionProvider theEncProvider = loadEncryptionProvider(null, false);
         if (theEncProvider != null) {
             return Collections.singletonList(theEncProvider);
         }
@@ -461,7 +461,7 @@ public final class JweUtils {
     }
     public static List<JweDecryptionProvider> loadJweDecryptionProviders(String propLoc, Message m) {
         Properties props = loadJweProperties(m, propLoc);
-        JweDecryptionProvider theDecProvider = loadDecryptionProvider(props, null, false);
+        JweDecryptionProvider theDecProvider = loadDecryptionProvider(null, false);
         if (theDecProvider != null) {
             return Collections.singletonList(theDecProvider);
         }

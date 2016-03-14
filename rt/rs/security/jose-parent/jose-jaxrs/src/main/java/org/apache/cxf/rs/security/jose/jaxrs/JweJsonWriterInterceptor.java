@@ -67,7 +67,7 @@ public class JweJsonWriterInterceptor extends AbstractJweJsonWriterProvider impl
         if (ctString != null) {
             protectedHeaders.setContentType(ctString);
         }
-        List<KeyAlgorithm> keyAlgos = new ArrayList<>();
+        List<KeyAlgorithm> keyAlgos = new ArrayList<KeyAlgorithm>();
         for (JweEncryptionProvider p : providers) {
             if (!keyAlgos.contains(p.getKeyAlgorithm())) {
                 keyAlgos.add(p.getKeyAlgorithm());    
