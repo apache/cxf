@@ -371,15 +371,15 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
     ) throws WSSecurityException {
         Validator validator = loadValidator(SecurityConstants.SAML1_TOKEN_VALIDATOR, message);
         if (validator != null) {
-            properties.addValidator(WSSConstants.TAG_SAML_ASSERTION, validator);
+            properties.addValidator(WSSConstants.TAG_saml_Assertion, validator);
         }
         validator = loadValidator(SecurityConstants.SAML2_TOKEN_VALIDATOR, message);
         if (validator != null) {
-            properties.addValidator(WSSConstants.TAG_SAML2_ASSERTION, validator);
+            properties.addValidator(WSSConstants.TAG_saml2_Assertion, validator);
         }
         validator = loadValidator(SecurityConstants.USERNAME_TOKEN_VALIDATOR, message);
         if (validator != null) {
-            properties.addValidator(WSSConstants.TAG_WSSE_USERNAME_TOKEN, validator);
+            properties.addValidator(WSSConstants.TAG_wsse_UsernameToken, validator);
         }
         validator = loadValidator(SecurityConstants.SIGNATURE_TOKEN_VALIDATOR, message);
         if (validator != null) {
@@ -387,16 +387,16 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
         }
         validator = loadValidator(SecurityConstants.TIMESTAMP_TOKEN_VALIDATOR, message);
         if (validator != null) {
-            properties.addValidator(WSSConstants.TAG_WSU_TIMESTAMP, validator);
+            properties.addValidator(WSSConstants.TAG_wsu_Timestamp, validator);
         }
         validator = loadValidator(SecurityConstants.BST_TOKEN_VALIDATOR, message);
         if (validator != null) {
-            properties.addValidator(WSSConstants.TAG_WSSE_BINARY_SECURITY_TOKEN, validator);
+            properties.addValidator(WSSConstants.TAG_wsse_BinarySecurityToken, validator);
         }
         validator = loadValidator(SecurityConstants.SCT_TOKEN_VALIDATOR, message);
         if (validator != null) {
-            properties.addValidator(WSSConstants.TAG_WSC0502_SCT, validator);
-            properties.addValidator(WSSConstants.TAG_WSC0512_SCT, validator);
+            properties.addValidator(WSSConstants.TAG_wsc0502_SecurityContextToken, validator);
+            properties.addValidator(WSSConstants.TAG_wsc0512_SecurityContextToken, validator);
         }
     }
     

@@ -160,11 +160,11 @@ public class STSStaxTokenValidator
         // If the UsernameToken is to be used for key derivation, the (1.1)
         // spec says that it cannot contain a password, and it must contain
         // an Iteration element
-        final byte[] salt = XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_WSSE11_SALT);
+        final byte[] salt = XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_wsse11_Salt);
         PasswordString passwordType = 
-            XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_WSSE_PASSWORD);
+            XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_wsse_Password);
         final Long iteration = 
-            XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_WSSE11_ITERATION);
+            XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_wsse11_Iteration);
         if (salt != null && (passwordType != null || iteration == null)) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "badTokenType01");
         }
@@ -206,7 +206,7 @@ public class STSStaxTokenValidator
 
         final EncodedString encodedNonce =
                 XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), 
-                                              WSSConstants.TAG_WSSE_NONCE);
+                                              WSSConstants.TAG_wsse_Nonce);
         byte[] nonceVal = null;
         if (encodedNonce != null && encodedNonce.getValue() != null) {
             nonceVal = Base64.decodeBase64(encodedNonce.getValue());
@@ -214,7 +214,7 @@ public class STSStaxTokenValidator
 
         final AttributedDateTime attributedDateTimeCreated =
                 XMLSecurityUtils.getQNameType(usernameTokenType.getAny(),
-                                              WSSConstants.TAG_WSU_CREATED);
+                                              WSSConstants.TAG_wsu_Created);
 
         String created = null;
         if (attributedDateTimeCreated != null) {
@@ -492,7 +492,7 @@ public class STSStaxTokenValidator
                     x509PKIPathv1SecurityToken.setElementPath(tokenContext.getElementPath());
                     x509PKIPathv1SecurityToken.setXMLSecEvent(tokenContext.getFirstXMLSecEvent());
                     return x509PKIPathv1SecurityToken;
-                } else if (WSSConstants.NS_GSS_KERBEROS5_AP_REQ.equals(binarySecurityTokenType.getValueType())) {
+                } else if (WSSConstants.NS_GSS_Kerberos5_AP_REQ.equals(binarySecurityTokenType.getValueType())) {
                     KerberosServiceSecurityTokenImpl kerberosServiceSecurityToken = 
                         new KerberosServiceSecurityTokenImpl(
                             tokenContext.getWsSecurityContext(),
@@ -540,7 +540,7 @@ public class STSStaxTokenValidator
                 binarySecurity = new X509Security(doc);
             } else if (WSSConstants.NS_X509PKIPathv1.equals(binarySecurityTokenType.getValueType())) {
                 binarySecurity = new PKIPathSecurity(doc);
-            } else if (WSSConstants.NS_GSS_KERBEROS5_AP_REQ.equals(binarySecurityTokenType.getValueType())) {
+            } else if (WSSConstants.NS_GSS_Kerberos5_AP_REQ.equals(binarySecurityTokenType.getValueType())) {
                 binarySecurity = new KerberosSecurity(doc);
             } else {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN);
