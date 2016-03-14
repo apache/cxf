@@ -317,9 +317,9 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
                 DateFormat zulu = new XmlSchemaDateFormat();
                 
                 XMLGregorianCalendar createdCalendar = 
-                    WSSConfig.DATATYPE_FACTORY.newXMLGregorianCalendar(createdValue.getTextContent());
+                    WSSConfig.datatypeFactory.newXMLGregorianCalendar(createdValue.getTextContent());
                 // Add 5 seconds
-                Duration duration = WSSConfig.DATATYPE_FACTORY.newDuration(5000L);
+                Duration duration = WSSConfig.datatypeFactory.newDuration(5000L);
                 createdCalendar.add(duration);
                 Date createdDate = createdCalendar.toGregorianCalendar().getTime();
                 createdValue.setTextContent(zulu.format(createdDate));

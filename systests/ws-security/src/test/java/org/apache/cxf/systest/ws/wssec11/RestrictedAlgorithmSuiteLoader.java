@@ -43,8 +43,8 @@ public class RestrictedAlgorithmSuiteLoader implements AlgorithmSuiteLoader {
         CustomAlgorithmSuite(SPConstants.SPVersion version, Policy nestedPolicy) {
             super(version, nestedPolicy);
             
-            for (String key : ALGORITHM_SUITE_TYPES.keySet()) {
-                AlgorithmSuiteType algSuite = ALGORITHM_SUITE_TYPES.get(key);
+            for (String key : algorithmSuiteTypes.keySet()) {
+                AlgorithmSuiteType algSuite = algorithmSuiteTypes.get(key);
                 AlgorithmSuiteType newAlgSuite = 
                     new AlgorithmSuiteType(algSuite.getName(), algSuite.getDigest(),
                                            algSuite.getEncryption(), algSuite.getSymmetricKeyWrap(),
@@ -55,7 +55,7 @@ public class RestrictedAlgorithmSuiteLoader implements AlgorithmSuiteLoader {
                                            algSuite.getMinimumSymmetricKeyLength(),
                                            algSuite.getMaximumSymmetricKeyLength(), 512,
                                            algSuite.getMaximumAsymmetricKeyLength());
-                ALGORITHM_SUITE_TYPES.put(key, newAlgSuite);
+                algorithmSuiteTypes.put(key, newAlgSuite);
             }
         }
 
