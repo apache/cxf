@@ -18,13 +18,18 @@
  */
 package org.apache.cxf.rs.security.oidc.idp;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Properties;
 
+import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
+import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
+import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.provider.AccessTokenResponseFilter;
@@ -36,6 +41,7 @@ import org.apache.cxf.rs.security.oidc.utils.OidcUtils;
 
 public class IdTokenResponseFilter extends OAuthServerJoseJwtProducer implements AccessTokenResponseFilter {
     private IdTokenProvider idTokenProvider;
+    private WebClient keyServiceClient;
     @Override
     public void process(ClientAccessToken ct, ServerAccessToken st) {
         if (st.getResponseType() != null
@@ -58,7 +64,7 @@ public class IdTokenResponseFilter extends OAuthServerJoseJwtProducer implements
                 idTokenProvider.getIdToken(st.getClient().getClientId(), st.getSubject(), 
                                            OAuthUtils.convertPermissionsToScopeList(st.getScopes()));
             setAtHashAndNonce(idToken, st);
-            return super.processJwt(new JwtToken(idToken), st.getClient());
+            return processJwt(new JwtToken(idToken), st.getClient());
         } else if (st.getSubject().getProperties().containsKey(OidcUtils.ID_TOKEN)) {
             return st.getSubject().getProperties().get(OidcUtils.ID_TOKEN);
         } else if (st.getSubject() instanceof OidcUserSubject) {
@@ -69,7 +75,7 @@ public class IdTokenResponseFilter extends OAuthServerJoseJwtProducer implements
             // if this token was refreshed then the cloned IDToken might need to have its
             // issuedAt and expiry time properties adjusted if it proves to be necessary
             setAtHashAndNonce(idToken, st);
-            return super.processJwt(new JwtToken(idToken), st.getClient());
+            return processJwt(new JwtToken(idToken), st.getClient());
         } else {
             return null;
         }
@@ -113,5 +119,27 @@ public class IdTokenResponseFilter extends OAuthServerJoseJwtProducer implements
     public void setIdTokenProvider(IdTokenProvider idTokenProvider) {
         this.idTokenProvider = idTokenProvider;
     }
-    
+    @Override
+    public String processJwt(JwtToken jwt, Client client) {
+        if (keyServiceClient != null) {
+            List<String> opers = new LinkedList<String>();
+            if (super.isJwsRequired()) {
+                opers.add(JsonWebKey.KEY_OPER_SIGN);
+            }
+            if (super.isJweRequired()) {
+                opers.add(JsonWebKey.KEY_OPER_ENCRYPT);
+            }
+            // the form request can be supported too
+            keyServiceClient.resetQuery();
+            keyServiceClient.query(JsonWebKey.KEY_OPERATIONS, opers);
+            //TODO: OIDC core talks about various security algorithm preferences
+            // that may be set during the client registrations, they can be passed along too
+            return keyServiceClient.post(jwt, String.class);
+        } else {
+            return super.processJwt(jwt, client);
+        }
+    }
+    public void setKeyServiceClient(WebClient keyServiceClient) {
+        this.keyServiceClient = keyServiceClient;
+    }
 }
