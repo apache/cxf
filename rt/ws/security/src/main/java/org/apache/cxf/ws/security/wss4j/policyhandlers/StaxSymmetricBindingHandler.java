@@ -172,7 +172,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                 
                 if (tok == null && !isRequestor()) {
                     org.apache.xml.security.stax.securityToken.SecurityToken securityToken = 
-                        findInboundSecurityToken(WSSecurityEventConstants.SAML_TOKEN);
+                        findInboundSecurityToken(WSSecurityEventConstants.SamlToken);
                     tokenId = WSS4JUtils.parseAndStoreStreamingSecurityToken(securityToken, message);
                 }
             } else if (encryptionToken instanceof SecureConversationToken
@@ -185,7 +185,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                     properties.addAction(actionToPerform);
                 } else if (tok == null && !isRequestor()) {
                     org.apache.xml.security.stax.securityToken.SecurityToken securityToken = 
-                        findInboundSecurityToken(WSSecurityEventConstants.SECURITY_CONTEXT_TOKEN);
+                        findInboundSecurityToken(WSSecurityEventConstants.SecurityContextToken);
                     tokenId = WSS4JUtils.parseAndStoreStreamingSecurityToken(securityToken, message);
                 }
             } else if (encryptionToken instanceof X509Token) {
@@ -298,7 +298,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                     
                     if (sigTok == null && !isRequestor()) {
                         org.apache.xml.security.stax.securityToken.SecurityToken securityToken = 
-                            findInboundSecurityToken(WSSecurityEventConstants.SAML_TOKEN);
+                            findInboundSecurityToken(WSSecurityEventConstants.SamlToken);
                         sigTokId = WSS4JUtils.parseAndStoreStreamingSecurityToken(securityToken, message);
                     }
                 } else if (sigToken instanceof SecureConversationToken
@@ -311,7 +311,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                         properties.addAction(actionToPerform);
                     } else if (sigTok == null && !isRequestor()) {
                         org.apache.xml.security.stax.securityToken.SecurityToken securityToken = 
-                            findInboundSecurityToken(WSSecurityEventConstants.SECURITY_CONTEXT_TOKEN);
+                            findInboundSecurityToken(WSSecurityEventConstants.SecurityContextToken);
                         sigTokId = WSS4JUtils.parseAndStoreStreamingSecurityToken(securityToken, message);
                     }
                 } else if (sigToken instanceof X509Token) {
@@ -618,7 +618,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             (List<SecurityEvent>) message.getExchange().get(SecurityEvent.class.getName() + ".in");
         if (incomingEventList != null) {
             for (SecurityEvent incomingEvent : incomingEventList) {
-                if (WSSecurityEventConstants.ENCRYPTED_PART == incomingEvent.getSecurityEventType()
+                if (WSSecurityEventConstants.EncryptedPart == incomingEvent.getSecurityEventType()
                     || WSSecurityEventConstants.EncryptedElement 
                         == incomingEvent.getSecurityEventType()) {
                     org.apache.xml.security.stax.securityToken.SecurityToken token = 
@@ -635,7 +635,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             
             // Fall back to a Signature in case there was no encrypted Element in the request
             for (SecurityEvent incomingEvent : incomingEventList) {
-                if (WSSecurityEventConstants.SIGNED_PART == incomingEvent.getSecurityEventType()
+                if (WSSecurityEventConstants.SignedPart == incomingEvent.getSecurityEventType()
                     || WSSecurityEventConstants.SignedElement 
                         == incomingEvent.getSecurityEventType()) {
                     org.apache.xml.security.stax.securityToken.SecurityToken token = 

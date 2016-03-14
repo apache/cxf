@@ -87,13 +87,13 @@ public class StaxCryptoCoverageChecker extends AbstractPhaseInterceptor<SoapMess
         if (incomingSecurityEventList != null) {
             // Get all Signed/Encrypted Results
             results.addAll(
-                getEventFromResults(WSSecurityEventConstants.SIGNED_PART, incomingSecurityEventList));
+                getEventFromResults(WSSecurityEventConstants.SignedPart, incomingSecurityEventList));
             results.addAll(
                 getEventFromResults(WSSecurityEventConstants.SignedElement, incomingSecurityEventList));
             
             if (encryptBody || encryptUsernameToken) {
                 results.addAll(
-                    getEventFromResults(WSSecurityEventConstants.ENCRYPTED_PART, incomingSecurityEventList));
+                    getEventFromResults(WSSecurityEventConstants.EncryptedPart, incomingSecurityEventList));
                 results.addAll(
                     getEventFromResults(WSSecurityEventConstants.EncryptedElement, incomingSecurityEventList));
             }
@@ -106,7 +106,7 @@ public class StaxCryptoCoverageChecker extends AbstractPhaseInterceptor<SoapMess
             if (signTimestamp) {
                 // We only insist on the Timestamp being signed if it is actually present in the message
                 List<SecurityEvent> timestampResults =
-                    getEventFromResults(WSSecurityEventConstants.TIMESTAMP, incomingSecurityEventList);
+                    getEventFromResults(WSSecurityEventConstants.Timestamp, incomingSecurityEventList);
                 if (!timestampResults.isEmpty()) {
                     checkSignedTimestamp(results);
                 }
@@ -122,7 +122,7 @@ public class StaxCryptoCoverageChecker extends AbstractPhaseInterceptor<SoapMess
                 // We only insist on the UsernameToken being signed/encrypted if it is actually 
                 // present in the message
                 List<SecurityEvent> usernameTokenResults =
-                    getEventFromResults(WSSecurityEventConstants.USERNAME_TOKEN, incomingSecurityEventList);
+                    getEventFromResults(WSSecurityEventConstants.UsernameToken, incomingSecurityEventList);
                 if (!usernameTokenResults.isEmpty()) {
                     if (signUsernameToken) {
                         checkSignedUsernameToken(results);

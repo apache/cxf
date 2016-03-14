@@ -407,7 +407,7 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
         // Now try steaming results
         try {
             org.apache.xml.security.stax.securityToken.SecurityToken securityToken = 
-                findInboundSecurityToken(WSSecurityEventConstants.SAML_TOKEN, messageContext);
+                findInboundSecurityToken(WSSecurityEventConstants.SamlToken, messageContext);
             if (securityToken instanceof SamlSecurityToken
                 && ((SamlSecurityToken)securityToken).getSamlAssertionWrapper() != null) {
                 return ((SamlSecurityToken)securityToken).getSamlAssertionWrapper();

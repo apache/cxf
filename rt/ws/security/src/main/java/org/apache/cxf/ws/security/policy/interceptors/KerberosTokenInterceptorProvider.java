@@ -309,7 +309,7 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
                 (List<SecurityEvent>)message.get(SecurityEvent.class.getName() + ".in");
             if (incomingEventList != null) {
                 for (SecurityEvent incomingEvent : incomingEventList) {
-                    if (WSSecurityEventConstants.KERBEROS_TOKEN 
+                    if (WSSecurityEventConstants.KerberosToken 
                         == incomingEvent.getSecurityEventType()) {
                         return incomingEvent;
                     }
