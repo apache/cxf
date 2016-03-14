@@ -829,7 +829,7 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         WSSecEncryptedKey builder = new WSSecEncryptedKey();
         builder.setUserInfo("mystskey");
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-        builder.setKeyEncAlgo(WSConstants.KEYTRANSPORT_RSAOEP);
+        builder.setKeyEncAlgo(WSConstants.KEYTRANSPORT_RSAOAEP);
         
         Document doc = DOMUtils.createDocument();
         builder.prepare(doc, stsProperties.getSignatureCrypto());
