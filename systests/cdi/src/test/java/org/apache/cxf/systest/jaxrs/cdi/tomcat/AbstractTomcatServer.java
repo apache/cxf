@@ -26,7 +26,7 @@ import java.io.IOException;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.jboss.weld.environment.Container;
-import org.jboss.weld.environment.tomcat7.Tomcat7Container;
+import org.jboss.weld.environment.tomcat.TomcatContainer;
 
 public abstract class AbstractTomcatServer extends AbstractBusTestServerBase {
 
@@ -44,7 +44,7 @@ public abstract class AbstractTomcatServer extends AbstractBusTestServerBase {
     protected void run() {
         System.setProperty("java.naming.factory.url", "org.eclipse.jetty.jndi");
         System.setProperty("java.naming.factory.initial", "org.eclipse.jetty.jndi.InitialContextFactory");
-        System.setProperty(Container.class.getName(), Tomcat7Container.class.getName());
+        System.setProperty(Container.class.getName(), TomcatContainer.class.getName());
                 
         server = new Tomcat();
         server.setPort(port);
