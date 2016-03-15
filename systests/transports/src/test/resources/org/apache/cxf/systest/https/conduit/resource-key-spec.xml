@@ -61,7 +61,7 @@ under the License.
                 <sec:keyStore type="pkcs12" password="password" resource="keys/Morpit.p12"/>
             </sec:keyManagers>
             <sec:trustManagers>
-                <sec:certStore resource="keys/Truststore.pem"/>
+                <sec:certStore type="jks" resource="keys/Truststore.pem"/>
             </sec:trustManagers>
         </http:tlsClientParameters>
     </http:conduit>
