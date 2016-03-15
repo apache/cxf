@@ -168,9 +168,14 @@ public final class TLSParameterJaxBUtils {
         if (pst == null) {
             return null;
         }
-
+        String type;
+        if (pst.isSetType()) {
+            type = pst.getType();
+        } else {
+            type = KeyStore.getDefaultType();
+        }
         if (pst.isSetFile()) {
-            return createTrustStore(new FileInputStream(pst.getFile()));
+            return createTrustStore(new FileInputStream(pst.getFile()), type);
         }
         if (pst.isSetResource()) {
             final InputStream is = getResourceAsStream(pst.getResource());
@@ -180,10 +185,10 @@ public final class TLSParameterJaxBUtils {
                 LOG.severe(msg);
                 throw new IOException(msg);
             }
-            return createTrustStore(is);
+            return createTrustStore(is, type);
         }
         if (pst.isSetUrl()) {
-            return createTrustStore(new URL(pst.getUrl()).openStream());
+            return createTrustStore(new URL(pst.getUrl()).openStream(), type);
         }
         // TODO error?
         return null;
@@ -205,12 +210,12 @@ public final class TLSParameterJaxBUtils {
      * Create a KeyStore containing the trusted CA certificates contained
      * in the supplied input stream.
      */
-    private static KeyStore createTrustStore(final InputStream is)
+    private static KeyStore createTrustStore(final InputStream is, String type)
         throws IOException, CertificateException, KeyStoreException, NoSuchAlgorithmException {
 
         final Collection<? extends Certificate> certs = loadCertificates(is);
         final KeyStore keyStore =
-            KeyStore.getInstance(KeyStore.getDefaultType());
+            KeyStore.getInstance(type);
         keyStore.load(null, null);
         for (Certificate cert : certs) {
             final X509Certificate xcert = (X509Certificate) cert;
