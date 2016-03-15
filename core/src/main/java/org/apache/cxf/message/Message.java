@@ -146,7 +146,7 @@ public interface Message extends StringMap {
     String ACCEPT_CONTENT_TYPE = "Accept";
     String BASE_PATH = Message.class.getName() + ".BASE_PATH";
     String ENCODING = Message.class.getName() + ".ENCODING";
-    String FIXED_PARAMETER_ORDER = Message.class.getName() + "FIXED_PARAMETER_ORDER";
+    String FIXED_PARAMETER_ORDER = Message.class.getName() + ".FIXED_PARAMETER_ORDER";
     String MAINTAIN_SESSION = Message.class.getName() + ".MAINTAIN_SESSION";
     String ATTACHMENTS = Message.class.getName() + ".ATTACHMENTS";
 
