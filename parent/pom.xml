@@ -172,12 +172,7 @@
         <cxf.validation.api.version>1.1.0.Final</cxf.validation.api.version>
         <cxf.cdi.api.version>1.1</cxf.cdi.api.version>
         <cxf.json.api.version>1.0</cxf.json.api.version>
-<<<<<<< HEAD
-        <cxf.jboss.weld.version>2.1.2.Final</cxf.jboss.weld.version>
-=======
-        <cxf.jboss.weld.version>2.3.3.Final</cxf.jboss.weld.version>
-        <cxf.jboss.logging.version>3.3.0.Final</cxf.jboss.logging.version>
->>>>>>> 3a1b806... Updating Weld version due to CVE-2014-8122
+        <cxf.jboss.weld.version>2.2.16.Final</cxf.jboss.weld.version>
         <cxf.osgi.validation.api.version>1.1.0</cxf.osgi.validation.api.version>
         <cxf.hibernate.validator.version>5.0.2.Final</cxf.hibernate.validator.version>
         <cxf.glassfish.json.version>1.0.4</cxf.glassfish.json.version>
