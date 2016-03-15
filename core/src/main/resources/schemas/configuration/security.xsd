@@ -192,6 +192,15 @@
         1) "file", 2) "resource", and 3) "url".
         </xs:documentation>
       </xs:annotation>
+        <xs:attribute name="type"     type="xs:string">
+          <xs:annotation>
+            <xs:documentation>
+            This attribute specifies the type of the certstore.
+            It is highly correlated to the provider. Most common examples
+            are "jks" "pkcs12".
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
         <xs:attribute name="file"     type="xs:string">
           <xs:annotation>
             <xs:documentation>
