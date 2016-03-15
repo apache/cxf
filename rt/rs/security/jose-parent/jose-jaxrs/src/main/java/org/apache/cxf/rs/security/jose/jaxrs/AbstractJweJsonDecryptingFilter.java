@@ -20,7 +20,6 @@ package org.apache.cxf.rs.security.jose.jaxrs;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import org.apache.cxf.helpers.IOUtils;
@@ -39,7 +38,7 @@ public class AbstractJweJsonDecryptingFilter {
     private Map<String, Object> recipientProperties;
     protected JweDecryptionOutput decrypt(InputStream is) throws IOException {
         JweJsonConsumer c = new JweJsonConsumer(new String(IOUtils.readBytesFromStream(is), 
-                                                                   StandardCharsets.UTF_8));
+                                                                   "UTF-8"));
         JweDecryptionProvider theProvider = getInitializedDecryptionProvider(c.getProtectedHeader());
         JweJsonEncryptionEntry entry = c.getJweDecryptionEntry(theProvider, recipientProperties);
         if (entry == null) {
