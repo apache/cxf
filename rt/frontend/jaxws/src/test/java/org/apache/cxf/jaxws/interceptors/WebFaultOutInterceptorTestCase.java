@@ -227,7 +227,7 @@ public class WebFaultOutInterceptorTestCase {
 
         @Override
         public Iterator getFaultReasonLocales() throws SOAPException {
-            return Collections.emptyIterator();
+            return Collections.emptyList().iterator();
         }
 
         @Override
