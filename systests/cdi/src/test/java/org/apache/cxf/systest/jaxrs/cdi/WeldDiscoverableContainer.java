@@ -21,7 +21,8 @@ package org.apache.cxf.systest.jaxrs.cdi;
 import org.jboss.weld.environment.Container;
 import org.jboss.weld.environment.ContainerContext;
 import org.jboss.weld.environment.jetty.JettyContainer;
-import org.jboss.weld.environment.tomcat7.Tomcat7Container;
+import org.jboss.weld.environment.tomcat.TomcatContainer;
+import org.jboss.weld.resources.spi.ResourceLoader;
 
 /**
  * Because we are mixing several Servlet Containers in the same project, JBoss Weld
@@ -34,13 +35,13 @@ public class WeldDiscoverableContainer implements Container {
         if (JettyContainer.class.getName().equals(System.getProperty(Container.class.getName()))) {
             delegate = JettyContainer.INSTANCE;
         } else {
-            delegate = Tomcat7Container.INSTANCE;
+            delegate = TomcatContainer.INSTANCE;
         }
     }
 
     @Override
-    public boolean touch(ContainerContext context) throws Exception {
-        return delegate.touch(context);
+    public boolean touch(ResourceLoader loader, ContainerContext context) throws Exception {
+        return delegate.touch(loader, context);
     }
 
     @Override

@@ -163,7 +163,7 @@
         <cxf.validation.api.package.version>[1.0.0,2)</cxf.validation.api.package.version>
         <cxf.cdi.api.version>1.1</cxf.cdi.api.version>
         <cxf.json.api.version>1.0</cxf.json.api.version>
-        <cxf.jboss.weld.version>2.1.2.Final</cxf.jboss.weld.version>
+        <cxf.jboss.weld.version>2.3.3.Final</cxf.jboss.weld.version>
         <cxf.jboss.logging.version>3.3.0.Final</cxf.jboss.logging.version>
         <cxf.osgi.validation.api.version>1.1.0</cxf.osgi.validation.api.version>
         <cxf.hibernate.validator.version>5.2.2.Final</cxf.hibernate.validator.version>
