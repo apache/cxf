@@ -25,15 +25,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.DatagramPacket;
 import java.net.InetSocketAddress;
-import java.net.InterfaceAddress;
 import java.net.MulticastSocket;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
 import java.util.logging.Logger;
 
 import org.apache.cxf.Bus;
@@ -172,8 +168,12 @@ public class UDPDestination extends AbstractDestination {
                 socket.setReceiveBufferSize(64 * 1024);
                 socket.setSendBufferSize(64 * 1024);
                 socket.setTimeToLive(1);
+                socket.setLoopbackMode(false);
                 socket.bind(new InetSocketAddress(isa.getPort()));
-                socket.setNetworkInterface(findNetworkInterface());
+                NetworkInterface ni = findNetworkInterface();
+                if (ni != null) {
+                    socket.setNetworkInterface(ni);
+                }
                 socket.joinGroup(isa.getAddress());
                 mcast = socket;
                 queue.execute(new MCastListener());
@@ -194,30 +194,14 @@ public class UDPDestination extends AbstractDestination {
             throw new RuntimeException(ex);
         }
     }
+
     private NetworkInterface findNetworkInterface() throws SocketException {
-        String name = (String)this.getEndpointInfo().getProperty(UDPDestination.NETWORK_INTERFACE);
+        //Allow configuring a default interface, but do not try to guess. 
+        //Instead delegate this to the OS routing table.
+        String name = (String) this.getEndpointInfo().getProperty(UDPDestination.NETWORK_INTERFACE);
         NetworkInterface ret = null;
         if (!StringUtils.isEmpty(name)) {
             ret = NetworkInterface.getByName(name);
-        }
-        if (ret == null) {
-            Enumeration<NetworkInterface> ifcs = NetworkInterface.getNetworkInterfaces();
-            List<NetworkInterface> possibles = new ArrayList<NetworkInterface>();
-            while (ifcs.hasMoreElements()) {
-                NetworkInterface ni = ifcs.nextElement();
-                if (ni.supportsMulticast()
-                    && ni.isUp()) {
-                    for (InterfaceAddress ia : ni.getInterfaceAddresses()) {
-                        if (ia.getAddress() instanceof java.net.Inet4Address
-                            && !ia.getAddress().isLoopbackAddress()
-                            && !ni.getDisplayName().startsWith("vnic")) {
-                            possibles.add(ni);
-                        }
-                    }
-                }
-            }
-            ret = possibles.isEmpty() ? null : possibles.get(possibles.size() - 1);
-
         }
         return ret;
     }

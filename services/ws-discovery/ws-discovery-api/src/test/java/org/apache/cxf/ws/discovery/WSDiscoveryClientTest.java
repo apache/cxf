@@ -22,14 +22,11 @@ package org.apache.cxf.ws.discovery;
 import java.io.InputStream;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
-import java.net.InterfaceAddress;
 import java.net.MulticastSocket;
 import java.net.NetworkInterface;
 import java.net.SocketAddress;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.List;
 
 import javax.jws.WebMethod;
 import javax.jws.WebService;
@@ -59,25 +56,6 @@ import org.junit.Test;
 public final class WSDiscoveryClientTest {
     public static final String PORT = TestUtil.getPortNumber(WSDiscoveryClientTest.class);
    
-    static NetworkInterface findIpv4Interface() throws Exception {
-        Enumeration<NetworkInterface> ifcs = NetworkInterface.getNetworkInterfaces();
-        List<NetworkInterface> possibles = new ArrayList<NetworkInterface>();
-        while (ifcs.hasMoreElements()) {
-            NetworkInterface ni = ifcs.nextElement();
-            if (ni.supportsMulticast()
-                && ni.isUp()) {
-                for (InterfaceAddress ia : ni.getInterfaceAddresses()) {
-                    if (ia.getAddress() instanceof java.net.Inet4Address
-                        && !ia.getAddress().isLoopbackAddress()
-                        && !ni.getDisplayName().startsWith("vnic")) {
-                        possibles.add(ni);
-                    }
-                }
-            }
-        }
-        return possibles.isEmpty() ? null : possibles.get(possibles.size() - 1);
-    }
-    
     @Test
     public void testMultiResponses() throws Exception {
         // Disable the test on Redhat Enterprise Linux which doesn't enable the UDP broadcast by default
@@ -91,7 +69,7 @@ public final class WSDiscoveryClientTest {
         int count = 0;
         while (interfaces.hasMoreElements()) {
             NetworkInterface networkInterface = interfaces.nextElement();
-            if (!networkInterface.isUp() || networkInterface.isLoopback()) {
+            if (!networkInterface.isUp()) {
                 continue;  
             }
             count++;
@@ -109,7 +87,8 @@ public final class WSDiscoveryClientTest {
                     InetAddress address = InetAddress.getByName("239.255.255.250");
                     MulticastSocket s = new MulticastSocket(Integer.parseInt(PORT));
                     s.setBroadcast(true);
-                    s.setNetworkInterface(findIpv4Interface());
+                    s.setLoopbackMode(false);
+                    s.setReuseAddress(true);
                     s.joinGroup(address);
                     s.setReceiveBufferSize(64 * 1024);
                     s.setSoTimeout(5000);
