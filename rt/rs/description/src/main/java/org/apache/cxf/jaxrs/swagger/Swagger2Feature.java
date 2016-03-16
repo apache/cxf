@@ -32,6 +32,7 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
@@ -44,6 +45,7 @@ import org.apache.cxf.jaxrs.model.doc.DocumentationProvider;
 import org.apache.cxf.jaxrs.model.doc.JavaDocProvider;
 import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
 import io.swagger.jaxrs.config.BeanConfig;
 import io.swagger.jaxrs.config.DefaultReaderConfig;
@@ -51,6 +53,12 @@ import io.swagger.jaxrs.config.ReaderConfig;
 import io.swagger.jaxrs.listing.ApiListingResource;
 
 public class Swagger2Feature extends AbstractSwaggerFeature {
+
+    protected boolean dynamicBasePath;
+
+    protected boolean replaceTags;
+
+    protected DocumentationProvider javadocProvider;
 
     private String host;
 
@@ -62,32 +70,23 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
 
     private String ignoreRoutes;
 
-    private boolean dynamicBasePath;
-
-    private boolean replaceTags;
-
-    private DocumentationProvider javadocProvider;
-
     @Override
     protected void addSwaggerResource(Server server) {
-        List<ClassResourceInfo> cris = Collections.emptyList();
-        if (!runAsFilter) {
-            List<Object> serviceBeans = new ArrayList<Object>();
-            ApiListingResource apiListingResource = new ApiListingResource();
-            serviceBeans.add(apiListingResource);
-            JAXRSServiceFactoryBean sfb =
-                    (JAXRSServiceFactoryBean) server.getEndpoint().get(JAXRSServiceFactoryBean.class.getName());
-            sfb.setResourceClassesFromBeans(serviceBeans);
-            cris = sfb.getClassResourceInfo();
-            for (ClassResourceInfo cri : cris) {
-                if (ApiListingResource.class == cri.getResourceClass()) {
-                    InjectionUtils.injectContextProxiesAndApplication(cri, apiListingResource, null);
-                }
-            }
-        }
+        ApiListingResource apiListingResource = new ApiListingResource();
+        JAXRSServiceFactoryBean sfb =
+                (JAXRSServiceFactoryBean) server.getEndpoint().get(JAXRSServiceFactoryBean.class.getName());
+        sfb.setResourceClassesFromBeans(Collections.<Object>singletonList(apiListingResource));
+        List<ClassResourceInfo> cris = sfb.getClassResourceInfo();
+
         List<Object> providers = new ArrayList<Object>();
         if (runAsFilter) {
             providers.add(new SwaggerContainerRequestFilter());
+        } else {
+            for (ClassResourceInfo cri : cris) {
+                if (ApiListingResource.class == cri.getResourceClass()) {
+                    InjectionUtils.injectContextProxies(cri, apiListingResource);
+                }
+            }
         }
         providers.add(new Swagger2Serializers(dynamicBasePath, replaceTags, javadocProvider, cris));
         providers.add(new ReaderConfigFilter());
@@ -184,32 +183,49 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
     }
 
     @PreMatching
-    private static class SwaggerContainerRequestFilter extends ApiListingResource implements ContainerRequestFilter {
+    protected static class SwaggerContainerRequestFilter extends ApiListingResource implements ContainerRequestFilter {
 
-        private static final String APIDOCS_LISTING_PATH_JSON = "swagger.json";
+        protected static final MediaType APPLICATION_YAML_TYPE = JAXRSUtils.toMediaType("application/yaml");
 
-        private static final String APIDOCS_LISTING_PATH_YAML = "swagger.yaml";
+        protected static final String APIDOCS_LISTING_PATH = "swagger";
+
+        protected static final String APIDOCS_LISTING_PATH_JSON = APIDOCS_LISTING_PATH + ".json";
+
+        protected static final String APIDOCS_LISTING_PATH_YAML = APIDOCS_LISTING_PATH + ".yaml";
 
         @Context
-        private MessageContext mc;
+        protected MessageContext mc;
 
         @Override
         public void filter(ContainerRequestContext requestContext) throws IOException {
             UriInfo ui = mc.getUriInfo();
-            if (ui.getPath().endsWith(APIDOCS_LISTING_PATH_JSON)) {
-                Response r = getListingJson(null, mc.getServletConfig(), mc.getHttpHeaders(), ui);
-                requestContext.abortWith(r);
-            } else if (ui.getPath().endsWith(APIDOCS_LISTING_PATH_YAML)) {
-                Response r = getListingYaml(null, mc.getServletConfig(), mc.getHttpHeaders(), ui);
-                requestContext.abortWith(r);
+            List<MediaType> mediaTypes = mc.getHttpHeaders().getAcceptableMediaTypes();
+
+            Response response = null;
+            if ((ui.getPath().endsWith(APIDOCS_LISTING_PATH)
+                    && !JAXRSUtils.intersectMimeTypes(mediaTypes, MediaType.APPLICATION_JSON_TYPE).isEmpty())
+                    || ui.getPath().endsWith(APIDOCS_LISTING_PATH_JSON)) {
+
+                response = getListingJsonResponse(
+                        null, mc.getServletContext(), mc.getServletConfig(), mc.getHttpHeaders(), ui);
+            } else if ((ui.getPath().endsWith(APIDOCS_LISTING_PATH)
+                    && !JAXRSUtils.intersectMimeTypes(mediaTypes, APPLICATION_YAML_TYPE).isEmpty())
+                    || ui.getPath().endsWith(APIDOCS_LISTING_PATH_YAML)) {
+
+                response = getListingYamlResponse(
+                        null, mc.getServletContext(), mc.getServletConfig(), mc.getHttpHeaders(), ui);
+            }
+
+            if (response != null) {
+                requestContext.abortWith(response);
             }
         }
     }
 
-    private class ReaderConfigFilter implements ContainerRequestFilter {
+    protected class ReaderConfigFilter implements ContainerRequestFilter {
 
         @Context
-        private MessageContext mc;
+        protected MessageContext mc;
 
         @Override
         public void filter(ContainerRequestContext requestContext) throws IOException {
@@ -224,7 +240,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
             }
         }
 
-        private void addReaderConfig(String ignoreRoutesParam) {
+        protected void addReaderConfig(String ignoreRoutesParam) {
             DefaultReaderConfig rc = new DefaultReaderConfig();
             rc.setScanAllResources(true);
             if (ignoreRoutesParam != null) {

@@ -48,13 +48,13 @@ import io.swagger.models.Tag;
 
 public class Swagger2Serializers extends SwaggerSerializers {
 
-    private final boolean dynamicBasePath;
+    protected final boolean dynamicBasePath;
 
-    private final boolean replaceTags;
+    protected final boolean replaceTags;
 
-    private final DocumentationProvider javadocProvider;
+    protected final DocumentationProvider javadocProvider;
 
-    private final List<ClassResourceInfo> cris;
+    protected final List<ClassResourceInfo> cris;
 
     public Swagger2Serializers(
             final boolean dynamicBasePath,
@@ -88,8 +88,8 @@ public class Swagger2Serializers extends SwaggerSerializers {
 
         if (replaceTags || javadocProvider != null) {
             Map<String, ClassResourceInfo> operations = new HashMap<String, ClassResourceInfo>();
-            Map<Pair<String, String>, OperationResourceInfo> methods = 
-                new HashMap<Pair<String, String>, OperationResourceInfo>();
+            Map<Pair<String, String>, OperationResourceInfo> methods =
+                    new HashMap<Pair<String, String>, OperationResourceInfo>();
             for (ClassResourceInfo cri : cris) {
                 for (OperationResourceInfo ori : cri.getMethodDispatcher().getOperationResourceInfos()) {
                     String normalizedPath = getNormalizedPath(
@@ -146,7 +146,7 @@ public class Swagger2Serializers extends SwaggerSerializers {
         super.writeTo(data, type, genericType, annotations, mediaType, headers, out);
     }
 
-    private String getNormalizedPath(String classResourcePath, String operationResourcePath) {
+    protected String getNormalizedPath(String classResourcePath, String operationResourcePath) {
         StringBuilder normalizedPath = new StringBuilder();
 
         String[] segments = StringUtils.split(classResourcePath + operationResourcePath, "/");
