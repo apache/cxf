@@ -28,7 +28,7 @@ import java.util.regex.Pattern;
 
 public class ContentDisposition {
     private static final String CD_HEADER_PARAMS_EXPRESSION =
-        "(([\\w]+( )?\\*?=( )?\"[^\"]+\")|([\\w]+( )?\\*?=( )?[^;]+))";
+        "(([\\w-]+( )?\\*?=( )?\"[^\"]+\")|([\\w-]+( )?\\*?=( )?[^;]+))";
     private static final Pattern CD_HEADER_PARAMS_PATTERN =
             Pattern.compile(CD_HEADER_PARAMS_EXPRESSION);
 
