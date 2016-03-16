@@ -25,6 +25,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import javax.servlet.http.HttpServletResponse;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -43,13 +46,15 @@ import org.apache.cxf.transport.websocket.WebSocketConstants;
 @Path("/customerservice/")
 @Produces("text/xml")
 public class CustomerService {
+    private static final int MAX_ERROR_COUNT = 5;
     private static ExecutorService executor = Executors.newSingleThreadExecutor();
 
     long currentId = 123;
     Map<Long, Customer> customers = new HashMap<Long, Customer>();
     Map<Long, Order> orders = new HashMap<Long, Order>();
-    Map<String, OutputStream> monitors = new HashMap<String, OutputStream>();
-    
+    Map<String, WriterHolder<OutputStream>> monitors = new HashMap<String, WriterHolder<OutputStream>>();
+    Map<String, WriterHolder<HttpServletResponse>> monitors2 = new HashMap<String, WriterHolder<HttpServletResponse>>();
+
     public CustomerService() {
         init();
     }
@@ -60,7 +65,9 @@ public class CustomerService {
         System.out.println("----invoking getCustomer, Customer id is: " + id);
         long idNumber = Long.parseLong(id);
         Customer customer = customers.get(idNumber);
-        sendCustomerEvent("retrieved", customer);
+        if (customer != null) {
+            sendCustomerEvent("retrieved", customer);
+        }
         return customer;
     }
 
@@ -129,10 +136,26 @@ public class CustomerService {
         final String key = reqid == null ? "*" : reqid; 
         return new StreamingOutput() {
             public void write(final OutputStream out) throws IOException, WebApplicationException {
-                monitors.put(key, out);
+                monitors.put(key, new WriterHolder(out, MAX_ERROR_COUNT));
                 out.write(("Subscribed at " + new java.util.Date()).getBytes());
             }
+            
         };
+    }
+
+    @GET
+    @Path("/monitor2")
+    @Produces("text/*")
+    public void monitorCustomers2(
+            final @javax.ws.rs.core.Context HttpServletResponse httpResponse,
+            @HeaderParam(WebSocketConstants.DEFAULT_REQUEST_ID_KEY) String reqid) {
+        final String key = reqid == null ? "*" : reqid; 
+        monitors2.put(key, new WriterHolder(httpResponse, MAX_ERROR_COUNT));
+        try {
+            httpResponse.getOutputStream().write(("Subscribed at " + new java.util.Date()).getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @GET
@@ -142,22 +165,54 @@ public class CustomerService {
         return (monitors.remove(key) != null ? "Removed: " : "Already removed: ") + key; 
     }
 
+    @GET
+    @Path("/unmonitor2/{key}")
+    @Produces("text/*")
+    public String unmonitorCustomers2(@PathParam("key") String key) {
+        return (monitors2.remove(key) != null ? "Removed: " : "Already removed: ") + key; 
+    }
+
     private void sendCustomerEvent(final String msg, final Customer customer) {
         executor.execute(new Runnable() {
             public void run() {
                 try {
                     String t = msg + ": " + customer.getId() + "/" + customer.getName();
-                    for (Iterator<OutputStream> it = monitors.values().iterator(); it.hasNext();) {
-                        OutputStream out = it.next();
+                    for (Iterator<WriterHolder<OutputStream>> it = monitors.values().iterator(); it.hasNext();) {
+                        WriterHolder<OutputStream> wh = it.next();
                         try {
-                            out.write(t.getBytes());
+                            wh.getValue().write(t.getBytes());
+                            wh.getValue().flush();
+                            wh.reset();
                         } catch (IOException e) {
-                            try {
-                                out.close();
-                            } catch (IOException e2) {
-                                // ignore;
+                            System.out.println("----error writing to " + wh.getValue() + " " + wh.get());
+                            if (wh.increment()) {
+                                try {
+                                    wh.getValue().close();
+                                } catch (IOException e2) {
+                                    // ignore;
+                                }
+                                it.remove();
+                                System.out.println("----purged " + wh.getValue());
                             }
-                            it.remove();
+                        }
+                    }
+                    for (Iterator<WriterHolder<HttpServletResponse>> it = monitors2.values().iterator(); it.hasNext();) {
+                        WriterHolder<HttpServletResponse> wh = it.next();
+                        try {
+                            wh.getValue().getOutputStream().write(t.getBytes());
+                            wh.getValue().getOutputStream().flush();
+                            wh.reset();
+                        } catch (IOException e) {
+                            System.out.println("----error writing to " + wh.getValue() + " " + wh.get());
+                            if (wh.increment()) {
+                                try {
+                                    wh.getValue().getOutputStream().close();
+                                } catch (IOException e2) {
+                                    // ignore;
+                                }
+                                it.remove();
+                                System.out.println("----purged " + wh.getValue());
+                            }
                         }
                     }
                 } catch (Exception e) {
@@ -183,4 +238,30 @@ public class CustomerService {
         orders.put(o.getId(), o);
     }
 
+    private static class WriterHolder<T> {
+        final private T value;
+        final private int max; 
+        final private AtomicInteger errorCount;
+
+        public WriterHolder(T object, int max) {
+            this.value = object;
+            this.max = max;
+            this.errorCount = new AtomicInteger();
+        }
+
+        public T getValue() {
+            return value;
+        }
+
+        public int get() {
+            return errorCount.get();
+        }
+        public boolean increment() {
+            return max < errorCount.getAndIncrement();
+        }
+
+        public void reset() {
+            errorCount.getAndSet(0);
+        }
+    }
 }

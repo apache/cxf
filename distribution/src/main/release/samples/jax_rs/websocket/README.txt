@@ -6,6 +6,13 @@ This is a websocket transport version of JAX-RS Basic Demo.
 A RESTful customer service is provided on URL ws://localhost:9000/customers. 
 Users access this URI to operate on customer.
 
+This sample includes two convenient clients: a plain javascript browser client
+and a node.js client based on atmosphere.
+
+
+Connecting to the server
+---------------------------------------
+
 Open a websocket to ws://localhost:9000/ and send requests over the websocket.
 
 A GET request to path /customerservice/customers/123
@@ -102,7 +109,6 @@ Please review the README in the samples directory before
 continuing.
 
 
-
 Building and running the demo using maven
 ---------------------------------------
 
@@ -118,6 +124,8 @@ Using either UNIX or Windows:
 
 To remove the target dir, run mvn clean".
 
+Using Javascript client in Browser
+--------
 Using a web browser that natively supports WebSocket (Safari, Chrome, Firefox):
 After starting the server (see above), open the index.html page located at
 
@@ -140,3 +148,19 @@ Content-Type: text/xml; charset="utf-8"
   <name>Jack</name>
 </Customer>
 ------------------------------------------------------------------------
+
+
+Using Node.js client 
+--------
+
+Go to samples/jax_rs/websocket/src/test/resources and at the console
+
+Assuming node (>=v4) and npm are installed, execute the following shell commands.
+
+% npm install atmosphere.js
+% node client.js
+
+This client program supports websocket and sse and allows
+you to choose your preferred protocol.
+
+
