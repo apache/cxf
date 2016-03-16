@@ -41,7 +41,6 @@ import org.atmosphere.cpr.AtmosphereRequest;
 import org.atmosphere.cpr.AtmosphereResource;
 import org.atmosphere.cpr.AtmosphereResponse;
 import org.atmosphere.handler.AbstractReflectorAtmosphereHandler;
-import org.atmosphere.util.Utils;
 
 /**
  * 
@@ -69,7 +68,7 @@ public class AtmosphereWebSocketServletDestination extends ServletDestination im
     @Override
     public void invoke(ServletConfig config, ServletContext context, HttpServletRequest req,
                        HttpServletResponse resp) throws IOException {
-        if (Utils.webSocketEnabled(req)) {
+        if (AtmosphereUtils.useAtmosphere(req)) {
             try {
                 framework.doCometSupport(AtmosphereRequest.wrap(req), 
                                          AtmosphereResponse.wrap(resp));
