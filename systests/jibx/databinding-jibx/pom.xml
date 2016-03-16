@@ -139,6 +139,18 @@
                 <doc.lit.bare.binding.file>none</doc.lit.bare.binding.file>
             </properties>
         </profile>
+        <profile>
+            <id>skipTests</id>
+            <activation>
+                <property>
+                    <name>maven.test.skip</name>
+                </property>
+            </activation>
+            <properties>
+                <hello.world.binding.file>none</hello.world.binding.file>
+                <doc.lit.bare.binding.file>none</doc.lit.bare.binding.file>
+            </properties>
+        </profile>
     </profiles>
     <dependencies>
         <dependency>
