@@ -8,7 +8,7 @@
 
 "use strict";
 
-var HOST_URL = 'http://localhost:9100/';
+var HOST_URL = 'http://localhost:9000/';
 
 var reader = require('readline');
 var prompt = reader.createInterface(process.stdin, process.stdout);
@@ -25,13 +25,13 @@ var isopen = false;
 const TRANSPORT_NAMES = ["websocket", "sse"];
 
 const COMMAND_LIST = 
-    [["add name",       "Add a new consumer and return the customer instance."],
-     ["delete id",      "Delete the customer."],
-     ["get id",         "Return the customere."],
+    [["add name",       "Add a new consumer and return the customer instance. (e.g., add green)"],
+     ["delete id",      "Delete the customer. (e.g., delete 124)"],
+     ["get id",         "Return the customere. (e.g., get 123)"],
      ["quit",           "Quit the application."],
-     ["subscribe",      "Subscribe to the customer updatese."],
-     ["unsubscribe",    "Unsubscribe from the customer updatese."],
-     ["update id name", "Update the customer."]];
+     ["subscribe",      "Subscribe to the customer queries."],
+     ["unsubscribe",    "Unsubscribe from the customer queries."],
+     ["update id name", "Update the customer. (e.g., update 125 red)"]];
 
 function selectOption(c, opts) {
     var i = parseInt(c);
