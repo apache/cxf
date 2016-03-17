@@ -186,6 +186,8 @@ public class CustomerService {
                         } catch (IOException e) {
                             System.out.println("----error writing to " + wh.getValue() + " " + wh.get());
                             if (wh.increment()) {
+                                // the max error count reached; purging the output resource
+                                e.printStackTrace();
                                 try {
                                     wh.getValue().close();
                                 } catch (IOException e2) {
@@ -205,6 +207,8 @@ public class CustomerService {
                         } catch (IOException e) {
                             System.out.println("----error writing to " + wh.getValue() + " " + wh.get());
                             if (wh.increment()) {
+                                // the max error count reached; purging the output resource
+                                e.printStackTrace();
                                 try {
                                     wh.getValue().getOutputStream().close();
                                 } catch (IOException e2) {
