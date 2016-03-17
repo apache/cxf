@@ -25,7 +25,10 @@ import java.util.Map;
 
 import org.apache.cxf.transport.websocket.WebSocketUtils;
 import org.atmosphere.cpr.AtmosphereRequest;
+import org.atmosphere.cpr.AtmosphereResource;
+import org.atmosphere.cpr.AtmosphereResourceImpl;
 import org.atmosphere.cpr.AtmosphereResponse;
+import org.atmosphere.cpr.FrameworkConfig;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -40,6 +43,9 @@ public class DefaultProtocolInterceptorTest extends Assert {
         DefaultProtocolInterceptor dpi = new DefaultProtocolInterceptor();
         AtmosphereRequest request = AtmosphereRequest.newInstance();
         AtmosphereResponse response = AtmosphereResponse.newInstance();
+        AtmosphereResourceImpl resource = new AtmosphereResourceImpl();
+        resource.transport(AtmosphereResource.TRANSPORT.WEBSOCKET);
+        request.localAttributes().put(FrameworkConfig.ATMOSPHERE_RESOURCE, resource);
         response.request(request);
         String payload = "hello cxf";
         String contentType = "text/plain";
