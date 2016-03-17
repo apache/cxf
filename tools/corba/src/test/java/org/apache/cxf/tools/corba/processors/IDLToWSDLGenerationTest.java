@@ -165,6 +165,11 @@ public class IDLToWSDLGenerationTest extends ProcessorTestBase {
     }
 
     @Test
+    public void testFixedStructGeneration() throws Exception {
+        testWSDLGeneration("/idl/FixedStruct.idl", "/idl/expected_FixedStruct.wsdl");
+    }
+
+    @Test
     public void testTypedefGeneration() throws Exception {
         testWSDLGeneration("/idl/Typedef.idl", "/idl/expected_Typedef.wsdl");
     }
