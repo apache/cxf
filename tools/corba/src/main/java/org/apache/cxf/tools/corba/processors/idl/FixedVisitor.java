@@ -24,6 +24,8 @@ import javax.xml.namespace.QName;
 
 import antlr.collections.AST;
 
+import org.apache.cxf.binding.corba.wsdl.Anonfixed;
+import org.apache.cxf.binding.corba.wsdl.CorbaType;
 import org.apache.cxf.binding.corba.wsdl.Fixed;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaFractionDigitsFacet;
@@ -76,7 +78,12 @@ public class FixedVisitor extends VisitorBase {
 
         AST digitsNode = fixedNode.getFirstChild();
         AST scaleNode = digitsNode.getNextSibling();
-        Scope scopedName = new Scope(getScope(), identifierNode);
+        Scope scopedName = null;
+        if (identifierNode == null) {
+            scopedName = TypesUtils.generateAnonymousScopedName(getScope(), schema);
+        } else {
+            scopedName = new Scope(getScope(), identifierNode);
+        }
 
         // validate digits and scale
         Long digits = Long.valueOf(digitsNode.toString());
@@ -109,17 +116,30 @@ public class FixedVisitor extends VisitorBase {
         // add xmlschema:fixed
         setSchemaType(fixedSimpleType);
 
-
-        // corba:fixed
-        Fixed corbaFixed = new Fixed();
-        corbaFixed.setQName(new QName(typeMap.getTargetNamespace(), scopedName.toString()));
-        corbaFixed.setDigits(digits);
-        corbaFixed.setScale(scale);
-        corbaFixed.setRepositoryID(scopedName.toIDLRepositoryID());
-        //corbaFixed.setType(Constants.XSD_DECIMAL);
-        corbaFixed.setType(fixedSimpleType.getQName());
+        CorbaType type = null;
+        if (identifierNode != null) {
+            // corba:fixed
+            Fixed corbaFixed = new Fixed();
+            corbaFixed.setQName(new QName(typeMap.getTargetNamespace(), scopedName.toString()));
+            corbaFixed.setDigits(digits);
+            corbaFixed.setScale(scale);
+            corbaFixed.setRepositoryID(scopedName.toIDLRepositoryID());
+            //corbaFixed.setType(Constants.XSD_DECIMAL);
+            corbaFixed.setType(fixedSimpleType.getQName());
+            type = corbaFixed;
+        } else {
+            // corba:anonfixed
+            Anonfixed corbaFixed = new Anonfixed();
+            corbaFixed.setQName(new QName(typeMap.getTargetNamespace(), scopedName.toString()));
+            corbaFixed.setDigits(digits);
+            corbaFixed.setScale(scale);
+            //corbaFixed.setType(Constants.XSD_DECIMAL);
+            corbaFixed.setType(fixedSimpleType.getQName());
+            typeMap.getStructOrExceptionOrUnion().add(corbaFixed);
+            type = corbaFixed;
+        }
 
         // add corba:fixed
-        setCorbaType(corbaFixed);
+        setCorbaType(type);
     }
 }
