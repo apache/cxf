@@ -16,41 +16,56 @@ tags:
 paths:
   /bookstore:
     get:
-      tags:
-      - "bookstore"
-      summary: "Get books"
-      description: "Get books"
       operationId: "getBooks"
       produces:
       - "application/json"
       parameters:
       - name: "page"
         in: "query"
-        description: "Page to fetch"
-        required: true
+        required: false
         type: "integer"
-        default: "1"
+        default: 1
         format: "int32"
+      responses:
+        default:
+          description: "successful operation"
+  /bookstore/name/{id}:
+    get:
+      operationId: "getBookName"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        type: "string"
       responses:
         200:
           description: "successful operation"
           schema:
-            type: "array"
-            items:
-              $ref: "#/definitions/Book"
+            type: "string"
+          headers: {}
+  /bookstore/names:
+    get:
+      operationId: "getBookNames"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "page"
+        in: "query"
+        required: false
+        type: "integer"
+        default: 1
+        format: "int32"
+      responses:
+        default:
+          description: "successful operation"
   /bookstore/{id}:
     get:
-      tags:
-      - "bookstore"
-      summary: "Get book by Id"
-      description: "Get book by Id"
       operationId: "getBook"
       produces:
       - "application/json"
       parameters:
       - name: "id"
         in: "path"
-        description: "id"
         required: true
         type: "integer"
         format: "int64"
@@ -59,16 +74,12 @@ paths:
           description: "successful operation"
           schema:
             $ref: "#/definitions/Book"
+          headers: {}
     delete:
-      tags:
-      - "bookstore"
-      summary: "Delete book"
-      description: "Delete book"
       operationId: "delete"
       parameters:
       - name: "id"
         in: "path"
-        description: "id"
         required: true
         type: "string"
       responses:
