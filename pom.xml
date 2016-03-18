@@ -43,7 +43,7 @@
     </prerequisites>
     <properties>
         <cxf.compiler.fork>false</cxf.compiler.fork>
-        <cxf.build-utils.version>3.1.0</cxf.build-utils.version>
+        <cxf.build-utils.version>3.2.0</cxf.build-utils.version>
         <cxf.xjc-utils.version>3.0.5</cxf.xjc-utils.version>
         <cxf.jdk.version>1.8</cxf.jdk.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
