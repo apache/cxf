@@ -77,6 +77,6 @@ public class Swagger2NonAnnotatedServiceDescriptionTest extends AbstractSwagger2
 
     @Override
     protected String getExpectedFileYaml() {
-        return "swagger2-noano-json.txt";
+        return "swagger2-noano-yaml.txt";
     }
 }

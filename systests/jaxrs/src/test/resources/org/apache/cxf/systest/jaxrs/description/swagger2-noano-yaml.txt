@@ -29,12 +29,14 @@ paths:
   /bookstore/names:
     get:
       operationId: "getBookNames"
+      produces:
+      - "application/json"
       parameters:
       - name: "page"
         in: "query"
         required: false
         type: "integer"
-        default: "1"
+        default: 1
         format: "int32"
       responses:
         default:

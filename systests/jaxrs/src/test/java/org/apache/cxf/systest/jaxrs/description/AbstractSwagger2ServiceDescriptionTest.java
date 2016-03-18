@@ -55,6 +55,7 @@ public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBus
             this.runAsFilter = runAsFilter;
         }
         
+        @Override
         protected void run() {
             final JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
             sf.setResourceClasses(BookStoreSwagger2.class);
