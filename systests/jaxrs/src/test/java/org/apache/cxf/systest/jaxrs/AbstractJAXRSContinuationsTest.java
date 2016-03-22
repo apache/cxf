@@ -44,7 +44,6 @@ public abstract class AbstractJAXRSContinuationsTest extends AbstractBusClientSe
     @Test
     public void testDefaultTimeout() throws Exception {
         WebClient wc = WebClient.create("http://localhost:" + getPort() + getBaseAddress() + "/books/defaulttimeout");
-        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(1000000L);
         Response r = wc.get();
         assertEquals(503, r.getStatus());
     }
@@ -52,10 +51,17 @@ public abstract class AbstractJAXRSContinuationsTest extends AbstractBusClientSe
     @Test
     public void testImmediateResume() throws Exception {
         WebClient wc = WebClient.create("http://localhost:" + getPort() + getBaseAddress() + "/books/resume");
-        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(1000000L);
         wc.accept("text/plain");
         String str = wc.get(String.class);
         assertEquals("immediateResume", str);
+    }
+    
+    @Test
+    public void testNoContent() throws Exception {
+        WebClient wc = WebClient.create("http://localhost:" + getPort() + getBaseAddress() + "/books/nocontent");
+        wc.accept("text/plain");
+        Response r = wc.get(Response.class);
+        assertEquals(204, r.getStatus());
     }
     
     @Test
@@ -69,7 +75,6 @@ public abstract class AbstractJAXRSContinuationsTest extends AbstractBusClientSe
     public void testImmediateResumeSubresource() throws Exception {
         WebClient wc = WebClient.create("http://localhost:" + getPort() 
                                         + getBaseAddress() + "/books/subresources/books/resume");
-        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(1000000L);
         wc.accept("text/plain");
         String str = wc.get(String.class);
         assertEquals("immediateResume", str);
@@ -99,7 +104,6 @@ public abstract class AbstractJAXRSContinuationsTest extends AbstractBusClientSe
     
     protected void doTestTimeoutAndCancel(String baseAddress) throws Exception {
         WebClient wc = WebClient.create("http://localhost:" + getPort() + baseAddress + "/books/cancel");
-        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(1000000L);
         Response r = wc.get();
         assertEquals(503, r.getStatus());
         String retryAfter = r.getHeaderString(HttpHeaders.RETRY_AFTER);
