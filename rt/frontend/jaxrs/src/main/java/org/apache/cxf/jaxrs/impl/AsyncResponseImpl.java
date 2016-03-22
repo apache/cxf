@@ -272,7 +272,11 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
     public synchronized Object getResponseObject() {
         Object obj = cont.getObject();
         if (!(obj instanceof Response) && !(obj instanceof Throwable)) {
-            obj = Response.ok().entity(obj).build();    
+            if (obj == null) {
+                obj = Response.noContent().build();
+            } else {
+                obj = Response.ok().entity(obj).build();
+            }
         }
         return obj;
     }

@@ -68,6 +68,13 @@ public class BookContinuationStore {
     }
     
     @GET
+    @Path("/books/nocontent")
+    @Produces("text/plain")
+    public void getBookNoContent(@Suspended AsyncResponse async) {
+        async.resume(null);
+    }
+    
+    @GET
     @Path("/books/cancel")
     public void getBookDescriptionWithCancel(@PathParam("id") String id, 
                                              @Suspended AsyncResponse async) {
