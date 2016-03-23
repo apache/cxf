@@ -25,7 +25,7 @@
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
-        <version>3.0.9-SNAPSHOT</version>
+        <version>3.0.9</version>
     </parent>
     <properties>
         <cxf.version>${project.version}</cxf.version>
@@ -125,17 +125,17 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxws</artifactId>
-            <version>3.0.9-SNAPSHOT</version>
+            <version>3.0.9</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http</artifactId>
-            <version>3.0.9-SNAPSHOT</version>
+            <version>3.0.9</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http-jetty</artifactId>
-            <version>3.0.9-SNAPSHOT</version>
+            <version>3.0.9</version>
         </dependency>
     </dependencies>
 </project>
