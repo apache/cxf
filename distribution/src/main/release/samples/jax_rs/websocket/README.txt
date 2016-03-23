@@ -3,7 +3,7 @@ JAX-RS WebSocket Demo
 
 This is a websocket transport version of JAX-RS Basic Demo.
 
-A RESTful customer service is provided on URL ws://localhost:9000/customers. 
+A RESTful customer service is provided on URL ws://localhost:9000/demo
 Users access this URI to operate on customer.
 
 This sample includes two convenient clients: a plain javascript browser client
@@ -13,12 +13,12 @@ and a node.js client based on atmosphere.
 Connecting to the server
 ---------------------------------------
 
-Open a websocket to ws://localhost:9000/ and send requests over the websocket.
+Open a websocket to ws://localhost:9000/demo and send requests over the websocket.
 
-A GET request to path /customerservice/customers/123
+A GET request to path /demo/customerservice/customers/123
 
 ------------------------------------------------------------------------
-GET /customerservice/customers/123
+GET /demo/customerservice/customers/123
 ------------------------------------------------------------------------
 
 returns a customer instance whose id is 123. The XML document returned:
@@ -30,10 +30,10 @@ returns a customer instance whose id is 123. The XML document returned:
 </Customer>
 ------------------------------------------------------------------------
 
-A GET request to path /customerservice/orders/223/products/323
+A GET request to path /demo/customerservice/orders/223/products/323
 
 ------------------------------------------------------------------------
-GET /customerservice/orders/223/products/323
+GET /demo/customerservice/orders/223/products/323
 ------------------------------------------------------------------------
 
 returns product 323 that belongs to order 223. The XML document returned:
@@ -48,7 +48,7 @@ returns product 323 that belongs to order 223. The XML document returned:
 A POST request to path /customerservice/customers
 
 ------------------------------------------------------------------------
-POST /customerservice/customers
+POST /demo/customerservice/customers
 Content-Type: text/xml; charset="utf-8"
 ------------------------------------------------------------------------
 
@@ -63,7 +63,7 @@ with the data:
 adds a customer whose name is Jack 
 
 
-A PUT request to path /customerservice/customers
+A PUT request to path /demo/customerservice/customers
 
 ------------------------------------------------------------------------
 PUT /customerservice/customers
@@ -82,20 +82,20 @@ with the data:
 updates the customer instance whose id is 123
 
 
-A GET request to path /monitor with id monitor-12345
+A GET request to path /demo/monitor with id monitor-12345
 
 ------------------------------------------------------------------------
-GET /customerservice/monitor
+GET /demo/customerservice/monitor
 requestId: monitor-12345
 ------------------------------------------------------------------------
 
 returns a continuous event stream on the customer
 activities. Try invoking some customer related operations.
 
-A GET request to path /unmonitor with id monitor-12345
+A GET request to path /demo/unmonitor with id monitor-12345
 
 ------------------------------------------------------------------------
-GET /customerservice/unmonitor/monitor-12345
+GET /demo/customerservice/unmonitor/monitor-12345
 ------------------------------------------------------------------------
 
 unregisters the event stream and returns its status.
@@ -141,7 +141,7 @@ the content. For example, the above POST example should use the Request
 value:
 
 ------------------------------------------------------------------------
-POST /customerservice/customers
+POST /demo/customerservice/customers
 Content-Type: text/xml; charset="utf-8"
 
 <Customer>

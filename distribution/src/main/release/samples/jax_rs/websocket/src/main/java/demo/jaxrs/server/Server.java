@@ -23,13 +23,15 @@ import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 
 public class Server {
+    public static final String HOST_URL = "ws://localhost:9000";
+    public static final String CONTEXT_PATH = "/demo";
 
     protected Server() throws Exception {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setResourceClasses(CustomerService.class);
         sf.setResourceProvider(CustomerService.class, 
             new SingletonResourceProvider(new CustomerService()));
-        sf.setAddress("ws://localhost:9000/");
+        sf.setAddress(HOST_URL + CONTEXT_PATH);
 
         sf.create();
     }
