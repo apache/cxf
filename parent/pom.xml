@@ -86,10 +86,10 @@
         <cxf.fastinfoset.bundle.version>1.2.13_1</cxf.fastinfoset.bundle.version>
         <cxf.guava.version>18.0</cxf.guava.version>
         <cxf.hazelcast.version>1.9.4</cxf.hazelcast.version>
-        <cxf.httpcomponents.asyncclient.version>4.1</cxf.httpcomponents.asyncclient.version>
+        <cxf.httpcomponents.asyncclient.version>4.1.1</cxf.httpcomponents.asyncclient.version>
         <cxf.httpcomponents.asyncclient.version.range>[4.0,4.2)</cxf.httpcomponents.asyncclient.version.range>
-        <cxf.httpcomponents.client.version>4.5.1</cxf.httpcomponents.client.version>
-        <cxf.httpcomponents.core.version>4.4.1</cxf.httpcomponents.core.version>
+        <cxf.httpcomponents.client.version>4.5.2</cxf.httpcomponents.client.version>
+        <cxf.httpcomponents.core.version>4.4.4</cxf.httpcomponents.core.version>
         <cxf.httpcomponents.core.version.range>[4.3,4.5.0)</cxf.httpcomponents.core.version.range>
         <cxf.jackson.version>2.6.5</cxf.jackson.version>
         <cxf.james.mim4j.version>0.7.2</cxf.james.mim4j.version>
@@ -115,7 +115,7 @@
         <cxf.jdom.version>1.0</cxf.jdom.version>
         <cxf.jettison.version>1.3.7</cxf.jettison.version>
         <cxf.jetty8.version>8.1.19.v20160209</cxf.jetty8.version>
-        <cxf.jetty9.version>9.2.11.v20150529</cxf.jetty9.version>
+        <cxf.jetty9.version>9.2.15.v20160210</cxf.jetty9.version>
         <cxf.jetty.version>${cxf.jetty9.version}</cxf.jetty.version>
         <cxf.jetty.osgi.version>[8.1,10)</cxf.jetty.osgi.version>
         <cxf.jibx.version>1.2.6</cxf.jibx.version>
@@ -138,10 +138,10 @@
         <cxf.servlet-api.version>1.0</cxf.servlet-api.version>
         <cxf.servlet-api-2.5.artifact>geronimo-servlet_2.5_spec</cxf.servlet-api-2.5.artifact>
         <cxf.servlet-api-2.5.version>1.1.2</cxf.servlet-api-2.5.version>
-        <cxf.slf4j.version>1.7.14</cxf.slf4j.version>
+        <cxf.slf4j.version>1.7.19</cxf.slf4j.version>
         <cxf.specs.jaxws.api.version>1.2</cxf.specs.jaxws.api.version>
-        <cxf.spring.version>4.1.8.RELEASE</cxf.spring.version>
-        <cxf.spring.security.version>3.2.8.RELEASE</cxf.spring.security.version>
+        <cxf.spring.version>4.1.9.RELEASE</cxf.spring.version>
+        <cxf.spring.security.version>3.2.9.RELEASE</cxf.spring.security.version>
         <cxf.spring.osgi.version>1.2.1</cxf.spring.osgi.version>
         <cxf.spring.ldap.version>1.3.1.RELEASE</cxf.spring.ldap.version>
         <cxf.spring.mock>spring-test</cxf.spring.mock>
@@ -840,7 +840,7 @@
             <dependency>
                 <groupId>org.apache.ant</groupId>
                 <artifactId>ant</artifactId>
-                <version>1.8.4</version>
+                <version>1.9.6</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.ant</groupId>
