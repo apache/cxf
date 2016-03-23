@@ -130,7 +130,8 @@ public class SchemaHandler {
                                         resolvedLocation = catalogResolver.resolveURI(namespaceURI);
                                     }
                                     if (resolvedLocation == null) {
-                                        resolvedLocation = catalogResolver.resolvePublic(publicId, systemId);
+                                        resolvedLocation = catalogResolver.resolvePublic(
+                                            publicId != null ? publicId : namespaceURI, systemId);
                                     } 
                                     if (resolvedLocation != null) {
                                         InputStream resourceStream = 
