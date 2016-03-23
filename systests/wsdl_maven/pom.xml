@@ -27,7 +27,7 @@
     <parent>
         <groupId>org.apache.cxf.systests</groupId>
         <artifactId>cxf-systests</artifactId>
-        <version>3.0.9</version>
+        <version>3.0.10-SNAPSHOT</version>
     </parent>
     <modules>
         <module>codegen</module>

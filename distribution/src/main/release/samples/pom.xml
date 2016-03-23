@@ -22,7 +22,7 @@
     <groupId>org.apache.cxf.samples</groupId>
     <artifactId>cxf-samples</artifactId>
     <packaging>pom</packaging>
-    <version>3.0.9</version>
+    <version>3.0.10-SNAPSHOT</version>
     <name>Apache CXF Samples</name>
     <description>Apache CXF Samples</description>
     <url>http://cxf.apache.org</url>

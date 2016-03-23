@@ -27,7 +27,7 @@
     <parent>
         <artifactId>cxf-rt-rs-security-oauth-parent</artifactId>
         <groupId>org.apache.cxf</groupId>
-        <version>3.0.9</version>
+        <version>3.0.10-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <dependencies>
