@@ -8,14 +8,16 @@
 
 "use strict";
 
-var HOST_URL = 'http://localhost:9000/';
+// set the host url and path if the service runs at a different location
+var HOST_URL = 'http://localhost:9000';
+var CONTEXT_PATH = "/demo"
 
 var reader = require('readline');
 var prompt = reader.createInterface(process.stdin, process.stdout);
 
 var atmosphere = require('atmosphere.js');
 
-var request = { url: HOST_URL,
+var request = { url: HOST_URL + CONTEXT_PATH,
                 transport : 'websocket',
                 trackMessageLength: false,
                 dropHeaders: false,
@@ -75,10 +77,10 @@ function doHelp() {
 function doAdd(v) {
     var req;
     if (transport == 'websocket') {
-        req = "POST /customerservice/customers\r\nContent-Type: text/xml; charset='utf-8'\r\nAccept: text/xml\r\n\r\n" 
+        req = "POST " + CONTEXT_PATH + "/customerservice/customers\r\nContent-Type: text/xml; charset='utf-8'\r\nAccept: text/xml\r\n\r\n" 
             + createAddCustomerPayload(v[0]);
     } else if (transport == 'sse') {
-        req = {"method": "POST", "url": HOST_URL + "customerservice/customers", "headers": {"content-type": "text/xml; charset=utf-8", "accept": "text/xml"}, "data": createAddCustomerPayload(v[0])}
+        req = {"method": "POST", "url": HOST_URL + CONTEXT_PATH + "/customerservice/customers", "headers": {"content-type": "text/xml; charset=utf-8", "accept": "text/xml"}, "data": createAddCustomerPayload(v[0])}
     }
     console.log("TRACE: sending ", req);
     subSocket.push(req);
@@ -87,9 +89,9 @@ function doAdd(v) {
 function doDelete(v) {
     var req;
     if (transport == 'websocket') {
-        req = "DELETE /customerservice/customers/" + v[0];
+        req = "DELETE" + CONTEXT_PATH + "/customerservice/customers/" + v[0];
     } else if (transport == 'sse') {
-        req = {"method": "DELETE", "url": HOST_URL + "customerservice/customers/" + v[0]}
+        req = {"method": "DELETE", "url": HOST_URL + CONTEXT_PATH + "/customerservice/customers/" + v[0]}
     }
     console.log("TRACE: sending ", req);
     subSocket.push(req);
@@ -98,9 +100,9 @@ function doDelete(v) {
 function doGet(v) {
     var req;
     if (transport == 'websocket') {
-        req = "GET /customerservice/customers/" + v[0];
+        req = "GET " + CONTEXT_PATH + "/customerservice/customers/" + v[0];
     } else if (transport == 'sse') {
-        req = {"method": "GET", "url": HOST_URL + "customerservice/customers/" + v[0]}
+        req = {"method": "GET", "url": HOST_URL + CONTEXT_PATH + "/customerservice/customers/" + v[0]}
     }
     console.log("TRACE: sending ", req);
     subSocket.push(req);
@@ -109,9 +111,9 @@ function doGet(v) {
 function doSubscribe() {
     var req;
     if (transport == 'websocket') {
-        req = "GET /customerservice/monitor\r\nAccept: text/plain\r\n";
+        req = "GET " + CONTEXT_PATH + "/customerservice/monitor\r\nAccept: text/plain\r\n";
     } else if (transport == 'sse') {
-        req = {"method": "GET", "url": HOST_URL + "customerservice/monitor2", "headers": {"accept": "text/plain"}}
+        req = {"method": "GET", "url": HOST_URL + CONTEXT_PATH + "/customerservice/monitor", "headers": {"accept": "text/plain"}}
     }
     console.log("TRACE: sending ", req);
     subSocket.push(req);
@@ -120,9 +122,9 @@ function doSubscribe() {
 function doUnsubscribe() {
     var req;
     if (transport == 'websocket') {
-        req = "GET /customerservice/unmonitor/*\r\nAccept: text/plain\r\n";
+        req = "GET " + CONTEXT_PATH + "/customerservice/unmonitor/*\r\nAccept: text/plain\r\n";
     } else if (transport == 'sse') {
-        req = {"method": "GET", "url": HOST_URL + "customerservice/unmonitor2/*", "headers": {"accept": "text/plain"}}
+        req = {"method": "GET", "url": HOST_URL + CONTEXT_PATH + "/customerservice/unmonitor/*", "headers": {"accept": "text/plain"}}
     }
     console.log("TRACE: sending ", req);
     subSocket.push(req);
@@ -131,10 +133,10 @@ function doUnsubscribe() {
 function doUpdate(v) {
     var req;
     if (transport == 'websocket') {
-        req = "PUT /customerservice/customers\r\nContent-Type: text/xml; charset='utf-8'\r\nAccept: text/xml\r\n\r\n" 
+        req = "PUT " + CONTEXT_PATH + "/customerservice/customers\r\nContent-Type: text/xml; charset='utf-8'\r\nAccept: text/xml\r\n\r\n" 
             + createUpdateCustomerPayload(v[0], v[1]);
     } else if (transport == 'sse') {
-        req = {"method": "PUT", "url": HOST_URL + "customerservice/customers", "headers": {"content-type": "text/xml; charset=utf-8", "accept": "text/xml"}, "data": createUpdateCustomerPayload(v[0], v[1])}
+        req = {"method": "PUT", "url": HOST_URL + CONTEXT_PATH + "/customerservice/customers", "headers": {"content-type": "text/xml; charset=utf-8", "accept": "text/xml"}, "data": createUpdateCustomerPayload(v[0], v[1])}
     }
     console.log("TRACE: sending ", req);
     subSocket.push(req);
