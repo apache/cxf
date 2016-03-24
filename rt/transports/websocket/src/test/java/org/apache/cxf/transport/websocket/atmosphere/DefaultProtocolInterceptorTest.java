@@ -25,9 +25,11 @@ import java.util.Map;
 
 import org.apache.cxf.transport.websocket.WebSocketUtils;
 import org.atmosphere.cpr.AtmosphereRequest;
+import org.atmosphere.cpr.AtmosphereRequestImpl;
 import org.atmosphere.cpr.AtmosphereResource;
 import org.atmosphere.cpr.AtmosphereResourceImpl;
 import org.atmosphere.cpr.AtmosphereResponse;
+import org.atmosphere.cpr.AtmosphereResponseImpl;
 import org.atmosphere.cpr.FrameworkConfig;
 
 import org.junit.Assert;
@@ -41,8 +43,8 @@ public class DefaultProtocolInterceptorTest extends Assert {
     @Test
     public void testCreateResponseWithHeadersFiltering() throws Exception {
         DefaultProtocolInterceptor dpi = new DefaultProtocolInterceptor();
-        AtmosphereRequest request = AtmosphereRequest.newInstance();
-        AtmosphereResponse response = AtmosphereResponse.newInstance();
+        AtmosphereRequest request = AtmosphereRequestImpl.newInstance();
+        AtmosphereResponse response = AtmosphereResponseImpl.newInstance();
         AtmosphereResourceImpl resource = new AtmosphereResourceImpl();
         resource.transport(AtmosphereResource.TRANSPORT.WEBSOCKET);
         request.localAttributes().put(FrameworkConfig.ATMOSPHERE_RESOURCE, resource);
