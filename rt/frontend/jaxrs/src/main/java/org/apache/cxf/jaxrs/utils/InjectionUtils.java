@@ -459,13 +459,14 @@ public final class InjectionUtils {
 
     private static RuntimeException createParamConversionException(ParameterType pType, Exception ex) {
         //
-        //  For path, query & matrix parameters this is 404,
+        //  For path & matrix parameters this is 404, for query is 406
         //  for others 400...
         //
-        if (pType == ParameterType.PATH || pType == ParameterType.QUERY
-            || pType == ParameterType.MATRIX) {
+        if (pType == ParameterType.QUERY) {
+            return ExceptionUtils.toNotAcceptableException(ex, null);
+        } else if (pType == ParameterType.PATH || pType == ParameterType.MATRIX) {
             return ExceptionUtils.toNotFoundException(ex, null);
-        }
+        } 
         return ExceptionUtils.toBadRequestException(ex, null);
     }
     public static <T> T createFromParameterHandler(String value, 
