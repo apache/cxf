@@ -95,6 +95,13 @@ public final class ExceptionUtils {
                 }
             }
         }
+        if (response == null) {
+            Throwable unwrappedException = ex.getCause();
+            if (unwrappedException instanceof WebApplicationException) {
+                WebApplicationException webEx = (WebApplicationException)unwrappedException;
+                return webEx.getResponse();
+            }
+        }
         JAXRSUtils.setMessageContentType(currentMessage, response);
         return response;
     }
