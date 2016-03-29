@@ -42,9 +42,10 @@ public final class MessageUtils {
      * @return true if the message direction is outbound
      */
     public static boolean isOutbound(Message message) {
-        Exchange exchange = message.getExchange();
-        return exchange != null
-               && (message == exchange.getOutMessage() || message == exchange.getOutFaultMessage());
+        return message != null 
+               && message.getExchange() != null
+               && (message == message.getExchange().getOutMessage() 
+                || message == message.getExchange().getOutFaultMessage());
     }
 
     /**
@@ -88,8 +89,11 @@ public final class MessageUtils {
      * @return true if the current messaging role is that of requestor
      */
     public static boolean isRequestor(Message message) {
-        Boolean requestor = (Boolean)message.get(Message.REQUESTOR_ROLE);
-        return requestor != null && requestor.booleanValue();
+        if (message != null) {
+            Boolean requestor = (Boolean) message.get(Message.REQUESTOR_ROLE);
+            return requestor != null && requestor;
+        }
+        return false;
     }
     
     /**
@@ -99,7 +103,7 @@ public final class MessageUtils {
      * @return true if the current messags is a partial response
      */
     public static boolean isPartialResponse(Message message) {
-        return Boolean.TRUE.equals(message.get(Message.PARTIAL_RESPONSE_MESSAGE));
+        return message != null && Boolean.TRUE.equals(message.get(Message.PARTIAL_RESPONSE_MESSAGE));
     }
     
     /**
@@ -110,7 +114,7 @@ public final class MessageUtils {
      * @return true if the current messags is a partial empty response
      */
     public static boolean isEmptyPartialResponse(Message message) {
-        return Boolean.TRUE.equals(message.get(Message.EMPTY_PARTIAL_RESPONSE_MESSAGE));
+        return message != null && Boolean.TRUE.equals(message.get(Message.EMPTY_PARTIAL_RESPONSE_MESSAGE));
     }
 
     /**
@@ -134,9 +138,12 @@ public final class MessageUtils {
     }
     
     public static Object getContextualProperty(Message m, String propPreferred, String propDefault) {
-        Object prop = m.getContextualProperty(propPreferred);
-        if (prop == null && propDefault != null) {
-            prop = m.getContextualProperty(propDefault);
+        Object prop = null;
+        if (m != null) {
+            prop = m.getContextualProperty(propPreferred);
+            if (prop == null && propDefault != null) {
+                prop = m.getContextualProperty(propDefault);
+            }
         }
         return prop;
     }
@@ -145,7 +152,7 @@ public final class MessageUtils {
      * Returns true if the underlying content format is a W3C DOM or a SAAJ message.
      */
     public static boolean isDOMPresent(Message m) {
-        return m.getContent(Node.class) != null;
+        return m != null && m.getContent(Node.class) != null;
         /*
         for (Class c : m.getContentFormats()) {
             if (c.equals(Node.class) || c.getName().equals("javax.xml.soap.SOAPMessage")) {
