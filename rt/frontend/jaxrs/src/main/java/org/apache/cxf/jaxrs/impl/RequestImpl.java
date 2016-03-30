@@ -90,7 +90,7 @@ public class RequestImpl implements Request {
             }
             
             boolean encMatched = acceptEncs.isEmpty() || enc == null 
-                || acceptEncs.contains(enc);
+                || isEncMatached(acceptEncs, enc);;
             if (encMatched) {
                 handleVaryValues(varyValues, HttpHeaders.ACCEPT_ENCODING);
             }
@@ -142,6 +142,18 @@ public class RequestImpl implements Request {
             String language = locale.getLanguage();
             if ("*".equals(language) 
                 || language.equalsIgnoreCase(l.getLanguage())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean isEncMatached(List<String> accepts, String enc) {
+        if (accepts.contains(enc)) {
+            return true;
+        }
+        for (String accept : accepts) {
+            if ("*".equals(accept)) {
                 return true;
             }
         }
