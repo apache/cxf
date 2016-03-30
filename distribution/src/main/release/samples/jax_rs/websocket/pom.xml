@@ -41,11 +41,6 @@
     <profiles>
         <profile>
             <id>jetty8</id>
-            <activation>
-                <property>
-                    <name>!jetty9</name>
-                </property>
-            </activation>
             <properties>
                 <cxf.jetty.version>${cxf.jetty8.version}</cxf.jetty.version>
             </properties>
@@ -60,6 +55,12 @@
         </profile>
         <profile>
             <id>jetty9</id>
+            <!-- activate it by default -->
+            <activation>
+                <property>
+                    <name>!jetty8</name>
+                </property>
+            </activation>
             <properties>
                 <cxf.jetty.version>${cxf.jetty9.version}</cxf.jetty.version>
             </properties>
