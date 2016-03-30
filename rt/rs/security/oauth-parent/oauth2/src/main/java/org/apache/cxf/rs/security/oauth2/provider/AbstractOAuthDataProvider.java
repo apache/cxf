@@ -322,11 +322,36 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         }
     }
     
+    @Override
+    public Client removeClient(String clientId) {
+        Client c = getClient(clientId);
+        removeClientTokens(c);
+        doRemoveClient(c);
+        return c;
+    }
+    
+    protected ServerAccessToken revokeAccessToken(String accessTokenKey) {
+        ServerAccessToken at = getAccessToken(accessTokenKey);
+        if (at != null) {
+            doRevokeAccessToken(at);
+        }
+        return at;
+    }
+    protected RefreshToken revokeRefreshToken(String refreshTokenKey) { 
+        RefreshToken refreshToken = getRefreshToken(refreshTokenKey);
+        if (refreshToken != null) {
+            doRevokeRefreshToken(refreshToken);
+        }
+        return refreshToken;
+    }
+    
+    
     protected abstract void saveAccessToken(ServerAccessToken serverToken);
     protected abstract void saveRefreshToken(ServerAccessToken at, RefreshToken refreshToken);
-    protected abstract ServerAccessToken revokeAccessToken(String accessTokenKey);
-    protected abstract RefreshToken revokeRefreshToken(String refreshTokenKey);
+    protected abstract void doRevokeAccessToken(ServerAccessToken accessToken);
+    protected abstract void doRevokeRefreshToken(RefreshToken  refreshToken);
     protected abstract RefreshToken getRefreshToken(String refreshTokenKey);
+    protected abstract void doRemoveClient(Client c);
 
     public List<String> getDefaultScopes() {
         return defaultScopes;
@@ -359,7 +384,21 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
     public void setSupportPreauthorizedTokens(boolean supportPreauthorizedTokens) {
         this.supportPreauthorizedTokens = supportPreauthorizedTokens;
     }
-
+    protected static boolean isClientMatched(Client c, UserSubject resourceOwner) {
+        return resourceOwner == null 
+            || c.getResourceOwnerSubject() != null 
+                && c.getResourceOwnerSubject().getLogin().equals(resourceOwner.getLogin());
+    }
+    protected static boolean isTokenMatched(ServerAccessToken token, Client c, UserSubject sub) {
+        if (c == null || token.getClient().getClientId().equals(c.getClientId())) {
+            UserSubject tokenSub = token.getSubject();
+            if (sub == null || tokenSub != null && tokenSub.getLogin().equals(sub.getLogin())) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
     
 
 }

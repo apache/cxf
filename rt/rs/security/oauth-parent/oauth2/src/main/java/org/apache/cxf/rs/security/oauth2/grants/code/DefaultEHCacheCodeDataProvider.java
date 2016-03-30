@@ -58,9 +58,9 @@ public class DefaultEHCacheCodeDataProvider extends DefaultEHCacheOAuthDataProvi
     }
 
     @Override
-    protected Client doRemoveClient(Client c) {
+    protected void doRemoveClient(Client c) {
         removeClientCodeGrants(c);
-        return super.doRemoveClient(c);
+        super.doRemoveClient(c);
     }
     
     protected void removeClientCodeGrants(Client c) {
@@ -88,11 +88,8 @@ public class DefaultEHCacheCodeDataProvider extends DefaultEHCacheOAuthDataProvi
             new ArrayList<ServerAuthorizationCodeGrant>(keys.size());
         for (String key : keys) {
             ServerAuthorizationCodeGrant grant = getCodeGrant(key);
-            if (c == null || grant.getClient().getClientId().equals(c.getClientId())) {
-                UserSubject grantSub = grant.getSubject();
-                if (sub == null || grantSub != null && grantSub.getLogin().equals(sub.getLogin())) {
-                    grants.add(grant);
-                }
+            if (AbstractCodeDataProvider.isCodeMatched(grant, c, sub)) {
+                grants.add(grant);
             }
         }
         return grants;

@@ -78,24 +78,9 @@ public class DefaultEHCacheOAuthDataProvider extends AbstractOAuthDataProvider {
         putCacheValue(clientCache, client.getClientId(), client, 0);
     }
     
-    public void setClients(List<Client> clients) {
-        if (clients != null) {
-            for (Client client : clients) {
-                setClient(client);
-            }
-        }
-    }
-
     @Override
-    public Client removeClient(String clientId) {
-        Client c = getClient(clientId);
-        return doRemoveClient(c);
-    }
-    
-    protected Client doRemoveClient(Client c) {
-        removeClientTokens(c);
+    protected void doRemoveClient(Client c) {
         clientCache.remove(c.getClientId());
-        return c;
     }
 
     @Override
@@ -104,9 +89,7 @@ public class DefaultEHCacheOAuthDataProvider extends AbstractOAuthDataProvider {
         List<Client> clients = new ArrayList<Client>(keys.size());
         for (String key : keys) {
             Client c = getClient(key);
-            if (resourceOwner == null 
-                || c.getResourceOwnerSubject() != null 
-                   && c.getResourceOwnerSubject().getLogin().equals(resourceOwner.getLogin())) {
+            if (isClientMatched(c, resourceOwner)) {
                 clients.add(c);
             }
         }
@@ -139,39 +122,21 @@ public class DefaultEHCacheOAuthDataProvider extends AbstractOAuthDataProvider {
         return tokens;
     }
     
-    protected static boolean isTokenMatched(ServerAccessToken token, Client c, UserSubject sub) {
-        if (c == null || token.getClient().getClientId().equals(c.getClientId())) {
-            UserSubject tokenSub = token.getSubject();
-            if (sub == null || tokenSub != null && tokenSub.getLogin().equals(sub.getLogin())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     @Override
     public ServerAccessToken getAccessToken(String accessToken) throws OAuthServiceException {
         return getCacheValue(accessTokenCache, accessToken, ServerAccessToken.class);
     }
     @Override
-    protected ServerAccessToken revokeAccessToken(String accessTokenKey) {
-        ServerAccessToken at = getAccessToken(accessTokenKey);
-        if (at != null) {
-            accessTokenCache.remove(accessTokenKey);
-        }
-        return at;
+    protected void doRevokeAccessToken(ServerAccessToken at) {
+        accessTokenCache.remove(at.getTokenKey());
     }
     @Override
     protected RefreshToken getRefreshToken(String refreshTokenKey) { 
         return getCacheValue(refreshTokenCache, refreshTokenKey, RefreshToken.class);
     }
     @Override
-    protected RefreshToken revokeRefreshToken(String refreshTokenKey) { 
-        RefreshToken refreshToken = getRefreshToken(refreshTokenKey);
-        if (refreshToken != null) {
-            refreshTokenCache.remove(refreshTokenKey);
-        }
-        return refreshToken;
+    protected void doRevokeRefreshToken(RefreshToken rt) { 
+        refreshTokenCache.remove(rt.getTokenKey());
     }
     
     protected void saveAccessToken(ServerAccessToken serverToken) {

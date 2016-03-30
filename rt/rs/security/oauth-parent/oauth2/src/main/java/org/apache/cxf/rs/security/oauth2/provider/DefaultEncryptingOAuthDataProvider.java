@@ -62,20 +62,15 @@ public class DefaultEncryptingOAuthDataProvider extends AbstractOAuthDataProvide
         
     }
     @Override
-    public Client removeClient(String clientId) {
-        Client client = getClient(clientId);
-        clientsMap.remove(clientId);
-        removeClientTokens(client);
-        return client;
+    public void doRemoveClient(Client c) {
+        clientsMap.remove(c.getClientId());
     }
     @Override
     public List<Client> getClients(UserSubject resourceOwner) {
         List<Client> clients = new ArrayList<Client>(clientsMap.size());
         for (String clientKey : clientsMap.keySet()) {
             Client c = getClient(clientKey);
-            if (resourceOwner == null 
-                || c.getResourceOwnerSubject() != null 
-                   && c.getResourceOwnerSubject().getLogin().equals(resourceOwner.getLogin())) {
+            if (isClientMatched(c, resourceOwner)) {
                 clients.add(c);
             }
         }
@@ -103,16 +98,6 @@ public class DefaultEncryptingOAuthDataProvider extends AbstractOAuthDataProvide
         }
         return list;
     }
-    
-    protected static boolean isTokenMatched(ServerAccessToken token, Client c, UserSubject sub) {
-        if (c == null || token.getClient().getClientId().equals(c.getClientId())) {
-            UserSubject tokenSub = token.getSubject();
-            if (sub == null || tokenSub != null && tokenSub.getLogin().equals(sub.getLogin())) {
-                return true;
-            }
-        }
-        return false;
-    }
     @Override
     public ServerAccessToken getAccessToken(String accessToken) throws OAuthServiceException {
         try {
@@ -128,10 +113,8 @@ public class DefaultEncryptingOAuthDataProvider extends AbstractOAuthDataProvide
     }
 
     @Override
-    protected ServerAccessToken revokeAccessToken(String accessTokenKey) {
-        ServerAccessToken at = getAccessToken(accessTokenKey);
-        tokens.remove(accessTokenKey);
-        return at;
+    protected void doRevokeAccessToken(ServerAccessToken at) {
+        tokens.remove(at.getTokenKey());
     }
     
     @Override
@@ -141,14 +124,8 @@ public class DefaultEncryptingOAuthDataProvider extends AbstractOAuthDataProvide
     }
 
     @Override
-    protected RefreshToken revokeRefreshToken(String refreshTokenKey) {
-        RefreshToken rt = null;
-        if (refreshTokens.containsKey(refreshTokenKey)) {
-            rt = getRefreshToken(refreshTokenKey);
-            refreshTokens.remove(refreshTokenKey);
-        }
-        return rt;
-        
+    protected void doRevokeRefreshToken(RefreshToken rt) {
+        refreshTokens.remove(rt.getTokenKey());
     }
 
     private void encryptAccessToken(ServerAccessToken token) {
