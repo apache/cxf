@@ -22,7 +22,6 @@ package org.apache.cxf.jaxrs.utils;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLDecoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -499,15 +498,6 @@ public final class HttpUtils {
     public static String getPathToMatch(String path, String address, boolean addSlash) {
         
         int ind = path.indexOf(address);
-        try {
-            String decodeAddr = URLDecoder.decode(address, "UTF-8");
-            if (ind == -1 && !address.equals(decodeAddr)) {
-                address = decodeAddr;
-                ind = path.indexOf(address);
-            }
-        } catch (UnsupportedEncodingException e) {
-            //
-        }
         if (ind == -1 && address.equals(path + "/")) {
             path += "/";
             ind = 0;

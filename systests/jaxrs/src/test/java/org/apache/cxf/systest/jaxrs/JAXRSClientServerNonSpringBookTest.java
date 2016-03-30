@@ -183,7 +183,7 @@ public class JAXRSClientServerNonSpringBookTest extends AbstractBusClientServerT
     @Test
     public void testGetBook123TwoApplications() throws Exception {
         doTestPerRequest("http://localhost:" + PORT + "/application6/thebooks/bookstore2/bookheaders");
-        doTestPerRequest("http://localhost:" + PORT + "/application6/thebooks2/bookstore2/bookheaders");
+        doTestPerRequest("http://localhost:" + PORT + "/application6/the%20books2/bookstore2/book%20headers");
     }
     
     private Response doTestPerRequest(String address) throws Exception {

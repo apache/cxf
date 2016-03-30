@@ -82,6 +82,12 @@ public class BookStorePerRequest {
     }
     
     @GET
+    @Path("/book%20headers/")
+    public Book getBookByHeader2() throws Exception {
+        return getBookByHeader();
+    }
+    
+    @GET
     @Path("/bookheaders/")
     public Book getBookByHeader() throws Exception {
         
