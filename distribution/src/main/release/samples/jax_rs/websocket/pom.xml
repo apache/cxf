@@ -32,7 +32,7 @@
         <cxf.version>${project.version}</cxf.version>
         <!-- TODO remove these local entries after making the referenced dependency managed in parent/pom.xml -->
         <cxf.ahc.version>1.8.5</cxf.ahc.version>
-        <cxf.atmosphere.version>2.3.7</cxf.atmosphere.version>
+        <cxf.atmosphere.version>2.4.3</cxf.atmosphere.version>
         <cxf.jetty8.version>8.1.15.v20140411</cxf.jetty8.version>
         <cxf.jetty9.version>9.2.2.v20140723</cxf.jetty9.version>
         <cxf.jetty.version>${cxf.jetty8.version}</cxf.jetty.version>

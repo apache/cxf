@@ -51,6 +51,7 @@
         <module>jax_rs/basic_https</module>
         <module>jax_rs/basic</module>
         <module>jax_rs/websocket</module>
+        <module>jax_rs/websocket_web</module>
         <module>jax_rs/search</module>
         <module>jax_rs/description_swagger</module>
         <module>jax_rs/description_swagger2</module>
