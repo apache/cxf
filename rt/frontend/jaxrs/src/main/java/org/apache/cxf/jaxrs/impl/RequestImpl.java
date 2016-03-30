@@ -90,7 +90,7 @@ public class RequestImpl implements Request {
             }
             
             boolean encMatched = acceptEncs.isEmpty() || enc == null 
-                || isEncMatached(acceptEncs, enc);;
+                || isEncMatached(acceptEncs, enc);
             if (encMatched) {
                 handleVaryValues(varyValues, HttpHeaders.ACCEPT_ENCODING);
             }
