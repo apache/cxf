@@ -324,6 +324,14 @@ public class BookStore {
         return "empty form";
     }
     
+    @POST
+    @Path("/form")
+    @Produces(MediaType.APPLICATION_FORM_URLENCODED)
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public Form echoForm(Form form) {
+        return form;
+    }
+    
     @GET
     @Path("/booknames/123")
     @Produces("application/bar")
