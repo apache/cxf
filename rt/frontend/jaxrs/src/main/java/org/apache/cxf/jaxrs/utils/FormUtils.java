@@ -188,15 +188,26 @@ public final class FormUtils {
                                               boolean encoded) throws IOException {
         for (Iterator<Map.Entry<String, List<String>>> it = map.entrySet().iterator(); it.hasNext();) {
             Map.Entry<String, List<String>> entry = it.next();
+            
+            String key = entry.getKey();
+            if (!encoded) {
+                key = HttpUtils.urlEncode(key, enc);
+            }
             for (Iterator<String> entryIterator = entry.getValue().iterator(); entryIterator.hasNext();) {
-                String value = entryIterator.next();
-                os.write(entry.getKey().getBytes(enc));
+                os.write(key.getBytes(enc));
                 os.write('=');
-                String data = encoded ? value : HttpUtils.urlEncode(value, enc);
-                os.write(data.getBytes(enc));
-                if (entryIterator.hasNext() || it.hasNext()) {
+                
+                String value = entryIterator.next();
+                if (!encoded) {
+                    value = HttpUtils.urlEncode(value, enc);
+                }
+                os.write(value.getBytes(enc));
+                if (entryIterator.hasNext()) {
                     os.write('&');
                 }
+            }
+            if (it.hasNext()) {
+                os.write('&');
             }
 
         }
