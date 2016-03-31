@@ -41,11 +41,11 @@ import org.apache.cxf.transport.Conduit;
  */
 class FrontendClientAdapter implements org.apache.cxf.endpoint.Client {
     private ClientConfiguration config;
-    
+
     FrontendClientAdapter(ClientConfiguration config) {
         this.config = config;
     }
-    
+
     @Override
     public List<Interceptor<? extends Message>> getInInterceptors() {
         return config.getInInterceptors();
@@ -85,17 +85,17 @@ class FrontendClientAdapter implements org.apache.cxf.endpoint.Client {
     public Bus getBus() {
         return config.getBus();
     }
-    
+
     @Override
     public Endpoint getEndpoint() {
         return config.getEndpoint();
     }
-    
+
     @Override
     public void destroy() {
         //complete, the actual JAX-RS Client will be closed via a different path 
     }
-    
+
     @Override
     public Map<String, Object> getRequestContext() {
         return config.getRequestContext();
@@ -105,7 +105,7 @@ class FrontendClientAdapter implements org.apache.cxf.endpoint.Client {
     public Map<String, Object> getResponseContext() {
         return config.getResponseContext();
     }
-    
+
     @Override
     public void setThreadLocalRequestContext(boolean b) {
         throw new UnsupportedOperationException();
@@ -120,7 +120,7 @@ class FrontendClientAdapter implements org.apache.cxf.endpoint.Client {
     public void setExecutor(Executor executor) {
         throw new UnsupportedOperationException();
     }
-    
+
     @Override
     public void onMessage(Message message) {
         throw new UnsupportedOperationException();
@@ -171,7 +171,7 @@ class FrontendClientAdapter implements org.apache.cxf.endpoint.Client {
     @Override
     public void invoke(ClientCallback callback, QName operationName, Object... params) throws Exception {
         throw new UnsupportedOperationException();
-        
+
     }
 
     @Override
@@ -209,5 +209,9 @@ class FrontendClientAdapter implements org.apache.cxf.endpoint.Client {
         throw new UnsupportedOperationException();
     }
 
-    
+
+    @Override
+    public void close() throws Exception {
+        destroy();
+    }
 }

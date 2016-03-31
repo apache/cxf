@@ -1012,6 +1012,11 @@ public class ClientImpl
         return Boolean.TRUE.equals(in.get(Message.PARTIAL_RESPONSE_MESSAGE));
     }
 
+    @Override
+    public void close() throws Exception {
+        destroy();
+    }
+
 
     /*
      * modification are echoed back to the shared map

@@ -31,7 +31,7 @@ import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.MessageObserver;
 
-public interface Client extends InterceptorProvider, MessageObserver, ConduitSelectorHolder {
+public interface Client extends InterceptorProvider, MessageObserver, ConduitSelectorHolder, AutoCloseable {
     String REQUEST_CONTEXT = "RequestContext";
     String RESPONSE_CONTEXT = "ResponseContext";
     String KEEP_CONDUIT_ALIVE = "KeepConduitAlive";
