@@ -174,6 +174,11 @@ public class ClientImpl
                 getConduit().close();
             }
         }
+
+        ClassLoaderHolder holder = bus.getExtension(ClassLoaderHolder.class);
+        if (null != holder){
+            holder.reset();
+        }
         
         bus = null;
         conduitSelector = null;
