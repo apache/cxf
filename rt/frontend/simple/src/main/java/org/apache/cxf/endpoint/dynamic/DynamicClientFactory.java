@@ -424,7 +424,8 @@ public class DynamicClientFactory {
         ServiceInfo svcfo = client.getEndpoint().getEndpointInfo().getService();
 
         // Setup the new classloader!
-        ClassLoaderUtils.setThreadContextClassloader(cl);
+        ClassLoaderUtils.ClassLoaderHolder holder = ClassLoaderUtils.setThreadContextClassloader(cl);
+        bus.setExtension(holder, ClassLoaderUtils.ClassLoaderHolder.class);
 
         TypeClassInitializer visitor = new TypeClassInitializer(svcfo,
                                                                 intermediateModel,
@@ -440,7 +441,7 @@ public class DynamicClientFactory {
 
     protected SchemaCompiler createSchemaCompiler() {
         SchemaCompiler compiler =
-            JAXBUtils.createSchemaCompilerWithDefaultAllocator(new HashSet<>());
+         JAXBUtils.createSchemaCompilerWithDefaultAllocator(new HashSet<>());
         if (schemaCompilerOptions != null && schemaCompilerOptions.length > 0) {
             compiler.getOptions().parseArguments(schemaCompilerOptions);
         }
@@ -630,7 +631,6 @@ public class DynamicClientFactory {
         } else {
             javaCompiler.setTarget("1.6");
         }
-
         return javaCompiler.compileFiles(srcList);
     }
 

@@ -175,6 +175,11 @@ public class ClientImpl
             }
         }
 
+        ClassLoaderHolder holder = bus.getExtension(ClassLoaderHolder.class);
+        if (null != holder){
+            holder.reset();
+        }
+        
         bus = null;
         conduitSelector = null;
         outFaultObserver = null;
@@ -1018,6 +1023,11 @@ public class ClientImpl
 
     private boolean isPartialResponse(Message in) {
         return Boolean.TRUE.equals(in.get(Message.PARTIAL_RESPONSE_MESSAGE));
+    }
+
+    @Override
+    public void close() throws Exception {
+        destroy();
     }
 
 
