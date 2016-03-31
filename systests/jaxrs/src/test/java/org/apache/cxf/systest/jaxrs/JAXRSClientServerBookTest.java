@@ -60,6 +60,7 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
+import org.apache.cxf.feature.LoggingFeature;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.io.CachedOutputStream;
@@ -76,7 +77,6 @@ import org.apache.cxf.systest.jaxrs.BookStore.BookNotReturnedException;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
@@ -283,6 +283,18 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         WebClient wc = WebClient.create(address);
         Response r = wc.form(new Form());
         assertEquals("empty form", r.readEntity(String.class));
+    }
+    @Test
+    public void testEchoForm() throws Exception {
+        String address = "http://localhost:" + PORT + "/bookstore/form";
+        WebClient wc = WebClient.create(address, Collections.singletonList(new LoggingFeature()));
+        Form formOut = new Form().param("a", "aValue").param("b", "b value")
+            .param("c%", "cValue");
+        Form formIn = wc.post(formOut, Form.class);
+        assertEquals(3, formIn.asMap().size());
+        assertEquals("aValue", formIn.asMap().getFirst("a"));
+        assertEquals("b value", formIn.asMap().getFirst("b"));
+        assertEquals("cValue", formIn.asMap().getFirst("c%"));
     }
     
     @Test
@@ -1212,21 +1224,6 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
-    @Ignore
-    // uncomment once I can figure out how to set for this test only
-    // com.sun.xml.bind.v2.bytecode.ClassTailor.noOptimize - JAXB is a pain
-    public void testProxyUnwrapBookWithXslt() throws Exception {
-        XSLTJaxbProvider<?> provider = new XSLTJaxbProvider<Object>();
-        provider.setInTemplate("classpath:/org/apache/cxf/systest/jaxrs/resources/unwrapbook2.xsl");
-        BookStore bs = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class,
-                             Collections.singletonList(provider));
-        Book book = bs.getWrappedBook2(123L);
-        assertNotNull(book);
-        assertEquals(123L, book.getId());
-        
-    }
-    
-    @Test
     public void testOptions() throws Exception {
         WebClient wc = 
             WebClient.create("http://localhost:" 
@@ -1538,9 +1535,12 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         String msg1 = 
             "No message body writer has been found for class java.util.GregorianCalendar, ContentType: */*";
         String msg2 = "No message body writer has been found for class java.util.Calendar, ContentType: */*";
-        
-        getAndCompareStrings("http://localhost:" + PORT + "/bookstore/timetable", 
-                             new String[]{msg1, msg2}, "*/*", 500);
+        WebClient wc = WebClient.create("http://localhost:" + PORT + "/bookstore/timetable");
+        wc.accept("*/*");
+        Response r = wc.get();
+        assertEquals(500, r.getStatus());
+        String s = r.readEntity(String.class);
+        assertTrue(s.equals(msg1) || s.equals(msg2));
     }
     
     @SuppressWarnings("deprecation")
@@ -2747,24 +2747,6 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         return str;
     }
     
-    private void getAndCompareStrings(String address, 
-                               String[] expectedValue,
-                               String acceptType,
-                               int expectedStatus) throws Exception {
-        assertEquals(2, expectedValue.length);
-        GetMethod get = new GetMethod(address);
-        get.setRequestHeader("Accept", acceptType);
-        HttpClient httpClient = new HttpClient();
-        try {
-            int result = httpClient.executeMethod(get);
-            assertEquals(expectedStatus, result);
-            String jsonContent = getStringFromInputStream(get.getResponseBodyAsStream());
-            assertTrue("Expected value is wrong", 
-                       expectedValue[0].equals(jsonContent) || expectedValue[1].equals(jsonContent));
-        } finally {
-            get.releaseConnection();
-        }
-    }
     
     
     private String getStringFromInputStream(InputStream in) throws Exception {        
