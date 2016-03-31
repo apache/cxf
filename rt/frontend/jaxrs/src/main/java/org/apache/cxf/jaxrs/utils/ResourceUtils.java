@@ -590,7 +590,7 @@ public final class ResourceUtils {
                                                boolean jaxbOnly,
                                                MessageBodyWriter<?> jaxbWriter) {
         for (OperationResourceInfo ori : resource.getMethodDispatcher().getOperationResourceInfos()) {
-            Method method = ori.getMethodToInvoke();
+            Method method = ori.getAnnotatedMethod() == null ? ori.getMethodToInvoke() : ori.getAnnotatedMethod();
             Class<?> realReturnType = method.getReturnType();
             Class<?> cls = realReturnType;
             if (cls == Response.class) {
