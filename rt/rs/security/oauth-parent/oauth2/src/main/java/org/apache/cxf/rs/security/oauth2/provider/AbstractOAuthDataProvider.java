@@ -393,7 +393,11 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         }
         return false;
     }
-    
+    public void setClients(List<Client> clients) {    
+        for (Client c : clients) {
+            setClient(c);
+        }
+    }
     
 
 }
