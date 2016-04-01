@@ -24,6 +24,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.ElementCollection;
+import javax.persistence.MapKeyColumn;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -92,6 +94,7 @@ public class UserSubject implements Serializable {
      * been captured during the authentication process 
      * @return the list of roles
      */
+    @ElementCollection
     public List<String> getRoles() {
         return roles;
     }
@@ -109,6 +112,8 @@ public class UserSubject implements Serializable {
      * Get the list of additional user subject properties
      * @return the list of properties
      */
+    @ElementCollection
+    @MapKeyColumn(name = "name")
     public Map<String, String> getProperties() {
         return properties;
     }
