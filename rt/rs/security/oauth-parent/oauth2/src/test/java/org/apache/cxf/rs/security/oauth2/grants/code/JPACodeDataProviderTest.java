@@ -21,6 +21,7 @@ package org.apache.cxf.rs.security.oauth2.grants.code;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.Collections;
+import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -60,20 +61,56 @@ public class JPACodeDataProviderTest extends Assert {
 
     @Test
     public void testAddGetDeleteClient() {
-        Client c = new Client();
-        c.setRedirectUris(Collections.singletonList("http://client/redirect"));
-        c.setClientId("12345");
-        c.setResourceOwnerSubject(new UserSubject("alice"));
-        provider.setClient(c);
+        Client c = addClient("12345", "alice");
         Client c2 = provider.getClient(c.getClientId());
-        assertNotNull(c2);
-        assertEquals(c.getClientId(), c2.getClientId());
-        assertEquals(c.getRedirectUris(), c.getRedirectUris());
-        assertEquals("alice", c.getResourceOwnerSubject().getLogin());
+        compareClients(c, c2);
         
         provider.removeClient(c.getClientId());
         Client c3 = provider.getClient(c.getClientId());
         assertNull(c3);
+    }
+    
+    @Test
+    public void testAddGetDeleteClients() {
+        Client c = addClient("12345", "alice");
+        Client c2 = addClient("56789", "alice");
+        Client c3 = addClient("09876", "bob");
+        
+        List<Client> aliceClients = provider.getClients(new UserSubject("alice"));
+        assertNotNull(aliceClients);
+        assertEquals(2, aliceClients.size());
+        compareClients(c, aliceClients.get(0).getClientId().equals("12345") 
+                       ? aliceClients.get(0) : aliceClients.get(1));
+        compareClients(c2, aliceClients.get(0).getClientId().equals("56789") 
+                       ? aliceClients.get(0) : aliceClients.get(1));
+        
+        List<Client> bobClients = provider.getClients(new UserSubject("bob"));
+        assertNotNull(bobClients);
+        assertEquals(1, bobClients.size());
+        Client bobClient = bobClients.get(0);
+        compareClients(c3, bobClient);
+        
+        List<Client> allClients = provider.getClients(null);
+        assertNotNull(allClients);
+        assertEquals(3, allClients.size());
+        
+    }
+    
+    private Client addClient(String clientId, String userLogin) {
+        Client c = new Client();
+        c.setRedirectUris(Collections.singletonList("http://client/redirect"));
+        c.setClientId(clientId);
+        c.setResourceOwnerSubject(new UserSubject(userLogin));
+        provider.setClient(c);
+        return c;
+    }
+    private void compareClients(Client c, Client c2) {
+        assertNotNull(c2);
+        assertEquals(c.getClientId(), c2.getClientId());
+        assertEquals(1, c.getRedirectUris().size());
+        assertEquals(1, c2.getRedirectUris().size());
+        assertEquals("http://client/redirect", c.getRedirectUris().get(0));
+        assertEquals(c.getResourceOwnerSubject().getLogin(), c2.getResourceOwnerSubject().getLogin());
     }
     
     @After

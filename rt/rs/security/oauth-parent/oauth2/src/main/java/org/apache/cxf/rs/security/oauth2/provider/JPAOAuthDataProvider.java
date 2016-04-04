@@ -21,6 +21,7 @@ package org.apache.cxf.rs.security.oauth2.provider;
 import java.util.Collections;
 import java.util.List;
 
+import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
@@ -40,15 +41,14 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
     @Override
     public Client getClient(String clientId) throws OAuthServiceException {
         try {
-            TypedQuery<Client> query = entityManager.createQuery(
-                "SELECT c FROM " + CLIENT_TABLE_NAME + " c WHERE c.clientId = '" + clientId + "'", Client.class);
-            return query.getSingleResult();
+            return getClientQuery(clientId).getSingleResult();
         } catch (NoResultException ex) {
             return null;
         }
     }
     
     public void setClient(Client client) {
+        persistEntity(client.getResourceOwnerSubject());
         persistEntity(client);
     }
     
@@ -59,7 +59,7 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
 
     @Override
     public List<Client> getClients(UserSubject resourceOwner) {
-        return null;
+        return getClientsQuery(resourceOwner).getResultList();
     }
 
     @Override
@@ -93,18 +93,33 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
     
     protected void saveRefreshToken(ServerAccessToken at, RefreshToken refreshToken) {
     }
-    
     protected void persistEntity(Object entity) {
-        entityManager.getTransaction().begin();
-        entityManager.persist(entity);
-        entityManager.getTransaction().commit();
+        try {
+            entityManager.getTransaction().begin();
+            entityManager.persist(entity);
+            entityManager.getTransaction().commit();
+        }  catch (EntityExistsException ex) {
+            entityManager.getTransaction().rollback();
+        }
     }
     protected void removeEntity(Object entity) {
         entityManager.getTransaction().begin();
         entityManager.remove(entity);
         entityManager.getTransaction().commit();
     }
-
+    protected TypedQuery<Client> getClientQuery(String clientId) {
+        return entityManager.createQuery(
+            "SELECT c FROM " + CLIENT_TABLE_NAME + " c WHERE c.clientId = '" + clientId + "'", Client.class);
+    }
+    protected TypedQuery<Client> getClientsQuery(UserSubject resourceOwnerSubject) {
+        if (resourceOwnerSubject == null) {
+            return entityManager.createQuery("SELECT c FROM " + CLIENT_TABLE_NAME + " c", Client.class);
+        } else {
+            return entityManager.createQuery(
+                "SELECT c FROM " + CLIENT_TABLE_NAME + " c JOIN c.resourceOwnerSubject r WHERE r.login = '" 
+                + resourceOwnerSubject.getLogin() + "'", Client.class);
+        }
+    }
     public void setEntityManager(EntityManager entityManager) {
         this.entityManager = entityManager;
     }

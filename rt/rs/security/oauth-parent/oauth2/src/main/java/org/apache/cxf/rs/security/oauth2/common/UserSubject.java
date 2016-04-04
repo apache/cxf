@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 
 import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.MapKeyColumn;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -33,6 +35,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * may capture after the end user approved a given third party request
  */
 @XmlRootElement
+@Entity
 public class UserSubject implements Serializable {
     
     private static final long serialVersionUID = -1469694589163385689L;
@@ -77,6 +80,7 @@ public class UserSubject implements Serializable {
      * Return the user login name
      * @return the login name
      */
+    @Id
     public String getLogin() {
         return login;
     }
