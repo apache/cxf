@@ -42,10 +42,13 @@ public final class MessageUtils {
      * @return true if the message direction is outbound
      */
     public static boolean isOutbound(Message message) {
-        return message != null 
-               && message.getExchange() != null
-               && (message == message.getExchange().getOutMessage() 
-                || message == message.getExchange().getOutFaultMessage());
+        if (message == null) {
+            return false;
+        }
+
+        Exchange exchange = message.getExchange();
+        return exchange != null
+               && (message == exchange.getOutMessage() || message == exchange.getOutFaultMessage());
     }
 
     /**
