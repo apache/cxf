@@ -5,6 +5,7 @@
    <persistence-unit name="testUnitHibernate" transaction-type="RESOURCE_LOCAL">
      <provider>org.hibernate.ejb.HibernatePersistence</provider>
      <class>org.apache.cxf.rs.security.oauth2.common.Client</class>
+     <class>org.apache.cxf.rs.security.oauth2.common.UserSubject</class>
      <exclude-unlisted-classes>true</exclude-unlisted-classes>
      <properties>
         <property name="hibernate.connection.url" value="jdbc:hsqldb:mem:oauth-jpa"/>
@@ -19,6 +20,7 @@
    <persistence-unit name="testUnitOpenJPA" transaction-type="RESOURCE_LOCAL">
      <provider>org.apache.openjpa.persistence.PersistenceProviderImpl</provider>
      <class>org.apache.cxf.rs.security.oauth2.common.Client</class>
+     <class>org.apache.cxf.rs.security.oauth2.common.UserSubject</class>
      <exclude-unlisted-classes>true</exclude-unlisted-classes>
      <properties>
         <property name="openjpa.ConnectionURL" value="jdbc:hsqldb:mem:oauth-jpa"/>
