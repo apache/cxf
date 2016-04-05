@@ -73,6 +73,15 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
         UNRESTRICTED_POLICIES_INSTALLED = ok;
     }
     
+<<<<<<< HEAD
+=======
+    static final String PORT = allocatePort(CipherSuitesServer.class);
+    static final String PORT2 = allocatePort(CipherSuitesServer.class, 2);
+    static final String PORT3 = allocatePort(CipherSuitesServer.class, 3);
+    static final String PORT4 = allocatePort(CipherSuitesServer.class, 4);
+    static final String PORT5 = allocatePort(CipherSuitesServer.class, 5);
+    
+>>>>>>> 3235f4b... Adding a TLS test for an expired cert
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -615,6 +624,36 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
         conduit.setTlsClientParameters(tlsParams);
         
         assertEquals(port.greetMe("Kitty"), "Hello Kitty");
+        
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+    
+    // Test an expired cert
+    @org.junit.Test
+    public void testExpiredCert() throws Exception {
+        
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = CipherSuitesTest.class.getResource("ciphersuites-client-expired-cert.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        URL url = SOAPService.WSDL_LOCATION;
+        SOAPService service = new SOAPService(url, SOAPService.SERVICE);
+        assertNotNull("Service is null", service);   
+        final Greeter port = service.getHttpsPort();
+        assertNotNull("Port is null", port);
+        
+        updateAddressPort(port, PORT5);
+        
+        try {
+            port.greetMe("Kitty");
+            fail("Failure expected on not being able to negotiate a cipher suite");
+        } catch (Exception ex) {
+            // expected
+        }
         
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
