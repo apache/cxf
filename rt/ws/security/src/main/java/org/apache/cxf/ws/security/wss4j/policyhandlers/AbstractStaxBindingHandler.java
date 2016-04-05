@@ -548,6 +548,11 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
         properties.setSignatureDigestAlgorithm(algType.getDigest());
         // sig.setSigCanonicalization(binding.getAlgorithmSuite().getC14n().getValue());
 
+        boolean includePrefixes = 
+            MessageUtils.getContextualBoolean(
+                message, SecurityConstants.ADD_INCLUSIVE_PREFIXES, true
+            );
+        properties.setAddExcC14NInclusivePrefixes(includePrefixes);
     }
     
     protected WSSecurityTokenConstants.KeyIdentifier getKeyIdentifierType(
