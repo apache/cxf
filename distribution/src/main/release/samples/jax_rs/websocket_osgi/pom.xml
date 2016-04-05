@@ -48,6 +48,8 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.groupId}.${project.artifactId};blueprint.aries.xml-validation:=false</Bundle-SymbolicName>
                         <Import-Package>
+                            javax.servlet;version="[2.6,4)",
+                            javax.servlet.http;version="[2.6,4)",
                             javax.ws.rs,
                             javax.ws.rs.core,
                             org.apache.cxf.jaxrs.provider,

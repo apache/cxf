@@ -16,8 +16,8 @@ Using either UNIX or Windows:
 
 This will produce a war file in the target folder.
 
-
-Starting Karaf (refer to http://karaf.apache.org/manual/latest-3.0.x/quick-start.html)
+Starting Karaf (refer to http://karaf.apache.org/manual/latest-3.0.x/quick-start.html.
+You can also use Karaf 4.0.x for this demo.)
 
   bin/karaf
 
