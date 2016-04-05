@@ -6,6 +6,8 @@
      <provider>org.hibernate.ejb.HibernatePersistence</provider>
      <class>org.apache.cxf.rs.security.oauth2.common.Client</class>
      <class>org.apache.cxf.rs.security.oauth2.common.UserSubject</class>
+     <class>org.apache.cxf.rs.security.oauth2.tokens.bearer.BearerAccessToken</class>
+     <class>org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken</class>
      <exclude-unlisted-classes>true</exclude-unlisted-classes>
      <properties>
         <property name="hibernate.connection.url" value="jdbc:hsqldb:mem:oauth-jpa"/>
@@ -21,6 +23,8 @@
      <provider>org.apache.openjpa.persistence.PersistenceProviderImpl</provider>
      <class>org.apache.cxf.rs.security.oauth2.common.Client</class>
      <class>org.apache.cxf.rs.security.oauth2.common.UserSubject</class>
+     <class>org.apache.cxf.rs.security.oauth2.tokens.bearer.BearerAccessToken</class>
+     <class>org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken</class>
      <exclude-unlisted-classes>true</exclude-unlisted-classes>
      <properties>
         <property name="openjpa.ConnectionURL" value="jdbc:hsqldb:mem:oauth-jpa"/>

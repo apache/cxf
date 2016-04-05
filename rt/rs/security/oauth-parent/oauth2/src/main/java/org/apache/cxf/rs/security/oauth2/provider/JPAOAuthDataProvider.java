@@ -29,10 +29,13 @@ import javax.persistence.TypedQuery;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
+import org.apache.cxf.rs.security.oauth2.tokens.bearer.BearerAccessToken;
 import org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken;
 
 public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
     private static final String CLIENT_TABLE_NAME = Client.class.getSimpleName();
+    private static final String BEARER_TOKEN_TABLE_NAME = BearerAccessToken.class.getSimpleName();
+    private static final String REFRESH_TOKEN_TABLE_NAME = BearerAccessToken.class.getSimpleName();
     private EntityManager entityManager;
     
     public JPAOAuthDataProvider() {
@@ -74,17 +77,27 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
     
     @Override
     public ServerAccessToken getAccessToken(String accessToken) throws OAuthServiceException {
-        return null;
+        try {
+            return getTokenQuery(accessToken).getSingleResult();
+        } catch (NoResultException ex) {
+            return null;
+        }
     }
     @Override
     protected void doRevokeAccessToken(ServerAccessToken at) {
+        removeEntity(at);
     }
     @Override
     protected RefreshToken getRefreshToken(String refreshTokenKey) { 
-        return null;
+        try {
+            return getRefreshTokenQuery(refreshTokenKey).getSingleResult();
+        } catch (NoResultException ex) {
+            return null;
+        }
     }
     @Override
     protected void doRevokeRefreshToken(RefreshToken rt) { 
+        removeEntity(rt);
     }
     
     protected void saveAccessToken(ServerAccessToken serverToken) {
@@ -110,6 +123,16 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
     protected TypedQuery<Client> getClientQuery(String clientId) {
         return entityManager.createQuery(
             "SELECT c FROM " + CLIENT_TABLE_NAME + " c WHERE c.clientId = '" + clientId + "'", Client.class);
+    }
+    protected TypedQuery<ServerAccessToken> getTokenQuery(String tokenKey) {
+        return entityManager.createQuery(
+            "SELECT t FROM " + BEARER_TOKEN_TABLE_NAME + " t WHERE t.tokenKey = '" + tokenKey + "'", 
+            ServerAccessToken.class);
+    }
+    protected TypedQuery<RefreshToken> getRefreshTokenQuery(String tokenKey) {
+        return entityManager.createQuery(
+            "SELECT t FROM " + REFRESH_TOKEN_TABLE_NAME + " t WHERE t.tokenKey = '" + tokenKey + "'", 
+            RefreshToken.class);
     }
     protected TypedQuery<Client> getClientsQuery(UserSubject resourceOwnerSubject) {
         if (resourceOwnerSubject == null) {

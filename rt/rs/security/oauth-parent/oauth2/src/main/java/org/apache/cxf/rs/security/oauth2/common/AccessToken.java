@@ -22,9 +22,15 @@ import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import javax.persistence.ElementCollection;
+import javax.persistence.Id;
+import javax.persistence.MapKeyColumn;
+import javax.persistence.MappedSuperclass;
+
 /**
  * Base Access Token representation
  */
+@MappedSuperclass
 public abstract class AccessToken implements Serializable {
 
     private static final long serialVersionUID = -5750544301887053480L;
@@ -80,6 +86,7 @@ public abstract class AccessToken implements Serializable {
      * Returns the token key
      * @return the key
      */
+    @Id
     public String getTokenKey() {
         return tokenKey;
     }
@@ -110,6 +117,8 @@ public abstract class AccessToken implements Serializable {
      * Gets token parameters 
      * @return
      */
+    @ElementCollection
+    @MapKeyColumn(name = "propName")
     public Map<String, String> getParameters() {
         return parameters;
     }
