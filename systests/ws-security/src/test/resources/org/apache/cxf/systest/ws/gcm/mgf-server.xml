@@ -38,4 +38,13 @@
             <entry key="security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
     </jaxws:endpoint>
+    
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="GCM256MGFSHA256Digest" address="http://localhost:${testutil.ports.gcm.MGFServer}/DoubleItGCM256MGFSHA256digest" serviceName="s:DoubleItService" endpointName="s:DoubleItGCM256MGFSHA256DigestPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/gcm/DoubleItGCM.wsdl">
+        <jaxws:properties>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+            <entry key="security.signature.properties" value="bob.properties"/>
+            <entry key="security.encryption.username" value="useReqSigCert"/>
+            <entry key="security.subject.cert.constraints" value=".*O=apache.org.*"/>
+        </jaxws:properties>
+    </jaxws:endpoint>
 </beans>

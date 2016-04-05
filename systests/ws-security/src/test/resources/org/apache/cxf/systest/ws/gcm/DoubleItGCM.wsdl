@@ -91,6 +91,24 @@
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
+    <wsdl:binding name="DoubleItGCM256MGFSHA256DigestBinding" type="tns:DoubleItPortType">
+        <wsp:PolicyReference URI="#DoubleItGCM256MGFSHA256DigestPolicy"/>
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="DoubleIt">
+            <soap:operation soapAction=""/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Input_Policy"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy"/>
+            </wsdl:output>
+            <wsdl:fault name="DoubleItFault">
+                <soap:body use="literal" name="DoubleItFault"/>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
     <wsdl:service name="DoubleItService">
         <wsdl:port name="DoubleItGCM128Port" binding="tns:DoubleItGCM128Binding">
             <soap:address location="http://localhost:9001/DoubleItGCM128"/>
@@ -103,6 +121,9 @@
         </wsdl:port>
         <wsdl:port name="DoubleItGCM256MGFSHA256Port" binding="tns:DoubleItGCM256MGFSHA256Binding">
             <soap:address location="http://localhost:9001/DoubleItGCM256MGFSHA256"/>
+        </wsdl:port>
+        <wsdl:port name="DoubleItGCM256MGFSHA256DigestPort" binding="tns:DoubleItGCM256MGFSHA256DigestBinding">
+            <soap:address location="http://localhost:9001/DoubleItGCM256MGFSHA256digest"/>
         </wsdl:port>
     </wsdl:service>
     <wsp:Policy wsu:Id="DoubleItGCM128Policy">
@@ -258,6 +279,46 @@
                         <sp:AlgorithmSuite>
                             <wsp:Policy>
                                 <sp-cxf:Basic256GCMMGFSHA256 xmlns:sp-cxf="http://cxf.apache.org/custom/security-policy"/>
+                            </wsp:Policy>
+                        </sp:AlgorithmSuite>
+                    </wsp:Policy>
+                </sp:AsymmetricBinding>
+            </wsp:All>
+        </wsp:ExactlyOne>
+    </wsp:Policy>
+    <wsp:Policy wsu:Id="DoubleItGCM256MGFSHA256DigestPolicy">
+        <wsp:ExactlyOne>
+            <wsp:All>
+                <sp:AsymmetricBinding>
+                    <wsp:Policy>
+                        <sp:InitiatorToken>
+                            <wsp:Policy>
+                                <sp:X509Token sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
+                                    <wsp:Policy>
+                                        <sp:WssX509V3Token10/>
+                                    </wsp:Policy>
+                                </sp:X509Token>
+                            </wsp:Policy>
+                        </sp:InitiatorToken>
+                        <sp:RecipientToken>
+                            <wsp:Policy>
+                                <sp:X509Token sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never">
+                                    <wsp:Policy>
+                                        <sp:WssX509V3Token10/>
+                                    </wsp:Policy>
+                                </sp:X509Token>
+                            </wsp:Policy>
+                        </sp:RecipientToken>
+                        <sp:Layout>
+                            <wsp:Policy>
+                                <sp:Lax/>
+                            </wsp:Policy>
+                        </sp:Layout>
+                        <sp:IncludeTimestamp/>
+                        <sp:OnlySignEntireHeadersAndBody/>
+                        <sp:AlgorithmSuite>
+                            <wsp:Policy>
+                                <sp-cxf:Basic256GCMMGFSHA256Digest xmlns:sp-cxf="http://cxf.apache.org/custom/security-policy"/>
                             </wsp:Policy>
                         </sp:AlgorithmSuite>
                     </wsp:Policy>

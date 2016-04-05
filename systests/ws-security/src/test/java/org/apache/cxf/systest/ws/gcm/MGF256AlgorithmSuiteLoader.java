@@ -86,7 +86,22 @@ public class MGF256AlgorithmSuiteLoader implements AlgorithmSuiteLoader {
                     256, 192, 256, 256, 1024, 4096
                 )
             );
+            ALGORITHM_SUITE_TYPES.put(
+                 "Basic256GCMMGFSHA256Digest", 
+                 new AlgorithmSuiteType(
+                     "Basic256GCMMGFSHA256Digest",
+                     SPConstants.SHA256,
+                     "http://www.w3.org/2009/xmlenc11#aes256-gcm",
+                     SPConstants.KW_AES256,
+                     WSConstants.KEYTRANSPORT_RSAOAEP_XENC11,
+                     SPConstants.P_SHA1_L256,
+                     SPConstants.P_SHA1_L192,
+                     256, 192, 256, 256, 1024, 4096
+                 )
+            );
             ALGORITHM_SUITE_TYPES.get("Basic256GCMMGFSHA256").setMGFAlgo(WSConstants.MGF_SHA256);
+            ALGORITHM_SUITE_TYPES.get("Basic256GCMMGFSHA256Digest").setMGFAlgo(WSConstants.MGF_SHA256);
+            ALGORITHM_SUITE_TYPES.get("Basic256GCMMGFSHA256Digest").setEncryptionDigest(SPConstants.SHA256);
         }
 
         GCMAlgorithmSuite(SPConstants.SPVersion version, Policy nestedPolicy) {
@@ -108,6 +123,9 @@ public class MGF256AlgorithmSuiteLoader implements AlgorithmSuiteLoader {
 
             if ("Basic256GCMMGFSHA256".equals(assertionName)) {
                 setAlgorithmSuiteType(ALGORITHM_SUITE_TYPES.get("Basic256GCMMGFSHA256"));
+                getAlgorithmSuiteType().setNamespace(assertionNamespace);
+            } else if ("Basic256GCMMGFSHA256Digest".equals(assertionName)) {
+                setAlgorithmSuiteType(ALGORITHM_SUITE_TYPES.get("Basic256GCMMGFSHA256Digest"));
                 getAlgorithmSuiteType().setNamespace(assertionNamespace);
             }
         }
