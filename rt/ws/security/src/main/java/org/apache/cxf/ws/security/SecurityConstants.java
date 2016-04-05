@@ -139,6 +139,12 @@ public final class SecurityConstants extends org.apache.cxf.rt.security.Security
      * hence set this configuration option to "false" in this case.
      */
     public static final String USE_STR_TRANSFORM = "ws-security.use.str.transform";
+    
+    /**
+     * Whether to add an InclusiveNamespaces PrefixList as a CanonicalizationMethod child when generating 
+     * Signatures using WSConstants.C14N_EXCL_OMIT_COMMENTS. Default is "true".
+     */
+    public static final String ADD_INCLUSIVE_PREFIXES = "ws-security.add.inclusive.prefixes";
 
     //
     // Non-boolean WS-Security Configuration parameters
