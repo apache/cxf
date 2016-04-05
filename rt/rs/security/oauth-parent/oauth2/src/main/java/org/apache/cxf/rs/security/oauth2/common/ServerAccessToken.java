@@ -23,6 +23,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.ElementCollection;
+import javax.persistence.MapKeyColumn;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.OneToOne;
+
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
@@ -30,6 +35,7 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 /**
  * Server Access Token representation
  */
+@MappedSuperclass
 public abstract class ServerAccessToken extends AccessToken {
     private static final long serialVersionUID = 638776204861456064L;
     
@@ -86,6 +92,7 @@ public abstract class ServerAccessToken extends AccessToken {
      * Returns the Client associated with this token
      * @return the client
      */
+    @OneToOne
     public Client getClient() {
         return client;
     }
@@ -98,6 +105,7 @@ public abstract class ServerAccessToken extends AccessToken {
      * Returns a list of opaque permissions/scopes
      * @return the scopes
      */
+    @ElementCollection
     public List<OAuthPermission> getScopes() {
         return scopes;
     }
@@ -126,6 +134,7 @@ public abstract class ServerAccessToken extends AccessToken {
      * when authorizing a given client request
      * @return UserSubject
      */
+    @OneToOne
     public UserSubject getSubject() {
         return subject;
     }
@@ -162,7 +171,7 @@ public abstract class ServerAccessToken extends AccessToken {
         return responseType;
     }
     
-
+    @ElementCollection
     public List<String> getAudiences() {
         return audiences;
     }
@@ -194,6 +203,8 @@ public abstract class ServerAccessToken extends AccessToken {
         this.nonce = nonce;
     }
 
+    @ElementCollection
+    @MapKeyColumn(name = "extraPropName")
     public Map<String, String> getExtraProperties() {
         return extraProperties;
     }

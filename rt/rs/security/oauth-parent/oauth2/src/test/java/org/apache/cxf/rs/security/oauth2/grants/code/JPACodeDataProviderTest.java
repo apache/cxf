@@ -27,8 +27,12 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
+import org.apache.cxf.rs.security.oauth2.common.AccessTokenRegistration;
 import org.apache.cxf.rs.security.oauth2.common.Client;
+import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
+import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
+import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -53,6 +57,7 @@ public class JPACodeDataProviderTest extends Assert {
             EntityManager em = emFactory.createEntityManager();
             provider = new JPACodeDataProvider();
             provider.setEntityManager(em);
+            provider.setSupportedScopes(Collections.singletonMap("a", "A Scope"));
         } catch (Exception ex) {
             ex.printStackTrace();
             fail("Exception during JPA EntityManager creation.");
@@ -94,6 +99,27 @@ public class JPACodeDataProviderTest extends Assert {
         assertNotNull(allClients);
         assertEquals(3, allClients.size());
         
+    }
+    
+    @Test
+    public void testAddGetDeleteAccessToken() {
+        Client c = addClient("101", "bob");
+        
+        AccessTokenRegistration atr = new AccessTokenRegistration();
+        atr.setClient(c);
+        atr.setApprovedScope(Collections.singletonList("a"));
+        atr.setSubject(c.getResourceOwnerSubject());
+        
+        ServerAccessToken at = provider.createAccessToken(atr);
+        ServerAccessToken at2 = provider.getAccessToken(at.getTokenKey());
+        assertEquals(at.getTokenKey(), at2.getTokenKey());
+        List<OAuthPermission> scopes = at2.getScopes();
+        assertNotNull(scopes);
+        assertEquals(1, scopes.size());
+        OAuthPermission perm = scopes.get(0);
+        assertEquals("a", perm.getPermission());
+        provider.revokeToken(c, at.getTokenKey(), OAuthConstants.ACCESS_TOKEN);
+        assertNull(provider.getAccessToken(at.getTokenKey()));
     }
     
     private Client addClient(String clientId, String userLogin) {
