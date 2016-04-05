@@ -21,7 +21,6 @@ package org.apache.cxf.transport.websocket.atmosphere;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -160,12 +159,7 @@ public class DefaultProtocolInterceptor extends AtmosphereInterceptorAdapter {
         AsyncIOWriter writer = res.getAsyncIOWriter();
 
         if (writer instanceof AtmosphereInterceptorWriter) {
-            //REVIST need a better way to add a custom filter at the first entry and not at the last as
-            // e.g. interceptor(AsyncIOInterceptor interceptor, int position)
-            Deque<AsyncIOInterceptor> filters = AtmosphereInterceptorWriter.class.cast(writer).filters();
-            if (!filters.contains(interceptor)) {
-                filters.addFirst(interceptor);
-            }
+            AtmosphereInterceptorWriter.class.cast(writer).interceptor(interceptor, 0);
         }
     }
 
