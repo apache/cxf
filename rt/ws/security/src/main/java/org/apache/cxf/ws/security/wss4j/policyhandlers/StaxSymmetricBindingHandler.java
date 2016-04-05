@@ -475,6 +475,10 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                        algorithmSuite.getAlgorithmSuiteType().getAsymmetricKeyWrap());
             properties.setEncryptionSymAlgorithm(
                        algorithmSuite.getAlgorithmSuiteType().getEncryption());
+            properties.setEncryptionKeyTransportDigestAlgorithm(
+                       algorithmSuite.getAlgorithmSuiteType().getEncryptionDigest());
+            properties.setEncryptionKeyTransportMGFAlgorithm(
+                       algorithmSuite.getAlgorithmSuiteType().getMGFAlgo());
 
             String encUser = 
                 (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.ENCRYPT_USERNAME, message);

@@ -272,4 +272,52 @@ public class GCMTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
+    // Same as above but with explicitly adding a ds:DigestMethod of SHA-256 as well
+    @org.junit.Test
+    public void testAESGCM256MGFSHA256Digest() throws Exception {
+        if (!unrestrictedPoliciesInstalled) {
+            return;
+        }
+        
+        //
+        // This test fails with the IBM JDK 7
+        // IBM JDK 7 appears to require a GCMParameter class to be used, which
+        // only exists in JDK 7. The Sun JDK appears to be more lenient and 
+        // allows us to use the existing IVParameterSpec class.
+        //
+        if ("IBM Corporation".equals(System.getProperty("java.vendor"))
+            && System.getProperty("java.version") != null
+            &&  System.getProperty("java.version").startsWith("1.7")) {
+            return;
+        }
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = GCMTest.class.getResource("mgf-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        URL wsdl = GCMTest.class.getResource("DoubleItGCM.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItGCM256MGFSHA256DigestPort");
+        DoubleItPortType gcmPort = 
+                service.getPort(portQName, DoubleItPortType.class);
+        
+        String port = MGF_PORT;
+        if (STAX_PORT.equals(test.getPort())) {
+            port = MGF_STAX_PORT;
+        }
+        updateAddressPort(gcmPort, port);
+        
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(gcmPort);
+        }
+        
+        gcmPort.doubleIt(25);
+        
+        ((java.io.Closeable)gcmPort).close();
+        bus.shutdown(true);
+    }
+    
 }
