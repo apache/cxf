@@ -51,6 +51,7 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
     static final String PORT2 = allocatePort(CipherSuitesServer.class, 2);
     static final String PORT3 = allocatePort(CipherSuitesServer.class, 3);
     static final String PORT4 = allocatePort(CipherSuitesServer.class, 4);
+    static final String PORT5 = allocatePort(CipherSuitesServer.class, 5);
     
     private static final boolean UNRESTRICTED_POLICIES_INSTALLED;
     static {
@@ -73,15 +74,6 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
         UNRESTRICTED_POLICIES_INSTALLED = ok;
     }
     
-<<<<<<< HEAD
-=======
-    static final String PORT = allocatePort(CipherSuitesServer.class);
-    static final String PORT2 = allocatePort(CipherSuitesServer.class, 2);
-    static final String PORT3 = allocatePort(CipherSuitesServer.class, 3);
-    static final String PORT4 = allocatePort(CipherSuitesServer.class, 4);
-    static final String PORT5 = allocatePort(CipherSuitesServer.class, 5);
-    
->>>>>>> 3235f4b... Adding a TLS test for an expired cert
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
