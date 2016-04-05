@@ -17,3 +17,4 @@ target/
 velocity.log
 bin/
 *~
+node_modules/
