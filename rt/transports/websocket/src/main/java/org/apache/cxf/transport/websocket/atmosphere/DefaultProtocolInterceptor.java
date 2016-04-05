@@ -142,6 +142,10 @@ public class DefaultProtocolInterceptor extends AtmosphereInterceptorAdapter {
                     suspendedResponse.flushBuffer();
                     return this;
                 }
+
+                @Override
+                public void close(AtmosphereResponse response) throws IOException {
+                }
             });
             // REVISIT we need to keep this response's asyncwriter alive so that data can be written to the 
             //   suspended response, but investigate if there is a better alternative. 
@@ -158,10 +162,6 @@ public class DefaultProtocolInterceptor extends AtmosphereInterceptorAdapter {
                 suspendedResponses.put(srid, event.getResource().getResponse());
 
                 AsyncIOWriter writer = event.getResource().getResponse().getAsyncIOWriter();
-                if (writer == null) {
-                    writer = new AtmosphereInterceptorWriter();
-                    r.getResponse().asyncIOWriter(writer);
-                }
                 if (writer instanceof AtmosphereInterceptorWriter) {
                     ((AtmosphereInterceptorWriter)writer).interceptor(interceptor);
                 }
