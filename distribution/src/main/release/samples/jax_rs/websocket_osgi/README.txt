@@ -16,23 +16,22 @@ Using either UNIX or Windows:
 
 This will produce a war file in the target folder.
 
+Starting Karaf (refer to http://karaf.apache.org/manual/latest-3.0.x/quick-start.html.
+You can also use Karaf 4.0.x for this demo.)
 
-Starting Karaf (refer to http://karaf.apache.org/manual/latest-3.0.x/quick-start.html)
+$ bin/karaf 
+        __ __                  ____      
+       / //_/____ __________ _/ __/      
+      / ,<  / __ `/ ___/ __ `/ /_        
+     / /| |/ /_/ / /  / /_/ / __/        
+    /_/ |_|\__,_/_/   \__,_/_/         
 
-  bin/karaf
+  Apache Karaf (3.0.4)
 
+Hit '<tab>' for a list of available commands
+and '[cmd] --help' for help on a specific command.
+Hit '<ctrl-d>' or type 'system:shutdown' or 'logout' to shutdown Karaf.
 
-          __ __                  ____      
-         / //_/____ __________ _/ __/      
-        / ,<  / __ `/ ___/ __ `/ /_        
-       / /| |/ /_/ / /  / /_/ / __/        
-      /_/ |_|\__,_/_/   \__,_/_/         
-  
-    Apache Karaf (3.0.4)
-  
-  Hit '<tab>' for a list of available commands
-  and '[cmd] --help' for help on a specific command.
-  Hit '<ctrl-d>' or type 'system:shutdown' or 'logout' to shutdown Karaf.
 
 
 In order to install CXF's features, you need to add the CXF's features repo using
@@ -52,28 +51,29 @@ Install this demo bundle (using the appropriate bundle version number)
 
 And verify the bundles are installed.
 
-karaf@root()> feature:repo-add cxf 3.2.0-SNAPSHOT
-Adding feature url mvn:org.apache.cxf.karaf/apache-cxf/3.2.0-SNAPSHOT/xml/features
+
+karaf@root()> feature:repo-add cxf 3.1.7-SNAPSHOT
+Adding feature url mvn:org.apache.cxf.karaf/apache-cxf/3.1.7-SNAPSHOT/xml/features
 karaf@root()> feature:install cxf-jaxrs cxf-transports-websocket-server
-karaf@root()> list -t 0 | grep CXF
- 80 | Active   |  40 | 3.2.0.SNAPSHOT   | Apache CXF Core                                                    
- 81 | Active   |  40 | 3.2.0.SNAPSHOT   | Apache CXF Runtime Management                                      
-100 | Active   |  40 | 3.2.0.SNAPSHOT   | Apache CXF Runtime HTTP Transport                                  
-102 | Active   |  40 | 3.2.0.SNAPSHOT   | Apache CXF JAX-RS Extensions: Providers                            
-103 | Active   |  40 | 3.2.0.SNAPSHOT   | Apache CXF JAX-RS Extensions: Search                               
-104 | Active   |  40 | 3.2.0.SNAPSHOT   | Apache CXF JAX-RS Service Description                              
-105 | Active   |  40 | 3.2.0.SNAPSHOT   | Apache CXF Runtime JAX-RS Frontend                                 
-106 | Active   |  40 | 3.2.0.SNAPSHOT   | Apache CXF JAX-RS Client                                           
-108 | Active   |  40 | 3.2.0.SNAPSHOT   | Apache CXF Runtime WebSocket Transport                             
-karaf@root()> install -s mvn:org.apache.cxf.samples/jax_rs_websocket_osgi
+karaf@root()> install -s mvn:org.apache.cxf.samples/jax_rs_websocket_osgi/3.1.7-SNAPSHOT
 Bundle ID: 109
+karaf@root()> list -t 0 | grep CXF
+ 80 | Active   |  40 | 3.1.7.SNAPSHOT   | Apache CXF Core                                                    
+ 81 | Active   |  40 | 3.1.7.SNAPSHOT   | Apache CXF Runtime Management                                      
+100 | Active   |  40 | 3.1.7.SNAPSHOT   | Apache CXF Runtime HTTP Transport                                  
+102 | Active   |  40 | 3.1.7.SNAPSHOT   | Apache CXF JAX-RS Extensions: Providers                            
+103 | Active   |  40 | 3.1.7.SNAPSHOT   | Apache CXF JAX-RS Extensions: Search                               
+104 | Active   |  40 | 3.1.7.SNAPSHOT   | Apache CXF JAX-RS Service Description                              
+105 | Active   |  40 | 3.1.7.SNAPSHOT   | Apache CXF Runtime JAX-RS Frontend                                 
+106 | Active   |  40 | 3.1.7.SNAPSHOT   | Apache CXF JAX-RS Client                                           
+108 | Active   |  40 | 3.1.7.SNAPSHOT   | Apache CXF Runtime WebSocket Transport                             
 karaf@root()> list
 START LEVEL 100 , List Threshold: 50
  ID | State  | Lvl | Version        | Name                           
 ---------------------------------------------------------------------
-107 | Active |  80 | 2.4.3          | atmosphere-runtime             
-109 | Active |  80 | 3.2.0.SNAPSHOT | JAX-RS WebSocket Blueprint Demo
-karaf@root()>
+107 | Active |  80 | 2.3.7          | atmosphere-runtime             
+109 | Active |  80 | 3.1.7.SNAPSHOT | JAX-RS WebSocket Blueprint Demo
+karaf@root()> 
 
 
 Visit http://localhost:8181/cxf/ to see if this RESTful service is registered.
