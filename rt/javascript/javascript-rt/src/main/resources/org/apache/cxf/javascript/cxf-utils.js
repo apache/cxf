@@ -745,6 +745,9 @@ function org_apache_cxf_client_request(url, requestXML, method, sync, headers)
 	this.req.onreadystatechange = function() {
 		requester.onReadyState();
 	}
+	this.req.onerror = function() {
+		requester.onReadyState();
+	}
 
 	// NOTE: we do not call the onerror callback for a synchronous error
 	// at request time. We let the request object throw as it will.
@@ -929,7 +932,7 @@ function org_apache_cxf_client_onReadyState() {
 						return;
 					}
 					if (this.onerror != null) {
-						this.onerror("Could not handle content of response.");
+						this.onerror(this, "Could not handle content of response.");
 						return;
 					}
 				}
