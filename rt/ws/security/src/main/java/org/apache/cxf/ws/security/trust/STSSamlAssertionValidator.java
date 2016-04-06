@@ -19,6 +19,10 @@
 
 package org.apache.cxf.ws.security.trust;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.handler.RequestData;
@@ -32,6 +36,7 @@ import org.apache.wss4j.dom.validate.SamlAssertionValidator;
  * for validation.
  */
 public class STSSamlAssertionValidator extends SamlAssertionValidator {
+    private static final Logger LOG = LogUtils.getL7dLogger(STSSamlAssertionValidator.class);
     
     private boolean trustVerificationSucceeded;
     
@@ -64,6 +69,7 @@ public class STSSamlAssertionValidator extends SamlAssertionValidator {
             trustVerificationSucceeded = true;
             return credential;
         } catch (WSSecurityException ex) {
+            LOG.log(Level.WARNING, "Trust verification of SAML assertion failed: " + ex.getMessage(), ex);
             trustVerificationSucceeded = false;
             return null;
         }
