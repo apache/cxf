@@ -143,7 +143,7 @@ public class DefaultEHCacheOAuthDataProvider extends AbstractOAuthDataProvider {
         putCacheValue(accessTokenCache, serverToken.getTokenKey(), serverToken, serverToken.getExpiresIn());
     }
     
-    protected void saveRefreshToken(ServerAccessToken at, RefreshToken refreshToken) {
+    protected void saveRefreshToken(RefreshToken refreshToken) {
         putCacheValue(refreshTokenCache, refreshToken.getTokenKey(), refreshToken, refreshToken.getExpiresIn());
     }
     

@@ -103,7 +103,7 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
         persistEntity(serverToken);
     }
     
-    protected void saveRefreshToken(ServerAccessToken at, RefreshToken refreshToken) {
+    protected void saveRefreshToken(RefreshToken refreshToken) {
         persistEntity(refreshToken);
     }
     protected void persistEntityWithPossibleRollback(Object entity) {

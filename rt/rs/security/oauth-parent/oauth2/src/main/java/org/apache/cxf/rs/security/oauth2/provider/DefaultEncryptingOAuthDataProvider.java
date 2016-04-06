@@ -39,7 +39,7 @@ import org.apache.cxf.rt.security.crypto.KeyProperties;
 public class DefaultEncryptingOAuthDataProvider extends AbstractOAuthDataProvider {
     protected SecretKey key;
     private Set<String> tokens = Collections.synchronizedSet(new HashSet<String>());
-    private ConcurrentHashMap<String, String> refreshTokens = new ConcurrentHashMap<String, String>();
+    private Set<String> refreshTokens = Collections.synchronizedSet(new HashSet<String>());
     private ConcurrentHashMap<String, String> clientsMap = new ConcurrentHashMap<String, String>();
     public DefaultEncryptingOAuthDataProvider(String algo, int keySize) {
         this(new KeyProperties(algo, keySize));
@@ -90,7 +90,7 @@ public class DefaultEncryptingOAuthDataProvider extends AbstractOAuthDataProvide
     @Override
     public List<RefreshToken> getRefreshTokens(Client c, UserSubject sub) {
         List<RefreshToken> list = new ArrayList<RefreshToken>(refreshTokens.size());
-        for (String tokenKey : tokens) {
+        for (String tokenKey : refreshTokens) {
             RefreshToken token = getRefreshToken(tokenKey);
             if (isTokenMatched(token, c, sub)) {
                 list.add(token);
@@ -118,9 +118,10 @@ public class DefaultEncryptingOAuthDataProvider extends AbstractOAuthDataProvide
     }
     
     @Override
-    protected void saveRefreshToken(ServerAccessToken at, RefreshToken refreshToken) {
+    protected void saveRefreshToken(RefreshToken refreshToken) {
         String encryptedRefreshToken = ModelEncryptionSupport.encryptRefreshToken(refreshToken, key);
-        at.setRefreshToken(encryptedRefreshToken);
+        refreshToken.setTokenKey(encryptedRefreshToken);
+        refreshTokens.add(encryptedRefreshToken);
     }
 
     @Override
@@ -131,7 +132,6 @@ public class DefaultEncryptingOAuthDataProvider extends AbstractOAuthDataProvide
     private void encryptAccessToken(ServerAccessToken token) {
         String encryptedToken = ModelEncryptionSupport.encryptAccessToken(token, key);
         tokens.add(encryptedToken);
-        refreshTokens.put(token.getRefreshToken(), encryptedToken);
         token.setTokenKey(encryptedToken);
     }
     @Override
