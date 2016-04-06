@@ -127,6 +127,7 @@ public abstract class AbstractSamlInHandler implements ContainerRequestFilter {
     protected void validateToken(Message message, SamlAssertionWrapper assertion) {
         try {
             RequestData data = new RequestData();
+            data.setMsgContext(message);
             
             // Add Audience Restrictions for SAML
             configureAudienceRestriction(message, data);
