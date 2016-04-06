@@ -89,9 +89,11 @@ public class ResponseImplTest extends Assert {
     public void testReadBufferedStaxSource() throws Exception {
         ResponseImpl r = new ResponseImpl(200);
         Source responseSource = readResponseSource(r);
-        Transformer trans = TransformerFactory.newInstance().newTransformer();
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        transformerFactory.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        Transformer transformer = transformerFactory.newTransformer();
         DOMResult res = new DOMResult();
-        trans.transform(responseSource, res);
+        transformer.transform(responseSource, res);
         Document doc = (Document)res.getNode();
         assertEquals("Response", doc.getDocumentElement().getLocalName());
     }

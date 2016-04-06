@@ -64,6 +64,7 @@ public class FastInfosetExperiment {
     private FastInfosetExperiment() throws ParserConfigurationException {
         documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         transformerFactory = TransformerFactory.newInstance();
+        transformerFactory.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
         fiFile = new File("fiTest.fixml");
     }
     

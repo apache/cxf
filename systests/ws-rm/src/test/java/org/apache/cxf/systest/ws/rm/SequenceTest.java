@@ -1660,10 +1660,11 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
 
     private static String convertToString(DOMSource domSource)
         throws TransformerException {
-        Transformer xformer =
-            TransformerFactory.newInstance().newTransformer();
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        transformerFactory.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        Transformer transformer = transformerFactory.newTransformer();
         StringWriter output = new StringWriter();
-        xformer.transform(domSource, new StreamResult(output));
+        transformer.transform(domSource, new StreamResult(output));
         return output.toString();
     }
 

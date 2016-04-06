@@ -402,12 +402,13 @@ public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
     private static String source2String(Source source) throws Exception {
         final java.io.ByteArrayOutputStream bos = new java.io.ByteArrayOutputStream();
         final StreamResult sr = new StreamResult(bos);
-        final Transformer trans =
-            TransformerFactory.newInstance().newTransformer();
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        transformerFactory.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        Transformer transformer = transformerFactory.newTransformer();
         final java.util.Properties oprops = new java.util.Properties();
         oprops.put(OutputKeys.OMIT_XML_DECLARATION, "yes");
-        trans.setOutputProperties(oprops);
-        trans.transform(source, sr);
+        transformer.setOutputProperties(oprops);
+        transformer.transform(source, sr);
         return bos.toString();
     }
 }

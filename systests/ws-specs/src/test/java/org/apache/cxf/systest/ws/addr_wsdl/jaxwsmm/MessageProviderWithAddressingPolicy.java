@@ -51,12 +51,13 @@ public class MessageProviderWithAddressingPolicy implements Provider<Source> {
     }
 
     public Source invoke(Source request) {
-        TransformerFactory tfactory = TransformerFactory.newInstance();
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
         try {
+            transformerFactory.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
             /*
             tfactory.setAttribute("indent-number", "2");
              */
-            Transformer serializer = tfactory.newTransformer();
+            Transformer serializer = transformerFactory.newTransformer();
             // Setup indenting to "pretty print"
             serializer.setOutputProperty(OutputKeys.INDENT, "yes");
             serializer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
