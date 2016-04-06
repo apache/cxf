@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.rs.security.oauth2.provider;
 
-import java.util.Collections;
 import java.util.List;
 
 import javax.persistence.EntityExistsException;
@@ -35,7 +34,7 @@ import org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken;
 public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
     private static final String CLIENT_TABLE_NAME = Client.class.getSimpleName();
     private static final String BEARER_TOKEN_TABLE_NAME = BearerAccessToken.class.getSimpleName();
-    private static final String REFRESH_TOKEN_TABLE_NAME = BearerAccessToken.class.getSimpleName();
+    private static final String REFRESH_TOKEN_TABLE_NAME = RefreshToken.class.getSimpleName();
     private EntityManager entityManager;
     
     public JPAOAuthDataProvider() {
@@ -51,7 +50,7 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
     }
     
     public void setClient(Client client) {
-        persistEntity(client.getResourceOwnerSubject());
+        persistEntityWithPossibleRollback(client.getResourceOwnerSubject());
         persistEntity(client);
     }
     
@@ -67,12 +66,12 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
 
     @Override
     public List<ServerAccessToken> getAccessTokens(Client c, UserSubject sub) {
-        return Collections.emptyList();
+        return getTokensQuery(c, sub).getResultList();
     }
 
     @Override
     public List<RefreshToken> getRefreshTokens(Client c, UserSubject sub) {
-        return Collections.emptyList();
+        return getRefreshTokensQuery(c, sub).getResultList();
     }
     
     @Override
@@ -105,8 +104,9 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
     }
     
     protected void saveRefreshToken(ServerAccessToken at, RefreshToken refreshToken) {
+        persistEntity(refreshToken);
     }
-    protected void persistEntity(Object entity) {
+    protected void persistEntityWithPossibleRollback(Object entity) {
         try {
             entityManager.getTransaction().begin();
             entityManager.persist(entity);
@@ -114,6 +114,11 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
         }  catch (EntityExistsException ex) {
             entityManager.getTransaction().rollback();
         }
+    }
+    protected void persistEntity(Object entity) {
+        entityManager.getTransaction().begin();
+        entityManager.persist(entity);
+        entityManager.getTransaction().commit();
     }
     protected void removeEntity(Object entity) {
         entityManager.getTransaction().begin();
@@ -124,16 +129,6 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
         return entityManager.createQuery(
             "SELECT c FROM " + CLIENT_TABLE_NAME + " c WHERE c.clientId = '" + clientId + "'", Client.class);
     }
-    protected TypedQuery<ServerAccessToken> getTokenQuery(String tokenKey) {
-        return entityManager.createQuery(
-            "SELECT t FROM " + BEARER_TOKEN_TABLE_NAME + " t WHERE t.tokenKey = '" + tokenKey + "'", 
-            ServerAccessToken.class);
-    }
-    protected TypedQuery<RefreshToken> getRefreshTokenQuery(String tokenKey) {
-        return entityManager.createQuery(
-            "SELECT t FROM " + REFRESH_TOKEN_TABLE_NAME + " t WHERE t.tokenKey = '" + tokenKey + "'", 
-            RefreshToken.class);
-    }
     protected TypedQuery<Client> getClientsQuery(UserSubject resourceOwnerSubject) {
         if (resourceOwnerSubject == null) {
             return entityManager.createQuery("SELECT c FROM " + CLIENT_TABLE_NAME + " c", Client.class);
@@ -143,8 +138,59 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
                 + resourceOwnerSubject.getLogin() + "'", Client.class);
         }
     }
+    protected TypedQuery<BearerAccessToken> getTokenQuery(String tokenKey) {
+        return entityManager.createQuery(
+            "SELECT t FROM " + BEARER_TOKEN_TABLE_NAME + " t WHERE t.tokenKey = '" + tokenKey + "'", 
+            BearerAccessToken.class);
+    }
+    protected TypedQuery<ServerAccessToken> getTokensQuery(Client c, UserSubject resourceOwnerSubject) {
+        if (c == null && resourceOwnerSubject == null) {
+            return entityManager.createQuery("SELECT t FROM " + BEARER_TOKEN_TABLE_NAME + " t", 
+                                             ServerAccessToken.class);
+        } else if (c == null) {
+            return entityManager.createQuery(
+                "SELECT t FROM " + BEARER_TOKEN_TABLE_NAME + " t JOIN t.subject s WHERE s.login = '" 
+                + resourceOwnerSubject.getLogin() + "'", ServerAccessToken.class);
+        } else if (resourceOwnerSubject == null) {
+            return entityManager.createQuery(
+                "SELECT t FROM " + BEARER_TOKEN_TABLE_NAME + " t JOIN t.client c WHERE c.clientId = '" 
+                    + c.getClientId() + "'", ServerAccessToken.class);
+        } else {
+            return entityManager.createQuery(
+                "SELECT t FROM " + BEARER_TOKEN_TABLE_NAME + " t JOIN t.subject s JOIN t.client c WHERE s.login = '" 
+                + resourceOwnerSubject.getLogin() + "' AND c.clientId = '" + c.getClientId() + "'",
+                ServerAccessToken.class);
+        }
+    }
+    protected TypedQuery<RefreshToken> getRefreshTokenQuery(String tokenKey) {
+        return entityManager.createQuery(
+            "SELECT t FROM " + REFRESH_TOKEN_TABLE_NAME + " t WHERE t.tokenKey = '" + tokenKey + "'", 
+            RefreshToken.class);
+    }
+    protected TypedQuery<RefreshToken> getRefreshTokensQuery(Client c, UserSubject resourceOwnerSubject) {
+        if (c == null && resourceOwnerSubject == null) {
+            return entityManager.createQuery("SELECT t FROM " + REFRESH_TOKEN_TABLE_NAME + " t", 
+                                             RefreshToken.class);
+        } else if (c == null) {
+            return entityManager.createQuery(
+                "SELECT t FROM " + REFRESH_TOKEN_TABLE_NAME + " t JOIN t.subject s WHERE s.login = '" 
+                + resourceOwnerSubject.getLogin() + "'", RefreshToken.class);
+        } else if (resourceOwnerSubject == null) {
+            return entityManager.createQuery(
+                "SELECT t FROM " + REFRESH_TOKEN_TABLE_NAME + " t JOIN t.client c WHERE c.clientId = '" 
+                    + c.getClientId() + "'", RefreshToken.class);
+        } else {
+            return entityManager.createQuery(
+                "SELECT t FROM " + REFRESH_TOKEN_TABLE_NAME + " t JOIN t.subject s JOIN t.client c WHERE s.login = '" 
+                + resourceOwnerSubject.getLogin() + "' AND c.clientId = '" + c.getClientId() + "'",
+                RefreshToken.class);
+        }
+    }
     public void setEntityManager(EntityManager entityManager) {
         this.entityManager = entityManager;
+    }
+    public EntityManager getEntityManager() {
+        return entityManager;
     }
     @Override
     public void close() {

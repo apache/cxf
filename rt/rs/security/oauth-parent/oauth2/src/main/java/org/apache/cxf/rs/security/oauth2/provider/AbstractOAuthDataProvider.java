@@ -21,6 +21,7 @@ package org.apache.cxf.rs.security.oauth2.provider;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -230,9 +231,17 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
     }
     protected RefreshToken doCreateNewRefreshToken(ServerAccessToken at) {
         RefreshToken rt = new RefreshToken(at.getClient(), refreshTokenLifetime);
-        rt.setAudiences(at.getAudiences());
+        if (at.getAudiences() != null) {
+            List<String> audiences = new LinkedList<String>();
+            audiences.addAll(at.getAudiences());
+            rt.setAudiences(audiences);
+        }
         rt.setGrantType(at.getGrantType());
-        rt.setScopes(at.getScopes());
+        if (at.getScopes() != null) {
+            List<OAuthPermission> scopes = new LinkedList<OAuthPermission>();
+            scopes.addAll(at.getScopes());
+            rt.setScopes(scopes);
+        }
         rt.setSubject(at.getSubject());
         rt.setClientCodeVerifier(at.getClientCodeVerifier());
         linkRefreshAccessTokens(rt, at);

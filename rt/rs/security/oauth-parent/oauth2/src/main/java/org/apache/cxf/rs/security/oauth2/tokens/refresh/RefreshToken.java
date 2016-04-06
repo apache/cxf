@@ -21,6 +21,9 @@ package org.apache.cxf.rs.security.oauth2.tokens.refresh;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
@@ -29,6 +32,7 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 /**
  * Simple Refresh Token implementation
  */
+@Entity
 public class RefreshToken extends ServerAccessToken {
     
     private static final long serialVersionUID = 2837120382251693874L;
@@ -63,7 +67,7 @@ public class RefreshToken extends ServerAccessToken {
     public RefreshToken() {
         
     }
-    
+    @ElementCollection
     public List<String> getAccessTokens() {
         return accessTokens;
     }
