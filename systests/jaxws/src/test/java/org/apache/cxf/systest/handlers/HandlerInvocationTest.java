@@ -1011,8 +1011,8 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
                 throws TransformerException {
                 StringWriter stringWriter = new StringWriter();
                 StreamResult streamResult = new StreamResult(stringWriter);
-                TransformerFactory transformerFactory = 
-                    TransformerFactory.newInstance();
+                TransformerFactory transformerFactory = TransformerFactory.newInstance();
+                transformerFactory.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
                 Transformer transformer = transformerFactory.newTransformer();
                 transformer.setOutputProperty(OutputKeys.INDENT, "no");
                 transformer.setOutputProperty(

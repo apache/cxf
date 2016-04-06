@@ -92,7 +92,9 @@ public final class Client {
         try {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             StreamResult sr = new StreamResult(bos);
-            Transformer trans = TransformerFactory.newInstance().newTransformer();
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            transformerFactory.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            Transformer transformer = transformerFactory.newTransformer();
             Properties oprops = new Properties();
             oprops.put(OutputKeys.OMIT_XML_DECLARATION, "yes");
             trans.setOutputProperties(oprops);

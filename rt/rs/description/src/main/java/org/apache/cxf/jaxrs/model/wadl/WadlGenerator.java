@@ -1227,14 +1227,17 @@ public class WadlGenerator implements ContainerRequestFilter {
         DOMSource domSource = new DOMSource(wadlDoc);
         // temporary workaround
         StringWriter stringWriter = new StringWriter();
-        TransformerFactory tFactory = TransformerFactory.newInstance();
-        Transformer transformer = tFactory.newTransformer();
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        transformerFactory.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        Transformer transformer = transformerFactory.newTransformer();
         transformer.transform(domSource, new StreamResult(stringWriter));
         return stringWriter.toString();
     }
     private String transformLocally(Message m, UriInfo ui, Source source) throws Exception {
         InputStream is = ResourceUtils.getResourceStream(stylesheetReference, m.getExchange().getBus());
-        Transformer t = TransformerFactory.newInstance().newTemplates(new StreamSource(is)).newTransformer();
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        transformerFactory.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        Transformer t = transformerFactory.newTemplates(new StreamSource(is)).newTransformer();
         t.setParameter("base.path", (String)m.get("http.base.path"));
         StringWriter stringWriter = new StringWriter();
         t.transform(source, new StreamResult(stringWriter));
