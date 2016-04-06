@@ -456,7 +456,9 @@ public class JsXMLHttpRequest extends ScriptableObject {
         StreamResult result = new StreamResult(baos);
         DOMSource source = new DOMSource(node);
         try {
-            TransformerFactory.newInstance().newTransformer().transform(source, result);
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            transformerFactory.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            transformerFactory.newTransformer().transform(source, result);
         } catch (TransformerConfigurationException e) {
             throw new RuntimeException(e);
         } catch (TransformerException e) {

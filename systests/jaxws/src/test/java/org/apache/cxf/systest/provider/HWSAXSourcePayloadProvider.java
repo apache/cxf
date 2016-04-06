@@ -92,7 +92,9 @@ public class HWSAXSourcePayloadProvider implements Provider<SAXSource> {
         try {
             
             DOMResult domResult = new DOMResult();
-            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            transformerFactory.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            Transformer transformer = transformerFactory.newTransformer();
             transformer.transform(request, domResult);
             Node n = domResult.getNode().getFirstChild();
 

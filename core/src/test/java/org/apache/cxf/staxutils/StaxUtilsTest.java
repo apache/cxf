@@ -314,8 +314,9 @@ public class StaxUtilsTest extends Assert {
         XMLStreamReader reader = StaxUtils.createXMLStreamReader(source);
         XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(baos);
         StaxSource staxSource = new StaxSource(reader);
-        TransformerFactory trf = TransformerFactory.newInstance();
-        Transformer transformer = trf.newTransformer();
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        transformerFactory.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        Transformer transformer = transformerFactory.newTransformer();
         transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
         transformer.transform(staxSource, new StreamResult(baos));
         writer.flush();
@@ -332,9 +333,10 @@ public class StaxUtilsTest extends Assert {
         XMLStreamReader reader = StaxUtils.createXMLStreamReader(stringReader);
         XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(baos);
         StaxSource staxSource = new StaxSource(reader);
-        TransformerFactory trf = TransformerFactory.newInstance();
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        transformerFactory.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
         Document doc = StaxUtils.read(getTestStream("./resources/copy.xsl"));
-        Transformer transformer = trf.newTransformer(new DOMSource(doc));
+        Transformer transformer = transformerFactory.newTransformer(new DOMSource(doc));
         //System.out.println("Used transformer: " + transformer.getClass().getName());
         transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
         transformer.transform(staxSource, new StreamResult(baos));
@@ -349,6 +351,7 @@ public class StaxUtilsTest extends Assert {
         try {
             trf = TransformerFactory
                 .newInstance("com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl", null);
+            trf.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             String xml = "<root xmlns=\"urn:org.apache.cxf:test\">Text</root>";
             StringReader stringReader = new StringReader(xml);
