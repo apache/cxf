@@ -97,8 +97,8 @@ public final class Client {
             Transformer transformer = transformerFactory.newTransformer();
             Properties oprops = new Properties();
             oprops.put(OutputKeys.OMIT_XML_DECLARATION, "yes");
-            trans.setOutputProperties(oprops);
-            trans.transform(source, sr);
+            transformer.setOutputProperties(oprops);
+            transformer.transform(source, sr);
             System.out.println("**** Response ******");
             System.out.println(bos.toString());
             bos.close();
