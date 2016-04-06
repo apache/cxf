@@ -27,12 +27,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
-import org.apache.cxf.rs.security.oauth2.common.AccessTokenRegistration;
 import org.apache.cxf.rs.security.oauth2.common.Client;
-import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
-import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
-import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -65,61 +61,23 @@ public class JPACodeDataProviderTest extends Assert {
     }
 
     @Test
-    public void testAddGetDeleteClient() {
-        Client c = addClient("12345", "alice");
-        Client c2 = provider.getClient(c.getClientId());
-        compareClients(c, c2);
+    public void testAddGetDeleteCodeGrants() {
+        Client c = addClient("111", "bob");
         
-        provider.removeClient(c.getClientId());
-        Client c3 = provider.getClient(c.getClientId());
-        assertNull(c3);
-    }
-    
-    @Test
-    public void testAddGetDeleteClients() {
-        Client c = addClient("12345", "alice");
-        Client c2 = addClient("56789", "alice");
-        Client c3 = addClient("09876", "bob");
-        
-        List<Client> aliceClients = provider.getClients(new UserSubject("alice"));
-        assertNotNull(aliceClients);
-        assertEquals(2, aliceClients.size());
-        compareClients(c, aliceClients.get(0).getClientId().equals("12345") 
-                       ? aliceClients.get(0) : aliceClients.get(1));
-        compareClients(c2, aliceClients.get(0).getClientId().equals("56789") 
-                       ? aliceClients.get(0) : aliceClients.get(1));
-        
-        List<Client> bobClients = provider.getClients(new UserSubject("bob"));
-        assertNotNull(bobClients);
-        assertEquals(1, bobClients.size());
-        Client bobClient = bobClients.get(0);
-        compareClients(c3, bobClient);
-        
-        List<Client> allClients = provider.getClients(null);
-        assertNotNull(allClients);
-        assertEquals(3, allClients.size());
-        
-    }
-    
-    @Test
-    public void testAddGetDeleteAccessToken() {
-        Client c = addClient("101", "bob");
-        
-        AccessTokenRegistration atr = new AccessTokenRegistration();
+        AuthorizationCodeRegistration atr = new AuthorizationCodeRegistration();
         atr.setClient(c);
         atr.setApprovedScope(Collections.singletonList("a"));
         atr.setSubject(c.getResourceOwnerSubject());
         
-        ServerAccessToken at = provider.createAccessToken(atr);
-        ServerAccessToken at2 = provider.getAccessToken(at.getTokenKey());
-        assertEquals(at.getTokenKey(), at2.getTokenKey());
-        List<OAuthPermission> scopes = at2.getScopes();
-        assertNotNull(scopes);
-        assertEquals(1, scopes.size());
-        OAuthPermission perm = scopes.get(0);
-        assertEquals("a", perm.getPermission());
-        provider.revokeToken(c, at.getTokenKey(), OAuthConstants.ACCESS_TOKEN);
-        assertNull(provider.getAccessToken(at.getTokenKey()));
+        ServerAuthorizationCodeGrant grant = provider.createCodeGrant(atr);
+        
+        List<ServerAuthorizationCodeGrant> grants = provider.getCodeGrants(c, c.getResourceOwnerSubject());
+        assertNotNull(grants);
+        assertEquals(1, grants.size());
+        assertEquals(grant.getCode(), grants.get(0).getCode());
+        
+        ServerAuthorizationCodeGrant grant2 = provider.removeCodeGrant(grant.getCode());
+        assertEquals(grant.getCode(), grant2.getCode());
     }
     
     private Client addClient(String clientId, String userLogin) {
@@ -130,15 +88,6 @@ public class JPACodeDataProviderTest extends Assert {
         provider.setClient(c);
         return c;
     }
-    private void compareClients(Client c, Client c2) {
-        assertNotNull(c2);
-        assertEquals(c.getClientId(), c2.getClientId());
-        assertEquals(1, c.getRedirectUris().size());
-        assertEquals(1, c2.getRedirectUris().size());
-        assertEquals("http://client/redirect", c.getRedirectUris().get(0));
-        assertEquals(c.getResourceOwnerSubject().getLogin(), c2.getResourceOwnerSubject().getLogin());
-    }
-    
     @After
     public void tearDown() throws Exception {
         try {

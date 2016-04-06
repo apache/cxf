@@ -20,6 +20,9 @@ package org.apache.cxf.rs.security.oauth2.grants.code;
 
 import java.net.URI;
 
+import javax.persistence.Id;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.Transient;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.jaxrs.impl.MetadataMap;
@@ -32,6 +35,7 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
  * Base Authorization Code Grant representation, captures the code 
  * and the redirect URI this code has been returned to, visible to the client
  */
+@MappedSuperclass
 public class AuthorizationCodeGrant implements AccessTokenGrant {
     private static final long serialVersionUID = -3738825769770411453L;
     private String code;
@@ -72,6 +76,7 @@ public class AuthorizationCodeGrant implements AccessTokenGrant {
      * Gets the authorization code
      * @return the code
      */
+    @Id
     public String getCode() {
         return code;
     }
@@ -83,6 +88,7 @@ public class AuthorizationCodeGrant implements AccessTokenGrant {
     /**
      * {@inheritDoc}
      */
+    @Transient
     public String getType() {
         return OAuthConstants.AUTHORIZATION_CODE_GRANT;
     }

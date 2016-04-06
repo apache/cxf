@@ -23,6 +23,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.MapKeyColumn;
+import javax.persistence.OneToOne;
+
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
@@ -31,6 +36,7 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 /**
  * The Authorization Code Grant representation visible to the server
  */
+@Entity
 public class ServerAuthorizationCodeGrant extends AuthorizationCodeGrant {
     private static final long serialVersionUID = -5004608901535459036L;
     
@@ -94,6 +100,7 @@ public class ServerAuthorizationCodeGrant extends AuthorizationCodeGrant {
      * Returns the reference to {@link Client}
      * @return the client
      */
+    @OneToOne
     public Client getClient() {
         return client;
     }
@@ -116,7 +123,7 @@ public class ServerAuthorizationCodeGrant extends AuthorizationCodeGrant {
      * Gets the scopes explicitly approved by the end user
      * @return the approved scopes
      */
-    
+    @ElementCollection
     public List<String> getApprovedScopes() {
         return approvedScopes;
     }
@@ -134,6 +141,7 @@ public class ServerAuthorizationCodeGrant extends AuthorizationCodeGrant {
      * Gets the user subject representing the end user
      * @return the subject
      */
+    @OneToOne
     public UserSubject getSubject() {
         return subject;
     }
@@ -154,6 +162,7 @@ public class ServerAuthorizationCodeGrant extends AuthorizationCodeGrant {
         this.clientCodeChallenge = clientCodeChallenge;
     }
 
+    @ElementCollection
     public List<String> getRequestedScopes() {
         return requestedScopes;
     }
@@ -178,6 +187,8 @@ public class ServerAuthorizationCodeGrant extends AuthorizationCodeGrant {
         this.preauthorizedTokenAvailable = preauthorizedTokenAvailable;
     }
 
+    @ElementCollection
+    @MapKeyColumn(name = "extraPropName")
     public Map<String, String> getExtraProperties() {
         return extraProperties;
     }
