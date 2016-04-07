@@ -39,7 +39,9 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
     private static final String HTTP_ONLY = "HttpOnly";
     
     /** from RFC 2068, token special case characters */
-    private static final String TSPECIALS = "\"()<>@,;:\\/[]?={} \t";
+    
+    private static final String TSPECIALS_PATH = "\"()<>@,;:\\[]?={} \t";
+    private static final String TSPECIALS_ALL = TSPECIALS_PATH + "/";
     private static final String DOUBLE_QUOTE = "\""; 
         
     public NewCookie fromString(String c) {
@@ -108,18 +110,18 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
         }
 
         StringBuilder sb = new StringBuilder();
-        sb.append(value.getName()).append('=').append(maybeQuote(value.getValue()));
+        sb.append(value.getName()).append('=').append(maybeQuoteAll(value.getValue()));
         if (value.getComment() != null) {
-            sb.append(';').append(COMMENT).append('=').append(maybeQuote(value.getComment()));
+            sb.append(';').append(COMMENT).append('=').append(maybeQuoteAll(value.getComment()));
         }
         if (value.getDomain() != null) {
-            sb.append(';').append(DOMAIN).append('=').append(maybeQuote(value.getDomain()));
+            sb.append(';').append(DOMAIN).append('=').append(maybeQuoteAll(value.getDomain()));
         }
         if (value.getMaxAge() != -1) {
             sb.append(';').append(MAX_AGE).append('=').append(value.getMaxAge());
         }
         if (value.getPath() != null) {
-            sb.append(';').append(PATH).append('=').append(maybeQuote(value.getPath()));
+            sb.append(';').append(PATH).append('=').append(maybeQuotePath(value.getPath()));
         }
         if (value.getExpiry() != null) {
             sb.append(';').append(EXPIRES).append('=').append(HttpUtils.toHttpDate(value.getExpiry()));
@@ -142,20 +144,24 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
      * @param value
      * @return String
      */
-    static String maybeQuote(String value) {
-        
-        StringBuilder buff = new StringBuilder();
-        // handle a null value as well as an empty one, attr=
-        if (null == value || 0 == value.length()) {
-            buff.append("");
-        } else if (needsQuote(value)) {
+    static String maybeQuote(String tSpecials, String value) {
+        if (needsQuote(tSpecials, value)) {
+            StringBuilder buff = new StringBuilder();
             buff.append('"');
-            buff.append(value);
+            if (value != null) {
+                buff.append(value);
+            }
             buff.append('"');
+            return buff.toString();
         } else {
-            buff.append(value);
+            return value == null ? "" : value;
         }
-        return buff.toString();
+    }
+    static String maybeQuoteAll(String value) {
+        return maybeQuote(TSPECIALS_ALL, value);
+    }
+    static String maybeQuotePath(String value) {
+        return maybeQuote(TSPECIALS_PATH, value);
     }
 
     /**
@@ -165,7 +171,7 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
      * @param value
      * @return boolean
      */
-    static boolean needsQuote(String value) {
+    static boolean needsQuote(String tSpecials, String value) {
         if (null == value) {
             return true;
         }
@@ -180,7 +186,7 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
 
         for (int i = 0; i < len; i++) {
             char c = value.charAt(i);
-            if (c < 0x20 || c >= 0x7f || TSPECIALS.indexOf(c) != -1) {
+            if (c < 0x20 || c >= 0x7f || tSpecials.indexOf(c) != -1) {
                 return true;
             }
         }

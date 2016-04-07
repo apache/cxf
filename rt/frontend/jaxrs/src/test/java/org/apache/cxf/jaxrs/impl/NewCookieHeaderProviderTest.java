@@ -136,5 +136,11 @@ public class NewCookieHeaderProviderTest extends Assert {
         assertEquals("foo=\"bar (space)<>[]\";Comment=\"comment@comment:,\";Domain=domain.com;Max-Age=2;"
                      + "Path=\"/path?path\";Secure;Version=1", c.toString());
     }
+    @Test
+    public void testToStringWithPathSlalshOnly() {
+        NewCookie c = new NewCookie("foo", "bar (space)<>[]", "/path", "domain.com", "comment@comment:,", 2, true);
+        assertEquals("foo=\"bar (space)<>[]\";Comment=\"comment@comment:,\";Domain=domain.com;Max-Age=2;"
+                     + "Path=/path;Secure;Version=1", c.toString());
+    }
     
 }
