@@ -134,7 +134,8 @@ public abstract class ProviderFactory {
                      new FormEncodingProvider<Object>(),
                      new StringTextProvider(),
                      new PrimitiveTextProvider<Object>(),
-                     createProvider(JAXB_PROVIDER_NAME),
+                     new JAXBElementProvider<Object>(),
+                     new JAXBElementTypedProvider(),
                      new MultipartProvider());
         Object prop = factory.getBus().getProperty("skip.default.json.provider.registration");
         if (!PropertyUtils.isTrue(prop)) {
