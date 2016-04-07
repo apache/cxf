@@ -75,12 +75,12 @@ public class CookieHeaderProvider implements HeaderDelegate<Cookie> {
         if (c.getVersion() != 0) {
             sb.append(VERSION).append('=').append(c.getVersion()).append(';');
         }
-        sb.append(c.getName()).append('=').append(NewCookieHeaderProvider.maybeQuote(c.getValue()));
+        sb.append(c.getName()).append('=').append(NewCookieHeaderProvider.maybeQuoteAll(c.getValue()));
         if (c.getPath() != null) {
-            sb.append(';').append(PATH).append('=').append(NewCookieHeaderProvider.maybeQuote(c.getPath()));
+            sb.append(';').append(PATH).append('=').append(NewCookieHeaderProvider.maybeQuotePath(c.getPath()));
         }
         if (c.getDomain() != null) {
-            sb.append(';').append(DOMAIN).append('=').append(NewCookieHeaderProvider.maybeQuote(c.getDomain()));
+            sb.append(';').append(DOMAIN).append('=').append(NewCookieHeaderProvider.maybeQuoteAll(c.getDomain()));
         }
         return sb.toString();
     }
