@@ -785,24 +785,25 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     @Test
     public void testRetrieveBookAegis3() throws Exception {
         
-        Socket s = new Socket("localhost", Integer.parseInt(PORT));
+        try (Socket s = new Socket("localhost", Integer.parseInt(PORT));
+            InputStream is = this.getClass().getResourceAsStream("resources/retrieveRequest.txt")) {
         
-        InputStream is = this.getClass().getResourceAsStream("resources/retrieveRequest.txt");
-        byte[] bytes = IOUtils.readBytesFromStream(is);
-        s.getOutputStream().write(bytes);
-        s.getOutputStream().flush();
+            byte[] bytes = IOUtils.readBytesFromStream(is);
+            s.getOutputStream().write(bytes);
+            s.getOutputStream().flush();
         
-        BufferedReader r = new BufferedReader(new InputStreamReader(s.getInputStream()));
-        StringBuilder sb = new StringBuilder();
-        String str = null;
-        while ((str = r.readLine()) != null) {
-            sb.append(str);
+            BufferedReader r = new BufferedReader(new InputStreamReader(s.getInputStream()));
+            StringBuilder sb = new StringBuilder();
+            String str = null;
+            while ((str = r.readLine()) != null) {
+                sb.append(str);
+            }
+        
+            String aegisData = sb.toString();
+            s.getInputStream().close();
+            s.close();
+            assertTrue(aegisData.contains("CXF in Action - 2"));
         }
-        
-        String aegisData = sb.toString();
-        s.getInputStream().close();
-        s.close();
-        assertTrue(aegisData.contains("CXF in Action - 2"));
         
     }
     
