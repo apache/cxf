@@ -82,7 +82,7 @@ public class JPACodeDataProvider extends JPAOAuthDataProvider implements Authori
                 + resourceOwnerSubject.getLogin() + "'", ServerAuthorizationCodeGrant.class);
         } else if (resourceOwnerSubject == null) {
             return getEntityManager().createQuery(
-                "SELECT code FROM " + CODE_TABLE_NAME + " code JOIN code.cliednt c WHERE c.clientId = '" 
+                "SELECT code FROM " + CODE_TABLE_NAME + " code JOIN code.client c WHERE c.clientId = '" 
                     + c.getClientId() + "'", ServerAuthorizationCodeGrant.class);
         } else {
             return getEntityManager().createQuery(

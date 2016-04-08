@@ -76,6 +76,11 @@ public class JPACodeDataProviderTest extends Assert {
         assertEquals(1, grants.size());
         assertEquals(grant.getCode(), grants.get(0).getCode());
         
+        grants = provider.getCodeGrants(c, null);
+        assertNotNull(grants);
+        assertEquals(1, grants.size());
+        assertEquals(grant.getCode(), grants.get(0).getCode());
+        
         ServerAuthorizationCodeGrant grant2 = provider.removeCodeGrant(grant.getCode());
         assertEquals(grant.getCode(), grant2.getCode());
     }
