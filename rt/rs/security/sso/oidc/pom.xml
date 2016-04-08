@@ -30,6 +30,10 @@
         <version>3.2.0-SNAPSHOT</version>
         <relativePath>../../../../../parent/pom.xml</relativePath>
     </parent>
+    <properties>
+        <hibernate.em.version>4.1.0.Final</hibernate.em.version>
+        <hsqldb.version>1.8.0.10</hsqldb.version>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -41,6 +45,40 @@
             <artifactId>cxf-rt-rs-security-jose-jaxrs</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-jpa_2.0_spec</artifactId>
+            <version>${cxf.geronimo.jpa.version}</version>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-entitymanager</artifactId>
+            <version>${hibernate.em.version}</version>
+            <scope>test</scope>
+            <!-- Conflicts with Apache Tika dependencies -->
+            <exclusions>
+                <exclusion>
+                    <groupId>xml-apis</groupId>
+                    <artifactId>xml-apis</artifactId>                
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>hsqldb</groupId>
+            <artifactId>hsqldb</artifactId>
+            <version>${hsqldb.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!--
+           <dependency>
+             <groupId>org.apache.openjpa</groupId>
+             <artifactId>openjpa</artifactId>
+             <version>2.2.0</version>
+             <scope>test</scope>
+           </dependency>
+        -->
         <!--test dependencies-->
         <dependency>
             <groupId>junit</groupId>
