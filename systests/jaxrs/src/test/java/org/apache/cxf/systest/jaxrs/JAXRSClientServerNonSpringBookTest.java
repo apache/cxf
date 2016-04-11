@@ -39,7 +39,6 @@ import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class JAXRSClientServerNonSpringBookTest extends AbstractBusClientServerTestBase {
@@ -181,10 +180,10 @@ public class JAXRSClientServerNonSpringBookTest extends AbstractBusClientServerT
         assertEquals("TheBook", r.getHeaderString("BookWriter"));
     }
     
-    @Ignore
+    @Test
     public void testGetBook123TwoApplications() throws Exception {
         doTestPerRequest("http://localhost:" + PORT + "/application6/thebooks/bookstore2/bookheaders");
-        doTestPerRequest("http://localhost:" + PORT + "/application6/thebooks2!/bookstore2/book%20headers");
+        doTestPerRequest("http://localhost:" + PORT + "/application6/the%20books2/bookstore2/book%20headers");
     }
     
     private Response doTestPerRequest(String address) throws Exception {

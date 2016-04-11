@@ -22,7 +22,7 @@ import javax.servlet.ServletContext;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Context;
 
-@ApplicationPath("/thebooks2%21")
+@ApplicationPath("/the%20books2")
 public class BookApplication2 extends BookApplication {
     public BookApplication2(@Context ServletContext sc) {
         super(sc);
