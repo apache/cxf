@@ -69,7 +69,8 @@ public class STSSamlAssertionValidator extends SamlAssertionValidator {
             trustVerificationSucceeded = true;
             return credential;
         } catch (WSSecurityException ex) {
-            LOG.log(Level.WARNING, "Trust verification of SAML assertion failed: " + ex.getMessage(), ex);
+            LOG.log(Level.WARNING, "Local trust verification of SAML assertion failed: " + ex.getMessage(),
+                    ex);
             trustVerificationSucceeded = false;
             return null;
         }
