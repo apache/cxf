@@ -70,6 +70,8 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
     
     public static final String ENVELOPE_EVENTS = "envelope.events";
     public static final String BODY_EVENTS = "body.events";
+    public static final String ENVELOPE_PREFIX = "envelope.prefix";
+    public static final String BODY_PREFIX = "body.prefix";
     /**
      * 
      */
@@ -205,6 +207,8 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
                     } else {
                         message.put(ENVELOPE_EVENTS, processor.getEnvAttributeAndNamespaceEvents());
                         message.put(BODY_EVENTS, processor.getBodyAttributeAndNamespaceEvents());
+                        message.put(ENVELOPE_PREFIX, processor.getEnvelopePrefix());
+                        message.put(BODY_PREFIX, processor.getBodyPrefix());
                     }
                     if (addNC) {
                         // add the Body-level declarations
@@ -326,6 +330,8 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
         private Document doc;
         private Node parent;
         private QName lastStartElementQName;
+        private String envelopePrefix;
+        private String bodyPrefix;
 
         HeadersProcessor(SoapVersion version) {
             this.header = version.getHeader().getLocalPart();
@@ -409,6 +415,13 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
                         throw new Fault(e);
                     }
                 } else {
+                    if (ns.equals(lastStartElementQName.getNamespaceURI())) {
+                        if (body.equals(lastStartElementQName.getLocalPart())) {
+                            bodyPrefix = lastStartElementQName.getPrefix();
+                        } else if (envelope.equals(lastStartElementQName.getLocalPart())) {
+                            envelopePrefix = lastStartElementQName.getPrefix();
+                        }
+                    }
                     events.add(event);
                 }
             } else {
@@ -444,6 +457,14 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
             } else {
                 return Collections.unmodifiableList(envEvents);
             }
+        }
+        
+        public String getEnvelopePrefix() {
+            return envelopePrefix;
+        }
+        
+        public String getBodyPrefix() {
+            return bodyPrefix;
         }
     }
 }

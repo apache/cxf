@@ -21,6 +21,7 @@ package org.apache.cxf.binding.soap.saaj;
 
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPBody;
+import javax.xml.soap.SOAPElement;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPFault;
 import javax.xml.soap.SOAPHeader;
@@ -65,5 +66,21 @@ public final class SAAJUtils {
             f.setFaultCode(pfx + ":" + code.getLocalPart());
         }
         
+    }
+    
+    public static SOAPElement adjustPrefix(SOAPElement e, String prefix) {
+        if (prefix == null) {
+            prefix = "";
+        }
+        try {
+            String s = e.getPrefix();
+            if (!prefix.equals(s)) {
+                e.setPrefix(prefix);
+                e.removeNamespaceDeclaration(s);
+            }
+        } catch (Throwable t) {
+            //likely old old version of SAAJ, we'll just try our best
+        }
+        return e;
     }
 }
