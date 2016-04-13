@@ -20,10 +20,13 @@ package org.apache.cxf.rs.security.oauth2.common;
 
 import java.io.Serializable;
 
+import javax.persistence.Id;
+import javax.persistence.MappedSuperclass;
 /**
  * Base permission description
  * @see OAuthAuthorizationData
  */
+@MappedSuperclass
 public class Permission implements Serializable {
     private static final long serialVersionUID = 8988574955042726083L;
     private String permission;
@@ -60,6 +63,7 @@ public class Permission implements Serializable {
      * Get the permission value such as "read_calendar"
      * @return the value
      */
+    @Id
     public String getPermission() {
         return permission;
     }

@@ -18,14 +18,15 @@
  */
 package org.apache.cxf.rs.security.oauth2.provider;
 
+import java.util.LinkedList;
 import java.util.List;
 
-import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 
 import org.apache.cxf.rs.security.oauth2.common.Client;
+import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.tokens.bearer.BearerAccessToken;
@@ -50,7 +51,12 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
     }
     
     public void setClient(Client client) {
-        persistEntityWithPossibleRollback(client.getResourceOwnerSubject());
+        UserSubject sub = getEntityManager().find(UserSubject.class, client.getResourceOwnerSubject().getLogin());
+        if (sub == null) {
+            persistEntity(client.getResourceOwnerSubject());
+        } else {
+            client.setResourceOwnerSubject(sub);
+        }
         persistEntity(client);
     }
     
@@ -100,20 +106,33 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
     }
     
     protected void saveAccessToken(ServerAccessToken serverToken) {
+        List<OAuthPermission> perms = new LinkedList<OAuthPermission>();
+        for (OAuthPermission perm : serverToken.getScopes()) {
+            OAuthPermission permSaved = getEntityManager().find(OAuthPermission.class, perm.getPermission());
+            if (permSaved != null) {
+                perms.add(permSaved);
+            } else {
+                persistEntity(perm);
+                perms.add(perm);
+            }
+        }
+        serverToken.setScopes(perms);
+        
+        UserSubject sub = getEntityManager().find(UserSubject.class, serverToken.getSubject().getLogin());
+        if (sub == null) {
+            persistEntity(serverToken.getSubject());
+        } else {
+            entityManager.getTransaction().begin();
+            sub = entityManager.merge(serverToken.getSubject());
+            entityManager.getTransaction().commit();
+            serverToken.setSubject(sub);
+        }
+        
         persistEntity(serverToken);
     }
     
     protected void saveRefreshToken(RefreshToken refreshToken) {
         persistEntity(refreshToken);
-    }
-    protected void persistEntityWithPossibleRollback(Object entity) {
-        try {
-            entityManager.getTransaction().begin();
-            entityManager.persist(entity);
-            entityManager.getTransaction().commit();
-        }  catch (EntityExistsException ex) {
-            entityManager.getTransaction().rollback();
-        }
     }
     protected void persistEntity(Object entity) {
         entityManager.getTransaction().begin();

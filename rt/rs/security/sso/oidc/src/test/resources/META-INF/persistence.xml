@@ -2,13 +2,19 @@
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
              version="2.0">
+             
    <persistence-unit name="testUnitHibernate" transaction-type="RESOURCE_LOCAL">
      <provider>org.hibernate.ejb.HibernatePersistence</provider>
+     <class>org.apache.cxf.rs.security.oidc.idp.OidcUserSubject</class>
      <class>org.apache.cxf.rs.security.oauth2.common.Client</class>
      <class>org.apache.cxf.rs.security.oauth2.common.UserSubject</class>
-     <class>org.apache.cxf.rs.security.oauth2.tokens.bearer.BearerAccessToken</class>
-     <class>org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken</class>
      <class>org.apache.cxf.rs.security.oauth2.grants.code.ServerAuthorizationCodeGrant</class>
+     <class>org.apache.cxf.rs.security.oauth2.grants.code.AuthorizationCodeGrant</class>
+     <class>org.apache.cxf.rs.security.oauth2.tokens.bearer.BearerAccessToken</class>
+     <class>org.apache.cxf.rs.security.oauth2.common.ServerAccessToken</class>
+     <class>org.apache.cxf.rs.security.oauth2.common.AccessToken</class>
+     <class>org.apache.cxf.rs.security.oauth2.common.OAuthPermission</class>
+     <class>org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken</class>
      <exclude-unlisted-classes>true</exclude-unlisted-classes>
      <properties>
         <property name="hibernate.connection.url" value="jdbc:hsqldb:mem:oauth-jpa"/>
@@ -20,13 +26,19 @@
         <property name="javax.persistence.validation.mode" value="none"/>
      </properties>
    </persistence-unit>
+   <!--
    <persistence-unit name="testUnitOpenJPA" transaction-type="RESOURCE_LOCAL">
      <provider>org.apache.openjpa.persistence.PersistenceProviderImpl</provider>
+     <class>org.apache.cxf.rs.security.oidc.idp.OidcUserSubject</class>
      <class>org.apache.cxf.rs.security.oauth2.common.Client</class>
      <class>org.apache.cxf.rs.security.oauth2.common.UserSubject</class>
-     <class>org.apache.cxf.rs.security.oauth2.tokens.bearer.BearerAccessToken</class>
-     <class>org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken</class>
      <class>org.apache.cxf.rs.security.oauth2.grants.code.ServerAuthorizationCodeGrant</class>
+     <class>org.apache.cxf.rs.security.oauth2.grants.code.AuthorizationCodeGrant</class>
+     <class>org.apache.cxf.rs.security.oauth2.tokens.bearer.BearerAccessToken</class>
+     <class>org.apache.cxf.rs.security.oauth2.common.ServerAccessToken</class>
+     <class>org.apache.cxf.rs.security.oauth2.common.AccessToken</class>
+     <class>org.apache.cxf.rs.security.oauth2.common.OAuthPermission</class>
+     <class>org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken</class>
      <exclude-unlisted-classes>true</exclude-unlisted-classes>
      <properties>
         <property name="openjpa.ConnectionURL" value="jdbc:hsqldb:mem:oauth-jpa"/>
@@ -37,4 +49,5 @@
         <property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema"/>
      </properties>
     </persistence-unit>
+    -->
 </persistence>

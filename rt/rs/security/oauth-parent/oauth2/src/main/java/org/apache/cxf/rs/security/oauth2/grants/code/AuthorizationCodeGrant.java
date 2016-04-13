@@ -99,12 +99,12 @@ public class AuthorizationCodeGrant implements AccessTokenGrant {
     public MultivaluedMap<String, String> toMap() {
         MultivaluedMap<String, String> map = new MetadataMap<String, String>();
         map.putSingle(OAuthConstants.GRANT_TYPE, OAuthConstants.AUTHORIZATION_CODE_GRANT);
-        map.putSingle(OAuthConstants.AUTHORIZATION_CODE_VALUE, code);
-        if (redirectUri != null) {
-            map.putSingle(OAuthConstants.REDIRECT_URI, redirectUri);
+        map.putSingle(OAuthConstants.AUTHORIZATION_CODE_VALUE, getCode());
+        if (getRedirectUri() != null) {
+            map.putSingle(OAuthConstants.REDIRECT_URI, getRedirectUri());
         }
-        if (codeVerifier != null) {
-            map.putSingle(OAuthConstants.AUTHORIZATION_CODE_VERIFIER, codeVerifier);
+        if (getCodeVerifier() != null) {
+            map.putSingle(OAuthConstants.AUTHORIZATION_CODE_VERIFIER, getCodeVerifier());
         }
         return map;
     }

@@ -21,6 +21,8 @@ package org.apache.cxf.rs.security.oauth2.common;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -31,6 +33,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * a limited set of HTTP verbs and request URIs
  */
 @XmlRootElement
+@Entity
 public class OAuthPermission extends Permission {
     private static final long serialVersionUID = -6486616235830491290L;
     private List<String> httpVerbs = new LinkedList<String>();
@@ -61,6 +64,7 @@ public class OAuthPermission extends Permission {
      * Gets the optional list of HTTP verbs
      * @return the list of HTTP verbs
      */
+    @ElementCollection
     public List<String> getHttpVerbs() {
         return httpVerbs;
     }
@@ -77,6 +81,7 @@ public class OAuthPermission extends Permission {
      * Gets the optional list of relative request URIs
      * @return the list of URIs
      */
+    @ElementCollection
     public List<String> getUris() {
         return uris;
     }
@@ -86,31 +91,28 @@ public class OAuthPermission extends Permission {
         if (!(object instanceof OAuthPermission) || !super.equals(object)) {
             return false;
         }
-        
         OAuthPermission that = (OAuthPermission)object;
-        if (this.httpVerbs != null && that.httpVerbs == null
-            || this.httpVerbs == null && that.httpVerbs != null
-            || this.httpVerbs != null && !this.httpVerbs.equals(that.httpVerbs)) {
+        if (getHttpVerbs() != null && that.getHttpVerbs() == null
+            || getHttpVerbs() == null && that.getHttpVerbs() != null
+            || getHttpVerbs() != null && !getHttpVerbs().equals(that.getHttpVerbs())) { 
             return false;
         }
-        if (this.uris != null && that.uris == null || this.uris == null && that.uris != null //NOPMD
-            || this.uris != null && !this.uris.equals(that.uris)) { //NOPMD
+        if (getUris() != null && that.getUris() == null // NOPMD
+            || getUris() == null && that.getUris() != null // NOPMD
+            || getUris() != null && !getUris().equals(that.getUris())) { // NOPMD
             return false;
         }
-        
         return true;
     }
-    
     @Override
     public int hashCode() {
         int hashCode = super.hashCode();
-        if (httpVerbs != null) {
-            hashCode = 31 * hashCode + httpVerbs.hashCode();
+        if (getHttpVerbs() != null) {
+            hashCode = 31 * hashCode + getHttpVerbs().hashCode();
         }
-        if (uris != null) {
-            hashCode = 31 * hashCode + uris.hashCode();
+        if (getUris() != null) {
+            hashCode = 31 * hashCode + getUris().hashCode();
         }
-        
         return hashCode;
     }
 }

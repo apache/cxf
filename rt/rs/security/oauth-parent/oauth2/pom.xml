@@ -37,6 +37,7 @@
         </cxf.osgi.import>
         <hibernate.em.version>4.1.0.Final</hibernate.em.version>
         <hsqldb.version>1.8.0.10</hsqldb.version>
+        <openjpa.version>2.4.0</openjpa.version>
     </properties>
     <dependencies>
         <dependency>
@@ -95,18 +96,19 @@
             <artifactId>easymock</artifactId>
             <scope>test</scope>
         </dependency>
+        <!--
+        <dependency>
+             <groupId>org.apache.openjpa</groupId>
+             <artifactId>openjpa</artifactId>
+             <version>${openjpa.version}</version>
+             <scope>test</scope>
+        </dependency>
+        -->
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-entitymanager</artifactId>
             <version>${hibernate.em.version}</version>
             <scope>test</scope>
-            <!-- Conflicts with Apache Tika dependencies -->
-            <exclusions>
-                <exclusion>
-                    <groupId>xml-apis</groupId>
-                    <artifactId>xml-apis</artifactId>                
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>hsqldb</groupId>
@@ -114,13 +116,38 @@
             <version>${hsqldb.version}</version>
             <scope>test</scope>
         </dependency>
-        <!--
-           <dependency>
-             <groupId>org.apache.openjpa</groupId>
-             <artifactId>openjpa</artifactId>
-             <version>2.2.0</version>
-             <scope>test</scope>
-           </dependency>
-        -->
-    </dependencies>
-</project>
+     </dependencies>
+     <!--
+     <build>
+       <plugins>
+            <plugin>
+                <groupId>org.apache.openjpa</groupId>
+                <artifactId>openjpa-maven-plugin</artifactId>
+                <version>${openjpa.version}</version>
+                <configuration>
+                    <includes>
+                       org/apache/cxf/rs/security/oauth2/common/Client.class,
+                       org/apache/cxf/rs/security/oauth2/common/UserSubject.class,
+                       org/apache/cxf/rs/security/oauth2/grants/code/AuthorizationCodeGrant,
+                       org/apache/cxf/rs/security/oauth2/grants/code/ServerAuthorizationCodeGrant.class,
+                       org/apache/cxf/rs/security/oauth2/tokens/bearer/BearerAccessToken.class,
+                       org/apache/cxf/rs/security/oauth2/common/ServerAccessToken.class,
+                       org/apache/cxf/rs/security/oauth2/common/AccessToken.class,
+                       org/apache/cxf/rs/security/oauth2/tokens/refresh/RefreshToken.class,
+                       org/apache/cxf/rs/security/oauth2/common/OAuthPermission.class
+                    </includes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>enhancer</id>
+                        <phase>process-test-classes</phase>
+                        <goals>
+                            <goal>test-enhance</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+      </build>
+      -->
+   </project>

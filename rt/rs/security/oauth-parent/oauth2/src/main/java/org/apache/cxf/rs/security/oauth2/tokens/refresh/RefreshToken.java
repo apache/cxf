@@ -77,10 +77,10 @@ public class RefreshToken extends ServerAccessToken {
     }
     
     public void addAccessToken(String token) {
-        accessTokens.add(token);
+        getAccessTokens().add(token);
     }
     
     public boolean removeAccessToken(String token) {
-        return accessTokens.remove(token);
+        return getAccessTokens().remove(token);
     }
 }

@@ -26,11 +26,13 @@ import java.util.Map;
 import javax.persistence.ElementCollection;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
+
 
 /**
  * Server Access Token representation
@@ -105,7 +107,7 @@ public abstract class ServerAccessToken extends AccessToken {
      * Returns a list of opaque permissions/scopes
      * @return the scopes
      */
-    @ElementCollection
+    @OneToMany
     public List<OAuthPermission> getScopes() {
         return scopes;
     }
