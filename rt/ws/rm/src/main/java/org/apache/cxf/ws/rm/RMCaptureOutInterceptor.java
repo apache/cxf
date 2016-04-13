@@ -181,8 +181,9 @@ public class RMCaptureOutInterceptor extends AbstractRMInterceptor<Message>  {
             maps.getAction().setValue(constants.getCreateSequenceResponseAction());
         } else if (isPartialResponse && action == null
             && isResponseToAction(msg, constants.getSequenceAckAction())) {
-            Collection<SequenceAcknowledgement> acks = rmpsIn.getAcks();
-            if (acks.size() == 1) {
+            Collection<SequenceAcknowledgement> acks =
+                rmpsIn != null ? rmpsIn.getAcks() : null;
+            if (acks != null && acks.size() == 1) {
                 SourceSequence ss = source.getSequence(acks.iterator().next().getIdentifier());
                 if (ss != null && ss.allAcknowledged()) {
                     setAction(maps, constants.getTerminateSequenceAction());

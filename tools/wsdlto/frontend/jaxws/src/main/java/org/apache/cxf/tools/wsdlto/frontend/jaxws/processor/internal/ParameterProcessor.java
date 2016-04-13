@@ -423,7 +423,7 @@ public class ParameterProcessor extends AbstractProcessor {
                     if (!qualified && !isRefElement(outputPart, outElement)) {
                         jp.setTargetNamespace("");
                     }
-                    if (!jpIn.getClassName().equals(jp.getClassName())) {
+                    if (jpIn != null && !jpIn.getClassName().equals(jp.getClassName())) {
                         jp.setStyle(JavaType.Style.OUT);
                     } 
                     addParameter(outputPart, method, jp);
@@ -475,7 +475,7 @@ public class ParameterProcessor extends AbstractProcessor {
                         if (!qualified && !isRefElement(outputPart, outElement)) {
                             jp.setTargetNamespace("");
                         }
-                        if (!jpIn.getClassName().equals(jp.getClassName())) {
+                        if (jpIn != null && !jpIn.getClassName().equals(jp.getClassName())) {
                             jp.setStyle(JavaType.Style.OUT);
                             checkPartName(outputMessage, outElement, jp);
                         }

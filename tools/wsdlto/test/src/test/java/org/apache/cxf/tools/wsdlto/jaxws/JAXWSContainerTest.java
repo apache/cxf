@@ -188,6 +188,7 @@ public class JAXWSContainerTest extends ProcessorTestBase {
                 }
             }
             assertTrue(methodSame);
+            assertNotNull(m1);
             
             assertEquals(2, m1.getExceptions().size());
             List<String> names = new ArrayList<String>();

@@ -676,7 +676,11 @@ public final class JAXBUtils {
                     
                 }
             }
-            
+
+            if (ctx == null) {
+                throw new JAXBException("No ctx found");
+            }
+                
             Object bridge = ctx.getClass().getMethod("createBridge", refClass).invoke(ctx, ref);
             return ReflectionInvokationHandler.createProxyWrapper(bridge,
                                                                   BridgeWrapper.class);

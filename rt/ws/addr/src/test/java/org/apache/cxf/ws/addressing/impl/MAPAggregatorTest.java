@@ -694,7 +694,7 @@ public class MAPAggregatorTest extends Assert {
         AddressingProperties maps = mapsInContext 
                                         ? new AddressingProperties()
                                         : null;
-        if (zeroLengthAction) {
+        if (zeroLengthAction && maps != null) {
             maps.setAction(ContextUtils.getAttributedURI(""));
         }
         setUpMessageProperty(message,

@@ -140,8 +140,10 @@ public class JMSBookStore {
             session.close();
         } finally {
             try {
-                connection.stop();
-                connection.close();
+                if (connection != null) {
+                    connection.stop();
+                    connection.close();
+                }
             } catch (JMSException ex) {
                 // ignore
             }

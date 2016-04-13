@@ -345,6 +345,11 @@ public class ServiceProcessor extends AbstractProcessor {
                 jf = jf2;
             }
         }
+
+        if (jf == null) {
+            throw new ToolException("No Java Interface available");
+        }
+
         if (isSoapBinding()) {
             SoapBinding soapBinding = (SoapBinding)bindingObj;
             if (SOAPBindingUtil.getSoapStyle(soapBinding.getStyle()) == null) {

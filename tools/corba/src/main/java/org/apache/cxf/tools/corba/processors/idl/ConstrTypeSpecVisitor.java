@@ -63,10 +63,12 @@ public class ConstrTypeSpecVisitor extends VisitorBase {
             visitor = new EnumVisitor(getScope(), definition, schema, wsdlVisitor);
         }
 
-        visitor.visit(node);
+        if (visitor != null) {
+            visitor.visit(node);
         
-        setSchemaType(visitor.getSchemaType());
-        setCorbaType(visitor.getCorbaType());
+            setSchemaType(visitor.getSchemaType());
+            setCorbaType(visitor.getCorbaType());
+        }
     }
     
 }
