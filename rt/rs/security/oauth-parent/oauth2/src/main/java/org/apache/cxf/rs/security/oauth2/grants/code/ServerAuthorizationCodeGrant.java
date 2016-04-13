@@ -18,8 +18,8 @@
  */
 package org.apache.cxf.rs.security.oauth2.grants.code;
 
-import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -43,8 +43,8 @@ public class ServerAuthorizationCodeGrant extends AuthorizationCodeGrant {
     private long issuedAt;
     private long expiresIn;
     private Client client;
-    private List<String> approvedScopes = Collections.emptyList();
-    private List<String> requestedScopes = Collections.emptyList();
+    private List<String> approvedScopes = new LinkedList<String>();
+    private List<String> requestedScopes = new LinkedList<String>();
     private UserSubject subject;
     private String audience;
     private String clientCodeChallenge;
