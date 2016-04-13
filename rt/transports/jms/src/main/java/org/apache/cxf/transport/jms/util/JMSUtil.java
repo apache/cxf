@@ -103,7 +103,9 @@ public final class JMSUtil {
             session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             return session.createQueue(name);
         } finally {
-            session.close();
+            if (session != null) {
+                session.close();
+            }
         }
     }
     

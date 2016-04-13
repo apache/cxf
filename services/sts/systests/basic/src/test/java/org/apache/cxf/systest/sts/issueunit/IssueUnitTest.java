@@ -250,7 +250,7 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
         if (methods != null && methods.size() > 0) {
             confirmMethod = methods.get(0);
         }
-        assertTrue(confirmMethod.contains("bearer"));
+        assertTrue(confirmMethod != null && confirmMethod.contains("bearer"));
         
         bus.shutdown(true);
     }
@@ -349,7 +349,7 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
         if (methods != null && methods.size() > 0) {
             confirmMethod = methods.get(0);
         }
-        assertTrue(confirmMethod.contains("bearer"));
+        assertTrue(confirmMethod != null && confirmMethod.contains("bearer"));
         
         bus.shutdown(true);
     }
@@ -386,7 +386,7 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
         if (methods != null && methods.size() > 0) {
             confirmMethod = methods.get(0);
         }
-        assertTrue(confirmMethod.contains("bearer"));
+        assertTrue(confirmMethod != null && confirmMethod.contains("bearer"));
         
         bus.shutdown(true);
     }
@@ -453,7 +453,7 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
         if (methods != null && methods.size() > 0) {
             confirmMethod = methods.get(0);
         }
-        assertTrue(confirmMethod.contains("bearer"));
+        assertTrue(confirmMethod != null && confirmMethod.contains("bearer"));
         
         assertTrue("b-issuer".equals(assertion.getIssuerString()));
         String subjectName = assertion.getSaml2().getSubject().getNameID().getValue();

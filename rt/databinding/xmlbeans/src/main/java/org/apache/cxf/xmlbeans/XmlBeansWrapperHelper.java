@@ -56,8 +56,10 @@ public class XmlBeansWrapperHelper extends AbstractWrapperHelper {
                     Method method = c.getMethod("newInstance", NO_CLASSES);
                     obj = method.invoke(null, NO_PARAMS);                    
                 }
-                // create the value object
-                obj = newType.invoke(obj, NO_PARAMS);
+                if (newType != null) {
+                    // create the value object
+                    obj = newType.invoke(obj, NO_PARAMS);
+                }
                 break;
             }
         }

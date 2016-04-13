@@ -125,8 +125,10 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
             session.close();
         } finally {
             try {
-                connection.stop();
-                connection.close();
+                if (connection != null) {
+                    connection.stop();
+                    connection.close();
+                }
             } catch (JMSException ex) {
                 // ignore
             }
@@ -214,8 +216,10 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
             session.close();
         } finally {
             try {
-                connection.stop();
-                connection.close();
+                if (connection != null) {
+                    connection.stop();
+                    connection.close();
+                }
             } catch (JMSException ex) {
                 // ignore
             }
@@ -242,8 +246,10 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
             session.close();
         } finally {
             try {
-                connection.stop();
-                connection.close();
+                if (connection != null) {
+                    connection.stop();
+                    connection.close();
+                }
             } catch (JMSException ex) {
                 // ignore
             }
@@ -269,8 +275,10 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
             session.close();
         } finally {
             try {
-                connection.stop();
-                connection.close();
+                if (connection != null) {
+                    connection.stop();
+                    connection.close();
+                }
             } catch (JMSException ex) {
                 // ignore
             }
