@@ -1222,11 +1222,10 @@ public abstract class ProviderFactory {
         return theProviders;
     }
     
-    public MessageBodyWriter<?> getRegisteredJaxbWriter() {
+    public MessageBodyWriter<?> getDefaultJaxbWriter() {
         for (ProviderInfo<MessageBodyWriter<?>> pi : this.messageWriters) {    
             Class<?> cls = pi.getProvider().getClass();
-            if (cls.getName().equals(JAXB_PROVIDER_NAME)
-                || cls.getSuperclass().getName().equals(JAXB_PROVIDER_NAME)) {
+            if (cls.getName().equals(JAXB_PROVIDER_NAME)) {
                 return pi.getProvider();
             }
         }

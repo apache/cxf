@@ -286,7 +286,7 @@ public class WadlGenerator implements ContainerRequestFilter {
 
         
         MessageBodyWriter<?> jaxbWriter = (m != null && useJaxbContextForQnames) 
-            ? ServerProviderFactory.getInstance(m).getRegisteredJaxbWriter() : null;
+            ? ServerProviderFactory.getInstance(m).getDefaultJaxbWriter() : null;
         ResourceTypes resourceTypes = ResourceUtils.getAllRequestResponseTypes(cris, 
                                                                                useJaxbContextForQnames,
                                                                                jaxbWriter);
