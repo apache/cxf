@@ -32,6 +32,8 @@ import org.w3c.dom.Node;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.staxutils.OverlayW3CDOMStreamWriter;
 
+import static org.apache.cxf.binding.soap.saaj.SAAJUtils.adjustPrefix;
+
 public final class SAAJStreamWriter extends OverlayW3CDOMStreamWriter {
     private final SOAPPart part;
 
@@ -44,21 +46,6 @@ public final class SAAJStreamWriter extends OverlayW3CDOMStreamWriter {
         this.part = part;
     }
 
-    private SOAPElement adjustPrefix(SOAPElement e, String prefix) {
-        if (prefix == null) {
-            prefix = "";
-        }
-        try {
-            String s = e.getPrefix();
-            if (!prefix.equals(s)) {
-                e.setPrefix(prefix);
-                e.removeNamespaceDeclaration(s);
-            }
-        } catch (Throwable t) {
-            //likely old old version of SAAJ, we'll just try our best
-        }
-        return e;
-    }
     protected void adjustOverlaidNode(Node nd2, String pfx) {
         String namespace = nd2.getNamespaceURI();
         try {

@@ -193,6 +193,10 @@ public class SAAJInInterceptor extends AbstractSoapInterceptor {
                 StaxUtils.copy(node, new SAAJStreamWriter(part));
             } else {
                 SOAPEnvelope env = soapMessage.getSOAPPart().getEnvelope();
+                if (node == null) {
+                    adjustPrefixes(env, (String)message.get(ReadHeadersInterceptor.ENVELOPE_PREFIX),
+                                   (String)message.get(ReadHeadersInterceptor.BODY_PREFIX));
+                }
                 List<XMLEvent> events = (List<XMLEvent>)message.get(ReadHeadersInterceptor.ENVELOPE_EVENTS);
                 applyEvents(events, env);
                 SOAPBody body = soapMessage.getSOAPBody();
@@ -257,6 +261,12 @@ public class SAAJInInterceptor extends AbstractSoapInterceptor {
                     "SOAPHANDLERINTERCEPTOR_EXCEPTION", BUNDLE), e, message
                     .getVersion().getSender());
         }
+    }
+    
+    private static void adjustPrefixes(SOAPEnvelope env, String envPrefix, String bodyPrefix) throws SOAPException {
+        SAAJUtils.adjustPrefix(env, envPrefix);
+        SAAJUtils.adjustPrefix(env.getBody(), bodyPrefix);
+        SAAJUtils.adjustPrefix(env.getHeader(), envPrefix);
     }
 
     private static void applyEvents(List<XMLEvent> events, SOAPElement el) throws SOAPException {
