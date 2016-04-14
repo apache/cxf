@@ -51,7 +51,11 @@ public class ProviderCache {
         String key = getKey(type, mt);
 
         List<ProviderInfo<MessageBodyReader<?>>> list = readerProviderCache.get(key);
-        return list != null ? list : Collections.emptyList();
+        if (list != null) {
+            return list;
+        } else {
+            return Collections.emptyList();
+        }
     }
     public List<ProviderInfo<MessageBodyWriter<?>>> getWriters(Class<?> type, MediaType mt) {
         if (writerProviderCache.isEmpty()) {
@@ -61,7 +65,11 @@ public class ProviderCache {
         String key = getKey(type, mt);
 
         List<ProviderInfo<MessageBodyWriter<?>>> list = writerProviderCache.get(key);
-        return list != null ? list : Collections.emptyList();
+        if (list != null) {
+            return list;
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     public void putReaders(Class<?> type, MediaType mt, List<ProviderInfo<MessageBodyReader<?>>> candidates) {
