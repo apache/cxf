@@ -24,6 +24,7 @@
         <property name="javax.persistence.validation.mode" value="none"/>
      </properties>
    </persistence-unit>
+   
    <!--
    <persistence-unit name="testUnitOpenJPA" transaction-type="RESOURCE_LOCAL">
      <provider>org.apache.openjpa.persistence.PersistenceProviderImpl</provider>

@@ -73,6 +73,11 @@ public class JPAOAuthDataProviderTest extends Assert {
         Client c2 = provider.getClient(c.getClientId());
         compareClients(c, c2);
         
+        c2.setClientSecret("567");
+        provider.setClient(c);
+        Client c22 = provider.getClient(c.getClientId());
+        compareClients(c2, c22);
+        
         provider.removeClient(c.getClientId());
         Client c3 = provider.getClient(c.getClientId());
         assertNull(c3);
@@ -179,6 +184,7 @@ public class JPAOAuthDataProviderTest extends Assert {
         Client c = new Client();
         c.setRedirectUris(Collections.singletonList("http://client/redirect"));
         c.setClientId(clientId);
+        c.setClientSecret("123");
         c.setResourceOwnerSubject(new UserSubject(userLogin));
         provider.setClient(c);
         return c;

@@ -86,17 +86,17 @@ public class JPAOidcUserSubjectTest extends Assert {
         OidcUserSubject oidcSubject2 = (OidcUserSubject)at2.getSubject();
         assertEquals(c.getClientId(), oidcSubject2.getIdToken().getAudience());
         
-//        OidcUserSubject oidcSubject3 = new OidcUserSubject();
-//        oidcSubject3.setLogin("bob");
-//        IdToken idToken2 = new IdToken();
-//        idToken2.setAudience(c.getClientId());
-//        oidcSubject3.setIdToken(idToken2);
-//        atr.setSubject(oidcSubject3);
-//        
-//        ServerAccessToken at3 = provider.createAccessToken(atr);
-//        ServerAccessToken at4 = provider.getAccessToken(at3.getTokenKey());
-//        OidcUserSubject oidcSubject4 = (OidcUserSubject)at4.getSubject();
-//        assertEquals(c.getClientId(), oidcSubject4.getIdToken().getAudience());
+        OidcUserSubject oidcSubject3 = new OidcUserSubject();
+        oidcSubject3.setLogin("bob");
+        IdToken idToken2 = new IdToken();
+        idToken2.setAudience(c.getClientId());
+        oidcSubject3.setIdToken(idToken2);
+        atr.setSubject(oidcSubject3);
+        
+        ServerAccessToken at3 = provider.createAccessToken(atr);
+        ServerAccessToken at4 = provider.getAccessToken(at3.getTokenKey());
+        OidcUserSubject oidcSubject4 = (OidcUserSubject)at4.getSubject();
+        assertEquals(c.getClientId(), oidcSubject4.getIdToken().getAudience());
     }
     
     
