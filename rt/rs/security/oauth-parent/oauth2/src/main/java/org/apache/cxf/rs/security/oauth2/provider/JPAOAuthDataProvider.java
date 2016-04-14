@@ -51,11 +51,13 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
     }
     
     public void setClient(Client client) {
-        UserSubject sub = getEntityManager().find(UserSubject.class, client.getResourceOwnerSubject().getLogin());
-        if (sub == null) {
-            persistEntity(client.getResourceOwnerSubject());
-        } else {
-            client.setResourceOwnerSubject(sub);
+        if (client.getResourceOwnerSubject() != null) {
+            UserSubject sub = getEntityManager().find(UserSubject.class, client.getResourceOwnerSubject().getLogin());
+            if (sub == null) {
+                persistEntity(client.getResourceOwnerSubject());
+            } else {
+                client.setResourceOwnerSubject(sub);
+            }
         }
         persistEntity(client);
     }

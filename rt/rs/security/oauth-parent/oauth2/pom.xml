@@ -96,6 +96,12 @@
             <artifactId>easymock</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>hsqldb</groupId>
+            <artifactId>hsqldb</artifactId>
+            <version>${hsqldb.version}</version>
+            <scope>test</scope>
+        </dependency>
         <!--
         <dependency>
              <groupId>org.apache.openjpa</groupId>
@@ -110,12 +116,7 @@
             <version>${hibernate.em.version}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>hsqldb</groupId>
-            <artifactId>hsqldb</artifactId>
-            <version>${hsqldb.version}</version>
-            <scope>test</scope>
-        </dependency>
+        
      </dependencies>
      <!--
      <build>

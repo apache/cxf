@@ -24,9 +24,9 @@ import java.util.List;
 import java.util.Map;
 
 import javax.persistence.ElementCollection;
+import javax.persistence.ManyToMany;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.MappedSuperclass;
-import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
@@ -107,7 +107,7 @@ public abstract class ServerAccessToken extends AccessToken {
      * Returns a list of opaque permissions/scopes
      * @return the scopes
      */
-    @OneToMany
+    @ManyToMany
     public List<OAuthPermission> getScopes() {
         return scopes;
     }
