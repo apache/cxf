@@ -74,7 +74,7 @@ public class JPAOAuthDataProviderTest extends Assert {
         compareClients(c, c2);
         
         c2.setClientSecret("567");
-        provider.setClient(c);
+        provider.setClient(c2);
         Client c22 = provider.getClient(c.getClientId());
         compareClients(c2, c22);
         
