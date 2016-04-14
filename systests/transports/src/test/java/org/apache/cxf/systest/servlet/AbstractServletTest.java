@@ -52,6 +52,7 @@ public abstract class AbstractServletTest extends AbstractCXFTest {
         }   
         
         HttpUnitOptions.setExceptionsThrownOnErrorStatus(true);
+        configurationStream.close();
     } 
     @After
     public void tearDown() throws Exception {
