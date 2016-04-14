@@ -91,6 +91,8 @@ public abstract class ProviderFactory {
     private static final String JAXB_PROVIDER_NAME = "org.apache.cxf.jaxrs.provider.JAXBElementProvider";
     private static final String JSON_PROVIDER_NAME = "org.apache.cxf.jaxrs.provider.json.JSONProvider";
     private static final String BUS_PROVIDERS_ALL = "org.apache.cxf.jaxrs.bus.providers";
+    private static final String PROVIDER_CACHE_ALLOWED = "org.apache.cxf.jaxrs.provider.cache.allowed";
+    private static final String PROVIDER_CACHE_CHECK_ALL = "org.apache.cxf.jaxrs.provider.cache.checkAllCandidates";
     
     protected Map<NameKey, ProviderInfo<ReaderInterceptor>> readerInterceptors = 
         new NameKeyMap<ProviderInfo<ReaderInterceptor>>(true);
@@ -117,14 +119,25 @@ public abstract class ProviderFactory {
     
     private Comparator<?> providerComparator;
     
+    private ProviderCache providerCache;
+    
     protected ProviderFactory(Bus bus) {
         this.bus = bus;
+        providerCache = initCache(bus);
     }
     
     public Bus getBus() {
         return bus;
     }
-    
+    protected static ProviderCache initCache(Bus theBus) {
+        Object allowProp = theBus.getProperty(PROVIDER_CACHE_ALLOWED);
+        boolean allowed = allowProp == null || PropertyUtils.isTrue(allowProp);
+        if (!allowed) {
+            return null;
+        }
+        boolean checkAll = PropertyUtils.isTrue(theBus.getProperty(PROVIDER_CACHE_CHECK_ALL));
+        return new ProviderCache(checkAll);
+    }
     protected static void initFactory(ProviderFactory factory) {
         factory.setProviders(false,
                              false,
@@ -413,13 +426,45 @@ public abstract class ProviderFactory {
                                                             Annotation[] annotations,
                                                             MediaType mediaType,
                                                             Message m) {
+        // Step1: check the cache 
+        
+        if (providerCache != null) {
+            for (ProviderInfo<MessageBodyReader<?>> ep : providerCache.getReaders(type, mediaType)) {
+                if (isReadable(ep, type, genericType, annotations, mediaType, m)) {
+                    return (MessageBodyReader<T>)ep.getProvider();
+                }
+            }           
+        }
+        
+        boolean checkAll = providerCache != null && providerCache.isCheckAllCandidates();
+        List<ProviderInfo<MessageBodyReader<?>>> allCandidates = 
+            checkAll ? new LinkedList<ProviderInfo<MessageBodyReader<?>>>() : null;
+            
+        MessageBodyReader<T> selectedReader = null;    
         for (ProviderInfo<MessageBodyReader<?>> ep : messageReaders) {
-            if (matchesReaderCriterias(ep, type, genericType, annotations, mediaType, m)
+            if (matchesReaderMediaTypes(ep, mediaType)
                 && handleMapper(ep, type, m, MessageBodyReader.class, false)) {
-                return (MessageBodyReader<T>)ep.getProvider();
+                // This writer matches Media Type and Class
+                if (checkAll) {
+                    allCandidates.add(ep);
+                } else if (providerCache != null && providerCache.getReaders(type, mediaType).isEmpty()) {
+                    providerCache.putReaders(type, mediaType, Collections.singletonList(ep));
+                }
+                if (selectedReader == null
+                    && isReadable(ep, type, genericType, annotations, mediaType, m)) {
+                    // This writer is a selected candidate
+                    selectedReader = (MessageBodyReader<T>)ep.getProvider();
+                    if (!checkAll) {
+                        return selectedReader;
+                    }
+                }
+                
             }
         }     
-        return null;
+        if (checkAll) {
+            providerCache.putReaders(type, mediaType, allCandidates);
+        } 
+        return selectedReader;
     }
     
     @SuppressWarnings("unchecked")
@@ -428,13 +473,49 @@ public abstract class ProviderFactory {
                                                             Annotation[] annotations,
                                                             MediaType mediaType,
                                                             Message m) {
-        for (ProviderInfo<MessageBodyWriter<?>> ep : messageWriters) {
-            if (matchesWriterCriterias(ep, type, genericType, annotations, mediaType, m)
-                && handleMapper(ep, type, m, MessageBodyWriter.class, false)) {
-                return (MessageBodyWriter<T>)ep.getProvider();
-            }
+        
+        // Step1: check the cache. 
+        if (providerCache != null) {
+            for (ProviderInfo<MessageBodyWriter<?>> ep : providerCache.getWriters(type, mediaType)) {
+                if (isWriteable(ep, type, genericType, annotations, mediaType, m)) {
+                    return (MessageBodyWriter<T>)ep.getProvider();
+                }
+            }           
         }
-        return null;
+        
+        // Step2: check all the registered writers
+        
+        // The cache, if enabled, may have been configured to keep the top candidate only
+        boolean checkAll = providerCache != null && providerCache.isCheckAllCandidates();
+        List<ProviderInfo<MessageBodyWriter<?>>> allCandidates = 
+            checkAll ? new LinkedList<ProviderInfo<MessageBodyWriter<?>>>() : null;
+            
+        MessageBodyWriter<T> selectedWriter = null;    
+        for (ProviderInfo<MessageBodyWriter<?>> ep : messageWriters) {
+            if (matchesWriterMediaTypes(ep, mediaType)
+                && handleMapper(ep, type, m, MessageBodyWriter.class, false)) {
+                // This writer matches Media Type and Class
+                if (checkAll) {
+                    allCandidates.add(ep);
+                } else if (providerCache != null && providerCache.getWriters(type, mediaType).isEmpty()) {
+                    providerCache.putWriters(type, mediaType, Collections.singletonList(ep));
+                }
+                if (selectedWriter == null
+                    && isWriteable(ep, type, genericType, annotations, mediaType, m)) {
+                    // This writer is a selected candidate
+                    selectedWriter = (MessageBodyWriter<T>)ep.getProvider();
+                    if (!checkAll) {
+                        return selectedWriter;
+                    }
+                }
+                
+            }
+        }     
+        if (checkAll) {
+            providerCache.putWriters(type, mediaType, allCandidates);
+        } 
+        return selectedWriter;
+        
     }
     
     protected void setBusProviders() {
@@ -635,33 +716,32 @@ public abstract class ProviderFactory {
     
     
     
-    private <T> boolean matchesReaderCriterias(ProviderInfo<MessageBodyReader<?>> pi,
-                                               Class<T> type,
-                                               Type genericType,
-                                               Annotation[] annotations,
-                                               MediaType mediaType,
-                                               Message m) {
+    private <T> boolean matchesReaderMediaTypes(ProviderInfo<MessageBodyReader<?>> pi,
+                                                MediaType mediaType) {
         MessageBodyReader<?> ep = pi.getProvider();
         List<MediaType> supportedMediaTypes = JAXRSUtils.getProviderConsumeTypes(ep);
         
         List<MediaType> availableMimeTypes = 
             JAXRSUtils.intersectMimeTypes(Collections.singletonList(mediaType), supportedMediaTypes, false);
 
-        if (availableMimeTypes.size() == 0) {
-            return false;
-        }
+        return availableMimeTypes.size() != 0;
+    }
+    
+    private boolean isReadable(ProviderInfo<MessageBodyReader<?>> pi,
+                               Class<?> type,
+                               Type genericType,
+                               Annotation[] annotations,
+                               MediaType mediaType,
+                               Message m) {
+        MessageBodyReader<?> ep = pi.getProvider();
         if (m.get(ACTIVE_JAXRS_PROVIDER_KEY) != ep) {
             injectContextValues(pi, m);
         }
         return ep.isReadable(type, genericType, annotations, mediaType);
     }
         
-    private <T> boolean matchesWriterCriterias(ProviderInfo<MessageBodyWriter<?>> pi,
-                                               Class<T> type,
-                                               Type genericType,
-                                               Annotation[] annotations,
-                                               MediaType mediaType,
-                                               Message m) {
+    private <T> boolean matchesWriterMediaTypes(ProviderInfo<MessageBodyWriter<?>> pi,
+                                                MediaType mediaType) {
         MessageBodyWriter<?> ep = pi.getProvider();
         List<MediaType> supportedMediaTypes = JAXRSUtils.getProviderProduceTypes(ep);
         
@@ -669,9 +749,16 @@ public abstract class ProviderFactory {
             JAXRSUtils.intersectMimeTypes(Collections.singletonList(mediaType),
                                           supportedMediaTypes, false);
 
-        if (availableMimeTypes.size() == 0) {
-            return false;
-        }
+        return availableMimeTypes.size() != 0;
+    }
+    
+    private boolean isWriteable(ProviderInfo<MessageBodyWriter<?>> pi,
+                               Class<?> type,
+                               Type genericType,
+                               Annotation[] annotations,
+                               MediaType mediaType,
+                               Message m) {
+        MessageBodyWriter<?> ep = pi.getProvider();
         if (m.get(ACTIVE_JAXRS_PROVIDER_KEY) != ep) {
             injectContextValues(pi, m);
         }
