@@ -122,12 +122,12 @@ public abstract class AbstractSourcePayloadProvider implements SourceProvider {
             Transformer transformer = transformerFactory.newTransformer();
             transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
             transformer.setOutputProperty(OutputKeys.METHOD, "xml");
-            Writer out = new StringWriter();
-            StreamResult streamResult = new StreamResult();
-            streamResult.setWriter(out);
-            transformer.transform(s, streamResult);
-            return streamResult.getWriter().toString();
-            
+            try (Writer out = new StringWriter()) {
+                StreamResult streamResult = new StreamResult();
+                streamResult.setWriter(out);
+                transformer.transform(s, streamResult);
+                return streamResult.getWriter().toString();
+            }
         } catch (TransformerException te) {
             if ("javax.xml.transform.stax.StAXSource".equals(s.getClass().getName())) {
                 //on java6, we will get this class if "stax" is configured

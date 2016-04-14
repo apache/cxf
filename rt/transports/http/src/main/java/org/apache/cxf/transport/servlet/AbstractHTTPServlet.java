@@ -136,6 +136,7 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
                 for (String name : props.stringPropertyNames()) {
                     staticContentTypes.put(name, props.getProperty(name));
                 }
+                is.close();
             } catch (IOException ex) {
                 String message = new org.apache.cxf.common.i18n.Message("STATIC_RESOURCES_MAP_LOAD_FAILURE",
                                                                         BUNDLE).toString();
@@ -353,7 +354,7 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
                 response.setHeader("Cache-Control", cacheControl.trim());
             }
             ServletOutputStream os = response.getOutputStream();
-            IOUtils.copy(is, os);
+            IOUtils.copyAndCloseInput(is, os);
             os.flush();
         } catch (IOException ex) {
             throw new ServletException("Static resource " + pathInfo 

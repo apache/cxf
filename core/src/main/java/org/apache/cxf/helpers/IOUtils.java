@@ -264,15 +264,8 @@ public final class IOUtils {
         if (Transferable.class.isAssignableFrom(inputStream.getClass())) {
             ((Transferable)inputStream).transferTo(destinationFile);
         } else {
-            FileOutputStream fout = new FileOutputStream(destinationFile);
-            try {
+            try (FileOutputStream fout = new FileOutputStream(destinationFile)) {
                 copyAndCloseInput(inputStream, fout);
-            } finally {
-                try {
-                    fout.close();
-                } catch (IOException ex) {
-                    //ignore
-                }
             }
         }
     }
@@ -308,17 +301,20 @@ public final class IOUtils {
 
         StringBuilder buf = new StringBuilder();
         final char[] buffer = new char[bufSize];
-        int n = 0;
-        n = input.read(buffer);
-        while (-1 != n) {
-            if (n == 0) {
-                throw new IOException("0 bytes read in violation of InputStream.read(byte[])");
-            }
-            buf.append(new String(buffer, 0, n));
+        try {
+            int n = 0;
             n = input.read(buffer);
+            while (-1 != n) {
+                if (n == 0) {
+                    throw new IOException("0 bytes read in violation of InputStream.read(byte[])");
+                }
+                buf.append(new String(buffer, 0, n));
+                n = input.read(buffer);
+            }
+            return buf.toString();
+        } finally {
+            input.close();
         }
-        input.close();
-        return buf.toString();
     }
 
     public static String readStringFromStream(InputStream in)
@@ -326,13 +322,14 @@ public final class IOUtils {
 
         StringBuilder sb = new StringBuilder(1024);
 
-        for (int i = in.read(); i != -1; i = in.read()) {
-            sb.append((char) i);
+        try {
+            for (int i = in.read(); i != -1; i = in.read()) {
+                sb.append((char) i);
+            }
+            return sb.toString();
+        } finally {
+            in.close();
         }
-
-        in.close();
-
-        return sb.toString();
     }
 
     /**
@@ -407,9 +404,11 @@ public final class IOUtils {
         if (i < DEFAULT_BUFFER_SIZE) {
             i = DEFAULT_BUFFER_SIZE;
         }
-        ByteArrayOutputStream bos = new ByteArrayOutputStream(i);
-        copy(in, bos);
-        in.close();
-        return bos.toByteArray();
+        try (ByteArrayOutputStream bos = new ByteArrayOutputStream(i)) {
+            copy(in, bos);
+            return bos.toByteArray();
+        } finally {
+            in.close();
+        }
     }
 }
