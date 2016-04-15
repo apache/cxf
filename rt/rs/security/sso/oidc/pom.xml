@@ -75,7 +75,7 @@
              <groupId>org.apache.openjpa</groupId>
              <artifactId>openjpa</artifactId>
              <version>${openjpa.version}</version>
-             <scope>test</scope>
+             <scope>provided</scope>
         </dependency>
         -->
         <dependency>

@@ -22,7 +22,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 
 import org.apache.cxf.rs.security.oauth2.common.Client;
@@ -43,23 +42,21 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
     
     @Override
     public Client getClient(String clientId) throws OAuthServiceException {
-        try {
-            return getClientQuery(clientId).getSingleResult();
-        } catch (NoResultException ex) {
-            return null;
-        }
+        return getEntityManager().find(Client.class, clientId);
     }
     
     public void setClient(Client client) {
+        getEntityManager().getTransaction().begin();
         if (client.getResourceOwnerSubject() != null) {
             UserSubject sub = getEntityManager().find(UserSubject.class, client.getResourceOwnerSubject().getLogin());
             if (sub == null) {
-                persistEntity(client.getResourceOwnerSubject());
+                getEntityManager().persist(client.getResourceOwnerSubject());
             } else {
                 client.setResourceOwnerSubject(sub);
             }
         }
-        persistEntity(client);
+        getEntityManager().persist(client);
+        getEntityManager().getTransaction().commit();
     }
     
     @Override
@@ -84,11 +81,7 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
     
     @Override
     public ServerAccessToken getAccessToken(String accessToken) throws OAuthServiceException {
-        try {
-            return getTokenQuery(accessToken).getSingleResult();
-        } catch (NoResultException ex) {
-            return null;
-        }
+        return getEntityManager().find(BearerAccessToken.class, accessToken);
     }
     @Override
     protected void doRevokeAccessToken(ServerAccessToken at) {
@@ -96,11 +89,7 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
     }
     @Override
     protected RefreshToken getRefreshToken(String refreshTokenKey) { 
-        try {
-            return getRefreshTokenQuery(refreshTokenKey).getSingleResult();
-        } catch (NoResultException ex) {
-            return null;
-        }
+        return getEntityManager().find(RefreshToken.class, refreshTokenKey);
     }
     @Override
     protected void doRevokeRefreshToken(RefreshToken rt) { 
@@ -108,13 +97,14 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
     }
     
     protected void saveAccessToken(ServerAccessToken serverToken) {
+        getEntityManager().getTransaction().begin();
         List<OAuthPermission> perms = new LinkedList<OAuthPermission>();
         for (OAuthPermission perm : serverToken.getScopes()) {
             OAuthPermission permSaved = getEntityManager().find(OAuthPermission.class, perm.getPermission());
             if (permSaved != null) {
                 perms.add(permSaved);
             } else {
-                persistEntity(perm);
+                getEntityManager().persist(perm);
                 perms.add(perm);
             }
         }
@@ -122,15 +112,14 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
         
         UserSubject sub = getEntityManager().find(UserSubject.class, serverToken.getSubject().getLogin());
         if (sub == null) {
-            persistEntity(serverToken.getSubject());
+            getEntityManager().persist(serverToken.getSubject());
         } else {
-            entityManager.getTransaction().begin();
-            sub = entityManager.merge(serverToken.getSubject());
-            entityManager.getTransaction().commit();
+            sub = getEntityManager().merge(serverToken.getSubject());
             serverToken.setSubject(sub);
         }
         
-        persistEntity(serverToken);
+        getEntityManager().persist(serverToken);
+        getEntityManager().getTransaction().commit();
     }
     
     protected void saveRefreshToken(RefreshToken refreshToken) {
@@ -146,10 +135,6 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
         entityManager.remove(entity);
         entityManager.getTransaction().commit();
     }
-    protected TypedQuery<Client> getClientQuery(String clientId) {
-        return entityManager.createQuery(
-            "SELECT c FROM " + CLIENT_TABLE_NAME + " c WHERE c.clientId = '" + clientId + "'", Client.class);
-    }
     protected TypedQuery<Client> getClientsQuery(UserSubject resourceOwnerSubject) {
         if (resourceOwnerSubject == null) {
             return entityManager.createQuery("SELECT c FROM " + CLIENT_TABLE_NAME + " c", Client.class);
@@ -158,11 +143,6 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
                 "SELECT c FROM " + CLIENT_TABLE_NAME + " c JOIN c.resourceOwnerSubject r WHERE r.login = '" 
                 + resourceOwnerSubject.getLogin() + "'", Client.class);
         }
-    }
-    protected TypedQuery<BearerAccessToken> getTokenQuery(String tokenKey) {
-        return entityManager.createQuery(
-            "SELECT t FROM " + BEARER_TOKEN_TABLE_NAME + " t WHERE t.tokenKey = '" + tokenKey + "'", 
-            BearerAccessToken.class);
     }
     protected TypedQuery<ServerAccessToken> getTokensQuery(Client c, UserSubject resourceOwnerSubject) {
         if (c == null && resourceOwnerSubject == null) {
@@ -182,11 +162,6 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
                 + resourceOwnerSubject.getLogin() + "' AND c.clientId = '" + c.getClientId() + "'",
                 ServerAccessToken.class);
         }
-    }
-    protected TypedQuery<RefreshToken> getRefreshTokenQuery(String tokenKey) {
-        return entityManager.createQuery(
-            "SELECT t FROM " + REFRESH_TOKEN_TABLE_NAME + " t WHERE t.tokenKey = '" + tokenKey + "'", 
-            RefreshToken.class);
     }
     protected TypedQuery<RefreshToken> getRefreshTokensQuery(Client c, UserSubject resourceOwnerSubject) {
         if (c == null && resourceOwnerSubject == null) {
