@@ -20,7 +20,6 @@ package org.apache.cxf.rs.security.oauth2.grants.code;
 
 import java.util.List;
 
-import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 
 import org.apache.cxf.rs.security.oauth2.common.Client;
@@ -50,13 +49,11 @@ public class JPACodeDataProvider extends JPAOAuthDataProvider implements Authori
     
     @Override
     public ServerAuthorizationCodeGrant removeCodeGrant(String code) throws OAuthServiceException {
-        try {
-            ServerAuthorizationCodeGrant grant = getCodeQuery(code).getSingleResult();
+        ServerAuthorizationCodeGrant grant = getEntityManager().find(ServerAuthorizationCodeGrant.class, code);
+        if (grant != null) {
             removeEntity(grant);
-            return grant;
-        } catch (NoResultException ex) {
-            return null;
-        }
+        } 
+        return grant;
     }
 
     @Override
@@ -66,11 +63,6 @@ public class JPACodeDataProvider extends JPAOAuthDataProvider implements Authori
     }
     public void setCodeLifetime(long codeLifetime) {
         this.codeLifetime = codeLifetime;
-    }
-    protected TypedQuery<ServerAuthorizationCodeGrant> getCodeQuery(String code) {
-        return getEntityManager().createQuery(
-            "SELECT c FROM " + CODE_TABLE_NAME + " c WHERE c.code = '" + code + "'", 
-            ServerAuthorizationCodeGrant.class);
     }
     protected TypedQuery<ServerAuthorizationCodeGrant> getCodesQuery(Client c, UserSubject resourceOwnerSubject) {
         if (c == null && resourceOwnerSubject == null) {
