@@ -79,6 +79,7 @@ public class ClassLoaderResolverTest extends Assert {
         String content = reader.readLine(); 
 
         assertEquals("resource content incorrect", RESOURCE_DATA, content);
+        reader.close();
     } 
 
 }

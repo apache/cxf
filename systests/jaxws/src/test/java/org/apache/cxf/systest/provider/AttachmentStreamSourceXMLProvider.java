@@ -81,9 +81,8 @@ public class AttachmentStreamSourceXMLProvider implements Provider<StreamSource>
                 if (i++ > count) {
                     break;
                 }
-                try {
+                try (ByteArrayOutputStream bous = new ByteArrayOutputStream()) {
                     InputStream is = entry.getValue().getInputStream();
-                    ByteArrayOutputStream bous = new ByteArrayOutputStream();
                     IOUtils.copy(is, bous);
             
                     buf.append("<att contentId=\"" + entry.getKey() + "\">");

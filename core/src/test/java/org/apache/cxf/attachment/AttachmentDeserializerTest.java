@@ -122,6 +122,7 @@ public class AttachmentDeserializerTest extends Assert {
         }
         assertEquals(0, cidlist.size());
         assertEquals(0, msg.getAttachments().size());
+        is.close();
     }
     
     @Test
@@ -154,9 +155,10 @@ public class AttachmentDeserializerTest extends Assert {
         InputStream attIs = a.getDataHandler().getInputStream();
         
         // check the cached output stream
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        IOUtils.copy(attBody, out);
-        assertTrue(out.toString().startsWith("<env:Envelope"));
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            IOUtils.copy(attBody, out);
+            assertTrue(out.toString().startsWith("<env:Envelope"));
+        }
         
         // try streaming a character off the wire
         assertEquals(255, attIs.read());
@@ -166,6 +168,7 @@ public class AttachmentDeserializerTest extends Assert {
 //        assertNull(invalid.getDataHandler().getInputStream());
 //        
 //        assertTrue(attIs instanceof ByteArrayInputStream);
+        is.close();
     }
 
     @Test
@@ -198,9 +201,10 @@ public class AttachmentDeserializerTest extends Assert {
         InputStream attIs = a.getDataHandler().getInputStream();
 
         // check the cached output stream
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        IOUtils.copy(attBody, out);
-        assertTrue(out.toString().startsWith("<env:Envelope"));
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            IOUtils.copy(attBody, out);
+            assertTrue(out.toString().startsWith("<env:Envelope"));
+        }
 
         // try streaming a character off the wire
         assertEquals(255, attIs.read());
@@ -210,6 +214,7 @@ public class AttachmentDeserializerTest extends Assert {
 //        assertNull(invalid.getDataHandler().getInputStream());
 //
 //        assertTrue(attIs instanceof ByteArrayInputStream);
+        is.close();
     }
     
     @Test
@@ -242,9 +247,10 @@ public class AttachmentDeserializerTest extends Assert {
         InputStream attIs = a.getDataHandler().getInputStream();
 
         // check the cached output stream
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        IOUtils.copy(attBody, out);
-        assertTrue(out.toString().startsWith("<?xml"));
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            IOUtils.copy(attBody, out);
+            assertTrue(out.toString().startsWith("<?xml"));
+        }
         
         // try streaming a character off the wire
         assertTrue(attIs.read() == 'f');
@@ -254,6 +260,8 @@ public class AttachmentDeserializerTest extends Assert {
         assertTrue(attIs.read() == 'a');
         assertTrue(attIs.read() == 'r');
         assertTrue(attIs.read() == -1);
+
+        is.close();
     }
     
     @Test
@@ -284,9 +292,10 @@ public class AttachmentDeserializerTest extends Assert {
         InputStream attIs = a.getDataHandler().getInputStream();
         
         // check the cached output stream
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        IOUtils.copy(attBody, out);
-        assertTrue(out.toString().startsWith("<?xml"));
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            IOUtils.copy(attBody, out);
+            assertTrue(out.toString().startsWith("<?xml"));
+        }
         
         // try streaming a character off the wire
         assertTrue(attIs.read() == 'f');
@@ -298,6 +307,7 @@ public class AttachmentDeserializerTest extends Assert {
         assertTrue(attIs.read() == -1);
         
         assertFalse(itr.hasNext());
+        is.close();
     }
     
     @Test
@@ -332,10 +342,11 @@ public class AttachmentDeserializerTest extends Assert {
         
         assertFalse(itr.hasNext());
         
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        IOUtils.copy(attIs, out);
-        assertTrue(out.size() > 1000);
-
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            IOUtils.copy(attIs, out);
+            assertTrue(out.size() > 1000);
+        }
+        is.close();
     }
     
     
@@ -384,6 +395,9 @@ public class AttachmentDeserializerTest extends Assert {
         InputStream inputStreamWithoutAttachments = message.getContent(InputStream.class);
         SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
         parser.parse(inputStreamWithoutAttachments, new DefaultHandler());
+
+        inputStreamWithoutAttachments.close();
+        rawInputStream.close();
     }
     
     @Test
@@ -412,6 +426,7 @@ public class AttachmentDeserializerTest extends Assert {
         ad.initializeAttachments();
         message.getAttachments().size();
 
+        inputStream.close();
     }
     @Test
     public void testDoesntReturnZero() throws Exception {
@@ -457,20 +472,23 @@ public class AttachmentDeserializerTest extends Assert {
             s = getString(a.getDataHandler().getInputStream());
             assertEquals("ABCD" + count++, s);
         }
+
+        in.close();
     }
     
     private String getString(InputStream ins) throws Exception {
-        ByteArrayOutputStream bout = new ByteArrayOutputStream(100);
-        byte b[] = new byte[100];
-        int i = ins.read(b);
-        while (i > 0) {
-            bout.write(b, 0, i);
-            i = ins.read(b);
+        try (ByteArrayOutputStream bout = new ByteArrayOutputStream(100)) {
+            byte b[] = new byte[100];
+            int i = ins.read(b);
+            while (i > 0) {
+                bout.write(b, 0, i);
+                i = ins.read(b);
+            }
+            if (i == 0) {
+                throw new IOException("Should not be 0");
+            }
+            return bout.toString();
         }
-        if (i == 0) {
-            throw new IOException("Should not be 0");
-        }
-        return bout.toString();
     }
     
     @Test
@@ -510,6 +528,7 @@ public class AttachmentDeserializerTest extends Assert {
                 sz = ins.read(bts, count, bts.length - count);
             }
             assertEquals(x + 1, count);
+            ins.close();
         }
     }
 
@@ -552,6 +571,8 @@ public class AttachmentDeserializerTest extends Assert {
         assertEquals(1024, count);
         assertEquals(225, ins.read(new byte[1000], 500, 500));
         assertEquals(-1, ins.read(new byte[1000], 500, 500));
+
+        ins.close();
     }
 
     @Test
@@ -589,6 +610,8 @@ public class AttachmentDeserializerTest extends Assert {
         assertEquals(500, count);
         assertEquals(-1, ins.read(new byte[1000], 500, 500));
 
+        ins.close();
+
         cid = "1a66bb35-67fc-4e89-9f33-48af417bf9fe-2@apache.org";
         ds = AttachmentUtil.getAttachmentDataSource(cid, message.getAttachments());
         bts = new byte[1024];
@@ -601,6 +624,7 @@ public class AttachmentDeserializerTest extends Assert {
         }
         assertEquals(1249, count);
         assertEquals(-1, ins.read(new byte[1000], 500, 500));
+        ins.close();
     }
     @Test
     public void testCXF3582c() throws Exception {
@@ -636,6 +660,7 @@ public class AttachmentDeserializerTest extends Assert {
         }
         assertEquals(500, count);
         assertEquals(-1, ins.read(new byte[1000], 100, 600));
+        ins.close();
 
         cid = "1a66bb35-67fc-4e89-9f33-48af417bf9fe-2@apache.org";
         ds = AttachmentUtil.getAttachmentDataSource(cid, message.getAttachments());
@@ -649,6 +674,7 @@ public class AttachmentDeserializerTest extends Assert {
         }
         assertEquals(1249, count);
         assertEquals(-1, ins.read(new byte[1000], 100, 600));
+        ins.close();
     }
 }
 

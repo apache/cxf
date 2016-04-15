@@ -290,8 +290,9 @@ public class CachedOutputStream extends OutputStream {
             }
         } else {
             // read the file
-            InputStream fin = createInputStream(tempFile);
-            return IOUtils.readBytesFromStream(fin);
+            try (InputStream fin = createInputStream(tempFile)) {
+                return IOUtils.readBytesFromStream(fin);
+            }
         }
     }
 
