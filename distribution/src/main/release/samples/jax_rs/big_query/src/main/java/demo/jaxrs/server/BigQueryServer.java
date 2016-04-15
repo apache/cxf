@@ -100,10 +100,11 @@ public final class BigQueryServer {
     }
 
     private static PrivateKey loadPrivateKey(String p12File, String password) throws Exception {
-        InputStream is = new FileInputStream(p12File);
-        KeyStore store = KeyStore.getInstance("PKCS12");
-        store.load(is, password.toCharArray());
-        return (PrivateKey)store.getKey("privateKey", password.toCharArray());
+        try (InputStream is = new FileInputStream(p12File)) {
+            KeyStore store = KeyStore.getInstance("PKCS12");
+            store.load(is, password.toCharArray());
+            return (PrivateKey)store.getKey("privateKey", password.toCharArray());
+        }
     }
 
 }

@@ -121,12 +121,13 @@ public class CertConstraintsTest extends org.junit.Assert {
             FileSystems.getDefault().getPath("src/test/java/org/apache/cxf/transport/https/resources/", 
                                              keystoreFilename);
         byte[] bytes = Files.readAllBytes(path);
-        ByteArrayInputStream bin = new ByteArrayInputStream(bytes);
-        store.load(bin, keystorePassword.toCharArray());
-        for (java.util.Enumeration<String> aliases = store.aliases(); aliases.hasMoreElements();) {
-            final String alias = aliases.nextElement();
-            if (id.equals(alias)) {
-                return (X509Certificate) store.getCertificate(alias);
+        try (ByteArrayInputStream bin = new ByteArrayInputStream(bytes)) {
+            store.load(bin, keystorePassword.toCharArray());
+            for (java.util.Enumeration<String> aliases = store.aliases(); aliases.hasMoreElements();) {
+                final String alias = aliases.nextElement();
+                if (id.equals(alias)) {
+                    return (X509Certificate) store.getCertificate(alias);
+                }
             }
         }
         assert false;
@@ -159,9 +160,10 @@ public class CertConstraintsTest extends org.junit.Assert {
     private static org.w3c.dom.Document loadDocument(
         final String name
     ) throws Exception {
-        final java.io.InputStream inStream = 
-            CertConstraintsTest.class.getResourceAsStream(name);
-        return StaxUtils.read(inStream);
+        try (java.io.InputStream inStream = 
+            CertConstraintsTest.class.getResourceAsStream(name)) {
+            return StaxUtils.read(inStream);
+        }
     }
 
     private static <T> T unmarshal(
