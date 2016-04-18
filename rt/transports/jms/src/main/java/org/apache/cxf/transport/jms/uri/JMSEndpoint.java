@@ -45,7 +45,7 @@ public class JMSEndpoint {
     public static final long TIMETOLIVE_DEFAULT = Message.DEFAULT_TIME_TO_LIVE;
     public static final int PRIORITY_DEFAULT = Message.DEFAULT_PRIORITY;
     private static final int DEFAULT_RETRY_COUNT = Integer.MAX_VALUE;
-	private static final long DEFAULT_RETRY_INTERVAL = 5000L;
+    private static final long DEFAULT_RETRY_INTERVAL = 5000L;
 
     /**
      * All parameters with this prefix will go to jndiParameters and be used
@@ -479,23 +479,23 @@ public class JMSEndpoint {
             throw new IllegalArgumentException(v);
         }
     }
-       public int getMaxNoOfRetries() {
-		return maxNoOfRetries;
-	}
-	public void setMaxNoOfRetries(int maxNoOfRetries) {
-		this.maxNoOfRetries = maxNoOfRetries;
-	}
-	public void setMaxNoOfRetries(String maxNoOfRetries) {
-		this.maxNoOfRetries = Integer.valueOf(maxNoOfRetries);
-	}
-	public long getRetryInterval() {
-		return retryInterval;
-	}
-	public void setRetryInterval(long retryInterval) {
-		this.retryInterval = retryInterval;
-	}
-	public void setRetryInterval(String retryInterval) {
-		this.retryInterval = Long.valueOf(retryInterval);
-	}
+    public int getMaxNoOfRetries() {
+	return maxNoOfRetries;
+    }
+    public void setMaxNoOfRetries(int maxNoOfRetries) {
+	this.maxNoOfRetries = maxNoOfRetries;
+    }
+    public void setMaxNoOfRetries(String maxNoOfRetries) {
+	this.maxNoOfRetries = Integer.valueOf(maxNoOfRetries);
+    }
+    public long getRetryInterval() {
+	return retryInterval;
+    }
+    public void setRetryInterval(long retryInterval) {
+	this.retryInterval = retryInterval;
+    }
+    public void setRetryInterval(String retryInterval) {
+	this.retryInterval = Long.valueOf(retryInterval);
+    }
     
 }
