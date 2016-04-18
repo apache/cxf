@@ -93,6 +93,9 @@ public class JMSConfiguration {
     // For jms spec. Do not configure manually
     private String targetService;
     private String requestURI;
+    
+    private int maxNoOfRetries ;
+    private long retryInterval ;
 
 
 
@@ -457,5 +460,18 @@ public class JMSConfiguration {
     public void setTransactionManager(TransactionManager transactionManager) {
         this.transactionManager = transactionManager;
     }
+    
+    public int getMaxNoOfRetries() {
+		return maxNoOfRetries;
+	}
+	public void setMaxNoOfRetries(int maxNoOfRetries) {
+		this.maxNoOfRetries = maxNoOfRetries;
+	}
+	public long getRetryInterval() {
+		return retryInterval;
+	}
+	public void setRetryInterval(long retryInterval) {
+		this.retryInterval = retryInterval;
+	}
 
 }
