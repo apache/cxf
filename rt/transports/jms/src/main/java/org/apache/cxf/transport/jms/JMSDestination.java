@@ -166,8 +166,7 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
                 Thread.sleep(retryInterval);
                 this.jmsListener = createTargetDestinationListener();
                 LOG.log(Level.INFO, "Established JMS connection");
-            }catch(InterruptedException ie){
-    			LOG.log(Level.INFO, "InterruptedException - stopping the retry");
+            } catch (InterruptedException ie) {
     			break;
             } catch (Exception e1) {
                 jmsListener = null;
@@ -178,10 +177,10 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
                     LOG.log(Level.WARNING, message);
                 }
             }
-        } while (jmsListener == null && !shutdown && tries<maxNoOfRetries);
+        } while (jmsListener == null && !shutdown && tries < maxNoOfRetries);
         //Cleanup the connection if Listener wasn't created after all the retries
-    	if(jmsListener == null ){
-    		deactivate();
+    	if(jmsListener == null) {
+    	    deactivate();
     	}
     }
 
