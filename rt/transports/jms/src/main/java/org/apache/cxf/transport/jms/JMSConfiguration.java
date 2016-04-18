@@ -94,8 +94,8 @@ public class JMSConfiguration {
     private String targetService;
     private String requestURI;
     
-    private int maxNoOfRetries ;
-    private long retryInterval ;
+    private int maxNoOfRetries;
+    private long retryInterval;
 
 
 
@@ -462,16 +462,16 @@ public class JMSConfiguration {
     }
     
     public int getMaxNoOfRetries() {
-		return maxNoOfRetries;
-	}
-	public void setMaxNoOfRetries(int maxNoOfRetries) {
-		this.maxNoOfRetries = maxNoOfRetries;
-	}
-	public long getRetryInterval() {
-		return retryInterval;
-	}
-	public void setRetryInterval(long retryInterval) {
-		this.retryInterval = retryInterval;
-	}
+	return this.maxNoOfRetries;
+    }
+    public void setMaxNoOfRetries(int maxNoOfRetries) {
+	this.maxNoOfRetries = maxNoOfRetries;
+    }
+    public long getRetryInterval() {
+	return this.retryInterval;
+    }
+    public void setRetryInterval(long retryInterval) {
+	this.retryInterval = retryInterval;
+    }
 
 }
