@@ -67,6 +67,8 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
     private ClassLoader loader;
     private Connection connection;
     private boolean shutdown;
+    private int maxNoOfRetries;
+    private long retryInterval;
 
     public JMSDestination(Bus b, EndpointInfo info, JMSConfiguration jmsConfig) {
         super(b, getTargetReference(info, b), info);
@@ -79,6 +81,8 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
 
         this.suspendedContinuations = new ThrottlingCounter(restartLimit,
                                                             jmsConfig.getMaxSuspendedContinuations());
+        this.maxNoOfRetries = jmsConfig.getMaxNoOfRetries();
+        this.retryInterval = jmsConfig.getRetryInterval();
     }
 
     /**
@@ -159,23 +163,26 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
             tries++;
             try {
                 deactivate();
+                Thread.sleep(retryInterval);
                 this.jmsListener = createTargetDestinationListener();
                 LOG.log(Level.INFO, "Established JMS connection");
+            }catch(InterruptedException ie){
+    			LOG.log(Level.INFO, "InterruptedException - stopping the retry");
+    			break;
             } catch (Exception e1) {
                 jmsListener = null;
-                String message = "Exception on reconnect. Trying again, attempt num " + tries;
+                String message = "Exception on reconnect. Attempt num was " + tries;
                 if (LOG.isLoggable(Level.FINE)) {
                     LOG.log(Level.WARNING, message, e1);
                 } else {
                     LOG.log(Level.WARNING, message);
                 }
-                try {
-                    Thread.sleep(5000);
-                } catch (InterruptedException e2) {
-                    // Ignore
-                }
             }
-        } while (jmsListener == null && !shutdown);
+        } while (jmsListener == null && !shutdown && tries<maxNoOfRetries);
+        //Cleanup the connection if Listener wasn't created after all the retries
+    	if(jmsListener == null ){
+    		deactivate();
+    	}
     }
 
     public void deactivate() {
