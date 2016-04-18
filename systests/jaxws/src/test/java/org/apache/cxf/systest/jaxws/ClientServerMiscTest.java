@@ -887,14 +887,15 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
         String str = IOUtils.readStringFromStream(con.getInputStream());
         
         //Check to make sure SESSIONID is a string
-        BufferedReader reader = new BufferedReader(new StringReader(str)); 
-        String s = reader.readLine();
-        while (s != null) {
-            if (s.contains("SESSIONID") && s.contains("element ")) {
-                assertTrue(s.contains("string"));
-                assertFalse(s.contains("headerObj"));
+        try (BufferedReader reader = new BufferedReader(new StringReader(str))) {
+            String s = reader.readLine();
+            while (s != null) {
+                if (s.contains("SESSIONID") && s.contains("element ")) {
+                    assertTrue(s.contains("string"));
+                    assertFalse(s.contains("headerObj"));
+                }
+                s = reader.readLine();   
             }
-            s = reader.readLine();   
         }
         //wsdl is correct, now make sure we can actually invoke it 
         QName name = new QName("http://cxf.apache.org/cxf5064", 

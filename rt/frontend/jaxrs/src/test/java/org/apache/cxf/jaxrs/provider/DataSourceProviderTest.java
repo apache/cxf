@@ -76,12 +76,13 @@ public class DataSourceProviderTest extends Assert {
         DataSourceProvider<DataSource> p = new DataSourceProvider<DataSource>();
         DataSource ds = new InputStreamDataSource(new ByteArrayInputStream("image".getBytes()), 
                                                   "image/png"); 
-        ByteArrayOutputStream os = new ByteArrayOutputStream(); 
         MultivaluedMap<String, Object> outHeaders = new MetadataMap<String, Object>();
         
-        p.writeTo(ds, DataSource.class, DataSource.class, new Annotation[]{}, 
-                   MediaType.valueOf("image/png"), outHeaders, os);
-        assertEquals("image", os.toString());
+        try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
+            p.writeTo(ds, DataSource.class, DataSource.class, new Annotation[]{}, 
+                    MediaType.valueOf("image/png"), outHeaders, os);
+            assertEquals("image", os.toString());
+        }
         assertEquals(0, outHeaders.size());
     }
     
@@ -91,11 +92,12 @@ public class DataSourceProviderTest extends Assert {
         p.setUseDataSourceContentType(true);
         DataSource ds = new InputStreamDataSource(new ByteArrayInputStream("image".getBytes()), 
                                                   "image/png"); 
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
         MultivaluedMap<String, Object> outHeaders = new MetadataMap<String, Object>();
-        p.writeTo(ds, DataSource.class, DataSource.class, new Annotation[]{}, 
-                   MediaType.valueOf("image/jpeg"), outHeaders, os);
-        assertEquals("image", os.toString());
+        try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
+            p.writeTo(ds, DataSource.class, DataSource.class, new Annotation[]{}, 
+                    MediaType.valueOf("image/jpeg"), outHeaders, os);
+            assertEquals("image", os.toString());
+        }
         assertEquals("image/png", outHeaders.getFirst("Content-Type"));
     }
     

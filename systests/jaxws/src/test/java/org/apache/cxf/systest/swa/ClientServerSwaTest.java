@@ -174,12 +174,12 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
         port.echoDataRef(structHolder);
 
         handler = structHolder.value.getDataRef();
-        InputStream bis = null;
-        bis = handler.getDataSource().getInputStream();
+        InputStream bis = handler.getDataSource().getInputStream();
         byte b[] = new byte[10];
         bis.read(b, 0, 10);
         String string = IOUtils.newStringFromBytes(b);
         assertEquals("testfoobar", string);
+        bis.close();
     }
     
     @Test

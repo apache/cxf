@@ -805,6 +805,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
         GZIPInputStream inputStream = new GZIPInputStream(in);
         Document doc = StaxUtils.read(inputStream);
         assertNotNull(doc);
+        inputStream.close();
     }
     
     @Test
