@@ -52,5 +52,6 @@
         <module>tracing</module>
         <module>jibx</module>
         <module>ws-transfer</module>
+        <module>rs-sse</module>
     </modules>
 </project>

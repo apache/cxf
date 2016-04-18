@@ -23,6 +23,9 @@ import java.util.Date;
 import java.util.List;
 
 import javax.ws.rs.core.EntityTag;
+import javax.ws.rs.core.NioCompletionHandler;
+import javax.ws.rs.core.NioErrorHandler;
+import javax.ws.rs.core.NioReaderHandler;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Variant;
@@ -52,6 +55,26 @@ public class ThreadLocalRequest extends AbstractThreadLocalProxy<Request>
 
     public ResponseBuilder evaluatePreconditions() {
         return get().evaluatePreconditions();
+    }
+
+    @Override
+    public void entity(NioReaderHandler reader) {
+        get().entity(reader);
+    }
+
+    @Override
+    public void entity(NioReaderHandler reader, NioCompletionHandler completion) {
+        get().entity(reader, completion);
+    }
+
+    @Override
+    public void entity(NioReaderHandler reader, NioErrorHandler error) {
+        get().entity(reader, error);
+    }
+
+    @Override
+    public void entity(NioReaderHandler reader, NioCompletionHandler completion, NioErrorHandler error) {
+        get().entity(reader, completion, error);
     }
 
 }

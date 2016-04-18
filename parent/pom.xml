@@ -110,7 +110,7 @@
         <cxf.geronimo.transaction.version>1.1.1</cxf.geronimo.transaction.version>
         <cxf.jasypt.bundle.version>1.9.0_1</cxf.jasypt.bundle.version>
         <cxf.javassist.version>3.19.0-GA</cxf.javassist.version>
-        <cxf.javax.ws.rs.version>2.0.1</cxf.javax.ws.rs.version>
+        <cxf.javax.ws.rs.version>2.1-m01</cxf.javax.ws.rs.version>
         <cxf.jaxb.version>2.2.11</cxf.jaxb.version>
         <cxf.jaxb.impl.version>${cxf.jaxb.version}</cxf.jaxb.impl.version>
         <cxf.jaxb.core.version>${cxf.jaxb.version}</cxf.jaxb.core.version>
@@ -2185,4 +2185,19 @@
             </build>
         </profile>
     </profiles>
+
+    <!-- Temporarily only till JAX-RS 2.1 artifacts become available -->
+    <repositories>
+        <repository>
+            <id>maven.java.net</id>
+            <name>java.net snapshots</name>
+            <url>https://maven.java.net/content/repositories/snapshots/</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 </project>

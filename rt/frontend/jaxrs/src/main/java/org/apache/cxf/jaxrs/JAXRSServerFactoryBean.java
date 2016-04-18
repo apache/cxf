@@ -193,6 +193,7 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
             checkPrivateEndpoint(ep);
             
             factory.applyDynamicFeatures(getServiceFactory().getClassResourceInfo());
+            applyBusFeatures(getBus());
             applyFeatures();
 
             getServiceFactory().sendEvent(FactoryBeanListener.Event.SERVER_CREATED,
@@ -244,6 +245,14 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
             cri.initBeanParamInfo(factory);
         }
         
+    }
+    
+    protected void applyBusFeatures(final Bus bus) {
+        if (bus.getFeatures() != null) {
+            for (Feature feature : bus.getFeatures()) {
+                feature.initialize(server, bus);
+            }
+        }
     }
     
     protected void applyFeatures() {

@@ -45,6 +45,7 @@ import javax.ws.rs.ext.Provider;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.extension.ExtensionManagerBus;
+import org.apache.cxf.cdi.extension.JAXRSServerFactoryCustomizationExtension;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
@@ -99,11 +100,13 @@ public class JAXRSCdiResourceExtension implements Extension {
                     loadServices(beanManager, Collections.<Class<?>>emptySet()),
                     loadProviders(beanManager, Collections.<Class<?>>emptySet()),
                     loadFeatures(beanManager, Collections.<Class<?>>emptySet()));
+                customize(beanManager, factory);
                 factory.init();
             } else {
                 // If there is an application with any singletons or classes defined, we will
                 // create a server factory bean with only application singletons and classes.
                 final JAXRSServerFactoryBean factory = createFactoryInstance(instance, beanManager);
+                customize(beanManager, factory);
                 factory.init();
             }
         }
@@ -272,5 +275,25 @@ public class JAXRSCdiResourceExtension implements Extension {
         }
         
         return services;
+    }
+    
+    /**
+     * Look and apply the available JAXRSServerFactoryBean extensions to customize its
+     * creation (f.e. add features, providers, assign transport, ...)
+     * @param beanManager bean manager
+     * @param bean JAX-RS server factory bean about to be created
+     */
+    private void customize(final BeanManager beanManager, final JAXRSServerFactoryBean bean) {
+        final Collection<Bean<?>> extensionBeans = beanManager.getBeans(JAXRSServerFactoryCustomizationExtension.class);
+        
+        for (final Bean<?> extensionBean: extensionBeans) {
+            final JAXRSServerFactoryCustomizationExtension extension =
+                (JAXRSServerFactoryCustomizationExtension)beanManager.getReference(
+                    extensionBean, 
+                    extensionBean.getBeanClass(), 
+                    beanManager.createCreationalContext(extensionBean) 
+                );
+            extension.customize(bean);
+        }
     }
 }

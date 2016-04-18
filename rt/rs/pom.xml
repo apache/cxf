@@ -39,5 +39,6 @@
         <module>extensions/search</module>
         <module>extensions/rx</module>
         <module>security</module>
+        <module>sse</module>
     </modules>
 </project>

@@ -87,13 +87,19 @@ public class HTTPTransportFactory
     public HTTPTransportFactory() {
         this(new DestinationRegistryImpl());
     }
+    
     public HTTPTransportFactory(DestinationRegistry registry) {
-        super(DEFAULT_NAMESPACES);
+        this(DEFAULT_NAMESPACES, registry);
+    }
+    
+    protected HTTPTransportFactory(List<String> transportIds, DestinationRegistry registry) {
+        super(transportIds);
         if (registry == null) {
             registry = new DestinationRegistryImpl();
         }
         this.registry = registry;
     }
+    
     public DestinationRegistry getRegistry() {
         return registry;
     }
