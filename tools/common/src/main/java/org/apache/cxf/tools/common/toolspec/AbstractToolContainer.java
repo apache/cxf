@@ -83,7 +83,7 @@ public abstract class AbstractToolContainer implements ToolContainer {
         }        
     }
     
-    public void parseCommandLine() throws BadUsageException {
+    public void parseCommandLine() throws BadUsageException, IOException {
         if (toolspec != null) {
             parser = new CommandLineParser(toolspec);
             commandDoc = parser.parseArguments(arguments);           
@@ -176,8 +176,8 @@ public abstract class AbstractToolContainer implements ToolContainer {
         init();
         try {
             parseCommandLine();
-        } catch (BadUsageException bue) {
-            throw new ToolException(bue);
+        } catch (BadUsageException | IOException e) {
+            throw new ToolException(e);
         }        
     }
 

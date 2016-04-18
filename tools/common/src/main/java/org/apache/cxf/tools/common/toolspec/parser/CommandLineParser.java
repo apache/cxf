@@ -20,6 +20,7 @@
 package org.apache.cxf.tools.common.toolspec.parser;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -68,11 +69,11 @@ public class CommandLineParser {
         return res.toArray(new String[res.size()]);
     }
 
-    public CommandDocument parseArguments(String args) throws BadUsageException {
+    public CommandDocument parseArguments(String args) throws BadUsageException, IOException {
         return parseArguments(getArgsFromString(args));
     }
 
-    public CommandDocument parseArguments(String[] args) throws BadUsageException {
+    public CommandDocument parseArguments(String[] args) throws BadUsageException, IOException {
 
         if (LOG.isLoggable(Level.FINE)) {
             StringBuilder debugMsg = new StringBuilder("Parsing arguments: ");
@@ -185,9 +186,10 @@ public class CommandLineParser {
                                     new StreamSource(Tool.class
                                         .getResourceAsStream("indent-no-xml-declaration.xsl")));
 
-                OutputStream os = new ByteArrayOutputStream();
-                serializer.transform(new DOMSource(resultDoc), new StreamResult(os));
-                LOG.fine(os.toString());
+                try (OutputStream os = new ByteArrayOutputStream()) {
+                    serializer.transform(new DOMSource(resultDoc), new StreamResult(os));
+                    LOG.fine(os.toString());
+                }
             } catch (Exception ex) {
                 LOG.log(Level.SEVERE, "ERROR_SERIALIZE_COMMAND_MSG", ex);
             }
@@ -196,7 +198,7 @@ public class CommandLineParser {
         return new CommandDocument(toolspec, resultDoc);
     }
 
-    public void throwUsage(ErrorVisitor errors) throws BadUsageException {
+    public void throwUsage(ErrorVisitor errors) throws BadUsageException, IOException {
         try {
             throw new BadUsageException(getUsage(), errors);
         } catch (TransformerException ex) {
@@ -205,28 +207,32 @@ public class CommandLineParser {
         }
     }
 
-    public String getUsage() throws TransformerException {
+    public String getUsage() throws TransformerException, IOException {
         // REVISIT: style usage document into a form more readily output as a
         // usage message
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        InputStream in = getClass().getResourceAsStream("usage.xsl");
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            InputStream in = getClass().getResourceAsStream("usage.xsl");
 
-        toolspec.transform(in, baos);
-        return baos.toString();
+            toolspec.transform(in, baos);
+            return baos.toString();
+        }
     }
 
-    public String getDetailedUsage() throws TransformerException {
+    public String getDetailedUsage() throws TransformerException, IOException {
         // REVISIT: style usage document into a form more readily output as a
         // usage message
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        toolspec.transform(getClass().getResourceAsStream("detailedUsage.xsl"), baos);
-        return baos.toString();
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            toolspec.transform(getClass().getResourceAsStream("detailedUsage.xsl"), baos);
+            return baos.toString();
+        }
     }
 
-    public String getFormattedDetailedUsage() throws TransformerException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        toolspec.transform(getClass().getResourceAsStream("detailedUsage.xsl"), baos);
-        String usage = baos.toString();
+    public String getFormattedDetailedUsage() throws TransformerException, IOException {
+        String usage = null;
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            toolspec.transform(getClass().getResourceAsStream("detailedUsage.xsl"), baos);
+            usage = baos.toString();
+        }
         // we use the following pattern to format usage
         // |-------|-options|------|description-----------------|
         // before option white space size is 7

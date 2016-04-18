@@ -19,6 +19,7 @@
 
 package org.apache.cxf.tools.common.toolspec.parser;
 
+import java.io.IOException;
 import java.util.StringTokenizer;
 
 import org.apache.cxf.common.util.StringUtils;
@@ -97,7 +98,7 @@ public class CommandLineParserTest extends Assert {
     }
 
     @Test
-    public void testInvalidOption() {
+    public void testInvalidOption() throws IOException {
         try {
             String[] args = new String[] {"-n", "-r", "arg1"};
             parser.parseArguments(args);
@@ -119,7 +120,7 @@ public class CommandLineParserTest extends Assert {
     }
 
     @Test
-    public void testMissingOption() {
+    public void testMissingOption() throws IOException {
         try {
             String[] args = new String[] {"-n", "test", "arg1"};
             parser.parseArguments(args);
@@ -138,7 +139,7 @@ public class CommandLineParserTest extends Assert {
     }
 
     @Test
-    public void testMissingArgument() {
+    public void testMissingArgument() throws IOException {
         try {
             String[] args = new String[] {"-n", "test", "-r"};
             parser.parseArguments(args);
@@ -157,7 +158,7 @@ public class CommandLineParserTest extends Assert {
     }
 
     @Test
-    public void testDuplicateArgument() {
+    public void testDuplicateArgument() throws IOException {
         try {
             String[] args = new String[] {"-n", "test", "-r", "arg1", "arg2"};
             parser.parseArguments(args);
@@ -171,7 +172,7 @@ public class CommandLineParserTest extends Assert {
     }
 
     @Test
-    public void testUnexpectedOption() {
+    public void testUnexpectedOption() throws IOException {
         try {
             String[] args = new String[] {"-n", "test", "-r", "-unknown"};
             parser.parseArguments(args);
@@ -191,7 +192,7 @@ public class CommandLineParserTest extends Assert {
 
 
     @Test
-    public void testInvalidPackageName() {
+    public void testInvalidPackageName() throws IOException {
 
         try {
             String[] args = new String[]{
