@@ -480,22 +480,22 @@ public class JMSEndpoint {
         }
     }
     public int getMaxNoOfRetries() {
-	return maxNoOfRetries;
+        return maxNoOfRetries;
     }
     public void setMaxNoOfRetries(int maxNoOfRetries) {
-	this.maxNoOfRetries = maxNoOfRetries;
+        this.maxNoOfRetries = maxNoOfRetries;
     }
     public void setMaxNoOfRetries(String maxNoOfRetries) {
-	this.maxNoOfRetries = Integer.valueOf(maxNoOfRetries);
+        this.maxNoOfRetries = Integer.valueOf(maxNoOfRetries);
     }
     public long getRetryInterval() {
-	return retryInterval;
+        return retryInterval;
     }
     public void setRetryInterval(long retryInterval) {
-	this.retryInterval = retryInterval;
+        this.retryInterval = retryInterval;
     }
     public void setRetryInterval(String retryInterval) {
-	this.retryInterval = Long.valueOf(retryInterval);
+        this.retryInterval = Long.valueOf(retryInterval);
     }
     
 }
