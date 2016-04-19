@@ -530,11 +530,12 @@ public class Headers {
 
     public String getAuthorization() {
         if (headers.containsKey("Authorization")) {
-            List<String> authorizationLines = headers.get("Authorization"); 
-            return authorizationLines.get(0);
-        } else {
-            return null;
-        }
+            List<String> authorizationLines = headers.get("Authorization");
+            if (authorizationLines != null && !authorizationLines.isEmpty()) {
+                return authorizationLines.get(0);
+            }
+        } 
+        return null;
     }
 
     public static SimpleDateFormat getHttpDateFormat() {
