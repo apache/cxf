@@ -44,8 +44,8 @@ public class JMSEndpoint {
     public static final DeliveryModeType DELIVERYMODE_DEFAULT = DeliveryModeType.PERSISTENT;
     public static final long TIMETOLIVE_DEFAULT = Message.DEFAULT_TIME_TO_LIVE;
     public static final int PRIORITY_DEFAULT = Message.DEFAULT_PRIORITY;
-    private static final int DEFAULT_RETRY_COUNT = Integer.MAX_VALUE;
-    private static final long DEFAULT_RETRY_INTERVAL = 5000L;
+    public static final int DEFAULT_RETRY_COUNT = Integer.MAX_VALUE;
+    public static final long DEFAULT_RETRY_INTERVAL = 5000L;
 
     /**
      * All parameters with this prefix will go to jndiParameters and be used
