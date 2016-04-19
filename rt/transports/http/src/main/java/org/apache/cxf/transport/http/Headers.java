@@ -75,11 +75,12 @@ public class Headers {
      * Known HTTP headers whose values have to be represented as individual HTTP headers
      */
     private static final Set<String> HTTP_HEADERS_SINGLE_VALUE_ONLY;
-    
+    private static final String USER_AGENT;
     static {
         HTTP_HEADERS_SINGLE_VALUE_ONLY = new HashSet<String>();
         HTTP_HEADERS_SINGLE_VALUE_ONLY.add(HTTP_HEADERS_SETCOOKIE);
         HTTP_HEADERS_SINGLE_VALUE_ONLY.add(HTTP_HEADERS_LINK);
+        USER_AGENT = initUserAgent();
     }
     
     private final Message message;
@@ -92,6 +93,19 @@ public class Headers {
     public Headers() {
         this.headers = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
         this.message = null;
+    }
+    
+    public static String getUserAgent() {
+        return USER_AGENT;
+    }
+    
+    private static String initUserAgent() {
+        String name = Version.getName();
+        if ("Apache CXF".equals(name)) {
+            name = "Apache-CXF";
+        }
+        String version = Version.getCurrentVersion();
+        return name + "/" + version;
     }
     
     public Map<String, List<String>> headerMap() {
@@ -387,7 +401,7 @@ public class Headers {
         }
         // make sure we don't add more than one User-Agent header
         if (connection.getRequestProperty("User-Agent") == null) {
-            connection.addRequestProperty("User-Agent", Version.getCompleteVersionString());
+            connection.addRequestProperty("User-Agent", USER_AGENT);
         }
     }
     
