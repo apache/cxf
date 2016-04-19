@@ -187,8 +187,14 @@ public final class OAuthUtils {
     }
     
     public static boolean isExpired(Long issuedAt, Long lifetime) {
-        return lifetime != 0L
-            && issuedAt + lifetime < System.currentTimeMillis() / 1000L;
+        // At some point -1 was used to indicate an unlimited lifetime
+        // with 0 being introduced instead at a later stage. 
+        // In theory there still could be a code around initializing the tokens with -1. 
+        // Treating -1 and 0 the same way is reasonable and it also makes it easier to
+        // deal with the token introspection responses with no issuedAt time reported
+        return lifetime == null
+            || lifetime < -1
+            || lifetime > 0L && issuedAt + lifetime < System.currentTimeMillis() / 1000L;
     }
     
     public static boolean validateAudience(String providedAudience, 
