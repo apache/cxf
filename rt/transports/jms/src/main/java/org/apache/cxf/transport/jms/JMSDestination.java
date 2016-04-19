@@ -167,7 +167,7 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
                 this.jmsListener = createTargetDestinationListener();
                 LOG.log(Level.INFO, "Established JMS connection");
             } catch (InterruptedException ie) {
-    			break;
+                break;
             } catch (Exception e1) {
                 jmsListener = null;
                 String message = "Exception on reconnect. Attempt num was " + tries;
@@ -179,9 +179,10 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
             }
         } while (jmsListener == null && !shutdown && tries < maxNoOfRetries);
         //Cleanup the connection if Listener wasn't created after all the retries
-    	if(jmsListener == null) {
-    	    deactivate();
-    	}
+        if (jmsListener == null) {
+            deactivate();
+            
+        }
     }
 
     public void deactivate() {
