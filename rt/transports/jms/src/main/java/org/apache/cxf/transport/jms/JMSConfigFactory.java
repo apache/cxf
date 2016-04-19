@@ -129,10 +129,8 @@ public final class JMSConfigFactory {
         
         String targetService = endpoint.getTargetService();
         jmsConfig.setTargetService(targetService);
-        int maxNoOfRetries = endpoint.getMaxNoOfRetries();
-        jmsConfig.setMaxNoOfRetries(maxNoOfRetries);
-        long retryInterval = endpoint.getRetryInterval();
-        jmsConfig.setRetryInterval(retryInterval);
+        jmsConfig.setMaxNoOfRetries(endpoint.getMaxNoOfRetries());
+        jmsConfig.setRetryInterval(endpoint.getRetryInterval());
         return jmsConfig;
     }
 
