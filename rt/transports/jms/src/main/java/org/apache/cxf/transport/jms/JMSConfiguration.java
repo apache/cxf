@@ -462,16 +462,16 @@ public class JMSConfiguration {
     }
     
     public int getMaxNoOfRetries() {
-	return this.maxNoOfRetries;
+    	return this.maxNoOfRetries;
     }
     public void setMaxNoOfRetries(int maxNoOfRetries) {
-	this.maxNoOfRetries = maxNoOfRetries;
+    	this.maxNoOfRetries = maxNoOfRetries;
     }
     public long getRetryInterval() {
-	return this.retryInterval;
+    	return this.retryInterval;
     }
     public void setRetryInterval(long retryInterval) {
-	this.retryInterval = retryInterval;
+    	this.retryInterval = retryInterval;
     }
 
 }
