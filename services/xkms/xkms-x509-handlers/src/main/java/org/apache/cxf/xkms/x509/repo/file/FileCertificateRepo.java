@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.net.URISyntaxException;
 import java.security.cert.CRLException;
@@ -86,11 +87,11 @@ public class FileCertificateRepo implements CertificateRepo {
             
             File certFile = new File(storageDir + "/" + CRLS_PATH, path);
             certFile.getParentFile().mkdirs();
-            FileOutputStream fos = new FileOutputStream(certFile);
-            BufferedOutputStream bos = new BufferedOutputStream(fos);
-            bos.write(crl.getEncoded());
-            bos.close();
-            fos.close();
+            try (FileOutputStream fos = new FileOutputStream(certFile);
+                BufferedOutputStream bos = new BufferedOutputStream(fos)) {
+                bos.write(crl.getEncoded());
+                bos.close();
+            }
         } catch (Exception e) {
             throw new RuntimeException("Error saving CRL " + name + ": " + e.getMessage(), e);
         }
@@ -109,11 +110,11 @@ public class FileCertificateRepo implements CertificateRepo {
             File certFile = new File(storageDir + "/" + category,
                                      getCertPath(cert, id));
             certFile.getParentFile().mkdirs();
-            FileOutputStream fos = new FileOutputStream(certFile);
-            BufferedOutputStream bos = new BufferedOutputStream(fos);
-            bos.write(cert.getEncoded());
-            bos.close();
-            fos.close();
+            try (FileOutputStream fos = new FileOutputStream(certFile);
+                BufferedOutputStream bos = new BufferedOutputStream(fos)) {
+                bos.write(cert.getEncoded());
+                bos.close();
+            }
         } catch (Exception e) {
             throw new RuntimeException("Error saving certificate " + cert.getSubjectDN() + ": " + e.getMessage(), e);
         }
@@ -175,14 +176,17 @@ public class FileCertificateRepo implements CertificateRepo {
         return certificateFiles.toArray(new File[certificateFiles.size()]);
     }
 
-    public X509Certificate readCertificate(File certFile) throws CertificateException, FileNotFoundException {
-        FileInputStream fis = new FileInputStream(certFile);
-        return (X509Certificate)certFactory.generateCertificate(fis);
+    public X509Certificate readCertificate(File certFile) throws CertificateException, FileNotFoundException,
+        IOException {
+        try (FileInputStream fis = new FileInputStream(certFile)) {
+            return (X509Certificate)certFactory.generateCertificate(fis);
+        }
     }
     
-    public X509CRL readCRL(File crlFile) throws FileNotFoundException, CRLException {
-        FileInputStream fis = new FileInputStream(crlFile);
-        return (X509CRL)certFactory.generateCRL(fis);
+    public X509CRL readCRL(File crlFile) throws FileNotFoundException, CRLException, IOException {
+        try (FileInputStream fis = new FileInputStream(crlFile)) {
+            return (X509CRL)certFactory.generateCRL(fis);
+        }
     }
 
     @Override
