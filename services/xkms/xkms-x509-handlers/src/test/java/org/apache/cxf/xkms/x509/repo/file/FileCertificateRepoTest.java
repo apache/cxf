@@ -59,9 +59,10 @@ public class FileCertificateRepoTest {
 
         File certFile = new File(storageDir, fileRegisterHandler.getCertPath(cert, key));
         Assert.assertTrue("Cert file " + certFile + " should exist", certFile.exists());
-        FileInputStream fis = new FileInputStream(certFile);
-        X509Certificate outCert = loadTestCert(fis);
-        Assert.assertEquals(cert, outCert);
+        try (FileInputStream fis = new FileInputStream(certFile)) {
+            X509Certificate outCert = loadTestCert(fis);
+            Assert.assertEquals(cert, outCert);
+        }
 
         X509Certificate resultCert = fileRegisterHandler.findBySubjectDn(EXAMPLE_SUBJECT_DN);
         Assert.assertNotNull(resultCert);
@@ -93,11 +94,11 @@ public class FileCertificateRepoTest {
         is.close();
         byte[] certData = DatatypeConverter.parseBase64Binary(certString);
         File file = new File(destPath);
-        FileOutputStream fos = new FileOutputStream(file);
-        BufferedOutputStream bos = new BufferedOutputStream(fos);
-        bos.write(certData);
-        bos.close();
-        fos.close();
+        try (FileOutputStream fos = new FileOutputStream(file);
+            BufferedOutputStream bos = new BufferedOutputStream(fos)) {
+            bos.write(certData);
+            bos.close();
+        }
     }
 
     @Test
