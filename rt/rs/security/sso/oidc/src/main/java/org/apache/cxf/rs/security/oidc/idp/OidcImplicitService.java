@@ -66,6 +66,7 @@ public class OidcImplicitService extends ImplicitGrantService {
                                           Client client) {    
         // Validate the nonce, it must be present for the Implicit flow
         if (params.getFirst(OAuthConstants.NONCE) == null) {
+            LOG.fine("A nonce is required for the Implicit flow");
             throw new OAuthServiceException(new OAuthError(OAuthConstants.INVALID_REQUEST));
         }
         return super.startAuthorization(params, userSubject, client);

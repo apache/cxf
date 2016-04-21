@@ -24,6 +24,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -78,7 +79,6 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
                                            String supportedGrantType) {
         this.supportedResponseTypes = supportedResponseTypes;
         this.supportedGrantType = supportedGrantType;
-System.out.println("SUPP: " + supportedGrantType);
     }
     
     /**
@@ -123,7 +123,6 @@ System.out.println("SUPP: " + supportedGrantType);
         // Make sure the end user has authenticated, check if HTTPS is used
         SecurityContext sc = getAndValidateSecurityContext(params);
         Client client = getClient(params);
-System.out.println("HERE1");
         // Create a UserSubject representing the end user 
         UserSubject userSubject = createUserSubject(sc, params);
         return startAuthorization(params, userSubject, client);
@@ -139,22 +138,20 @@ System.out.println("HERE1");
         
         // Validate the provided request URI, if any, against the ones Client provided
         // during the registration
-System.out.println("HERE2");
         String redirectUri = validateRedirectUri(client, params.getFirst(OAuthConstants.REDIRECT_URI)); 
         
-System.out.println("HERE3");
         // Enforce the client confidentiality requirements
         if (!OAuthUtils.isGrantSupportedForClient(client, canSupportPublicClient(client), supportedGrantType)) {
+            LOG.fine("The grant type is not supported");
             return createErrorResponse(params, redirectUri, OAuthConstants.UNAUTHORIZED_CLIENT);
         }
-System.out.println("HERE4");
         
         // Check response_type
         String responseType = params.getFirst(OAuthConstants.RESPONSE_TYPE);
         if (responseType == null || !getSupportedResponseTypes().contains(responseType)) {
+            LOG.fine("The response type is null or not supported");
             return createErrorResponse(params, redirectUri, OAuthConstants.UNSUPPORTED_RESPONSE_TYPE);
         }
-System.out.println("HERE5");
         // Get the requested scopes
         String providedScope = params.getFirst(OAuthConstants.SCOPE);
         List<String> requestedScope = null;
@@ -164,14 +161,15 @@ System.out.println("HERE5");
                                                            useAllClientScopes,
                                                            partialMatchScopeValidation);
         } catch (OAuthServiceException ex) {
+            LOG.log(Level.FINE, "Error parsing scopes", ex);
             return createErrorResponse(params, redirectUri, OAuthConstants.INVALID_SCOPE);
         }
-System.out.println("HERE6");
         // Convert the requested scopes to OAuthPermission instances
         List<OAuthPermission> requestedPermissions = null;
         try {
             requestedPermissions = getDataProvider().convertScopeToPermissions(client, requestedScope);
         } catch (OAuthServiceException ex) {
+            LOG.log(Level.FINE, "Error converting scopes into OAuthPermissions", ex);
             return createErrorResponse(params, redirectUri, OAuthConstants.INVALID_SCOPE);
         }
         // Validate the audience
@@ -179,6 +177,7 @@ System.out.println("HERE6");
         // Right now if the audience parameter is set it is expected to be contained
         // in the list of Client audiences set at the Client registration time.
         if (!OAuthUtils.validateAudience(clientAudience, client.getRegisteredAudiences())) {
+            LOG.fine("Error validating audience parameter");
             throw new OAuthServiceException(new OAuthError(OAuthConstants.INVALID_REQUEST));
         }
     
