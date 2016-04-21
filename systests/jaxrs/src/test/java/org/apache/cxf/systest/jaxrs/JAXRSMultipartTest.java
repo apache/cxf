@@ -56,7 +56,6 @@ import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
-import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
@@ -1004,12 +1003,7 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
     }
     
     private String getStringFromInputStream(InputStream in) throws Exception {        
-        CachedOutputStream bos = new CachedOutputStream();
-        IOUtils.copy(in, bos);
-        String str = new String(bos.getBytes()); 
-        in.close();
-        bos.close();
-        return str;
+        return IOUtils.toString(in);
     }
 
     private Book readBookFromInputStream(InputStream is) throws Exception {

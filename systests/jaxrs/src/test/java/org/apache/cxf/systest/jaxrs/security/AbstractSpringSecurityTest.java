@@ -25,18 +25,12 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.helpers.IOUtils;
-import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 public abstract class AbstractSpringSecurityTest extends AbstractBusClientServerTestBase {
 
     private String getStringFromInputStream(InputStream in) throws Exception {        
-        CachedOutputStream bos = new CachedOutputStream();
-        IOUtils.copy(in, bos);
-        in.close();
-        bos.close();
-        //System.out.println(bos.getOut().toString());        
-        return bos.getOut().toString();        
+        return IOUtils.toString(in); 
     }
     
     protected String base64Encode(String value) {

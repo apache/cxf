@@ -319,17 +319,7 @@ public final class IOUtils {
 
     public static String readStringFromStream(InputStream in)
         throws IOException {
-
-        StringBuilder sb = new StringBuilder(1024);
-
-        try {
-            for (int i = in.read(); i != -1; i = in.read()) {
-                sb.append((char) i);
-            }
-            return sb.toString();
-        } finally {
-            in.close();
-        }
+        return toString(in);
     }
 
     /**

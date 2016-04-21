@@ -248,12 +248,12 @@ public class JAXRSAtomBookTest extends AbstractBusClientServerTestBase {
     }
     
     private InputStream copyIn(InputStream in) throws Exception {
-        CachedOutputStream bos = new CachedOutputStream();
-        IOUtils.copy(in, bos);
-        in.close();
-        in = bos.getInputStream();
-        bos.close();
-        return in;
+        try (CachedOutputStream bos = new CachedOutputStream()) {
+            IOUtils.copyAndCloseInput(in, bos);
+            in = bos.getInputStream();
+            bos.close();
+            return in;
+        }
     }
     private String getStringFromInputStream(InputStream in) throws Exception {
         return IOUtils.toString(in);
