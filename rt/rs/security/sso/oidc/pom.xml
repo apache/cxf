@@ -85,16 +85,62 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-    <!--
     <build>
        <plugins>
+         <plugin>
+	       <groupId>org.bsc.maven</groupId>
+	       <artifactId>maven-processor-plugin</artifactId>
+	       <version>3.1.0</version>
+	       <executions>
+	        <execution>
+		     <id>process</id>
+		     <goals>
+		       <goal>process</goal>
+		     </goals>
+		     <phase>generate-sources</phase>
+		     <configuration>
+               <compilerArguments>-Aopenjpa.source=7 -Aopenjpa.metamodel=true</compilerArguments>
+		       <processors>
+		         <processor>org.apache.openjpa.persistence.meta.AnnotationProcessor6</processor>
+	           </processors>
+               <outputDirectory>target/generated-sources/metamodel</outputDirectory>
+		     </configuration>
+            </execution>
+		   </executions>
+		   <dependencies>
+		     <dependency>
+		       <groupId>org.apache.openjpa</groupId>
+		       <artifactId>openjpa</artifactId>
+		       <version>${openjpa.version}</version>
+		     </dependency>
+		   </dependencies>
+		 </plugin>
+		 <plugin>
+		  <groupId>org.codehaus.mojo</groupId>
+		  <artifactId>build-helper-maven-plugin</artifactId>
+		  <version>1.10</version>
+		  <executions>
+		    <execution>
+		      <id>add-source</id>
+		      <phase>generate-sources</phase>
+		      <goals>
+			<goal>add-source</goal>
+		      </goals>
+		      <configuration>
+			<sources>
+			  <source>target/generated-sources/metamodel</source>
+			</sources>
+		      </configuration>
+		    </execution>
+		  </executions>
+		 </plugin>
+         <!--
             <plugin>
                 <groupId>org.apache.openjpa</groupId>
                 <artifactId>openjpa-maven-plugin</artifactId>
                 <version>${openjpa.version}</version>
                 <configuration>
                     <includes>
-                       org/apache/cxf/rs/security/oidc/idp/OidcUserSubject.class,
                        org/apache/cxf/rs/security/oauth2/common/Client.class,
                        org/apache/cxf/rs/security/oauth2/common/UserSubject.class,
                        org/apache/cxf/rs/security/oauth2/grants/code/AuthorizationCodeGrant,
@@ -116,7 +162,7 @@
                     </execution>
                 </executions>
             </plugin>
+          -->
         </plugins>
       </build>
-      -->
 </project>
