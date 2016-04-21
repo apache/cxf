@@ -62,7 +62,6 @@ public abstract class AbstractImplicitGrantService extends RedirectionBasedGrant
                                           List<String> approvedScope,
                                           UserSubject userSubject,
                                           ServerAccessToken preAuthorizedToken) {
-System.out.println("STATE: " + (state == null));
         StringBuilder sb =
             prepareGrant(state, client, requestedScope, approvedScope, userSubject, preAuthorizedToken);
         return Response.seeOther(URI.create(sb.toString())).build();

@@ -100,13 +100,11 @@ public abstract class AbstractOAuthService {
      * @throws {@link OAuthServiceExcepption} if no matching Client is found
      */
     protected Client getValidClient(String clientId) throws OAuthServiceException {
-        Client client = null;
-        
         if (clientId != null) {
-            client = dataProvider.getClient(clientId);
+            return dataProvider.getClient(clientId);
         }
-        return client;
-        
+        LOG.fine("No valid client found as the given clientId is null");
+        return null;
     }
     
     /**

@@ -21,6 +21,7 @@ package org.apache.cxf.rs.security.oauth2.services;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -90,6 +91,8 @@ public class AccessTokenService extends AbstractTokenService {
         if (!OAuthUtils.isGrantSupportedForClient(client, 
                                                   isCanSupportPublicClients(),
                                                   params.getFirst(OAuthConstants.GRANT_TYPE))) {
+            LOG.log(Level.FINE, "The grant type {} is not supported for the client",
+                     params.getFirst(OAuthConstants.GRANT_TYPE));
             return createErrorResponse(params, OAuthConstants.UNAUTHORIZED_CLIENT);    
         }
         
@@ -102,6 +105,7 @@ public class AccessTokenService extends AbstractTokenService {
         // Find the grant handler
         AccessTokenGrantHandler handler = findGrantHandler(params);
         if (handler == null) {
+            LOG.fine("No Grant Handler found");
             return createErrorResponse(params, OAuthConstants.UNSUPPORTED_GRANT_TYPE);
         }
         
@@ -119,6 +123,7 @@ public class AccessTokenService extends AbstractTokenService {
             return handleException(oauthEx, OAuthConstants.INVALID_GRANT);
         }
         if (serverToken == null) {
+            LOG.fine("No access token was created");
             return createErrorResponse(params, OAuthConstants.INVALID_GRANT);
         }
         
@@ -139,6 +144,7 @@ public class AccessTokenService extends AbstractTokenService {
     protected void checkAudience(Client c, MultivaluedMap<String, String> params) { 
         String audienceParam = params.getFirst(OAuthConstants.CLIENT_AUDIENCE);
         if (!OAuthUtils.validateAudience(audienceParam, c.getRegisteredAudiences())) {
+            LOG.fine("Error validating the audience parameter");
             throw new OAuthServiceException(new OAuthError(OAuthConstants.ACCESS_DENIED));
         }
         
