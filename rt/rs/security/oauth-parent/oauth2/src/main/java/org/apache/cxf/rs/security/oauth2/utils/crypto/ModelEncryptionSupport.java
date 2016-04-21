@@ -245,7 +245,7 @@ public final class ModelEncryptionSupport {
             String[] allPermParts = parts[9].split("\\.");
             for (int i = 0; i + 4 < allPermParts.length; i = i + 5) {
                 OAuthPermission perm = new OAuthPermission(allPermParts[i], allPermParts[i + 1]);
-                perm.setDefault(Boolean.valueOf(allPermParts[i + 2]));
+                perm.setDefaultPermission(Boolean.valueOf(allPermParts[i + 2]));
                 perm.setHttpVerbs(parseSimpleList(allPermParts[i + 3]));
                 perm.setUris(parseSimpleList(allPermParts[i + 4]));
                 perms.add(perm);
@@ -309,7 +309,7 @@ public final class ModelEncryptionSupport {
                 state.append(tokenizeString(p.getDescription()));
                 state.append(".");
                 // 9.3
-                state.append(p.isDefault());
+                state.append(p.isDefaultPermission());
                 state.append(".");
                 // 9.4
                 state.append(p.getHttpVerbs().toString());
