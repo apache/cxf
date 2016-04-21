@@ -44,7 +44,17 @@ public class JPACodeDataProvider extends JPAOAuthDataProvider implements Authori
     }
 
     protected void saveCodeGrant(ServerAuthorizationCodeGrant grant) { 
-        persistEntity(grant);
+        getEntityManager().getTransaction().begin();
+        if (grant.getSubject() != null) {
+            UserSubject sub = getEntityManager().find(UserSubject.class, grant.getSubject().getLogin());
+            if (sub == null) {
+                getEntityManager().persist(grant.getSubject());
+            } else {
+                grant.setSubject(sub);
+            }
+        }
+        getEntityManager().persist(grant);
+        getEntityManager().getTransaction().commit();
     }
     
     @Override
