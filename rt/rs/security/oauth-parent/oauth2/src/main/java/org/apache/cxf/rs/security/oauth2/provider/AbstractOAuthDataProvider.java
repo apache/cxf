@@ -284,7 +284,7 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
     public void init() {
         for (OAuthPermission perm : permissionMap.values()) {
             if (defaultScopes != null && defaultScopes.contains(perm.getPermission())) {
-                perm.setDefault(true);
+                perm.setDefaultPermission(true);
             }
             if (invisibleToClientScopes != null && invisibleToClientScopes.contains(perm.getPermission())) {
                 perm.setInvisibleToClient(true);
