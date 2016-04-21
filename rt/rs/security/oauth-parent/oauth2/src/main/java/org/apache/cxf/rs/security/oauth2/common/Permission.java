@@ -22,6 +22,7 @@ import java.io.Serializable;
 
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.Transient;
 /**
  * Base permission description
  * @see OAuthAuthorizationData
@@ -31,7 +32,7 @@ public class Permission implements Serializable {
     private static final long serialVersionUID = 8988574955042726083L;
     private String permission;
     private String description;
-    private boolean isDefault;
+    private boolean isDefaultPermission;
     private boolean invisibleToClient;
     
     public Permission() {
@@ -86,12 +87,18 @@ public class Permission implements Serializable {
      * optionally select 'add' and/or 'update' scopes, in addition to the default 'read' one. 
      * @param isDefault true if the permission has been allocated by default
      */
-    public void setDefault(boolean value) {
-        this.isDefault = value;
+    public void setDefaultPermission(boolean value) {
+        this.isDefaultPermission = value;
     }
 
+    public boolean isDefaultPermission() {
+        return isDefaultPermission;
+    }
+    
+    @Deprecated
+    @Transient
     public boolean isDefault() {
-        return isDefault;
+        return isDefaultPermission;
     }
 
     public boolean isInvisibleToClient() {
@@ -125,7 +132,8 @@ public class Permission implements Serializable {
             || this.description != null && !this.description.equals(that.description)) {
             return false;
         }
-        if (this.invisibleToClient != that.invisibleToClient || this.isDefault != that.isDefault) { //NOPMD
+        if (this.invisibleToClient != that.invisibleToClient //NOPMD
+            || this.isDefaultPermission != that.isDefaultPermission) { //NOPMD
             return false;
         }
         
@@ -142,7 +150,7 @@ public class Permission implements Serializable {
             hashCode = 31 * hashCode + description.hashCode();
         }
         hashCode = 31 * hashCode + Boolean.valueOf(invisibleToClient).hashCode();
-        hashCode = 31 * hashCode + Boolean.valueOf(isDefault).hashCode();
+        hashCode = 31 * hashCode + Boolean.valueOf(isDefaultPermission).hashCode();
         
         return hashCode;
     }
