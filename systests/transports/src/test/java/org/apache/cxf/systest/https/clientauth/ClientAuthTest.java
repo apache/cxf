@@ -264,18 +264,18 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
         
         URL trustStore = ClientAuthTest.class.getResource("../../../../../../keys/Truststore.jks");
         KeyStore ts = KeyStore.getInstance("JKS");
-        try (FileInputStream trustStoreInputStream = new FileInputStream(trustStore.getPath())) {
-            ts.load(trustStoreInputStream, "password".toCharArray());
-        }
+        FileInputStream trustStoreInputStream = new FileInputStream(trustStore.getPath());
+        ts.load(trustStoreInputStream, "password".toCharArray());
+        trustStoreInputStream.close();
 
         TrustManagerFactory tmf = TrustManagerFactory.getInstance("PKIX");
         tmf.init(ts);
         
         URL keyStore = ClientAuthTest.class.getResource("../../../../../../keys/Morpit.jks");
         KeyStore ks = KeyStore.getInstance("JKS");
-        try (FileInputStream keyStoreInputStream = new FileInputStream(keyStore.getPath())) {
-            ks.load(keyStoreInputStream, "password".toCharArray());
-        }
+        FileInputStream keyStoreInputStream = new FileInputStream(keyStore.getPath());
+        ks.load(keyStoreInputStream, "password".toCharArray());
+        keyStoreInputStream.close();
 
         KeyManagerFactory kmf = KeyManagerFactory.getInstance("PKIX");
         kmf.init(ks, "password".toCharArray());
