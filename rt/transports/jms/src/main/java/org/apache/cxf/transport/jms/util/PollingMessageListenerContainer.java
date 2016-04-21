@@ -70,6 +70,11 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
                     }
                 } catch (Exception e) {
                     LOG.log(Level.WARNING, "Unexpected exception. Restarting session and consumer", e);
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e1) {
+                        // Ignore
+                    }
                 }
             }
 

@@ -27,6 +27,7 @@ import java.util.logging.Logger;
 import javax.jms.Connection;
 import javax.jms.Destination;
 import javax.jms.ExceptionListener;
+import javax.jms.InvalidClientIDException;
 import javax.jms.JMSException;
 import javax.jms.MessageListener;
 import javax.jms.Session;
@@ -105,6 +106,9 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
         try {
             this.jmsListener = createTargetDestinationListener();
         } catch (Exception e) {
+            if (e.getCause() != null && InvalidClientIDException.class.isInstance(e.getCause())) {
+                throw e;
+            }
             // If first connect fails we will try to establish the connection in the background 
             new Thread(new Runnable() {
                 
@@ -150,6 +154,8 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
             connection.start();
             return container;
         } catch (JMSException e) {
+            ResourceCloser.close(connection);
+            this.connection = null;
             throw JMSUtil.convertJmsException(e);
         } finally {
             ResourceCloser.close(session);
@@ -173,9 +179,9 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
                     LOG.log(Level.WARNING, message);
                 }
                 try {
-                    Thread.sleep(5000);
+                    Thread.sleep(jmsConfig.getRetryInterval());
                 } catch (InterruptedException e2) {
-                    // Ignore
+                    shutdown = true;
                 }
             }
         } while (jmsListener == null && !shutdown);

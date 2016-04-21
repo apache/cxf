@@ -32,7 +32,6 @@ import javax.xml.namespace.QName;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.broker.BrokerService;
-import org.apache.activemq.pool.PooledConnectionFactory;
 import org.apache.activemq.store.memory.MemoryPersistenceAdapter;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -57,6 +56,7 @@ public abstract class AbstractJMSTester extends Assert {
     protected static final int MAX_RECEIVE_TIME = 10;
     protected static final String MESSAGE_CONTENT = "HelloWorld";
     protected static Bus bus;
+    protected static ActiveMQConnectionFactory cf1;
     protected static ConnectionFactory cf;
     protected static BrokerService broker;
 
@@ -78,8 +78,8 @@ public abstract class AbstractJMSTester extends Assert {
         broker.addConnector(brokerUri);
         broker.start();
         bus = BusFactory.getDefaultBus();
-        ActiveMQConnectionFactory cf1 = new ActiveMQConnectionFactory(brokerUri);
-        cf = new PooledConnectionFactory(cf1);
+        cf1 = new ActiveMQConnectionFactory(brokerUri);
+        cf = cf1;
     }
 
     @AfterClass
