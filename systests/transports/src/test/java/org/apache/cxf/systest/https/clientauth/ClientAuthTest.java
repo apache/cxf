@@ -19,7 +19,16 @@
 
 package org.apache.cxf.systest.https.clientauth;
 
+import java.io.FileInputStream;
 import java.net.URL;
+import java.security.KeyStore;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManagerFactory;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
@@ -243,4 +252,49 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
+    
+    @org.junit.Test
+    public void testSSLConnectionUsingJavaAPIs() throws Exception {
+        URL service = new URL("https://localhost:" + PORT);
+        HttpsURLConnection connection = (HttpsURLConnection) service.openConnection();
+        
+        connection.setHostnameVerifier(new DisableCNCheckVerifier());
+        
+        SSLContext sslContext = SSLContext.getInstance("TLS");
+        
+        URL trustStore = ClientAuthTest.class.getResource("../../../../../../keys/Truststore.jks");
+        KeyStore ts = KeyStore.getInstance("JKS");
+        try (FileInputStream trustStoreInputStream = new FileInputStream(trustStore.getPath())) {
+            ts.load(trustStoreInputStream, "password".toCharArray());
+        }
+
+        TrustManagerFactory tmf = TrustManagerFactory.getInstance("PKIX");
+        tmf.init(ts);
+        
+        URL keyStore = ClientAuthTest.class.getResource("../../../../../../keys/Morpit.jks");
+        KeyStore ks = KeyStore.getInstance("JKS");
+        try (FileInputStream keyStoreInputStream = new FileInputStream(keyStore.getPath())) {
+            ks.load(keyStoreInputStream, "password".toCharArray());
+        }
+
+        KeyManagerFactory kmf = KeyManagerFactory.getInstance("PKIX");
+        kmf.init(ks, "password".toCharArray());
+
+        sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(), new java.security.SecureRandom());
+        
+        connection.setSSLSocketFactory(sslContext.getSocketFactory());
+        
+        connection.connect();
+        
+        connection.disconnect();
+    }
+    
+    private static final class DisableCNCheckVerifier implements HostnameVerifier {
+
+        @Override
+        public boolean verify(String arg0, SSLSession arg1) {
+            return true;
+        }
+        
+    };
 }
