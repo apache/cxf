@@ -87,6 +87,7 @@ public class JMSEndpoint {
     private String username;
     private int concurrentConsumers = 1;
     private String messageSelector;
+    private int retryInterval = 5000;
 
     /**
      * @param uri
@@ -486,6 +487,14 @@ public class JMSEndpoint {
         this.messageSelector = messageSelector;
     }
     
-    
+    public int getRetryInterval() {
+        return retryInterval;
+    }
+    public void setRetryInterval(int retryInterval) {
+        this.retryInterval = retryInterval;
+    }
+    public void setRetryInterval(String retryInterval) {
+        this.retryInterval = Integer.valueOf(retryInterval);
+    }
     
 }
