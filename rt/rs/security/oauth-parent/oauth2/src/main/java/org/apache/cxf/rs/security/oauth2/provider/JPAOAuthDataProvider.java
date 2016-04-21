@@ -24,6 +24,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
@@ -71,7 +72,7 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
 
     @Override
     public List<ServerAccessToken> getAccessTokens(Client c, UserSubject sub) {
-        return getTokensQuery(c, sub).getResultList();
+        return CastUtils.cast(getTokensQuery(c, sub).getResultList());
     }
 
     @Override
@@ -144,23 +145,23 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
                 + resourceOwnerSubject.getLogin() + "'", Client.class);
         }
     }
-    protected TypedQuery<ServerAccessToken> getTokensQuery(Client c, UserSubject resourceOwnerSubject) {
+    protected TypedQuery<BearerAccessToken> getTokensQuery(Client c, UserSubject resourceOwnerSubject) {
         if (c == null && resourceOwnerSubject == null) {
             return entityManager.createQuery("SELECT t FROM " + BEARER_TOKEN_TABLE_NAME + " t", 
-                                             ServerAccessToken.class);
+                                             BearerAccessToken.class);
         } else if (c == null) {
             return entityManager.createQuery(
                 "SELECT t FROM " + BEARER_TOKEN_TABLE_NAME + " t JOIN t.subject s WHERE s.login = '" 
-                + resourceOwnerSubject.getLogin() + "'", ServerAccessToken.class);
+                + resourceOwnerSubject.getLogin() + "'", BearerAccessToken.class);
         } else if (resourceOwnerSubject == null) {
             return entityManager.createQuery(
                 "SELECT t FROM " + BEARER_TOKEN_TABLE_NAME + " t JOIN t.client c WHERE c.clientId = '" 
-                    + c.getClientId() + "'", ServerAccessToken.class);
+                    + c.getClientId() + "'", BearerAccessToken.class);
         } else {
             return entityManager.createQuery(
                 "SELECT t FROM " + BEARER_TOKEN_TABLE_NAME + " t JOIN t.subject s JOIN t.client c WHERE s.login = '" 
                 + resourceOwnerSubject.getLogin() + "' AND c.clientId = '" + c.getClientId() + "'",
-                ServerAccessToken.class);
+                BearerAccessToken.class);
         }
     }
     protected TypedQuery<RefreshToken> getRefreshTokensQuery(Client c, UserSubject resourceOwnerSubject) {
