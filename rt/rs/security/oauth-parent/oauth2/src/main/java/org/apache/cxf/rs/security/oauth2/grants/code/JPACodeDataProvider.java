@@ -50,6 +50,7 @@ public class JPACodeDataProvider extends JPAOAuthDataProvider implements Authori
             if (sub == null) {
                 getEntityManager().persist(grant.getSubject());
             } else {
+                sub = getEntityManager().merge(grant.getSubject());
                 grant.setSubject(sub);
             }
         }
