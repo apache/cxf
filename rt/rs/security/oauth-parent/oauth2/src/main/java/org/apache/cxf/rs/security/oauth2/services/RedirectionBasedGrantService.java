@@ -78,6 +78,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
                                            String supportedGrantType) {
         this.supportedResponseTypes = supportedResponseTypes;
         this.supportedGrantType = supportedGrantType;
+System.out.println("SUPP: " + supportedGrantType);
     }
     
     /**
@@ -122,6 +123,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         // Make sure the end user has authenticated, check if HTTPS is used
         SecurityContext sc = getAndValidateSecurityContext(params);
         Client client = getClient(params);
+System.out.println("HERE1");
         // Create a UserSubject representing the end user 
         UserSubject userSubject = createUserSubject(sc, params);
         return startAuthorization(params, userSubject, client);
@@ -137,18 +139,22 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         
         // Validate the provided request URI, if any, against the ones Client provided
         // during the registration
+System.out.println("HERE2");
         String redirectUri = validateRedirectUri(client, params.getFirst(OAuthConstants.REDIRECT_URI)); 
         
+System.out.println("HERE3");
         // Enforce the client confidentiality requirements
         if (!OAuthUtils.isGrantSupportedForClient(client, canSupportPublicClient(client), supportedGrantType)) {
             return createErrorResponse(params, redirectUri, OAuthConstants.UNAUTHORIZED_CLIENT);
         }
+System.out.println("HERE4");
         
         // Check response_type
         String responseType = params.getFirst(OAuthConstants.RESPONSE_TYPE);
         if (responseType == null || !getSupportedResponseTypes().contains(responseType)) {
             return createErrorResponse(params, redirectUri, OAuthConstants.UNSUPPORTED_RESPONSE_TYPE);
         }
+System.out.println("HERE5");
         // Get the requested scopes
         String providedScope = params.getFirst(OAuthConstants.SCOPE);
         List<String> requestedScope = null;
@@ -160,6 +166,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         } catch (OAuthServiceException ex) {
             return createErrorResponse(params, redirectUri, OAuthConstants.INVALID_SCOPE);
         }
+System.out.println("HERE6");
         // Convert the requested scopes to OAuthPermission instances
         List<OAuthPermission> requestedPermissions = null;
         try {
