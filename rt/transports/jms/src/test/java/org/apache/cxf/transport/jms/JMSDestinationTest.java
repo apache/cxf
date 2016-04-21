@@ -25,8 +25,10 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
 
+import javax.jms.Connection;
 import javax.jms.DeliveryMode;
 import javax.jms.Destination;
+import javax.jms.InvalidClientIDException;
 import javax.jms.JMSException;
 import javax.jms.Queue;
 import javax.jms.Topic;
@@ -41,6 +43,7 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.MultiplexDestination;
+import org.apache.cxf.transport.jms.util.ResourceCloser;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -75,6 +78,29 @@ public class JMSDestinationTest extends AbstractJMSTester {
         verifyHeaders(destMessage, outMessage);
         conduit.close();
         destination.shutdown();
+    }
+    
+    @Test(expected = InvalidClientIDException.class)
+    public void testDurableInvalidClientId() throws Throwable {
+        Connection con = cf1.createConnection();
+        JMSDestination destination = null;
+        try {
+            con.setClientID("testClient");
+            con.start();
+            destMessage = null;
+            EndpointInfo ei = setupServiceInfo("HelloWorldPubSubService", "HelloWorldPubSubPort");
+            JMSConfiguration jmsConfig = JMSConfigFactory.createFromEndpointInfo(bus, ei, null);
+            jmsConfig.setDurableSubscriptionClientId("testClient");
+            jmsConfig.setDurableSubscriptionName("testsub");
+            jmsConfig.setConnectionFactory(cf);
+            destination = new JMSDestination(bus, ei, jmsConfig);
+            destination.setMessageObserver(createMessageObserver());
+        } catch (RuntimeException e) {
+            throw e.getCause();
+        } finally {
+            ResourceCloser.close(con);
+            destination.shutdown();
+        }
     }
 
     @Test

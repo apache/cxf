@@ -74,6 +74,11 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
                     }
                 } catch (Throwable e) {
                     handleException(e);
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e1) {
+                        // Ignore
+                    }
                 }
             }
         }
