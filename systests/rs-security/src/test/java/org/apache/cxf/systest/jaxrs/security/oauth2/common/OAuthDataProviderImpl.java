@@ -56,6 +56,7 @@ public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
         client.getRegisteredScopes().add("read_book");
         client.getRegisteredScopes().add("create_book");
         client.getRegisteredScopes().add("create_image");
+        client.getRegisteredScopes().add("openid");
         
         this.setClient(client);
         
@@ -69,6 +70,7 @@ public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
         client.getRegisteredAudiences().add("https://localhost:" + servicePort 
                                             + "/secured/bookstore/books");
         client.getRegisteredAudiences().add("https://127.0.0.1/test");
+        client.getRegisteredScopes().add("openid");
         
         this.setClient(client);
         
@@ -81,6 +83,7 @@ public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
         
         client.getRegisteredAudiences().add("https://localhost:" + servicePort 
                                             + "/securedxyz/bookstore/books");
+        client.getRegisteredScopes().add("openid");
         
         this.setClient(client);
         
@@ -175,6 +178,9 @@ public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
                 uris.add(partnerAddress);
                 permission.setUris(uris);
                 
+                permissions.add(permission);
+            } else if ("openid".equals(requestedScope)) {
+                OAuthPermission permission = new OAuthPermission("openid", "Authenticate user");
                 permissions.add(permission);
             } else {
                 throw new OAuthServiceException("invalid_scope");
