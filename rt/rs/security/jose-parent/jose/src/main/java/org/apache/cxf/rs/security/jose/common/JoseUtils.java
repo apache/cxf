@@ -195,8 +195,9 @@ public final class JoseUtils {
     
     public static Properties loadProperties(String propertiesLocation, Bus bus) throws Exception {
         Properties props = new Properties();
-        InputStream is = getResourceStream(propertiesLocation, bus);
-        props.load(is);
+        try (InputStream is = getResourceStream(propertiesLocation, bus)) {
+            props.load(is);
+        }
         return props;
     }
     
