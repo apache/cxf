@@ -59,6 +59,18 @@ public class JPACodeDataProvider extends JPAOAuthDataProvider implements Authori
     }
     
     @Override
+    protected void doRemoveClient(Client c) {
+        removeClientCodeGrants(c);
+        super.doRemoveClient(c);
+    }
+    
+    protected void removeClientCodeGrants(Client c) {
+        for (ServerAuthorizationCodeGrant grant : getCodeGrants(c, null)) {
+            removeCodeGrant(grant.getCode());
+        }
+    }
+    
+    @Override
     public ServerAuthorizationCodeGrant removeCodeGrant(String code) throws OAuthServiceException {
         ServerAuthorizationCodeGrant grant = getEntityManager().find(ServerAuthorizationCodeGrant.class, code);
         if (grant != null) {

@@ -106,7 +106,12 @@ public class JPAOAuthDataProviderTest extends Assert {
         List<Client> allClients = provider.getClients(null);
         assertNotNull(allClients);
         assertEquals(3, allClients.size());
-        
+        provider.removeClient(c.getClientId());
+        provider.removeClient(c2.getClientId());
+        provider.removeClient(c3.getClientId());
+        allClients = provider.getClients(null);
+        assertNotNull(allClients);
+        assertEquals(0, allClients.size());
     }
     
     @Test
@@ -132,6 +137,11 @@ public class JPAOAuthDataProviderTest extends Assert {
         assertEquals(1, tokens.size());
         assertEquals(at.getTokenKey(), tokens.get(0).getTokenKey());
         
+        tokens = provider.getAccessTokens(c, null);
+        assertNotNull(tokens);
+        assertEquals(1, tokens.size());
+        assertEquals(at.getTokenKey(), tokens.get(0).getTokenKey());
+        
         tokens = provider.getAccessTokens(null, c.getResourceOwnerSubject());
         assertNotNull(tokens);
         assertEquals(1, tokens.size());
@@ -144,6 +154,27 @@ public class JPAOAuthDataProviderTest extends Assert {
         
         provider.revokeToken(c, at.getTokenKey(), OAuthConstants.ACCESS_TOKEN);
         assertNull(provider.getAccessToken(at.getTokenKey()));
+    }
+    
+    @Test
+    public void testAddGetDeleteAccessToken2() {
+        Client c = addClient("102", "bob");
+        
+        AccessTokenRegistration atr = new AccessTokenRegistration();
+        atr.setClient(c);
+        atr.setApprovedScope(Collections.singletonList("a"));
+        atr.setSubject(c.getResourceOwnerSubject());
+        
+        provider.createAccessToken(atr);
+        List<ServerAccessToken> tokens = provider.getAccessTokens(c, null);
+        assertNotNull(tokens);
+        assertEquals(1, tokens.size());
+        
+        provider.removeClient(c.getClientId());
+        
+        tokens = provider.getAccessTokens(c, null);
+        assertNotNull(tokens);
+        assertEquals(0, tokens.size());
     }
     
     @Test
