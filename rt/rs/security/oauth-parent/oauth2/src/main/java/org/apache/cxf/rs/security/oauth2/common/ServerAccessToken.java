@@ -28,7 +28,6 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.MappedSuperclass;
-import javax.persistence.OneToOne;
 
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
@@ -137,7 +136,7 @@ public abstract class ServerAccessToken extends AccessToken {
      * when authorizing a given client request
      * @return UserSubject
      */
-    @OneToOne
+    @ManyToOne
     public UserSubject getSubject() {
         return subject;
     }
