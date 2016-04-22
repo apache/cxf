@@ -123,7 +123,22 @@ public class AnnotationsFactoryBeanListener implements FactoryBeanListener {
                                  docs.toArray(new WSDLDocumentation[docs.size()]));
             }
             addBindingOperationDocs(ep);
-            
+            for (Method method : implCls.getMethods()) {
+                if (method.getAnnotation(SchemaValidation.class) != null) {
+                    try {
+                        Method interfaceMethod = cls.getMethod(method.getName(), method.getParameterTypes());
+                        for (BindingOperationInfo bopInfo : ep.getBinding().getBindingInfo().getOperations()) {
+                            if (interfaceMethod.equals(bopInfo.getOperationInfo()
+                                .getProperty("operation.method"))) {
+                                addSchemaValidationSupport(bopInfo.getOperationInfo(),
+                                                           method.getAnnotation(SchemaValidation.class));
+                            }
+                        }
+                    } catch (Exception e) {
+                        // ignore this
+                    }
+                }
+            }
             break; 
         }
         case SERVER_CREATED: {
@@ -156,7 +171,6 @@ public class AnnotationsFactoryBeanListener implements FactoryBeanListener {
             if (col != null) {
                 addDocumentation(inf, WSDLDocumentation.Placement.PORT_TYPE_OPERATION, col.value());
             }
-            
             SchemaValidation methodValidation = m.getAnnotation(SchemaValidation.class);
             if (methodValidation != null) {
                 addSchemaValidationSupport(inf, methodValidation);

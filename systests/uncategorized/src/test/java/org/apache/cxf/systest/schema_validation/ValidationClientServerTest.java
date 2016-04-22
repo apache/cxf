@@ -98,6 +98,31 @@ public class ValidationClientServerTest extends AbstractBusClientServerTestBase 
         runSchemaValidationTest(validation);
         ((java.io.Closeable)validation).close();
     }
+
+    @Test
+    public void testSchemaValidationServerForMethod() throws Exception {
+        SchemaValidation validation = createService(Boolean.FALSE, "SoapPortMethodValidate");
+        ComplexStruct complexStruct = new ComplexStruct();
+        complexStruct.setElem1("one");
+        complexStruct.setElem3(3);
+        try {
+            validation.setComplexStruct(complexStruct);
+            fail("Set ComplexStruct should have thrown ProtocolException");
+        } catch (WebServiceException e) {
+            String expected = "'{\"http://apache.org/schema_validation/types\":elem2}' is expected.";
+            assertTrue(e.getMessage(), e.getMessage().indexOf(expected) != -1);
+        }
+        
+        SchemaValidation novlidation = createService(Boolean.FALSE, "SoapPort");
+        try {
+            novlidation.setComplexStruct(complexStruct);
+           
+        } catch (WebServiceException e) {
+            fail("Exception is not expected :" + e);
+        }
+        
+    }
+
     @Test
     public void testSchemaValidationClient() throws Exception {
         SchemaValidation validation = createService(Boolean.TRUE, "SoapPort"); 

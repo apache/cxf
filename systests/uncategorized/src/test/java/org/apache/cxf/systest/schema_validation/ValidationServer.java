@@ -42,6 +42,7 @@ import org.apache.cxf.annotations.SchemaValidation;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.schema_validation.types.ComplexStruct;
 
 public class ValidationServer extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(ValidationServer.class);
@@ -58,6 +59,7 @@ public class ValidationServer extends AbstractBusTestServerBase {
         eps.add(Endpoint.publish(address + "/SoapPortValidate", new ValidatingSchemaValidationImpl()));
         eps.add(Endpoint.publish(address + "/PProvider", new PayloadProvider()));
         eps.add(Endpoint.publish(address + "/MProvider", new MessageProvider()));
+        eps.add(Endpoint.publish(address + "/SoapPortMethodValidate", new ValidatingSchemaValidationMethodImpl()));
     }
 
     public void tearDown() throws Exception {
@@ -76,6 +78,18 @@ public class ValidationServer extends AbstractBusTestServerBase {
         
     }
 
+    @WebService(serviceName = "SchemaValidationService", 
+        portName = "SoapPort",
+        endpointInterface = "org.apache.schema_validation.SchemaValidation",
+        targetNamespace = "http://apache.org/schema_validation",
+        wsdlLocation = "classpath:/wsdl/schema_validation.wsdl")
+    static class ValidatingSchemaValidationMethodImpl extends SchemaValidationImpl {
+        @SchemaValidation
+        public boolean setComplexStruct(ComplexStruct in) {
+            return true;
+        }
+    }
+    
     private static String getResponse(String v) {
         if ("9999999999".equals(v)) {
             return "<soap:Fault xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
