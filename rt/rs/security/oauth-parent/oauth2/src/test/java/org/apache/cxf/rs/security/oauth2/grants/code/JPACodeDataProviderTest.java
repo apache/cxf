@@ -83,6 +83,30 @@ public class JPACodeDataProviderTest extends Assert {
         
         ServerAuthorizationCodeGrant grant2 = provider.removeCodeGrant(grant.getCode());
         assertEquals(grant.getCode(), grant2.getCode());
+        
+        grants = provider.getCodeGrants(c, null);
+        assertNotNull(grants);
+        assertEquals(0, grants.size());
+    }
+    
+    @Test
+    public void testAddGetDeleteCodeGrants2() {
+        Client c = addClient("111", "bob");
+        
+        AuthorizationCodeRegistration atr = new AuthorizationCodeRegistration();
+        atr.setClient(c);
+        atr.setApprovedScope(Collections.singletonList("a"));
+        atr.setSubject(c.getResourceOwnerSubject());
+        
+        provider.createCodeGrant(atr);
+        
+        List<ServerAuthorizationCodeGrant> grants = provider.getCodeGrants(c, c.getResourceOwnerSubject());
+        assertNotNull(grants);
+        assertEquals(1, grants.size());
+        provider.removeClient(c.getClientId());
+        grants = provider.getCodeGrants(c, c.getResourceOwnerSubject());
+        assertNotNull(grants);
+        assertEquals(0, grants.size());
     }
     
     private Client addClient(String clientId, String userLogin) {
