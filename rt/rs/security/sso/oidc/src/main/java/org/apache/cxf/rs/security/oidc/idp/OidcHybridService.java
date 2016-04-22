@@ -41,7 +41,7 @@ public class OidcHybridService extends OidcImplicitService {
         this(false);
     }
     public OidcHybridService(boolean hybridOnly) {
-        super(getResponseTypes(hybridOnly), "Hybrid");
+        super(getResponseTypes(hybridOnly), "hybrid");
     }
     
     private static Set<String> getResponseTypes(boolean hybridOnly) {
