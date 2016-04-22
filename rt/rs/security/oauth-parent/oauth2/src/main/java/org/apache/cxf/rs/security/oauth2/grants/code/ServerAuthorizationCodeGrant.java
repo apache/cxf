@@ -25,6 +25,7 @@ import java.util.Map;
 
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.OneToOne;
 
@@ -100,7 +101,7 @@ public class ServerAuthorizationCodeGrant extends AuthorizationCodeGrant {
      * Returns the reference to {@link Client}
      * @return the client
      */
-    @OneToOne
+    @ManyToOne
     public Client getClient() {
         return client;
     }
