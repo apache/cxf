@@ -599,7 +599,7 @@ public abstract class AbstractHTTPDestination
             //However, also don't want to consume indefinitely.   We'll limit to 16M.
             try {
                 IOUtils.consume(in, 16 * 1024 * 1024);
-            } catch (IOException ioe) {
+            } catch (Exception ioe) {
                 //ignore
             }
         }
