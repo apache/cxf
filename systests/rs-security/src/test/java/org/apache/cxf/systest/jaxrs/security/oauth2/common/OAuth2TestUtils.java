@@ -97,6 +97,9 @@ public final class OAuth2TestUtils {
         form.param("session_authenticity_token", authzData.getAuthenticityToken());
         form.param("client_id", authzData.getClientId());
         form.param("redirect_uri", authzData.getRedirectUri());
+        if (authzData.getNonce() != null) {
+            form.param("nonce", authzData.getNonce());
+        }
         if (authzData.getProposedScope() != null) {
             form.param("scope", authzData.getProposedScope());
         }
