@@ -21,6 +21,7 @@ package org.apache.cxf.xkms.x509.repo.ldap;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
@@ -83,6 +84,7 @@ public class LDAPCertificateRepoTest {
         FileInputStream fis = new FileInputStream(certFile);
         CertificateFactory factory = CertificateFactory.getInstance("X.509");
         X509Certificate cert = (X509Certificate) factory.generateCertificate(fis);
+        fis.close();
 
         UseKeyWithType key = new UseKeyWithType();
         key.setApplication(Applications.PKIX.getUri());
@@ -136,11 +138,12 @@ public class LDAPCertificateRepoTest {
         c.verify();
     }
 
-    private X509Certificate getTestCert() throws FileNotFoundException, CertificateException {
+    private X509Certificate getTestCert() throws FileNotFoundException, CertificateException, IOException {
         File certFile = new File("src/test/resources/cert1.cer");
         Assert.assertTrue(certFile.exists());
-        FileInputStream fis = new FileInputStream(certFile);
-        CertificateFactory factory = CertificateFactory.getInstance("X.509");
-        return (X509Certificate) factory.generateCertificate(fis);
+        try (FileInputStream fis = new FileInputStream(certFile)) {
+            CertificateFactory factory = CertificateFactory.getInstance("X.509");
+            return (X509Certificate) factory.generateCertificate(fis);
+        }
     }
 }

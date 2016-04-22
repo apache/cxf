@@ -27,7 +27,6 @@ import com.meterware.servletunit.ServletUnitClient;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.helpers.IOUtils;
-import org.apache.cxf.io.CachedOutputStream;
 
 import org.junit.Test;
 
@@ -71,11 +70,7 @@ public class JaxRsServletTest extends AbstractServletTest {
      
     }
     
-    private String getStringFromInputStream(InputStream in) throws Exception {        
-        CachedOutputStream bos = new CachedOutputStream();
-        IOUtils.copy(in, bos);
-        in.close();
-        bos.close();            
-        return bos.getOut().toString();        
+    private String getStringFromInputStream(InputStream in) throws Exception {
+        return IOUtils.toString(in);
     }
 }
