@@ -25,6 +25,7 @@ import java.util.Map;
 
 import javax.persistence.ElementCollection;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToOne;
@@ -94,7 +95,7 @@ public abstract class ServerAccessToken extends AccessToken {
      * Returns the Client associated with this token
      * @return the client
      */
-    @OneToOne
+    @ManyToOne
     public Client getClient() {
         return client;
     }
