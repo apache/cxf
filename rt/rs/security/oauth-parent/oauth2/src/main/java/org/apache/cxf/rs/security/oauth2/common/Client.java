@@ -27,6 +27,7 @@ import java.util.Map;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.OneToOne;
 
@@ -278,7 +279,7 @@ public class Client implements Serializable {
      * who has registered this client
      * @return the resource owner user subject
      */
-    @OneToOne
+    @ManyToOne
     public UserSubject getResourceOwnerSubject() {
         return resourceOwnerSubject;
     }

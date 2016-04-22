@@ -27,7 +27,6 @@ import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapKeyColumn;
-import javax.persistence.OneToOne;
 
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
@@ -142,7 +141,7 @@ public class ServerAuthorizationCodeGrant extends AuthorizationCodeGrant {
      * Gets the user subject representing the end user
      * @return the subject
      */
-    @OneToOne
+    @ManyToOne
     public UserSubject getSubject() {
         return subject;
     }
