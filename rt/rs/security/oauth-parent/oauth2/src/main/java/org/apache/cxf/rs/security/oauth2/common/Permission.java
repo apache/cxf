@@ -122,18 +122,16 @@ public class Permission implements Serializable {
         }
         
         Permission that = (Permission)object;
-        if (this.permission != null && that.permission == null
-            || this.permission == null && that.permission != null
-            || this.permission != null && !this.permission.equals(that.permission)) {
+        if (!this.getPermission().equals(that.getPermission())) {
             return false;
         }
-        if (this.description != null && that.description == null
-            || this.description == null && that.description != null
-            || this.description != null && !this.description.equals(that.description)) {
+        if (this.getDescription() != null && that.getDescription() == null
+            || this.getDescription() == null && that.getDescription() != null
+            || this.getDescription() != null && !this.getDescription().equals(that.getDescription())) {
             return false;
         }
-        if (this.invisibleToClient != that.invisibleToClient //NOPMD
-            || this.isDefaultPermission != that.isDefaultPermission) { //NOPMD
+        if (this.isInvisibleToClient() != that.isInvisibleToClient() //NOPMD
+            || this.isDefaultPermission() != that.isDefaultPermission()) { //NOPMD
             return false;
         }
         
@@ -142,15 +140,12 @@ public class Permission implements Serializable {
     
     @Override
     public int hashCode() {
-        int hashCode = 17;
-        if (permission != null) {
-            hashCode = 31 * hashCode + permission.hashCode();
+        int hashCode = getPermission().hashCode();
+        if (getDescription() != null) {
+            hashCode = 31 * hashCode + getDescription().hashCode();
         }
-        if (description != null) {
-            hashCode = 31 * hashCode + description.hashCode();
-        }
-        hashCode = 31 * hashCode + Boolean.valueOf(invisibleToClient).hashCode();
-        hashCode = 31 * hashCode + Boolean.valueOf(isDefaultPermission).hashCode();
+        hashCode = 31 * hashCode + Boolean.valueOf(isInvisibleToClient()).hashCode();
+        hashCode = 31 * hashCode + Boolean.valueOf(isDefaultPermission()).hashCode();
         
         return hashCode;
     }
