@@ -69,11 +69,18 @@ public final class OAuth2TestUtils {
     
     public static String getAuthorizationCode(WebClient client, String scope, String consumerId,
                                               String nonce, String state) {
+        String location = getLocation(client, scope, consumerId, nonce, state, "code", "authorize/");
+        return getSubstring(location, "code");
+    }
+    
+    public static String getLocation(WebClient client, String scope, String consumerId,
+                                              String nonce, String state, String responseType,
+                                              String path) {
         // Make initial authorization request
         client.type("application/json").accept("application/json");
         client.query("client_id", consumerId);
         client.query("redirect_uri", "http://www.blah.apache.org");
-        client.query("response_type", "code");
+        client.query("response_type", responseType);
         if (scope != null) {
             client.query("scope", scope);
         }
@@ -84,7 +91,7 @@ public final class OAuth2TestUtils {
             client.query("state", state);
         }
 
-        client.path("authorize/");
+        client.path(path);
         Response response = client.get();
 
         OAuthAuthorizationData authzData = response.readEntity(OAuthAuthorizationData.class);
@@ -106,6 +113,7 @@ public final class OAuth2TestUtils {
         if (authzData.getState() != null) {
             form.param("state", authzData.getState());
         }
+        form.param("response_type", authzData.getResponseType());
         form.param("oauthDecision", "allow");
 
         response = client.post(form);
@@ -114,7 +122,7 @@ public final class OAuth2TestUtils {
             Assert.assertTrue(location.contains("state=" + state));
         }
 
-        return getSubstring(location, "code");
+        return location;
     }
 
     public static ClientAccessToken getAccessTokenWithAuthorizationCode(WebClient client, String code) {
