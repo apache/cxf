@@ -66,12 +66,14 @@ under the License.
        <constructor-arg><value>${testutil.ports.jaxrs-oidc}</value></constructor-arg>
    </bean>
    
-   <bean id="authorizationService" class="org.apache.cxf.rs.security.oauth2.services.AuthorizationCodeGrantService">
+   <bean id="authorizationService" class="org.apache.cxf.rs.security.oidc.idp.OidcAuthorizationCodeService">
       <property name="dataProvider" ref="oauthProvider"/>
    </bean>
    
-   <bean id="implicitService" class="org.apache.cxf.rs.security.oauth2.services.ImplicitGrantService">
+   <bean id="implicitService" class="org.apache.cxf.rs.security.oidc.idp.OidcImplicitService">
       <property name="dataProvider" ref="oauthProvider"/>
+      <property name="responseFilter" ref="idTokenFilter"/>
+      <property name="idTokenProvider" ref="idTokenProviderImpl"/>
    </bean>
    
    <bean id="refreshGrantHandler" class="org.apache.cxf.rs.security.oauth2.grants.refresh.RefreshTokenGrantHandler">
@@ -94,6 +96,13 @@ under the License.
       <property name="responseFilter" ref="idTokenFilter"/>
    </bean>
    
+   <bean id="hybridService" class="org.apache.cxf.rs.security.oidc.idp.OidcHybridService">
+      <property name="dataProvider" ref="oauthProvider"/>
+      <property name="responseFilter" ref="idTokenFilter"/>
+      <property name="idTokenProvider" ref="idTokenProviderImpl"/>
+      <property name="codeService" ref="authorizationService"/>
+   </bean>
+   
    <bean id="callbackHandler" class="org.apache.cxf.systest.jaxrs.security.oauth2.common.CallbackHandlerImpl"/>
    <bean id="basicAuthFilter" class="org.apache.cxf.systest.jaxrs.security.oauth2.common.WSS4JBasicAuthFilter">
        <property name="callbackHandler" ref="callbackHandler"/>
@@ -106,6 +115,7 @@ under the License.
        address="https://localhost:${testutil.ports.jaxrs-oidc}/services">
        <jaxrs:serviceBeans>
            <ref bean="authorizationService"/>
+           <ref bean="hybridService"/>
            <ref bean="implicitService"/>
            <ref bean="tokenService"/>
            <ref bean="oidcKeysService"/>

@@ -45,6 +45,7 @@ public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
         client.getAllowedGrantTypes().add("authorization_code");
         client.getAllowedGrantTypes().add("refresh_token");
         client.getAllowedGrantTypes().add("implicit");
+        client.getAllowedGrantTypes().add("hybrid");
         client.getAllowedGrantTypes().add("password");
         client.getAllowedGrantTypes().add("client_credentials");
         client.getAllowedGrantTypes().add("urn:ietf:params:oauth:grant-type:saml2-bearer");

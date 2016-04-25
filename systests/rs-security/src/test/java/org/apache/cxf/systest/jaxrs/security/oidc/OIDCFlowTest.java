@@ -36,6 +36,7 @@ import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactConsumer;
 import org.apache.cxf.rs.security.jose.jwt.JwtConstants;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
+import org.apache.cxf.rs.security.oauth2.common.OAuthAuthorizationData;
 import org.apache.cxf.rs.security.oidc.common.IdToken;
 import org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuth2TestUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -301,6 +302,166 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         ClientAccessToken accessToken = 
             OAuth2TestUtils.getAccessTokenWithAuthorizationCode(client, code, "consumer-id-aud", audience);
         assertNotNull(accessToken.getTokenKey());
+    }
+    
+    @org.junit.Test
+    public void testImplicitFlow() throws Exception {
+        URL busFile = OIDCFlowTest.class.getResource("client.xml");
+        
+        String address = "https://localhost:" + PORT + "/services/";
+        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(), 
+                                            "alice", "security", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+       
+        // Get Access Token
+        client.type("application/json").accept("application/json");
+        client.query("client_id", "consumer-id");
+        client.query("redirect_uri", "http://www.blah.apache.org");
+        client.query("scope", "openid");
+        client.query("response_type", "id_token token");
+        client.query("nonce", "123456789");
+        client.path("authorize-implicit/");
+        Response response = client.get();
+        
+        OAuthAuthorizationData authzData = response.readEntity(OAuthAuthorizationData.class);
+        
+        // Now call "decision" to get the access token
+        client.path("decision");
+        client.type("application/x-www-form-urlencoded");
+        
+        Form form = new Form();
+        form.param("session_authenticity_token", authzData.getAuthenticityToken());
+        form.param("client_id", authzData.getClientId());
+        form.param("redirect_uri", authzData.getRedirectUri());
+        form.param("scope", authzData.getProposedScope());
+        if (authzData.getResponseType() != null) {
+            form.param("response_type", authzData.getResponseType());
+        }
+        if (authzData.getNonce() != null) {
+            form.param("nonce", authzData.getNonce());
+        }
+        form.param("oauthDecision", "allow");
+        
+        response = client.post(form);
+        
+        String location = response.getHeaderString("Location"); 
+        
+        // Check Access Token
+        String accessToken = OAuth2TestUtils.getSubstring(location, "access_token");
+        assertNotNull(accessToken);
+        
+        // Check IdToken
+        String idToken = OAuth2TestUtils.getSubstring(location, "id_token");
+        assertNotNull(idToken);
+        validateIdToken(idToken, null);
+        
+        JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(idToken);
+        JwtToken jwt = jwtConsumer.getJwtToken();
+        Assert.assertNotNull(jwt.getClaims().getClaim(IdToken.ACCESS_TOKEN_HASH_CLAIM));
+        Assert.assertNotNull(jwt.getClaims().getClaim(IdToken.NONCE_CLAIM));
+    }
+    
+    @org.junit.Test
+    public void testHybridCodeIdToken() throws Exception {
+        URL busFile = OIDCFlowTest.class.getResource("client.xml");
+        
+        String address = "https://localhost:" + PORT + "/services/";
+        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(), 
+                                            "alice", "security", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+        
+        // Get location
+        String location = 
+            OAuth2TestUtils.getLocation(client, "openid", "consumer-id", "123456789", null, 
+                                        "code id_token", "authorize-hybrid");
+        assertNotNull(location);
+        
+        // Check code
+        String code = OAuth2TestUtils.getSubstring(location, "code");
+        assertNotNull(code);
+        
+        // Check id_token
+        String idToken = OAuth2TestUtils.getSubstring(location, "id_token");
+        assertNotNull(idToken);
+        validateIdToken(idToken, "123456789");
+        
+        // Now get the access token
+        client = WebClient.create(address, OAuth2TestUtils.setupProviders(), 
+                                  "consumer-id", "this-is-a-secret", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+        
+        ClientAccessToken accessToken = 
+            OAuth2TestUtils.getAccessTokenWithAuthorizationCode(client, code);
+        assertNotNull(accessToken.getTokenKey());
+        assertTrue(accessToken.getApprovedScope().contains("openid"));
+        
+        // Check id_token from the token endpoint
+        idToken = accessToken.getParameters().get("id_token");
+        assertNotNull(idToken);
+        validateIdToken(idToken, null);
+    }
+    
+    @org.junit.Test
+    public void testHybridCodeToken() throws Exception {
+        URL busFile = OIDCFlowTest.class.getResource("client.xml");
+        
+        String address = "https://localhost:" + PORT + "/services/";
+        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(), 
+                                            "alice", "security", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+        
+        // Get location
+        String location = 
+            OAuth2TestUtils.getLocation(client, "openid", "consumer-id", "123456789", null, 
+                                        "code token", "authorize-hybrid");
+        assertNotNull(location);
+        
+        // Check code
+        String code = OAuth2TestUtils.getSubstring(location, "code");
+        assertNotNull(code);
+        
+        // Check Access Token
+        String accessToken = OAuth2TestUtils.getSubstring(location, "access_token");
+        assertNotNull(accessToken);
+    }
+    
+    @org.junit.Test
+    public void testHybridCodeIdTokenToken() throws Exception {
+        URL busFile = OIDCFlowTest.class.getResource("client.xml");
+        
+        String address = "https://localhost:" + PORT + "/services/";
+        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(), 
+                                            "alice", "security", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+        
+        // Get location
+        String location = 
+            OAuth2TestUtils.getLocation(client, "openid", "consumer-id", "123456789", null, 
+                                        "code id_token token", "authorize-hybrid");
+        assertNotNull(location);
+        
+        // Check code
+        String code = OAuth2TestUtils.getSubstring(location, "code");
+        assertNotNull(code);
+        
+        // Check id_token
+        String idToken = OAuth2TestUtils.getSubstring(location, "id_token");
+        assertNotNull(idToken);
+        validateIdToken(idToken, "123456789");
+        
+        // Check Access Token
+        String accessToken = OAuth2TestUtils.getSubstring(location, "access_token");
+        assertNotNull(accessToken);
     }
     
     private void validateIdToken(String idToken, String nonce) 
