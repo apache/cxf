@@ -46,8 +46,7 @@ public class MtoMImpl implements MtoM {
     public MtoMImpl() {
         InputStream someData = 
             getClass().getClassLoader().getResourceAsStream("org/apache/cxf/javascript/cxf-utils.js");
-        StringWriter sw = new StringWriter();
-        try {
+        try (StringWriter sw = new StringWriter()) {
             InputStreamReader isr = new InputStreamReader(someData, "utf-8");
             IOUtils.copy(isr, sw, 4096);
             returnData = sw.toString();

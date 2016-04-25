@@ -144,13 +144,11 @@ public class LogicalMessageImpl implements LogicalMessage {
         if (message instanceof SoapMessage) {
             // StreamSource may only be used once, need to make a copy
             if (obj instanceof StreamSource) {
-                try {
-                    CachedOutputStream cos = new CachedOutputStream();
+                try (CachedOutputStream cos = new CachedOutputStream()) {
                     StaxUtils.copy(obj, cos);
 
                     obj = new StreamSource(cos.getInputStream());
                     message.setContent(Source.class, new StreamSource(cos.getInputStream()));
-                    cos.close();
                 } catch (Exception e) {
                     throw new Fault(e);
                 }
@@ -159,14 +157,12 @@ public class LogicalMessageImpl implements LogicalMessage {
             if (mode == Service.Mode.PAYLOAD) {
                 source = obj;
             } else {
-                try {
-                    CachedOutputStream cos = new CachedOutputStream();
+                try (CachedOutputStream cos = new CachedOutputStream()) {
                     StaxUtils.copy(obj, cos);
                     InputStream in = cos.getInputStream();
                     SOAPMessage msg = initSOAPMessage(in);
                     source = new DOMSource(SAAJUtils.getBody(msg).getFirstChild());
                     in.close();
-                    cos.close();
                 } catch (Exception e) {
                     throw new Fault(e);
                 }

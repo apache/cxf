@@ -164,10 +164,10 @@ public class MtomPolicyTest extends AbstractBusClientServerTestBase {
         assertEquals(1, attachments.size());
 
         Attachment inAtt = attachments.iterator().next();
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        IOUtils.copy(inAtt.getDataHandler().getInputStream(), out);
-        out.close();
-        assertEquals(27364, out.size());
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            IOUtils.copy(inAtt.getDataHandler().getInputStream(), out);
+            assertEquals(27364, out.size());
+        }
     }
 
 
