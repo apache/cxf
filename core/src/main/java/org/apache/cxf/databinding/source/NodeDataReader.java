@@ -55,12 +55,11 @@ public class NodeDataReader implements DataReader<Node> {
             XMLStreamReader reader = StaxUtils.createXMLStreamReader((Element)input);
             return new StaxSource(reader);
         } else if (StreamSource.class.isAssignableFrom(type)) {
-            try {
-                CachedOutputStream out = new CachedOutputStream();
+            try (CachedOutputStream out = new CachedOutputStream()) {
                 StaxUtils.writeTo(input, out);
                 InputStream is = out.getInputStream();
                 out.close();
-                
+
                 return new StreamSource(is);
             } catch (IOException e) {
                 throw new Fault("COULD_NOT_READ_XML_STREAM", LOG, e);

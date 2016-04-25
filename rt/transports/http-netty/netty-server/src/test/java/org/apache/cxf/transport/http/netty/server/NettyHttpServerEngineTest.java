@@ -148,8 +148,9 @@ public class NettyHttpServerEngineTest extends Assert {
         assertTrue(connection instanceof HttpURLConnection);
         connection.connect();
         InputStream in = connection.getInputStream();
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-        IOUtils.copy(in, buffer);
-        return buffer.toString();
+        try (ByteArrayOutputStream buffer = new ByteArrayOutputStream()) {
+            IOUtils.copy(in, buffer);
+            return buffer.toString();
+        }
     }
 }
