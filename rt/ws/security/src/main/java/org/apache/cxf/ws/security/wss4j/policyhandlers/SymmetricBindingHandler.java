@@ -751,22 +751,24 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
         
         dkSign.getParts().addAll(sigs);
         List<Reference> referenceList = dkSign.addReferencesToSign(sigs, secHeader);
-        
-        //Add elements to header
-        Element el = dkSign.getdktElement();
-        addDerivedKeyElement(el);
-        
-        //Do signature
-        if (bottomUpElement == null) {
-            dkSign.computeSignature(referenceList, false, null);
-        } else {
-            dkSign.computeSignature(referenceList, true, bottomUpElement);
+        if (!referenceList.isEmpty()) {
+            //Add elements to header
+            Element el = dkSign.getdktElement();
+            addDerivedKeyElement(el);
+            
+            //Do signature
+            if (bottomUpElement == null) {
+                dkSign.computeSignature(referenceList, false, null);
+            } else {
+                dkSign.computeSignature(referenceList, true, bottomUpElement);
+            }
+            bottomUpElement = dkSign.getSignatureElement();
+            
+            this.mainSigId = dkSign.getSignatureId();
+    
+            return dkSign.getSignatureValue();
         }
-        bottomUpElement = dkSign.getSignatureElement();
-        
-        this.mainSigId = dkSign.getSignatureId();
-
-        return dkSign.getSignatureValue();        
+        return null;
     }
     
     private byte[] doSignature(List<WSEncryptionPart> sigs,
@@ -885,17 +887,19 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             sig.prepare(saaj.getSOAPPart(), crypto, secHeader);
             sig.getParts().addAll(sigs);
             List<Reference> referenceList = sig.addReferencesToSign(sigs, secHeader);
-
-            //Do signature
-            if (bottomUpElement == null) {
-                sig.computeSignature(referenceList, false, null);
-            } else {
-                sig.computeSignature(referenceList, true, bottomUpElement);
+            if (!referenceList.isEmpty()) {
+                //Do signature
+                if (bottomUpElement == null) {
+                    sig.computeSignature(referenceList, false, null);
+                } else {
+                    sig.computeSignature(referenceList, true, bottomUpElement);
+                }
+                bottomUpElement = sig.getSignatureElement();
+    
+                this.mainSigId = sig.getId();
+                return sig.getSignatureValue();
             }
-            bottomUpElement = sig.getSignatureElement();
-
-            this.mainSigId = sig.getId();
-            return sig.getSignatureValue();
+            return null;
         }
     }
 
