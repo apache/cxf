@@ -502,10 +502,14 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                                 this.insertBeforeBottomUp(attachment);
                             }
                         }
-                        this.addEncryptedKeyElement(encryptedKeyElement);
+                        if (refList != null || (attachments != null && !attachments.isEmpty())) {
+                            this.addEncryptedKeyElement(encryptedKeyElement);
+                        }
                     } else {
                         Element refList = encr.encryptForRef(null, encrParts);
-                        this.addEncryptedKeyElement(encryptedKeyElement);
+                        if (refList != null || (attachments != null && !attachments.isEmpty())) {
+                            this.addEncryptedKeyElement(encryptedKeyElement);
+                        }
                         
                         // Add internal refs
                         if (refList != null) {
@@ -660,20 +664,21 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                 dkSign.setParts(sigParts);
 
                 List<Reference> referenceList = dkSign.addReferencesToSign(sigParts, secHeader);
-
-                // Add elements to header
-                addDerivedKeyElement(dkSign.getdktElement());
-                
-                //Do signature
-                if (bottomUpElement == null) {
-                    dkSign.computeSignature(referenceList, false, null);
-                } else {
-                    dkSign.computeSignature(referenceList, true, bottomUpElement);
+                if (!referenceList.isEmpty()) {
+                    // Add elements to header
+                    addDerivedKeyElement(dkSign.getdktElement());
+                    
+                    //Do signature
+                    if (bottomUpElement == null) {
+                        dkSign.computeSignature(referenceList, false, null);
+                    } else {
+                        dkSign.computeSignature(referenceList, true, bottomUpElement);
+                    }
+                    bottomUpElement = dkSign.getSignatureElement();
+                    signatures.add(dkSign.getSignatureValue());
+                    
+                    mainSigId = dkSign.getSignatureId();
                 }
-                bottomUpElement = dkSign.getSignatureElement();
-                signatures.add(dkSign.getSignatureValue());
-                
-                mainSigId = dkSign.getSignatureId();
             } catch (Exception ex) {
                 LOG.log(Level.FINE, ex.getMessage(), ex);
                 throw new Fault(ex);
@@ -695,24 +700,26 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             }
 
             List<Reference> referenceList = sig.addReferencesToSign(sigParts, secHeader);
-            //Do signature
-            if (bottomUpElement == null) {
-                sig.computeSignature(referenceList, false, null);
-            } else {
-                sig.computeSignature(referenceList, true, bottomUpElement);
-            }
-            bottomUpElement = sig.getSignatureElement();
-            
-            if (!abinding.isProtectTokens()) {
-                Element bstElement = sig.getBinarySecurityTokenElement();
-                if (bstElement != null) {
-                    secHeader.getSecurityHeader().insertBefore(bstElement, bottomUpElement);
+            if (!referenceList.isEmpty()) {
+                //Do signature
+                if (bottomUpElement == null) {
+                    sig.computeSignature(referenceList, false, null);
+                } else {
+                    sig.computeSignature(referenceList, true, bottomUpElement);
                 }
+                bottomUpElement = sig.getSignatureElement();
+                
+                if (!abinding.isProtectTokens()) {
+                    Element bstElement = sig.getBinarySecurityTokenElement();
+                    if (bstElement != null) {
+                        secHeader.getSecurityHeader().insertBefore(bstElement, bottomUpElement);
+                    }
+                }
+                
+                signatures.add(sig.getSignatureValue());
+                            
+                mainSigId = sig.getId();
             }
-            
-            signatures.add(sig.getSignatureValue());
-                        
-            mainSigId = sig.getId();
         }
     }
 
