@@ -298,7 +298,14 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             Map<Object, Crypto> o = 
                 CastUtils.cast((Map<?, ?>)message.getContextualProperty(CRYPTO_CACHE));
             if (o == null) {
+<<<<<<< HEAD
                 o = new ConcurrentHashMap<Object, Crypto>();
+=======
+                o = CastUtils.cast((Map<?, ?>)info.getProperty(CRYPTO_CACHE));
+            }
+            if (o == null) {
+                o = new ConcurrentHashMap<>();
+>>>>>>> ea1b593... [CXF-6883] - Crypto caching issues in the WS-Security code
                 info.setProperty(CRYPTO_CACHE, o);
             }
             return o;
@@ -1489,6 +1496,9 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                 crypto.verifyTrust(certs, enableRevocation, null);
             }
         }
+        if (crypto != null) {
+            this.message.getExchange().put(SecurityConstants.ENCRYPT_CRYPTO, crypto);
+        }
         return crypto;
 
     }
@@ -1739,7 +1749,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             crypto = getEncryptionCrypto();
         }
         
-        if (!endorse) {
+        if (!encryptCrypto) {
             message.getExchange().put(SecurityConstants.SIGNATURE_CRYPTO, crypto);
         }
         String user = (String)message.getContextualProperty(userNameKey);

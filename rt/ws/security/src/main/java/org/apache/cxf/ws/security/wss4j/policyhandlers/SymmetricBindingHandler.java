@@ -537,7 +537,6 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                     encr.setEphemeralKey(encrTok.getSecret());
                     Crypto crypto = getEncryptionCrypto();
                     if (crypto != null) {
-                        this.message.getExchange().put(SecurityConstants.ENCRYPT_CRYPTO, crypto);
                         setEncryptionUser(encr, encrToken, false, crypto);
                     }
                     
