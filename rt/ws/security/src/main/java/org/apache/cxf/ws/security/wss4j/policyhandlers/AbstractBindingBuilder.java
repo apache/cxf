@@ -309,6 +309,9 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             Map<Object, Crypto> o = 
                 CastUtils.cast((Map<?, ?>)message.getContextualProperty(CRYPTO_CACHE));
             if (o == null) {
+                o = CastUtils.cast((Map<?, ?>)info.getProperty(CRYPTO_CACHE));
+            }
+            if (o == null) {
                 o = new ConcurrentHashMap<>();
                 info.setProperty(CRYPTO_CACHE, o);
             }
@@ -1507,6 +1510,9 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                 crypto.verifyTrust(certs, enableRevocation, null);
             }
         }
+        if (crypto != null) {
+            this.message.getExchange().put(SecurityConstants.ENCRYPT_CRYPTO, crypto);
+        }
         return crypto;
 
     }
@@ -1777,7 +1783,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             crypto = getEncryptionCrypto();
         }
         
-        if (!endorse) {
+        if (!encryptCrypto) {
             message.getExchange().put(SecurityConstants.SIGNATURE_CRYPTO, crypto);
         }
         String user = (String)SecurityUtils.getSecurityPropertyValue(userNameKey, message);
