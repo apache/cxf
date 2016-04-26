@@ -298,14 +298,10 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             Map<Object, Crypto> o = 
                 CastUtils.cast((Map<?, ?>)message.getContextualProperty(CRYPTO_CACHE));
             if (o == null) {
-<<<<<<< HEAD
-                o = new ConcurrentHashMap<Object, Crypto>();
-=======
                 o = CastUtils.cast((Map<?, ?>)info.getProperty(CRYPTO_CACHE));
             }
             if (o == null) {
-                o = new ConcurrentHashMap<>();
->>>>>>> ea1b593... [CXF-6883] - Crypto caching issues in the WS-Security code
+                o = new ConcurrentHashMap<Object, Crypto>();
                 info.setProperty(CRYPTO_CACHE, o);
             }
             return o;
