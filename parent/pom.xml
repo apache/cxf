@@ -86,12 +86,12 @@
         <cxf.fastinfoset.bundle.version>1.2.13_1</cxf.fastinfoset.bundle.version>
         <cxf.guava.version>18.0</cxf.guava.version>
         <cxf.hazelcast.version>1.9.4</cxf.hazelcast.version>
-        <cxf.httpcomponents.asyncclient.version>4.1</cxf.httpcomponents.asyncclient.version>
+        <cxf.httpcomponents.asyncclient.version>4.1.1</cxf.httpcomponents.asyncclient.version>
         <cxf.httpcomponents.asyncclient.version.range>[4.0,4.2)</cxf.httpcomponents.asyncclient.version.range>
-        <cxf.httpcomponents.client.version>4.5.1</cxf.httpcomponents.client.version>
+        <cxf.httpcomponents.client.version>4.5.2</cxf.httpcomponents.client.version>
         <cxf.httpcomponents.core.version>4.4.1</cxf.httpcomponents.core.version>
         <cxf.httpcomponents.core.version.range>[4.3,4.5.0)</cxf.httpcomponents.core.version.range>
-        <cxf.jackson.version>2.6.5</cxf.jackson.version>
+        <cxf.jackson.version>2.6.6</cxf.jackson.version>
         <cxf.james.mim4j.version>0.7.2</cxf.james.mim4j.version>
         <cxf.logback.classic.version>1.0.13</cxf.logback.classic.version>
         <cxf.log4j.version>1.2.17</cxf.log4j.version>
@@ -140,7 +140,7 @@
         <cxf.servlet-api.version>1.0</cxf.servlet-api.version>
         <cxf.servlet-api-2.5.artifact>geronimo-servlet_2.5_spec</cxf.servlet-api-2.5.artifact>
         <cxf.servlet-api-2.5.version>1.1.2</cxf.servlet-api-2.5.version>
-        <cxf.slf4j.version>1.7.19</cxf.slf4j.version>
+        <cxf.slf4j.version>1.7.21</cxf.slf4j.version>
         <cxf.specs.jaxws.api.version>1.2</cxf.specs.jaxws.api.version>
         <cxf.spring.version>4.1.9.RELEASE</cxf.spring.version>
         <cxf.spring.security.version>3.2.9.RELEASE</cxf.spring.security.version>
