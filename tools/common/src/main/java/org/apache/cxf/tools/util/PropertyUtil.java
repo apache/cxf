@@ -34,24 +34,24 @@ public class PropertyUtil {
     private Map<String, String>  maps = new HashMap<String, String>();
 
     public void load(InputStream is, String delim) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(is));
-        String line = br.readLine();
-        while (!StringUtils.isEmpty(line)) {
-            StringTokenizer st = new StringTokenizer(line, delim);
-            String key = null;
-            String value = null;
-            if (st.hasMoreTokens()) {
-                key  = st.nextToken().trim();
-            }
-            if (st.hasMoreTokens()) {
-                value = st.nextToken().trim();
-            }
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
+            String line = br.readLine();
+            while (!StringUtils.isEmpty(line)) {
+                StringTokenizer st = new StringTokenizer(line, delim);
+                String key = null;
+                String value = null;
+                if (st.hasMoreTokens()) {
+                    key  = st.nextToken().trim();
+                }
+                if (st.hasMoreTokens()) {
+                    value = st.nextToken().trim();
+                }
 
-            maps.put(key, value);
+                maps.put(key, value);
 
-            line = br.readLine();
+                line = br.readLine();
+            }
         }
-        br.close();
     }
     
     public void load(InputStream is) throws IOException {

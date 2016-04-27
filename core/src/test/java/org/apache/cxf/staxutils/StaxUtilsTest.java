@@ -111,6 +111,7 @@ public class StaxUtilsTest extends Assert {
            
         // write output to a string
         String output = baos.toString();       
+        baos.close();
         
         // re-read the input xml doc to a string
         InputStreamReader inputStreamReader = new InputStreamReader(getTestStream(soapMessage));
@@ -123,6 +124,7 @@ public class StaxUtilsTest extends Assert {
             n = inputStreamReader.read(buffer);
         }
         String input = stringWriter.toString();
+        stringWriter.close();
         // seach for the first begin of "<soap:Envelope" to escape the apache licenses header
         int beginIndex = input.indexOf("<soap:Envelope");
         input = input.substring(beginIndex);
