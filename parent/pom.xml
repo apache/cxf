@@ -89,7 +89,7 @@
         <cxf.httpcomponents.asyncclient.version>4.1.1</cxf.httpcomponents.asyncclient.version>
         <cxf.httpcomponents.asyncclient.version.range>[4.0,4.2)</cxf.httpcomponents.asyncclient.version.range>
         <cxf.httpcomponents.client.version>4.5.2</cxf.httpcomponents.client.version>
-        <cxf.httpcomponents.core.version>4.4.1</cxf.httpcomponents.core.version>
+        <cxf.httpcomponents.core.version>4.4.4</cxf.httpcomponents.core.version>
         <cxf.httpcomponents.core.version.range>[4.3,4.5.0)</cxf.httpcomponents.core.version.range>
         <cxf.jackson.version>2.6.6</cxf.jackson.version>
         <cxf.james.mim4j.version>0.7.2</cxf.james.mim4j.version>
