@@ -134,5 +134,25 @@ under the License.
        </jaxrs:properties>
    </jaxrs:server>
    
+   <bean id="jwtRequestFilter" class="org.apache.cxf.rs.security.oauth2.grants.code.JwtRequestCodeFilter"/>
+   
+   <bean id="jwtAuthorizationService" class="org.apache.cxf.rs.security.oauth2.services.AuthorizationCodeGrantService">
+      <property name="dataProvider" ref="oauthProvider"/>
+      <property name="authorizationFilter" ref="jwtRequestFilter"/>
+   </bean>
+   
+   <jaxrs:server 
+       depends-on="tls-config" 
+       address="https://localhost:${testutil.ports.jaxrs-oidc}/unsignedjwtservices">
+       <jaxrs:serviceBeans>
+           <ref bean="jwtAuthorizationService"/>
+       </jaxrs:serviceBeans>
+       <jaxrs:providers>
+           <ref bean="basicAuthFilter"/>
+       </jaxrs:providers>
+       <jaxrs:properties>
+           <entry key="rs.security.signature.algorithm" value="none" />
+       </jaxrs:properties>
+   </jaxrs:server>
 
 </beans>

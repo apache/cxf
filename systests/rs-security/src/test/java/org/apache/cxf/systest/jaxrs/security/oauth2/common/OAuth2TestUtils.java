@@ -69,29 +69,37 @@ public final class OAuth2TestUtils {
     
     public static String getAuthorizationCode(WebClient client, String scope, String consumerId,
                                               String nonce, String state) {
-        String location = getLocation(client, scope, consumerId, nonce, state, "code", "authorize/");
+        AuthorizationCodeParameters parameters = new AuthorizationCodeParameters();
+        parameters.setConsumerId(consumerId);
+        parameters.setScope(scope);
+        parameters.setNonce(nonce);
+        parameters.setState(state);
+        parameters.setResponseType("code");
+        parameters.setPath("authorize/");
+        String location = getLocation(client, parameters);
         return getSubstring(location, "code");
     }
     
-    public static String getLocation(WebClient client, String scope, String consumerId,
-                                              String nonce, String state, String responseType,
-                                              String path) {
+    public static String getLocation(WebClient client, AuthorizationCodeParameters parameters) { 
         // Make initial authorization request
         client.type("application/json").accept("application/json");
-        client.query("client_id", consumerId);
+        client.query("client_id", parameters.getConsumerId());
         client.query("redirect_uri", "http://www.blah.apache.org");
-        client.query("response_type", responseType);
-        if (scope != null) {
-            client.query("scope", scope);
+        client.query("response_type", parameters.getResponseType());
+        if (parameters.getScope() != null) {
+            client.query("scope", parameters.getScope());
         }
-        if (nonce != null) {
-            client.query("nonce", nonce);
+        if (parameters.getNonce() != null) {
+            client.query("nonce", parameters.getNonce());
         }
-        if (state != null) {
-            client.query("state", state);
+        if (parameters.getState() != null) {
+            client.query("state", parameters.getState());
+        }
+        if (parameters.getRequest() != null) {
+            client.query("request", parameters.getRequest());
         }
 
-        client.path(path);
+        client.path(parameters.getPath());
         Response response = client.get();
 
         OAuthAuthorizationData authzData = response.readEntity(OAuthAuthorizationData.class);
@@ -118,8 +126,8 @@ public final class OAuth2TestUtils {
 
         response = client.post(form);
         String location = response.getHeaderString("Location");
-        if (state != null) {
-            Assert.assertTrue(location.contains("state=" + state));
+        if (parameters.getState() != null) {
+            Assert.assertTrue(location.contains("state=" + parameters.getState()));
         }
 
         return location;
@@ -242,5 +250,58 @@ public final class OAuth2TestUtils {
             ampersandIndex = foundString.length();
         }
         return foundString.substring(0, ampersandIndex);
+    }
+    
+    public static class AuthorizationCodeParameters {
+        private String scope;
+        private String consumerId;
+        private String nonce;
+        private String state;
+        private String responseType;
+        private String path; 
+        private String request;
+        
+        public String getScope() {
+            return scope;
+        }
+        public void setScope(String scope) {
+            this.scope = scope;
+        }
+        public String getConsumerId() {
+            return consumerId;
+        }
+        public void setConsumerId(String consumerId) {
+            this.consumerId = consumerId;
+        }
+        public String getNonce() {
+            return nonce;
+        }
+        public void setNonce(String nonce) {
+            this.nonce = nonce;
+        }
+        public String getState() {
+            return state;
+        }
+        public void setState(String state) {
+            this.state = state;
+        }
+        public String getResponseType() {
+            return responseType;
+        }
+        public void setResponseType(String responseType) {
+            this.responseType = responseType;
+        }
+        public String getPath() {
+            return path;
+        }
+        public void setPath(String path) {
+            this.path = path;
+        }
+        public String getRequest() {
+            return request;
+        }
+        public void setRequest(String request) {
+            this.request = request;
+        }
     }
 }
