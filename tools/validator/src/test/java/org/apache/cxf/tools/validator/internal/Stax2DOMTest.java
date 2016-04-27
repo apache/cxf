@@ -83,9 +83,9 @@ public class Stax2DOMTest extends Assert {
         File wsdlFile = new File(getClass().getResource(
                 "/validator_wsdl/jms_test.wsdl").toURI());
         File tempFile = File.createTempFile("Stax2DOMTest", ".wsdl");
-        FileOutputStream output = new FileOutputStream(tempFile);
-        IOUtils.copyAndCloseInput(new FileInputStream(wsdlFile), output);
-        output.close();
+        try (FileOutputStream output = new FileOutputStream(tempFile)) {
+            IOUtils.copyAndCloseInput(new FileInputStream(wsdlFile), output);
+        }
         return tempFile;
     }
 
