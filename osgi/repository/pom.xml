@@ -31,7 +31,7 @@
 	<properties>
 		<bnd.version>3.1.0</bnd.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<local.index.policy>ALLOWED</local.index.policy>
+		<local.index.policy>REQUIRED</local.index.policy>
 	</properties>
 	<profiles>
 		<profile>
