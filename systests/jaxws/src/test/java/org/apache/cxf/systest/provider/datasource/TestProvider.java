@@ -66,11 +66,12 @@ public class TestProvider extends AbstractProvider<DataSource> implements Provid
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             IOUtils.copy(req.getInputStream(), baos);
             LOG.info("body [" + new String(baos.toByteArray())  + "]");
-            ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-            msg = "<ok/>";
+            try (ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray())) {
+                msg = "<ok/>";
 
-            MimeMultipart multipart = DataSourceProviderTest.readAttachmentParts(req.getContentType(), bais);
-            LOG.info("found " + multipart.getCount() + " parts");
+                MimeMultipart multipart = DataSourceProviderTest.readAttachmentParts(req.getContentType(), bais);
+                LOG.info("found " + multipart.getCount() + " parts");
+            }
             return new ByteArrayDataSource(baos.toByteArray(), req.getContentType());
         } catch (Exception e) {
             e.printStackTrace();

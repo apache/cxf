@@ -45,56 +45,57 @@ public final class ToolsStaxUtils {
         List<Tag> tags = new ArrayList<Tag>();
         List<String> ignoreEmptyTags = Arrays.asList(new String[]{"sequence"});
 
-        InputStream is = new BufferedInputStream(new FileInputStream(source));
-        XMLStreamReader reader = StaxUtils.createXMLStreamReader(is);
-        Tag newTag = null;
-        int count = 0;
-        QName checkingPoint = null;
-        
-        Stack<Tag> stack = new Stack<Tag>();
+        try (InputStream is = new BufferedInputStream(new FileInputStream(source))) {
+            XMLStreamReader reader = StaxUtils.createXMLStreamReader(is);
+            Tag newTag = null;
+            int count = 0;
+            QName checkingPoint = null;
 
-        while (reader.hasNext()) {
-            int event = reader.next();
+            Stack<Tag> stack = new Stack<Tag>();
 
-            if (checkingPoint != null) {
-                count++;
-            }
+            while (reader.hasNext()) {
+                int event = reader.next();
 
-            if (event == XMLStreamReader.START_ELEMENT) {
-                newTag = new Tag();
-                newTag.setName(reader.getName());
-
-                if (ignoreEmptyTags.contains(reader.getLocalName())) {
-                    checkingPoint = reader.getName();
+                if (checkingPoint != null) {
+                    count++;
                 }
 
-                for (int i = 0; i < reader.getAttributeCount(); i++) {
-                    newTag.getAttributes().put(reader.getAttributeName(i), 
-                                               reader.getAttributeValue(i));
+                if (event == XMLStreamReader.START_ELEMENT) {
+                    newTag = new Tag();
+                    newTag.setName(reader.getName());
+
+                    if (ignoreEmptyTags.contains(reader.getLocalName())) {
+                        checkingPoint = reader.getName();
+                    }
+
+                    for (int i = 0; i < reader.getAttributeCount(); i++) {
+                        newTag.getAttributes().put(reader.getAttributeName(i), 
+                                reader.getAttributeValue(i));
+                    }
+                    stack.push(newTag);
                 }
-                stack.push(newTag);
-            }
-            if (event == XMLStreamReader.CHARACTERS) {
-                newTag.setText(reader.getText());
-            }
+                if (event == XMLStreamReader.CHARACTERS) {
+                    newTag.setText(reader.getText());
+                }
 
-            if (event == XMLStreamReader.END_ELEMENT) {
-                Tag startTag = stack.pop();
+                if (event == XMLStreamReader.END_ELEMENT) {
+                    Tag startTag = stack.pop();
 
-                if (checkingPoint != null && checkingPoint.equals(reader.getName())) {
-                    if (count == 1) {
-                        //Tag is empty, and it's in the ignore collection, so we just skip this tag
+                    if (checkingPoint != null && checkingPoint.equals(reader.getName())) {
+                        if (count == 1) {
+                            //Tag is empty, and it's in the ignore collection, so we just skip this tag
+                        } else {
+                            tags.add(startTag);
+                        }
+                        count = 0;
+                        checkingPoint = null;
                     } else {
                         tags.add(startTag);
                     }
-                    count = 0;
-                    checkingPoint = null;
-                } else {
-                    tags.add(startTag);
                 }
             }
+            reader.close();
         }
-        reader.close();
         return tags;
     }
 
@@ -103,14 +104,16 @@ public final class ToolsStaxUtils {
     }
 
     public static Tag getTagTree(final File source, final List<String> ignoreAttr) throws Exception {
-        InputStream is = new BufferedInputStream(new FileInputStream(source));
-        return getTagTree(is, ignoreAttr, null);
+        try (InputStream is = new BufferedInputStream(new FileInputStream(source))) {
+            return getTagTree(is, ignoreAttr, null);
+        }
     }
     public static Tag getTagTree(final File source,
                                  final List<String> ignoreAttr,
                                  Map<QName, Set<String>> types) throws Exception {
-        InputStream is = new BufferedInputStream(new FileInputStream(source));
-        return getTagTree(is, ignoreAttr, types);        
+        try (InputStream is = new BufferedInputStream(new FileInputStream(source))) {
+            return getTagTree(is, ignoreAttr, types);        
+        }
     }    
     public static Tag getTagTree(final InputStream is,
                                  final List<String> ignoreAttr,

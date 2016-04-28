@@ -20,14 +20,13 @@
 package org.apache.cxf.tools.java2wsdl.generator.wsdl11;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Files;
 
 import javax.xml.bind.annotation.XmlList;
 
-import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.tools.common.ProcessorTestBase;
 import org.apache.cxf.tools.common.ToolConstants;
@@ -77,7 +76,7 @@ public class WrapperBeanGeneratorTest extends ProcessorTestBase {
         String pkgBase = "org/apache/cxf";
         File requestWrapperClass = new File(output, pkgBase + "/EchoDataBean.java");
         assertTrue(requestWrapperClass.exists());
-        String contents = IOUtils.toString(new FileInputStream(requestWrapperClass));
+        String contents = new String(Files.readAllBytes(requestWrapperClass.toPath()));
         assertTrue(contents.indexOf("org.apache.cxf.tools.fortest.withannotation.doc") != -1);
         
         File responseWrapperClass = new File(output, pkgBase + "/EchoDataBeanResponse.java");
@@ -103,12 +102,12 @@ public class WrapperBeanGeneratorTest extends ProcessorTestBase {
         String pkgBase = "org/apache/cxf/tools/fortest/withannotation/doc/jaxws";
         File requestWrapperClass = new File(output, pkgBase + "/SayIntArray.java");
         assertTrue(requestWrapperClass.exists());
-        String contents = IOUtils.toString(new FileInputStream(requestWrapperClass));
+        String contents = new String(Files.readAllBytes(requestWrapperClass.toPath()));
         assertTrue(contents.indexOf("int[]") != -1);
         
         File responseWrapperClass = new File(output, pkgBase + "/SayIntArrayResponse.java");
         assertTrue(responseWrapperClass.exists());
-        contents = IOUtils.toString(new FileInputStream(responseWrapperClass));
+        contents = new String(Files.readAllBytes(responseWrapperClass.toPath()));
         assertTrue(contents.indexOf("_return") != -1);
         
         requestWrapperClass = new File(output, pkgBase + "/SayStringArray.java");
@@ -120,7 +119,7 @@ public class WrapperBeanGeneratorTest extends ProcessorTestBase {
         assertTrue(requestWrapperClass.exists());
         responseWrapperClass = new File(output, pkgBase + "/SayTestDataBeanArrayResponse.java");
         assertTrue(responseWrapperClass.exists());
-        contents = IOUtils.toString(new FileInputStream(requestWrapperClass));
+        contents = new String(Files.readAllBytes(requestWrapperClass.toPath()));
         assertTrue(contents.indexOf("org.apache.cxf.tools.fortest.withannotation.doc.TestDataBean[]") != -1);
     }
     
@@ -154,12 +153,12 @@ public class WrapperBeanGeneratorTest extends ProcessorTestBase {
         String pkgBase = "org/apache/cxf";
         File requestWrapperClass = new File(output, pkgBase + "/EchoGeneric.java");
         assertTrue(requestWrapperClass.exists());
-        String contents = IOUtils.toString(new FileInputStream(requestWrapperClass));
+        String contents = new String(Files.readAllBytes(requestWrapperClass.toPath()));
         assertTrue(contents.indexOf("public java.util.List<java.lang.String> get") != -1);
         
         File responseWrapperClass = new File(output, pkgBase + "/EchoGenericResponse.java");
         assertTrue(responseWrapperClass.exists());
-        contents = IOUtils.toString(new FileInputStream(responseWrapperClass));
+        contents = new String(Files.readAllBytes(responseWrapperClass.toPath()));
         assertTrue(contents.indexOf("public java.util.List<java.lang.String> getReturn()") != -1);
     }
     
