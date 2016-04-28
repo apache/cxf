@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<entity-mappings xmlns="http://java.sun.com/xml/ns/persistence/orm"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_2_0.xsd"
+    version="2.0">
+
+    <mapped-superclass class="org.apache.cxf.rs.security.oauth2.common.AccessToken">
+      <attributes>
+        <id name="tokenKey"/>
+        <element-collection name="parameters">
+            <map-key-column name="propName"/>
+        </element-collection>
+      </attributes>
+    </mapped-superclass>
+    <mapped-superclass class="org.apache.cxf.rs.security.oauth2.common.ServerAccessToken">
+      <attributes>
+        <many-to-one name="subject" fetch="LAZY"/>
+        <many-to-one name="client" fetch="LAZY"/>
+        <many-to-many name="scopes"/>
+        <element-collection name="audiences" target-class="java.lang.String"/>
+        <element-collection name="extraProperties">
+            <map-key-column name="extraPropName"/>
+        </element-collection>
+      </attributes>
+    </mapped-superclass>
+    <mapped-superclass class="org.apache.cxf.rs.security.oauth2.grants.code.AuthorizationCodeGrant">
+      <attributes>
+        <id name="code"/>
+      </attributes>
+    </mapped-superclass>
+    <entity class="org.apache.cxf.rs.security.oauth2.tokens.bearer.BearerAccessToken">
+      <attributes/>
+    </entity>
+    <entity class="org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken">
+      <attributes>
+        <element-collection name="accessTokens" target-class="java.lang.String"/>
+      </attributes>
+    </entity>
+    <entity class="org.apache.cxf.rs.security.oauth2.common.OAuthPermission">
+      <attributes>
+        <id name="permission"/>
+        <element-collection name="httpVerbs" target-class="java.lang.String"/>
+        <element-collection name="uris" target-class="java.lang.String"/>
+      </attributes>
+    </entity>
+    <entity class="org.apache.cxf.rs.security.oauth2.common.Client">
+      <attributes>
+        <id name="clientId"/>
+        <many-to-one name="resourceOwnerSubject" fetch="LAZY"/>
+        <one-to-one name="subject" fetch="LAZY"/>
+        <element-collection name="applicationCertificates" target-class="java.lang.String"/>
+        <element-collection name="redirectUris" target-class="java.lang.String"/>
+        <element-collection name="allowedGrantTypes" target-class="java.lang.String"/>
+        <element-collection name="registeredScopes" target-class="java.lang.String"/>
+        <element-collection name="registeredAudiences" target-class="java.lang.String"/>
+        <element-collection name="properties">
+            <map-key-column name="name"/>
+        </element-collection>
+      </attributes>
+    </entity>
+    <entity class="org.apache.cxf.rs.security.oauth2.common.UserSubject">
+      <attributes>
+        <id name="login"/>
+        <element-collection name="roles" target-class="java.lang.String"/>
+        <element-collection name="properties">
+            <map-key-column name="name"/>
+        </element-collection>
+      </attributes>
+    </entity>
+    <entity class="org.apache.cxf.rs.security.oauth2.grants.code.ServerAuthorizationCodeGrant">
+      <attributes>
+        <many-to-one name="subject" fetch="LAZY"/>
+        <many-to-one name="client" fetch="LAZY"/>
+        <element-collection name="requestedScopes" target-class="java.lang.String"/>
+        <element-collection name="approvedScopes" target-class="java.lang.String"/>
+        <element-collection name="extraProperties">
+            <map-key-column name="extraPropName"/>
+        </element-collection>
+      </attributes>
+    </entity>
+ </entity-mappings>
