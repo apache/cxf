@@ -34,6 +34,7 @@ import javax.ws.rs.core.Response;
 
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
+import org.apache.cxf.rs.security.jose.jwk.JsonWebKeys;
 import org.apache.cxf.rs.security.jose.jws.JwsHeaders;
 import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactConsumer;
 import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactProducer;
@@ -560,6 +561,67 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         String location = OAuth2TestUtils.getLocation(client, parameters);
         String code = OAuth2TestUtils.getSubstring(location, "code");
         assertNotNull(code);
+    }
+    
+    @org.junit.Test
+    public void testGetKeys() throws Exception {
+        URL busFile = OIDCFlowTest.class.getResource("client.xml");
+        
+        String address = "https://localhost:" + PORT + "/services/";
+        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(), 
+                                            "alice", "security", busFile.toString());
+        client.accept("application/json");
+        
+        client.path("keys/");
+        Response response = client.get();
+        JsonWebKeys jsonWebKeys = response.readEntity(JsonWebKeys.class);
+        
+        assertEquals(1, jsonWebKeys.getKeys().size());
+    }
+    
+    @org.junit.Test
+    public void testAuthorizationCodeFlowWithKey() throws Exception {
+        URL busFile = OIDCFlowTest.class.getResource("client.xml");
+        
+        String address = "https://localhost:" + PORT + "/services/";
+        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(), 
+                                            "alice", "security", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+        
+        // Get Authorization Code
+        String code = OAuth2TestUtils.getAuthorizationCode(client, "openid");
+        assertNotNull(code);
+        
+        // Now get the access token
+        client = WebClient.create(address, OAuth2TestUtils.setupProviders(), 
+                                  "consumer-id", "this-is-a-secret", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+        
+        ClientAccessToken accessToken = 
+            OAuth2TestUtils.getAccessTokenWithAuthorizationCode(client, code);
+        assertNotNull(accessToken.getTokenKey());
+        assertTrue(accessToken.getApprovedScope().contains("openid"));
+        
+        String idToken = accessToken.getParameters().get("id_token");
+        assertNotNull(idToken);
+        
+        JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(idToken);
+        
+        // Now get the key to validate the token
+        client = WebClient.create(address, OAuth2TestUtils.setupProviders(), 
+                                  "alice", "security", busFile.toString());
+        client.accept("application/json");
+        
+        client.path("keys/");
+        Response response = client.get();
+        JsonWebKeys jsonWebKeys = response.readEntity(JsonWebKeys.class);
+        
+        Assert.assertTrue(jwtConsumer.verifySignatureWith(jsonWebKeys.getKeys().get(0),
+                                                          SignatureAlgorithm.RS256));
     }
     
     private void validateIdToken(String idToken, String nonce) 

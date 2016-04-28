@@ -122,6 +122,7 @@ under the License.
        </jaxrs:serviceBeans>
        <jaxrs:providers>
            <ref bean="basicAuthFilter"/>
+           <bean class="org.apache.cxf.rs.security.jose.jaxrs.JsonWebKeysProvider"/>
        </jaxrs:providers>
        <jaxrs:properties>
            <entry key="rs.security.keystore.type" value="jks" />
