@@ -1803,16 +1803,17 @@ public class WadlGenerator implements ContainerRequestFilter {
         if (is == null) {
             return;
         }
-        ByteArrayInputStream bis = IOUtils.loadIntoBAIS(is);
-        XMLSource source = new XMLSource(bis);
-        source.setBuffering();
-        String targetNs = source.getValue("/*/@targetNamespace");
+        try (ByteArrayInputStream bis = IOUtils.loadIntoBAIS(is)) {
+            XMLSource source = new XMLSource(bis);
+            source.setBuffering();
+            String targetNs = source.getValue("/*/@targetNamespace");
 
-        Map<String, String> nsMap = Collections.singletonMap("xs", Constants.URI_2001_SCHEMA_XSD);
-        String[] elementNames = source.getValues("/*/xs:element/@name", nsMap);
-        externalQnamesMap.put(targetNs, Arrays.asList(elementNames));
-        String schemaValue = source.getNode("/xs:schema", nsMap, String.class);
-        externalSchemasCache.add(schemaValue);
+            Map<String, String> nsMap = Collections.singletonMap("xs", Constants.URI_2001_SCHEMA_XSD);
+            String[] elementNames = source.getValues("/*/xs:element/@name", nsMap);
+            externalQnamesMap.put(targetNs, Arrays.asList(elementNames));
+            String schemaValue = source.getNode("/xs:schema", nsMap, String.class);
+            externalSchemasCache.add(schemaValue);
+        }
     }
 
     public void setUseJaxbContextForQnames(boolean checkJaxbOnly) {

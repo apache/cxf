@@ -20,8 +20,8 @@
 package org.apache.cxf.tools.java2wsdl.processor.internal.jaxws;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.net.URI;
+import java.nio.file.Files;
 import java.util.Collection;
 
 import javax.xml.namespace.QName;
@@ -29,7 +29,6 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.jaxb.JAXBContextCache;
-import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxws.JaxwsServiceBuilder;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.ServiceInfo;
@@ -307,7 +306,7 @@ public class JaxwsServiceBuilderTest extends ProcessorTestBase {
         generator.generate(output);
         assertTrue(output.exists());
 
-        String s = IOUtils.toString(new FileInputStream(output));
+        String s = new String(Files.readAllBytes(output.toPath()));
         assertTrue(s.indexOf("EchoPort") != -1);
         URI expectedFile = this.getClass()
             .getResource("expected/expected_rpclist_no_sei.wsdl").toURI();
@@ -344,18 +343,18 @@ public class JaxwsServiceBuilderTest extends ProcessorTestBase {
         File schema = new File(output, "HelloService_schema1.xsd");
         assertTrue(schema.exists());
 
-        String s = IOUtils.toString(new FileInputStream(wsdl));
+        String s = new String(Files.readAllBytes(wsdl.toPath()));
         assertTrue(s.indexOf("<wsdl:import namespace=\"http://foo.com/HelloWorld\" "
                              + "location=\"HelloWorld.wsdl\">") != -1);
         assertTrue(s.indexOf("targetNamespace=\"http://foo.com/HelloWorldService\"") != -1);
 
-        s = IOUtils.toString(new FileInputStream(logical));
+        s = new String(Files.readAllBytes(logical.toPath()));
 
         assertTrue(s.indexOf("<import namespace=\"http://foo.com/HelloWorld\"") != -1);
         assertTrue(s.indexOf("schemaLocation=\"HelloService_schema1.xsd\"/>") != -1);
         assertTrue(s.indexOf("targetNamespace=\"http://foo.com/HelloWorld\"") != -1);
 
-        s = IOUtils.toString(new FileInputStream(schema));
+        s = new String(Files.readAllBytes(schema.toPath()));
         assertTrue(s.indexOf("targetNamespace=\"http://foo.com/HelloWorld\"") != -1);
 
         generator.setAllowImports(oldSetting);
