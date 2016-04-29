@@ -54,7 +54,8 @@ public class ObservableWriter<T> implements MessageBodyWriter<Observable<T>> {
     public void writeTo(Observable<T> obs, Class<?> cls, Type t, Annotation[] anns, MediaType mt,
                         MultivaluedMap<String, Object> headers, OutputStream os)
                             throws IOException, WebApplicationException {
-        obs.subscribe(value -> writeToOutputStream(value, anns, mt, headers, os));   
+        obs.subscribe(value -> writeToOutputStream(value, anns, mt, headers, os),
+            throwable -> throwError(throwable));   
     }
 
     private void writeToOutputStream(T value,
@@ -66,14 +67,17 @@ public class ObservableWriter<T> implements MessageBodyWriter<Observable<T>> {
         MessageBodyWriter<T> writer = 
             (MessageBodyWriter<T>)providers.getMessageBodyWriter(value.getClass(), value.getClass(), anns, mt);
         if (writer == null) {
-            throw ExceptionUtils.toInternalServerErrorException(null, null);
+            throwError(null);
         }
     
         try {
             writer.writeTo(value, value.getClass(), value.getClass(), anns, mt, headers, os);    
         } catch (IOException ex) {
-            throw ExceptionUtils.toInternalServerErrorException(ex, null);
+            throwError(ex);
         }
     }
     
+    private static void throwError(Throwable cause) {
+        throw ExceptionUtils.toInternalServerErrorException(cause, null);
+    }
 }
