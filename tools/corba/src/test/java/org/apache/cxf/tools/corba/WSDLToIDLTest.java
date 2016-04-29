@@ -41,7 +41,7 @@ import org.apache.cxf.tools.corba.utils.TestUtils;
 
 public class WSDLToIDLTest extends ToolTestBase {
    
-    private static StringBuffer usageBuf;
+    private static String usage;
     private static int noError;
     private static int error = -1;
     ByteArrayOutputStream bout;
@@ -53,7 +53,7 @@ public class WSDLToIDLTest extends ToolTestBase {
         try {
             TestUtils utils = new TestUtils(WSDLToIDL.TOOL_NAME, WSDLToIDL.class
                 .getResourceAsStream("/toolspecs/wsdl2idl.xml"));
-            usageBuf = new StringBuffer(utils.getUsage());
+            usage = utils.getUsage();
             bout = new ByteArrayOutputStream();
             newOut = new PrintStream(bout);
             System.setOut(newOut);
@@ -230,7 +230,7 @@ public class WSDLToIDLTest extends ToolTestBase {
         assertEquals("WSDLToIDL Failed", error, exc);
         StringBuilder strBuf = new StringBuilder();
         strBuf.append("Missing argument: wsdlurl\n\n");
-        strBuf.append(usageBuf.toString());
+        strBuf.append(usage);
         checkStrings(strBuf.toString().getBytes(), bout.toByteArray());
     }
     
@@ -240,7 +240,7 @@ public class WSDLToIDLTest extends ToolTestBase {
         assertEquals("WSDLToIDL Failed", error, exc);
         StringBuilder expected = new StringBuilder();
         expected.append("Missing argument: wsdlurl\n\n");
-        expected.append(usageBuf.toString());
+        expected.append(usage);
         checkStrings(expected.toString().getBytes(), bout.toByteArray());
     }    
     
