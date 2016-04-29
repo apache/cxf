@@ -21,6 +21,8 @@ package org.apache.cxf.systest.jaxrs.reactive;
 
 import java.util.concurrent.Future;
 
+import javax.ws.rs.core.GenericType;
+
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -28,6 +30,7 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import edu.emory.mathcs.backport.java.util.Collections;
 import rx.Observable;
 
 public class JAXRSReactiveTest extends AbstractBusClientServerTestBase {
@@ -52,6 +55,18 @@ public class JAXRSReactiveTest extends AbstractBusClientServerTestBase {
         WebClient wc = WebClient.create(address);
         String text = wc.accept("text/plain").get(String.class);
         assertEquals("Hello, world!", text);
+    }
+    
+    @Test
+    public void testGetHelloWorldTextObservableSync() throws Exception {
+        String address = "http://localhost:" + PORT + "/reactive/text";
+        WebClient wc = WebClient.create(address, Collections.singletonList(
+            new ObservableReader<Object>()));
+        GenericType<Observable<String>> genericResponseType = 
+            new GenericType<Observable<String>>() {        
+            };
+        Observable<String> obs = wc.accept("text/plain").get(genericResponseType);
+        obs.subscribe(s -> assertResponse(s));
     }
     
     @Test

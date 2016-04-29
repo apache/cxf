@@ -35,7 +35,7 @@ import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import rx.Observable;
 
 public class ObservableWriter<T> implements MessageBodyWriter<Observable<T>> {
-
+    
     @Context
     private Providers providers;
     
@@ -80,4 +80,5 @@ public class ObservableWriter<T> implements MessageBodyWriter<Observable<T>> {
     private static void throwError(Throwable cause) {
         throw ExceptionUtils.toInternalServerErrorException(cause, null);
     }
+
 }
