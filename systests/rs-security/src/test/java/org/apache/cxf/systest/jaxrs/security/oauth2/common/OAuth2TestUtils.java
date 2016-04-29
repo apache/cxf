@@ -30,6 +30,7 @@ import javax.ws.rs.core.Response;
 
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.provider.json.JSONProvider;
+import org.apache.cxf.jaxrs.provider.json.JsonMapObjectProvider;
 import org.apache.cxf.rs.security.jose.jaxrs.JsonWebKeysProvider;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jws.JwsHeaders;
@@ -165,6 +166,7 @@ public final class OAuth2TestUtils {
         providers.add(jsonP);
         providers.add(new OAuthJSONProvider());
         providers.add(new JsonWebKeysProvider());
+        providers.add(new JsonMapObjectProvider());
         
         return providers;
     }
