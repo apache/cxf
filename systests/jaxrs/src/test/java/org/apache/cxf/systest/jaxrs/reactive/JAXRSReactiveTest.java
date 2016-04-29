@@ -19,12 +19,16 @@
 
 package org.apache.cxf.systest.jaxrs.reactive;
 
+import java.util.concurrent.Future;
+
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import rx.Observable;
 
 public class JAXRSReactiveTest extends AbstractBusClientServerTestBase {
     public static final String PORT = ReactiveServer.PORT;
@@ -49,6 +53,19 @@ public class JAXRSReactiveTest extends AbstractBusClientServerTestBase {
         String text = wc.accept("text/plain").get(String.class);
         assertEquals("Hello, world!", text);
     }
+    
+    @Test
+    public void testGetHelloWorldAsyncObservable() throws Exception {
+        String address = "http://localhost:" + PORT + "/reactive/textAsync";
+        WebClient wc = WebClient.create(address);
+        Observable<String> obs = 
+            getObservable(wc.accept("text/plain").async().get(String.class));
+        obs.subscribe(s -> assertResponse(s));
+    }
+    
+    private void assertResponse(String s) {
+        assertEquals("Hello, world!", s);
+    }
     @Test
     public void testGetHelloWorldJson() throws Exception {
         String address = "http://localhost:" + PORT + "/reactive/textJson";
@@ -58,4 +75,7 @@ public class JAXRSReactiveTest extends AbstractBusClientServerTestBase {
                    || "{\"greeting\":\"Hello\",\"audience\":\"World\"}".equals(text));
     }
     
+    private Observable<String> getObservable(Future<String> future) {
+        return Observable.from(future);
+    }
 }
