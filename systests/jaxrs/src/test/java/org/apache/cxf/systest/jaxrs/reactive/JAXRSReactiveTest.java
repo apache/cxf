@@ -42,6 +42,13 @@ public class JAXRSReactiveTest extends AbstractBusClientServerTestBase {
         String text = wc.accept("text/plain").get(String.class);
         assertEquals("Hello, world!", text);
     }
+    @Test
+    public void testGetHelloWorldAsyncText() throws Exception {
+        String address = "http://localhost:" + PORT + "/reactive/textAsync";
+        WebClient wc = WebClient.create(address);
+        String text = wc.accept("text/plain").get(String.class);
+        assertEquals("Hello, world!", text);
+    }
     
     
 }

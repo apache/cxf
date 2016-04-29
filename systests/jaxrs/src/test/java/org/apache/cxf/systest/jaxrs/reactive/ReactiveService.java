@@ -23,8 +23,11 @@ package org.apache.cxf.systest.jaxrs.reactive;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.container.Suspended;
 
 import rx.Observable;
+import rx.Subscriber;
 
 
 @Path("/reactive")
@@ -37,6 +40,39 @@ public class ReactiveService {
         return Observable.just("Hello, world!");
     }
     
+    @GET
+    @Produces("text/plain")
+    @Path("textAsync")
+    public void getTextAsync(@Suspended final AsyncResponse ar) {
+        Observable.just("Hello, ").map(s -> s + "world!")
+            .subscribe(new AsyncResponseSubscriber(ar));
+        
+    }
+    
+    private class AsyncResponseSubscriber extends Subscriber<String> {
+        
+        private StringBuilder sb = new StringBuilder();
+        private AsyncResponse ar;
+        
+        AsyncResponseSubscriber(AsyncResponse ar) {
+            this.ar = ar;
+        }
+        @Override
+        public void onCompleted() {
+            ar.resume(sb.toString());
+        }
+
+        @Override
+        public void onError(Throwable arg0) {
+            // TODO Auto-generated method stub
+        }
+
+        @Override
+        public void onNext(String s) {
+            sb.append(s);
+        }
+        
+    }
 }
 
 
