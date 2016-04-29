@@ -19,6 +19,10 @@
 
 package org.apache.cxf.systest.jaxrs.reactive;
 
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
@@ -31,8 +35,12 @@ public class ReactiveServer extends AbstractBusTestServerBase {
     }
     
     protected void run() {
+        Bus bus = BusFactory.getDefaultBus();
+        // Make sure default JSONProvider is not loaded
+        bus.setProperty("skip.default.json.provider.registration", true);
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
-        sf.setProvider(new ObservableWriter());
+        sf.setProvider(new ObservableWriter<Object>());
+        sf.setProvider(new JacksonJsonProvider());
         sf.setResourceClasses(ReactiveService.class);
         sf.setResourceProvider(ReactiveService.class,
                                new SingletonResourceProvider(new ReactiveService(), true));

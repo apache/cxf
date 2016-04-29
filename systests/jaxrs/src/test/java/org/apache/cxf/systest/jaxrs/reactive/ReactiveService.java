@@ -49,6 +49,13 @@ public class ReactiveService {
         
     }
     
+    @GET
+    @Produces("application/json")
+    @Path("textJson")
+    public Observable<HelloWorldBean> getJsonText() {
+        return Observable.just(new HelloWorldBean());
+    }
+    
     private class AsyncResponseSubscriber extends Subscriber<String> {
         
         private StringBuilder sb = new StringBuilder();

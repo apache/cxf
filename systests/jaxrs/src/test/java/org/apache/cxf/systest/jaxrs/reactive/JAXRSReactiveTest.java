@@ -49,6 +49,13 @@ public class JAXRSReactiveTest extends AbstractBusClientServerTestBase {
         String text = wc.accept("text/plain").get(String.class);
         assertEquals("Hello, world!", text);
     }
-    
+    @Test
+    public void testGetHelloWorldJson() throws Exception {
+        String address = "http://localhost:" + PORT + "/reactive/textJson";
+        WebClient wc = WebClient.create(address);
+        String text = wc.accept("application/json").get(String.class);
+        assertTrue("{\"audience\":\"World\",\"greeting\":\"Hello\"}".equals(text)
+                   || "{\"greeting\":\"Hello\",\"audience\":\"World\"}".equals(text));
+    }
     
 }

@@ -22,22 +22,25 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.nio.charset.StandardCharsets;
 
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
+import javax.ws.rs.ext.Providers;
 
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
-import org.apache.cxf.jaxrs.utils.HttpUtils;
 
 import rx.Observable;
 
-public class ObservableWriter implements MessageBodyWriter<Observable<String>> {
+public class ObservableWriter<T> implements MessageBodyWriter<Observable<T>> {
 
+    @Context
+    private Providers providers;
+    
     @Override
-    public long getSize(Observable<String> arg0, Class<?> arg1, Type arg2, Annotation[] arg3, MediaType arg4) {
+    public long getSize(Observable<T> arg0, Class<?> arg1, Type arg2, Annotation[] arg3, MediaType arg4) {
         // TODO Auto-generated method stub
         return -1;
     }
@@ -48,16 +51,26 @@ public class ObservableWriter implements MessageBodyWriter<Observable<String>> {
     }
 
     @Override
-    public void writeTo(Observable<String> obs, Class<?> cls, Type t, Annotation[] anns, MediaType mt,
+    public void writeTo(Observable<T> obs, Class<?> cls, Type t, Annotation[] anns, MediaType mt,
                         MultivaluedMap<String, Object> headers, OutputStream os)
                             throws IOException, WebApplicationException {
-        final String enc = HttpUtils.getSetEncoding(mt, headers, StandardCharsets.UTF_8.name());
-        obs.subscribe(s -> writeToOutputStream(s, os, enc));   
+        obs.subscribe(value -> writeToOutputStream(value, anns, mt, headers, os));   
     }
 
-    private static void writeToOutputStream(String s, OutputStream os, String enc) {
+    private void writeToOutputStream(T value,
+                                     Annotation[] anns,
+                                     MediaType mt,
+                                     MultivaluedMap<String, Object> headers, 
+                                     OutputStream os) {
+        @SuppressWarnings("unchecked")
+        MessageBodyWriter<T> writer = 
+            (MessageBodyWriter<T>)providers.getMessageBodyWriter(value.getClass(), value.getClass(), anns, mt);
+        if (writer == null) {
+            throw ExceptionUtils.toInternalServerErrorException(null, null);
+        }
+    
         try {
-            os.write(s.getBytes(enc));
+            writer.writeTo(value, value.getClass(), value.getClass(), anns, mt, headers, os);    
         } catch (IOException ex) {
             throw ExceptionUtils.toInternalServerErrorException(ex, null);
         }
