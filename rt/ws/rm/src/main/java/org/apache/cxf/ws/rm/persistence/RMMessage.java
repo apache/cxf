@@ -25,7 +25,9 @@ import java.util.List;
 public class RMMessage {
     
     private InputStream content;
+    //TODO remove attachments when we remove the deprecated attachments related methods
     private List<InputStream> attachments = Collections.emptyList();
+    private String contentType;
     private long messageNumber;
     private String to;
     
@@ -82,7 +84,9 @@ public class RMMessage {
     /**
      * Returns the list of attachments.
      * @return list (non-null)
+     * @deprecated not used as the optional attachments are stored in the content
      */
+    @Deprecated
     public List<InputStream> getAttachments() {
         return attachments;
     }
@@ -90,9 +94,28 @@ public class RMMessage {
     /**
      * Set the list of attachments.
      * @param attaches (non-null)
+     * @deprecated not used as the optional attachments are stored in the content
      */
+    @Deprecated
     public void setAttachments(List<InputStream> attaches) {
         assert attaches != null;
         attachments = attaches;
     }
+
+    /**
+     * Returns the content type of the message content
+     * @return
+     */
+    public String getContentType() {
+        return contentType;
+    }
+
+    /**
+     * Set the content type of the RMMessage
+     * @param contentType
+     */
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
+    }
+
 }
