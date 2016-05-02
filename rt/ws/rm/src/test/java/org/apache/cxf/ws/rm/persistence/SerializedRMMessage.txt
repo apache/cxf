@@ -1,0 +1,14 @@
+
+--uuid:74b6a245-2e17-40eb-a86c-308664e18460
+Content-Type: text/xml; charset=UTF-8
+Content-Transfer-Encoding: binary
+Content-ID: <root.message@cxf.apache.org>
+
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Header><Action xmlns="http://schemas.xmlsoap.org/ws/2004/08/addressing">http://cxf.apache.org/hello_world_soap_http/Greeter/greetMeOneWayRequest</Action><MessageID xmlns="http://schemas.xmlsoap.org/ws/2004/08/addressing">urn:uuid:9a29d476-d1c6-4cc2-b8cf-76de0cf1d4c7</MessageID><To xmlns="http://schemas.xmlsoap.org/ws/2004/08/addressing">http://localhost:8999/SoapContext/GreeterPort</To></soap:Header><soap:Body><greetMeOneWay xmlns="http://cxf.apache.org/hello_world_soap_http/types"><requestType>Chris</requestType></greetMeOneWay></soap:Body></soap:Envelope>
+--uuid:74b6a245-2e17-40eb-a86c-308664e18460
+Content-Type: text/plain
+Content-Transfer-Encoding: binary
+Content-ID: <test.xml>
+
+Hello World!
+--uuid:74b6a245-2e17-40eb-a86c-308664e18460--

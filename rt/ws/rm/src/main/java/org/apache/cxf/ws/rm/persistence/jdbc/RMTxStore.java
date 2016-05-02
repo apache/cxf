@@ -88,22 +88,13 @@ public class RMTxStore implements RMStore {
         = {{"SEQ_ID", "VARCHAR(256) NOT NULL"},
            {"MSG_NO", "DECIMAL(19, 0) NOT NULL"},
            {"SEND_TO", "VARCHAR(256)"},
-           {"CONTENT", "BLOB"}};
+           {"CONTENT", "BLOB"},
+           {"CONTENT_TYPE", "VARCHAR(1024)"}};
     private static final String[] MESSAGES_TABLE_KEYS = {"SEQ_ID", "MSG_NO"};
-    private static final String[][] ATTACHMENTS_TABLE_COLS
-        = {{"SEQ_ID", "VARCHAR(256) NOT NULL"},
-           {"MSG_NO", "DECIMAL(19, 0) NOT NULL"},
-           {"ATTACHMENT_NO", "DECIMAL(19, 0) NOT NULL"},
-           {"DATA", "BLOB"}};
-    private static final String[] ATTACHMENTS_TABLE_KEYS = {"SEQ_ID", "MSG_NO", "ATTACHMENT_NO"};
-
     private static final String DEST_SEQUENCES_TABLE_NAME = "CXF_RM_DEST_SEQUENCES"; 
     private static final String SRC_SEQUENCES_TABLE_NAME = "CXF_RM_SRC_SEQUENCES";
     private static final String INBOUND_MSGS_TABLE_NAME = "CXF_RM_INBOUND_MESSAGES";
     private static final String OUTBOUND_MSGS_TABLE_NAME = "CXF_RM_OUTBOUND_MESSAGES";    
-    private static final String INBOUND_ATTS_TABLE_NAME = "CXF_RM_INBOUND_ATTACHMENTS";
-    private static final String OUTBOUND_ATTS_TABLE_NAME = "CXF_RM_OUTBOUND_ATTACHMENTS";    
-    
     private static final String CREATE_DEST_SEQUENCES_TABLE_STMT = 
         buildCreateTableStatement(DEST_SEQUENCES_TABLE_NAME, 
                                   DEST_SEQUENCES_TABLE_COLS, DEST_SEQUENCES_TABLE_KEYS);
@@ -113,9 +104,6 @@ public class RMTxStore implements RMStore {
                                   SRC_SEQUENCES_TABLE_COLS, SRC_SEQUENCES_TABLE_KEYS);
     private static final String CREATE_MESSAGES_TABLE_STMT =
         buildCreateTableStatement("{0}", MESSAGES_TABLE_COLS, MESSAGES_TABLE_KEYS);
-    private static final String CREATE_ATTACHMENTS_TABLE_STMT =
-        buildCreateTableStatement("{0}", ATTACHMENTS_TABLE_COLS, ATTACHMENTS_TABLE_KEYS);
-
     private static final String CREATE_DEST_SEQUENCE_STMT_STR 
         = "INSERT INTO CXF_RM_DEST_SEQUENCES "
             + "(SEQ_ID, ACKS_TO, ENDPOINT_ID, PROTOCOL_VERSION) " 
@@ -133,12 +121,8 @@ public class RMTxStore implements RMStore {
     private static final String UPDATE_SRC_SEQUENCE_STMT_STR =
         "UPDATE CXF_RM_SRC_SEQUENCES SET CUR_MSG_NO = ?, LAST_MSG = ? WHERE SEQ_ID = ?";
     private static final String CREATE_MESSAGE_STMT_STR 
-        = "INSERT INTO {0} (SEQ_ID, MSG_NO, SEND_TO, CONTENT) VALUES(?, ?, ?, ?)";
+        = "INSERT INTO {0} (SEQ_ID, MSG_NO, SEND_TO, CONTENT, CONTENT_TYPE) VALUES(?, ?, ?, ?, ?)";
     private static final String DELETE_MESSAGE_STMT_STR =
-        "DELETE FROM {0} WHERE SEQ_ID = ? AND MSG_NO = ?";
-    private static final String CREATE_ATTACHMENT_STMT_STR 
-        = "INSERT INTO {0} (SEQ_ID, MSG_NO, ATTACHMENT_NO, DATA) VALUES(?, ?, ?, ?)";
-    private static final String DELETE_ATTACHMENTS_STMT_STR =
         "DELETE FROM {0} WHERE SEQ_ID = ? AND MSG_NO = ?";
     private static final String SELECT_DEST_SEQUENCE_STMT_STR =
         "SELECT ACKS_TO, LAST_MSG_NO, PROTOCOL_VERSION, ACKNOWLEDGED FROM CXF_RM_DEST_SEQUENCES "
@@ -153,9 +137,7 @@ public class RMTxStore implements RMStore {
         "SELECT SEQ_ID, CUR_MSG_NO, LAST_MSG, EXPIRY, OFFERING_SEQ_ID, PROTOCOL_VERSION "
         + "FROM CXF_RM_SRC_SEQUENCES WHERE ENDPOINT_ID = ?";
     private static final String SELECT_MESSAGES_STMT_STR =
-        "SELECT MSG_NO, SEND_TO, CONTENT FROM {0} WHERE SEQ_ID = ?";
-    private static final String SELECT_ATTACHMENTS_STMT_STR =
-        "SELECT ATTACHMENT_NO, DATA FROM {0} WHERE SEQ_ID = ? AND MSG_NO = ?";
+        "SELECT MSG_NO, SEND_TO, CONTENT, CONTENT_TYPE FROM {0} WHERE SEQ_ID = ?";
     private static final String ALTER_TABLE_STMT_STR =
         "ALTER TABLE {0} ADD {1} {2}";
     private static final String CREATE_INBOUND_MESSAGE_STMT_STR = 
@@ -170,19 +152,6 @@ public class RMTxStore implements RMStore {
         MessageFormat.format(SELECT_MESSAGES_STMT_STR, INBOUND_MSGS_TABLE_NAME);
     private static final String SELECT_OUTBOUND_MESSAGES_STMT_STR =
         MessageFormat.format(SELECT_MESSAGES_STMT_STR, OUTBOUND_MSGS_TABLE_NAME);
-    private static final String CREATE_INBOUND_ATTACHMENT_STMT_STR = 
-        MessageFormat.format(CREATE_ATTACHMENT_STMT_STR, INBOUND_ATTS_TABLE_NAME);
-    private static final String CREATE_OUTBOUND_ATTACHMENT_STMT_STR = 
-        MessageFormat.format(CREATE_ATTACHMENT_STMT_STR, OUTBOUND_ATTS_TABLE_NAME);
-    private static final String DELETE_INBOUND_ATTACHMENTS_STMT_STR =
-        MessageFormat.format(DELETE_ATTACHMENTS_STMT_STR, INBOUND_ATTS_TABLE_NAME);
-    private static final String DELETE_OUTBOUND_ATTACHMENTS_STMT_STR =
-        MessageFormat.format(DELETE_ATTACHMENTS_STMT_STR, OUTBOUND_ATTS_TABLE_NAME);
-    private static final String SELECT_INBOUND_ATTACHMENTS_STMT_STR =
-        MessageFormat.format(SELECT_ATTACHMENTS_STMT_STR, INBOUND_ATTS_TABLE_NAME);
-    private static final String SELECT_OUTBOUND_ATTACHMENTS_STMT_STR =
-        MessageFormat.format(SELECT_ATTACHMENTS_STMT_STR, OUTBOUND_ATTS_TABLE_NAME);
-    
     // create_schema may not work for several reasons, if so, create one manually
     private static final String CREATE_SCHEMA_STMT_STR = "CREATE SCHEMA {0}";
     // given the schema, try these standard statements to switch to the schema
@@ -613,44 +582,33 @@ public class RMTxStore implements RMStore {
     
     public Collection<RMMessage> getMessages(Identifier sid, boolean outbound) {
         Connection con = verifyConnection();
-        PreparedStatement stmt1 = null;
-        PreparedStatement stmt2 = null;
+        PreparedStatement stmt = null;
         SQLException conex = null;
         Collection<RMMessage> msgs = new ArrayList<RMMessage>();
-        ResultSet res1 = null;
-        ResultSet res2 = null;
+        ResultSet res = null;
         try {
-            stmt1 = getStatement(con, outbound ? SELECT_OUTBOUND_MESSAGES_STMT_STR : SELECT_INBOUND_MESSAGES_STMT_STR);
+            stmt = getStatement(con, outbound ? SELECT_OUTBOUND_MESSAGES_STMT_STR : SELECT_INBOUND_MESSAGES_STMT_STR);
 
-            stmt1.setString(1, sid.getValue());
-            res1 = stmt1.executeQuery();
-            while (res1.next()) {
-                long mn = res1.getLong(1);
-                String to = res1.getString(2);
-                Blob blob = res1.getBlob(3);
+            stmt.setString(1, sid.getValue());
+            res = stmt.executeQuery();
+            while (res.next()) {
+                long mn = res.getLong(1);
+                String to = res.getString(2);
+                Blob blob = res.getBlob(3);
+                String contentType = res.getString(4);
                 RMMessage msg = new RMMessage();
                 msg.setMessageNumber(mn);
                 msg.setTo(to);
                 msg.setContent(blob.getBinaryStream());
+                msg.setContentType(contentType);
                 msgs.add(msg);
-                stmt2 = getStatement(con, outbound
-                     ? SELECT_OUTBOUND_ATTACHMENTS_STMT_STR : SELECT_INBOUND_ATTACHMENTS_STMT_STR);
-                stmt2.setString(1, sid.getValue());
-                stmt2.setLong(2, mn);
-                res2 = stmt2.executeQuery();
-                List<InputStream> attaches = new ArrayList<InputStream>();
-                while (res2.next()) {
-                    attaches.add(res2.getBinaryStream(1));
-                }
-                msg.setAttachments(attaches);
             }
         } catch (SQLException ex) {
             conex = ex;
             LOG.log(Level.WARNING, new Message(outbound ? "SELECT_OUTBOUND_MSGS_FAILED_MSG"
                 : "SELECT_INBOUND_MSGS_FAILED_MSG", LOG).toString(), ex);
         } finally {
-            releaseResources(stmt2, res2);
-            releaseResources(stmt1, res1);
+            releaseResources(stmt, res);
             updateConnectionState(con, conex);
         }
         return msgs;
@@ -709,24 +667,17 @@ public class RMTxStore implements RMStore {
     
     public void removeMessages(Identifier sid, Collection<Long> messageNrs, boolean outbound) {
         Connection con = verifyConnection();
-        PreparedStatement stmt1 = null;
-        PreparedStatement stmt2 = null;
+        PreparedStatement stmt = null;
         SQLException conex = null;
         try {
-            stmt1 = getStatement(con, outbound ? DELETE_OUTBOUND_MESSAGE_STMT_STR : DELETE_INBOUND_MESSAGE_STMT_STR);
-            stmt2 = getStatement(con, outbound
-                ? DELETE_OUTBOUND_ATTACHMENTS_STMT_STR : DELETE_INBOUND_ATTACHMENTS_STMT_STR);
-
+            stmt = getStatement(con, outbound ? DELETE_OUTBOUND_MESSAGE_STMT_STR : DELETE_INBOUND_MESSAGE_STMT_STR);
             beginTransaction();
 
-            stmt1.setString(1, sid.getValue());
-            stmt2.setString(1, sid.getValue());
-                        
+            stmt.setString(1, sid.getValue());
+
             for (Long messageNr : messageNrs) {
-                stmt2.setLong(2, messageNr);
-                stmt2.execute();
-                stmt1.setLong(2, messageNr);
-                stmt1.execute();
+                stmt.setLong(2, messageNr);
+                stmt.execute();
             }
             
             commit(con);
@@ -736,8 +687,7 @@ public class RMTxStore implements RMStore {
             abort(con);
             throw new RMStoreException(ex);
         } finally {
-            releaseResources(stmt2, null);
-            releaseResources(stmt1, null);
+            releaseResources(stmt, null);
             updateConnectionState(con, conex);
         }
     }
@@ -779,47 +729,28 @@ public class RMTxStore implements RMStore {
         String id = sid.getValue();
         long nr = msg.getMessageNumber();
         String to = msg.getTo();
+        String contentType = msg.getContentType();
         if (LOG.isLoggable(Level.FINE)) {
             LOG.log(Level.FINE, "Storing {0} message number {1} for sequence {2}, to = {3}",
                     new Object[] {outbound ? "outbound" : "inbound", nr, id, to});
         }
-        PreparedStatement stmt1 = null;
-        PreparedStatement stmt2 = null;
+        PreparedStatement stmt = null;
         try {
             InputStream msgin = msg.getContent();
-            stmt1 = getStatement(con, outbound ? CREATE_OUTBOUND_MESSAGE_STMT_STR : CREATE_INBOUND_MESSAGE_STMT_STR);
+            stmt = getStatement(con, outbound ? CREATE_OUTBOUND_MESSAGE_STMT_STR : CREATE_INBOUND_MESSAGE_STMT_STR);
 
-            stmt1.setString(1, id);  
-            stmt1.setLong(2, nr);
-            stmt1.setString(3, to); 
-            stmt1.setBinaryStream(4, msgin);
-            stmt1.execute();
-            
-            List<InputStream> attachments = msg.getAttachments();
-            if (attachments.size() > 0) {
-                stmt2 = getStatement(con, outbound
-                     ? CREATE_OUTBOUND_ATTACHMENT_STMT_STR : CREATE_INBOUND_ATTACHMENT_STMT_STR);
-                stmt2.setString(1, id);
-                stmt2.setLong(2, nr);
-                for (int i = 0; i < attachments.size(); i++) {
-                    stmt2.setLong(3, i);
-                    stmt2.setBinaryStream(4, attachments.get(i));
-                    stmt2.execute();
-                    if (LOG.isLoggable(Level.FINE)) {
-                        LOG.log(Level.FINE,
-                            "Successfully stored {0} attachment {1} for message number {2} in sequence {3}",
-                            new Object[] {outbound ? "outbound" : "inbound", i, nr, id});
-                    }
-                }
-            }
-            
+            stmt.setString(1, id);
+            stmt.setLong(2, nr);
+            stmt.setString(3, to);
+            stmt.setBinaryStream(4, msgin);
+            stmt.setString(5, contentType);
+            stmt.execute();
             if (LOG.isLoggable(Level.FINE)) {
                 LOG.log(Level.FINE, "Successfully stored {0} message number {1} for sequence {2}",
                         new Object[] {outbound ? "outbound" : "inbound", nr, id});
             }
         } finally  {
-            releaseResources(stmt1, null);
-            releaseResources(stmt2, null);
+            releaseResources(stmt, null);
         }
     }
     
@@ -925,24 +856,6 @@ public class RMTxStore implements RMStore {
                             LOG.fine("Table " + tableName + " already exists.");
                         }
                         verifyTable(con, tableName, MESSAGES_TABLE_COLS);
-                    }
-                } finally {
-                    stmt.close();
-                }
-            }
-
-            for (String tableName : new String[] {OUTBOUND_ATTS_TABLE_NAME, INBOUND_ATTS_TABLE_NAME}) {
-                stmt = con.createStatement();
-                try {
-                    stmt.executeUpdate(MessageFormat.format(CREATE_ATTACHMENTS_TABLE_STMT, tableName));
-                } catch (SQLException ex) {
-                    if (!isTableExistsError(ex)) {
-                        throw ex;
-                    } else {
-                        if (LOG.isLoggable(Level.FINE)) {
-                            LOG.fine("Table " + tableName + " already exists.");
-                        }
-                        verifyTable(con, tableName, ATTACHMENTS_TABLE_COLS);
                     }
                 } finally {
                     stmt.close();
@@ -1137,12 +1050,6 @@ public class RMTxStore implements RMStore {
         cacheStatement(connection, DELETE_OUTBOUND_MESSAGE_STMT_STR);
         cacheStatement(connection, SELECT_INBOUND_MESSAGES_STMT_STR);
         cacheStatement(connection, SELECT_OUTBOUND_MESSAGES_STMT_STR);
-        cacheStatement(connection, CREATE_INBOUND_ATTACHMENT_STMT_STR);
-        cacheStatement(connection, CREATE_OUTBOUND_ATTACHMENT_STMT_STR);
-        cacheStatement(connection, DELETE_INBOUND_ATTACHMENTS_STMT_STR);
-        cacheStatement(connection, DELETE_OUTBOUND_ATTACHMENTS_STMT_STR);
-        cacheStatement(connection, SELECT_INBOUND_ATTACHMENTS_STMT_STR);
-        cacheStatement(connection, SELECT_OUTBOUND_ATTACHMENTS_STMT_STR);
     }
 
     public synchronized void init() {
