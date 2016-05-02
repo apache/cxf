@@ -20,6 +20,7 @@
 package org.apache.cxf.ws.rm;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -69,7 +70,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class RMManagerTest extends Assert {
-    
+
+    private static final String MULTIPART_TYPE = "multipart/related; type=\"text/xml\";"
+        + " boundary=\"uuid:74b6a245-2e17-40eb-a86c-308664e18460\"; start=\"<root."
+        + "message@cxf.apache.org>\"; start-info=\"application/soap+xml\"";
     private MyControl control;
     private RMManager manager;
     
@@ -541,6 +545,117 @@ public class RMManagerTest extends Assert {
         assertNotNull(msg.getExchange());
         assertSame(msg, msg.getExchange().getOutMessage());
     }
+ 
+    @Test
+    public void testRecoverReliableClientEndpointWithAttachment() throws NoSuchMethodException, IOException {
+        Method method = RMManager.class.getDeclaredMethod("createReliableEndpoint", 
+            new Class[] {Endpoint.class});
+        manager = control.createMock(RMManager.class, new Method[] {method});
+        manager.setReliableEndpointsMap(new HashMap<Endpoint, RMEndpoint>());
+        Endpoint endpoint = control.createMock(Endpoint.class);
+        EndpointInfo ei = control.createMock(EndpointInfo.class);
+        ServiceInfo si = control.createMock(ServiceInfo.class);  
+        BindingInfo bi = control.createMock(BindingInfo.class);
+        InterfaceInfo ii = control.createMock(InterfaceInfo.class);
+        setUpEndpointForRecovery(endpoint, ei, si, bi, ii);          
+        Conduit conduit = control.createMock(Conduit.class);        
+        SourceSequence ss = control.createMock(SourceSequence.class);
+        DestinationSequence ds = control.createMock(DestinationSequence.class);
+        RMMessage m1 = new RMMessage();
+        InputStream fis = getClass().getResourceAsStream("persistence/SerializedRMMessage.txt");
+        m1.setContent(fis);
+        m1.setTo("toAddress");
+        m1.setMessageNumber(new Long(10));
+        m1.setContentType(MULTIPART_TYPE);
+        Capture<Message> mc = Capture.newInstance();
+        
+        setUpRecoverReliableEndpointWithAttachment(endpoint, conduit, ss, ds, m1, mc);        
+        control.replay();
+        manager.recoverReliableEndpoint(endpoint, conduit);
+        control.verify();
+        
+        Message msg = mc.getValue();
+        assertNotNull(msg);
+        assertNotNull(msg.getExchange());
+        assertSame(msg, msg.getExchange().getOutMessage());
+
+        InputStream is = (InputStream) msg.get(RMMessageConstants.SAVED_CONTENT);
+        assertStartsWith(is, "<soap:Envelope");
+        assertEquals(1, msg.getAttachments().size());
+    }
+    
+    void setUpRecoverReliableEndpointWithAttachment(Endpoint endpoint,
+                                      Conduit conduit, 
+                                      SourceSequence ss, 
+                                      DestinationSequence ds, RMMessage m,
+                                      Capture<Message> mc)
+                                          throws IOException  {                
+        RMStore store = control.createMock(RMStore.class);
+        RetransmissionQueue queue = control.createMock(RetransmissionQueue.class);
+        manager.setStore(store);
+        manager.setRetransmissionQueue(queue);
+        
+        Collection<SourceSequence> sss = new ArrayList<SourceSequence>();
+        if (null != ss) {
+            sss.add(ss);            
+        }
+        EasyMock.expect(store.getSourceSequences("{S}s.{P}p@cxf"))
+            .andReturn(sss);
+        if (null == ss) {
+            return;
+        }         
+        
+        Collection<DestinationSequence> dss = new ArrayList<DestinationSequence>();
+        if (null != ds) {
+            dss.add(ds);            
+        }
+        EasyMock.expect(store.getDestinationSequences("{S}s.{P}p@cxf"))
+            .andReturn(dss);
+        if (null == ds) {
+            return;
+        }
+
+        Collection<RMMessage> ms = new ArrayList<RMMessage>();
+        if (null != m) {
+            ms.add(m);
+        }
+        Identifier id = new Identifier();
+        id.setValue("S1");
+        EasyMock.expect(ss.getIdentifier()).andReturn(id).times(null == m ? 1 : 2);
+        EasyMock.expect(ss.getProtocol()).andReturn(ProtocolVariation.RM10WSA200408).anyTimes();
+        EasyMock.expect(store.getMessages(id, true)).andReturn(ms);
+        
+        
+        RMEndpoint rme = control.createMock(RMEndpoint.class);
+        EasyMock.expect(manager.createReliableEndpoint(endpoint))
+            .andReturn(rme);
+        Source source = control.createMock(Source.class);
+        EasyMock.expect(rme.getSource()).andReturn(source).anyTimes();
+                
+        Destination destination = control.createMock(Destination.class);
+        EasyMock.expect(rme.getDestination()).andReturn(destination);
+        destination.addSequence(ds, false);
+        EasyMock.expectLastCall();
+        
+        Service service = control.createMock(Service.class);
+        EasyMock.expect(endpoint.getService()).andReturn(service).anyTimes();
+        Binding binding = control.createMock(Binding.class);
+        EasyMock.expect(endpoint.getBinding()).andReturn(binding).anyTimes();
+
+        EasyMock.expect(ss.isLastMessage()).andReturn(true).anyTimes();
+        EasyMock.expect(ss.getCurrentMessageNr()).andReturn(new Long(10)).anyTimes();
+        if (null == m) {
+            return;
+        }
+
+        queue.addUnacknowledged(EasyMock.capture(mc));
+        
+        EasyMock.expectLastCall();
+        queue.start();
+        EasyMock.expectLastCall();
+    }
+
+    
     
     Endpoint setUpEndpointForRecovery(Endpoint endpoint, 
                                       EndpointInfo ei, 
@@ -552,6 +667,7 @@ public class RMManagerTest extends Assert {
         EasyMock.expect(si.getName()).andReturn(new QName("S", "s")).anyTimes();
         EasyMock.expect(ei.getName()).andReturn(new QName("P", "p")).anyTimes();
         EasyMock.expect(si.getInterface()).andReturn(ii).anyTimes();
+        EasyMock.expect(ei.getBinding()).andReturn(bi).anyTimes();
         return endpoint;
     }
     
@@ -681,6 +797,25 @@ public class RMManagerTest extends Assert {
             return mock;
         }
         
-         
+
     }
-} 
+    // just read the begining of the input and compare it against the specified string
+    private static boolean assertStartsWith(InputStream in, String starting) {
+        assertNotNull(in);
+        byte[] buf = new byte[starting.length()];
+        try {
+            in.read(buf, 0, buf.length);
+            assertEquals(starting, new String(buf, "utf-8"));
+            return true;
+        } catch (IOException e) {
+            // ignore
+        } finally {
+            try {
+                in.close();
+            } catch (IOException e) {
+                // ignore
+            }
+        }
+        return false;
+    }
+}

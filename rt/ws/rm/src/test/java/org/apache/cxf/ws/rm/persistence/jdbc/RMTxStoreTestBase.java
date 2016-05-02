@@ -224,9 +224,7 @@ public abstract class RMTxStoreTestBase extends Assert {
         byte[] bytes = new byte[89];
         EasyMock.expect(msg1.getContent()).andReturn(new ByteArrayInputStream(bytes)).anyTimes();
         EasyMock.expect(msg2.getContent()).andReturn(new ByteArrayInputStream(bytes)).anyTimes();
-        EasyMock.expect(msg1.getAttachments()).andReturn(new ArrayList<InputStream>()).anyTimes();
-        EasyMock.expect(msg2.getAttachments()).andReturn(new ArrayList<InputStream>()).anyTimes();
-        
+        EasyMock.expect(msg1.getContentType()).andReturn("text/xml").times(1);
         control.replay();
 
         Connection con = getConnection();
@@ -264,9 +262,7 @@ public abstract class RMTxStoreTestBase extends Assert {
         EasyMock.expect(msg2.getMessageNumber()).andReturn(TEN).anyTimes(); 
         EasyMock.expect(msg1.getContent()).andReturn(new ByteArrayInputStream(bytes)).anyTimes(); 
         EasyMock.expect(msg2.getContent()).andReturn(new ByteArrayInputStream(bytes)).anyTimes(); 
-        EasyMock.expect(msg1.getAttachments()).andReturn(new ArrayList<InputStream>()).anyTimes();
-        EasyMock.expect(msg2.getAttachments()).andReturn(new ArrayList<InputStream>()).anyTimes();
-        
+
         control.replay();
         con = getConnection();
         try {
@@ -863,7 +859,8 @@ public abstract class RMTxStoreTestBase extends Assert {
         RMMessage msg = control.createMock(RMMessage.class);
         EasyMock.expect(msg.getMessageNumber()).andReturn(mn).anyTimes();
         EasyMock.expect(msg.getTo()).andReturn(to).anyTimes();
-        EasyMock.expect(msg.getAttachments()).andReturn(new ArrayList<InputStream>()).anyTimes();
+
+        EasyMock.expect(msg.getContentType()).andReturn("text/xml").anyTimes();
         byte[] value = ("Message " + mn.longValue()).getBytes();
         EasyMock.expect(msg.getContent()).andReturn(new ByteArrayInputStream(value)).anyTimes();
         return msg;

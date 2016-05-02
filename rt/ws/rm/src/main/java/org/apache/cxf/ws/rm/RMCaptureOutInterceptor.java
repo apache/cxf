@@ -54,6 +54,7 @@ import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.ContextUtils;
+import org.apache.cxf.ws.rm.persistence.PersistenceUtils;
 import org.apache.cxf.ws.rm.persistence.RMMessage;
 import org.apache.cxf.ws.rm.persistence.RMStore;
 import org.apache.cxf.ws.rm.v200702.Identifier;
@@ -272,7 +273,9 @@ public class RMCaptureOutInterceptor extends AbstractRMInterceptor<Message>  {
                             msg.setTo(maps.getTo().getValue());
                         }
                     }
-                    msg.setContent(bis);
+                    // serializes the message content and the attachments into
+                    // the RMMessage content
+                    PersistenceUtils.encodeRMContent(msg, message, bis);
                     store.persistOutgoing(ss, msg);
                 }
                     

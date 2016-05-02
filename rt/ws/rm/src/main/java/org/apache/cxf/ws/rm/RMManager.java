@@ -69,6 +69,7 @@ import org.apache.cxf.ws.rm.manager.DestinationPolicyType;
 import org.apache.cxf.ws.rm.manager.RM10AddressingNamespaceType;
 import org.apache.cxf.ws.rm.manager.SequenceTerminationPolicyType;
 import org.apache.cxf.ws.rm.manager.SourcePolicyType;
+import org.apache.cxf.ws.rm.persistence.PersistenceUtils;
 import org.apache.cxf.ws.rm.persistence.RMMessage;
 import org.apache.cxf.ws.rm.persistence.RMStore;
 import org.apache.cxf.ws.rm.policy.RMPolicyUtilities;
@@ -618,7 +619,10 @@ public class RMManager {
             }
                                     
             try {
-                message.put(RMMessageConstants.SAVED_CONTENT, RewindableInputStream.makeRewindable(m.getContent()));
+                // RMMessage is stored in a serialized way, therefore
+                // RMMessage content must be splitted into soap root message
+                // and attachments
+                PersistenceUtils.decodeRMContent(m, message);
                 RMContextUtils.setProtocolVariation(message, ss.getProtocol());
                 retransmissionQueue.addUnacknowledged(message);
             } catch (IOException e) {
