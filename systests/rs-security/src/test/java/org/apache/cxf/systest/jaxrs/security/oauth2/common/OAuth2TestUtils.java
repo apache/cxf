@@ -246,6 +246,9 @@ public final class OAuth2TestUtils {
     }
     
     public static String getSubstring(String parentString, String substringName) {
+        if (!parentString.contains(substringName)) {
+            return null;
+        }
         String foundString = 
             parentString.substring(parentString.indexOf(substringName + "=") + (substringName + "=").length());
         int ampersandIndex = foundString.indexOf('&');
