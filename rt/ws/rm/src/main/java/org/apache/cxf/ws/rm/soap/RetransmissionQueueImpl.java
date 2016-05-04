@@ -19,6 +19,9 @@
 
 package org.apache.cxf.ws.rm.soap;
 
+import java.io.Closeable;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -57,6 +60,7 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.Interceptor;
+import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.io.CachedOutputStreamCallback;
 import org.apache.cxf.io.WriteOnCloseOutputStream;
 import org.apache.cxf.message.Message;
@@ -91,7 +95,6 @@ import org.apache.cxf.ws.rm.RMProperties;
 import org.apache.cxf.ws.rm.RMUtils;
 import org.apache.cxf.ws.rm.RetransmissionQueue;
 import org.apache.cxf.ws.rm.RetryStatus;
-import org.apache.cxf.ws.rm.RewindableInputStream;
 import org.apache.cxf.ws.rm.SourceSequence;
 import org.apache.cxf.ws.rm.manager.RetryPolicyType;
 import org.apache.cxf.ws.rm.persistence.RMStore;
@@ -585,10 +588,24 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
         }
 
         private void releaseSavedMessage() {
-            RewindableInputStream is = (RewindableInputStream)message.get(RMMessageConstants.SAVED_CONTENT);
-            if (is != null) {
-                is.release();
+            CachedOutputStream cos = (CachedOutputStream)message.get(RMMessageConstants.SAVED_CONTENT);
+            if (cos != null) {
+                cos.releaseTempFileHold();
+                try {
+                    cos.close();
+                } catch (IOException e) {
+                    // ignore
+                }
             }
+            // REVISIT -- When reference holder is not needed anymore, code can be removed.
+            Closeable closeable = (Closeable)message.get(RMMessageConstants.ATTACHMENTS_CLOSEABLE);
+            if (closeable != null) {
+                try {
+                    closeable.close();
+                } catch (IOException e) {
+                    // ignore
+                }
+            }           
         }
 
         /**
@@ -760,8 +777,9 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
             }
             
             // read SOAP headers from saved input stream
-            RewindableInputStream is = (RewindableInputStream)message.get(RMMessageConstants.SAVED_CONTENT);
-            is.rewind();
+            CachedOutputStream cos = (CachedOutputStream)message.get(RMMessageConstants.SAVED_CONTENT);
+            cos.holdTempFile(); // CachedOutputStream is hold until delivering was successful
+            InputStream is = cos.getInputStream(); // instance is needed to close input stream later on
             XMLStreamReader reader = StaxUtils.createXMLStreamReader(is, "UTF-8");
             message.getHeaders().clear();
             if (reader.getEventType() != XMLStreamConstants.START_ELEMENT
@@ -814,7 +832,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
                     retransmitChain.remove(incept);
                 }
             }
-            retransmitChain.add(new CopyOutInterceptor(reader));
+            retransmitChain.add(new CopyOutInterceptor(reader, is));
             
             // restore callbacks on output stream
             if (callbacks != null) {
@@ -921,10 +939,12 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
     
     public static class CopyOutInterceptor extends AbstractOutDatabindingInterceptor {
         private final XMLStreamReader reader;
+        private InputStream is;
         
-        public CopyOutInterceptor(XMLStreamReader rdr) {
+        public CopyOutInterceptor(XMLStreamReader rdr, InputStream is) {
             super(Phase.MARSHAL);
             reader = rdr;
+            this.is = is;
         }
         
         @Override
@@ -932,6 +952,13 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
             try {
                 XMLStreamWriter writer = message.getContent(XMLStreamWriter.class);
                 StaxUtils.copy(reader, writer);
+                if (is != null) {
+                    try {
+                        is.close();
+                    } catch (IOException e) {
+                        // ignore
+                    }
+                }
             } catch (XMLStreamException e) {
                 throw new Fault("COULD_NOT_READ_XML_STREAM", LOG, e);
             }

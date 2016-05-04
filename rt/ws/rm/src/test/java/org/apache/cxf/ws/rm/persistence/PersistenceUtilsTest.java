@@ -29,9 +29,12 @@ import javax.activation.DataHandler;
 import javax.mail.util.ByteArrayDataSource;
 
 import org.apache.cxf.attachment.AttachmentImpl;
+import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.ws.rm.RMMessageConstants;
 import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
 import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement.AcknowledgementRange;
 
@@ -76,7 +79,7 @@ public class PersistenceUtilsTest extends Assert {
         // update rmmessage
         PersistenceUtils.encodeRMContent(rmmsg, messageImpl, bis);
 
-        assertStartsWith(rmmsg.getContent(), "<soap:");
+        assertStartsWith(rmmsg.getContent().getInputStream(), "<soap:");
         assertNotNull(rmmsg.getContentType());
         assertTrue(rmmsg.getContentType().startsWith("text/xml"));
     }
@@ -93,7 +96,7 @@ public class PersistenceUtilsTest extends Assert {
         // update rmmessage
         PersistenceUtils.encodeRMContent(rmmsg, messageImpl, bis);
 
-        assertStartsWith(rmmsg.getContent(), "--uuid:");
+        assertStartsWith(rmmsg.getContent().getInputStream(), "--uuid:");
         assertNotNull(rmmsg.getContentType());
         assertTrue(rmmsg.getContentType().startsWith("multipart/related"));
     }
@@ -112,21 +115,26 @@ public class PersistenceUtilsTest extends Assert {
         Message messageImplRestored = new MessageImpl();
         PersistenceUtils.decodeRMContent(rmmsg, messageImplRestored);
         assertEquals(1, messageImplRestored.getAttachments().size());
-
-        assertStartsWith(messageImplRestored.getContent(InputStream.class), SOAP_PART);
+        CachedOutputStream cos = (CachedOutputStream)messageImplRestored.get(RMMessageConstants.SAVED_CONTENT);
+        assertStartsWith(cos.getInputStream(), SOAP_PART);
     }
     
     @Test
     public void testDecodeRMContentWithAttachment() throws Exception {
         InputStream is = getClass().getResourceAsStream("SerializedRMMessage.txt");
+        CachedOutputStream cos = new CachedOutputStream();
+        IOUtils.copyAndCloseInput(is, cos);
+        cos.flush();
         RMMessage msg = new RMMessage();
-        msg.setContent(is);      
+        msg.setContent(cos);      
         msg.setContentType(MULTIPART_TYPE);
         Message messageImpl = new MessageImpl();
         PersistenceUtils.decodeRMContent(msg, messageImpl);
 
         assertEquals(1, messageImpl.getAttachments().size());
-        assertStartsWith(messageImpl.getContent(InputStream.class), "<soap:Envelope");
+        CachedOutputStream cos1 =  (CachedOutputStream)messageImpl
+            .get(RMMessageConstants.SAVED_CONTENT);
+        assertStartsWith(cos1.getInputStream(), "<soap:Envelope");
     }
 
     private static void addAttachment(Message msg) throws IOException {
@@ -137,7 +145,7 @@ public class PersistenceUtilsTest extends Assert {
         msg.setAttachments(attachments);
     }
 
-    // just read the begining of the input and compare it against the specified string
+    // just read the beginning of the input and compare it against the specified string
     private static boolean assertStartsWith(InputStream in, String starting) {
         assertNotNull(in);
         byte[] buf = new byte[starting.length()];
