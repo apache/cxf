@@ -59,9 +59,6 @@
         <jaxrs:dataBinding>
             <ref bean="sdoDatabinding"/>
         </jaxrs:dataBinding>
-        <jaxrs:providers>
-            <ref bean="jsonSdoBean"/>
-        </jaxrs:providers>
     </jaxrs:server>
     <jaxrs:server id="sdo2" address="/sdo2">
         <jaxrs:serviceBeans>
@@ -69,12 +66,6 @@
         </jaxrs:serviceBeans>
     </jaxrs:server>
     <bean id="sdoDatabinding" class="org.apache.cxf.sdo.SDODataBinding"/>
-    <bean id="jsonSdoBean" class="org.apache.cxf.jaxrs.provider.json.DataBindingJSONProvider">
-        <property name="dataBinding" ref="sdoDatabinding"/>
-        <property name="namespaceMap" ref="jsonNamespaceMap"/>
-    </bean>
-    <util:map id="jsonNamespaceMap" map-class="java.util.Hashtable">
-        <entry key="http://apache.org/structure/types" value="p0"/>
-    </util:map>
+    
 </beans>
 <!-- END SNIPPET: beans -->
