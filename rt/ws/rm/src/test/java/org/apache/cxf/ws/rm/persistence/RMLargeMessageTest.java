@@ -46,10 +46,6 @@ public class RMLargeMessageTest extends RMMessageTest {
         }
     }
     
-    @Test
-    public void testContentInputStream() throws Exception {
-        super.testContentInputStream();
-    }
     
     @Test
     public void testContentCachedOutputStream() throws Exception {

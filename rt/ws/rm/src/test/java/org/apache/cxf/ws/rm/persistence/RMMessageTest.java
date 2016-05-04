@@ -19,8 +19,6 @@
 
 package org.apache.cxf.ws.rm.persistence;
 
-import java.io.ByteArrayInputStream;
-
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
 
@@ -49,23 +47,13 @@ public class RMMessageTest extends Assert {
     }
     
     @Test
-    public void testContentInputStream() throws Exception {
-        RMMessage msg = new RMMessage();
-        msg.setContent(new ByteArrayInputStream(DATA));
-        
-        byte[] msgbytes = IOUtils.readBytesFromStream(msg.getContent());
-        
-        assertArrayEquals(DATA, msgbytes);
-    }
-    
-    @Test
     public void testContentCachedOutputStream() throws Exception {
         RMMessage msg = new RMMessage();
         CachedOutputStream co = new CachedOutputStream();
         co.write(DATA);
-        msg.setContent(co.getInputStream());
+        msg.setContent(co);
         
-        byte[] msgbytes = IOUtils.readBytesFromStream(msg.getContent());
+        byte[] msgbytes = IOUtils.readBytesFromStream(msg.getContent().getInputStream());
         
         assertArrayEquals(DATA, msgbytes);
         co.close();

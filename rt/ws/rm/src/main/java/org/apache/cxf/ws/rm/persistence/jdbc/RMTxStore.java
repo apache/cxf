@@ -51,6 +51,8 @@ import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.SystemPropertyAction;
+import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.rm.DestinationSequence;
 import org.apache.cxf.ws.rm.ProtocolVariation;
@@ -599,7 +601,10 @@ public class RMTxStore implements RMStore {
                 RMMessage msg = new RMMessage();
                 msg.setMessageNumber(mn);
                 msg.setTo(to);
-                msg.setContent(blob.getBinaryStream());
+                CachedOutputStream cos = new CachedOutputStream();
+                IOUtils.copyAndCloseInput(blob.getBinaryStream(), cos);
+                cos.flush();
+                msg.setContent(cos);
                 msg.setContentType(contentType);
                 msgs.add(msg);
             }
@@ -607,6 +612,9 @@ public class RMTxStore implements RMStore {
             conex = ex;
             LOG.log(Level.WARNING, new Message(outbound ? "SELECT_OUTBOUND_MSGS_FAILED_MSG"
                 : "SELECT_INBOUND_MSGS_FAILED_MSG", LOG).toString(), ex);
+        } catch (IOException e) {
+            abort(con);
+            throw new RMStoreException(e);
         } finally {
             releaseResources(stmt, res);
             updateConnectionState(con, conex);
@@ -735,8 +743,10 @@ public class RMTxStore implements RMStore {
                     new Object[] {outbound ? "outbound" : "inbound", nr, id, to});
         }
         PreparedStatement stmt = null;
+        CachedOutputStream cos = msg.getContent();
+        InputStream msgin = null;
         try {
-            InputStream msgin = msg.getContent();
+            msgin = cos.getInputStream();
             stmt = getStatement(con, outbound ? CREATE_OUTBOUND_MESSAGE_STMT_STR : CREATE_INBOUND_MESSAGE_STMT_STR);
 
             stmt.setString(1, id);
@@ -751,6 +761,10 @@ public class RMTxStore implements RMStore {
             }
         } finally  {
             releaseResources(stmt, null);
+            if (null != msgin) {
+                msgin.close();
+            }
+            cos.close(); // needed to clean-up tmp file folder
         }
     }
     

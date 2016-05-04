@@ -33,6 +33,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.continuations.Continuation;
 import org.apache.cxf.continuations.ContinuationProvider;
 import org.apache.cxf.continuations.SuspendedInvocationException;
+import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
@@ -167,9 +168,9 @@ public class DestinationSequence extends AbstractSequence {
             RMMessage msg = null;
             if (!MessageUtils.isTrue(message.getContextualProperty(Message.ROBUST_ONEWAY))) {
                 msg = new RMMessage();
-                RewindableInputStream in = (RewindableInputStream)message.get(RMMessageConstants.SAVED_CONTENT);
-                in.rewind();
-                msg.setContent(in);
+                CachedOutputStream cos = (CachedOutputStream)message.get(RMMessageConstants.SAVED_CONTENT);
+                msg.setContent(cos);
+                msg.setContentType((String) message.get(Message.CONTENT_TYPE));
                 msg.setMessageNumber(st.getMessageNumber());
             }
             store.persistIncoming(this, msg);

@@ -19,6 +19,7 @@
 
 package org.apache.cxf.ws.rm.persistence;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -38,7 +39,6 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.ws.rm.RMMessageConstants;
-import org.apache.cxf.ws.rm.RewindableInputStream;
 import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
 
 /**
@@ -105,13 +105,14 @@ public final class PersistenceUtils {
 
     public static void encodeRMContent(RMMessage rmmsg, Message msg, InputStream msgContent)
         throws IOException {
+        CachedOutputStream cos = new CachedOutputStream();
         if (msg.getAttachments() == null) {
             rmmsg.setContentType((String)msg.get(Message.CONTENT_TYPE));
-            rmmsg.setContent(msgContent);
+            IOUtils.copyAndCloseInput(msgContent, cos);
+            cos.flush();
+            rmmsg.setContent(cos);
         } else {
             MessageImpl msgImpl1 = new MessageImpl();
-            // using cached output stream to handle large files
-            CachedOutputStream cos = new CachedOutputStream();
             msgImpl1.setContent(OutputStream.class, cos);
             msgImpl1.setAttachments(msg.getAttachments());
             msgImpl1.put(Message.CONTENT_TYPE, (String) msg.get(Message.CONTENT_TYPE));
@@ -121,26 +122,49 @@ public final class PersistenceUtils {
             serializer.writeProlog();
             // write soap root message into cached output stream
             IOUtils.copyAndCloseInput(msgContent, cos);
+            cos.flush();
             serializer.writeAttachments();
             rmmsg.setContentType((String) msgImpl1.get(Message.CONTENT_TYPE));
-
-            //TODO will pass the cos instance to rmmessage in the future
-            rmmsg.setContent(cos.getInputStream());
+            rmmsg.setContent(cos);
         }
     }
 
     public static void decodeRMContent(RMMessage rmmsg, Message msg) throws IOException {
         String contentType = rmmsg.getContentType();
+        final CachedOutputStream cos = rmmsg.getContent();
         if ((null != contentType) && contentType.startsWith("multipart/related")) {
+            final InputStream is = cos.getInputStream();
             msg.put(Message.CONTENT_TYPE, contentType);
-            msg.setContent(InputStream.class, rmmsg.getContent());
+            msg.setContent(InputStream.class, is);
             AttachmentDeserializer ad = new AttachmentDeserializer(msg);
             ad.initializeAttachments();
+            // create new cos with soap envelope only
+            CachedOutputStream cosSoap = new CachedOutputStream();
+            IOUtils.copy(msg.getContent(InputStream.class), cosSoap);
+            cosSoap.flush();
+            msg.put(RMMessageConstants.SAVED_CONTENT, cosSoap);
+            // REVISIT -- At the moment references must be hold for retransmission
+            // and the final cleanup of the CachedOutputStream.  
+            msg.put(RMMessageConstants.ATTACHMENTS_CLOSEABLE, new Closeable() {
+
+                @Override
+                public void close() throws IOException {
+                    try {
+                        is.close();
+                    } catch (IOException e) {
+                        // Ignore
+                    }
+                    try {
+                        cos.close();
+                    } catch (IOException e) {
+                        // Ignore
+                    }                   
+                }
+                
+            });
         } else {
-            msg.setContent(InputStream.class, rmmsg.getContent());
+            msg.put(RMMessageConstants.SAVED_CONTENT, cos);
         }
-        InputStream is = RewindableInputStream.makeRewindable(msg.getContent(InputStream.class));
-        msg.setContent(InputStream.class, is);
-        msg.put(RMMessageConstants.SAVED_CONTENT, is);
     }
+
 }

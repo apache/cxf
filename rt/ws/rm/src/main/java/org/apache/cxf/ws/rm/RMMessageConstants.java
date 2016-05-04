@@ -36,8 +36,12 @@ public final class RMMessageConstants {
     
     public static final String ORIGINAL_REQUESTOR_ROLE = "org.apache.cxf.client.original";
     
-    /** Message content (must be an instance of {@link RewindableInputStream}. */
+    /** Message content must be an instance of {@link CachedOutputStream}. */
     public static final String SAVED_CONTENT = "org.apache.cxf.ws.rm.content";
+
+    /** Variable holds reference to source streams of the attachments.
+     * It must be an instance of {@link Closeable}. */
+    public static final String ATTACHMENTS_CLOSEABLE = "org.apache.cxf.ws.rm.attachment.closeable";
     
     /** Retransmission in progress flag (Boolean.TRUE if in progress). */
     public static final String RM_RETRANSMISSION = "org.apache.cxf.ws.rm.retransmitting";
