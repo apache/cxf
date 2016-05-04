@@ -22,9 +22,11 @@ import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.cxf.io.CachedOutputStream;
+
 public class RMMessage {
     
-    private InputStream content;
+    private CachedOutputStream content;
     //TODO remove attachments when we remove the deprecated attachments related methods
     private List<InputStream> attachments = Collections.emptyList();
     private String contentType;
@@ -48,11 +50,11 @@ public class RMMessage {
     }
     
     /**
-     * Sets the message content using the input stream.
+     * Sets the message content using the CachedOutputStream.class.
      * @param in
      */
-    public void setContent(InputStream in) {
-        content = in;
+    public void setContent(CachedOutputStream cos) {
+        content = cos;
     }
     
     /**
@@ -73,11 +75,11 @@ public class RMMessage {
     }
 
     /**
-     * Returns the input stream of this message content.
+     * Returns the CachedOutputStream of this message content.
      * @return
      * @throws IOException
      */
-    public InputStream getContent() {
+    public CachedOutputStream getContent() {
         return content;
     }
 

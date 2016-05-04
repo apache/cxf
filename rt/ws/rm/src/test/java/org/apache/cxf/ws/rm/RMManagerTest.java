@@ -41,6 +41,8 @@ import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.Service;
@@ -505,7 +507,7 @@ public class RMManagerTest extends Assert {
     }
     
     @Test
-    public void testRecoverReliableClientEndpoint() throws NoSuchMethodException {
+    public void testRecoverReliableClientEndpoint() throws NoSuchMethodException, IOException {
         Method method = RMManager.class.getDeclaredMethod("createReliableEndpoint", 
             new Class[] {Endpoint.class});
         manager = control.createMock(RMManager.class, new Method[] {method});
@@ -563,7 +565,10 @@ public class RMManagerTest extends Assert {
         DestinationSequence ds = control.createMock(DestinationSequence.class);
         RMMessage m1 = new RMMessage();
         InputStream fis = getClass().getResourceAsStream("persistence/SerializedRMMessage.txt");
-        m1.setContent(fis);
+        CachedOutputStream cos = new CachedOutputStream();
+        IOUtils.copyAndCloseInput(fis, cos);
+        cos.flush();
+        m1.setContent(cos);
         m1.setTo("toAddress");
         m1.setMessageNumber(new Long(10));
         m1.setContentType(MULTIPART_TYPE);
@@ -579,8 +584,8 @@ public class RMManagerTest extends Assert {
         assertNotNull(msg.getExchange());
         assertSame(msg, msg.getExchange().getOutMessage());
 
-        InputStream is = (InputStream) msg.get(RMMessageConstants.SAVED_CONTENT);
-        assertStartsWith(is, "<soap:Envelope");
+        CachedOutputStream cos1 = (CachedOutputStream) msg.get(RMMessageConstants.SAVED_CONTENT);
+        assertStartsWith(cos1.getInputStream(), "<soap:Envelope");
         assertEquals(1, msg.getAttachments().size());
     }
     
@@ -673,7 +678,8 @@ public class RMManagerTest extends Assert {
     void setUpRecoverReliableEndpoint(Endpoint endpoint,
                                       Conduit conduit, 
                                       SourceSequence ss, 
-                                      DestinationSequence ds, RMMessage m, Capture<Message> mc)  {                
+                                      DestinationSequence ds, RMMessage m, Capture<Message> mc) 
+                                          throws IOException  {                
         RMStore store = control.createMock(RMStore.class);
         RetransmissionQueue queue = control.createMock(RetransmissionQueue.class);
         manager.setStore(store);
@@ -735,7 +741,11 @@ public class RMManagerTest extends Assert {
             EasyMock.expect(m.getTo()).andReturn("toAddress");
         }
         InputStream is = new ByteArrayInputStream(new byte[0]);
-        EasyMock.expect(m.getContent()).andReturn(is).anyTimes();
+        CachedOutputStream cos = new CachedOutputStream();
+        IOUtils.copy(is, cos);
+        cos.flush();
+        is.close();
+        EasyMock.expect(m.getContent()).andReturn(cos).anyTimes();
 
         if (mc != null) {
             queue.addUnacknowledged(EasyMock.capture(mc));
