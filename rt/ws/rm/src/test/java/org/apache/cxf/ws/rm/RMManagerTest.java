@@ -588,8 +588,7 @@ public class RMManagerTest extends Assert {
                                       Conduit conduit, 
                                       SourceSequence ss, 
                                       DestinationSequence ds, RMMessage m,
-                                      Capture<Message> mc)
-                                          throws IOException  {                
+                                      Capture<Message> mc) throws IOException {
         RMStore store = control.createMock(RMStore.class);
         RetransmissionQueue queue = control.createMock(RetransmissionQueue.class);
         manager.setStore(store);
