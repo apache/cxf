@@ -1795,7 +1795,7 @@ public abstract class HTTPConduit
                 if (LOG.isLoggable(Level.FINE)) {
                     LOG.log(Level.FINE, "No Trust Decider for Conduit '"
                         + conduitName
-                        + "'. An afirmative Trust Decision is assumed.");
+                        + "'. An affirmative Trust Decision is assumed.");
                 }
             }
         }
