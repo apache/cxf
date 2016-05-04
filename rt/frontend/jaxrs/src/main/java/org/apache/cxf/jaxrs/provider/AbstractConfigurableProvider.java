@@ -32,6 +32,7 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
+import org.apache.cxf.jaxrs.utils.HttpUtils;
 
 public abstract class AbstractConfigurableProvider {
     protected static final ResourceBundle BUNDLE = BundleUtils.getBundle(AbstractJAXBProvider.class);
@@ -163,19 +164,7 @@ public abstract class AbstractConfigurableProvider {
     }
     
     protected boolean isPayloadEmpty(MultivaluedMap<String, String> headers) {
-        if (headers != null) {
-            String value = headers.getFirst(HttpHeaders.CONTENT_LENGTH);
-            if (value != null) {
-                try {
-                    Long len = Long.valueOf(value);
-                    return len <= 0;
-                } catch (NumberFormatException ex) {
-                    // ignore
-                }
-            }
-        }
-        
-        return false;
+        return HttpUtils.isPayloadEmpty(headers);
     }
     protected void reportEmptyContentLength() throws NoContentException {
         String message = new org.apache.cxf.common.i18n.Message("EMPTY_BODY", BUNDLE).toString();
