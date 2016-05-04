@@ -627,4 +627,20 @@ public final class HttpUtils {
     public static String toHttpLanguage(Locale locale) {
         return Headers.toHttpLanguage(locale);
     }
+    
+    public static boolean isPayloadEmpty(MultivaluedMap<String, String> headers) {
+        if (headers != null) {
+            String value = headers.getFirst(HttpHeaders.CONTENT_LENGTH);
+            if (value != null) {
+                try {
+                    Long len = Long.valueOf(value);
+                    return len <= 0;
+                } catch (NumberFormatException ex) {
+                    // ignore
+                }
+            }
+        }
+        
+        return false;
+    }
 }
