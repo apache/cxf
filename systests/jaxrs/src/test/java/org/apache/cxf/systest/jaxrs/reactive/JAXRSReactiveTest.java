@@ -19,18 +19,19 @@
 
 package org.apache.cxf.systest.jaxrs.reactive;
 
+import java.util.Collections;
 import java.util.concurrent.Future;
 
 import javax.ws.rs.core.GenericType;
 
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
+import org.apache.cxf.jaxrs.provider.rx.ObservableReader;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import edu.emory.mathcs.backport.java.util.Collections;
 import rx.Observable;
 
 public class JAXRSReactiveTest extends AbstractBusClientServerTestBase {

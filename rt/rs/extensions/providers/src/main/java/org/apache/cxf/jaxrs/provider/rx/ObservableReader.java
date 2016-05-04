@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.jaxrs.reactive;
+package org.apache.cxf.jaxrs.provider.rx;
 
 import java.io.IOException;
 import java.io.InputStream;

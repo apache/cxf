@@ -25,6 +25,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
+import org.apache.cxf.jaxrs.provider.rx.ObservableWriter;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
     
 public class ReactiveServer extends AbstractBusTestServerBase {
