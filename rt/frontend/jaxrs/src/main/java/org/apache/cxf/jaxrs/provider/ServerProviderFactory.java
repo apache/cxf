@@ -39,7 +39,6 @@ import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.container.DynamicFeature;
 import javax.ws.rs.container.PreMatching;
-import javax.ws.rs.core.Configurable;
 import javax.ws.rs.core.Configuration;
 import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.FeatureContext;
@@ -206,13 +205,36 @@ public final class ServerProviderFactory extends ProviderFactory {
     @SuppressWarnings("unchecked")
     @Override
     protected void setProviders(boolean custom, boolean busGlobal, Object... providers) {
+        List<Object> allProviders = new LinkedList<Object>();
+        for (Object p : providers) {
+            if (p instanceof Feature) {
+                FeatureContext featureContext = createServerFeatureContext();
+                ((Feature)p).configure(featureContext);
+                Configuration cfg = featureContext.getConfiguration();
+                
+                for (Object featureProvider : cfg.getInstances()) {
+                    Map<Class<?>, Integer> contracts = cfg.getContracts(featureProvider.getClass());
+                    if (contracts != null && !contracts.isEmpty()) {
+                        allProviders.add(new FilterProviderInfo<Object>(featureProvider, 
+                                                                        getBus(),
+                                                                        contracts));
+                    } else {
+                        allProviders.add(featureProvider);
+                    }
+                }
+            } else {
+                allProviders.add(p);
+            }
+        }
+        
+        
         List<ProviderInfo<ContainerRequestFilter>> postMatchRequestFilters = 
             new LinkedList<ProviderInfo<ContainerRequestFilter>>();
         List<ProviderInfo<ContainerResponseFilter>> postMatchResponseFilters = 
             new LinkedList<ProviderInfo<ContainerResponseFilter>>();
         
         List<ProviderInfo<? extends Object>> theProviders = 
-            prepareProviders(custom, busGlobal, (Object[])providers, application);
+            prepareProviders(custom, busGlobal, allProviders.toArray(), application);
         super.setCommonProviders(theProviders);
         for (ProviderInfo<? extends Object> provider : theProviders) {
             Class<?> providerCls = ClassHelper.getRealClass(getBus(), provider.getProvider());
@@ -350,11 +372,7 @@ public final class ServerProviderFactory extends ProviderFactory {
                 + "."
                 + ori.getMethodToInvoke().toString();
             for (DynamicFeature feature : dynamicFeatures) {
-                FeatureContextImpl featureContext = new FeatureContextImpl();
-                MethodFeatureContextConfigurable configImpl = new MethodFeatureContextConfigurable(featureContext);
-                setApplicationProperties(configImpl);
-                featureContext.setConfigurable(configImpl);
-                
+                FeatureContext featureContext = createServerFeatureContext();
                 feature.configure(new ResourceInfoImpl(ori), featureContext);
                 Configuration cfg = featureContext.getConfiguration();
                 for (Object provider : cfg.getInstances()) {
@@ -378,14 +396,18 @@ public final class ServerProviderFactory extends ProviderFactory {
         }
     }
     
-    private void setApplicationProperties(Configurable<?> configImpl) {
+    private FeatureContext createServerFeatureContext() {
+        FeatureContextImpl featureContext = new FeatureContextImpl();
+        ServerFeatureContextConfigurable configImpl = new ServerFeatureContextConfigurable(featureContext);
+        featureContext.setConfigurable(configImpl);
+        
         if (application != null) {
             Map<String, Object> appProps = application.getProvider().getProperties();
             for (Map.Entry<String, Object> entry : appProps.entrySet()) {
                 configImpl.property(entry.getKey(), entry.getValue());
             }
         }
-        
+        return featureContext;
     }
 
     protected static boolean isPrematching(Class<?> filterCls) {
@@ -393,8 +415,8 @@ public final class ServerProviderFactory extends ProviderFactory {
     }
 
         
-    private static class MethodFeatureContextConfigurable extends ConfigurableImpl<FeatureContext> {
-        protected MethodFeatureContextConfigurable(FeatureContext mc) {
+    private static class ServerFeatureContextConfigurable extends ConfigurableImpl<FeatureContext> {
+        protected ServerFeatureContextConfigurable(FeatureContext mc) {
             super(mc, RuntimeType.SERVER, SERVER_FILTER_INTERCEPTOR_CLASSES.toArray(new Class<?>[]{}));
         }
     }
