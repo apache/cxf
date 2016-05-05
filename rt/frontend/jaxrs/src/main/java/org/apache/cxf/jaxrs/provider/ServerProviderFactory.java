@@ -39,6 +39,7 @@ import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.container.DynamicFeature;
 import javax.ws.rs.container.PreMatching;
+import javax.ws.rs.core.Configurable;
 import javax.ws.rs.core.Configuration;
 import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.FeatureContext;
@@ -52,6 +53,7 @@ import org.apache.cxf.common.util.ClassHelper;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.impl.ConfigurableImpl;
+import org.apache.cxf.jaxrs.impl.FeatureContextImpl;
 import org.apache.cxf.jaxrs.impl.RequestPreprocessor;
 import org.apache.cxf.jaxrs.impl.ResourceInfoImpl;
 import org.apache.cxf.jaxrs.impl.WebApplicationExceptionMapper;
@@ -343,9 +345,29 @@ public final class ServerProviderFactory extends ProviderFactory {
     private void doApplyDynamicFeatures(ClassResourceInfo cri) {
         Set<OperationResourceInfo> oris = cri.getMethodDispatcher().getOperationResourceInfos();
         for (OperationResourceInfo ori : oris) {
+            String nameBinding = DEFAULT_FILTER_NAME_BINDING 
+                + ori.getClassResourceInfo().getServiceClass().getName()
+                + "."
+                + ori.getMethodToInvoke().toString();
             for (DynamicFeature feature : dynamicFeatures) {
-                FeatureContext featureContext = new MethodFeatureContextImpl(ori);
+                FeatureContextImpl featureContext = new FeatureContextImpl();
+                MethodFeatureContextConfigurable configImpl = new MethodFeatureContextConfigurable(featureContext);
+                setApplicationProperties(configImpl);
+                featureContext.setConfigurable(configImpl);
+                
                 feature.configure(new ResourceInfoImpl(ori), featureContext);
+                Configuration cfg = featureContext.getConfiguration();
+                for (Object provider : cfg.getInstances()) {
+                    Map<Class<?>, Integer> contracts = cfg.getContracts(provider.getClass());
+                    if (contracts != null && !contracts.isEmpty()) {
+                        registerUserProvider(new FilterProviderInfo<Object>(provider, 
+                            getBus(),
+                            nameBinding,
+                            true,
+                            contracts));
+                        ori.addNameBindings(Collections.singletonList(nameBinding));
+                    }
+                }
             }
         }
         Collection<ClassResourceInfo> subs = cri.getSubResources();
@@ -356,117 +378,24 @@ public final class ServerProviderFactory extends ProviderFactory {
         }
     }
     
+    private void setApplicationProperties(Configurable<?> configImpl) {
+        if (application != null) {
+            Map<String, Object> appProps = application.getProvider().getProperties();
+            for (Map.Entry<String, Object> entry : appProps.entrySet()) {
+                configImpl.property(entry.getKey(), entry.getValue());
+            }
+        }
+        
+    }
+
     protected static boolean isPrematching(Class<?> filterCls) {
         return AnnotationUtils.getClassAnnotation(filterCls, PreMatching.class) != null;
     }
-    
-    
-    
-    private class MethodFeatureContextImpl implements FeatureContext {
-        private MethodFeatureContextConfigurable configImpl;    
-        private OperationResourceInfo ori;
-        private String nameBinding;
         
-        MethodFeatureContextImpl(OperationResourceInfo ori) {
-            this.ori = ori;
-            configImpl = new MethodFeatureContextConfigurable(this);
-            if (application != null) {
-                Map<String, Object> appProps = application.getProvider().getProperties();
-                for (Map.Entry<String, Object> entry : appProps.entrySet()) {
-                    configImpl.property(entry.getKey(), entry.getValue());
-                }
-            }
-            nameBinding = DEFAULT_FILTER_NAME_BINDING 
-                + ori.getClassResourceInfo().getServiceClass().getName()
-                + "."
-                + ori.getMethodToInvoke().toString();
-        }
-        
-
-        @Override
-        public Configuration getConfiguration() {
-            return configImpl.getConfiguration();
-        }
-        
-        @Override
-        public FeatureContext property(String name, Object value) {
-            return configImpl.property(name, value);
-        }
-
-        @Override
-        public FeatureContext register(Class<?> cls) {
-            return configImpl.register(cls);
-        }
-
-        @Override
-        public FeatureContext register(Object object) {
-            return configImpl.register(object);
-        }
-
-        @Override
-        public FeatureContext register(Class<?> cls, int index) {
-            return configImpl.register(cls, index);
-        }
-
-        @Override
-        public FeatureContext register(Class<?> cls, Class<?>... contracts) {
-            return configImpl.register(cls, contracts);
-        }
-
-        @Override
-        public FeatureContext register(Class<?> cls, Map<Class<?>, Integer> map) {
-            return configImpl.register(cls, map);
-        }
-
-        @Override
-        public FeatureContext register(Object object, int index) {
-            return configImpl.register(object, index);
-        }
-
-        @Override
-        public FeatureContext register(Object object, Class<?>... contracts) {
-            return configImpl.register(object, contracts);
-        }
-
-        @Override
-        public FeatureContext register(Object object, Map<Class<?>, Integer> map) {
-            return configImpl.register(object, map);
-        }
-        
-        FeatureContext doRegister(Object provider, Map<Class<?>, Integer> contracts) {
-        
-            Map<Class<?>, Integer> actualContracts = new HashMap<Class<?>, Integer>();
-            
-            for (Class<?> contract : contracts.keySet()) {
-                if (SERVER_FILTER_INTERCEPTOR_CLASSES.contains(contract)
-                    && contract.isAssignableFrom(provider.getClass())) {
-                    actualContracts.put(contract, contracts.get(contract));
-                }
-            }
-            if (!actualContracts.isEmpty()) {
-                registerUserProvider(new FilterProviderInfo<Object>(provider, 
-                    getBus(),
-                    nameBinding,
-                    true,
-                    actualContracts));
-                ori.addNameBindings(Collections.singletonList(nameBinding));
-            }
-            return this;
-        }
-        
-    }
-    
     private static class MethodFeatureContextConfigurable extends ConfigurableImpl<FeatureContext> {
-        protected MethodFeatureContextConfigurable(MethodFeatureContextImpl mc) {
+        protected MethodFeatureContextConfigurable(FeatureContext mc) {
             super(mc, RuntimeType.SERVER, SERVER_FILTER_INTERCEPTOR_CLASSES.toArray(new Class<?>[]{}));
         }
-        @Override
-        public FeatureContext register(Object provider, Map<Class<?>, Integer> contracts) {
-            super.register(provider, contracts);
-            return ((MethodFeatureContextImpl)super.getConfigurable())
-                .doRegister(provider, contracts);
-        }
-        
     }
     
     public static void clearThreadLocalProxies(Message message) {
