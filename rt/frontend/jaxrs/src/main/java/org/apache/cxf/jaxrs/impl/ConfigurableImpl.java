@@ -26,7 +26,6 @@ import javax.ws.rs.RuntimeType;
 import javax.ws.rs.core.Configurable;
 import javax.ws.rs.core.Configuration;
 import javax.ws.rs.core.Feature;
-import javax.ws.rs.core.FeatureContext;
 
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 
@@ -115,72 +114,5 @@ public class ConfigurableImpl<C extends Configurable<C>> implements Configurable
     
     private C doRegister(Object provider, int bindingPriority, Class<?>... contracts) {
         return register(provider, ConfigurationImpl.initContractsMap(bindingPriority, contracts));
-    }
-
-    public static class FeatureContextImpl implements FeatureContext {
-        private Configurable<?> cfg;
-        public FeatureContextImpl(Configurable<?> cfg) {
-            this.cfg = cfg;
-        }
-        
-        @Override
-        public Configuration getConfiguration() {
-            return cfg.getConfiguration();
-        }
-
-        @Override
-        public FeatureContext property(String name, Object value) {
-            cfg.property(name, value);
-            return this;
-        }
-
-        @Override
-        public FeatureContext register(Class<?> cls) {
-            cfg.register(cls);
-            return this;
-        }
-
-        @Override
-        public FeatureContext register(Object obj) {
-            cfg.register(obj);
-            return this;
-        }
-
-        @Override
-        public FeatureContext register(Class<?> cls, int priority) {
-            cfg.register(cls, priority);
-            return this;
-        }
-
-        @Override
-        public FeatureContext register(Class<?> cls, Class<?>... contract) {
-            cfg.register(cls, contract);
-            return this;
-        }
-
-        @Override
-        public FeatureContext register(Class<?> cls, Map<Class<?>, Integer> map) {
-            cfg.register(cls, map);
-            return this;
-        }
-
-        @Override
-        public FeatureContext register(Object obj, int priority) {
-            cfg.register(obj, priority);
-            return this;
-        }
-
-        @Override
-        public FeatureContext register(Object obj, Class<?>... contract) {
-            cfg.register(obj, contract);
-            return this;
-        }
-
-        @Override
-        public FeatureContext register(Object obj, Map<Class<?>, Integer> map) {
-            cfg.register(obj, map);
-            return this;
-        } 
-        
     }
 }
