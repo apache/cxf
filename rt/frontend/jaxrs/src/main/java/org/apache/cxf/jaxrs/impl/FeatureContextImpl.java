@@ -29,6 +29,8 @@ public class FeatureContextImpl implements FeatureContext {
     public FeatureContextImpl(Configurable<?> cfg) {
         this.cfg = cfg;
     }
+    public FeatureContextImpl() {
+    }
     
     @Override
     public Configuration getConfiguration() {
@@ -87,5 +89,11 @@ public class FeatureContextImpl implements FeatureContext {
     public FeatureContext register(Object obj, Map<Class<?>, Integer> map) {
         cfg.register(obj, map);
         return this;
+    }
+    public Configurable<?> getConfigurable() {
+        return cfg;
+    }
+    public void setConfigurable(Configurable<?> configurable) {
+        this.cfg = configurable;
     } 
 }
