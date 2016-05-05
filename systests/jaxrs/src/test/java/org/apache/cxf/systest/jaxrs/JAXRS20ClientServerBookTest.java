@@ -40,6 +40,8 @@ import javax.ws.rs.client.ClientResponseFilter;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.InvocationCallback;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Feature;
+import javax.ws.rs.core.FeatureContext;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.HttpHeaders;
@@ -156,6 +158,17 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         String address = "http://localhost:" + PORT + "/bookstore/bookheaders/simple";
         Client client = ClientBuilder.newClient();
         client.register(new BookInfoReader());
+        WebTarget target = client.target(address);
+        BookInfo book = target.request("application/xml").get(BookInfo.class);
+        assertEquals(124L, book.getId());
+        book = target.request("application/xml").get(BookInfo.class);
+        assertEquals(124L, book.getId());
+    }
+    @Test
+    public void testGetBookSpecProviderWithFeature() {
+        String address = "http://localhost:" + PORT + "/bookstore/bookheaders/simple";
+        Client client = ClientBuilder.newClient();
+        client.register(new ClientTestFeature());
         WebTarget target = client.target(address);
         BookInfo book = target.request("application/xml").get(BookInfo.class);
         assertEquals(124L, book.getId());
@@ -852,6 +865,15 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
             WebApplicationException {
             Book book = new JAXBElementProvider<Book>().readFrom(Book.class, Book.class, anns, mt, headers, is);
             return new BookInfo(book);
+        }
+        
+    }
+    private static class ClientTestFeature implements Feature {
+
+        @Override
+        public boolean configure(FeatureContext context) {
+            context.register(new BookInfoReader());
+            return true;
         }
         
     }
