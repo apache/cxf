@@ -142,6 +142,9 @@ public final class IOUtils {
 
     public static int copy(final InputStream input, final OutputStream output)
         throws IOException {
+        if (input == null) {
+            return 0;
+        }
         if (output instanceof CopyingOutputStream) {
             return ((CopyingOutputStream)output).copyFrom(input);
         }
