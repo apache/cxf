@@ -20,12 +20,15 @@ package org.apache.cxf.jaxrs.provider.dom4j;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.SequenceInputStream;
 import java.lang.annotation.Annotation;
 
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.Providers;
 
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.impl.ProvidersImpl;
@@ -50,8 +53,28 @@ public class DOM4JProviderTest extends Assert {
         // starts with the xml PI
         assertTrue(str.contains("<a/>") || str.contains("<a></a>"));
     }
+    @Test
+    public void testReadXMLWithBom() throws Exception {
+        String str = readXMLBom().asXML();
+        // starts with the xml PI
+        assertTrue(str.contains("<a/>") || str.contains("<a></a>"));
+    }
     private org.dom4j.Document readXML() throws Exception {
         return readXML(MediaType.APPLICATION_XML_TYPE, "<a/>");
+    }
+    private org.dom4j.Document readXMLBom() throws Exception {
+        byte[] bom = new byte[]{(byte)239, (byte)187, (byte)191};
+        assertEquals("efbbbf", StringUtils.toHexString(bom));
+        byte[] strBytes = "<a/>".getBytes(StandardCharsets.UTF_8);
+        InputStream is = new SequenceInputStream(new ByteArrayInputStream(bom),
+                                                 new ByteArrayInputStream(strBytes));
+        DOM4JProvider p = new DOM4JProvider();
+        p.setProviders(new ProvidersImpl(createMessage(false)));
+        org.dom4j.Document dom = p.readFrom(org.dom4j.Document.class, org.dom4j.Document.class, 
+            new Annotation[] {}, MediaType.valueOf("text/xml;a=b"), 
+            new MetadataMap<String, String>(),
+            is);
+        return dom;
     }
     private org.dom4j.Document readXML(MediaType ct, final String xml) throws Exception {
         DOM4JProvider p = new DOM4JProvider();
