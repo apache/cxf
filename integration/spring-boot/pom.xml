@@ -26,9 +26,8 @@
     <url>http://cxf.apache.org</url>
     <parent>
         <groupId>org.apache.cxf</groupId>
-        <artifactId>cxf</artifactId>
+        <artifactId>cxf-integration</artifactId>
         <version>3.1.7-SNAPSHOT</version>
-        <relativePath>../../parent/pom.xml</relativePath>
     </parent>
     <modules>
         <module>autoconfigure</module>
