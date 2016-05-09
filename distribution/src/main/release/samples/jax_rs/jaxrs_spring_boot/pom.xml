@@ -23,20 +23,15 @@
         
         <dependency>
             <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-transports-http</artifactId>
+            <artifactId>cxf-spring-boot-starter-jax-rs</artifactId>
             <version>${cxf.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-frontend-jaxrs</artifactId>
-            <version>${cxf.version}</version>
-        </dependency>
+        
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-client</artifactId>
             <version>${cxf.version}</version>
         </dependency>
-        
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-service-description</artifactId>
@@ -70,9 +65,6 @@
                <mainClass>sample.rs.service.SampleRestApplication</mainClass>
                -->
                <mainClass>sample.rs.service.SampleScanRestApplication</mainClass>
-               <!--  
-               <mainClass>sample.rs.service.SampleScanRestApplication2</mainClass>
-               --> 
            </configuration>  
         </plugin>
         <plugin>
