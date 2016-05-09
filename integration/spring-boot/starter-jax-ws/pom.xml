@@ -31,6 +31,14 @@
     </parent>
     <dependencies>
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-spring-boot-autoconfigure</artifactId>
             <version>${project.version}</version>
@@ -44,11 +52,6 @@
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxws</artifactId>
             <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${cxf.servlet-api.group}</groupId>
-            <artifactId>${cxf.servlet-api.artifact}</artifactId>
-            <version>${cxf.servlet-api.version}</version>
         </dependency>
         <dependency>
             <groupId>javax.validation</groupId>
