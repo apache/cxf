@@ -120,6 +120,7 @@
         <cxf.jetty.osgi.version>[8.1,10)</cxf.jetty.osgi.version>
         <cxf.jibx.version>1.2.6</cxf.jibx.version>
         <cxf.junit.version>4.12</cxf.junit.version>
+        <cxf.hamcrest.version>1.3</cxf.hamcrest.version>
         <cxf.maven.core.version>3.0.5</cxf.maven.core.version>
         <cxf.msv.version>2013.6.1</cxf.msv.version>
         <cxf.neethi.version>3.0.3</cxf.neethi.version>
@@ -141,6 +142,7 @@
         <cxf.slf4j.version>1.7.21</cxf.slf4j.version>
         <cxf.specs.jaxws.api.version>1.2</cxf.specs.jaxws.api.version>
         <cxf.spring.version>4.1.9.RELEASE</cxf.spring.version>
+        <cxf.spring.boot.version>1.3.4.RELEASE</cxf.spring.boot.version>
         <cxf.spring.security.version>3.2.9.RELEASE</cxf.spring.security.version>
         <cxf.spring.osgi.version>1.2.1</cxf.spring.osgi.version>
         <cxf.spring.ldap.version>1.3.1.RELEASE</cxf.spring.ldap.version>
@@ -721,6 +723,12 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
+                <groupId>org.hamcrest</groupId>
+                <artifactId>hamcrest-library</artifactId>
+                <version>${cxf.hamcrest.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
                 <groupId>nekohtml</groupId>
                 <artifactId>nekohtml</artifactId>
                 <version>1.9.6.2</version>
@@ -1226,6 +1234,21 @@
                         <artifactId>commons-logging</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot</artifactId>
+                <version>${cxf.spring.boot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-autoconfigure</artifactId>
+                <version>${cxf.spring.boot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-configuration-processor</artifactId>
+                <version>${cxf.spring.boot.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.security</groupId>
