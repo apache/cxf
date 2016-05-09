@@ -19,20 +19,20 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>cxf-integration</artifactId>
+    <artifactId>cxf-integration-spring-boot</artifactId>
     <packaging>pom</packaging>
-    <name>Apache CXF Integration</name>
-    <description>Apache CXF Integration</description>
+    <name>Apache CXF Spring Boot Integration</name>
+    <description>Apache CXF Spring Boot Integration</description>
     <url>http://cxf.apache.org</url>
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf</artifactId>
         <version>3.2.0-SNAPSHOT</version>
+        <relativePath>../../parent/pom.xml</relativePath>
     </parent>
     <modules>
-        <module>jca</module>
-        <module>cdi</module>
-        <module>tracing/tracing-htrace</module>
-        <module>spring-boot</module>
+        <module>autoconfigure</module>
+        <module>starter-jax-ws</module>
+        <module>starter-jax-rs</module>
     </modules>
 </project>
