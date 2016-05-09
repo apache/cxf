@@ -33,5 +33,8 @@
         <module>jca</module>
         <module>cdi</module>
         <module>tracing/tracing-htrace</module>
+        <module>spring-boot/autoconfigure</module>
+        <module>spring-boot/starter-jax-ws</module>
+        <module>spring-boot/starter-jax-rs</module>
     </modules>
 </project>
