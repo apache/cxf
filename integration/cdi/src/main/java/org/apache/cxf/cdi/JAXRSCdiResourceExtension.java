@@ -19,10 +19,7 @@
 package org.apache.cxf.cdi;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.ServiceLoader;
 
 import javax.enterprise.event.Observes;
@@ -44,7 +41,6 @@ import javax.ws.rs.ext.Provider;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.extension.ExtensionManagerBus;
 import org.apache.cxf.feature.Feature;
-import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
@@ -146,43 +142,11 @@ public class JAXRSCdiResourceExtension implements Extension {
     private JAXRSServerFactoryBean createFactoryInstance(final Application application) {
         
         final JAXRSServerFactoryBean instance = ResourceUtils.createApplication(application, false, false);
-        final Map< Class< ? >, List< Object > > classified = classifySingletons(application.getSingletons());
-        instance.setServiceBeans(classified.get(Path.class));
-        instance.setProviders(classified.get(Provider.class));
-        instance.setFeatures(CastUtils.cast(classified.get(Feature.class), Feature.class));
         instance.setBus(bus);
 
         return instance; 
     }
     
-    /**
-     * JAX-RS application has defined singletons as being instances of any providers, resources and features.
-     * In the JAXRSServerFactoryBean, those should be split around several method calls depending on instance
-     * type. At the moment, only the Feature is CXF-specific and should be replaced by JAX-RS Feature implementation.
-     * @param singletons application singletons
-     * @return classified singletons by instance types
-     */
-    private Map< Class< ? >, List< Object > > classifySingletons(final Collection< Object > singletons) {
-        final Map< Class< ? >, List< Object > > classified = 
-            new HashMap< Class< ? >, List< Object > >();
-        
-        classified.put(Feature.class, new ArrayList< Object >());
-        classified.put(Provider.class, new ArrayList< Object >());
-        classified.put(Path.class, new ArrayList< Object >());
-        
-        for (final Object singleton: singletons) {
-            if (singleton instanceof Feature) {
-                classified.get(Feature.class).add(singleton);
-            } else if (singleton.getClass().isAnnotationPresent(Provider.class)) {
-                classified.get(Provider.class).add(singleton);
-            } else if (singleton.getClass().isAnnotationPresent(Path.class)) {
-                classified.get(Path.class).add(singleton);
-            }
-        }
-        
-        return classified;
-    }
-
     /**
      * Load external providers from service loader
      * @return loaded external providers
