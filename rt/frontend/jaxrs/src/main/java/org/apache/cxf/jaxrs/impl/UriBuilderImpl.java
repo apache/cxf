@@ -94,7 +94,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
         }
         for (int i = 0; i < values.length; i++) {
             if (values[i] == null) {
-                throw new IllegalArgumentException("Template parameter value is set to null");
+                throw new IllegalArgumentException("Template parameter value at position " + i + " is set to null");
             }
         }
         
