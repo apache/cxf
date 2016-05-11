@@ -125,7 +125,7 @@ public final class DispatchSourceClient {
         String elementName;
         boolean recording;
         
-        public ContentHandler(String namespaceURI, String elementName) {
+        ContentHandler(String namespaceURI, String elementName) {
             this.namespaceURI = namespaceURI;
             this.elementName = elementName;
         }
