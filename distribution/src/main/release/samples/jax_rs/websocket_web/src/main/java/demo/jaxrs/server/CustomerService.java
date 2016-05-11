@@ -147,7 +147,7 @@ public class CustomerService {
     @Path("/monitor2")
     @Produces("text/*")
     public void monitorCustomers2(
-            final @javax.ws.rs.core.Context HttpServletResponse httpResponse,
+            @javax.ws.rs.core.Context final HttpServletResponse httpResponse,
             @HeaderParam(WebSocketConstants.DEFAULT_REQUEST_ID_KEY) String reqid) {
         final String key = reqid == null ? "*" : reqid; 
         monitors2.put(key, new WriterHolder(httpResponse, MAX_ERROR_COUNT));
@@ -198,7 +198,8 @@ public class CustomerService {
                             }
                         }
                     }
-                    for (Iterator<WriterHolder<HttpServletResponse>> it = monitors2.values().iterator(); it.hasNext();) {
+                    for (Iterator<WriterHolder<HttpServletResponse>> it = monitors2.values().iterator(); 
+                            it.hasNext();) {
                         WriterHolder<HttpServletResponse> wh = it.next();
                         try {
                             wh.getValue().getOutputStream().write(t.getBytes());
@@ -243,11 +244,11 @@ public class CustomerService {
     }
 
     private static class WriterHolder<T> {
-        final private T value;
-        final private int max; 
-        final private AtomicInteger errorCount;
+        private final T value;
+        private final int max; 
+        private final AtomicInteger errorCount;
 
-        public WriterHolder(T object, int max) {
+        WriterHolder(T object, int max) {
             this.value = object;
             this.max = max;
             this.errorCount = new AtomicInteger();

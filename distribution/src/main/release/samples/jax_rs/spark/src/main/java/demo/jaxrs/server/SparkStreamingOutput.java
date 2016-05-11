@@ -85,7 +85,7 @@ public class SparkStreamingOutput implements StreamingOutput {
     private class OutputFunction implements VoidFunction<JavaPairRDD<String, Integer>> {
         private static final long serialVersionUID = 1L;
         private OutputStream os;
-        public OutputFunction(OutputStream os) {
+        OutputFunction(OutputStream os) {
             this.os = os;
         }
         @Override

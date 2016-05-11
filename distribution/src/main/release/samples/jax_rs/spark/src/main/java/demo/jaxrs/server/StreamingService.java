@@ -72,7 +72,8 @@ public class StreamingService {
     }
 
     @SuppressWarnings("serial")
-    private static JavaPairDStream<String, Integer> createOutputDStream(JavaReceiverInputDStream<String> receiverStream) {
+    private static JavaPairDStream<String, Integer> createOutputDStream(
+            JavaReceiverInputDStream<String> receiverStream) {
         final JavaDStream<String> words = receiverStream.flatMap(
             new FlatMapFunction<String, String>() {
                 @Override 

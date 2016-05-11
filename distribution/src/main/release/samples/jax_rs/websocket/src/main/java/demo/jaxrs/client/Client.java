@@ -19,13 +19,13 @@
 
 package demo.jaxrs.client;
 
-import demo.jaxrs.server.Server;
-
 import java.io.InputStream;
 import java.util.List;
 
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
+
+import demo.jaxrs.server.Server;
 
 public final class Client {
 

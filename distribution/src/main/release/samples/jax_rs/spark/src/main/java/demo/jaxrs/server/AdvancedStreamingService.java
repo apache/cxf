@@ -58,8 +58,8 @@ public class AdvancedStreamingService {
      
     public static class MyReceiverInputDStream extends ReceiverInputDStream<String> {
 
-        public MyReceiverInputDStream(StreamingContext ssc_, ClassTag<String> evidence$1) {
-            super(ssc_, evidence$1);
+        public MyReceiverInputDStream(StreamingContext ssc, ClassTag<String> evidence) {
+            super(ssc, evidence);
         }
         public void putInputStream(InputStream is) {
             
