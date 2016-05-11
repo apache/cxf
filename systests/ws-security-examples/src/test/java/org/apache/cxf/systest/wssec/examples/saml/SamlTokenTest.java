@@ -37,11 +37,13 @@ import org.apache.cxf.ws.security.trust.STSClient;
 import org.example.contract.doubleit.DoubleItPortType;
 
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 
 /**
  * A set of tests for SAML Tokens using policies defined in the OASIS spec:
  * "WS-SecurityPolicy Examples Version 1.0".
  */
+@Ignore("invalid")
 public class SamlTokenTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(Server.class);
     static final String PORT2 = allocatePort(Server.class, 2);

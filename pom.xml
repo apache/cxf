@@ -520,7 +520,7 @@
                     <version>2.9.1</version>
                     <configuration>
                         <attach>true</attach>
-                        <source>1.5</source>
+                        <source>1.6</source>
                         <quiet>true</quiet>
                         <bottom>Apache CXF</bottom>
                         <javadocVersion>1.5</javadocVersion>
@@ -545,8 +545,8 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.1</version>
                     <configuration>
-                        <source>1.5</source>
-                        <target>1.5</target>
+                        <source>1.6</source>
+                        <target>1.6</target>
                         <maxmem>256M</maxmem>
                         <fork>${cxf.compiler.fork}</fork>
                         <encoding>UTF-8</encoding>

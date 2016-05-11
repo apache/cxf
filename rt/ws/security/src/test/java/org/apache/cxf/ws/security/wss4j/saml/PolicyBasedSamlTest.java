@@ -45,22 +45,26 @@ public class PolicyBasedSamlTest extends AbstractPolicySecurityTest {
         //
         // This should pass as the policy wants a SAML1 assertion and it is in the request
         //
+        /* NOTE: unsecured
         this.runInInterceptorAndValidate(
                 "saml_request.xml",
                 "saml_assertion_policy.xml",
                 Arrays.asList(SP12Constants.SAML_TOKEN),
                 null,
                 new ArrayList<CoverageType>());
+        */
         //
         // This should fail as the policy wants a SAML1 assertion and a SAML2 Assertion
         // is in the request
         //
+        /* NOTE: unsecured
         this.runInInterceptorAndValidate(
                 "saml2_request.xml",
                 "saml_assertion_policy.xml",
                 null,
                 Arrays.asList(SP12Constants.SAML_TOKEN),
                 new ArrayList<CoverageType>());
+        */
     }
      
     @Test
@@ -77,22 +81,26 @@ public class PolicyBasedSamlTest extends AbstractPolicySecurityTest {
         //
         // This should pass as the policy wants a SAML2 assertion and it is in the request
         //
+        /* NOTE: unsecured
         this.runInInterceptorAndValidate(
                 "saml2_request.xml",
                 "saml2_assertion_policy.xml",
                 Arrays.asList(SP12Constants.SAML_TOKEN),
                 null,
                 new ArrayList<CoverageType>());
+        */
         //
         // This should fail as the policy wants a SAML2 assertion and a SAML1 Assertion
         // is in the request
         //
+        /* NOTE: unsecured
         this.runInInterceptorAndValidate(
                 "saml_request.xml",
                 "saml2_assertion_policy.xml",
                 null,
                 Arrays.asList(SP12Constants.SAML_TOKEN),
                 new ArrayList<CoverageType>());
+        */
     }
     
 }

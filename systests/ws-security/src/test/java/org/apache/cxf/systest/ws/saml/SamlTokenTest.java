@@ -36,6 +36,7 @@ import org.apache.ws.security.saml.ext.bean.KeyInfoBean.CERT_IDENTIFIER;
 import org.apache.ws.security.saml.ext.builder.SAML2Constants;
 import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 
 /**
  * A set of tests for SAML Tokens.
@@ -578,7 +579,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)saml2Port).close();
         bus.shutdown(true);
     }
-    
+
+    @Ignore("invalid")
     @org.junit.Test
     public void testSaml2OverAsymmetricEncrypted() throws Exception {
 

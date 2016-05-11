@@ -35,6 +35,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -1269,6 +1270,8 @@ public class JAXBElementProviderTest extends Assert {
         provider.setValidateOutput(true);
         provider.setValidateBeforeWrite(true);
 
+        final Locale l = Locale.getDefault();
+        Locale.setDefault(Locale.ENGLISH); // great news, everybody is not "english"!
         try {
             provider.writeTo(new Book2(), Book2.class, Book2.class, new Annotation[]{}, 
                              MediaType.TEXT_XML_TYPE,
@@ -1277,6 +1280,8 @@ public class JAXBElementProviderTest extends Assert {
         } catch (Exception ex) {
             Throwable cause = ex.getCause();
             assertTrue(cause.getMessage().contains("Cannot find the declaration of element"));
+        } finally {
+            Locale.setDefault(l);
         }
         
     }
