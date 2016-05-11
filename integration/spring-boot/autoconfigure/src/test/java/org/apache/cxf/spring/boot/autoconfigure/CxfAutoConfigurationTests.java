@@ -88,8 +88,8 @@ public class CxfAutoConfigurationTests {
         load(CxfAutoConfiguration.class, "spring.cxf.servlet.load-on-startup=1");
         ServletRegistrationBean registrationBean = this.context
                 .getBean(ServletRegistrationBean.class);
-        assertThat(ReflectionTestUtils.getField(registrationBean, "loadOnStartup"),
-                equalTo(1));
+        Integer value = (Integer)ReflectionTestUtils.getField(registrationBean, "loadOnStartup");
+        assertThat(value, equalTo(1));
     }
 
     @Test
