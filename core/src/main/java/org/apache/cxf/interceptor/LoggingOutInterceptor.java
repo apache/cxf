@@ -259,8 +259,7 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
             } catch (Exception ex) {
                 //ignore
             }
-            message.setContent(OutputStream.class, 
-                               origStream);
+            message.setContent(OutputStream.class, origStream);
         }
     }
 
