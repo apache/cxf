@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.apache.cxf.bus.spring.SpringBus;
 import org.apache.cxf.transport.servlet.CXFServlet;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -46,11 +47,8 @@ import org.springframework.context.annotation.ImportResource;
 @AutoConfigureAfter(EmbeddedServletContainerAutoConfiguration.class)
 public class CxfAutoConfiguration {
 
-    private final CxfProperties properties;
-
-    public CxfAutoConfiguration(CxfProperties properties) {
-        this.properties = properties;
-    }
+    @Autowired
+    private CxfProperties properties;
 
     @Bean
     public ServletRegistrationBean messageDispatcherServlet() {

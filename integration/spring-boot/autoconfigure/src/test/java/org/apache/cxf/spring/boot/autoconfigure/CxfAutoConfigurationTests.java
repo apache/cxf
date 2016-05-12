@@ -64,19 +64,19 @@ public class CxfAutoConfigurationTests {
     public void customPathMustBeginWithASlash() {
         this.thrown.expect(BeanCreationException.class);
         this.thrown.expectMessage("Path must start with /");
-        load(CxfAutoConfiguration.class, "spring.cxf.path=invalid");
+        load(CxfAutoConfiguration.class, "cxf.path=invalid");
     }
 
     @Test
     public void customPathWithTrailingSlash() {
-        load(CxfAutoConfiguration.class, "spring.cxf.path=/valid/");
+        load(CxfAutoConfiguration.class, "cxf.path=/valid/");
         assertThat(this.context.getBean(ServletRegistrationBean.class).getUrlMappings(),
                 contains("/valid/*"));
     }
 
     @Test
     public void customPath() {
-        load(CxfAutoConfiguration.class, "spring.cxf.path=/valid");
+        load(CxfAutoConfiguration.class, "cxf.path=/valid");
         assertThat(this.context.getBeansOfType(ServletRegistrationBean.class).size(),
                 equalTo(1));
         assertThat(this.context.getBean(ServletRegistrationBean.class).getUrlMappings(),
@@ -85,7 +85,7 @@ public class CxfAutoConfigurationTests {
 
     @Test
     public void customLoadOnStartup() {
-        load(CxfAutoConfiguration.class, "spring.cxf.servlet.load-on-startup=1");
+        load(CxfAutoConfiguration.class, "cxf.servlet.load-on-startup=1");
         ServletRegistrationBean registrationBean = this.context
                 .getBean(ServletRegistrationBean.class);
         Integer value = (Integer)ReflectionTestUtils.getField(registrationBean, "loadOnStartup");
@@ -94,7 +94,7 @@ public class CxfAutoConfigurationTests {
 
     @Test
     public void customInitParameters() {
-        load(CxfAutoConfiguration.class, "spring.cxf.servlet.init.key1=value1",
+        load(CxfAutoConfiguration.class, "cxf.servlet.init.key1=value1",
                 "spring.cxf.servlet.init.key2=value2");
         ServletRegistrationBean registrationBean = this.context
                 .getBean(ServletRegistrationBean.class);
