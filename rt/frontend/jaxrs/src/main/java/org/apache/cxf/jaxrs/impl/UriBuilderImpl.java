@@ -291,7 +291,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
             ? Collections.<String>emptySet() : new HashSet<String>();
         for (String var : uniqueVars) {
             
-            boolean resolvedPathVarHasToBeEncoded = !isQuery && alreadyResolvedTsPathEnc.containsKey(var);
+            boolean resolvedPathVarHasToBeEncoded = alreadyResolvedTsPathEnc.containsKey(var);
             boolean varValueHasToBeEncoded = resolvedPathVarHasToBeEncoded || alreadyResolvedTs.containsKey(var);
             
             Map<String, Object> resolved = !varValueHasToBeEncoded ? alreadyResolvedTsEnc 
