@@ -18,27 +18,18 @@
  */
 package org.apache.cxf.systest.jaxrs.security.oauth;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
+import java.net.URI;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import net.oauth.OAuth;
-import net.oauth.OAuthException;
-import net.oauth.OAuthMessage;
-import net.oauth.ParameterStyle;
 
-import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.jaxrs.client.WebClient;
+import org.apache.cxf.rs.security.oauth.client.OAuthClientUtils;
+import org.apache.cxf.rs.security.oauth.client.OAuthClientUtils.Token;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
-import org.eclipse.jetty.http.HttpHeaders;
-
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -46,8 +37,6 @@ public class TemporaryCredentialServiceTest extends AbstractBusClientServerTestB
 
     public static final String TEMPORARY_CREDENTIALS_URL = "/a/oauth/initiate";
     public static final String HOST = "http://localhost:";
-
-    private static final Logger LOG = LogUtils.getL7dLogger(TemporaryCredentialServiceTest.class);
 
     @BeforeClass
     public static void startServers() throws Exception {
@@ -59,62 +48,21 @@ public class TemporaryCredentialServiceTest extends AbstractBusClientServerTestB
     @Test
     public void testGetTemporaryCredentialsURIQuery() throws Exception {
         Map<String, String> parameters = new HashMap<String, String>();
-        parameters.put(OAuth.OAUTH_CALLBACK, OAuthTestUtils.CALLBACK);
         
-        //check all parameter transmissions
-        for (ParameterStyle style : ParameterStyle.values()) {
-            //for all signing methods
-            for (String signMethod : OAuthTestUtils.SIGN_METHOD) {
-                LOG.log(Level.INFO, "Preparing request with parameter style: {0} and signature method: {1}",
-                    new String[] {style.toString(), signMethod});
-
-                parameters.put(OAuth.OAUTH_SIGNATURE_METHOD, signMethod);
-                parameters.put(OAuth.OAUTH_NONCE, UUID.randomUUID().toString());
-                parameters.put(OAuth.OAUTH_TIMESTAMP, String.valueOf(System.currentTimeMillis() / 1000));
-                parameters.put(OAuth.OAUTH_CONSUMER_KEY, OAuthTestUtils.CLIENT_ID);
-                OAuthMessage message = invokeRequestToken(parameters, style, OAuthServer.PORT);
-
-                //test response ok
-                boolean isFormEncoded = OAuth.isFormEncoded(message.getBodyType());
-                Assert.assertTrue(isFormEncoded);
-
-                List<OAuth.Parameter> responseParams = OAuthTestUtils.getResponseParams(message);
-
-                String wwwHeader = message.getHeader(HttpHeaders.WWW_AUTHENTICATE);
-                Assert.assertNull(wwwHeader);
-
-                String callbacConf = OAuthTestUtils
-                    .findOAuthParameter(responseParams, OAuth.OAUTH_CALLBACK_CONFIRMED)
-                    .getValue();
-                Assert.assertEquals("true", callbacConf);
-
-                String oauthToken = OAuthTestUtils.findOAuthParameter(responseParams, OAuth.OAUTH_TOKEN)
-                    .getKey();
-                Assert.assertFalse(StringUtils.isEmpty(oauthToken));
-
-                String tokenSecret = OAuthTestUtils
-                    .findOAuthParameter(responseParams, OAuth.OAUTH_TOKEN_SECRET)
-                    .getKey();
-                Assert.assertFalse(StringUtils.isEmpty(tokenSecret));
-
-
-                //test wrong client id
-                parameters.put(OAuth.OAUTH_CONSUMER_KEY, "wrong");
-                message = invokeRequestToken(parameters, style, OAuthServer.PORT);
-                String response = message.getHeader("oauth_problem");
-                Assert.assertEquals(OAuth.Problems.CONSUMER_KEY_UNKNOWN, response);
-            }
-        }
-    }
-
-    protected OAuthMessage invokeRequestToken(Map<String, String> parameters, ParameterStyle style,
-                                              int port)
-        throws IOException, URISyntaxException, OAuthException {
-        OAuthMessage message;
-        String uri = HOST + port + TEMPORARY_CREDENTIALS_URL;
-        message = OAuthTestUtils
-            .access(uri, OAuthMessage.POST, parameters, style);
-        return message;
+        parameters.put(OAuth.OAUTH_SIGNATURE_METHOD, "HMAC-SHA1");
+        parameters.put(OAuth.OAUTH_NONCE, UUID.randomUUID().toString());
+        parameters.put(OAuth.OAUTH_TIMESTAMP, String.valueOf(System.currentTimeMillis() / 1000));
+        
+        String uri = HOST + OAuthServer.PORT + TEMPORARY_CREDENTIALS_URL;
+        WebClient wc = WebClient.create(uri);
+        
+        Token t = OAuthClientUtils.getRequestToken(wc, 
+            new OAuthClientUtils.Consumer(OAuthTestUtils.CLIENT_ID, OAuthTestUtils.CLIENT_SECRET), 
+                                         URI.create(OAuthTestUtils.CALLBACK), 
+                                         parameters);
+        assertNotNull(t);
+        assertNotNull(t.getToken());
+        assertNotNull(t.getSecret());
     }
 
 }

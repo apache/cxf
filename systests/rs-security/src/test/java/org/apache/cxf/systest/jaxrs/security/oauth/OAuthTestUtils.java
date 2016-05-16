@@ -22,18 +22,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URISyntaxException;
 import java.util.List;
-import java.util.Map;
 
 import net.oauth.OAuth;
-import net.oauth.OAuthAccessor;
-import net.oauth.OAuthConsumer;
-import net.oauth.OAuthException;
 import net.oauth.OAuthMessage;
-import net.oauth.ParameterStyle;
-import net.oauth.client.OAuthClient;
-import net.oauth.client.URLConnectionClient;
 
 public final class OAuthTestUtils {
 
@@ -41,28 +33,11 @@ public final class OAuthTestUtils {
     public static final String APPLICATION_NAME = "Test Oauth 1.0 application";
     public static final String CLIENT_ID = "12345678";
     public static final String CLIENT_SECRET = "secret";
-    public static final String[] SIGN_METHOD = {"HMAC-SHA1", "PLAINTEXT"};
-
+    
 
     private OAuthTestUtils() {
     }
 
-    public static OAuthMessage access(String url, String method, Map<String, String> params,
-                                      ParameterStyle style)
-        throws IOException, URISyntaxException, OAuthException {
-
-        OAuthConsumer consumer = new OAuthConsumer(null, params.get(OAuth.OAUTH_CONSUMER_KEY),
-            CLIENT_SECRET, null);
-
-        OAuthAccessor accessor = new OAuthAccessor(consumer);
-
-        OAuthMessage msg = accessor
-            .newRequestMessage(method, url, params.entrySet());
-
-        OAuthClient client = new OAuthClient(new URLConnectionClient());
-
-        return client.access(msg, style);
-    }
 
     public static String readBody(OAuthMessage msg) throws IOException {
         StringBuffer body = new StringBuffer();
