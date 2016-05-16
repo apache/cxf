@@ -183,6 +183,7 @@ public class FaultTest extends AbstractBusClientServerTestBase {
         
         // Creating a DOMSource Object for the request
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
         DocumentBuilder db = dbf.newDocumentBuilder();
         Document requestDoc = db.newDocument();
         Element root = requestDoc.createElementNS("http://www.example.org/schema/DoubleIt", "ns2:DoubleIt");
