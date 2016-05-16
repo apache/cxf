@@ -19,7 +19,6 @@
 
 package org.apache.cxf.interceptor;
 
-
 import java.io.FilterWriter;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -35,7 +34,6 @@ import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.io.CachedOutputStreamCallback;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
-
 
 /**
  * 
@@ -189,7 +187,7 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
             } catch (Exception ex) {
                 //ignore
             }
-            log(logger, buffer.toString());
+            log(logger, formatLoggingMessage(buffer));
             message.setContent(Writer.class, out);
             super.close();
         }
@@ -228,7 +226,7 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
             }
             if (!isShowMultipartContent() && isMultipartContent(ct)) {
                 buffer.getMessage().append(MULTIPART_CONTENT_MESSAGE).append('\n');
-                log(logger, buffer.toString());
+                log(logger, formatLoggingMessage(buffer));
                 return;
             }
             
@@ -259,8 +257,7 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
             } catch (Exception ex) {
                 //ignore
             }
-            message.setContent(OutputStream.class, 
-                               origStream);
+            message.setContent(OutputStream.class, origStream);
         }
     }
 
