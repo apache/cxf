@@ -132,12 +132,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>net.oauth.core</groupId>
-            <artifactId>oauth-consumer</artifactId>
-            <version>${oauth.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
             <scope>test</scope>
@@ -222,11 +216,4 @@
             </dependencies>
         </profile>
     </profiles>
-    <repositories>
-        <repository>
-            <id>oauth</id>
-            <name>OAuth Repository</name>
-            <url>http://oauth.googlecode.com/svn/code/maven/</url>
-        </repository>
-    </repositories>
 </project>
