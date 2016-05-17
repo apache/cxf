@@ -20,7 +20,6 @@ package org.apache.cxf.ws.security.wss4j.saml;
 
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -273,14 +272,14 @@ public class SamlTokenTest extends AbstractSecurityTest {
         xpaths.add("//wsse:Security/saml1:Assertion");
         
         try {
-            makeInvocation(outProperties, xpaths, inProperties, Collections.emptyMap());
+            makeInvocation(outProperties, xpaths, inProperties, new HashMap<String, String>());
             fail("Failure expected in SAML Validator");
         } catch (Fault ex) {
             // expected
         }
         validator.setRequireSenderVouches(false);
 
-        Message message = makeInvocation(outProperties, xpaths, inProperties, Collections.emptyMap());
+        Message message = makeInvocation(outProperties, xpaths, inProperties, new HashMap<String, String>());
         final List<WSHandlerResult> handlerResults = 
             CastUtils.cast((List<?>)message.get(WSHandlerConstants.RECV_RESULTS));
         
@@ -329,7 +328,7 @@ public class SamlTokenTest extends AbstractSecurityTest {
         xpaths.add("//wsse:Security/saml2:Assertion");
         
         try {
-            makeInvocation(outProperties, xpaths, inProperties, Collections.emptyMap());
+            makeInvocation(outProperties, xpaths, inProperties, new HashMap<String, String>());
             fail("Failure expected in SAML Validator");
         } catch (Fault ex) {
             // expected
@@ -337,14 +336,14 @@ public class SamlTokenTest extends AbstractSecurityTest {
         validator.setRequireSenderVouches(false);
         
         try {
-            makeInvocation(outProperties, xpaths, inProperties, Collections.emptyMap());
+            makeInvocation(outProperties, xpaths, inProperties, new HashMap<String, String>());
             fail("Failure expected in SAML Validator");
         } catch (Fault ex) {
             // expected
         }
         validator.setRequireSAML1Assertion(false);
 
-        Message message = makeInvocation(outProperties, xpaths, inProperties, Collections.emptyMap());
+        Message message = makeInvocation(outProperties, xpaths, inProperties, new HashMap<String, String>());
         final List<WSHandlerResult> handlerResults = 
             CastUtils.cast((List<?>)message.get(WSHandlerConstants.RECV_RESULTS));
         
