@@ -30,6 +30,7 @@ import javax.xml.soap.SOAPMessage;
 import javax.xml.soap.SOAPPart;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 
 import org.w3c.dom.Document;
@@ -39,6 +40,7 @@ import org.apache.cxf.helpers.DOMUtils.NullResolver;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.staxutils.StaxSource;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.junit.Assert;
 import org.junit.Test;
@@ -87,26 +89,30 @@ public class ParseBodyTest extends Assert {
     
     // TODO - See CXF-6900
     @Test
-    @org.junit.Ignore
     public void testReadSOAPFault() throws Exception {
         InputStream inStream = getClass().getResourceAsStream("soap12-fault.xml");
         Document doc = StaxUtils.read(inStream);
-
+        
         SoapMessage msg = new SoapMessage(new MessageImpl());
         Exchange ex = new ExchangeImpl();
         ex.setInMessage(msg);
         
         SOAPMessage saajMsg = MessageFactory.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL).createMessage();
         SOAPPart part = saajMsg.getSOAPPart();
-        part.setContent(new DOMSource(doc));
+        SAAJStreamWriter writer = new SAAJStreamWriter(part);
+        StaxUtils.copy(doc, writer);
+        //Source s = new StaxSource(StaxUtils.createXMLStreamReader(doc));
+        //part.setContent(s);
         saajMsg.saveChanges();
-
+        
         msg.setContent(SOAPMessage.class, saajMsg);
         doc = part;
         
         // System.out.println("OUTPUT: " + StaxUtils.toString(doc));
         
         byte[] docbytes = getMessageBytes(doc);
+        
+        // System.out.println("OUTPUT: " + new String(docbytes));
         XMLStreamReader reader = StaxUtils.createXMLStreamReader(new ByteArrayInputStream(docbytes));
 
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
