@@ -19,20 +19,16 @@
 package org.apache.cxf.ws.security.wss4j;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.util.List;
 import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPMessage;
-import javax.xml.soap.SOAPPart;
 import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLStreamWriter;
-import javax.xml.transform.dom.DOMSource;
 
 import org.w3c.dom.Document;
+
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils.NullResolver;
@@ -43,7 +39,6 @@ import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
-
 
 /**
  * This a test of the Signature Confirmation functionality that is contained in the
@@ -65,16 +60,7 @@ public class SignatureConfirmationTest extends AbstractSecurityTest {
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor();
         PhaseInterceptor<SoapMessage> handler = ohandler.createEndingInterceptor();
 
-        SoapMessage msg = new SoapMessage(new MessageImpl());
-        Exchange ex = new ExchangeImpl();
-        ex.setInMessage(msg);
-        
-        SOAPMessage saajMsg = MessageFactory.newInstance().createMessage();
-        SOAPPart part = saajMsg.getSOAPPart();
-        part.setContent(new DOMSource(doc));
-        saajMsg.saveChanges();
-
-        msg.setContent(SOAPMessage.class, saajMsg);
+        SoapMessage msg = getSoapMessageForDom(doc);
 
         msg.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
         msg.put(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION, "true");
@@ -88,7 +74,9 @@ public class SignatureConfirmationTest extends AbstractSecurityTest {
         msg.put(org.apache.cxf.message.Message.REQUESTOR_ROLE, true);
 
         handler.handleMessage(msg);
-        doc = part;
+        
+        SOAPMessage saajMsg = msg.getContent(SOAPMessage.class);
+        doc = saajMsg.getSOAPPart();
         
         assertValid("//wsse:Security", doc);
         assertValid("//wsse:Security/ds:Signature", doc);
@@ -117,6 +105,7 @@ public class SignatureConfirmationTest extends AbstractSecurityTest {
         WSS4JInInterceptor inHandler = new WSS4JInInterceptor();
 
         SoapMessage inmsg = new SoapMessage(new MessageImpl());
+        Exchange ex = new ExchangeImpl();
         ex.setInMessage(inmsg);
         inmsg.setContent(SOAPMessage.class, saajMsg);
 
@@ -147,23 +136,15 @@ public class SignatureConfirmationTest extends AbstractSecurityTest {
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor();
         PhaseInterceptor<SoapMessage> handler = ohandler.createEndingInterceptor();
 
-        SoapMessage msg = new SoapMessage(new MessageImpl());
-        Exchange ex = new ExchangeImpl();
-        ex.setInMessage(msg);
-        
-        SOAPMessage saajMsg = MessageFactory.newInstance().createMessage();
-        SOAPPart part = saajMsg.getSOAPPart();
-        part.setContent(new DOMSource(doc));
-        saajMsg.saveChanges();
-
-        msg.setContent(SOAPMessage.class, saajMsg);
+        SoapMessage msg = getSoapMessageForDom(doc);
 
         msg.put(WSHandlerConstants.ACTION, WSHandlerConstants.TIMESTAMP);
         msg.put(WSHandlerConstants.RECV_RESULTS, sigReceived);
         
         handler.handleMessage(msg);
 
-        doc = part;
+        SOAPMessage saajMsg = msg.getContent(SOAPMessage.class);
+        doc = saajMsg.getSOAPPart();
         
         assertValid("//wsse:Security", doc);
         // assertValid("//wsse:Security/wsse11:SignatureConfirmation", doc);
@@ -187,6 +168,7 @@ public class SignatureConfirmationTest extends AbstractSecurityTest {
         WSS4JInInterceptor inHandler = new WSS4JInInterceptor();
 
         SoapMessage inmsg = new SoapMessage(new MessageImpl());
+        Exchange ex = new ExchangeImpl();
         ex.setInMessage(inmsg);
         inmsg.setContent(SOAPMessage.class, saajMsg);
 
@@ -196,18 +178,4 @@ public class SignatureConfirmationTest extends AbstractSecurityTest {
         inHandler.handleMessage(inmsg);
     }
     
-    
-    private byte[] getMessageBytes(Document doc) throws Exception {
-        // XMLOutputFactory factory = XMLOutputFactory.newInstance();
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-
-        // XMLStreamWriter byteArrayWriter =
-        // factory.createXMLStreamWriter(outputStream);
-        XMLStreamWriter byteArrayWriter = StaxUtils.createXMLStreamWriter(outputStream);
-
-        StaxUtils.writeDocument(doc, byteArrayWriter, false);
-
-        byteArrayWriter.flush();
-        return outputStream.toByteArray();
-    }
 }
