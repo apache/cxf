@@ -59,11 +59,7 @@ public class SecurityActionTokenTest extends AbstractSecurityTest {
         outProperties.put(WSHandlerConstants.HANDLER_ACTIONS, actions);
         outProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
         
-<<<<<<< HEAD
-        Map<String, String> inProperties = new HashMap<String, String>();
-=======
-        Map<String, Object> inProperties = new HashMap<>();
->>>>>>> c4c48d0... Security test refactor
+        Map<String, Object> inProperties = new HashMap<String, Object>();
         inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
         inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
         
