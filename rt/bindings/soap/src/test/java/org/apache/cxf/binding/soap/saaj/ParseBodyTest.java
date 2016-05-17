@@ -30,7 +30,6 @@ import javax.xml.soap.SOAPMessage;
 import javax.xml.soap.SOAPPart;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
-import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 
 import org.w3c.dom.Document;
@@ -40,7 +39,6 @@ import org.apache.cxf.helpers.DOMUtils.NullResolver;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.MessageImpl;
-import org.apache.cxf.staxutils.StaxSource;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.junit.Assert;
 import org.junit.Test;
