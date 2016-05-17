@@ -52,6 +52,7 @@
     <security:global-method-security secured-annotations="disabled" jsr250-annotations="enabled"/>
     <security:http auto-config="true">
         <security:http-basic/>
+        <security:csrf disabled="true"/>
     </security:http>
     <security:authentication-manager>
 	    <security:authentication-provider>
