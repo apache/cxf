@@ -54,7 +54,6 @@ public class WSS4JFaultCodeTest extends AbstractSecurityTest {
      * Test for WSS4JInInterceptor when it receives a message with no security header. 
      */
     @Test
-    @org.junit.Ignore
     public void testNoSecurity() throws Exception {
         Document doc = readDocument("wsse-request-clean.xml");
 
@@ -104,7 +103,6 @@ public class WSS4JFaultCodeTest extends AbstractSecurityTest {
      * Test that an invalid Timestamp gets mapped to a proper fault code 
      */
     @Test
-    @org.junit.Ignore
     public void testInvalidTimestamp() throws Exception {
         Document doc = readDocument("wsse-request-clean.xml");
 
@@ -166,7 +164,6 @@ public class WSS4JFaultCodeTest extends AbstractSecurityTest {
      * Test that an action mismatch gets mapped to a proper fault code 
      */
     @Test
-    @org.junit.Ignore
     public void testActionMismatch() throws Exception {
         Document doc = readDocument("wsse-request-clean.xml");
 
