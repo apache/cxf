@@ -45,6 +45,7 @@ public class ContentTypeModifyingMBW implements MessageBodyWriter<String> {
                         MultivaluedMap<String, Object> headers, OutputStream os) throws IOException,
         WebApplicationException {
         headers.putSingle("Content-Type", mt.toString() + ";charset=us-ascii");
+        headers.putSingle("CustomHeader", "CustomValue");
         os.write(str.getBytes());
     }
 

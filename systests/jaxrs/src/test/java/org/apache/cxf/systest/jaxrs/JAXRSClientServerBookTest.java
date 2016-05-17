@@ -351,6 +351,8 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         String name = r.readEntity(String.class);
         assertEquals("Good book", name);
         assertEquals("text/custom;charset=us-ascii", r.getMediaType().toString());
+        assertEquals("CustomValue", r.getHeaderString("CustomHeader"));
+        
     }    
     
     @Test
