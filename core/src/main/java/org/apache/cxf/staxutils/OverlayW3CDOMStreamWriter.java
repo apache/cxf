@@ -38,9 +38,9 @@ import org.apache.cxf.common.util.StringUtils;
  * location, it will just walk into it instead of creating a new element
  */
 public class OverlayW3CDOMStreamWriter extends W3CDOMStreamWriter {
+    protected boolean isOverlaid = true;
 
     List<Boolean> isOverlaidStack = new LinkedList<Boolean>();
-    boolean isOverlaid = true;
     Boolean textOverlay;
     
     public OverlayW3CDOMStreamWriter(Document document) {

@@ -27,6 +27,8 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import javax.xml.soap.SOAPMessage;
+
 import org.w3c.dom.Document;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.MustUnderstandInterceptor;
@@ -37,6 +39,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.phase.PhaseInterceptorChain;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageChecker.XPathExpression;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageScope;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageType;
