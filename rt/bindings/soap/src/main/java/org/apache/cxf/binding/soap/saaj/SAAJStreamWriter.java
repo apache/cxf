@@ -25,6 +25,7 @@ import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPFault;
 import javax.xml.soap.SOAPHeader;
 import javax.xml.soap.SOAPPart;
+import javax.xml.stream.XMLStreamException;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -155,5 +156,20 @@ public final class SAAJStreamWriter extends OverlayW3CDOMStreamWriter {
         }
         return super.createElementNS(ns, pfx, local);
     }
-    
+
+    @Override
+    public String getPrefix(String uri) throws XMLStreamException {
+        String prefix = super.getPrefix(uri);
+        if (StringUtils.isEmpty(prefix)) {
+            try {
+                QName env = part.getEnvelope().getElementQName();
+                if (env.getNamespaceURI().equals(uri)) {
+                    prefix = env.getPrefix();
+                }
+            } catch (Exception e) {
+                //ignore
+            }
+        }
+        return prefix;
+    }
 }
