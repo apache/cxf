@@ -40,6 +40,10 @@ public final class SAAJStreamWriter extends OverlayW3CDOMStreamWriter {
     public SAAJStreamWriter(SOAPPart part) {
         super(part);
         this.part = part;
+        Node nd = part.getFirstChild();
+        if (nd == null) {
+            isOverlaid = false;
+        }
     }
     public SAAJStreamWriter(SOAPPart part, Element current) {
         super(part, current);
@@ -69,8 +73,14 @@ public final class SAAJStreamWriter extends OverlayW3CDOMStreamWriter {
                 if ("Envelope".equals(local)) {
                     setChild(adjustPrefix(part.getEnvelope(), prefix), false);
                     adjustPrefix(part.getEnvelope().getHeader(), prefix);
+                    adjustPrefix(part.getEnvelope().getBody(), prefix);
+                    part.getEnvelope().removeChild(part.getEnvelope().getHeader());
+                    part.getEnvelope().removeChild(part.getEnvelope().getBody());
                     return;
                 } else if ("Body".equals(local)) {
+                    if (part.getEnvelope().getBody() == null) {
+                        part.getEnvelope().addBody();
+                    }
                     setChild(adjustPrefix(part.getEnvelope().getBody(), prefix), false);
                     return;
                 } else if ("Header".equals(local)) {

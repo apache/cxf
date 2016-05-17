@@ -30,7 +30,6 @@ import java.util.concurrent.Executor;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 import javax.xml.soap.Node;
-import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
@@ -405,7 +404,7 @@ public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
      * @see #getSoapMessageForDom(Document, AssertionInfoMap)
      */
     protected SoapMessage getOutSoapMessageForDom(Document doc, AssertionInfoMap aim)
-        throws SOAPException {
+        throws Exception {
         SoapMessage msg = this.getSoapMessageForDom(doc, aim);
         msg.put(SecurityConstants.SIGNATURE_PROPERTIES, "outsecurity.properties");
         msg.put(SecurityConstants.ENCRYPT_PROPERTIES, "outsecurity.properties");
@@ -421,7 +420,7 @@ public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
     }
     
     protected SoapMessage getSoapMessageForDom(Document doc, AssertionInfoMap aim)
-        throws SOAPException {
+        throws Exception {
         
         SoapMessage msg = this.getSoapMessageForDom(doc);
         if (aim != null) {
