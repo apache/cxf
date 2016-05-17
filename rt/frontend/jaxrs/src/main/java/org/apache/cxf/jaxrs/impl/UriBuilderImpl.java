@@ -920,7 +920,17 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
             }
             
         }
+        String rawQuery = null;
+        index = uri.indexOf("?");
+        if (index != -1) {
+            rawQuery = uri.substring(index + 1);
+            uri = uri.substring(0, index);
+        }
         setPathAndMatrix(uri);
+        if (rawQuery != null) {
+            query = JAXRSUtils.getStructuredParams(rawQuery, "&", false, true);
+        }
+        
         return this;
     }
     
