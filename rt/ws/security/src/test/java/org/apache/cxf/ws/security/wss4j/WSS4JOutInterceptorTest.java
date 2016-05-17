@@ -22,14 +22,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.soap.SOAPMessage;
-import javax.xml.soap.SOAPPart;
 
 import org.w3c.dom.Document;
+
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
-import org.apache.cxf.message.Exchange;
-import org.apache.cxf.message.ExchangeImpl;
-import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.wss4j.common.SecurityActionToken;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -44,16 +41,11 @@ public class WSS4JOutInterceptorTest extends AbstractSecurityTest {
     
     @Test
     public void testUsernameTokenText() throws Exception {
-        SOAPMessage saaj = readSAAJDocument("wsse-request-clean.xml");
+        Document doc = readDocument("wsse-request-clean.xml");
+        SoapMessage msg = getSoapMessageForDom(doc);
 
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor();
         PhaseInterceptor<SoapMessage> handler = ohandler.createEndingInterceptor();
-
-        SoapMessage msg = new SoapMessage(new MessageImpl());
-        Exchange ex = new ExchangeImpl();
-        ex.setInMessage(msg);
-
-        msg.setContent(SOAPMessage.class, saaj);
 
         msg.put(WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN);
         msg.put(WSHandlerConstants.SIG_PROP_FILE, "outsecurity.properties");
@@ -62,7 +54,7 @@ public class WSS4JOutInterceptorTest extends AbstractSecurityTest {
         msg.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
         handler.handleMessage(msg);
 
-        SOAPPart doc = saaj.getSOAPPart();
+        doc = msg.getContent(SOAPMessage.class).getSOAPPart();
         assertValid("//wsse:Security", doc);
         assertValid("//wsse:Security/wsse:UsernameToken", doc);
         assertValid("//wsse:Security/wsse:UsernameToken/wsse:Username[text()='username']", doc);
@@ -72,16 +64,11 @@ public class WSS4JOutInterceptorTest extends AbstractSecurityTest {
         
     @Test
     public void testUsernameTokenDigest() throws Exception {
-        SOAPMessage saaj = readSAAJDocument("wsse-request-clean.xml");
+        Document doc = readDocument("wsse-request-clean.xml");
+        SoapMessage msg = getSoapMessageForDom(doc);
 
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor();
         PhaseInterceptor<SoapMessage> handler = ohandler.createEndingInterceptor();
-
-        SoapMessage msg = new SoapMessage(new MessageImpl());
-        Exchange ex = new ExchangeImpl();
-        ex.setInMessage(msg);
-
-        msg.setContent(SOAPMessage.class, saaj);
 
         msg.put(WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN);
         msg.put(WSHandlerConstants.SIG_PROP_FILE, "outsecurity.properties");
@@ -90,7 +77,7 @@ public class WSS4JOutInterceptorTest extends AbstractSecurityTest {
         msg.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_DIGEST);
         handler.handleMessage(msg);
 
-        SOAPPart doc = saaj.getSOAPPart();
+        doc = msg.getContent(SOAPMessage.class).getSOAPPart();
         assertValid("//wsse:Security", doc);
         assertValid("//wsse:Security/wsse:UsernameToken", doc);
         assertValid("//wsse:Security/wsse:UsernameToken/wsse:Username[text()='username']", doc);
@@ -100,17 +87,12 @@ public class WSS4JOutInterceptorTest extends AbstractSecurityTest {
 
     @Test
     public void testEncrypt() throws Exception {
-        SOAPMessage saaj = readSAAJDocument("wsse-request-clean.xml");
+        Document doc = readDocument("wsse-request-clean.xml");
+        SoapMessage msg = getSoapMessageForDom(doc);
 
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor();
         PhaseInterceptor<SoapMessage> handler = ohandler.createEndingInterceptor();
 
-        SoapMessage msg = new SoapMessage(new MessageImpl());
-        Exchange ex = new ExchangeImpl();
-        ex.setInMessage(msg);
-
-        msg.setContent(SOAPMessage.class, saaj);
-        
         msg.put(WSHandlerConstants.ACTION, WSHandlerConstants.ENCRYPT);
         msg.put(WSHandlerConstants.SIG_PROP_FILE, "outsecurity.properties");
         msg.put(WSHandlerConstants.ENC_PROP_FILE, "outsecurity.properties");
@@ -119,23 +101,18 @@ public class WSS4JOutInterceptorTest extends AbstractSecurityTest {
 
         handler.handleMessage(msg);
 
-        SOAPPart doc = saaj.getSOAPPart();
+        doc = msg.getContent(SOAPMessage.class).getSOAPPart();
         assertValid("//wsse:Security", doc);
         assertValid("//s:Body/xenc:EncryptedData", doc);
     }
     
     @Test
     public void testSignature() throws Exception {
-        SOAPMessage saaj = readSAAJDocument("wsse-request-clean.xml");
+        Document doc = readDocument("wsse-request-clean.xml");
+        SoapMessage msg = getSoapMessageForDom(doc);
 
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor();
         PhaseInterceptor<SoapMessage> handler = ohandler.createEndingInterceptor();
-
-        SoapMessage msg = new SoapMessage(new MessageImpl());
-        Exchange ex = new ExchangeImpl();
-        ex.setInMessage(msg);
-
-        msg.setContent(SOAPMessage.class, saaj);
 
         msg.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
         msg.put(WSHandlerConstants.SIG_PROP_FILE, "outsecurity.properties");
@@ -144,24 +121,19 @@ public class WSS4JOutInterceptorTest extends AbstractSecurityTest {
 
         handler.handleMessage(msg);
 
-        SOAPPart doc = saaj.getSOAPPart();
+        doc = msg.getContent(SOAPMessage.class).getSOAPPart();
         assertValid("//wsse:Security", doc);
         assertValid("//wsse:Security/ds:Signature", doc);
     }
 
     @Test
     public void testTimestamp() throws Exception {
-        SOAPMessage saaj = readSAAJDocument("wsse-request-clean.xml");
+        Document doc = readDocument("wsse-request-clean.xml");
+        SoapMessage msg = getSoapMessageForDom(doc);
 
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor();
         PhaseInterceptor<SoapMessage> handler = ohandler.createEndingInterceptor();
 
-        SoapMessage msg = new SoapMessage(new MessageImpl());
-        Exchange ex = new ExchangeImpl();
-        ex.setInMessage(msg);
-
-        msg.setContent(SOAPMessage.class, saaj);
-        
         ohandler.setProperty(WSHandlerConstants.ACTION, WSHandlerConstants.TIMESTAMP);
         ohandler.setProperty(WSHandlerConstants.SIG_PROP_FILE, "outsecurity.properties");
         msg.put(WSHandlerConstants.USER, "myalias");
@@ -169,23 +141,18 @@ public class WSS4JOutInterceptorTest extends AbstractSecurityTest {
 
         handler.handleMessage(msg);
 
-        SOAPPart doc = saaj.getSOAPPart();
+        doc = msg.getContent(SOAPMessage.class).getSOAPPart();
         assertValid("//wsse:Security", doc);
         assertValid("//wsse:Security/wsu:Timestamp", doc);
     }
     
     @Test
     public void testOverrideCustomAction() throws Exception {
-        SOAPMessage saaj = readSAAJDocument("wsse-request-clean.xml");
+        Document doc = readDocument("wsse-request-clean.xml");
+        SoapMessage msg = getSoapMessageForDom(doc);
 
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor();
         PhaseInterceptor<SoapMessage> handler = ohandler.createEndingInterceptor();
-
-        SoapMessage msg = new SoapMessage(new MessageImpl());
-        Exchange ex = new ExchangeImpl();
-        ex.setInMessage(msg);
-
-        msg.setContent(SOAPMessage.class, saaj);
         
         CountingUsernameTokenAction action = new CountingUsernameTokenAction();
         Map<Object, Object> customActions = new HashMap<Object, Object>(1);
@@ -199,7 +166,7 @@ public class WSS4JOutInterceptorTest extends AbstractSecurityTest {
         msg.put(WSS4JOutInterceptor.WSS4J_ACTION_MAP, customActions);
         handler.handleMessage(msg);
 
-        SOAPPart doc = saaj.getSOAPPart();
+        doc = msg.getContent(SOAPMessage.class).getSOAPPart();
         assertValid("//wsse:Security", doc);
         assertValid("//wsse:Security/wsse:UsernameToken", doc);
         assertValid("//wsse:Security/wsse:UsernameToken/wsse:Username[text()='username']", doc);
@@ -225,17 +192,12 @@ public class WSS4JOutInterceptorTest extends AbstractSecurityTest {
     
     @Test
     public void testAddCustomAction() throws Exception {
-        SOAPMessage saaj = readSAAJDocument("wsse-request-clean.xml");
+        Document doc = readDocument("wsse-request-clean.xml");
+        SoapMessage msg = getSoapMessageForDom(doc);
 
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor();
         PhaseInterceptor<SoapMessage> handler = ohandler.createEndingInterceptor();
 
-        SoapMessage msg = new SoapMessage(new MessageImpl());
-        Exchange ex = new ExchangeImpl();
-        ex.setInMessage(msg);
-
-        msg.setContent(SOAPMessage.class, saaj);
-        
         CountingUsernameTokenAction action = new CountingUsernameTokenAction();
         Map<Object, Object> customActions = new HashMap<Object, Object>(1);
         customActions.put(12345, action);
@@ -248,7 +210,7 @@ public class WSS4JOutInterceptorTest extends AbstractSecurityTest {
         msg.put(WSS4JOutInterceptor.WSS4J_ACTION_MAP, customActions);
         handler.handleMessage(msg);
 
-        SOAPPart doc = saaj.getSOAPPart();
+        doc = msg.getContent(SOAPMessage.class).getSOAPPart();
         assertValid("//wsse:Security", doc);
         assertValid("//wsse:Security/wsse:UsernameToken", doc);
         assertValid("//wsse:Security/wsse:UsernameToken/wsse:Username[text()='username']", doc);
