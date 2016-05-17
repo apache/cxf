@@ -52,6 +52,9 @@ public final class SAAJStreamWriter extends OverlayW3CDOMStreamWriter {
             if (namespace != null 
                 && namespace.equals(part.getEnvelope().getElementName().getURI())) {
                 adjustPrefix((SOAPElement)nd2, pfx);
+                if ("Envelope".equals(nd2.getLocalName())) {
+                    adjustPrefix(part.getEnvelope().getHeader(), pfx);
+                }
             }
         } catch (SOAPException e) {
             //ignore, fallback
@@ -146,6 +149,7 @@ public final class SAAJStreamWriter extends OverlayW3CDOMStreamWriter {
                     el = ((SOAPElement)cur).addChildElement(local, "", "");
                 } else {
                     el = ((SOAPElement)cur).addChildElement(local, pfx == null ? "" : pfx, ns);
+                    adjustPrefix((SOAPElement)el, pfx);
                 }
                 cur.removeChild(el);
                 return el;
