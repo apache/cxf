@@ -115,8 +115,7 @@ public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
         final Element inPolicyElement;
 
         if (inPolicyDocument != null) {
-            inPolicyElement = this.readDocument(inPolicyDocument)
-                    .getDocumentElement();
+            inPolicyElement = this.readDocument(inPolicyDocument).getDocumentElement();
         } else {
             inPolicyElement = outPolicyElement;
         }
@@ -416,7 +415,7 @@ public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
         SoapMessage msg = this.getSoapMessageForDom(doc, aim);
         msg.put(SecurityConstants.SIGNATURE_PROPERTIES, "outsecurity.properties");
         msg.put(SecurityConstants.ENCRYPT_PROPERTIES, "outsecurity.properties");
-        msg.put(SecurityConstants.CALLBACK_HANDLER, TestPwdCallback.class.getName());
+        msg.put(SecurityConstants.CALLBACK_HANDLER, new TestPwdCallback());
         msg.put(SecurityConstants.SIGNATURE_USERNAME, "myalias");
         msg.put(SecurityConstants.ENCRYPT_USERNAME, "myalias");
         

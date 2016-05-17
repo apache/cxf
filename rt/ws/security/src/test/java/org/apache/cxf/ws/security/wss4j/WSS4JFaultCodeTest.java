@@ -19,20 +19,15 @@
 package org.apache.cxf.ws.security.wss4j;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.soap.MessageFactory;
-import javax.xml.soap.SOAPConstants;
 import javax.xml.soap.SOAPMessage;
-import javax.xml.soap.SOAPPart;
 import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLStreamWriter;
-import javax.xml.transform.dom.DOMSource;
 
 import org.w3c.dom.Document;
+
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.helpers.DOMUtils.NullResolver;
@@ -63,17 +58,9 @@ public class WSS4JFaultCodeTest extends AbstractSecurityTest {
     public void testNoSecurity() throws Exception {
         Document doc = readDocument("wsse-request-clean.xml");
 
-        SoapMessage msg = new SoapMessage(new MessageImpl());
-        Exchange ex = new ExchangeImpl();
-        ex.setInMessage(msg);
-        
-        SOAPMessage saajMsg = MessageFactory.newInstance().createMessage();
-        SOAPPart part = saajMsg.getSOAPPart();
-        part.setContent(new DOMSource(doc));
-        saajMsg.saveChanges();
-
-        msg.setContent(SOAPMessage.class, saajMsg);
-        doc = part;
+        SoapMessage msg = getSoapMessageForDom(doc);
+        SOAPMessage saajMsg = msg.getContent(SOAPMessage.class);
+        doc = saajMsg.getSOAPPart();
         
         byte[] docbytes = getMessageBytes(doc);
         XMLStreamReader reader = StaxUtils.createXMLStreamReader(new ByteArrayInputStream(docbytes));
@@ -92,6 +79,7 @@ public class WSS4JFaultCodeTest extends AbstractSecurityTest {
         WSS4JInInterceptor inHandler = new WSS4JInInterceptor();
 
         SoapMessage inmsg = new SoapMessage(new MessageImpl());
+        Exchange ex = new ExchangeImpl();
         ex.setInMessage(inmsg);
         inmsg.setContent(SOAPMessage.class, saajMsg);
 
@@ -123,23 +111,15 @@ public class WSS4JFaultCodeTest extends AbstractSecurityTest {
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor();
         PhaseInterceptor<SoapMessage> handler = ohandler.createEndingInterceptor();
 
-        SoapMessage msg = new SoapMessage(new MessageImpl());
-        Exchange ex = new ExchangeImpl();
-        ex.setInMessage(msg);
-        
-        SOAPMessage saajMsg = MessageFactory.newInstance().createMessage();
-        SOAPPart part = saajMsg.getSOAPPart();
-        part.setContent(new DOMSource(doc));
-        saajMsg.saveChanges();
-
-        msg.setContent(SOAPMessage.class, saajMsg);
+        SoapMessage msg = getSoapMessageForDom(doc);
 
         msg.put(WSHandlerConstants.ACTION, WSHandlerConstants.TIMESTAMP);
         msg.put(WSHandlerConstants.TTL_TIMESTAMP, "1");
 
         handler.handleMessage(msg);
 
-        doc = part;
+        SOAPMessage saajMsg = msg.getContent(SOAPMessage.class);
+        doc = saajMsg.getSOAPPart();
         
         assertValid("//wsse:Security", doc);
 
@@ -160,6 +140,7 @@ public class WSS4JFaultCodeTest extends AbstractSecurityTest {
         WSS4JInInterceptor inHandler = new WSS4JInInterceptor();
 
         SoapMessage inmsg = new SoapMessage(new MessageImpl());
+        Exchange ex = new ExchangeImpl();
         ex.setInMessage(inmsg);
         inmsg.setContent(SOAPMessage.class, saajMsg);
 
@@ -192,22 +173,14 @@ public class WSS4JFaultCodeTest extends AbstractSecurityTest {
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor();
         PhaseInterceptor<SoapMessage> handler = ohandler.createEndingInterceptor();
 
-        SoapMessage msg = new SoapMessage(new MessageImpl());
-        Exchange ex = new ExchangeImpl();
-        ex.setInMessage(msg);
-        
-        SOAPMessage saajMsg = MessageFactory.newInstance().createMessage();
-        SOAPPart part = saajMsg.getSOAPPart();
-        part.setContent(new DOMSource(doc));
-        saajMsg.saveChanges();
-
-        msg.setContent(SOAPMessage.class, saajMsg);
+        SoapMessage msg = getSoapMessageForDom(doc);
 
         msg.put(WSHandlerConstants.ACTION, WSHandlerConstants.TIMESTAMP);
 
         handler.handleMessage(msg);
 
-        doc = part;
+        SOAPMessage saajMsg = msg.getContent(SOAPMessage.class);
+        doc = saajMsg.getSOAPPart();
         
         assertValid("//wsse:Security", doc);
 
@@ -228,6 +201,7 @@ public class WSS4JFaultCodeTest extends AbstractSecurityTest {
         WSS4JInInterceptor inHandler = new WSS4JInInterceptor();
 
         SoapMessage inmsg = new SoapMessage(new MessageImpl());
+        Exchange ex = new ExchangeImpl();
         ex.setInMessage(inmsg);
         inmsg.setContent(SOAPMessage.class, saajMsg);
 
@@ -254,17 +228,9 @@ public class WSS4JFaultCodeTest extends AbstractSecurityTest {
     public void testSignedEncryptedSOAP12Fault() throws Exception {
         Document doc = readDocument("wsse-response-fault.xml");
 
-        SoapMessage msg = new SoapMessage(new MessageImpl());
-        Exchange ex = new ExchangeImpl();
-        ex.setInMessage(msg);
-        
-        SOAPMessage saajMsg = MessageFactory.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL).createMessage();
-        SOAPPart part = saajMsg.getSOAPPart();
-        part.setContent(new DOMSource(doc));
-        saajMsg.saveChanges();
-
-        msg.setContent(SOAPMessage.class, saajMsg);
-        doc = part;
+        SoapMessage msg = getSoapMessageForDom(doc);
+        SOAPMessage saajMsg = msg.getContent(SOAPMessage.class);
+        doc = saajMsg.getSOAPPart();
         
         byte[] docbytes = getMessageBytes(doc);
         XMLStreamReader reader = StaxUtils.createXMLStreamReader(new ByteArrayInputStream(docbytes));
@@ -283,6 +249,7 @@ public class WSS4JFaultCodeTest extends AbstractSecurityTest {
         WSS4JInInterceptor inHandler = new WSS4JInInterceptor();
 
         SoapMessage inmsg = new SoapMessage(new MessageImpl());
+        Exchange ex = new ExchangeImpl();
         ex.setInMessage(inmsg);
         inmsg.setContent(SOAPMessage.class, saajMsg);
 
@@ -310,17 +277,4 @@ public class WSS4JFaultCodeTest extends AbstractSecurityTest {
         }
     }
     
-    private byte[] getMessageBytes(Document doc) throws Exception {
-        // XMLOutputFactory factory = XMLOutputFactory.newInstance();
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-
-        // XMLStreamWriter byteArrayWriter =
-        // factory.createXMLStreamWriter(outputStream);
-        XMLStreamWriter byteArrayWriter = StaxUtils.createXMLStreamWriter(outputStream);
-
-        StaxUtils.writeDocument(doc, byteArrayWriter, false);
-
-        byteArrayWriter.flush();
-        return outputStream.toByteArray();
-    }
 }

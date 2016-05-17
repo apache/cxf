@@ -100,10 +100,8 @@ public class DOMToStaxSamlTest extends AbstractSecurityTest {
         
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SAML_TOKEN_SIGNED);
-        properties.put(
-            WSHandlerConstants.SAML_CALLBACK_CLASS, 
-            "org.apache.cxf.ws.security.wss4j.saml.SAML1CallbackHandler"
-        );
+        properties.put(WSHandlerConstants.SAML_CALLBACK_REF, new SAML1CallbackHandler());
+
         properties.put(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
         properties.put(WSHandlerConstants.USER, "alice");
         properties.put(WSHandlerConstants.PW_CALLBACK_REF, new PasswordCallbackHandler());
@@ -165,10 +163,8 @@ public class DOMToStaxSamlTest extends AbstractSecurityTest {
         
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SAML_TOKEN_SIGNED);
-        properties.put(
-            WSHandlerConstants.SAML_CALLBACK_CLASS, 
-            "org.apache.cxf.ws.security.wss4j.saml.SAML2CallbackHandler"
-        );
+        properties.put(WSHandlerConstants.SAML_CALLBACK_REF, new SAML2CallbackHandler());
+
         properties.put(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
         properties.put(WSHandlerConstants.USER, "alice");
         properties.put(WSHandlerConstants.PW_CALLBACK_REF, new PasswordCallbackHandler());
@@ -209,9 +205,7 @@ public class DOMToStaxSamlTest extends AbstractSecurityTest {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setConfirmationMethod(SAML1Constants.CONF_HOLDER_KEY);
         callbackHandler.setSignAssertion(true);
-        properties.put(
-            WSHandlerConstants.SAML_CALLBACK_REF, callbackHandler
-        );
+        properties.put(WSHandlerConstants.SAML_CALLBACK_REF, callbackHandler);
         
         properties.put(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
         properties.put(WSHandlerConstants.USER, "alice");
@@ -261,9 +255,7 @@ public class DOMToStaxSamlTest extends AbstractSecurityTest {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
         callbackHandler.setSignAssertion(true);
-        properties.put(
-            WSHandlerConstants.SAML_CALLBACK_REF, callbackHandler
-        );
+        properties.put(WSHandlerConstants.SAML_CALLBACK_REF, callbackHandler);
         
         properties.put(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
         properties.put(WSHandlerConstants.USER, "alice");

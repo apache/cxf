@@ -18,29 +18,36 @@
  */
 package org.apache.cxf.ws.security.wss4j;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
+import java.util.Map;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.soap.SOAPPart;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMSource;
 
 import org.w3c.dom.Document;
 
-import org.xml.sax.SAXException;
-
 import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.helpers.DOMUtils.NullResolver;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.test.AbstractCXFTest;
 import org.apache.wss4j.dom.WSConstants;
@@ -71,16 +78,6 @@ public abstract class AbstractSecurityTest extends AbstractCXFTest {
     }
 
     /**
-     * Reads a classpath resource into a SAAJ structure.
-     * @param name the name of the classpath resource
-     */
-    protected SOAPMessage readSAAJDocument(String name) throws SAXException, IOException,
-        ParserConfigurationException, SOAPException {
-        InputStream inStream = getClass().getResourceAsStream(name);
-        return MessageFactory.newInstance().createMessage(null, inStream);
-    }
-    
-    /**
      * Creates a {@link SoapMessage} from the contents of a document.
      * @param doc the document containing the SOAP content.
      */
@@ -90,15 +87,73 @@ public abstract class AbstractSecurityTest extends AbstractCXFTest {
         part.setContent(new DOMSource(doc));
         saajMsg.saveChanges();
 
-        // Hack to create the context map
         MessageImpl message = new MessageImpl();
-        message.getContextualProperty("XYZ");
-        
         SoapMessage msg = new SoapMessage(message);
         Exchange ex = new ExchangeImpl();
         ex.setInMessage(msg);
         msg.setContent(SOAPMessage.class, saajMsg);
+        
         return msg;
+    }
+    
+    protected byte[] getMessageBytes(Document doc) throws Exception {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        XMLStreamWriter byteArrayWriter = StaxUtils.createXMLStreamWriter(outputStream);
+        StaxUtils.writeDocument(doc, byteArrayWriter, false);
+        byteArrayWriter.flush();
+        return outputStream.toByteArray();
+    }
+   
+    protected SoapMessage makeInvocation(
+        Map<String, Object> outProperties,
+        List<String> xpaths,
+        Map<String, Object> inProperties
+    ) throws Exception {
+        Document doc = readDocument("wsse-request-clean.xml");
+
+        WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor();
+        PhaseInterceptor<SoapMessage> handler = ohandler.createEndingInterceptor();
+
+        SoapMessage msg = getSoapMessageForDom(doc);
+
+        for (String key : outProperties.keySet()) {
+            msg.put(key, outProperties.get(key));
+        }
+
+        handler.handleMessage(msg);
+
+        SOAPMessage saajMsg = msg.getContent(SOAPMessage.class);
+        doc = saajMsg.getSOAPPart();
+
+        for (String xpath : xpaths) {
+            assertValid(xpath, doc);
+        }
+
+        byte[] docbytes = getMessageBytes(doc);
+        XMLStreamReader reader = StaxUtils.createXMLStreamReader(new ByteArrayInputStream(docbytes));
+
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+
+        dbf.setValidating(false);
+        dbf.setIgnoringComments(false);
+        dbf.setIgnoringElementContentWhitespace(true);
+        dbf.setNamespaceAware(true);
+
+        DocumentBuilder db = dbf.newDocumentBuilder();
+        db.setEntityResolver(new NullResolver());
+        doc = StaxUtils.read(db, reader, false);
+
+        WSS4JInInterceptor inHandler = new WSS4JInInterceptor(inProperties);
+
+        SoapMessage inmsg = new SoapMessage(new MessageImpl());
+        Exchange ex = new ExchangeImpl();
+        ex.setInMessage(inmsg);
+        inmsg.setContent(SOAPMessage.class, saajMsg);
+
+        
+        inHandler.handleMessage(inmsg);
+
+        return inmsg;
     }
     
     protected static boolean checkUnrestrictedPoliciesInstalled() {
