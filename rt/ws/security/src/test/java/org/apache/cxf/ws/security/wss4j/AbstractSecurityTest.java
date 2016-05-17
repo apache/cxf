@@ -32,17 +32,16 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.soap.MessageFactory;
-import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.soap.SOAPPart;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
-import javax.xml.transform.dom.DOMSource;
 
 import org.w3c.dom.Document;
 
 import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.binding.soap.saaj.SAAJStreamWriter;
 import org.apache.cxf.helpers.DOMUtils.NullResolver;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
@@ -81,10 +80,11 @@ public abstract class AbstractSecurityTest extends AbstractCXFTest {
      * Creates a {@link SoapMessage} from the contents of a document.
      * @param doc the document containing the SOAP content.
      */
-    protected SoapMessage getSoapMessageForDom(Document doc) throws SOAPException {
+    protected SoapMessage getSoapMessageForDom(Document doc) throws Exception {
         SOAPMessage saajMsg = MessageFactory.newInstance().createMessage();
         SOAPPart part = saajMsg.getSOAPPart();
-        part.setContent(new DOMSource(doc));
+        SAAJStreamWriter writer = new SAAJStreamWriter(part);
+        StaxUtils.copy(doc, writer);
         saajMsg.saveChanges();
 
         MessageImpl message = new MessageImpl();
