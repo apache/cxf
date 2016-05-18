@@ -28,15 +28,19 @@ import javax.ws.rs.core.Response;
 
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.jose.jws.JwsHeaders;
+import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactConsumer;
 import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactProducer;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
+import org.apache.cxf.rs.security.oauth2.common.OAuthAuthorizationData;
+import org.apache.cxf.rs.security.oidc.common.IdToken;
 import org.apache.cxf.rs.security.oidc.common.UserInfo;
 import org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuth2TestUtils;
 import org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuth2TestUtils.AuthorizationCodeParameters;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.TestUtil;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 
 /**
@@ -54,6 +58,126 @@ public class OIDCNegativeTest extends AbstractBusClientServerTestBase {
                 // set this to false to fork
                 launchServer(OIDCNegativeServer.class, true)
         );
+    }
+    
+    // TODO
+    @org.junit.Test
+    @org.junit.Ignore
+    public void testImplicitFlowPromptNone() throws Exception {
+        URL busFile = OIDCFlowTest.class.getResource("client.xml");
+        
+        String address = "https://localhost:" + PORT + "/services/";
+        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(), 
+                                            "alice", "security", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+       
+        // Get Access Token
+        client.type("application/json").accept("application/json");
+        client.query("client_id", "consumer-id");
+        client.query("redirect_uri", "http://www.blah.apache.org");
+        client.query("scope", "openid");
+        client.query("response_type", "id_token");
+        client.query("nonce", "1234565635");
+        client.query("prompt", "none login");
+        client.path("authorize-implicit/");
+        Response response = client.get();
+        
+        try {
+            response.readEntity(OAuthAuthorizationData.class);
+            fail("Failure expected on a bad prompt");
+        } catch (Exception ex) {
+            // expected
+        }
+    }
+    
+    @org.junit.Test
+    @org.junit.Ignore
+    public void testImplicitFlowMaxAge() throws Exception {
+        URL busFile = OIDCFlowTest.class.getResource("client.xml");
+        
+        String address = "https://localhost:" + PORT + "/services/";
+        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(), 
+                                            "alice", "security", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+       
+        // Get Access Token
+        client.type("application/json").accept("application/json");
+        client.query("client_id", "consumer-id");
+        client.query("redirect_uri", "http://www.blah.apache.org");
+        client.query("scope", "openid");
+        client.query("response_type", "id_token");
+        client.query("nonce", "1234565635");
+        client.query("max_age", "300");
+        client.path("authorize-implicit/");
+        Response response = client.get();
+        
+        OAuthAuthorizationData authzData = response.readEntity(OAuthAuthorizationData.class);
+        
+        // Now call "decision" to get the access token
+        client.path("decision");
+        client.type("application/x-www-form-urlencoded");
+        
+        Form form = new Form();
+        form.param("session_authenticity_token", authzData.getAuthenticityToken());
+        form.param("client_id", authzData.getClientId());
+        form.param("redirect_uri", authzData.getRedirectUri());
+        form.param("scope", authzData.getProposedScope());
+        if (authzData.getResponseType() != null) {
+            form.param("response_type", authzData.getResponseType());
+        }
+        if (authzData.getNonce() != null) {
+            form.param("nonce", authzData.getNonce());
+        }
+        form.param("oauthDecision", "allow");
+        
+        response = client.post(form);
+        
+        String location = response.getHeaderString("Location"); 
+        
+        // Check IdToken
+        String idToken = OAuth2TestUtils.getSubstring(location, "id_token");
+        assertNotNull(idToken);
+        
+        JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(idToken);
+        JwtToken jwt = jwtConsumer.getJwtToken();
+        Assert.assertNotNull(jwt.getClaims().getClaim(IdToken.AUTH_TIME_CLAIM));
+    }
+    
+    @org.junit.Test
+    public void testImplicitFlowNoNonce() throws Exception {
+        URL busFile = OIDCFlowTest.class.getResource("client.xml");
+        
+        String address = "https://localhost:" + PORT + "/services/";
+        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(), 
+                                            "alice", "security", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+       
+        // Get Access Token
+        client.type("application/json").accept("application/json");
+        client.query("client_id", "consumer-id");
+        client.query("redirect_uri", "http://www.blah.apache.org");
+        client.query("scope", "openid");
+        client.query("response_type", "id_token");
+        client.path("authorize-implicit/");
+        Response response = client.get();
+        
+        try {
+            response.readEntity(OAuthAuthorizationData.class);
+            fail("Failure expected on no nonce");
+        } catch (Exception ex) {
+            // expected
+        }
+
+        // Add a nonce and it should succeed
+        client.query("nonce", "1234565635");
+        response = client.get();
+        response.readEntity(OAuthAuthorizationData.class);
     }
     
     @org.junit.Test

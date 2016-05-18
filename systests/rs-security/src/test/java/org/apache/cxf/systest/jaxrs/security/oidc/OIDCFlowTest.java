@@ -476,6 +476,11 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         idToken = accessToken.getParameters().get("id_token");
         assertNotNull(idToken);
         validateIdToken(idToken, null);
+        
+        // JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(idToken);
+        // JwtToken jwt = jwtConsumer.getJwtToken();
+        // TODO Assert.assertNotNull(jwt.getClaims().getClaim(IdToken.AUTH_CODE_HASH_CLAIM));
+        // TODO Assert.assertNull(jwt.getClaims().getClaim(IdToken.ACCESS_TOKEN_HASH_CLAIM));
     }
     
     @org.junit.Test
@@ -543,6 +548,11 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         // Check Access Token
         String accessToken = OAuth2TestUtils.getSubstring(location, "access_token");
         assertNotNull(accessToken);
+        
+        JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(idToken);
+        JwtToken jwt = jwtConsumer.getJwtToken();
+        Assert.assertNotNull(jwt.getClaims().getClaim(IdToken.ACCESS_TOKEN_HASH_CLAIM));
+        // TODO Assert.assertNotNull(jwt.getClaims().getClaim(IdToken.AUTH_CODE_HASH_CLAIM));
     }
     
     @org.junit.Test
