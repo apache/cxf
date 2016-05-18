@@ -480,7 +480,6 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         // JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(idToken);
         // JwtToken jwt = jwtConsumer.getJwtToken();
         // TODO Assert.assertNotNull(jwt.getClaims().getClaim(IdToken.AUTH_CODE_HASH_CLAIM));
-        // TODO Assert.assertNull(jwt.getClaims().getClaim(IdToken.ACCESS_TOKEN_HASH_CLAIM));
     }
     
     @org.junit.Test
