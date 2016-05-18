@@ -32,6 +32,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.soap.MessageFactory;
+import javax.xml.soap.SOAPConstants;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.soap.SOAPPart;
 import javax.xml.stream.XMLStreamReader;
@@ -81,7 +82,11 @@ public abstract class AbstractSecurityTest extends AbstractCXFTest {
      * @param doc the document containing the SOAP content.
      */
     protected SoapMessage getSoapMessageForDom(Document doc) throws Exception {
-        SOAPMessage saajMsg = MessageFactory.newInstance().createMessage();
+        return getSoapMessageForDom(doc, SOAPConstants.SOAP_1_1_PROTOCOL);
+    }
+    
+    protected SoapMessage getSoapMessageForDom(Document doc, String protocol) throws Exception {
+        SOAPMessage saajMsg = MessageFactory.newInstance(protocol).createMessage();
         SOAPPart part = saajMsg.getSOAPPart();
         SAAJStreamWriter writer = new SAAJStreamWriter(part);
         StaxUtils.copy(doc, writer);

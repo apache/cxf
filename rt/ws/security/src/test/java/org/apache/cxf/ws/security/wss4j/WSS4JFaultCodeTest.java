@@ -23,6 +23,7 @@ import java.io.ByteArrayInputStream;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.soap.SOAPConstants;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.stream.XMLStreamReader;
 
@@ -225,7 +226,7 @@ public class WSS4JFaultCodeTest extends AbstractSecurityTest {
     public void testSignedEncryptedSOAP12Fault() throws Exception {
         Document doc = readDocument("wsse-response-fault.xml");
 
-        SoapMessage msg = getSoapMessageForDom(doc);
+        SoapMessage msg = getSoapMessageForDom(doc, SOAPConstants.SOAP_1_2_PROTOCOL);
         SOAPMessage saajMsg = msg.getContent(SOAPMessage.class);
         doc = saajMsg.getSOAPPart();
         
