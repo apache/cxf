@@ -62,11 +62,18 @@
             <optional>true</optional>
         </dependency>
         <dependency>
-            <groupId>net.sf.ehcache</groupId>
-            <artifactId>ehcache</artifactId>
-            <version>${cxf.ehcache.version}</version>
-            <scope>provided</scope>
-            <optional>true</optional>
+          <groupId>net.sf.ehcache</groupId>
+          <artifactId>ehcache</artifactId>
+          <version>${cxf.ehcache.version}</version>
+          <scope>provided</scope>
+          <optional>true</optional>
+        </dependency>
+        <dependency>
+          <groupId>javax.cache</groupId>
+          <artifactId>cache-api</artifactId>
+          <version>${cxf.jcache.version}</version>
+          <scope>provided</scope>
+          <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
@@ -102,6 +109,12 @@
             <version>${hsqldb.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+          <groupId>org.ehcache</groupId>
+          <artifactId>ehcache</artifactId>
+          <version>${cxf.ehcache3.version}</version>
+          <scope>test</scope>
+        </dependency>
         <!--
         <dependency>
              <groupId>org.apache.openjpa</groupId>
@@ -116,6 +129,12 @@
             <version>${hibernate.em.version}</version>
             <scope>test</scope>
         </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-nop</artifactId>
+        <version>${cxf.slf4j.version}</version>
+        <scope>test</scope>
+      </dependency>
         
      </dependencies>
      <build>
