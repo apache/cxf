@@ -114,8 +114,11 @@ public final class OidcUtils {
         validateAccessTokenHash(at, jwt, true);
     }
     public static void validateAccessTokenHash(ClientAccessToken at, JwtToken jwt, boolean required) {
+        validateAccessTokenHash(at.getTokenKey(), jwt, required);
+    }
+    public static void validateAccessTokenHash(String accessToken, JwtToken jwt, boolean required) {
         if (required) {
-            validateHash(at.getTokenKey(),
+            validateHash(accessToken,
                          (String)jwt.getClaims().getClaim(IdToken.ACCESS_TOKEN_HASH_CLAIM),
                          jwt.getJwsHeaders().getSignatureAlgorithm());
         }

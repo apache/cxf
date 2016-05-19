@@ -44,6 +44,7 @@ import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.OAuthAuthorizationData;
 import org.apache.cxf.rs.security.oidc.common.IdToken;
+import org.apache.cxf.rs.security.oidc.utils.OidcUtils;
 import org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuth2TestUtils;
 import org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuth2TestUtils.AuthorizationCodeParameters;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -368,6 +369,7 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         JwtToken jwt = jwtConsumer.getJwtToken();
         Assert.assertNotNull(jwt.getClaims().getClaim(IdToken.ACCESS_TOKEN_HASH_CLAIM));
         Assert.assertNotNull(jwt.getClaims().getClaim(IdToken.NONCE_CLAIM));
+        OidcUtils.validateAccessTokenHash(accessToken, jwt, true);
     }
     
     @org.junit.Test
@@ -551,6 +553,7 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(idToken);
         JwtToken jwt = jwtConsumer.getJwtToken();
         Assert.assertNotNull(jwt.getClaims().getClaim(IdToken.ACCESS_TOKEN_HASH_CLAIM));
+        OidcUtils.validateAccessTokenHash(accessToken, jwt, true);
         // TODO Assert.assertNotNull(jwt.getClaims().getClaim(IdToken.AUTH_CODE_HASH_CLAIM));
     }
     
