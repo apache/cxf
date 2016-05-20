@@ -60,6 +60,10 @@ public class W3CDOMStreamWriter implements XMLStreamWriter {
         this.document = frag.getOwnerDocument();
         currentNode = frag;
     }
+    public W3CDOMStreamWriter(Document document, DocumentFragment frag) {
+        this.document = document;
+        currentNode = frag;
+    }
 
     public W3CDOMStreamWriter(Element e) {
         this.document = e.getOwnerDocument();

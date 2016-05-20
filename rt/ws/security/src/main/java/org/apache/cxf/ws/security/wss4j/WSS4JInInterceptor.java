@@ -196,7 +196,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             config = engine.getWssConfig();
         }
         reqData.setWssConfig(config);
-        // reqData.setEncryptionSerializer(new StaxSerializer());
+        reqData.setEncryptionSerializer(new StaxSerializer());
         
         // Add Audience Restrictions for SAML
         configureAudienceRestriction(msg, reqData);

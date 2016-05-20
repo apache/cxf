@@ -22,6 +22,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.StringReader;
 
+import javax.xml.soap.SOAPElement;
+import javax.xml.soap.SOAPEnvelope;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
@@ -35,6 +37,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
+import org.apache.cxf.binding.soap.saaj.SAAJStreamWriter;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.xml.security.encryption.AbstractSerializer;
 import org.apache.xml.security.encryption.XMLEncryptionException;
@@ -105,26 +108,53 @@ public class StaxSerializer extends AbstractSerializer {
         
         XMLStreamReader reader = StaxUtils.createXMLStreamReader(inputSource);
         
-        // Import to a dummy fragment
-        DocumentFragment dummyFragment = contextDocument.createDocumentFragment();
-        XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(new DOMResult(dummyFragment));
-        
+        XMLStreamWriter writer = null;
         try {
+            if (ctx instanceof SOAPElement) {
+                SOAPElement el = (SOAPElement)ctx;
+                while (el != null && !(el instanceof SOAPEnvelope)) {
+                    el = el.getParentElement();
+                }
+                //cannot load into fragment due to a ClassCastException iwthin SAAJ addChildElement 
+                //which only checks for Document as parent, not DocumentFragment
+                Element element = ctx.getOwnerDocument().createElementNS("dummy", "dummy");
+                writer = new SAAJStreamWriter((SOAPEnvelope)el, element);
+                StaxUtils.copy(reader, writer);
+                
+                DocumentFragment result = contextDocument.createDocumentFragment();
+                Node child = element.getFirstChild().getFirstChild();
+                if (child != null && child.getNextSibling() == null) {
+                    return child;
+                }
+                while (child != null) {
+                    Node nextChild = child.getNextSibling();
+                    result.appendChild(child);
+                    child = nextChild;
+                }
+                
+                return result;
+            }
+            // Import to a dummy fragment
+            DocumentFragment dummyFragment = contextDocument.createDocumentFragment();
+            writer = StaxUtils.createXMLStreamWriter(new DOMResult(dummyFragment));
             StaxUtils.copy(reader, writer);
+            
+            // Remove the "dummy" wrapper
+            DocumentFragment result = contextDocument.createDocumentFragment();
+            Node child = dummyFragment.getFirstChild().getFirstChild();
+            if (child != null && child.getNextSibling() == null) {
+                return child;
+            }
+            while (child != null) {
+                Node nextChild = child.getNextSibling();
+                result.appendChild(child);
+                child = nextChild;
+            }
+            
+            return result;
         } catch (XMLStreamException ex) {
             throw new XMLEncryptionException(ex);
         }
-        
-        // Remove the "dummy" wrapper
-        DocumentFragment result = contextDocument.createDocumentFragment();
-        Node child = dummyFragment.getFirstChild().getFirstChild();
-        while (child != null) {
-            Node nextChild = child.getNextSibling();
-            result.appendChild(child);
-            child = nextChild;
-        }
-        
-        return result;
     }
 
 }
