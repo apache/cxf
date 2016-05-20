@@ -246,6 +246,9 @@
         <wsdl:port name="DoubleItPortSignThenEncrypt" binding="tns:DoubleItBindingSignThenEncrypt">
             <soap:address location="http://localhost:9010/SecPolTestSignThenEncrypt"/>
         </wsdl:port>
+        <wsdl:port name="DoubleItFaultPortSignThenEncrypt" binding="tns:DoubleItBindingSignThenEncrypt">
+            <soap:address location="http://localhost:9010/SecPolTestFaultSignThenEncryptProvider"/>
+        </wsdl:port>
         <wsdl:port name="DoubleItPortSign" binding="tns:DoubleItBindingSign">
             <soap:address location="http://localhost:9010/SecPolTestSign"/>
         </wsdl:port>
