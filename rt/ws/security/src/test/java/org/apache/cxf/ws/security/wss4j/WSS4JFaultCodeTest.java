@@ -265,6 +265,8 @@ public class WSS4JFaultCodeTest extends AbstractSecurityTest {
         
         try {
             inHandler.handleMessage(inmsg);
+            StaxUtils.print(saajMsg.getSOAPPart());
+            
             fail("Expected failure on a SOAP Fault");
         } catch (SoapFault fault) {
             fault.printStackTrace();
