@@ -83,6 +83,7 @@
         <cxf.derby.version>10.2.2.0</cxf.derby.version>
         <cxf.dropwizard.version>3.1.2</cxf.dropwizard.version>
         <cxf.ehcache.version>2.10.1</cxf.ehcache.version>
+        <cxf.ehcache3.version>3.0.1</cxf.ehcache3.version>
         <cxf.fastinfoset.bundle.version>1.2.13_1</cxf.fastinfoset.bundle.version>
         <cxf.guava.version>18.0</cxf.guava.version>
         <cxf.hazelcast.version>1.9.4</cxf.hazelcast.version>
@@ -99,6 +100,7 @@
         <cxf.mina.version>2.0.13</cxf.mina.version>
         <cxf.rx.java.version>1.1.3</cxf.rx.java.version>
         <cxf.javax.annotation-api.version>1.2</cxf.javax.annotation-api.version>
+        <cxf.jcache.version>1.0.0</cxf.jcache.version>
         <cxf.geronimo.jms.version>1.1.1</cxf.geronimo.jms.version>
         <cxf.geronimo.j2ee.management.version>1.0.1</cxf.geronimo.j2ee.management.version>
         <cxf.geronimo.jpa.version>1.0</cxf.geronimo.jpa.version>
