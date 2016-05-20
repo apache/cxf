@@ -89,6 +89,7 @@ public class IdTokenResponseFilter extends OAuthServerJoseJwtProducer implements
             && (rType.equals(OidcUtils.CODE_ID_TOKEN_AT_RESPONSE_TYPE)
                 || rType.equals(OidcUtils.CODE_ID_TOKEN_RESPONSE_TYPE));
         
+        Message m = JAXRSUtils.getCurrentMessage();
         if (atHashRequired || cHashRequired) {
             Properties props = JwsUtils.loadSignatureOutProperties(false);
             SignatureAlgorithm sigAlgo = null;
@@ -103,12 +104,22 @@ public class IdTokenResponseFilter extends OAuthServerJoseJwtProducer implements
                     idToken.setAccessTokenHash(atHash);
                 }
                 if (cHashRequired) {
-                    String cHash = OidcUtils.calculateAuthorizationCodeHash(st.getGrantCode(), sigAlgo);
-                    idToken.setAuthorizationCodeHash(cHash);
+                    // c_hash can be returned from either Authorization or Token endpoints
+                    String code;
+                    if (st.getGrantCode() != null) {
+                        // This is a token endpoint, the code has been exchanged for a token
+                        code = st.getGrantCode();
+                    } else {
+                        // Authorization endpoint: hybrid flow, implicit part
+                        code = (String)m.getExchange().get(OAuthConstants.AUTHORIZATION_CODE_VALUE);
+                    }
+                    if (code != null) {
+                        idToken.setAuthorizationCodeHash(OidcUtils.calculateAuthorizationCodeHash(code, sigAlgo));
+                    }
                 }
             }
         }
-        Message m = JAXRSUtils.getCurrentMessage();
+        
         if (m != null && m.getExchange().containsKey(OAuthConstants.NONCE)) {
             idToken.setNonce((String)m.getExchange().get(OAuthConstants.NONCE));
         } else if (st.getNonce() != null) {

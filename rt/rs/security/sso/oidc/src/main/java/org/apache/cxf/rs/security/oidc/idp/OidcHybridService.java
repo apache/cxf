@@ -26,6 +26,7 @@ import java.util.Set;
 
 import javax.ws.rs.Path;
 
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthRedirectionState;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
@@ -71,13 +72,17 @@ public class OidcHybridService extends OidcImplicitService {
                                    List<String> approvedScope,
                                    UserSubject userSubject,
                                    ServerAccessToken preAuthorizedToken) {
+        String code = null;
+        if (state.getResponseType() != null && state.getResponseType().startsWith(OAuthConstants.CODE_RESPONSE_TYPE)) {
+            code = codeService.getGrantCode(state, client, requestedScope,
+                                                   approvedScope, userSubject, preAuthorizedToken);
+            JAXRSUtils.getCurrentMessage().getExchange().put(OAuthConstants.AUTHORIZATION_CODE_VALUE, code);
+        }
+        
         StringBuilder sb = super.prepareGrant(state, client, requestedScope, 
                                                           approvedScope, userSubject, preAuthorizedToken);
    
-        if (state.getResponseType() != null && state.getResponseType().startsWith(OAuthConstants.CODE_RESPONSE_TYPE)) {
-            String code = codeService.getGrantCode(state, client, requestedScope,
-                                                   approvedScope, userSubject, preAuthorizedToken);
-            
+        if (code != null) {
             sb.append("&");
             sb.append(OAuthConstants.AUTHORIZATION_CODE_VALUE).append("=").append(code);
         }

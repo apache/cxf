@@ -21,12 +21,15 @@ package org.apache.cxf.rs.security.oidc.idp;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
-import org.apache.cxf.rs.security.jose.jwt.JoseJwtProducer;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
+import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenRegistration;
 import org.apache.cxf.rs.security.oauth2.common.Client;
@@ -35,16 +38,18 @@ import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
 import org.apache.cxf.rs.security.oauth2.common.OAuthRedirectionState;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
+import org.apache.cxf.rs.security.oauth2.provider.OAuthJoseJwtProducer;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.services.ImplicitGrantService;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
+import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 import org.apache.cxf.rs.security.oidc.common.IdToken;
 import org.apache.cxf.rs.security.oidc.utils.OidcUtils;
 
 
 public class OidcImplicitService extends ImplicitGrantService {
     private boolean skipAuthorizationWithOidcScope;
-    private JoseJwtProducer idTokenHandler;
+    private OAuthJoseJwtProducer idTokenHandler;
     private IdTokenProvider idTokenProvider;
     
     public OidcImplicitService() {
@@ -118,15 +123,13 @@ public class OidcImplicitService extends ImplicitGrantService {
             return subject.getProperties().get(OidcUtils.ID_TOKEN);
         } else if (idTokenProvider != null) {
             IdToken idToken = idTokenProvider.getIdToken(state.getClientId(), subject, scopes);
-            idToken.setNonce(state.getNonce());
-            return processIdToken(idToken);
+            return processIdToken(state, idToken);
         } else if (subject instanceof OidcUserSubject) {
             OidcUserSubject sub = (OidcUserSubject)subject;
             IdToken idToken = new IdToken(sub.getIdToken());
             idToken.setAudience(state.getClientId());
             idToken.setAuthorizedParty(state.getClientId());
-            idToken.setNonce(state.getNonce());
-            return processIdToken(idToken);
+            return processIdToken(state, idToken);
         } else {
             return null;
         }
@@ -152,12 +155,28 @@ public class OidcImplicitService extends ImplicitGrantService {
         return reg;
     }
     
-    protected String processIdToken(IdToken idToken) {
-        JoseJwtProducer processor = idTokenHandler == null ? new JoseJwtProducer() : idTokenHandler; 
+    protected String processIdToken(OAuthRedirectionState state, IdToken idToken) {
+        OAuthJoseJwtProducer processor = idTokenHandler == null ? new OAuthJoseJwtProducer() : idTokenHandler; 
+        
+        String code = 
+            (String)JAXRSUtils.getCurrentMessage().getExchange().get(OAuthConstants.AUTHORIZATION_CODE_VALUE);
+        if (code != null) {
+            // this service is invoked as part of the hybrid flow
+            Properties props = JwsUtils.loadSignatureOutProperties(false);
+            SignatureAlgorithm sigAlgo = null;
+            if (processor.isSignWithClientSecret()) {
+                sigAlgo = OAuthUtils.getClientSecretSignatureAlgorithm(props);
+            } else {
+                sigAlgo = JwsUtils.getSignatureAlgorithm(props, SignatureAlgorithm.RS256);
+            }
+            idToken.setAuthorizationCodeHash(OidcUtils.calculateAuthorizationCodeHash(code, sigAlgo));
+        }
+        
+        idToken.setNonce(state.getNonce());
         return processor.processJwt(new JwtToken(idToken));
     }
 
-    public void setIdTokenJoseHandler(JoseJwtProducer idTokenJoseHandler) {
+    public void setIdTokenJoseHandler(OAuthJoseJwtProducer idTokenJoseHandler) {
         this.idTokenHandler = idTokenJoseHandler;
     }
     public void setIdTokenProvider(IdTokenProvider idTokenProvider) {
