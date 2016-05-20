@@ -21,9 +21,13 @@ package org.apache.cxf.ws.security.wss4j;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.StringReader;
+import java.util.HashMap;
+import java.util.Map;
 
+import javax.xml.namespace.NamespaceContext;
 import javax.xml.soap.SOAPElement;
 import javax.xml.soap.SOAPEnvelope;
+import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
@@ -33,9 +37,11 @@ import javax.xml.transform.dom.DOMSource;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
+
 
 import org.apache.cxf.binding.soap.saaj.SAAJStreamWriter;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -46,7 +52,72 @@ import org.apache.xml.security.encryption.XMLEncryptionException;
  * Converts <code>String</code>s into <code>Node</code>s and visa versa using CXF's StaxUtils
  */
 public class StaxSerializer extends AbstractSerializer {
-
+    XMLInputFactory factory;
+    boolean validFactory;
+    
+    boolean addNamespaces(XMLStreamReader reader, Node ctx) {
+        try {
+            NamespaceContext nsctx = reader.getNamespaceContext();
+            if (nsctx instanceof com.ctc.wstx.sr.InputElementStack) {
+                com.ctc.wstx.sr.InputElementStack ies = (com.ctc.wstx.sr.InputElementStack)nsctx;
+                com.ctc.wstx.util.InternCache ic = com.ctc.wstx.util.InternCache.getInstance();
+                
+                Map<String, String> storedNamespaces = new HashMap<String, String>();
+                Node wk = ctx;
+                while (wk != null) {
+                    NamedNodeMap atts = wk.getAttributes();
+                    if (atts != null) {
+                        for (int i = 0; i < atts.getLength(); ++i) {
+                            Node att = atts.item(i);
+                            String nodeName = att.getNodeName();
+                            if ((nodeName.equals("xmlns") || nodeName.startsWith("xmlns:"))
+                                && !storedNamespaces.containsKey(att.getNodeName())) {
+                                
+                                String prefix = att.getLocalName();
+                                if (prefix.equals("xmlns")) {
+                                    prefix = "";
+                                }
+                                prefix = ic.intern(prefix);
+                                ies.addNsBinding(prefix, att.getNodeValue());
+                                storedNamespaces.put(nodeName, att.getNodeValue());
+                            }
+                        }
+                    }
+                    wk = wk.getParentNode();
+                }
+            }
+            return true;
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
+        return false;
+    }
+    
+    private XMLStreamReader createWstxReader(byte[] source, Node ctx) throws XMLEncryptionException {
+        try {
+            if (factory == null) {
+                factory = StaxUtils.createXMLInputFactory(true);
+                try {
+                    factory.setProperty("com.ctc.wstx.fragmentMode",
+                                        com.ctc.wstx.api.WstxInputProperties.PARSING_MODE_FRAGMENT);
+                    factory.setProperty(org.codehaus.stax2.XMLInputFactory2.P_REPORT_PROLOG_WHITESPACE, Boolean.TRUE);
+                    validFactory = true;
+                } catch (Throwable t) {
+                    //ignore
+                    validFactory = false;
+                }
+            }
+            if (validFactory) {
+                XMLStreamReader reader = factory.createXMLStreamReader(new ByteArrayInputStream(source));
+                if (addNamespaces(reader, ctx)) {
+                    return reader;
+                }
+            }
+        } catch (Throwable e) {
+            //ignore
+        }
+        return null;
+    }
     /**
      * @param source
      * @param ctx
@@ -54,6 +125,10 @@ public class StaxSerializer extends AbstractSerializer {
      * @throws XMLEncryptionException
      */
     public Node deserialize(byte[] source, Node ctx) throws XMLEncryptionException {
+        XMLStreamReader reader = createWstxReader(source, ctx);
+        if (reader != null) {
+            return deserialize(ctx, reader, false);            
+        }
         byte[] fragment = createContext(source, ctx);
         return deserialize(ctx, new InputSource(new ByteArrayInputStream(fragment)));
     }
@@ -98,16 +173,17 @@ public class StaxSerializer extends AbstractSerializer {
      * @throws XMLEncryptionException
      */
     private Node deserialize(Node ctx, InputSource inputSource) throws XMLEncryptionException {
-        
+        XMLStreamReader reader = StaxUtils.createXMLStreamReader(inputSource);
+        return deserialize(ctx, reader, true);
+    }
+    private Node deserialize(Node ctx, XMLStreamReader reader, boolean wrapped) throws XMLEncryptionException {
         Document contextDocument = null;
         if (Node.DOCUMENT_NODE == ctx.getNodeType()) {
             contextDocument = (Document)ctx;
         } else {
             contextDocument = ctx.getOwnerDocument();
         }
-        
-        XMLStreamReader reader = StaxUtils.createXMLStreamReader(inputSource);
-        
+
         XMLStreamWriter writer = null;
         try {
             if (ctx instanceof SOAPElement) {
@@ -122,7 +198,10 @@ public class StaxSerializer extends AbstractSerializer {
                 StaxUtils.copy(reader, writer);
                 
                 DocumentFragment result = contextDocument.createDocumentFragment();
-                Node child = element.getFirstChild().getFirstChild();
+                Node child = element.getFirstChild();
+                if (wrapped) {
+                    child = child.getFirstChild();
+                }
                 if (child != null && child.getNextSibling() == null) {
                     return child;
                 }
@@ -140,18 +219,21 @@ public class StaxSerializer extends AbstractSerializer {
             StaxUtils.copy(reader, writer);
             
             // Remove the "dummy" wrapper
-            DocumentFragment result = contextDocument.createDocumentFragment();
-            Node child = dummyFragment.getFirstChild().getFirstChild();
-            if (child != null && child.getNextSibling() == null) {
-                return child;
-            }
-            while (child != null) {
-                Node nextChild = child.getNextSibling();
-                result.appendChild(child);
-                child = nextChild;
-            }
             
-            return result;
+            if (wrapped) {
+                DocumentFragment result = contextDocument.createDocumentFragment();
+                Node child = dummyFragment.getFirstChild().getFirstChild();
+                if (child != null && child.getNextSibling() == null) {
+                    return child;
+                }
+                while (child != null) {
+                    Node nextChild = child.getNextSibling();
+                    result.appendChild(child);
+                    child = nextChild;
+                }
+                dummyFragment = result;
+            }
+            return dummyFragment;
         } catch (XMLStreamException ex) {
             throw new XMLEncryptionException(ex);
         }
