@@ -20,9 +20,15 @@ package org.apache.cxf.ws.security.wss4j;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.io.SequenceInputStream;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Vector;
 
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.soap.SOAPElement;
@@ -44,6 +50,7 @@ import org.xml.sax.InputSource;
 
 
 import org.apache.cxf.binding.soap.saaj.SAAJStreamWriter;
+import org.apache.cxf.helpers.LoadingByteArrayOutputStream;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.xml.security.encryption.AbstractSerializer;
 import org.apache.xml.security.encryption.XMLEncryptionException;
@@ -129,8 +136,54 @@ public class StaxSerializer extends AbstractSerializer {
         if (reader != null) {
             return deserialize(ctx, reader, false);            
         }
-        byte[] fragment = createContext(source, ctx);
-        return deserialize(ctx, new InputSource(new ByteArrayInputStream(fragment)));
+        return deserialize(ctx, new InputSource(createStreamContext(source, ctx)));
+    }
+    
+    InputStream createStreamContext(byte[] source, Node ctx) throws XMLEncryptionException {
+        Vector<InputStream> v = new Vector<>(2);
+
+        LoadingByteArrayOutputStream byteArrayOutputStream = new LoadingByteArrayOutputStream();
+        try {
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(byteArrayOutputStream, "UTF-8");
+            outputStreamWriter.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?><dummy");
+
+            // Run through each node up to the document node and find any xmlns: nodes
+            Map<String, String> storedNamespaces = new HashMap<String, String>();
+            Node wk = ctx;
+            while (wk != null) {
+                NamedNodeMap atts = wk.getAttributes();
+                if (atts != null) {
+                    for (int i = 0; i < atts.getLength(); ++i) {
+                        Node att = atts.item(i);
+                        String nodeName = att.getNodeName();
+                        if ((nodeName.equals("xmlns") || nodeName.startsWith("xmlns:"))
+                                && !storedNamespaces.containsKey(att.getNodeName())) {
+                            outputStreamWriter.write(" ");
+                            outputStreamWriter.write(nodeName);
+                            outputStreamWriter.write("=\"");
+                            outputStreamWriter.write(att.getNodeValue());
+                            outputStreamWriter.write("\"");
+                            storedNamespaces.put(nodeName, att.getNodeValue());
+                        }
+                    }
+                }
+                wk = wk.getParentNode();
+            }
+            outputStreamWriter.write(">");
+            outputStreamWriter.close();
+            v.add(byteArrayOutputStream.createInputStream());
+            v.addElement(new ByteArrayInputStream(source));
+            byteArrayOutputStream = new LoadingByteArrayOutputStream();
+            outputStreamWriter = new OutputStreamWriter(byteArrayOutputStream, "UTF-8");
+            outputStreamWriter.write("</dummy>");
+            outputStreamWriter.close();
+            v.add(byteArrayOutputStream.createInputStream());
+        } catch (UnsupportedEncodingException e) {
+            throw new XMLEncryptionException(e);
+        } catch (IOException e) {
+            throw new XMLEncryptionException(e);
+        }
+        return new SequenceInputStream(v.elements());
     }
 
     /**
