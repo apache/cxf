@@ -216,7 +216,6 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
         e.setEntity(entity);
 
         RequestConfig.Builder b = RequestConfig.custom()
-            .setSocketTimeout((int) csPolicy.getReceiveTimeout())
             .setConnectTimeout((int) csPolicy.getConnectionTimeout());
         Proxy p = proxyFactory.createProxy(csPolicy, uri);
         if (p != null && p.type() != Proxy.Type.DIRECT) {
