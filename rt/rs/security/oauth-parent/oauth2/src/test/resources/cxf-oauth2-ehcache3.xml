@@ -1,0 +1,27 @@
+<config
+    xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+    xmlns='http://www.ehcache.org/v3'
+    xmlns:jsr107='http://www.ehcache.org/v3/jsr107'
+    xsi:schemaLocation="
+        http://www.ehcache.org/v3 http://www.ehcache.org/schema/ehcache-core-3.0.xsd">
+
+  <cache alias="cxf.oauth2.client.cache">
+    <key-type>java.lang.String</key-type>
+    <value-type>org.apache.cxf.rs.security.oauth2.common.Client</value-type>
+    <heap unit="entries">100</heap>
+    <jsr107:mbeans enable-management="false" enable-statistics="false"/>
+  </cache>
+  <cache alias="cxf.oauth2.accesstoken.cache">
+    <key-type>java.lang.String</key-type>
+    <value-type>org.apache.cxf.rs.security.oauth2.common.ServerAccessToken</value-type>
+    <heap unit="entries">100</heap>
+    <jsr107:mbeans enable-management="false" enable-statistics="false"/>
+  </cache>
+  <cache alias="cxf.oauth2.refreshtoken.cache">
+    <key-type>java.lang.String</key-type>
+    <value-type>org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken</value-type>
+    <heap unit="entries">100</heap>
+    <jsr107:mbeans enable-management="false" enable-statistics="false"/>
+  </cache>
+
+</config>
