@@ -25,6 +25,7 @@ import java.util.List;
 import javax.xml.stream.XMLStreamException;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
@@ -53,6 +54,11 @@ public class OverlayW3CDOMStreamWriter extends W3CDOMStreamWriter {
     public OverlayW3CDOMStreamWriter(Document doc, Element e) {
         super(doc, e);
     }
+    public OverlayW3CDOMStreamWriter(Document doc, DocumentFragment frag) {
+        super(doc, frag);
+        isOverlaid = false;
+    }
+
 
     @Override
     protected void createAndAddElement(String prefix, String local, String namespace) {
