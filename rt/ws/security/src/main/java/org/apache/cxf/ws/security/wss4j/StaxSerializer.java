@@ -77,11 +77,11 @@ public class StaxSerializer extends AbstractSerializer {
                         for (int i = 0; i < atts.getLength(); ++i) {
                             Node att = atts.item(i);
                             String nodeName = att.getNodeName();
-                            if ((nodeName.equals("xmlns") || nodeName.startsWith("xmlns:"))
+                            if (("xmlns".equals(nodeName) || nodeName.startsWith("xmlns:"))
                                 && !storedNamespaces.containsKey(att.getNodeName())) {
                                 
                                 String prefix = att.getLocalName();
-                                if (prefix.equals("xmlns")) {
+                                if ("xmlns".equals(prefix)) {
                                     prefix = "";
                                 }
                                 prefix = ic.intern(prefix);
@@ -156,7 +156,7 @@ public class StaxSerializer extends AbstractSerializer {
                     for (int i = 0; i < atts.getLength(); ++i) {
                         Node att = atts.item(i);
                         String nodeName = att.getNodeName();
-                        if ((nodeName.equals("xmlns") || nodeName.startsWith("xmlns:"))
+                        if (("xmlns".equals(nodeName) || nodeName.startsWith("xmlns:"))
                                 && !storedNamespaces.containsKey(att.getNodeName())) {
                             outputStreamWriter.write(" ");
                             outputStreamWriter.write(nodeName);
