@@ -56,7 +56,7 @@ public class MemoryClientCodeStateManager implements ClientCodeStateManager {
                                                             MultivaluedMap<String, String> redirectState) {
         String stateParam = redirectState.getFirst(OAuthConstants.STATE);
         String sessionToken = OAuthUtils.getSessionToken(mc, "state");
-        if (!sessionToken.equals(stateParam)) {
+        if (sessionToken == null || !sessionToken.equals(stateParam)) {
             throw new OAuthServiceException("Invalid session token");
         }
         return map.remove(stateParam);
