@@ -47,6 +47,7 @@ public class ServerAuthorizationCodeGrant extends AuthorizationCodeGrant {
     private List<String> requestedScopes = new LinkedList<String>();
     private UserSubject subject;
     private String audience;
+    private String responseType;
     private String clientCodeChallenge;
     private String nonce;
     private boolean preauthorizedTokenAvailable;
@@ -195,5 +196,13 @@ public class ServerAuthorizationCodeGrant extends AuthorizationCodeGrant {
 
     public void setExtraProperties(Map<String, String> extraProperties) {
         this.extraProperties = extraProperties;
+    }
+
+    public String getResponseType() {
+        return responseType;
+    }
+
+    public void setResponseType(String responseType) {
+        this.responseType = responseType;
     }
 }

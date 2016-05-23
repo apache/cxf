@@ -46,6 +46,7 @@ public final class OidcUtils {
     public static final String CODE_ID_TOKEN_RESPONSE_TYPE = "code id_token";
     public static final String CODE_ID_TOKEN_AT_RESPONSE_TYPE = "code id_token token";
     
+    public static final String HYBRID_FLOW = "hybrid";
     
     public static final String ID_TOKEN = "id_token";
     public static final String OPENID_SCOPE = "openid";

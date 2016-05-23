@@ -38,6 +38,7 @@ public class AuthorizationCodeRegistration {
     private UserSubject subject;
     private String audience;
     private String nonce;
+    private String responseType;
     private String clientCodeChallenge;
     private boolean preauthorizedTokenAvailable;
     private Map<String, String> extraProperties = new LinkedHashMap<String, String>();
@@ -147,5 +148,11 @@ public class AuthorizationCodeRegistration {
     }
     public void setExtraProperties(Map<String, String> extraProperties) {
         this.extraProperties = extraProperties;
+    }
+    public String getResponseType() {
+        return responseType;
+    }
+    public void setResponseType(String responseType) {
+        this.responseType = responseType;
     }
 }

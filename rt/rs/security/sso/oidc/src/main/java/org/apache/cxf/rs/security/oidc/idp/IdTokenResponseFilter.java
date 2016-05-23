@@ -45,7 +45,11 @@ public class IdTokenResponseFilter extends OAuthServerJoseJwtProducer implements
     @Override
     public void process(ClientAccessToken ct, ServerAccessToken st) {
         if (st.getResponseType() != null
-            && OidcUtils.CODE_AT_RESPONSE_TYPE.equals(st.getResponseType())) {
+            && OidcUtils.CODE_AT_RESPONSE_TYPE.equals(st.getResponseType())
+            && OidcUtils.HYBRID_FLOW.equals(st.getGrantType())) {
+            // token post-processing as part of the current hybrid (implicit) flow
+            // so no id_token is returned now - however when the code gets exchanged later on
+            // this filter will add id_token to the returned access token
             return;
         }
         // Only add an IdToken if the client has the "openid" scope
@@ -84,7 +88,7 @@ public class IdTokenResponseFilter extends OAuthServerJoseJwtProducer implements
         String rType = st.getResponseType();
         boolean atHashRequired = idToken.getAccessTokenHash() == null
             && (rType == null || !rType.equals(OidcUtils.ID_TOKEN_RESPONSE_TYPE));
-        boolean cHashRequired = idToken.getAuthorizationCodeHash() == null && st.getGrantCode() != null 
+        boolean cHashRequired = idToken.getAuthorizationCodeHash() == null 
             && rType != null 
             && (rType.equals(OidcUtils.CODE_ID_TOKEN_AT_RESPONSE_TYPE)
                 || rType.equals(OidcUtils.CODE_ID_TOKEN_RESPONSE_TYPE));

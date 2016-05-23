@@ -31,6 +31,7 @@ import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthRedirectionState;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
+import org.apache.cxf.rs.security.oauth2.grants.code.ServerAuthorizationCodeGrant;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rs.security.oidc.utils.OidcUtils;
 
@@ -42,7 +43,7 @@ public class OidcHybridService extends OidcImplicitService {
         this(false);
     }
     public OidcHybridService(boolean hybridOnly) {
-        super(getResponseTypes(hybridOnly), "hybrid");
+        super(getResponseTypes(hybridOnly), OidcUtils.HYBRID_FLOW);
     }
     
     private static Set<String> getResponseTypes(boolean hybridOnly) {
@@ -72,19 +73,20 @@ public class OidcHybridService extends OidcImplicitService {
                                    List<String> approvedScope,
                                    UserSubject userSubject,
                                    ServerAccessToken preAuthorizedToken) {
-        String code = null;
+        ServerAuthorizationCodeGrant codeGrant = null;
         if (state.getResponseType() != null && state.getResponseType().startsWith(OAuthConstants.CODE_RESPONSE_TYPE)) {
-            code = codeService.getGrantCode(state, client, requestedScope,
-                                                   approvedScope, userSubject, preAuthorizedToken);
-            JAXRSUtils.getCurrentMessage().getExchange().put(OAuthConstants.AUTHORIZATION_CODE_VALUE, code);
+            codeGrant = codeService.getGrantRepresentation(
+                state, client, requestedScope, approvedScope, userSubject, preAuthorizedToken);
+            JAXRSUtils.getCurrentMessage().getExchange().put(OAuthConstants.AUTHORIZATION_CODE_VALUE, 
+                                                             codeGrant.getCode());
         }
         
         StringBuilder sb = super.prepareGrant(state, client, requestedScope, 
                                                           approvedScope, userSubject, preAuthorizedToken);
    
-        if (code != null) {
+        if (codeGrant != null) {
             sb.append("&");
-            sb.append(OAuthConstants.AUTHORIZATION_CODE_VALUE).append("=").append(code);
+            sb.append(OAuthConstants.AUTHORIZATION_CODE_VALUE).append("=").append(codeGrant.getCode());
         }
         return sb;
     }
