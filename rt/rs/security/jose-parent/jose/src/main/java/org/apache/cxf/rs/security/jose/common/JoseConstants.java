@@ -161,29 +161,6 @@ public final class JoseConstants {
     public static final String RSSEC_SIGNATURE_PROPS = "rs.security.signature.properties";
     
     /**
-     * The OLD signature properties file for JSON Serialization signature creation. 
-     * If not specified then it falls back to RSSEC_SIGNATURE_LIST_PROPS.
-     * Use RSSEC_SIGNATURE_OUT_PROPS instead
-     */
-    @Deprecated
-    public static final String DEP_RSSEC_SIGNATURE_OUT_LIST_PROPS = "rs.security.signature.out.list.properties";
-    
-    /**
-     * The OLD signature properties file for JSON Serialization signature verification. 
-     * If not specified then it falls back to RSSEC_SIGNATURE_LIST_PROPS.
-     * Use RSSEC_SIGNATURE_IN_PROPS instead
-     */
-    @Deprecated
-    public static final String DEP_RSSEC_SIGNATURE_IN_LIST_PROPS = "rs.security.signature.in.list.properties";
-    
-    /**
-     * The OLD signature properties file for JSON Serialization signature creation/verification.
-     * Use RSSEC_SIGNATURE_PROPS instead
-     */
-    @Deprecated
-    public static final String DEP_RSSEC_SIGNATURE_LIST_PROPS = "rs.security.signature.list.properties";
-    
-    /**
      * Include the JWK public key for signature in the "jwk" header. 
      */
     public static final String RSSEC_SIGNATURE_INCLUDE_PUBLIC_KEY = "rs.security.signature.include.public.key";

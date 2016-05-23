@@ -52,7 +52,6 @@ public class AbstractJwsJsonWriterProvider {
         this.sigProviders = signatureProviders;
     }
     
-    @SuppressWarnings("deprecation")
     protected List<JwsSignatureProvider> getInitializedSigProviders() {
         if (sigProviders != null) {
             return sigProviders;    
@@ -61,11 +60,6 @@ public class AbstractJwsJsonWriterProvider {
         Object propLocsProp = 
             MessageUtils.getContextualProperty(m, JoseConstants.RSSEC_SIGNATURE_OUT_PROPS, 
                                                JoseConstants.RSSEC_SIGNATURE_PROPS);
-        if (propLocsProp == null) {
-            propLocsProp = 
-                MessageUtils.getContextualProperty(m, JoseConstants.DEP_RSSEC_SIGNATURE_OUT_LIST_PROPS, 
-                                               JoseConstants.DEP_RSSEC_SIGNATURE_LIST_PROPS);
-        }
         if (propLocsProp == null) {
             LOG.warning("JWS JSON init properties resource is not identified");
             throw new JwsException(JwsException.Error.NO_INIT_PROPERTIES);
