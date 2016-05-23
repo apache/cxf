@@ -19,19 +19,26 @@
 package org.apache.cxf.rs.security.oidc.idp;
 
 import java.util.List;
+import java.util.logging.Level;
 
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
 
 import org.apache.cxf.rs.security.oauth2.common.Client;
+import org.apache.cxf.rs.security.oauth2.common.OAuthError;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
 import org.apache.cxf.rs.security.oauth2.common.OAuthRedirectionState;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.grants.code.AuthorizationCodeRegistration;
+import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.services.AuthorizationCodeGrantService;
+import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rs.security.oidc.utils.OidcUtils;
 
 public class OidcAuthorizationCodeService extends AuthorizationCodeGrantService {
+    private static final String PROMPT_PARAMETER = "prompt";
+    
     private boolean skipAuthorizationWithOidcScope;
     @Override
     protected boolean canAuthorizationBeSkipped(Client client,
@@ -47,6 +54,28 @@ public class OidcAuthorizationCodeService extends AuthorizationCodeGrantService 
     public void setSkipAuthorizationWithOidcScope(boolean skipAuthorizationWithOidcScope) {
         this.skipAuthorizationWithOidcScope = skipAuthorizationWithOidcScope;
     }
+    
+    @Override
+    protected Response startAuthorization(MultivaluedMap<String, String> params, 
+                                          UserSubject userSubject,
+                                          Client client) {    
+        // Validate the prompt - if it contains "none" then an error is returned with any other value
+        String prompt = params.getFirst(PROMPT_PARAMETER);
+        if (prompt != null) {
+            String[] promptValues = prompt.trim().split(" ");
+            if (promptValues.length > 1) {
+                for (String promptValue : promptValues) {
+                    if ("none".equals(promptValue)) {
+                        LOG.log(Level.FINE, "The prompt value {} is invalid", prompt);
+                        throw new OAuthServiceException(new OAuthError(OAuthConstants.INVALID_REQUEST));
+                    }
+                }
+            }
+        }
+        
+        return super.startAuthorization(params, userSubject, client);
+    }
+    
     protected AuthorizationCodeRegistration createCodeRegistration(OAuthRedirectionState state, 
                                                                    Client client, 
                                                                    List<String> requestedScope, 

@@ -60,9 +60,7 @@ public class OIDCNegativeTest extends AbstractBusClientServerTestBase {
         );
     }
     
-    // TODO
     @org.junit.Test
-    @org.junit.Ignore
     public void testImplicitFlowPromptNone() throws Exception {
         URL busFile = OIDCFlowTest.class.getResource("client.xml");
         
