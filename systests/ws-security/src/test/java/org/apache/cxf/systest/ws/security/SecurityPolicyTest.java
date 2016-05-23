@@ -68,7 +68,6 @@ import org.example.contract.doubleit.DoubleItPortTypeHeader;
 import org.example.schema.doubleit.DoubleIt;
 
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
@@ -702,7 +701,6 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
     }
     
     @Test
-    @Ignore("CXF-6908")
     public void testFault() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
 
