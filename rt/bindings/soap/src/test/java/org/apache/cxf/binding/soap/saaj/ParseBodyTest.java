@@ -85,7 +85,6 @@ public class ParseBodyTest extends Assert {
         testUsingStaxUtilsCopyWithSAAJWriter(2);
     }
     
-    // TODO - See CXF-6900
     @Test
     public void testReadSOAPFault() throws Exception {
         InputStream inStream = getClass().getResourceAsStream("soap12-fault.xml");

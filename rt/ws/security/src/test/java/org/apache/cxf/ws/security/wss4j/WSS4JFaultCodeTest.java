@@ -220,9 +220,8 @@ public class WSS4JFaultCodeTest extends AbstractSecurityTest {
         }
     }
     
-    // TODO - See CXF-6900.
+    // See CXF-6900.
     @Test
-    @org.junit.Ignore
     public void testSignedEncryptedSOAP12Fault() throws Exception {
         Document doc = readDocument("wsse-response-fault.xml");
 
@@ -261,20 +260,8 @@ public class WSS4JFaultCodeTest extends AbstractSecurityTest {
             "org.apache.cxf.ws.security.wss4j.TestPwdCallback"
         );
         
-        inmsg.put(SecurityConstants.RETURN_SECURITY_ERROR, Boolean.TRUE);
-        
-        try {
-            inHandler.handleMessage(inmsg);
-            StaxUtils.print(saajMsg.getSOAPPart());
-            
-            fail("Expected failure on a SOAP Fault");
-        } catch (SoapFault fault) {
-            fault.printStackTrace();
-            // TODO assertTrue(fault.getReason().startsWith(
-               // "An error was discovered processing the <wsse:Security> header"));
-            QName faultCode = new QName(WSConstants.WSSE_NS, "InvalidSecurity");
-            assertTrue(fault.getFaultCode().equals(faultCode));
-        }
+        inHandler.handleMessage(inmsg);
+        // StaxUtils.print(saajMsg.getSOAPPart());
     }
     
 }
