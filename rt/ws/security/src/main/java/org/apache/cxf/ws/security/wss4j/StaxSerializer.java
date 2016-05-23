@@ -95,7 +95,7 @@ public class StaxSerializer extends AbstractSerializer {
             }
             return true;
         } catch (Throwable t) {
-            t.printStackTrace();
+            //ignore, not much we can do but hope the decrypted XML is stand alone ok 
         }
         return false;
     }

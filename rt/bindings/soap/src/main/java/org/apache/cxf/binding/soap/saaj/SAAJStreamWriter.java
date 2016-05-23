@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.binding.soap.saaj;
 
+import java.util.Iterator;
+
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPBody;
 import javax.xml.soap.SOAPElement;
@@ -26,6 +28,7 @@ import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPFault;
 import javax.xml.soap.SOAPHeader;
 import javax.xml.soap.SOAPPart;
+import javax.xml.stream.XMLStreamException;
 
 import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
@@ -33,8 +36,10 @@ import org.w3c.dom.Node;
 
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.staxutils.OverlayW3CDOMStreamWriter;
+import org.apache.cxf.staxutils.W3CNamespaceContext;
 
 import static org.apache.cxf.binding.soap.saaj.SAAJUtils.adjustPrefix;
+
 
 public final class SAAJStreamWriter extends OverlayW3CDOMStreamWriter {
     private final SOAPPart part;
@@ -69,6 +74,25 @@ public final class SAAJStreamWriter extends OverlayW3CDOMStreamWriter {
         isOverlaid = false;
     }
     
+    @Override
+    public String getPrefix(String nsuri) throws XMLStreamException {
+        if (isOverlaid && part != null && getCurrentNode() == null) {
+            Node nd = part.getFirstChild();
+            while (nd != null) {
+                if (nd instanceof Element) {
+                    Iterator<String> it = new W3CNamespaceContext((Element)nd).getPrefixes(nsuri);
+                    if (it.hasNext()) {
+                        return it.next();
+                    } else {
+                        nd = null;
+                    }
+                } else {
+                    nd = nd.getNextSibling();
+                }
+            }
+        }
+        return super.getPrefix(nsuri);
+    }
     private String getEnvelopeURI() throws SOAPException {
         if (uri == null) {
             uri = getEnvelope().getElementName().getURI();
