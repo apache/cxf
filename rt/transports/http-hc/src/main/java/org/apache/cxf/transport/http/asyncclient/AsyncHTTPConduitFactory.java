@@ -78,6 +78,7 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
     public static final String MAX_PER_HOST_CONNECTIONS 
         = "org.apache.cxf.transport.http.async.MAX_PER_HOST_CONNECTIONS";
     public static final String CONNECTION_TTL = "org.apache.cxf.transport.http.async.CONNECTION_TTL";
+    public static final String CONNECTION_MAX_IDLE = "org.apache.cxf.transport.http.async.CONNECTION_MAX_IDLE";
     
     //AsycClient specific props
     public static final String THREAD_COUNT = "org.apache.cxf.transport.http.async.ioThreadCount";
@@ -121,6 +122,7 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
     int maxConnections = 5000;
     int maxPerRoute = 1000;
     int connectionTTL = 60000;
+    int connectionMaxIdle = 60000;
 
     int ioThreadCount = IOReactorConfig.DEFAULT.getIoThreadCount();
     long selectInterval = IOReactorConfig.DEFAULT.getSelectInterval();
@@ -179,6 +181,7 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
         
         maxConnections = getInt(s.get(MAX_CONNECTIONS), maxConnections);
         connectionTTL = getInt(s.get(CONNECTION_TTL), connectionTTL);
+        connectionMaxIdle = getInt(s.get(CONNECTION_MAX_IDLE), connectionMaxIdle);
         maxPerRoute = getInt(s.get(MAX_PER_HOST_CONNECTIONS), maxPerRoute);
 
         if (connectionManager != null) {
@@ -371,6 +374,11 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
         client = httpAsyncClientBuilder.build();
         // Start the client thread
         client.start();
+        if (this.connectionTTL == 0) {
+            //if the connection does not have an expiry deadline
+            //use the ConnectionMaxIdle to close the idle connection
+            new CloseIdleConnectionThread(connectionManager, client).start();
+        }
     }
 
     //provide a hook to customize the builder
@@ -384,4 +392,34 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
         return client;
     }
 
+    public class CloseIdleConnectionThread extends Thread {
+
+        private final PoolingNHttpClientConnectionManager connMgr;
+
+        private final CloseableHttpAsyncClient client;
+
+        public CloseIdleConnectionThread(PoolingNHttpClientConnectionManager connMgr,
+                                     CloseableHttpAsyncClient client) {
+            super();
+            this.connMgr = connMgr;
+            this.client = client;
+        }
+
+        @Override
+        public void run() {
+            try {
+                while (client.isRunning()) {
+                    synchronized (this) {
+                        sleep(connectionMaxIdle);
+                        // close connections
+                        // that have been idle longer than specified connectionMaxIdle
+                        connMgr.closeIdleConnections(connectionMaxIdle, TimeUnit.MILLISECONDS);
+                    }
+                }
+            } catch (InterruptedException ex) {
+                // terminate
+            }
+        }
+        
+    }
 }
