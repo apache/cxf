@@ -36,7 +36,7 @@
             javax.servlet*;version="${cxf.osgi.javax.servlet.version}"
         </cxf.osgi.import>
         <hibernate.em.version>4.1.0.Final</hibernate.em.version>
-        <hsqldb.version>1.8.0.10</hsqldb.version>
+        <hsqldb.version>2.3.4</hsqldb.version>
         <openjpa.version>2.4.0</openjpa.version>
     </properties>
     <dependencies>
@@ -104,7 +104,7 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>hsqldb</groupId>
+            <groupId>org.hsqldb</groupId>
             <artifactId>hsqldb</artifactId>
             <version>${hsqldb.version}</version>
             <scope>test</scope>
