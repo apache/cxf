@@ -138,6 +138,7 @@ public class AuthorizationCodeGrantHandler extends AbstractGrantHandler {
             reg.setApprovedScope(Collections.emptyList());
         }
         reg.setAudiences(audiences);
+        reg.setResponseType(grant.getResponseType());
         reg.setClientCodeVerifier(codeVerifier);
         reg.setGrantType(OAuthConstants.CODE_RESPONSE_TYPE);
         return getDataProvider().createAccessToken(reg);

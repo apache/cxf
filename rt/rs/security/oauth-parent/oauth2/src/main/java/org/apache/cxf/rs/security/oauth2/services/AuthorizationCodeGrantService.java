@@ -108,7 +108,7 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
             OOBAuthorizationResponse oobResponse = new OOBAuthorizationResponse();
             oobResponse.setClientId(client.getClientId());
             oobResponse.setClientDescription(client.getApplicationDescription());
-            oobResponse.setAuthorizationCode(grant.getCode());
+            oobResponse.setAuthorizationCode(grantCode);
             oobResponse.setUserId(userSubject.getLogin());
             oobResponse.setExpiresIn(grant.getExpiresIn());
             return deliverOOBResponse(oobResponse);
@@ -120,7 +120,7 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
         }
     }
     
-    protected ServerAuthorizationCodeGrant getGrantRepresentation(OAuthRedirectionState state,
+    public ServerAuthorizationCodeGrant getGrantRepresentation(OAuthRedirectionState state,
                            Client client,
                            List<String> requestedScope,
                            List<String> approvedScope,
@@ -141,21 +141,6 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
         return grant;
     }
     
-    public String getGrantCode(OAuthRedirectionState state,
-                               Client client,
-                               List<String> requestedScope,
-                               List<String> approvedScope,
-                               UserSubject userSubject,
-                               ServerAccessToken preauthorizedToken) {
-        ServerAuthorizationCodeGrant grant =  getGrantRepresentation(state,
-                                      client,
-                                      requestedScope,
-                                      approvedScope,
-                                      userSubject,
-                                      preauthorizedToken);
-        return processCodeGrant(client, grant.getCode(), grant.getSubject());
-    }
-    
     protected AuthorizationCodeRegistration createCodeRegistration(OAuthRedirectionState state, 
                                                                    Client client, 
                                                                    List<String> requestedScope, 
@@ -167,6 +152,7 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
         codeReg.setClient(client);
         codeReg.setRedirectUri(state.getRedirectUri());
         codeReg.setRequestedScope(requestedScope);
+        codeReg.setResponseType(state.getResponseType());
         codeReg.setApprovedScope(getApprovedScope(requestedScope, approvedScope));
         codeReg.setSubject(userSubject);
         codeReg.setAudience(state.getAudience());
