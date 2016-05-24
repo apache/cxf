@@ -79,6 +79,17 @@ public class JAXRSJwsJsonTest extends AbstractBusClientServerTestBase {
         assertEquals("book", text);
     }
     @Test
+    public void testJwsJsonPlainTextHmacUnencoded() throws Exception {
+        String address = "https://localhost:" + PORT + "/jwsjsonhmac";
+        BookStore bs = createBookStore(address, 
+                                       Collections.singletonMap(JoseConstants.RSSEC_SIGNATURE_PROPS, 
+                                           "org/apache/cxf/systest/jaxrs/security/secret.jwk.properties"),
+                                       null,
+                                       false);
+        String text = bs.echoText("book");
+        assertEquals("book", text);
+    }
+    @Test
     public void testJwsJsonBookBeanHmac() throws Exception {
         String address = "https://localhost:" + PORT + "/jwsjsonhmac";
         BookStore bs = createBookStore(address, 
@@ -170,11 +181,21 @@ public class JAXRSJwsJsonTest extends AbstractBusClientServerTestBase {
                                       List<?> extraProviders) throws Exception {
         return createBookStore(address, 
                                Collections.singletonMap(JoseConstants.RSSEC_SIGNATURE_PROPS, properties),
-                               extraProviders);
+                               extraProviders,
+                               true);
     }
     private BookStore createBookStore(String address, 
                                       Map<String, Object> mapProperties,
                                       List<?> extraProviders) throws Exception {
+        return createBookStore(address, 
+                               mapProperties,
+                               extraProviders,
+                               true);
+    }
+    private BookStore createBookStore(String address, 
+                                      Map<String, Object> mapProperties,
+                                      List<?> extraProviders,
+                                      boolean encodePayload) throws Exception {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = JAXRSJwsJsonTest.class.getResource("client.xml");
@@ -185,6 +206,7 @@ public class JAXRSJwsJsonTest extends AbstractBusClientServerTestBase {
         List<Object> providers = new LinkedList<Object>();
         JwsJsonWriterInterceptor writer = new JwsJsonWriterInterceptor();
         writer.setUseJwsJsonOutputStream(true);
+        writer.setEncodePayload(encodePayload);
         providers.add(writer);
         providers.add(new JwsJsonClientResponseFilter());
         if (extraProviders != null) {

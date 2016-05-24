@@ -74,9 +74,6 @@ public class JwsCompactProducer {
     private String getSigningInput() {
         checkAlgorithm();
         boolean unencoded = JwsUtils.isPayloadUnencoded(getJwsHeaders());
-        if (unencoded && !detached) {
-            throw new JwsException(JwsException.Error.INVALID_COMPACT_JWS);
-        }
         return Base64UrlUtility.encode(writer.toJson(getJwsHeaders())) 
                + "." 
                + (unencoded ? plainJwsPayload : Base64UrlUtility.encode(plainJwsPayload));
