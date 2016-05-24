@@ -259,10 +259,8 @@ public class FaultTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
-    // TODO - There seems to be a bug when a security policy is applied to a method as opposed to the class
     // See DoubleItPortTypeImplJavaFirst
     @org.junit.Test
-    @org.junit.Ignore
     public void testJavaFirst() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
