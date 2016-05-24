@@ -128,6 +128,9 @@
             <wsp:PolicyReference URI="#DoubleItPlaintextWithPartsPolicy"/>
             <soap:address location="http://localhost:9009/DoubleItSoap11PolicyWithParts"/>
         </wsdl:port>
+        <wsdl:port name="DoubleItJavaFirstPort" binding="tns:DoubleItSoap11NoPolicyBinding">
+            <soap12:address location="http://localhost:9009/DoubleItJavaFirst"/>
+        </wsdl:port>
     </wsdl:service>
     <wsp:Policy wsu:Id="DoubleItPlaintextPolicy">
         <wsp:ExactlyOne>

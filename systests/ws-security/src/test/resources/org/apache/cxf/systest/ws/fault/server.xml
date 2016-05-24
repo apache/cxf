@@ -56,4 +56,10 @@
             <entry key="security.signature.properties" value="bob.properties"/>
         </jaxws:properties>
     </jaxws:endpoint>
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="JavaFirst" address="http://localhost:${testutil.ports.fault.Server}/DoubleItJavaFirst" serviceName="s:DoubleItService" endpointName="s:DoubleItJavaFirstPort" implementor="org.apache.cxf.systest.ws.fault.DoubleItPortTypeImplJavaFirst" wsdlLocation="org/apache/cxf/systest/ws/fault/DoubleItFault.wsdl">
+        <jaxws:properties>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+            <entry key="security.signature.properties" value="bob.properties"/>
+        </jaxws:properties>
+    </jaxws:endpoint>
 </beans>
