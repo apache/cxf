@@ -39,7 +39,6 @@ public class JwsCompactConsumer {
     private String jwsPayload;
     private String decodedJwsPayload;
     private JwsHeaders jwsHeaders;
-    private boolean detached;
     public JwsCompactConsumer(String encodedJws) {
         this(encodedJws, null, null);
     }
@@ -67,7 +66,6 @@ public class JwsCompactConsumer {
                 LOG.warning("Compact JWS includes a payload expected to be detached");
                 throw new JwsException(JwsException.Error.INVALID_COMPACT_JWS);
             }
-            detached = true;
             jwsPayload = detachedPayload;
         }
         encodedSequence = parts[0] + "." + jwsPayload;
@@ -106,10 +104,6 @@ public class JwsCompactConsumer {
                 throw new JwsException(JwsException.Error.INVALID_COMPACT_JWS);
             }
             jwsHeaders = new JwsHeaders(joseHeaders.asMap());
-            if (JwsUtils.isPayloadUnencoded(jwsHeaders) && !detached) {
-                LOG.warning("Only detached payload can be unencoded");
-                throw new JwsException(JwsException.Error.INVALID_COMPACT_JWS);
-            }
         }
         return jwsHeaders;
     }

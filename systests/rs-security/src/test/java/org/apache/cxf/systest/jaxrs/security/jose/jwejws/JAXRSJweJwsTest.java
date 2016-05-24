@@ -254,6 +254,13 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         assertEquals("book", text);
     }
     @Test
+    public void testJwsJwkPlainTextHMacUnencoded() throws Exception {
+        String address = "https://localhost:" + PORT + "/jwsjwkhmac";
+        BookStore bs = createJwsBookStore(address, null, false);
+        String text = bs.echoText("book");
+        assertEquals("book", text);
+    }
+    @Test
     public void testJwsJwkBookHMac() throws Exception {
         String address = "https://localhost:" + PORT + "/jwsjwkhmac";
         BookStore bs = createJwsBookStore(address,
@@ -264,6 +271,11 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
     }
     private BookStore createJwsBookStore(String address, 
                                          List<?> mbProviders) throws Exception {
+        return createJwsBookStore(address, mbProviders, true);
+    }
+    private BookStore createJwsBookStore(String address, 
+                                         List<?> mbProviders,
+                                         boolean encodePayload) throws Exception {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = JAXRSJweJwsTest.class.getResource("client.xml");
@@ -273,6 +285,7 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         bean.setAddress(address);
         List<Object> providers = new LinkedList<Object>();
         JwsWriterInterceptor jwsWriter = new JwsWriterInterceptor();
+        jwsWriter.setEncodePayload(encodePayload);
         jwsWriter.setUseJwsOutputStream(true);
         providers.add(jwsWriter);
         providers.add(new JwsClientResponseFilter());

@@ -47,6 +47,7 @@ import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
 public class JwsWriterInterceptor extends AbstractJwsWriterProvider implements WriterInterceptor {
     private boolean contentTypeRequired = true;
     private boolean useJwsOutputStream;
+    private boolean encodePayload = true;
     private JsonMapObjectReaderWriter writer = new JsonMapObjectReaderWriter();
     @Override
     public void aroundWriteTo(WriterInterceptorContext ctx) throws IOException, WebApplicationException {
@@ -57,6 +58,9 @@ public class JwsWriterInterceptor extends AbstractJwsWriterProvider implements W
         JwsHeaders headers = new JwsHeaders();
         JwsSignatureProvider sigProvider = getInitializedSigProvider(headers);
         setContentTypeIfNeeded(headers, ctx);
+        if (!encodePayload) {
+            headers.setPayloadEncodingStatus(false);
+        }
         OutputStream actualOs = ctx.getOutputStream();
         if (useJwsOutputStream) {
             JwsSignature jwsSignature = sigProvider.createJwsSignature(headers);
@@ -65,12 +69,19 @@ public class JwsWriterInterceptor extends AbstractJwsWriterProvider implements W
             byte[] headerBytes = StringUtils.toBytesUTF8(writer.toJson(headers));
             Base64UrlUtility.encodeAndStream(headerBytes, 0, headerBytes.length, jwsStream);
             jwsStream.write(new byte[]{'.'});
-                        
-            Base64UrlOutputStream base64Stream = new Base64UrlOutputStream(jwsStream);
-            ctx.setOutputStream(base64Stream);
+            
+            Base64UrlOutputStream base64Stream = null;
+            if (encodePayload) {           
+                base64Stream = new Base64UrlOutputStream(jwsStream);
+                ctx.setOutputStream(base64Stream);
+            } else {
+                ctx.setOutputStream(jwsStream);
+            }
             ctx.proceed();
             setJoseMediaType(ctx);
-            base64Stream.flush();
+            if (base64Stream != null) {
+                base64Stream.flush();
+            }
             jwsStream.flush();
         } else {
             CachedOutputStream cos = new CachedOutputStream(); 
@@ -106,5 +117,8 @@ public class JwsWriterInterceptor extends AbstractJwsWriterProvider implements W
     private void setJoseMediaType(WriterInterceptorContext ctx) {
         MediaType joseMediaType = JAXRSUtils.toMediaType(JoseConstants.MEDIA_TYPE_JOSE);
         ctx.setMediaType(joseMediaType);
+    }
+    public void setEncodePayload(boolean encodePayload) {
+        this.encodePayload = encodePayload;
     }
 }
