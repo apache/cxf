@@ -82,8 +82,8 @@ public class JAXRSJwsJsonTest extends AbstractBusClientServerTestBase {
     public void testJwsJsonPlainTextHmacUnencoded() throws Exception {
         String address = "https://localhost:" + PORT + "/jwsjsonhmac";
         BookStore bs = createBookStore(address, 
-                                       Collections.singletonMap(JoseConstants.RSSEC_SIGNATURE_PROPS, 
-                                           "org/apache/cxf/systest/jaxrs/security/secret.jwk.properties"),
+            Collections.<String, Object>singletonMap(JoseConstants.RSSEC_SIGNATURE_PROPS,
+                "org/apache/cxf/systest/jaxrs/security/secret.jwk.properties"),
                                        null,
                                        false);
         String text = bs.echoText("book");
@@ -177,20 +177,13 @@ public class JAXRSJwsJsonTest extends AbstractBusClientServerTestBase {
         }
     }
     
-    private BookStore createBookStore(String address, Object properties,
+    private BookStore createBookStore(String address, Object props,
                                       List<?> extraProviders) throws Exception {
         return createBookStore(address, 
-                               Collections.singletonMap(JoseConstants.RSSEC_SIGNATURE_PROPS, properties),
-                               extraProviders,
-                               true);
-    }
-    private BookStore createBookStore(String address, 
-                                      Map<String, Object> mapProperties,
-                                      List<?> extraProviders) throws Exception {
-        return createBookStore(address, 
-                               mapProperties,
-                               extraProviders,
-                               true);
+            props instanceof Map ? (Map<String, Object>)props : Collections.<String, Object>singletonMap(
+                JoseConstants.RSSEC_SIGNATURE_PROPS, props),
+            extraProviders,
+            true);
     }
     private BookStore createBookStore(String address, 
                                       Map<String, Object> mapProperties,
