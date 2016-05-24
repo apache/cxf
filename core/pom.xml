@@ -277,7 +277,7 @@
                                 <extension>org.apache.cxf.xjcplugins:cxf-xjc-javadoc:${cxf.xjc-utils.version}</extension>
                                 <extension>org.apache.cxf.xjcplugins:cxf-xjc-dv:${cxf.xjc-utils.version}</extension>
                             </extensions>
-                            <sourceRoot>${basedir}/target/generated/src/main/java</sourceRoot>
+                            <sourceRoot>${basedir}/target/generated-sources/cxf-xjc-plugin</sourceRoot>
                             <xsdOptions>
                                 <xsdOption>
                                     <xsd>${basedir}/src/main/resources/schemas/wsdl/http.xsd</xsd>
