@@ -36,5 +36,6 @@
         <module>rm</module>
         <module>mex</module>
         <module>eventing</module>
+        <module>transfer</module>
     </modules>
 </project>

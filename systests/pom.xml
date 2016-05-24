@@ -50,6 +50,7 @@
         <module>cdi</module>
         <module>rs-http-sci</module>
         <module>tracing</module>
-	<module>jibx</module>
+        <module>jibx</module>
+        <module>ws-transfer</module>
     </modules>
 </project>

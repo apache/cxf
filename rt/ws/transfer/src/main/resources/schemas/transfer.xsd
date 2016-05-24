@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+
+<xs:schema
+  targetNamespace='http://www.w3.org/2011/03/ws-tra'
+  xmlns:tns='http://www.w3.org/2011/03/ws-tra'
+  xmlns:xs='http://www.w3.org/2001/XMLSchema'
+  xmlns:wsa='http://www.w3.org/2005/08/addressing'
+  elementFormDefault='qualified'
+  blockDefault='#all' >
+ 
+  <xs:import
+    namespace='http://www.w3.org/2005/08/addressing'
+    schemaLocation='http://www.w3.org/2006/03/addressing/ws-addr.xsd' />
+
+  <xs:complexType name='Representation'>
+    <xs:sequence>
+      <xs:any minOccurs='0' processContents='lax'/>
+    </xs:sequence>
+    <xs:anyAttribute namespace='##other' processContents='lax'/>
+  </xs:complexType>
+ 
+  <xs:element name='Get'>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:any minOccurs='0' maxOccurs='unbounded' namespace='##other' processContents='lax' />
+      </xs:sequence>
+      <xs:attribute name='Dialect' type='xs:anyURI' use='optional' />
+      <xs:anyAttribute namespace='##other' processContents='lax' />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name='GetResponse'>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name='Representation' type='tns:Representation' minOccurs='0'/>
+        <xs:any minOccurs='1' maxOccurs='unbounded' namespace='##other' processContents='lax' />
+      </xs:sequence>
+      <xs:anyAttribute namespace='##other' processContents='lax' />
+    </xs:complexType>
+  </xs:element>
+ 
+  <xs:element name='Put'>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name='Representation' type='tns:Representation' minOccurs='0'/>
+        <xs:any minOccurs='1' maxOccurs='unbounded' namespace='##other' processContents='lax' />
+      </xs:sequence>
+      <xs:attribute name='Dialect' type='xs:anyURI' use='optional' />
+      <xs:anyAttribute namespace='##other' processContents='lax' />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name='PutResponse'>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name='Representation' type='tns:Representation' minOccurs='0'/>
+        <xs:any minOccurs='1' namespace='##other' processContents='lax' />
+      </xs:sequence>
+      <xs:anyAttribute namespace='##other' processContents='lax' />
+    </xs:complexType>
+  </xs:element>
+ 
+  <xs:element name='Delete'>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:any minOccurs='0' maxOccurs='unbounded' namespace='##other' processContents='lax' />
+      </xs:sequence>
+      <xs:attribute name='Dialect' type='xs:anyURI' use='optional' />
+      <xs:anyAttribute namespace='##other' processContents='lax' />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name='DeleteResponse'>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:any minOccurs='0' namespace='##other' processContents='lax' />
+      </xs:sequence>
+      <xs:anyAttribute namespace='##other' processContents='lax' />
+    </xs:complexType>
+  </xs:element>
+ 
+  <xs:element name='Create'>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name='Representation' type='tns:Representation' minOccurs='0'/>
+        <xs:any minOccurs='0' maxOccurs='unbounded' namespace='##other' processContents='lax' />
+      </xs:sequence>
+      <xs:attribute name='Dialect' type='xs:anyURI' use='optional' />
+      <xs:anyAttribute namespace='##other' processContents='lax' />
+    </xs:complexType>
+  </xs:element>
+ 
+  <xs:element name='CreateResponse'>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name='ResourceCreated' type='wsa:EndpointReferenceType' />
+        <xs:element name='Representation' type='tns:Representation' minOccurs='0'/>
+        <xs:any minOccurs='0' namespace='##other' processContents='lax' />
+      </xs:sequence>
+      <xs:anyAttribute namespace='##other' processContents='lax' />
+    </xs:complexType>
+  </xs:element>
+
+  <!-- Policy -->
+  <xs:complexType name='URI'>
+    <xs:simpleContent>
+      <xs:extension base='xs:anyURI'>
+        <xs:anyAttribute namespace='##other' processContents='lax'/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name='QName'>
+    <xs:simpleContent>
+      <xs:extension base='xs:QName'>
+        <xs:anyAttribute namespace='##other' processContents='lax'/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name='Empty'>
+    <xs:sequence/>
+    <xs:anyAttribute namespace='##other' processContents='lax'/>
+  </xs:complexType>
+
+  <xs:element name='TransferResource'>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name='PutOperationSupported' type='tns:Empty'
+                                                 minOccurs='0'/>
+        <xs:element name='DeleteOperationSupported' type='tns:Empty'
+                                                    minOccurs='0'/>
+        <xs:element name='FaultOnPutDenied' type='tns:Empty' minOccurs='0'/>
+        <xs:element name='Dialect' minOccurs='0' maxOccurs='unbounded'>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:any namespace='##other' processContents='lax' minOccurs='0'
+                                          maxOccurs='0'/>
+            </xs:sequence>
+            <xs:attribute name='URI' type='xs:anyURI' use='required' />
+            <xs:anyAttribute namespace="##other" processContents='lax'/>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name='Resource' type='tns:QName' minOccurs='0'/>
+        <xs:any namespace='##other' processContents='lax' minOccurs='0'
+                                    maxOccurs='unbounded'/>
+      </xs:sequence>
+      <xs:anyAttribute namespace='##other' processContents='lax' />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name='TransferResourceFactory'>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name='Resource' type='tns:QName' minOccurs='0'/>
+        <xs:element name='Dialect' minOccurs='0' maxOccurs='unbounded'>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:any namespace='##other' processContents='lax' minOccurs='0'
+                                          maxOccurs='0'/>
+            </xs:sequence>
+            <xs:attribute name='URI' type='xs:anyURI' use='required' />
+            <xs:anyAttribute namespace="##other" processContents='lax'/>
+          </xs:complexType>
+        </xs:element>
+        <xs:any namespace='##other' processContents='lax' minOccurs='0'
+                                    maxOccurs='unbounded'/>
+      </xs:sequence>
+      <xs:anyAttribute namespace='##other' processContents='lax' />
+    </xs:complexType>
+  </xs:element>
+ 
+</xs:schema>
