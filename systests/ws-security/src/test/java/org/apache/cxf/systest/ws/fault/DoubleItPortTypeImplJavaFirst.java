@@ -30,7 +30,9 @@ import org.example.contract.doubleit.DoubleItFault;
 import org.example.contract.doubleit.DoubleItPortType;
 
 @WebService(targetNamespace = "http://www.example.org/contract/DoubleIt", 
-            serviceName = "DoubleItService", 
+            serviceName = "DoubleItService",
+            portName = "DoubleItSoap11NoPolicyBinding",
+            name = "DoubleItSoap11NoPolicyBinding",
             endpointInterface = "org.example.contract.doubleit.DoubleItPortType")
 @Features(features = "org.apache.cxf.feature.LoggingFeature")     
 // @Policy(uri = "classpath:/org/apache/cxf/systest/ws/fault/SymmetricUTPolicy.xml")

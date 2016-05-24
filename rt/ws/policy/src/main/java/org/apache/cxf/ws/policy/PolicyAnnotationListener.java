@@ -91,9 +91,8 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
             if (ep.getEndpointInfo().getInterface() != null) {
                 addPolicies(factory, ep, cls);
             
-                // this will allow us to support annotations in Implementations, but only for
-                // class level annotations.  Method level annotations are not currently supported
-                // for implementations.  The call has been moved here so that the ServiceInfo
+                // this will allow us to support annotations in Implementations.
+                // The call has been moved here so that the ServiceInfo
                 // policy stuff is loaded before jaxws factory calls the PolicyEngineImpl
                 addEndpointImplPolicies(factory, ep, implCls);
             }
