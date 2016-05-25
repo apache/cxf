@@ -160,6 +160,7 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
         codeReg.setAudience(state.getAudience());
         codeReg.setNonce(state.getNonce());
         codeReg.setClientCodeChallenge(state.getClientCodeChallenge());
+        codeReg.getExtraProperties().putAll(state.getExtraProperties());
         return codeReg;
     }
     protected String processCodeGrant(Client client, String code, UserSubject endUser) {

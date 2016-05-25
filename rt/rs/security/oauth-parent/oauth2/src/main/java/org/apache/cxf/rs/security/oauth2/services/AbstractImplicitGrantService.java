@@ -133,6 +133,7 @@ public abstract class AbstractImplicitGrantService extends RedirectionBasedGrant
         reg.setApprovedScope(getApprovedScope(requestedScope, approvedScope));
         reg.setAudiences(Collections.singletonList(state.getAudience()));
         reg.setNonce(state.getNonce());
+        reg.getExtraProperties().putAll(state.getExtraProperties());
         return reg;
     }
     protected void finalizeResponse(StringBuilder sb, OAuthRedirectionState state) {

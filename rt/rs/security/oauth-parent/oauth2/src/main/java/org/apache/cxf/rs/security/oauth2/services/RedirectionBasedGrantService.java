@@ -70,6 +70,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
     private boolean matchRedirectUriWithApplicationUri;
     private boolean hidePreauthorizedScopesInForm;
     private AuthorizationRequestFilter authorizationFilter;
+    private List<String> scopesRequiringNoConsent;
     
     protected RedirectionBasedGrantService(String supportedResponseType,
                                            String supportedGrantType) {
@@ -231,7 +232,10 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
                                                 UserSubject userSubject,
                                                 List<String> requestedScope, 
                                                 List<OAuthPermission> permissions) {
-        return false;
+        return scopesRequiringNoConsent != null 
+               && requestedScope != null
+               && requestedScope.size() == scopesRequiringNoConsent.size()
+               && requestedScope.containsAll(scopesRequiringNoConsent);
     }
 
     /**
@@ -553,5 +557,8 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
     }
     public void setAuthorizationFilter(AuthorizationRequestFilter authorizationFilter) {
         this.authorizationFilter = authorizationFilter;
+    }
+    public void setScopesRequiringNoConsent(List<String> scopesRequiringNoConsent) {
+        this.scopesRequiringNoConsent = scopesRequiringNoConsent;
     }
 }
