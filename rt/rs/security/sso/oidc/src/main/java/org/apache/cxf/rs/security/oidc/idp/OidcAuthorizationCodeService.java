@@ -51,14 +51,13 @@ public class OidcAuthorizationCodeService extends AuthorizationCodeGrantService 
         // Check the pre-configured consent
         boolean preConfiguredConsentForScopes =
             super.canAuthorizationBeSkipped(params, client, userSubject, requestedScope, permissions);
-        boolean nonePromptRequested = promptValues.contains(OidcUtils.PROMPT_NONE_VALUE);
         
-        if (nonePromptRequested && !preConfiguredConsentForScopes) {
+        if (!preConfiguredConsentForScopes && promptValues.contains(OidcUtils.PROMPT_NONE_VALUE)) {
             // An error is returned if client does not have pre-configured consent for the requested scopes/claims
             LOG.log(Level.FINE, "Prompt 'none' request can not be met");
             throw new OAuthServiceException(new OAuthError(OidcUtils.CONSENT_REQUIRED_ERROR));
         }
-        return !nonePromptRequested && preConfiguredConsentForScopes;
+        return preConfiguredConsentForScopes;
     }
     
     public void setSkipAuthorizationWithOidcScope(boolean skipAuthorizationWithOidcScope) {
