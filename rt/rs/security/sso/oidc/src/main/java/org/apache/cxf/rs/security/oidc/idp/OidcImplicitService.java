@@ -19,6 +19,7 @@
 package org.apache.cxf.rs.security.oidc.idp;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
@@ -32,7 +33,6 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
-import org.apache.cxf.rs.security.oauth2.common.AccessTokenRegistration;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthError;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
@@ -51,7 +51,6 @@ import org.apache.cxf.rs.security.oidc.utils.OidcUtils;
 public class OidcImplicitService extends ImplicitGrantService {
     private static final String PROMPT_PARAMETER = "prompt";
     
-    private boolean skipAuthorizationWithOidcScope;
     private OAuthJoseJwtProducer idTokenHandler;
     private IdTokenProvider idTokenProvider;
     
@@ -100,14 +99,11 @@ public class OidcImplicitService extends ImplicitGrantService {
                                                 UserSubject userSubject,
                                                 List<String> requestedScope,
                                                 List<OAuthPermission> permissions) {
-        // No need to challenge the authenticated user with the authorization form 
-        // if all the client application redirecting a user needs is to get this user authenticated
-        // with OIDC IDP
-        return requestedScope.size() == 1 && permissions.size() == 1 && skipAuthorizationWithOidcScope
-            && OidcUtils.OPENID_SCOPE.equals(requestedScope.get(0));
+        return super.canAuthorizationBeSkipped(client, userSubject, requestedScope, permissions);
     }
+    
     public void setSkipAuthorizationWithOidcScope(boolean skipAuthorizationWithOidcScope) {
-        this.skipAuthorizationWithOidcScope = skipAuthorizationWithOidcScope;
+        super.setScopesRequiringNoConsent(Collections.singletonList(OidcUtils.OPENID_SCOPE));
     }
     
     @Override
@@ -161,17 +157,6 @@ public class OidcImplicitService extends ImplicitGrantService {
         return state;
     }
     
-    @Override
-    protected AccessTokenRegistration createTokenRegistration(OAuthRedirectionState state, 
-                                                              Client client, 
-                                                              List<String> requestedScope, 
-                                                              List<String> approvedScope, 
-                                                              UserSubject userSubject) {
-        AccessTokenRegistration reg = 
-            super.createTokenRegistration(state, client, requestedScope, approvedScope, userSubject);
-        reg.getExtraProperties().putAll(state.getExtraProperties());
-        return reg;
-    }
     
     protected String processIdToken(OAuthRedirectionState state, IdToken idToken) {
         OAuthJoseJwtProducer processor = idTokenHandler == null ? new OAuthJoseJwtProducer() : idTokenHandler; 

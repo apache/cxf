@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.rs.security.oidc.idp;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -28,9 +29,7 @@ import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthError;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
 import org.apache.cxf.rs.security.oauth2.common.OAuthRedirectionState;
-import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
-import org.apache.cxf.rs.security.oauth2.grants.code.AuthorizationCodeRegistration;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.services.AuthorizationCodeGrantService;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
@@ -39,20 +38,16 @@ import org.apache.cxf.rs.security.oidc.utils.OidcUtils;
 public class OidcAuthorizationCodeService extends AuthorizationCodeGrantService {
     private static final String PROMPT_PARAMETER = "prompt";
     
-    private boolean skipAuthorizationWithOidcScope;
     @Override
     protected boolean canAuthorizationBeSkipped(Client client,
                                                 UserSubject userSubject,
                                                 List<String> requestedScope,
                                                 List<OAuthPermission> permissions) {
-        // No need to challenge the authenticated user with the authorization form 
-        // if all the client application redirecting a user needs is to get this user authenticated
-        // with OIDC IDP
-        return requestedScope.size() == 1 && permissions.size() == 1 && skipAuthorizationWithOidcScope
-            && OidcUtils.OPENID_SCOPE.equals(requestedScope.get(0));
+        return super.canAuthorizationBeSkipped(client, userSubject, requestedScope, permissions);
     }
+    
     public void setSkipAuthorizationWithOidcScope(boolean skipAuthorizationWithOidcScope) {
-        this.skipAuthorizationWithOidcScope = skipAuthorizationWithOidcScope;
+        super.setScopesRequiringNoConsent(Collections.singletonList(OidcUtils.OPENID_SCOPE));
     }
     
     @Override
@@ -76,22 +71,6 @@ public class OidcAuthorizationCodeService extends AuthorizationCodeGrantService 
         return super.startAuthorization(params, userSubject, client);
     }
     
-    protected AuthorizationCodeRegistration createCodeRegistration(OAuthRedirectionState state, 
-                                                                   Client client, 
-                                                                   List<String> requestedScope, 
-                                                                   List<String> approvedScope, 
-                                                                   UserSubject userSubject, 
-                                                                   ServerAccessToken preauthorizedToken) {
-        AuthorizationCodeRegistration codeReg = super.createCodeRegistration(state, 
-                                                                             client, 
-                                                                             requestedScope, 
-                                                                             approvedScope, 
-                                                                             userSubject, 
-                                                                             preauthorizedToken);
-        
-        codeReg.getExtraProperties().putAll(state.getExtraProperties());
-        return codeReg;
-    }
     @Override
     protected OAuthRedirectionState recreateRedirectionStateFromParams(
         MultivaluedMap<String, String> params) {
