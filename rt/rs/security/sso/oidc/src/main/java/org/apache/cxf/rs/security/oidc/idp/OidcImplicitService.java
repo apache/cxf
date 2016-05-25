@@ -49,8 +49,6 @@ import org.apache.cxf.rs.security.oidc.utils.OidcUtils;
 
 
 public class OidcImplicitService extends ImplicitGrantService {
-    private static final String PROMPT_PARAMETER = "prompt";
-    
     private OAuthJoseJwtProducer idTokenHandler;
     private IdTokenProvider idTokenProvider;
     
@@ -78,28 +76,37 @@ public class OidcImplicitService extends ImplicitGrantService {
         }
         
         // Validate the prompt - if it contains "none" then an error is returned with any other value
-        String prompt = params.getFirst(PROMPT_PARAMETER);
-        if (prompt != null) {
-            String[] promptValues = prompt.trim().split(" ");
-            if (promptValues.length > 1) {
-                for (String promptValue : promptValues) {
-                    if ("none".equals(promptValue)) {
-                        LOG.log(Level.FINE, "The prompt value {} is invalid", prompt);
-                        throw new OAuthServiceException(new OAuthError(OAuthConstants.INVALID_REQUEST));
-                    }
-                }
-            }
+        List<String> promptValues = OidcUtils.getPromptValues(params);
+        if (promptValues.size() > 1 && promptValues.contains(OidcUtils.PROMPT_NONE_VALUE)) {
+            LOG.log(Level.FINE, "The prompt value {} is invalid", params.getFirst(OidcUtils.PROMPT_PARAMETER));
+            throw new OAuthServiceException(new OAuthError(OAuthConstants.INVALID_REQUEST));
         }
         
         return super.startAuthorization(params, userSubject, client);
     }
     
     @Override
-    protected boolean canAuthorizationBeSkipped(Client client,
+    protected boolean canAuthorizationBeSkipped(MultivaluedMap<String, String> params,
+                                                Client client,
                                                 UserSubject userSubject,
                                                 List<String> requestedScope,
                                                 List<OAuthPermission> permissions) {
-        return super.canAuthorizationBeSkipped(client, userSubject, requestedScope, permissions);
+        List<String> promptValues = OidcUtils.getPromptValues(params);
+        if (promptValues.contains(OidcUtils.PROMPT_CONSENT_VALUE)) {
+            // Displaying the consent screen is preferred by the client
+            return false;
+        }
+        // Check the pre-configured consent
+        boolean preConfiguredConsentForScopes =
+            super.canAuthorizationBeSkipped(params, client, userSubject, requestedScope, permissions);
+        boolean nonePromptRequested = promptValues.contains(OidcUtils.PROMPT_NONE_VALUE);
+        
+        if (nonePromptRequested && !preConfiguredConsentForScopes) {
+            // An error is returned if client does not have pre-configured consent for the requested scopes/claims
+            LOG.log(Level.FINE, "Prompt 'none' request can not be met");
+            throw new OAuthServiceException(new OAuthError(OidcUtils.CONSENT_REQUIRED_ERROR));
+        }
+        return !nonePromptRequested && preConfiguredConsentForScopes;
     }
     
     public void setSkipAuthorizationWithOidcScope(boolean skipAuthorizationWithOidcScope) {
