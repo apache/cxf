@@ -24,7 +24,9 @@ import javax.annotation.Resource;
 import javax.jws.WebService;
 import javax.xml.ws.WebServiceContext;
 
+import org.apache.cxf.annotations.Policies;
 import org.apache.cxf.annotations.Policy;
+import org.apache.cxf.annotations.Policy.Placement;
 import org.apache.cxf.feature.Features;
 import org.example.contract.doubleit.DoubleItFault;
 import org.example.contract.doubleit.DoubleItPortType;
@@ -35,22 +37,19 @@ import org.example.contract.doubleit.DoubleItPortType;
             name = "DoubleItSoap11NoPolicyBinding",
             endpointInterface = "org.example.contract.doubleit.DoubleItPortType")
 @Features(features = "org.apache.cxf.feature.LoggingFeature")     
-// @Policy(uri = "classpath:/org/apache/cxf/systest/ws/fault/SymmetricUTPolicy.xml")
 public class DoubleItPortTypeImplJavaFirst implements DoubleItPortType {
     @Resource
     WebServiceContext wsContext;
     
-    //@Policies({
-        // @Policy(uri = "classpath:/org/apache/cxf/systest/ws/fault/SymmetricUTPolicy.xml")
-        //@Policy(uri = "classpath:/org/apache/cxf/systest/ws/fault/SignedEncryptedPolicy.xml", 
-         //       placement = Placement.BINDING_OPERATION)
-    //})  
-    
-    @Policy(uri = "classpath:/org/apache/cxf/systest/ws/fault/SymmetricUTPolicy.xml")
+    @Policies({
+        @Policy(uri = "classpath:/org/apache/cxf/systest/ws/fault/SymmetricUTPolicy.xml"),
+        @Policy(uri = "classpath:/org/apache/cxf/systest/ws/fault/SignedEncryptedPolicy.xml", 
+                placement = Placement.BINDING_OPERATION_OUTPUT)
+    })
     public int doubleIt(int numberToDouble) throws DoubleItFault {
         
         Principal pr = wsContext.getUserPrincipal();
-        if (pr == null || "alice".equals(pr.getName())) {
+        if ("alice".equals(pr.getName())) {
             return numberToDouble * 2;
         }
         

@@ -280,7 +280,7 @@ public class FaultTest extends AbstractBusClientServerTestBase {
         // Make a successful invocation
         ((BindingProvider)utPort).getRequestContext().put("security.username", "alice");
         utPort.doubleIt(25);
-        /*
+        
         // Now make an invocation using another username
         ((BindingProvider)utPort).getRequestContext().put("security.username", "bob");
         ((BindingProvider)utPort).getRequestContext().put("security.password", "password");
@@ -290,7 +290,7 @@ public class FaultTest extends AbstractBusClientServerTestBase {
         } catch (Exception ex) {
             assertTrue(ex.getMessage().contains("This is a fault"));
         }
-        */
+        
         ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
