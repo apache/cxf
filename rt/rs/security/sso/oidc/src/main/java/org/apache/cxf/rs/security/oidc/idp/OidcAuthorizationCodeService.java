@@ -67,15 +67,16 @@ public class OidcAuthorizationCodeService extends AuthorizationCodeGrantService 
     @Override
     protected Response startAuthorization(MultivaluedMap<String, String> params, 
                                           UserSubject userSubject,
-                                          Client client) {    
+                                          Client client,
+                                          String redirectUri) {    
         // Validate the prompt - if it contains "none" then an error is returned with any other value
         List<String> promptValues = OidcUtils.getPromptValues(params);
         if (promptValues != null && promptValues.size() > 1 && promptValues.contains(OidcUtils.PROMPT_NONE_VALUE)) {
             LOG.log(Level.FINE, "The prompt value {} is invalid", params.getFirst(OidcUtils.PROMPT_PARAMETER));
-            throw new OAuthServiceException(new OAuthError(OAuthConstants.INVALID_REQUEST));
+            return createErrorResponse(params, redirectUri, OAuthConstants.INVALID_REQUEST);
         }
         
-        return super.startAuthorization(params, userSubject, client);
+        return super.startAuthorization(params, userSubject, client, redirectUri);
     }
     
     @Override
