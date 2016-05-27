@@ -29,10 +29,8 @@ import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.annotation.Import;
 
-@Import(JaxRsConfig.class)
-public abstract class AbstractSpringConfigurationFactory 
+public abstract class AbstractSpringConfigurationFactory
     extends AbstractBasicInterceptorProvider implements ApplicationContextAware {
 
     protected ApplicationContext applicationContext;

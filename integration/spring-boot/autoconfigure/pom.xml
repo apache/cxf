@@ -37,16 +37,15 @@
             <artifactId>spring-boot-autoconfigure</artifactId>
         </dependency>
         <!-- Optional -->
-        
-        <!-- Annotation processing -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-configuration-processor</artifactId>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-transports-http</artifactId>
+            <version>${project.version}</version>
             <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-transports-http</artifactId>
+            <artifactId>cxf-rt-frontend-jaxrs</artifactId>
             <version>${project.version}</version>
             <optional>true</optional>
         </dependency>
@@ -59,6 +58,12 @@
         <dependency>
             <groupId>javax.validation</groupId>
             <artifactId>validation-api</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <!-- Annotation processing -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
         </dependency>
         <!-- Test -->
