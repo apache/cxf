@@ -22,11 +22,8 @@ import java.util.Arrays;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.swagger.Swagger2Feature;
-import org.apache.cxf.transport.servlet.CXFServlet;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.embedded.ServletRegistrationBean;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 
 import sample.rs.service.hello1.HelloService;
@@ -38,12 +35,6 @@ public class SampleRestApplication {
         SpringApplication.run(SampleRestApplication.class, args);
     }
  
-    @Bean
-    public ServletRegistrationBean servletRegistrationBean(ApplicationContext context) {
-        return new ServletRegistrationBean(new CXFServlet(), "/services/*");
-    }
- 
-    
     @Bean
     public Server rsServer() {
         JAXRSServerFactoryBean endpoint = new JAXRSServerFactoryBean();
