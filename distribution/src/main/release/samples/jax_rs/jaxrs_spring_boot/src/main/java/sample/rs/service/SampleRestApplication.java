@@ -39,7 +39,7 @@ public class SampleRestApplication {
     public Server rsServer() {
         JAXRSServerFactoryBean endpoint = new JAXRSServerFactoryBean();
         endpoint.setServiceBeans(Arrays.asList(new HelloService(), new HelloService2()));
-        endpoint.setAddress("/helloservice");
+        endpoint.setAddress("/");
         endpoint.setFeatures(Arrays.asList(new Swagger2Feature()));
         return endpoint.create();
     }
