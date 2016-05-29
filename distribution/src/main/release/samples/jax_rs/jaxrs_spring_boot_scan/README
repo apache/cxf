@@ -1,0 +1,28 @@
+== Spring Boot - Samples - CXF Rest Web Services 
+
+This sample project demonstrates how to use http://projects.spring.io/spring-rs-cxf/[CXF Rest Web Services]
+with Spring Boot. 
+
+The sample uses Maven. It can be built and run from the command line:
+
+----
+$ mvn spring-boot:run
+----
+
+http://localhost:8080/services/helloservice/sayHello/ApacheCxfUser
+
+will display "Hello ApacheCxfUser, Welcome to CXF RS Spring Boot World!!!"
+
+http://localhost:8080/services/helloservice/sayHello2/ApacheCxfUser
+
+will display "Hello2 ApacheCxfUser, Welcome to CXF RS Spring Boot World!!!"
+
+http://localhost:8080/services/helloservice/swagger.json will return a Swagger JSON
+description of services.
+
+To run the client from a command line open a new terminal window and run:
+
+----
+$ mvn exec:java
+----
+
