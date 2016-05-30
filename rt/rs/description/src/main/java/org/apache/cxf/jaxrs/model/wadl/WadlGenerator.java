@@ -69,6 +69,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
@@ -874,7 +875,9 @@ public class WadlGenerator implements ContainerRequestFilter {
             }
             Class<?> paramCls = entry.getValue();
             boolean isPrimitive = InjectionUtils.isPrimitive(paramCls) || paramCls.isEnum();
-            if (isPrimitive || Date.class.isAssignableFrom(paramCls) 
+            if (isPrimitive 
+                || Date.class.isAssignableFrom(paramCls)
+                || XMLGregorianCalendar.class.isAssignableFrom(paramCls)
                 || InjectionUtils.isSupportedCollectionOrArray(paramCls)) {
                 doWriteParam(ori, sb, entry.getKey(), paramCls, paramCls, name, new Annotation[] {}, isJson);
             } else if (!parentBeanClasses.contains(paramCls)) {
