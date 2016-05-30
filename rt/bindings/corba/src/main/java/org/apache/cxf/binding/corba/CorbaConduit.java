@@ -198,6 +198,11 @@ public class CorbaConduit implements Conduit {
         }
         Exception ex = request.env().exception();
         if (ex != null) {
+            if (ex instanceof SystemException) {
+                message.setContent(Exception.class, new Fault(ex));
+                message.setSystemException((SystemException) ex);
+                return;
+            }
             if (ex instanceof UnknownUserException) {
                 UnknownUserException userEx = (UnknownUserException) ex;
                 Any except = userEx.except;
