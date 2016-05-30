@@ -33,7 +33,7 @@ public class ServerTimeout extends AbstractBusTestServerBase {
         System.setProperty("com.sun.CORBA.POA.ORBPersistentServerPort", PERSIST_PORT);
         new SpringBusFactory().createBus("org/apache/cxf/systest/corba/hello_world_server.xml");
         Object implementor = new BaseGreeterTimeoutImpl();
-        String address = "file:./HelloWorld.ref";
+        String address = "file:./HelloWorldTimeout.ref";
         Endpoint.publish(address, implementor);
     }
 

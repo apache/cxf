@@ -20,10 +20,12 @@
 package org.apache.cxf.systest.corba;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.net.URL;
 import javax.xml.namespace.QName;
 import javax.xml.ws.WebServiceException;
 
+import org.apache.cxf.binding.corba.utils.CorbaBindingHelper;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.hello_world_corba.Greeter;
 import org.apache.cxf.hello_world_corba.GreeterCORBAService;
@@ -34,7 +36,7 @@ import org.junit.Test;
 import org.omg.CORBA.TIMEOUT;
 
 /**
- *
+ * This test uses Jacorb implementation, but cleans after itself.
  */
 public class CorbaTimeoutTest extends AbstractBusClientServerTestBase {
 
@@ -42,10 +44,12 @@ public class CorbaTimeoutTest extends AbstractBusClientServerTestBase {
 
     private static final QName SERVICE_NAME =
         new QName("http://cxf.apache.org/hello_world_corba",
-                  "GreeterCORBAService");
+                  "GreeterTimeoutCORBAService");
 
     @BeforeClass
     public static void startServers() throws Exception {
+        cleanDefaultORB();
+
         assertTrue(
             "Server failed to launch",
             launchServer(ServerTimeout.class)
@@ -54,7 +58,8 @@ public class CorbaTimeoutTest extends AbstractBusClientServerTestBase {
 
     @AfterClass
     public static void cleanupFile() throws Exception {
-        File file = new File("./HelloWorld.ref");
+        cleanDefaultORB();
+        File file = new File("./HelloWorldTimeout.ref");
         if (file.exists()) {
             file.delete();
         }
@@ -68,18 +73,27 @@ public class CorbaTimeoutTest extends AbstractBusClientServerTestBase {
         System.setProperty("org.omg.CORBA.ORBSingletonClass", "org.jacorb.orb.ORBSingleton");
         System.setProperty("jacorb.connection.client.pending_reply_timeout", "1000");
 
-        URL wsdlUrl = this.getClass().getResource("/wsdl_systest/hello_world_corba.wsdl");
+        URL wsdlUrl = this.getClass().getResource("/wsdl_systest/hello_world_corba_timeout.wsdl");
         new SpringBusFactory().createBus("org/apache/cxf/systest/corba/hello_world_client.xml");
 
         GreeterCORBAService gcs = new GreeterCORBAService(wsdlUrl, SERVICE_NAME);
-        Greeter port = gcs.getGreeterCORBAPort();
+        Greeter port = gcs.getPort(new QName("http://cxf.apache.org/hello_world_corba", "GreeterTimeoutCORBAPort"), GreeterCORBAService.GreeterProxy.class);
 
         try {
             port.greetMe("Betty");
             fail("Should throw org.omg.CORBA.TIMEOUT exception");
         } catch (WebServiceException e) {
             assertTrue(e.getCause() instanceof TIMEOUT);
+        } finally {
+            System.getProperties().remove("org.omg.CORBA.ORBClass");
+            System.getProperties().remove("org.omg.CORBA.ORBSingletonClass");
         }
+    }
+
+    private static void cleanDefaultORB() throws NoSuchFieldException, IllegalAccessException {
+        Field f = CorbaBindingHelper.class.getDeclaredField("defaultORB");
+        f.setAccessible(true);
+        f.set(null, null);
     }
 
 }
