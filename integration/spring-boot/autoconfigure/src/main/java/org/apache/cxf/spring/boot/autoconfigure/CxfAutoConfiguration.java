@@ -41,8 +41,7 @@ import org.springframework.context.annotation.ImportResource;
  */
 @Configuration
 @ConditionalOnWebApplication
-@ConditionalOnClass(CXFServlet.class)
-@ConditionalOnMissingBean(SpringBus.class)
+@ConditionalOnClass({ SpringBus.class, CXFServlet.class })
 @EnableConfigurationProperties(CxfProperties.class)
 @AutoConfigureAfter(EmbeddedServletContainerAutoConfiguration.class)
 public class CxfAutoConfiguration {
@@ -51,7 +50,8 @@ public class CxfAutoConfiguration {
     private CxfProperties properties;
 
     @Bean
-    public ServletRegistrationBean messageDispatcherServlet() {
+    @ConditionalOnMissingBean(name = "cxfServletRegistration")
+    public ServletRegistrationBean cxfServletRegistration() {
         String path = this.properties.getPath();
         String urlMapping = path.endsWith("/") ? path + "*" : path + "/*";
         ServletRegistrationBean registration = new ServletRegistrationBean(
@@ -65,8 +65,9 @@ public class CxfAutoConfiguration {
     }
 
     @Configuration
+    @ConditionalOnMissingBean(SpringBus.class)
     @ImportResource("classpath:META-INF/cxf/cxf.xml")
-    protected static class CxfConfiguration {
+    protected static class SpringBusConfiguration {
 
     }
 
