@@ -18,13 +18,8 @@
  */
 package org.apache.cxf.systest.corba;
 
-import java.util.ResourceBundle;
-
-import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.hello_world_corba.Greeter;
 import org.apache.cxf.hello_world_corba.PingMeFault;
-import org.apache.cxf.hello_world_corba.types.FaultDetail;
-import org.apache.cxf.interceptor.Fault;
 import org.junit.Assert;
 
 /**
@@ -46,14 +41,13 @@ import org.junit.Assert;
  * under the License.
  */
 
-@javax.jws.WebService(portName = "GreeterCORBAPort",
-        serviceName = "GreeterCORBAService",
+@javax.jws.WebService(portName = "GreeterTimeoutCORBAPort",
+        serviceName = "GreeterTimeoutCORBAService",
         targetNamespace = "http://cxf.apache.org/hello_world_corba",
-        wsdlLocation = "classpath:/wsdl_systest/hello_world_corba.wsdl",
+        wsdlLocation = "classpath:/wsdl_systest/hello_world_corba_timeout.wsdl",
         endpointInterface = "org.apache.cxf.hello_world_corba.Greeter")
 
 public class BaseGreeterTimeoutImpl extends Assert implements Greeter {
-    public static final String GREETME_IN = "test in";
     public static final String GREETME_OUT = "test out";
     static final String EX_STRING = "CXF RUNTIME EXCEPTION";
 
@@ -72,7 +66,6 @@ public class BaseGreeterTimeoutImpl extends Assert implements Greeter {
     }
 
     public void greetMeOneWay(String me) {
-        assertEquals("William", me);
     }
 
     public String sayHi() {
@@ -80,17 +73,5 @@ public class BaseGreeterTimeoutImpl extends Assert implements Greeter {
     }
 
     public void pingMe(String faultType) throws PingMeFault {
-        if ("USER".equals(faultType)) {
-
-            FaultDetail detail = new FaultDetail();
-            detail.setMajor((short)1);
-            detail.setMinor((short)2);
-            throw new PingMeFault("USER FAULT TEST", detail);
-        } else if ("SYSTEM".equals(faultType)) {
-            throw new Fault(new Message(EX_STRING, (ResourceBundle)null,
-                    new Object[]{"FAULT TEST"}));
-        } else {
-            throw new IllegalArgumentException(EX_STRING);
-        }
     }
 }
