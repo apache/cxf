@@ -179,6 +179,7 @@ public class BookStore extends AbstractStore<Book> implements BookDescription {
     
     public static class TheBeanParam {
         private int a;
+        @QueryParam("b")
         private int b;
         public int getA() {
             return a;
@@ -190,7 +191,6 @@ public class BookStore extends AbstractStore<Book> implements BookDescription {
         public int getB() {
             return b;
         }
-        @QueryParam("b")
         public void setB(int bb) {
             this.b = bb;
         }

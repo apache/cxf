@@ -72,6 +72,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ClassHelper;
 import org.apache.cxf.common.util.PrimitiveUtils;
 import org.apache.cxf.common.util.ProxyClassLoader;
+import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
@@ -113,6 +114,17 @@ public final class InjectionUtils {
         
     }
 
+    public static Field getDeclaredField(Class<?> cls, String fieldName) {
+        if (cls == null || cls == Object.class) {
+            return null;
+        }
+        Field f = ReflectionUtil.getDeclaredField(cls, fieldName);
+        if (f != null) {
+            return f;
+        }
+        return getDeclaredField(cls.getSuperclass(), fieldName);
+    }
+    
     public static boolean isConcreteClass(Class<?> cls) {
         return !cls.isInterface() && !Modifier.isAbstract(cls.getModifiers());
     }

@@ -49,6 +49,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
+import javax.ws.rs.BeanParam;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.Encoded;
 import javax.ws.rs.FormParam;
@@ -831,11 +832,13 @@ public class WadlGenerator implements ContainerRequestFilter {
                                        ParameterType ...parameterTypes) {
         for (Method m : beanType.getMethods()) {
             if (m.getName().startsWith("set")) {
+                String propertyName = StringUtils.uncapitalize(m.getName().substring(3));
+                Field f = InjectionUtils.getDeclaredField(beanType, propertyName);
+                
                 for (ParameterType parameterType : parameterTypes) {
                     Class<? extends Annotation> annClass = getAnnotationFromParamType(parameterType);
                     Annotation annotation = m.getAnnotation(annClass);
                     if (annotation != null) {
-                        String propertyName = StringUtils.uncapitalize(m.getName().substring(3));
                         Parameter pm = new Parameter(parameterType, propertyName);
                         pm.setEncoded(m.getAnnotation(Encoded.class) != null);
                         DefaultValue dv = m.getAnnotation(DefaultValue.class);
@@ -850,12 +853,36 @@ public class WadlGenerator implements ContainerRequestFilter {
                                      propertyName,
                                      new Annotation[]{}, 
                                      isJson);
+                    } else if (f != null) {
+                        annotation = f.getAnnotation(annClass);
+                        if (annotation != null) {
+                            Parameter pm = new Parameter(parameterType, propertyName);
+                            pm.setEncoded(f.getAnnotation(Encoded.class) != null);
+                            DefaultValue dv = f.getAnnotation(DefaultValue.class);
+                            if (dv != null) {
+                                pm.setDefaultValue(dv.value());
+                            }
+                            doWriteParam(ori,
+                                         sb,
+                                         pm, 
+                                         f.getType(), 
+                                         f.getGenericType(), 
+                                         propertyName,
+                                         new Annotation[]{}, 
+                                         isJson);
+                        }
                         
                     }
+                }
+                if (m.getAnnotation(BeanParam.class) != null) {
+                    doWriteJaxrsBeanParam(sb, ori, m.getParameterTypes()[0], isJson, parameterTypes);
+                } else if (f != null && f.getAnnotation(BeanParam.class) != null) {
+                    doWriteJaxrsBeanParam(sb, ori, f.getType(), isJson, parameterTypes);
                 }
             }
         }
     }
+    
     private Class<? extends Annotation> getAnnotationFromParamType(ParameterType pt) {
         return PARAMETER_TYPE_MAP.get(pt);
     }
