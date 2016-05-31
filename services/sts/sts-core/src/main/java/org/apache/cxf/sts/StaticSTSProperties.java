@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.sts;
 
-import java.net.URL;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -73,8 +72,7 @@ public class StaticSTSProperties implements STSPropertiesMBean {
     public void configureProperties() throws STSException {
         if (signatureCrypto == null && signatureCryptoProperties != null) {
             ResourceManager resourceManager = getResourceManager();
-            URL url = SecurityUtils.loadResource(resourceManager, signatureCryptoProperties);
-            Properties sigProperties = SecurityUtils.loadProperties(url);
+            Properties sigProperties = SecurityUtils.loadProperties(resourceManager, signatureCryptoProperties);
             if (sigProperties == null) {
                 LOG.fine("Cannot load signature properties using: " + signatureCryptoProperties);
                 throw new STSException("Configuration error: cannot load signature properties");
@@ -89,8 +87,7 @@ public class StaticSTSProperties implements STSPropertiesMBean {
         
         if (encryptionCrypto == null && encryptionCryptoProperties != null) {
             ResourceManager resourceManager = getResourceManager();
-            URL url = SecurityUtils.loadResource(resourceManager, encryptionCryptoProperties);
-            Properties encrProperties = SecurityUtils.loadProperties(url);
+            Properties encrProperties = SecurityUtils.loadProperties(resourceManager, encryptionCryptoProperties);
             if (encrProperties == null) {
                 LOG.fine("Cannot load encryption properties using: " + encryptionCryptoProperties);
                 throw new STSException("Configuration error: cannot load encryption properties");
