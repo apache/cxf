@@ -25,6 +25,7 @@ import java.net.URL;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -110,11 +111,9 @@ import org.apache.wss4j.policy.model.AlgorithmSuite;
 import org.apache.wss4j.policy.model.AlgorithmSuite.AlgorithmSuiteType;
 import org.apache.wss4j.policy.model.Trust10;
 import org.apache.wss4j.policy.model.Trust13;
-import org.apache.xml.security.exceptions.Base64DecodingException;
 import org.apache.xml.security.keys.content.X509Data;
 import org.apache.xml.security.keys.content.keyvalues.DSAKeyValue;
 import org.apache.xml.security.keys.content.keyvalues.RSAKeyValue;
-import org.apache.xml.security.utils.Base64;
 
 /**
  * A primitive STSClient for batch tokens. Note that this contains a number of hacks and should NOT be
@@ -665,7 +664,7 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
                 requestorEntropy = WSSecurityUtil
                     .generateNonce(algType.getMaximumSymmetricKeyLength() / 8);
             }
-            writer.writeCharacters(Base64.encode(requestorEntropy));
+            writer.writeCharacters(Base64.getMimeEncoder().encodeToString(requestorEntropy));
 
             writer.writeEndElement();
             writer.writeEndElement();
@@ -842,7 +841,7 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
     }
 
     protected SecurityToken createSecurityToken(Element el, byte[] requestorEntropy)
-        throws WSSecurityException, Base64DecodingException {
+        throws WSSecurityException {
 
         if ("RequestSecurityTokenResponseCollection".equals(el.getLocalName())) {
             el = DOMUtils.getFirstElement(el);
@@ -899,7 +898,7 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
             if (childQname.equals(new QName(namespace, "BinarySecret"))) {
                 // First check for the binary secret
                 String b64Secret = DOMUtils.getContent(child);
-                secret = Base64.decode(b64Secret);
+                secret = Base64.getMimeDecoder().decode(b64Secret);
             } else if (childQname.equals(new QName(WSConstants.ENC_NS, WSConstants.ENC_KEY_LN))) {
                 secret = decryptKey(child);
             } else if (childQname.equals(new QName(namespace, "ComputedKey"))) {
@@ -913,7 +912,7 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
                         serviceEntr = decryptKey(computedKeyChild);
                     } else if (computedKeyChildQName.equals(new QName(namespace, "BinarySecret"))) {
                         String content = DOMUtils.getContent(computedKeyChild);
-                        serviceEntr = Base64.decode(content);
+                        serviceEntr = Base64.getMimeDecoder().decode(content);
                     }
                 }
                 
@@ -945,7 +944,7 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
         return token;
     }
     
-    protected byte[] decryptKey(Element child) throws TrustException, WSSecurityException, Base64DecodingException {
+    protected byte[] decryptKey(Element child) throws TrustException, WSSecurityException {
         String encryptionAlgorithm = X509Util.getEncAlgo(child);
         // For the SPNEGO case just return the decoded cipher value and decrypt it later
         if (encryptionAlgorithm != null && encryptionAlgorithm.endsWith("spnego#GSS_Wrap")) {
@@ -958,7 +957,7 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
                     XMLUtils.getDirectChildElement(tmpE, "CipherValue", WSConstants.ENC_NS);
                 if (tmpE != null) {
                     String content = DOMUtils.getContent(tmpE);
-                    cipherValue = Base64.decode(content);
+                    cipherValue = Base64.getMimeDecoder().decode(content);
                 }
             }
             if (cipherValue == null) {

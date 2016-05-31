@@ -20,6 +20,7 @@
 package org.apache.cxf.ws.security.wss4j.policyhandlers;
 
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
@@ -78,7 +79,6 @@ import org.apache.wss4j.policy.model.SpnegoContextToken;
 import org.apache.wss4j.policy.model.SymmetricBinding;
 import org.apache.wss4j.policy.model.UsernameToken;
 import org.apache.wss4j.policy.model.X509Token;
-import org.apache.xml.security.utils.Base64;
 
 /**
  * 
@@ -941,7 +941,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
     private static String getSHA1(byte[] input) {
         try {
             byte[] digestBytes = KeyUtils.generateDigest(input);
-            return Base64.encode(digestBytes);
+            return Base64.getMimeEncoder().encodeToString(digestBytes);
         } catch (WSSecurityException e) {
             //REVISIT
         }

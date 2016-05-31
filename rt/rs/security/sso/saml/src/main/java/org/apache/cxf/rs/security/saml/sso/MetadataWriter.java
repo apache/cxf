@@ -25,6 +25,7 @@ import java.security.Key;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 
@@ -50,7 +51,6 @@ import org.w3c.dom.Document;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
-import org.apache.xml.security.utils.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -176,7 +176,7 @@ public class MetadataWriter {
 
             // Write the Base-64 encoded certificate
             byte data[] = signingCert.getEncoded();
-            String encodedCertificate = Base64.encode(data);
+            String encodedCertificate = Base64.getMimeEncoder().encodeToString(data);
             writer.writeCharacters(encodedCertificate);
             
             writer.writeEndElement(); // X509Certificate

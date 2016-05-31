@@ -21,6 +21,7 @@ package org.apache.cxf.sts.operation;
 import java.security.Principal;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Properties;
 
@@ -47,7 +48,6 @@ import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.xml.security.utils.Base64;
 
 /**
  * Some unit tests for the validate operation to validate X.509 tokens.
@@ -247,7 +247,7 @@ public class ValidateX509TokenUnitTest extends org.junit.Assert {
         X509Certificate cert
     ) throws Exception {
         BinarySecurityTokenType binarySecurityToken = new BinarySecurityTokenType();
-        binarySecurityToken.setValue(Base64.encode(cert.getEncoded()));
+        binarySecurityToken.setValue(Base64.getMimeEncoder().encodeToString(cert.getEncoded()));
         binarySecurityToken.setValueType(X509TokenValidator.X509_V3_TYPE);
         binarySecurityToken.setEncodingType(WSConstants.SOAPMESSAGE_NS + "#Base64Binary");
         JAXBElement<BinarySecurityTokenType> tokenType = 

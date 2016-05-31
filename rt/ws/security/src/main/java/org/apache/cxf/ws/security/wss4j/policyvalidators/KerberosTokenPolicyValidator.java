@@ -20,6 +20,7 @@
 package org.apache.cxf.ws.security.wss4j.policyvalidators;
 
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.List;
 
@@ -42,7 +43,6 @@ import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.KerberosToken;
 import org.apache.wss4j.policy.model.KerberosToken.ApReqTokenType;
-import org.apache.xml.security.utils.Base64;
 
 /**
  * Validate a WSSecurityEngineResult corresponding to the processing of a Kerberos Token
@@ -162,7 +162,7 @@ public class KerberosTokenPolicyValidator extends AbstractSecurityPolicyValidato
         token.setTokenType(binarySecurityToken.getValueType());
         byte[] tokenBytes = binarySecurityToken.getToken();
         try {
-            token.setSHA1(Base64.encode(KeyUtils.generateDigest(tokenBytes)));
+            token.setSHA1(Base64.getMimeEncoder().encodeToString(KeyUtils.generateDigest(tokenBytes)));
         } catch (WSSecurityException e) {
             // Just consume this for now as it isn't critical...
         }

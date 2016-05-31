@@ -21,6 +21,7 @@ package org.apache.cxf.ws.security.wss4j;
 
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -70,7 +71,6 @@ import org.apache.wss4j.policy.model.AbstractSecurityAssertion;
 import org.apache.wss4j.policy.model.SupportingTokens;
 import org.apache.wss4j.policy.model.UsernameToken;
 import org.apache.xml.security.exceptions.Base64DecodingException;
-import org.apache.xml.security.utils.Base64;
 
 /**
  * 
@@ -126,7 +126,7 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
                             UsernameTokenPrincipal utPrincipal = (UsernameTokenPrincipal)principal;
                             String nonce = null;
                             if (utPrincipal.getNonce() != null) {
-                                nonce = Base64.encode(utPrincipal.getNonce());
+                                nonce = Base64.getMimeEncoder().encodeToString(utPrincipal.getNonce());
                             }
                             subject = createSubject(utPrincipal.getName(), utPrincipal.getPassword(),
                                     utPrincipal.isPasswordDigest(), nonce, utPrincipal.getCreatedTime());
@@ -236,7 +236,7 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
         
         WSUsernameTokenPrincipalImpl principal = new WSUsernameTokenPrincipalImpl(ut.getName(), ut.isHashed());
         if (ut.getNonce() != null) {
-            principal.setNonce(Base64.decode(ut.getNonce()));
+            principal.setNonce(Base64.getMimeDecoder().decode(ut.getNonce()));
         }
         principal.setPassword(ut.getPassword());
         principal.setCreatedTime(ut.getCreated());

@@ -20,6 +20,7 @@ package org.apache.cxf.sts.token.validator;
 
 import java.security.Principal;
 import java.security.cert.X509Certificate;
+import java.util.Base64;
 import java.util.Properties;
 
 import javax.xml.bind.JAXBElement;
@@ -41,7 +42,6 @@ import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.xml.security.utils.Base64;
 
 
 /**
@@ -69,7 +69,7 @@ public class X509TokenValidatorTest extends org.junit.Assert {
         Crypto crypto = validatorParameters.getStsProperties().getSignatureCrypto();
         X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
         assertTrue(certs != null && certs.length > 0);
-        binarySecurityToken.setValue(Base64.encode(certs[0].getEncoded()));
+        binarySecurityToken.setValue(Base64.getMimeEncoder().encodeToString(certs[0].getEncoded()));
         
         ReceivedToken validateTarget = new ReceivedToken(tokenType);
         tokenRequirements.setValidateTarget(validateTarget);
@@ -120,7 +120,7 @@ public class X509TokenValidatorTest extends org.junit.Assert {
         X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
         assertTrue(certs != null && certs.length > 0);
         
-        binarySecurityToken.setValue(Base64.encode(certs[0].getEncoded()));
+        binarySecurityToken.setValue(Base64.getMimeEncoder().encodeToString(certs[0].getEncoded()));
         binarySecurityToken.setValueType(X509TokenValidator.X509_V3_TYPE);
         binarySecurityToken.setEncodingType(WSConstants.SOAPMESSAGE_NS + "#Base64Binary");
         

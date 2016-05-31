@@ -24,6 +24,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
 import java.security.Signature;
 import java.security.cert.X509Certificate;
+import java.util.Base64;
 import java.util.logging.Level;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -42,7 +43,6 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.util.DOM2Writer;
-import org.apache.xml.security.utils.Base64;
 import org.opensaml.saml.saml2.core.AuthnRequest;
 
 public class SamlRedirectBindingFilter extends AbstractServiceProviderFilter {
@@ -159,7 +159,7 @@ public class SamlRedirectBindingFilter extends AbstractServiceProviderFilter {
         signature.update(requestToSign.getBytes(StandardCharsets.UTF_8));
         byte[] signBytes = signature.sign();
         
-        String encodedSignature = Base64.encode(signBytes);
+        String encodedSignature = Base64.getMimeEncoder().encodeToString(signBytes);
         
         ub.queryParam(SSOConstants.SIGNATURE, URLEncoder.encode(encodedSignature, StandardCharsets.UTF_8.name()));
         

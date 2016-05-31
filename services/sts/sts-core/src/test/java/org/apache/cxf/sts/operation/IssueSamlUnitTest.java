@@ -22,6 +22,7 @@ import java.security.Principal;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
@@ -75,7 +76,6 @@ import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.WSSecEncryptedKey;
 import org.apache.wss4j.dom.saml.WSSSAMLKeyInfoProcessor;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
-import org.apache.xml.security.utils.Base64;
 
 /**
  * Some unit tests for the issue operation to issue SAML tokens.
@@ -1487,7 +1487,7 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         Element x509Data = doc.createElementNS(WSConstants.SIG_NS, "ds:X509Data");
         x509Data.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:ds", WSConstants.SIG_NS);
         Element x509Cert = doc.createElementNS(WSConstants.SIG_NS, "ds:X509Certificate");
-        Text certText = doc.createTextNode(Base64.encode(certs[0].getEncoded()));
+        Text certText = doc.createTextNode(Base64.getMimeEncoder().encodeToString(certs[0].getEncoded()));
         x509Cert.appendChild(certText);
         x509Data.appendChild(x509Cert);
         

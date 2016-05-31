@@ -19,6 +19,7 @@
 package org.apache.cxf.sts.token.validator;
 
 import java.security.Principal;
+import java.util.Base64;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -57,8 +58,6 @@ import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.token.UsernameToken;
 import org.apache.wss4j.dom.validate.Credential;
 import org.apache.wss4j.dom.validate.Validator;
-import org.apache.xml.security.exceptions.Base64DecodingException;
-import org.apache.xml.security.utils.Base64;
 
 /**
  * This class validates a wsse UsernameToken.
@@ -238,8 +237,6 @@ public class UsernameTokenValidator implements TokenValidator {
             LOG.fine("Username Token successfully validated");
         } catch (WSSecurityException ex) {
             LOG.log(Level.WARNING, "", ex);
-        } catch (Base64DecodingException ex) {
-            LOG.log(Level.WARNING, "", ex);
         }
         
         return response;
@@ -255,13 +252,15 @@ public class UsernameTokenValidator implements TokenValidator {
         String passwordType,
         String nonce,
         String createdTime
-    ) throws Base64DecodingException {
+    ) {
         boolean hashed = false;
         if (WSConstants.PASSWORD_DIGEST.equals(passwordType)) {
             hashed = true;
         }
         WSUsernameTokenPrincipalImpl principal = new WSUsernameTokenPrincipalImpl(username, hashed);
-        principal.setNonce(Base64.decode(nonce));
+        if (nonce != null) {
+            principal.setNonce(Base64.getMimeDecoder().decode(nonce));
+        }
         principal.setPassword(passwordValue);
         principal.setCreatedTime(createdTime);
         principal.setPasswordType(passwordType);

@@ -21,6 +21,7 @@ package org.apache.cxf.ws.security.policy.interceptors;
 
 import java.security.Key;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -66,7 +67,6 @@ import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 import org.apache.wss4j.stax.securityToken.KerberosServiceSecurityToken;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
-import org.apache.xml.security.utils.Base64;
 
 /**
  * 
@@ -268,7 +268,7 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
             
             byte[] ticket = kerberosToken.getBinaryContent();
             try {
-                token.setSHA1(Base64.encode(KeyUtils.generateDigest(ticket)));
+                token.setSHA1(Base64.getMimeEncoder().encodeToString(KeyUtils.generateDigest(ticket)));
             } catch (WSSecurityException e) {
                 // Just consume this for now as it isn't critical...
             }
