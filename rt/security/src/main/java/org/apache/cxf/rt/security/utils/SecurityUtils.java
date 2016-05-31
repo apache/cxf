@@ -135,13 +135,17 @@ public final class SecurityUtils {
     }
     
     public static Properties loadProperties(Object o) {
+        return loadProperties(null, o);
+    }
+    
+    public static Properties loadProperties(ResourceManager manager, Object o) {
         if (o instanceof Properties) {
             return (Properties)o;
         } 
         
         URL url = null;
         if (o instanceof String) {
-            url = SecurityUtils.loadResource(o);
+            url = SecurityUtils.loadResource(manager, o);
         } else if (o instanceof URL) {
             url = (URL)o;
         }
