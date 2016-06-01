@@ -73,16 +73,18 @@ public class IdTokenResponseFilter extends OAuthServerJoseJwtProducer implements
             return st.getSubject().getProperties().get(OidcUtils.ID_TOKEN);
         } else if (st.getSubject() instanceof OidcUserSubject) {
             OidcUserSubject sub = (OidcUserSubject)st.getSubject();
-            IdToken idToken = new IdToken(sub.getIdToken());
-            idToken.setAudience(st.getClient().getClientId());
-            idToken.setAuthorizedParty(st.getClient().getClientId());
-            // if this token was refreshed then the cloned IDToken might need to have its
-            // issuedAt and expiry time properties adjusted if it proves to be necessary
-            setAtHashAndNonce(idToken, st);
-            return processJwt(new JwtToken(idToken), st.getClient());
-        } else {
-            return null;
+            if (sub.getIdToken() != null) {
+                IdToken idToken = new IdToken(sub.getIdToken());
+                idToken.setAudience(st.getClient().getClientId());
+                idToken.setAuthorizedParty(st.getClient().getClientId());
+                // if this token was refreshed then the cloned IDToken might need to have its
+                // issuedAt and expiry time properties adjusted if it proves to be necessary
+                setAtHashAndNonce(idToken, st);
+                return processJwt(new JwtToken(idToken), st.getClient());
+            }
         }
+        return null;
+        
     }
     private void setAtHashAndNonce(IdToken idToken, ServerAccessToken st) {
         String rType = st.getResponseType();
