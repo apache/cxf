@@ -62,7 +62,11 @@ public final class SAAJUtils {
                 count++;
                 pfx = "fc" + count;
             }
-            f.addNamespaceDeclaration(pfx, code.getNamespaceURI());
+            if (code.getNamespaceURI() != null && !"".equals(code.getNamespaceURI())) {
+                f.addNamespaceDeclaration(pfx, code.getNamespaceURI());
+            } else {
+                f.addNamespaceDeclaration(pfx, f.getNamespaceURI());
+            }
             f.setFaultCode(pfx + ":" + code.getLocalPart());
         }
         
