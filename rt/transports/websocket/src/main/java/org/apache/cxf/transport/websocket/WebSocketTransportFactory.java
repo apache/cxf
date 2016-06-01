@@ -134,6 +134,11 @@ public class WebSocketTransportFactory extends AbstractTransportFactory implemen
             AbstractHTTPDestination d = registry.getDestinationForPath(endpointInfo.getAddress());
             if (d == null) {
                 d = factory.createDestination(endpointInfo, bus, registry);
+                if (d == null) {
+                    String error = "No destination available. The CXF websocket transport needs either the "
+                        + "Jetty WebSocket or Atmosphere dependencies to be available";
+                    throw new IOException(error); 
+                }
                 registry.addDestination(d);
                 configure(bus, d);
                 d.finalizeConfig();
