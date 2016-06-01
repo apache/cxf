@@ -31,7 +31,7 @@
     </parent>
     <modules>
         <module>autoconfigure</module>
-        <module>starter-jax-ws</module>
-        <module>starter-jax-rs</module>
+        <module>starter-jaxws</module>
+        <module>starter-jaxrs</module>
     </modules>
 </project>

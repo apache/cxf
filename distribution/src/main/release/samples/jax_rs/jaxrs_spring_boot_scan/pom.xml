@@ -17,7 +17,7 @@
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-spring-boot-starter-jax-rs</artifactId>
+            <artifactId>cxf-spring-boot-starter-jaxrs</artifactId>
             <version>${cxf.version}</version>
         </dependency>
         <dependency>
