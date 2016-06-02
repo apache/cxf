@@ -11,8 +11,7 @@
     <description>Spring Boot CXF REST Application</description>
     
     <properties>
-        <cxf.version>3.1.6-SNAPSHOT</cxf.version>
-        <jetty.version>8.1.5.v20120716</jetty.version>
+        <cxf.version>3.1.7-SNAPSHOT</cxf.version>
     </properties>
     <dependencies>
         <dependency>
