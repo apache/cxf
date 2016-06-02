@@ -19,7 +19,7 @@
 
 package org.apache.cxf.systest.https.clientauth;
 
-import java.io.FileInputStream;
+import java.io.InputStream;
 import java.net.URL;
 import java.security.KeyStore;
 
@@ -32,6 +32,7 @@ import javax.net.ssl.TrustManagerFactory;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.hello_world.Greeter;
 import org.apache.hello_world.services.SOAPService;
@@ -262,19 +263,19 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
         
         SSLContext sslContext = SSLContext.getInstance("TLS");
         
-        URL trustStore = ClientAuthTest.class.getResource("../../../../../../keys/Truststore.jks");
         KeyStore ts = KeyStore.getInstance("JKS");
-        try (FileInputStream trustStoreInputStream = new FileInputStream(trustStore.getPath())) {
-            ts.load(trustStoreInputStream, "password".toCharArray());
+        try (InputStream trustStore = 
+            ClassLoaderUtils.getResourceAsStream("keys/Truststore.jks", ClientAuthTest.class)) {
+            ts.load(trustStore, "password".toCharArray());
         }
 
         TrustManagerFactory tmf = TrustManagerFactory.getInstance("PKIX");
         tmf.init(ts);
         
-        URL keyStore = ClientAuthTest.class.getResource("../../../../../../keys/Morpit.jks");
         KeyStore ks = KeyStore.getInstance("JKS");
-        try (FileInputStream keyStoreInputStream = new FileInputStream(keyStore.getPath())) {
-            ks.load(keyStoreInputStream, "password".toCharArray());
+        try (InputStream keyStore = 
+            ClassLoaderUtils.getResourceAsStream("keys/Morpit.jks", ClientAuthTest.class)) {
+            ks.load(keyStore, "password".toCharArray());
         }
 
         KeyManagerFactory kmf = KeyManagerFactory.getInstance("PKIX");

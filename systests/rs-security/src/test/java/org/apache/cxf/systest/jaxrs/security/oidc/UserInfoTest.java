@@ -30,6 +30,7 @@ import java.security.cert.X509Certificate;
 
 import javax.ws.rs.core.Response;
 
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jwe.JweJwtCompactConsumer;
@@ -42,7 +43,6 @@ import org.apache.cxf.rs.security.oidc.common.UserInfo;
 import org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuth2TestUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.TestUtil;
-import org.apache.wss4j.common.util.Loader;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 
@@ -165,8 +165,8 @@ public class UserInfoTest extends AbstractBusClientServerTestBase {
         assertEquals("consumer-id", jwt.getClaim(JwtConstants.CLAIM_AUDIENCE));
         
         KeyStore keystore = KeyStore.getInstance("JKS");
-        String keystorePath = "org/apache/cxf/systest/jaxrs/security/certs/alice.jks";
-        keystore.load(Loader.getResource(keystorePath).openStream(), "password".toCharArray());
+        keystore.load(ClassLoaderUtils.getResourceAsStream("keys/alice.jks", this.getClass()), 
+                      "password".toCharArray());
         Certificate cert = keystore.getCertificate("alice");
         Assert.assertNotNull(cert);
 
@@ -220,8 +220,8 @@ public class UserInfoTest extends AbstractBusClientServerTestBase {
         assertNotNull(token);
         
         KeyStore keystore = KeyStore.getInstance("JKS");
-        String keystorePath = "org/apache/cxf/systest/jaxrs/security/certs/bob.jks";
-        keystore.load(Loader.getResource(keystorePath).openStream(), "password".toCharArray());
+        keystore.load(ClassLoaderUtils.getResourceAsStream("keys/bob.jks", this.getClass()), 
+                      "password".toCharArray());
         
         JweJwtCompactConsumer jwtConsumer = new JweJwtCompactConsumer(token);
         PrivateKey privateKey = (PrivateKey)keystore.getKey("bob", "password".toCharArray());
@@ -247,7 +247,7 @@ public class UserInfoTest extends AbstractBusClientServerTestBase {
         }
         
         KeyStore keystore = KeyStore.getInstance("JKS");
-        keystore.load(Loader.getResource("org/apache/cxf/systest/jaxrs/security/certs/alice.jks").openStream(), 
+        keystore.load(ClassLoaderUtils.getResourceAsStream("keys/alice.jks", this.getClass()), 
                       "password".toCharArray());
         Certificate cert = keystore.getCertificate("alice");
         Assert.assertNotNull(cert);

@@ -28,10 +28,10 @@ under the License.
         <httpj:engine port="${testutil.ports.jaxrs-xmlsec-stax}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="password">
-                    <sec:keyStore type="JKS" password="password" file="src/test/java/org/apache/cxf/systest/http/resources/Bethal.jks"/>
+                    <sec:keyStore type="JKS" password="password" resource="keys/Bethal.jks"/>
                 </sec:keyManagers>
                 <sec:trustManagers>
-                    <sec:keyStore type="JKS" password="password" file="src/test/java/org/apache/cxf/systest/http/resources/Truststore.jks"/>
+                    <sec:keyStore type="JKS" password="password" resource="keys/Truststore.jks"/>
                 </sec:trustManagers>
                 <sec:clientAuthentication want="true" required="true"/>
             </httpj:tlsServerParameters>

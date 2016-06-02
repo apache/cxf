@@ -51,10 +51,10 @@ under the License.
         <httpj:engine port="${testutil.ports.jaxrs-oauth2-filters}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="password">
-                    <sec:keyStore type="JKS" password="password" file="src/test/java/org/apache/cxf/systest/http/resources/Bethal.jks"/>
+                    <sec:keyStore type="JKS" password="password" resource="keys/Bethal.jks"/>
                 </sec:keyManagers>
                 <sec:trustManagers>
-                    <sec:keyStore type="JKS" password="password" file="src/test/java/org/apache/cxf/systest/http/resources/Truststore.jks"/>
+                    <sec:keyStore type="JKS" password="password" resource="keys/Truststore.jks"/>
                 </sec:trustManagers>
                 <sec:clientAuthentication want="true" required="true"/>
             </httpj:tlsServerParameters>
@@ -108,7 +108,7 @@ under the License.
         <http:client ConnectionTimeout="3000000" ReceiveTimeout="3000000"/>
         <http:tlsClientParameters disableCNCheck="true">
             <sec:trustManagers>
-                <sec:keyStore type="JKS" password="password" file="src/test/java/org/apache/cxf/systest/http/resources/Truststore.jks"/>
+                <sec:keyStore type="JKS" password="password" resource="keys/Truststore.jks"/>
             </sec:trustManagers>
         </http:tlsClientParameters>
         <http:authorization>

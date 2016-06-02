@@ -20,9 +20,8 @@
 package org.apache.cxf.systest.https.conduit;
 
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.security.GeneralSecurityException;
@@ -42,6 +41,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.BusApplicationContext;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
@@ -98,17 +98,12 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
     private static Map<String, String> addrMap = new TreeMap<String, String>();
     
     static {
-        try {
+        try (InputStream key = ClassLoaderUtils.getResourceAsStream("keys/Morpit.jks", HTTPSConduitTest.class);
+            InputStream truststore = 
+                ClassLoaderUtils.getResourceAsStream("keys/Truststore.jks", HTTPSConduitTest.class);) {
             //System.setProperty("javax.net.debug", "all");
-            URL key = Server.class.getResource("../../../../../../keys/Morpit.jks");
-            String keystore = new File(key.toURI()).getAbsolutePath();
-            //System.out.println("Keystore: " + keystore);
-            KeyManager[] kmgrs = getKeyManagers(getKeyStore("JKS", keystore, "password"), "password");
+            KeyManager[] kmgrs = getKeyManagers(getKeyStore("JKS", key, "password"), "password");
             
-            key = Server.class.getResource("../../../../../../keys/Truststore.jks");
-            
-            String truststore = new File(key.toURI()).getAbsolutePath();
-            //System.out.println("Truststore: " + truststore);
             TrustManager[] tmgrs = getTrustManagers(getKeyStore("JKS", truststore, "password"));
             
             tlsClientParameters.setKeyManagers(kmgrs);
@@ -196,7 +191,7 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
         }
     }
 
-    public static KeyStore getKeyStore(String ksType, String file, String ksPassword)
+    public static KeyStore getKeyStore(String ksType, InputStream inputStream, String ksPassword)
         throws GeneralSecurityException,
                IOException {
         
@@ -211,7 +206,7 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
         // We just use the default Keystore provider
         KeyStore keyStore = KeyStore.getInstance(type);
         
-        keyStore.load(new FileInputStream(file), password);
+        keyStore.load(inputStream, password);
         
         return keyStore;
     }

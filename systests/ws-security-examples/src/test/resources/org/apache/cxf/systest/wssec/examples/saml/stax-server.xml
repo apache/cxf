@@ -117,10 +117,10 @@
         <httpj:engine port="${testutil.ports.saml.StaxServer.2}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="password">
-                    <sec:keyStore type="jks" password="password" resource="bob.jks"/>
+                    <sec:keyStore type="jks" password="password" resource="keys/bob.jks"/>
                 </sec:keyManagers>
                 <sec:trustManagers>
-                    <sec:keyStore type="jks" password="password" resource="cxfca.jks"/>
+                    <sec:keyStore type="jks" password="password" resource="keys/cxfca.jks"/>
                 </sec:trustManagers>
                 <sec:clientAuthentication want="true" required="true"/>
             </httpj:tlsServerParameters>

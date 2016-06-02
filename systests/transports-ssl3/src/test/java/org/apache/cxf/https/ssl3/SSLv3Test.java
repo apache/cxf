@@ -20,19 +20,21 @@
 package org.apache.cxf.https.ssl3;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
+import java.security.KeyStore;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
 import javax.xml.ws.BindingProvider;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
-import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.configuration.jsse.SSLUtils;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.hello_world.Greeter;
 import org.apache.hello_world.services.SOAPService;
@@ -82,12 +84,17 @@ public class SSLv3Test extends AbstractBusClientServerTestBase {
         connection.setHostnameVerifier(new DisableCNCheckVerifier());
         
         SSLContext sslContext = SSLContext.getInstance("SSL");
-        URL keystore = SSLv3Test.class.getResource("../../../../../keys/Truststore.jks");
-        TrustManager[] trustManagers = 
-            SSLUtils.getTrustStoreManagers(false, "jks", keystore.getPath(), 
-                                           "PKIX", LogUtils.getL7dLogger(SSLv3Test.class));
-        sslContext.init(null, trustManagers, new java.security.SecureRandom());
         
+        KeyStore trustedCertStore = KeyStore.getInstance("jks");
+        try (InputStream keystore = ClassLoaderUtils.getResourceAsStream("keys/Truststore.jks", SSLv3Test.class)) {
+            trustedCertStore.load(keystore, null);
+        }
+        
+        TrustManagerFactory tmf = TrustManagerFactory.getInstance("PKIX");
+        tmf.init(trustedCertStore);
+        TrustManager[] trustManagers = tmf.getTrustManagers();
+        
+        sslContext.init(null, trustManagers, new java.security.SecureRandom());
         connection.setSSLSocketFactory(sslContext.getSocketFactory());
         
         try {
@@ -125,10 +132,15 @@ public class SSLv3Test extends AbstractBusClientServerTestBase {
         connection.setHostnameVerifier(new DisableCNCheckVerifier());
         
         SSLContext sslContext = SSLContext.getInstance("SSL");
-        URL keystore = SSLv3Test.class.getResource("../../../../../keys/Truststore.jks");
-        TrustManager[] trustManagers = 
-            SSLUtils.getTrustStoreManagers(false, "jks", keystore.getPath(), 
-                                           "PKIX", LogUtils.getL7dLogger(SSLv3Test.class));
+        KeyStore trustedCertStore = KeyStore.getInstance("jks");
+        try (InputStream keystore = ClassLoaderUtils.getResourceAsStream("keys/Truststore.jks", SSLv3Test.class)) {
+            trustedCertStore.load(keystore, null);
+        }
+        
+        TrustManagerFactory tmf = TrustManagerFactory.getInstance("PKIX");
+        tmf.init(trustedCertStore);
+        TrustManager[] trustManagers = tmf.getTrustManagers();
+        
         sslContext.init(null, trustManagers, new java.security.SecureRandom());
         
         connection.setSSLSocketFactory(sslContext.getSocketFactory());

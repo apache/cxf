@@ -185,7 +185,7 @@ public class HTTPSClientTest extends AbstractBusClientServerTestBase {
         public static KeyManager[] getKeyManagers() {
             KeyManagersType kmt = new KeyManagersType();
             KeyStoreType kst = new KeyStoreType();
-            kst.setFile("src/test/resources/keys/Bethal.jks");
+            kst.setResource("keys/Bethal.jks");
             kst.setPassword("password");
             kst.setType("JKS");
         
@@ -201,7 +201,7 @@ public class HTTPSClientTest extends AbstractBusClientServerTestBase {
         public static TrustManager[] getTrustManagers() {
             TrustManagersType tmt = new TrustManagersType();
             KeyStoreType kst = new KeyStoreType();
-            kst.setFile("src/test/resources/keys/Truststore.jks");
+            kst.setResource("keys/Truststore.jks");
             kst.setPassword("password");
             kst.setType("JKS");
         
@@ -218,7 +218,7 @@ public class HTTPSClientTest extends AbstractBusClientServerTestBase {
         public static KeyManager[] getKeyManagers() {
             KeyManagersType kmt = new KeyManagersType();
             KeyStoreType kst = new KeyStoreType();
-            kst.setFile("src/test/resources/keys/Morpit.jks");
+            kst.setResource("keys/Morpit.jks");
             kst.setPassword("password");
             kst.setType("JKS");
         
@@ -234,7 +234,7 @@ public class HTTPSClientTest extends AbstractBusClientServerTestBase {
         public static TrustManager[] getTrustManagers() {
             TrustManagersType tmt = new TrustManagersType();
             KeyStoreType kst = new KeyStoreType();
-            kst.setFile("src/test/resources/keys/Truststore.jks");
+            kst.setResource("keys/Truststore.jks");
             kst.setPassword("password");
             kst.setType("JKS");
         

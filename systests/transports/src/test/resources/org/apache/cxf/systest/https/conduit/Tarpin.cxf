@@ -51,11 +51,11 @@
 	     <httpj:tlsServerParameters>
 	      <sec:keyManagers keyPassword="password">
 	           <sec:keyStore type="JKS" password="password" 
-	                file="src/test/resources/keys/Tarpin.jks"/>
+	                resource="keys/Tarpin.jks"/>
 	      </sec:keyManagers>
 	      <sec:trustManagers>
 	          <sec:keyStore type="JKS" password="password"
-	               file="src/test/resources/keys/Truststore.jks"/>
+	               resource="keys/Truststore.jks"/>
 	      </sec:trustManagers>
 	      <sec:clientAuthentication want="true" required="true"/>
 	    </httpj:tlsServerParameters>

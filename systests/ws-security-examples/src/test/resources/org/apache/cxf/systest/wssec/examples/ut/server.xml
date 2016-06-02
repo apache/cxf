@@ -74,10 +74,10 @@
         <httpj:engine port="${testutil.ports.ut.Server.2}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="password">
-                    <sec:keyStore type="jks" password="password" resource="Bethal.jks"/>
+                    <sec:keyStore type="jks" password="password" resource="keys/Bethal.jks"/>
                 </sec:keyManagers>
                 <sec:trustManagers>
-                    <sec:keyStore type="jks" password="password" resource="Truststore.jks"/>
+                    <sec:keyStore type="jks" password="password" resource="keys/Truststore.jks"/>
                 </sec:trustManagers>
                 <sec:clientAuthentication want="false" required="false"/>
             </httpj:tlsServerParameters>

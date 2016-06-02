@@ -113,8 +113,7 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.keystore.alias", "bob");
         properties.put("rs.security.keystore.password", "password");
         properties.put("rs.security.key.password", "password");
-        properties.put("rs.security.keystore.file", 
-                       "org/apache/cxf/systest/jaxrs/security/certs/bob.jks");
+        properties.put("rs.security.keystore.file", "keys/bob.jks");
         properties.put("rs.security.encryption.content.algorithm", "A128GCM");
         properties.put("rs.security.encryption.key.algorithm", "RSA-OAEP");
         WebClient.getConfig(client).getRequestContext().putAll(properties);
@@ -151,8 +150,7 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.keystore.alias", "alice");
         properties.put("rs.security.keystore.password", "password");
         properties.put("rs.security.key.password", "password");
-        properties.put("rs.security.keystore.file", 
-                       "org/apache/cxf/systest/jaxrs/security/certs/alice.jks");
+        properties.put("rs.security.keystore.file", "keys/alice.jks");
         properties.put("rs.security.encryption.content.algorithm", "A128GCM");
         properties.put("rs.security.encryption.key.algorithm", "RSA-OAEP");
         properties.put("rs.security.encryption.include.cert", "true");
@@ -182,8 +180,7 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.keystore.alias", "bob");
         properties.put("rs.security.keystore.password", "password");
         properties.put("rs.security.key.password", "password");
-        properties.put("rs.security.keystore.file", 
-                       "org/apache/cxf/systest/jaxrs/security/certs/bob.jks");
+        properties.put("rs.security.keystore.file", "keys/bob.jks");
         properties.put("rs.security.encryption.content.algorithm", "A128GCM");
         properties.put("rs.security.encryption.key.algorithm", "RSA-OAEP");
         WebClient.getConfig(client).getRequestContext().putAll(properties);
@@ -220,8 +217,7 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.keystore.alias", "alice");
         properties.put("rs.security.keystore.password", "password");
         properties.put("rs.security.key.password", "password");
-        properties.put("rs.security.keystore.file", 
-                       "org/apache/cxf/systest/jaxrs/security/certs/alice.jks");
+        properties.put("rs.security.keystore.file", "keys/alice.jks");
         properties.put("rs.security.encryption.content.algorithm", "A128GCM");
         properties.put("rs.security.encryption.key.algorithm", "RSA-OAEP");
         properties.put("rs.security.encryption.include.cert.sha1", "true");
@@ -255,8 +251,7 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.keystore.alias", "alice");
         properties.put("rs.security.keystore.password", "password");
         properties.put("rs.security.key.password", "password");
-        properties.put("rs.security.keystore.file", 
-                       "org/apache/cxf/systest/jaxrs/security/certs/alice.jks");
+        properties.put("rs.security.keystore.file", "keys/alice.jks");
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 
         // First test that it fails without adding a cert (reference). This is because
@@ -291,8 +286,7 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.keystore.alias", "morpit");
         properties.put("rs.security.keystore.password", "password");
         properties.put("rs.security.key.password", "password");
-        properties.put("rs.security.keystore.file", 
-                       "org/apache/cxf/systest/jaxrs/security/certs/Morpit.jks");
+        properties.put("rs.security.keystore.file", "keys/Morpit.jks");
         properties.put("rs.security.signature.include.cert", "true");
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 
@@ -320,8 +314,7 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.keystore.alias", "alice");
         properties.put("rs.security.keystore.password", "password");
         properties.put("rs.security.key.password", "password");
-        properties.put("rs.security.keystore.file", 
-                       "org/apache/cxf/systest/jaxrs/security/certs/alice.jks");
+        properties.put("rs.security.keystore.file", "keys/alice.jks");
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 
         // First test that it fails without adding a cert (reference). This is because
@@ -357,8 +350,7 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.keystore.alias", "morpit");
         properties.put("rs.security.keystore.password", "password");
         properties.put("rs.security.key.password", "password");
-        properties.put("rs.security.keystore.file", 
-                       "org/apache/cxf/systest/jaxrs/security/certs/Morpit.jks");
+        properties.put("rs.security.keystore.file", "keys/Morpit.jks");
         properties.put("rs.security.signature.include.cert.sha1", "true");
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 

@@ -31,6 +31,7 @@ import org.apache.cxf.rs.security.oauth2.grants.code.DefaultEHCacheCodeDataProvi
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.saml.Constants;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
+import org.apache.xml.security.utils.ClassLoaderUtils;
 
 /**
  * Extend the DefaultEHCacheCodeDataProvider to allow refreshing of tokens
@@ -109,8 +110,9 @@ public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
     }
     
     private Certificate loadCert() throws Exception {
-        InputStream is = this.getClass().getResourceAsStream("/org/apache/cxf/systest/http/resources/Truststore.jks");
-        return CryptoUtils.loadCertificate(is, new char[]{'p', 'a', 's', 's', 'w', 'o', 'r', 'd'}, "morpit", null);
+        try (InputStream is = ClassLoaderUtils.getResourceAsStream("keys/Truststore.jks", this.getClass())) {
+            return CryptoUtils.loadCertificate(is, new char[]{'p', 'a', 's', 's', 'w', 'o', 'r', 'd'}, "morpit", null);
+        }
     }
     
     @Override

@@ -45,10 +45,10 @@ under the License.
         <httpj:engine port="9003">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="password">
-                    <sec:keyStore type="pkcs12" password="password" file="src/test/java/org/apache/cxf/systest/http/resources/Bethal.p12"/>
+                    <sec:keyStore type="pkcs12" password="password" resource="keys/Bethal.p12"/>
                 </sec:keyManagers>
                 <sec:trustManagers>
-                    <sec:certStore file="src/test/java/org/apache/cxf/systest/http/resources/Truststore.pem"/>
+                    <sec:certStore resource="keys/Truststore.pem"/>
                 </sec:trustManagers>
             </httpj:tlsServerParameters>
         </httpj:engine>
@@ -59,10 +59,10 @@ under the License.
     <http:conduit name="{http://apache.org/hello_world/services}HttpsPort.http-conduit">
         <http:tlsClientParameters disableCNCheck="true">
             <sec:keyManagers keyPassword="password">
-                <sec:keyStore type="pkcs12" password="password" file="src/test/java/org/apache/cxf/systest/http/resources/Morpit.p12"/>
+                <sec:keyStore type="pkcs12" password="password" resource="keys/Morpit.p12"/>
             </sec:keyManagers>
             <sec:trustManagers>
-                <sec:certStore file="src/test/java/org/apache/cxf/systest/http/resources/Truststore.pem"/>
+                <sec:certStore resource="keys/Truststore.pem"/>
             </sec:trustManagers>
         </http:tlsClientParameters>
     </http:conduit>
