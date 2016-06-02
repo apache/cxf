@@ -144,7 +144,7 @@ public abstract class AbstractUserInfo extends JwtClaims {
     public void setBirthDate(String date) {
         setProperty(BIRTHDATE_CLAIM, date);
     }
-    public String getBirthdate() {
+    public String getBirthDate() {
         return (String)getProperty(BIRTHDATE_CLAIM);
     }
     public String getPhoneNumber() {
@@ -170,7 +170,7 @@ public abstract class AbstractUserInfo extends JwtClaims {
             return null;
         }
     }
-    public void setUserAddressNumber(UserAddress address) {
+    public void setUserAddress(UserAddress address) {
         setProperty(ADDRESS_CLAIM, address);
     }
     public void setUpdatedAt(Long time) {
