@@ -7,12 +7,11 @@
         <version>1.2.3.RELEASE</version>
     </parent> 
     <artifactId>spring-boot-sample-rs-cxf-scan</artifactId>
-    <name>Spring Boot CXF REST Application</name>
-    <description>Spring Boot CXF REST Application</description>
+    <name>Spring Boot CXF REST Scan Application</name>
+    <description>Spring Boot CXF REST Scan Application</description>
     
     <properties>
         <cxf.version>3.2.0-SNAPSHOT</cxf.version>
-        <jetty.version>8.1.5.v20120716</jetty.version>
     </properties>
     <dependencies>
         <dependency>

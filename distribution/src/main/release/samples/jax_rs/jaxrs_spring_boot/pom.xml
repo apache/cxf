@@ -12,7 +12,6 @@
     
     <properties>
         <cxf.version>3.2.0-SNAPSHOT</cxf.version>
-        <jetty.version>8.1.5.v20120716</jetty.version>
     </properties>
     <dependencies>
         <dependency>
