@@ -19,7 +19,7 @@
 
 package org.apache.cxf.systest.jaxrs.security;
 
-import java.io.FileInputStream;
+import java.io.InputStream;
 import java.security.KeyStore;
 
 import javax.net.ssl.KeyManagerFactory;
@@ -30,6 +30,7 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.feature.LoggingFeature;
 import org.apache.cxf.systest.jaxrs.Book;
@@ -54,15 +55,16 @@ public class JAXRS20HttpsBookTest extends AbstractBusClientServerTestBase {
         
         ClientBuilder builder = ClientBuilder.newBuilder();
         
-        KeyStore trustStore = loadStore("src/test/java/org/apache/cxf/systest/http/resources/Truststore.jks",
-                                       "password");
-        
-        builder.trustStore(trustStore);
+        try (InputStream keystore = ClassLoaderUtils.getResourceAsStream("keys/Truststore.jks", this.getClass())) {
+            KeyStore trustStore = loadStore(keystore, "password");
+            builder.trustStore(trustStore);
+        }
         builder.hostnameVerifier(new AllowAllHostnameVerifier());
         
-        KeyStore keyStore = loadStore("src/test/java/org/apache/cxf/systest/http/resources/Morpit.jks",
-            "password");
-        builder.keyStore(keyStore, "password");
+        try (InputStream keystore = ClassLoaderUtils.getResourceAsStream("keys/Morpit.jks", this.getClass())) {
+            KeyStore keyStore = loadStore(keystore, "password");
+            builder.keyStore(keyStore, "password");
+        }
         
         Client client = builder.build();
         client.register(new LoggingFeature());
@@ -90,30 +92,32 @@ public class JAXRS20HttpsBookTest extends AbstractBusClientServerTestBase {
         assertEquals(123, b.getId());
     }
     
-    private KeyStore loadStore(String trustStoreFile, String password) throws Exception {
+    private KeyStore loadStore(InputStream inputStream, String password) throws Exception {
         KeyStore store = KeyStore.getInstance("JKS");
-        store.load(new FileInputStream(trustStoreFile), password.toCharArray());
+        store.load(inputStream, password.toCharArray());
         return store;
     }
     
     private SSLContext createSSLContext() throws Exception {
         TLSClientParameters tlsParams = new TLSClientParameters();
         
-        KeyStore trustStore = loadStore("src/test/java/org/apache/cxf/systest/http/resources/Truststore.jks",
-            "password");
+        try (InputStream keystore = ClassLoaderUtils.getResourceAsStream("keys/Truststore.jks", this.getClass())) {
+            KeyStore trustStore = loadStore(keystore, "password");
+            
+            TrustManagerFactory tmf = 
+                TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            tmf.init(trustStore);
+            tlsParams.setTrustManagers(tmf.getTrustManagers());
+        }
         
-        TrustManagerFactory tmf = 
-            TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-        tmf.init(trustStore);
-        tlsParams.setTrustManagers(tmf.getTrustManagers());
-        
-        KeyStore keyStore = loadStore("src/test/java/org/apache/cxf/systest/http/resources/Morpit.jks",
-            "password");
-        
-        KeyManagerFactory kmf = 
-            KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-        kmf.init(keyStore, "password".toCharArray());
-        tlsParams.setKeyManagers(kmf.getKeyManagers());
+        try (InputStream keystore = ClassLoaderUtils.getResourceAsStream("keys/Morpit.jks", this.getClass())) {
+            KeyStore keyStore = loadStore(keystore, "password");
+            
+            KeyManagerFactory kmf = 
+                KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+            kmf.init(keyStore, "password".toCharArray());
+            tlsParams.setKeyManagers(kmf.getKeyManagers());
+        }
         
         return SSLUtils.getSSLContext(tlsParams);
     }

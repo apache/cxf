@@ -40,10 +40,10 @@ under the License.
         <httpj:engine port="${testutil.ports.BusServer.1}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPasswordCallbackHandler="org.apache.cxf.systest.https.conduit.KeyPasswordCallbackHandler">
-                    <sec:keyStore type="JKS" password="password" file="src/test/resources/keys/Bethal.jks"/>
+                    <sec:keyStore type="JKS" password="password" resource="keys/Bethal.jks"/>
                 </sec:keyManagers>
                 <sec:trustManagers>
-                    <sec:keyStore type="JKS" password="password" file="src/test/resources/keys/Truststore.jks"/>
+                    <sec:keyStore type="JKS" password="password" resource="keys/Truststore.jks"/>
                 </sec:trustManagers>
             </httpj:tlsServerParameters>
         </httpj:engine>

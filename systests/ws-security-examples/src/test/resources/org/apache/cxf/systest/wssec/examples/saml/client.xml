@@ -143,10 +143,10 @@
     <http:conduit name="https://localhost:.*">
         <http:tlsClientParameters disableCNCheck="true">
             <sec:keyManagers keyPassword="password">
-                <sec:keyStore type="jks" password="password" resource="alice.jks"/>
+                <sec:keyStore type="jks" password="password" resource="keys/alice.jks"/>
             </sec:keyManagers>
             <sec:trustManagers>
-                <sec:keyStore type="jks" password="password" resource="cxfca.jks"/>
+                <sec:keyStore type="jks" password="password" resource="keys/cxfca.jks"/>
             </sec:trustManagers>
         </http:tlsClientParameters>
     </http:conduit>

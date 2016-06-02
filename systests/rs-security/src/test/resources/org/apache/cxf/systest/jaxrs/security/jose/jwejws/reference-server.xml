@@ -57,8 +57,7 @@ under the License.
        </jaxrs:providers>
        <jaxrs:properties>
             <entry key="rs.security.keystore.type" value="jks"/>
-            <entry key="rs.security.keystore.file" 
-                   value="org/apache/cxf/systest/jaxrs/security/certs/bob.jks"/>
+            <entry key="rs.security.keystore.file" value="keys/bob.jks"/>
             <entry key="rs.security.keystore.password" value="password"/>
             <entry key="rs.security.decryption.key.password.provider" value-ref="passwordProvider"/>
             <entry key="rs.security.encryption.content.algorithm" value="A128GCM"/>
@@ -77,8 +76,7 @@ under the License.
        </jaxrs:providers>
        <jaxrs:properties>
             <entry key="rs.security.keystore.type" value="jks"/>
-            <entry key="rs.security.keystore.file" 
-                   value="org/apache/cxf/systest/jaxrs/security/certs/cxfca.jks"/>
+            <entry key="rs.security.keystore.file" value="keys/cxfca.jks"/>
             <entry key="rs.security.keystore.password" value="password"/>
        </jaxrs:properties>
    </jaxrs:server>
@@ -92,8 +90,7 @@ under the License.
        </jaxrs:providers>
        <jaxrs:properties>
             <entry key="rs.security.keystore.type" value="jks"/>
-            <entry key="rs.security.keystore.file" 
-                   value="org/apache/cxf/systest/jaxrs/security/certs/alice.jks"/>
+            <entry key="rs.security.keystore.file" value="keys/alice.jks"/>
             <entry key="rs.security.keystore.password" value="password"/>
        </jaxrs:properties>
    </jaxrs:server>

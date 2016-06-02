@@ -51,10 +51,10 @@ under the License.
         <httpj:engine port="${testutil.ports.jaxrs-oauth2-grants}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="password">
-                    <sec:keyStore type="JKS" password="password" file="src/test/java/org/apache/cxf/systest/http/resources/Bethal.jks"/>
+                    <sec:keyStore type="JKS" password="password" resource="keys/Bethal.jks"/>
                 </sec:keyManagers>
                 <sec:trustManagers>
-                    <sec:keyStore type="JKS" password="password" file="src/test/java/org/apache/cxf/systest/http/resources/Truststore.jks"/>
+                    <sec:keyStore type="JKS" password="password" resource="keys/Truststore.jks"/>
                 </sec:trustManagers>
                 <sec:clientAuthentication want="true" required="true"/>
             </httpj:tlsServerParameters>
@@ -134,8 +134,7 @@ under the License.
            <entry key="rs.security.keystore.type" value="jks" />
            <entry key="rs.security.keystore.alias" value="alice"/>
            <entry key="rs.security.keystore.password" value="password"/>
-           <entry key="rs.security.keystore.file" 
-                  value="org/apache/cxf/systest/jaxrs/security/certs/alice.jks" />
+           <entry key="rs.security.keystore.file" value="keys/alice.jks" />
            <entry key="rs.security.signature.algorithm" value="RS256" />
        </jaxrs:properties>
    </jaxrs:server>

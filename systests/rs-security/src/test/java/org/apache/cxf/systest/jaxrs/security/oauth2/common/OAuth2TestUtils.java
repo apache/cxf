@@ -226,8 +226,7 @@ public final class OAuth2TestUtils {
             signingProperties.put("rs.security.keystore.type", "jks");
             signingProperties.put("rs.security.keystore.password", "password");
             signingProperties.put("rs.security.keystore.alias", "alice");
-            signingProperties.put("rs.security.keystore.file", 
-                                  "org/apache/cxf/systest/jaxrs/security/certs/alice.jks");
+            signingProperties.put("rs.security.keystore.file", "keys/alice.jks");
             signingProperties.put("rs.security.key.password", "password");
             signingProperties.put("rs.security.signature.algorithm", "RS256");
             

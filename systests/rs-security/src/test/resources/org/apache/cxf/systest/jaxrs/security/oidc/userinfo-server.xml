@@ -51,10 +51,10 @@ under the License.
         <httpj:engine port="${testutil.ports.jaxrs-userinfo}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="password">
-                    <sec:keyStore type="JKS" password="password" file="src/test/java/org/apache/cxf/systest/http/resources/Bethal.jks"/>
+                    <sec:keyStore type="JKS" password="password" resource="keys/Bethal.jks"/>
                 </sec:keyManagers>
                 <sec:trustManagers>
-                    <sec:keyStore type="JKS" password="password" file="src/test/java/org/apache/cxf/systest/http/resources/Truststore.jks"/>
+                    <sec:keyStore type="JKS" password="password" resource="keys/Truststore.jks"/>
                 </sec:trustManagers>
                 <sec:clientAuthentication want="false" required="false"/>
             </httpj:tlsServerParameters>
@@ -101,8 +101,7 @@ under the License.
            <entry key="rs.security.keystore.alias" value="alice"/>
            <entry key="rs.security.keystore.password" value="password"/>
            <entry key="rs.security.key.password" value="password"/>
-           <entry key="rs.security.keystore.file" 
-                  value="org/apache/cxf/systest/jaxrs/security/certs/alice.jks" />
+           <entry key="rs.security.keystore.file" value="keys/alice.jks" />
            <entry key="rs.security.signature.algorithm" value="RS256" />
        </jaxrs:properties>
    </jaxrs:server>
@@ -150,8 +149,7 @@ under the License.
            <entry key="rs.security.keystore.alias" value="alice"/>
            <entry key="rs.security.keystore.password" value="password"/>
            <entry key="rs.security.key.password" value="password"/>
-           <entry key="rs.security.keystore.file" 
-                  value="org/apache/cxf/systest/jaxrs/security/certs/alice.jks" />
+           <entry key="rs.security.keystore.file" value="keys/alice.jks" />
            <entry key="rs.security.signature.algorithm" value="RS256" />
         </jaxrs:properties>
    </jaxrs:server>
@@ -175,8 +173,7 @@ under the License.
            <entry key="rs.security.keystore.type" value="jks" />
            <entry key="rs.security.keystore.alias" value="bob"/>
            <entry key="rs.security.keystore.password" value="password"/>
-           <entry key="rs.security.keystore.file" 
-                  value="org/apache/cxf/systest/jaxrs/security/certs/bob.jks" />
+           <entry key="rs.security.keystore.file"  value="keys/bob.jks" />
            <entry key="rs.security.signature.algorithm" value="RS256" />
        </jaxrs:properties>
 
@@ -186,7 +183,7 @@ under the License.
         <http:client ConnectionTimeout="3000000" ReceiveTimeout="3000000"/>
         <http:tlsClientParameters disableCNCheck="true">
             <sec:trustManagers>
-                <sec:keyStore type="JKS" password="password" file="src/test/java/org/apache/cxf/systest/http/resources/Truststore.jks"/>
+                <sec:keyStore type="JKS" password="password" resource="keys/Truststore.jks"/>
             </sec:trustManagers>
         </http:tlsClientParameters>
     </http:conduit>

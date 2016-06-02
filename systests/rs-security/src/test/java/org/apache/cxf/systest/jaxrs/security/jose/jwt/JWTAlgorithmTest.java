@@ -71,7 +71,6 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
     //
     // Encryption tests
     //
-    
     @org.junit.Test
     public void testEncryptionProperties() throws Exception {
 
@@ -424,8 +423,7 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.keystore.password", "password");
         properties.put("rs.security.key.password", "password");
         properties.put("rs.security.keystore.alias", "alice");
-        properties.put("rs.security.keystore.file", 
-                       "org/apache/cxf/systest/jaxrs/security/certs/alice.jks");
+        properties.put("rs.security.keystore.file", "keys/alice.jks");
         properties.put("rs.security.signature.algorithm", "RS256");
         properties.put(JwtConstants.JWT_TOKEN, token);
         WebClient.getConfig(client).getRequestContext().putAll(properties);
@@ -652,8 +650,7 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.keystore.password", "password");
         properties.put("rs.security.key.password", "password");
         properties.put("rs.security.keystore.alias", "alice");
-        properties.put("rs.security.keystore.file", 
-                       "org/apache/cxf/systest/jaxrs/security/certs/alice.jks");
+        properties.put("rs.security.keystore.file", "keys/alice.jks");
         properties.put("rs.security.signature.algorithm", "RS256");
         properties.put("rs.security.signature.include.cert", "true");
         properties.put(JwtConstants.JWT_TOKEN, token);

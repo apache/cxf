@@ -392,8 +392,7 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.keystore.password", "password");
         properties.put("rs.security.key.password", "password");
         properties.put("rs.security.keystore.alias", "alice");
-        properties.put("rs.security.keystore.file", 
-                       "org/apache/cxf/systest/jaxrs/security/certs/alice.jks");
+        properties.put("rs.security.keystore.file", "keys/alice.jks");
         properties.put("rs.security.signature.algorithm", "RS256");
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 

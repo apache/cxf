@@ -49,8 +49,7 @@ import org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuth2TestUtils;
 import org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuth2TestUtils.AuthorizationCodeParameters;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.TestUtil;
-import org.apache.wss4j.common.util.Loader;
-
+import org.apache.xml.security.utils.ClassLoaderUtils;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 
@@ -750,7 +749,7 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         }
         
         KeyStore keystore = KeyStore.getInstance("JKS");
-        keystore.load(Loader.getResource("org/apache/cxf/systest/jaxrs/security/certs/alice.jks").openStream(), 
+        keystore.load(ClassLoaderUtils.getResourceAsStream("keys/alice.jks", this.getClass()), 
                       "password".toCharArray());
         Certificate cert = keystore.getCertificate("alice");
         Assert.assertNotNull(cert);

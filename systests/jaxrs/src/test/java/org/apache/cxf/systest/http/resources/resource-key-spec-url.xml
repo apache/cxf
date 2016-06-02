@@ -41,10 +41,10 @@ under the License.
         <httpj:engine port="9005">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="password">
-                    <sec:keyStore type="JKS" password="password" resource="org/apache/cxf/systest/http/resources/Bethal.jks"/>
+                    <sec:keyStore type="JKS" password="password" resource="keys/Bethal.jks"/>
                 </sec:keyManagers>
                 <sec:trustManagers>
-                    <sec:keyStore type="JKS" password="password" resource="org/apache/cxf/systest/http/resources/Truststore.jks"/>
+                    <sec:keyStore type="JKS" password="password" resource="keys/Truststore.jks"/>
                 </sec:trustManagers>
             </httpj:tlsServerParameters>
         </httpj:engine>
@@ -57,10 +57,10 @@ under the License.
     <http:conduit name="https://localhost:9005/SoapContext/HttpsPort">
         <http:tlsClientParameters disableCNCheck="true">
             <sec:keyManagers keyPassword="password">
-                <sec:keyStore type="pkcs12" password="password" resource="org/apache/cxf/systest/http/resources/Morpit.p12"/>
+                <sec:keyStore type="pkcs12" password="password" resource="keys/Morpit.p12"/>
             </sec:keyManagers>
             <sec:trustManagers>
-                <sec:certStore resource="org/apache/cxf/systest/http/resources/Truststore.pem"/>
+                <sec:certStore resource="keys/Truststore.pem"/>
             </sec:trustManagers>
         </http:tlsClientParameters>
     </http:conduit>
