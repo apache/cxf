@@ -4,13 +4,11 @@
      <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>1.2.3.RELEASE</version>
+        <version>1.3.5.RELEASE</version>
     </parent> 
     <artifactId>spring-boot-sample-ws-cxf</artifactId>
     <name>Spring Boot CXF Web Services Sample</name>
     <description>Spring Boot CXF Web Services Sample</description>
-    <groupId>org.apache.cxf.spring.boot</groupId>
-    <version>1.0.0</version>
     <properties>
         <cxf.version>3.1.6-SNAPSHOT</cxf.version>
     </properties> 
@@ -18,43 +16,19 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
-            <version>1.2.3.RELEASE</version>
+            <version>1.3.5.RELEASE</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-frontend-jaxws</artifactId>
-            <version>${cxf.version}</version>
-        </dependency>
-                <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-transports-http</artifactId>
-            <version>${cxf.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-webapp</artifactId>
-            <version>9.3.0.M2</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-ws</artifactId>
-            <version>1.2.3.RELEASE</version>
+            <version>1.3.5.RELEASE</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>jaxen</groupId>
-            <artifactId>jaxen</artifactId>
-            <version>1.1.6</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jdom</groupId>
-            <artifactId>jdom2</artifactId>
-            <version>2.0.6</version>
-        </dependency>
-        <dependency>
-            <groupId>wsdl4j</groupId>
-            <artifactId>wsdl4j</artifactId>
-            <version>1.6.3</version>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-spring-boot-starter-jaxws</artifactId>
+            <version>${cxf.version}</version>
         </dependency>
     </dependencies>
     <build>

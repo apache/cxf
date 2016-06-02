@@ -19,41 +19,23 @@
 package sample.ws;
 
 import javax.xml.ws.Endpoint;
-import org.apache.cxf.bus.spring.SpringBus;
+import org.apache.cxf.Bus;
 import org.apache.cxf.jaxws.EndpointImpl;
-import org.apache.cxf.transport.servlet.CXFServlet;
 
-import org.springframework.boot.context.embedded.ServletRegistrationBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.ws.config.annotation.EnableWs;
-import org.springframework.ws.config.annotation.WsConfigurerAdapter;
-import sample.ws.service.Hello;
 import sample.ws.service.HelloPortImpl;
 
-@EnableWs
 @Configuration
-public class WebServiceConfig extends WsConfigurerAdapter {
+public class WebServiceConfig {
 
-    @Bean
-    public ServletRegistrationBean dispatcherServlet() {
-        CXFServlet cxfServlet = new CXFServlet();
-        return new ServletRegistrationBean(cxfServlet, "/Service/*");
-    }
-
-    @Bean(name = "cxf")
-    public SpringBus springBus() {
-        return new SpringBus();
-    }
-
-    @Bean
-    public Hello myService() {
-        return new HelloPortImpl();
-    }
+    @Autowired
+    private Bus bus;
 
     @Bean
     public Endpoint endpoint() {
-        EndpointImpl endpoint = new EndpointImpl(springBus(), myService());
+        EndpointImpl endpoint = new EndpointImpl(bus, new HelloPortImpl());
         endpoint.publish("/Hello");
         return endpoint;
     }
