@@ -10,7 +10,7 @@
     <name>Spring Boot CXF Web Services Sample</name>
     <description>Spring Boot CXF Web Services Sample</description>
     <properties>
-        <cxf.version>3.1.6-SNAPSHOT</cxf.version>
+        <cxf.version>3.1.7-SNAPSHOT</cxf.version>
     </properties> 
     <dependencies>
         <dependency>
