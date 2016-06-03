@@ -20,6 +20,7 @@ package org.apache.cxf.rs.security.jose.jwt;
 
 import java.util.Date;
 
+import org.apache.cxf.jaxrs.json.basic.JsonMapObjectReaderWriter;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 
@@ -30,14 +31,14 @@ public final class JwtUtils {
     public static String claimsToJson(JwtClaims claims) {
         return claimsToJson(claims, null);
     }
-    public static String claimsToJson(JwtClaims claims, JwtTokenReaderWriter writer) {
+    public static String claimsToJson(JwtClaims claims, JsonMapObjectReaderWriter writer) {
         if (writer == null) {
-            writer = new JwtTokenReaderWriter();
+            writer = new JsonMapObjectReaderWriter();
         }
-        return writer.claimsToJson(claims);
+        return writer.toJson(claims);
     }
     public static JwtClaims jsonToClaims(String json) {
-        return new JwtTokenReaderWriter().fromJsonClaims(json);
+        return new JwtClaims(new JsonMapObjectReaderWriter().fromJson(json));
     }
     
     public static void validateJwtExpiry(JwtClaims claims, int clockOffset, boolean claimRequired) {

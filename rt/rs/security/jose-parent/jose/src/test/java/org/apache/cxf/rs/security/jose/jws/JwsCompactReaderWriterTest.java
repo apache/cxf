@@ -29,6 +29,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.cxf.jaxrs.json.basic.JsonMapObjectReaderWriter;
 import org.apache.cxf.rs.security.jose.common.JoseConstants;
 import org.apache.cxf.rs.security.jose.common.JoseType;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
@@ -37,7 +38,6 @@ import org.apache.cxf.rs.security.jose.jwk.KeyOperation;
 import org.apache.cxf.rs.security.jose.jwk.KeyType;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
-import org.apache.cxf.rs.security.jose.jwt.JwtTokenReaderWriter;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
@@ -311,8 +311,8 @@ public class JwsCompactReaderWriterTest extends Assert {
     }
 
     
-    private JwtTokenReaderWriter getWriter() {
-        JwtTokenReaderWriter jsonWriter = new JwtTokenReaderWriter();
+    private JsonMapObjectReaderWriter getWriter() {
+        JsonMapObjectReaderWriter jsonWriter = new JsonMapObjectReaderWriter();
         jsonWriter.setFormat(true);
         return jsonWriter;
     }

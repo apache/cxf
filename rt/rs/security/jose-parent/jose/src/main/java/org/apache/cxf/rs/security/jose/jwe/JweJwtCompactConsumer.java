@@ -25,7 +25,7 @@ import javax.crypto.SecretKey;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
-import org.apache.cxf.rs.security.jose.jwt.JwtTokenReaderWriter;
+import org.apache.cxf.rs.security.jose.jwt.JwtUtils;
 
 
 public class JweJwtCompactConsumer  {
@@ -51,7 +51,7 @@ public class JweJwtCompactConsumer  {
     }
     public JwtToken decryptWith(JweDecryptionProvider jwe) {
         byte[] bytes = jwe.decrypt(jweConsumer.getJweDecryptionInput());
-        JwtClaims claims = new JwtTokenReaderWriter().fromJsonClaims(toString(bytes));
+        JwtClaims claims = JwtUtils.jsonToClaims(toString(bytes));
         return new JwtToken(headers, claims);
     }
     

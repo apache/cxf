@@ -40,15 +40,9 @@ public class JwsCompactConsumer {
     private String decodedJwsPayload;
     private JwsHeaders jwsHeaders;
     public JwsCompactConsumer(String encodedJws) {
-        this(encodedJws, null, null);
+        this(encodedJws, null);
     }
     public JwsCompactConsumer(String encodedJws, String detachedPayload) {
-        this(encodedJws, detachedPayload, null);
-    }
-    protected JwsCompactConsumer(String encodedJws, String detachedPayload, JsonMapObjectReaderWriter r) {
-        if (r != null) {
-            this.reader = r;
-        }
         String[] parts = JoseUtils.getCompactParts(encodedJws);
         if (parts.length != 3) {
             if (parts.length == 2 && encodedJws.endsWith(".")) {

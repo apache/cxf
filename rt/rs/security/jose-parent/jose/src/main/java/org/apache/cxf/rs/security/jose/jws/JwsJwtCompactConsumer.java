@@ -20,12 +20,11 @@ package org.apache.cxf.rs.security.jose.jws;
 
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
-import org.apache.cxf.rs.security.jose.jwt.JwtTokenReaderWriter;
 
 public class JwsJwtCompactConsumer extends JwsCompactConsumer {
     private JwtToken token;
     public JwsJwtCompactConsumer(String encodedJws) {
-        super(encodedJws, null, new JwtTokenReaderWriter());
+        super(encodedJws, null);
     }
     public JwtClaims getJwtClaims() {
         return getJwtToken().getClaims();
@@ -33,8 +32,7 @@ public class JwsJwtCompactConsumer extends JwsCompactConsumer {
     public JwtToken getJwtToken() {
         if (token == null) {
             JwsHeaders theHeaders = super.getJwsHeaders();
-            JwtClaims theClaims = 
-                ((JwtTokenReaderWriter)getReader()).fromJsonClaims(getDecodedJwsPayload());
+            JwtClaims theClaims = new JwtClaims(getReader().fromJson(getDecodedJwsPayload()));
             token = new JwtToken(theHeaders, theClaims);
         }
         return token;
