@@ -98,6 +98,24 @@ public abstract class AbstractJAXRSContinuationsTest extends AbstractBusClientSe
     }
     
     @Test
+    public void testGetBookNotFoundUnmappedImmediate() throws Exception {
+        WebClient wc = 
+            WebClient.create("http://localhost:" + getPort() + getBaseAddress() + "/books/notfound/unmappedImmediate");
+        wc.accept("text/plain");
+        Response r = wc.get();
+        assertEquals(500, r.getStatus());
+    }
+    
+    @Test
+    public void testGetBookMappedImmediate() throws Exception {
+        WebClient wc = 
+            WebClient.create("http://localhost:" + getPort() + getBaseAddress() + "/books/mappedImmediate");
+        wc.accept("text/plain");
+        Response r = wc.get();
+        assertEquals(401, r.getStatus());
+    }
+    
+    @Test
     public void testTimeoutAndCancel() throws Exception {
         doTestTimeoutAndCancel(getBaseAddress());
     }
