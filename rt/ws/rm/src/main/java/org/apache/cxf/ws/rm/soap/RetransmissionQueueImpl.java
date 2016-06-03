@@ -741,6 +741,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
     }
 
     private void doResend(SoapMessage message) {
+        InputStream is = null;
         try {
             
             // initialize copied interceptor chain for message
@@ -779,7 +780,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
             // read SOAP headers from saved input stream
             CachedOutputStream cos = (CachedOutputStream)message.get(RMMessageConstants.SAVED_CONTENT);
             cos.holdTempFile(); // CachedOutputStream is hold until delivering was successful
-            InputStream is = cos.getInputStream(); // instance is needed to close input stream later on
+            is = cos.getInputStream(); // instance is needed to close input stream later on
             XMLStreamReader reader = StaxUtils.createXMLStreamReader(is, StandardCharsets.UTF_8.name());
             message.getHeaders().clear();
             if (reader.getEventType() != XMLStreamConstants.START_ELEMENT
@@ -832,7 +833,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
                     retransmitChain.remove(incept);
                 }
             }
-            retransmitChain.add(new CopyOutInterceptor(reader, is));
+            retransmitChain.add(new CopyOutInterceptor(reader));
             
             // restore callbacks on output stream
             if (callbacks != null) {
@@ -868,6 +869,15 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
             
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "RESEND_FAILED_MSG", ex);
+        } finally {
+            // make sure to always close InputStreams of the CachedOutputStream to avoid leaving temp files undeleted
+            if (null != is) {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    // Ignore
+                }
+            }
         }
     }
 
@@ -940,12 +950,10 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
     
     public static class CopyOutInterceptor extends AbstractOutDatabindingInterceptor {
         private final XMLStreamReader reader;
-        private InputStream is;
         
-        public CopyOutInterceptor(XMLStreamReader rdr, InputStream is) {
+        public CopyOutInterceptor(XMLStreamReader rdr) {
             super(Phase.MARSHAL);
             reader = rdr;
-            this.is = is;
         }
         
         @Override
@@ -953,13 +961,6 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
             try {
                 XMLStreamWriter writer = message.getContent(XMLStreamWriter.class);
                 StaxUtils.copy(reader, writer);
-                if (is != null) {
-                    try {
-                        is.close();
-                    } catch (IOException e) {
-                        // ignore
-                    }
-                }
             } catch (XMLStreamException e) {
                 throw new Fault("COULD_NOT_READ_XML_STREAM", LOG, e);
             }

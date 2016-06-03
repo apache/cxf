@@ -258,14 +258,17 @@ public class CachedOutputStream extends OutputStream {
                 }
             } else {
                 // read the file
-                currentStream.close();
-                if (copyOldContent) {
-                    InputStream fin = createInputStream(tempFile);
-                    IOUtils.copyAndCloseInput(fin, out);
+                try {
+                    currentStream.close();
+                    if (copyOldContent) {
+                        InputStream fin = createInputStream(tempFile);
+                        IOUtils.copyAndCloseInput(fin, out);
+                    }
+                } finally {
+                    streamList.remove(currentStream);
+                    deleteTempFile();
+                    inmem = true;
                 }
-                streamList.remove(currentStream);
-                deleteTempFile();
-                inmem = true;
             }
         }
         currentStream = out;
