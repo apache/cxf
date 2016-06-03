@@ -25,10 +25,10 @@ under the License.
     <http:conduit name="{http://www.example.org/contract/DoubleIt}DoubleItPortHttps.http-conduit">
         <http:tlsClientParameters disableCNCheck="true">
             <sec:keyManagers keyPassword="password">
-                <sec:keyStore type="JKS" password="password" resource="org/apache/cxf/systest/ws/security/Morpit.jks"/>
+                <sec:keyStore type="JKS" password="password" resource="keys/Morpit.jks"/>
             </sec:keyManagers>
             <sec:trustManagers>
-                <sec:keyStore type="JKS" password="password" resource="org/apache/cxf/systest/ws/security/Truststore.jks"/>
+                <sec:keyStore type="JKS" password="password" resource="keys/Truststore.jks"/>
             </sec:trustManagers>
         </http:tlsClientParameters>
     </http:conduit>

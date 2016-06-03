@@ -38,13 +38,13 @@ public class XKMSClientCacheTest extends org.junit.Assert {
         cache = new EHCacheXKMSClientCache();
         
         KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
-        keystore.load(ClassLoaderUtils.getResourceAsStream("certs/alice.jks", 
+        keystore.load(ClassLoaderUtils.getResourceAsStream("keys/alice.jks", 
                                                            XKMSClientCacheTest.class), 
                                                            "password".toCharArray());
         alice = (X509Certificate)keystore.getCertificate("alice");
         
         keystore = KeyStore.getInstance(KeyStore.getDefaultType());
-        keystore.load(ClassLoaderUtils.getResourceAsStream("certs/bob.jks", 
+        keystore.load(ClassLoaderUtils.getResourceAsStream("keys/bob.jks", 
                                                            XKMSClientCacheTest.class), 
                                                            "password".toCharArray());
         bob = (X509Certificate)keystore.getCertificate("bob");
