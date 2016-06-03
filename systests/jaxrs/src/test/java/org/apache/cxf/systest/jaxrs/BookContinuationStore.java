@@ -33,6 +33,7 @@ import javax.ws.rs.NotFoundException;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.CompletionCallback;
 import javax.ws.rs.container.ConnectionCallback;
@@ -134,6 +135,19 @@ public class BookContinuationStore {
     public void handleContinuationRequestNotFoundUnmapped(@Suspended AsyncResponse response) {
         response.register(new CallbackImpl());
         resumeSuspendedNotFoundUnmapped(response);
+    }
+    
+    @GET
+    @Path("books/notfound/unmappedImmediate")
+    @Produces("text/plain")
+    public void handleUnmappedImmediate(@Suspended AsyncResponse response) throws BookNotFoundFault {
+        throw new BookNotFoundFault("");
+    }
+    @GET
+    @Path("books/mappedImmediate")
+    @Produces("text/plain")
+    public void handleMappedImmediate(@Suspended AsyncResponse response) throws BookNotFoundFault {
+        throw new WebApplicationException(Response.status(401).build());
     }
     
     @GET
