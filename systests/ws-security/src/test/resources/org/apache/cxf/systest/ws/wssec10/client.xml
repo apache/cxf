@@ -42,10 +42,10 @@
     <http:conduit name="https://.*/UserNameOverTransport.*">
         <http:tlsClientParameters disableCNCheck="true">
             <sec:keyManagers keyPassword="password">
-                <sec:keyStore type="jks" password="password" resource="certs/alice.jks"/>
+                <sec:keyStore type="jks" password="password" resource="keys/alice.jks"/>
             </sec:keyManagers>
             <sec:trustManagers>
-                <sec:keyStore type="jks" password="password" resource="certs/bob.jks"/>
+                <sec:keyStore type="jks" password="password" resource="keys/bob.jks"/>
             </sec:trustManagers>
         </http:tlsClientParameters>
     </http:conduit>

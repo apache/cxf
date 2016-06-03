@@ -33,10 +33,10 @@
         <httpj:engine port="${testutil.ports.wssec10.server.StaxServer.1}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="password">
-                    <sec:keyStore type="jks" password="password" resource="certs/bob.jks"/>
+                    <sec:keyStore type="jks" password="password" resource="keys/bob.jks"/>
                 </sec:keyManagers>
                 <sec:trustManagers>
-                    <sec:keyStore type="jks" password="password" resource="certs/alice.jks"/>
+                    <sec:keyStore type="jks" password="password" resource="keys/alice.jks"/>
                 </sec:trustManagers>
                 <!--
                 <sec:clientAuthentication want="true" required="true"/>

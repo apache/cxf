@@ -20,10 +20,10 @@
     <http:conduit name="https://localhost:.*">
         <http:tlsClientParameters disableCNCheck="true">
             <sec:trustManagers>
-                <sec:keyStore type="jks" password="password" resource="org/apache/cxf/systest/ws/security/Truststore.jks"/>
+                <sec:keyStore type="jks" password="password" resource="keys/Truststore.jks"/>
             </sec:trustManagers>
             <sec:keyManagers keyPassword="password">
-                <sec:keyStore type="jks" password="password" resource="org/apache/cxf/systest/ws/security/Bethal.jks"/>
+                <sec:keyStore type="jks" password="password" resource="keys/Bethal.jks"/>
             </sec:keyManagers>
         </http:tlsClientParameters>
     </http:conduit>
