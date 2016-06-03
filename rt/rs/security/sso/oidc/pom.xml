@@ -33,7 +33,6 @@
     <properties>
         <hibernate.em.version>4.1.0.Final</hibernate.em.version>
         <hsqldb.version>1.8.0.10</hsqldb.version>
-        <openjpa.version>2.4.0</openjpa.version>
     </properties>
     <dependencies>
         <dependency>
@@ -74,7 +73,7 @@
         <dependency>
              <groupId>org.apache.openjpa</groupId>
              <artifactId>openjpa</artifactId>
-             <version>${openjpa.version}</version>
+             <version>${cxf.openjpa.version}</version>
              <scope>provided</scope>
         </dependency>
         -->
@@ -106,12 +105,12 @@
                <outputDirectory>target/generated-sources/metamodel</outputDirectory>
 		     </configuration>
             </execution>
-		   </executions>
+	    </executions>
 		   <dependencies>
 		     <dependency>
 		       <groupId>org.apache.openjpa</groupId>
 		       <artifactId>openjpa</artifactId>
-		       <version>${openjpa.version}</version>
+		       <version>${cxf.openjpa.version}</version>
 		     </dependency>
 		   </dependencies>
 		 </plugin>
@@ -134,13 +133,14 @@
 		    </execution>
 		  </executions>
 		 </plugin>
-         <!--
+            <!--  
             <plugin>
                 <groupId>org.apache.openjpa</groupId>
                 <artifactId>openjpa-maven-plugin</artifactId>
-                <version>${openjpa.version}</version>
+                <version>${cxf.openjpa.version}</version>
                 <configuration>
                     <includes>
+                       org/apache/cxf/rs/security/oidc/idp/OidcUserSubject.class,
                        org/apache/cxf/rs/security/oauth2/common/Client.class,
                        org/apache/cxf/rs/security/oauth2/common/UserSubject.class,
                        org/apache/cxf/rs/security/oauth2/grants/code/AuthorizationCodeGrant,
@@ -162,7 +162,7 @@
                     </execution>
                 </executions>
             </plugin>
-          -->
+            -->
         </plugins>
       </build>
 </project>
