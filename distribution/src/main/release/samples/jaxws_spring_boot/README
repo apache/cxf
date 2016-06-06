@@ -17,3 +17,18 @@ to run the client run in a new terminal window:
 $ mvn exec:java
 ----
 
+
+
+Using Docker:
+If you have Docker running on your machine (and appropriate DOCKER_HOST set), 
+you can run
+
+----
+$ mvn docker:build
+----
+
+to create the Docker image.  Once created, you can start the container via:
+
+----
+docker run -p 8080:8080 -t org.apache.cxf.samples/spring-boot-sample-ws-cxf
+----
