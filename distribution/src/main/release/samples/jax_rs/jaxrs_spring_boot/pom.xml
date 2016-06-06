@@ -7,6 +7,8 @@
         <version>1.3.5.RELEASE</version>
     </parent> 
     <artifactId>spring-boot-sample-rs-cxf</artifactId>
+    <groupId>org.apache.cxf.samples</groupId>
+    <version>3.2.0-SNAPSHOT</version>
     <name>Spring Boot CXF REST Application</name>
     <description>Spring Boot CXF REST Application</description>
     
