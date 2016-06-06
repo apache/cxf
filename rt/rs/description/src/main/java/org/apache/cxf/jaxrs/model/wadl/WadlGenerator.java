@@ -1719,6 +1719,7 @@ public class WadlGenerator implements ContainerRequestFilter {
                               String category, 
                               boolean allowDefault,
                               boolean isJson) {
+        boolean found = false;
         for (Annotation a : anns) {
             if (a.annotationType() == Descriptions.class) {
                 Descriptions ds = (Descriptions)a;
@@ -1757,10 +1758,10 @@ public class WadlGenerator implements ContainerRequestFilter {
                     }
                 }
                 sb.append("</doc>");
-                return true;
+                found = true;
             }
         }
-        return false;
+        return found;
     }
 
     private String getNamespace() {
