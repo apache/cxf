@@ -35,7 +35,7 @@
         <httpj:engine port="${testutil.ports.intermediary_transformation.Intermediary}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="skpass">
-                    <sec:keyStore type="jks" password="sspass" resource="servicestore.jks"/>
+                    <sec:keyStore type="jks" password="sspass" resource="keys/servicestore.jks"/>
                 </sec:keyManagers>
                 <sec:clientAuthentication want="false" required="false"/>
             </httpj:tlsServerParameters>
@@ -72,10 +72,10 @@
     <http:conduit name="https://localhost.*">
         <http:tlsClientParameters disableCNCheck="true">
             <sec:keyManagers keyPassword="ckpass">
-                <sec:keyStore type="jks" password="cspass" resource="clientstore.jks"/>
+                <sec:keyStore type="jks" password="cspass" resource="keys/clientstore.jks"/>
             </sec:keyManagers>
             <sec:trustManagers>
-                <sec:keyStore type="jks" password="cspass" resource="clientstore.jks"/>
+                <sec:keyStore type="jks" password="cspass" resource="keys/clientstore.jks"/>
             </sec:trustManagers>
         </http:tlsClientParameters>
     </http:conduit>

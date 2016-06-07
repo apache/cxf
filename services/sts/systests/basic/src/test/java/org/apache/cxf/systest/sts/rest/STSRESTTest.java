@@ -1211,7 +1211,7 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         Assert.assertNotNull(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT));
 
         KeyStore keystore = KeyStore.getInstance("JKS");
-        keystore.load(Loader.getResource("servicestore.jks").openStream(), "sspass".toCharArray());
+        keystore.load(Loader.getResource("keys/servicestore.jks").openStream(), "sspass".toCharArray());
         Certificate cert = keystore.getCertificate("mystskey");
         Assert.assertNotNull(cert);
         

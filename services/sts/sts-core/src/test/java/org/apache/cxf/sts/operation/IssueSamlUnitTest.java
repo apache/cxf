@@ -874,7 +874,7 @@ public class IssueSamlUnitTest extends org.junit.Assert {
             "org.apache.wss4j.crypto.provider", "org.apache.wss4j.common.crypto.Merlin"
         );
         properties.put("org.apache.wss4j.crypto.merlin.keystore.password", "sspass");
-        properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "servicestore.jks");
+        properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "keys/servicestore.jks");
         
         data.setDecCrypto(CryptoFactory.getInstance(properties));
         data.setCallbackHandler(new PasswordCallbackHandler());
@@ -1504,7 +1504,7 @@ public class IssueSamlUnitTest extends org.junit.Assert {
             "org.apache.wss4j.crypto.provider", "org.apache.wss4j.common.crypto.Merlin"
         );
         properties.put("org.apache.wss4j.crypto.merlin.keystore.password", "stsspass");
-        properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "stsstore.jks");
+        properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "keys/stsstore.jks");
         
         return properties;
     }

@@ -92,7 +92,7 @@ public class STSTokenRetrieverTest extends AbstractBusClientServerTestBase {
     private static final String STS_TRANSPORT_ENDPOINT_NAME = 
         "{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Port";
 
-    private static final String CLIENTSTORE = "/clientstore.jks";
+    private static final String CLIENTSTORE = "/keys/clientstore.jks";
     private static final String KEYSTORE_PASS = "cspass";
     private static final String KEY_PASS = "ckpass";
 
