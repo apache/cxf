@@ -22,12 +22,13 @@ package org.apache.cxf.transport.udp;
 import java.net.NetworkInterface;
 import java.util.Enumeration;
 
+import javax.jws.WebService;
+
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.hello_world.Greeter;
-import org.apache.hello_world.GreeterImpl;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -40,6 +41,23 @@ public class UDPTransportTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(UDPTransportTest.class);
     private static Server server; 
 
+    @WebService(serviceName = "SOAPService", 
+        endpointInterface = "org.apache.hello_world.Greeter", 
+        targetNamespace = "http://apache.org/hello_world")
+    static class GreeterImpl implements Greeter {
+        private String myName = "defaultGreeter";
+        GreeterImpl() {
+        }
+        public String greetMe(String me) {
+            return "Hello " + me;
+        }
+        public String sayHi() {
+            return "Bonjour from " + myName;
+        }
+        public void pingMe() {
+        }
+    }
+    
     
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
@@ -53,7 +71,9 @@ public class UDPTransportTest extends AbstractBusClientServerTestBase {
     
     @AfterClass 
     public static void shutdown() throws Exception {
-        server.stop();
+        if (server != null) {
+            server.stop();
+        }
     }
 
     @Test
