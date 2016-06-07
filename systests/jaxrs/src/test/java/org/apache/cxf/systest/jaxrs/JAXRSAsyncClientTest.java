@@ -302,6 +302,44 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         assertNotNull(holder.value);
         assertEquals(123L, holder.value.getId());
     }
+    @Test
+    public void testAsyncProxyMultipleCallbacks() throws Exception {
+        String address = "http://localhost:" + PORT;
+        final Holder<Book> bookHolder = new Holder<Book>();
+        final InvocationCallback<Book> bookCallback = new InvocationCallback<Book>() {
+            public void completed(Book response) {
+                bookHolder.value = response;
+            }
+            public void failed(Throwable error) {
+            }
+        };
+        final Holder<Boolean> booleanHolder = new Holder<Boolean>();
+        final InvocationCallback<Boolean> booleanCallback = new InvocationCallback<Boolean>() {
+            public void completed(Boolean response) {
+                booleanHolder.value = response;
+            }
+            public void failed(Throwable error) {
+            }
+        };
+        List<InvocationCallback<?>> callbacks = new ArrayList<InvocationCallback<?>>();
+        callbacks.add(bookCallback);
+        callbacks.add(booleanCallback);
+        
+        BookStore store = JAXRSClientFactory.create(address, BookStore.class);
+        WebClient.getConfig(store).getRequestContext().put(InvocationCallback.class.getName(), callbacks);
+        
+        
+        
+        Book book = store.getBookByMatrixParams("12", "3");
+        assertNull(book);
+        Thread.sleep(3000);
+        assertNotNull(bookHolder.value);
+        assertEquals(123L, bookHolder.value.getId());
+        
+        store.checkBook(123L);
+        Thread.sleep(3000);
+        assertTrue(booleanHolder.value);
+    }
     
     @SuppressWarnings({
      "unchecked", "rawtypes"
