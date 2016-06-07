@@ -519,7 +519,7 @@ public class RMManagerTest extends Assert {
         InterfaceInfo ii = control.createMock(InterfaceInfo.class);
         setUpEndpointForRecovery(endpoint, ei, si, bi, ii);          
         Conduit conduit = control.createMock(Conduit.class);        
-        setUpRecoverReliableEndpoint(endpoint, conduit, null, null, null, null);
+        setUpRecoverReliableEndpoint(endpoint, conduit, null, null, null);
         control.replay();
         manager.recoverReliableEndpoint(endpoint, conduit);
         control.verify();
@@ -528,7 +528,7 @@ public class RMManagerTest extends Assert {
         setUpEndpointForRecovery(endpoint, ei, si, bi, ii);
         SourceSequence ss = control.createMock(SourceSequence.class);
         DestinationSequence ds = control.createMock(DestinationSequence.class);
-        setUpRecoverReliableEndpoint(endpoint, conduit, ss, ds, null, null);
+        setUpRecoverReliableEndpoint(endpoint, conduit, ss, ds, null);
         control.replay();
         manager.recoverReliableEndpoint(endpoint, conduit);
         control.verify();
@@ -536,16 +536,10 @@ public class RMManagerTest extends Assert {
         control.reset();
         setUpEndpointForRecovery(endpoint, ei, si, bi, ii);  
         RMMessage m = control.createMock(RMMessage.class);
-        Capture<Message> mc = Capture.newInstance();
-        setUpRecoverReliableEndpoint(endpoint, conduit, ss, ds, m, mc);        
+        setUpRecoverReliableEndpoint(endpoint, conduit, ss, ds, m);        
         control.replay();
         manager.recoverReliableEndpoint(endpoint, conduit);
         control.verify();
-        
-        Message msg = mc.getValue();
-        assertNotNull(msg);
-        assertNotNull(msg.getExchange());
-        assertSame(msg, msg.getExchange().getOutMessage());
     }
  
     @Test
@@ -595,9 +589,11 @@ public class RMManagerTest extends Assert {
                                       DestinationSequence ds, RMMessage m,
                                       Capture<Message> mc) throws IOException {
         RMStore store = control.createMock(RMStore.class);
-        RetransmissionQueue queue = control.createMock(RetransmissionQueue.class);
+        RetransmissionQueue oqueue = control.createMock(RetransmissionQueue.class);
+        RedeliveryQueue iqueue = control.createMock(RedeliveryQueue.class);
         manager.setStore(store);
-        manager.setRetransmissionQueue(queue);
+        manager.setRetransmissionQueue(oqueue);
+        manager.setRedeliveryQueue(iqueue);
         
         Collection<SourceSequence> sss = new ArrayList<SourceSequence>();
         if (null != ss) {
@@ -652,10 +648,11 @@ public class RMManagerTest extends Assert {
             return;
         }
 
-        queue.addUnacknowledged(EasyMock.capture(mc));
-        
+        oqueue.addUnacknowledged(EasyMock.capture(mc));
         EasyMock.expectLastCall();
-        queue.start();
+        oqueue.start();
+        EasyMock.expectLastCall();
+        iqueue.start();
         EasyMock.expectLastCall();
     }
 
@@ -678,12 +675,14 @@ public class RMManagerTest extends Assert {
     void setUpRecoverReliableEndpoint(Endpoint endpoint,
                                       Conduit conduit, 
                                       SourceSequence ss, 
-                                      DestinationSequence ds, RMMessage m, Capture<Message> mc) 
+                                      DestinationSequence ds, RMMessage m) 
                                           throws IOException  {                
         RMStore store = control.createMock(RMStore.class);
-        RetransmissionQueue queue = control.createMock(RetransmissionQueue.class);
+        RetransmissionQueue oqueue = control.createMock(RetransmissionQueue.class);
+        RedeliveryQueue iqueue = control.createMock(RedeliveryQueue.class);
         manager.setStore(store);
-        manager.setRetransmissionQueue(queue);
+        manager.setRetransmissionQueue(oqueue);
+        manager.setRedeliveryQueue(iqueue);
         
         Collection<SourceSequence> sss = new ArrayList<SourceSequence>();
         if (null != ss) {
@@ -747,13 +746,11 @@ public class RMManagerTest extends Assert {
         is.close();
         EasyMock.expect(m.getContent()).andReturn(cos).anyTimes();
 
-        if (mc != null) {
-            queue.addUnacknowledged(EasyMock.capture(mc));
-        } else {
-            queue.addUnacknowledged(EasyMock.isA(Message.class));
-        }
+        oqueue.addUnacknowledged(EasyMock.isA(Message.class));
         EasyMock.expectLastCall();
-        queue.start();
+        oqueue.start();
+        EasyMock.expectLastCall();
+        iqueue.start();
         EasyMock.expectLastCall();
     }
     

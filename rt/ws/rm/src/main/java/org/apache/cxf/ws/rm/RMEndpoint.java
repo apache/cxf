@@ -830,6 +830,9 @@ public class RMEndpoint {
         for (SourceSequence ss : getSource().getAllSequences()) {
             manager.getRetransmissionQueue().stop(ss);
         }
+        for (DestinationSequence ds : getDestination().getAllSequences()) {
+            manager.getRedeliveryQueue().stop(ds);
+        }
 
         // unregistering of this managed bean from the server is done by the bus itself
     }

@@ -136,8 +136,7 @@ public class ManagedRMEndpoint implements ManagedComponent {
         if (outbound) {
             return endpoint.getManager().getRetransmissionQueue().countUnacknowledged(); 
         } else {
-//            return endpoint.getManager().getRedeliveryQueue().countUndelivered();
-            return 0;
+            return endpoint.getManager().getRedeliveryQueue().countUndelivered();
         }
     }
 
@@ -155,12 +154,11 @@ public class ManagedRMEndpoint implements ManagedComponent {
             }
             return manager.getRetransmissionQueue().countUnacknowledged(ss);
         } else {
-//            DestinationSequence ds = getDestinationSeq(sid);
-//            if (null == ds) {
-//                throw new IllegalArgumentException("no sequence");
-//            }
-//            return manager.getRedeliveryQueue().countUndelivered(ds);
-            return 0;
+            DestinationSequence ds = getDestinationSeq(sid);
+            if (null == ds) {
+                throw new IllegalArgumentException("no sequence");
+            }
+            return manager.getRedeliveryQueue().countUndelivered(ds);
         }
     }
 
@@ -280,55 +278,55 @@ public class ManagedRMEndpoint implements ManagedComponent {
         return rsps;
     }
 
-//     @ManagedOperation(description = "Redelivery Status")
-//     @ManagedOperationParameters({
-//         @ManagedOperationParameter(name = "sequenceId", description = "The sequence identifier"),
-//         @ManagedOperationParameter(name = "messageNumber", description = "The message number")
-//     })
-//     public CompositeData getRedeliveryStatus(String sid, long num) throws JMException {
-//         DestinationSequence ds = getDestinationSeq(sid);
-//         if (null == ds) {
-//             throw new IllegalArgumentException("no sequence");
-//         }
-//         RedeliveryQueue rq = endpoint.getManager().getRedeliveryQueue();
-//         RetryStatus rs = rq.getRedeliveryStatus(ds, num);
-//         return getRetryStatusProperties(num, rs);
-//     }
+    @ManagedOperation(description = "Redelivery Status")
+    @ManagedOperationParameters({
+        @ManagedOperationParameter(name = "sequenceId", description = "The sequence identifier"),
+        @ManagedOperationParameter(name = "messageNumber", description = "The message number")
+    })
+    public CompositeData getRedeliveryStatus(String sid, long num) throws JMException {
+        DestinationSequence ds = getDestinationSeq(sid);
+        if (null == ds) {
+            throw new IllegalArgumentException("no sequence");
+        }
+        RedeliveryQueue rq = endpoint.getManager().getRedeliveryQueue();
+        RetryStatus rs = rq.getRedeliveryStatus(ds, num);
+        return getRetryStatusProperties(num, rs);
+    }
 
-//    @ManagedOperation(description = "Redelivery Statuses")
-//     @ManagedOperationParameters({
-//         @ManagedOperationParameter(name = "sequenceId", description = "The sequence identifier")
-//     })
-//     public CompositeData[] getRedeliveryStatuses(String sid) throws JMException {
-//         DestinationSequence ds = getDestinationSeq(sid);
-//         if (null == ds) {
-//             throw new IllegalArgumentException("no sequence");
-//         }
-//         RedeliveryQueue rq = endpoint.getManager().getRedeliveryQueue();
-//         Map<Long, RetryStatus> rsmap = rq.getRedeliveryStatuses(ds);
-//
-//         CompositeData[] rsps = new CompositeData[rsmap.size()];
-//         int i = 0;
-//         for (Map.Entry<Long, RetryStatus> rs : rsmap.entrySet()) {
-//             rsps[i++] = getRetryStatusProperties(rs.getKey(), rs.getValue());
-//         }
-//         return rsps;
-//     }
+    @ManagedOperation(description = "Redelivery Statuses")
+    @ManagedOperationParameters({
+        @ManagedOperationParameter(name = "sequenceId", description = "The sequence identifier")
+    })
+    public CompositeData[] getRedeliveryStatuses(String sid) throws JMException {
+        DestinationSequence ds = getDestinationSeq(sid);
+        if (null == ds) {
+            throw new IllegalArgumentException("no sequence");
+        }
+        RedeliveryQueue rq = endpoint.getManager().getRedeliveryQueue();
+        Map<Long, RetryStatus> rsmap = rq.getRedeliveryStatuses(ds);
 
-//     @ManagedOperation(description = "List of UnDelivered Message Numbers")
-//     @ManagedOperationParameters({
-//         @ManagedOperationParameter(name = "sequenceId", description = "The sequence identifier") 
-//     })
-//     public Long[] getUnDeliveredMessageIdentifiers(String sid) {
-//         RedeliveryQueue rq = endpoint.getManager().getRedeliveryQueue();
-//         DestinationSequence ds = getDestinationSeq(sid);
-//         if (null == ds) {
-//             throw new IllegalArgumentException("no sequence");
-//         }
-//        
-//         List<Long> numbers = rq.getUndeliveredMessageNumbers(ds);
-//         return numbers.toArray(new Long[numbers.size()]);
-//     }
+        CompositeData[] rsps = new CompositeData[rsmap.size()];
+        int i = 0;
+        for (Map.Entry<Long, RetryStatus> rs : rsmap.entrySet()) {
+            rsps[i++] = getRetryStatusProperties(rs.getKey(), rs.getValue());
+        }
+        return rsps;
+    }
+
+    @ManagedOperation(description = "List of UnDelivered Message Numbers")
+    @ManagedOperationParameters({
+        @ManagedOperationParameter(name = "sequenceId", description = "The sequence identifier") 
+    })
+    public Long[] getUnDeliveredMessageIdentifiers(String sid) {
+        RedeliveryQueue rq = endpoint.getManager().getRedeliveryQueue();
+        DestinationSequence ds = getDestinationSeq(sid);
+        if (null == ds) {
+            throw new IllegalArgumentException("no sequence");
+        }
+        
+        List<Long> numbers = rq.getUndeliveredMessageNumbers(ds);
+        return numbers.toArray(new Long[numbers.size()]);
+    }
 
     @ManagedOperation(description = "List of Source Sequence IDs")
     @ManagedOperationParameters({
@@ -383,31 +381,31 @@ public class ManagedRMEndpoint implements ManagedComponent {
         rq.resume(ss);
     }
     
-//     @ManagedOperation(description = "Suspend Redelivery Queue")
-//     @ManagedOperationParameters({
-//         @ManagedOperationParameter(name = "sequenceId", description = "The sequence identifier") 
-//     })
-//     public void suspendDestinationQueue(String sid) throws JMException {
-//         DestinationSequence ds = getDestinationSeq(sid);
-//         if (null == ds) {
-//             throw new IllegalArgumentException("no sequence");
-//         }
-//         RedeliveryQueue rq = endpoint.getManager().getRedeliveryQueue();
-//         rq.suspend(ds);
-//     }
-    
-//     @ManagedOperation(description = "Resume Redelivery Queue")
-//     @ManagedOperationParameters({
-//         @ManagedOperationParameter(name = "sequenceId", description = "The sequence identifier") 
-//     })
-//     public void resumeDestinationQueue(String sid) throws JMException {
-//         DestinationSequence ds = getDestinationSeq(sid);
-//         if (null == ds) {
-//             throw new JMException("no source sequence");
-//         }
-//         RedeliveryQueue rq = endpoint.getManager().getRedeliveryQueue();
-//         rq.resume(ds);
-//     }
+    @ManagedOperation(description = "Suspend Redelivery Queue")
+    @ManagedOperationParameters({
+        @ManagedOperationParameter(name = "sequenceId", description = "The sequence identifier") 
+    })
+    public void suspendDestinationQueue(String sid) throws JMException {
+        DestinationSequence ds = getDestinationSeq(sid);
+        if (null == ds) {
+            throw new IllegalArgumentException("no sequence");
+        }
+        RedeliveryQueue rq = endpoint.getManager().getRedeliveryQueue();
+        rq.suspend(ds);
+    }
+
+    @ManagedOperation(description = "Resume Redelivery Queue")
+    @ManagedOperationParameters({
+        @ManagedOperationParameter(name = "sequenceId", description = "The sequence identifier") 
+    })
+    public void resumeDestinationQueue(String sid) throws JMException {
+        DestinationSequence ds = getDestinationSeq(sid);
+        if (null == ds) {
+            throw new JMException("no source sequence");
+        }
+        RedeliveryQueue rq = endpoint.getManager().getRedeliveryQueue();
+        rq.resume(ds);
+    }
     
     @ManagedOperation(description = "Current Source Sequence Properties")
     public CompositeData getCurrentSourceSequence() throws JMException {
@@ -572,10 +570,13 @@ public class ManagedRMEndpoint implements ManagedComponent {
     public void removeDestinationSequence(String sid) throws JMException {
         DestinationSequence ds = getDestinationSeq(sid);
         if (null == ds) {
-            throw new JMException("no source sequence");
+            throw new JMException("no destination sequence");
         }
-//         RedeliveryQueue rq = endpoint.getManager().getRedeliveryQueue();
-//         rq.suspend(ds);
+        RedeliveryQueue rq = endpoint.getManager().getRedeliveryQueue();
+        if (rq.countUndelivered(ds) > 0) {
+            throw new JMException("sequence not empty");
+        }
+        rq.stop(ds);
         ds.getDestination().removeSequence(ds);
     }
     
@@ -590,6 +591,19 @@ public class ManagedRMEndpoint implements ManagedComponent {
         }
         RetransmissionQueue rq = endpoint.getManager().getRetransmissionQueue();
         rq.purgeAll(ss);
+    }
+
+    @ManagedOperation(description = "Purge UnDelivered Messages")
+    @ManagedOperationParameters({
+        @ManagedOperationParameter(name = "sequenceId", description = "The sequence identifier") 
+    })
+    public void purgeUnDeliverededMessages(String sid) {
+        DestinationSequence ds = getDestinationSeq(sid);
+        if (null == ds) {
+            throw new IllegalArgumentException("no sequence");
+        }
+        RedeliveryQueue rq = endpoint.getManager().getRedeliveryQueue();
+        rq.purgeAll(ds);
     }
     
     private static String getAddressValue(EndpointReferenceType epr) {
@@ -675,10 +689,10 @@ public class ManagedRMEndpoint implements ManagedComponent {
 //        return endpoint.getManager().countCompleted();
 //    }
 
-//    @ManagedAttribute(description = "Number of Inbound Queued Messages", currencyTimeLimit = 10)
-//    public int getQueuedMessagesInboundCount() {
-//        return endpoint.getManager().getRedeliveryQueue().countUndelivered();
-//    }
+    @ManagedAttribute(description = "Number of Inbound Queued Messages", currencyTimeLimit = 10)
+    public int getQueuedMessagesInboundCount() {
+        return endpoint.getManager().getRedeliveryQueue().countUndelivered();
+    }
 
 //    @ManagedAttribute(description = "Number of Inbound Completed Messages", currencyTimeLimit = 10)
 //    public int getCompletedMessagesInboundCount() {
