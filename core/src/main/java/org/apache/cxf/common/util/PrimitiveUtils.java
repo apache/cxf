@@ -19,10 +19,28 @@
 
 package org.apache.cxf.common.util;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public final class PrimitiveUtils {
+    private static final Map<Class<?>, Class<?>> AUTOBOXED_PRIMITIVES_MAP;
+    static {
+        AUTOBOXED_PRIMITIVES_MAP = new HashMap<Class<?>, Class<?>>();
+        AUTOBOXED_PRIMITIVES_MAP.put(byte.class, Byte.class);
+        AUTOBOXED_PRIMITIVES_MAP.put(short.class, Short.class);
+        AUTOBOXED_PRIMITIVES_MAP.put(int.class, Integer.class);
+        AUTOBOXED_PRIMITIVES_MAP.put(long.class, Long.class);
+        AUTOBOXED_PRIMITIVES_MAP.put(float.class, Float.class);
+        AUTOBOXED_PRIMITIVES_MAP.put(double.class, Double.class);
+        AUTOBOXED_PRIMITIVES_MAP.put(boolean.class, Boolean.class);    
+    }
     
     private PrimitiveUtils() {
         
+    }
+    
+    public static boolean canPrimitiveTypeBeAutoboxed(Class<?> primitiveClass, Class<?> type) {
+        return primitiveClass.isPrimitive() && type == AUTOBOXED_PRIMITIVES_MAP.get(primitiveClass);
     }
     
     public static Class<?> getClass(String value) {

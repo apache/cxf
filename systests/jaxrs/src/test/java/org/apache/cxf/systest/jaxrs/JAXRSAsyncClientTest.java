@@ -52,6 +52,7 @@ import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.xml.ws.Holder;
 
+import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -261,6 +262,45 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
             .build().target(address)
             .request().accept("text/boolean").async().get(callback).get();
         assertTrue(((GenericInvocationCallback)callback).getResult().readEntity(Boolean.class));
+    }
+    
+    @Test
+    public void testAsyncProxyPrimitiveResponse() throws Exception {
+        String address = "http://localhost:" + PORT;
+        final Holder<Boolean> holder = new Holder<Boolean>();
+        final InvocationCallback<Boolean> callback = new InvocationCallback<Boolean>() {
+            public void completed(Boolean response) {
+                holder.value = response;
+            }
+            public void failed(Throwable error) {
+            }
+        };
+        
+        BookStore store = JAXRSClientFactory.create(address, BookStore.class);
+        WebClient.getConfig(store).getRequestContext().put(InvocationCallback.class.getName(), callback);
+        store.checkBook(123L);
+        Thread.sleep(3000);
+        assertTrue(holder.value);
+    }
+    @Test
+    public void testAsyncProxyBookResponse() throws Exception {
+        String address = "http://localhost:" + PORT;
+        final Holder<Book> holder = new Holder<Book>();
+        final InvocationCallback<Book> callback = new InvocationCallback<Book>() {
+            public void completed(Book response) {
+                holder.value = response;
+            }
+            public void failed(Throwable error) {
+            }
+        };
+        
+        BookStore store = JAXRSClientFactory.create(address, BookStore.class);
+        WebClient.getConfig(store).getRequestContext().put(InvocationCallback.class.getName(), callback);
+        Book book = store.getBookByMatrixParams("12", "3");
+        assertNull(book);
+        Thread.sleep(3000);
+        assertNotNull(holder.value);
+        assertEquals(123L, holder.value.getId());
     }
     
     @SuppressWarnings({
