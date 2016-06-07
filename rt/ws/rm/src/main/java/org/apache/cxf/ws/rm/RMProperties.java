@@ -37,6 +37,7 @@ public class RMProperties {
     private CloseSequenceType closeSequence;
     private String namespaceURI;
     private boolean lastMessage;
+    private long createdTime = System.currentTimeMillis();
     
     public Collection<SequenceAcknowledgement> getAcks() {
         return acks;
@@ -119,5 +120,22 @@ public class RMProperties {
      */
     public void exposeAs(String uri) {
         namespaceURI = uri;
+    }
+
+    /**
+     * Get the initial creation time of this RM properties instance.
+     * @return Returns the createdTime.
+     */
+    public long getCreatedTime() {
+        return createdTime;
+    }
+
+    /**
+     * Set the initial creation time of this RM properties instance.
+     * 
+     * @param createdTime The createdTime to set.
+     */
+    public void setCreatedTime(long createdTime) {
+        this.createdTime = createdTime;
     }
 }

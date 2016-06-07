@@ -139,7 +139,10 @@ public class RMSoapInInterceptor extends AbstractSoapInterceptor {
      * @return the RM properties
      */
     public RMProperties unmarshalRMProperties(SoapMessage message) { 
-        RMProperties rmps = new RMProperties();
+        RMProperties rmps = (RMProperties)message.get(RMContextUtils.getRMPropertiesKey(false));
+        if (rmps == null) {
+            rmps = new RMProperties();
+        }
         List<Header> headers = message.getHeaders();
         if (headers != null) {
             decodeHeaders(message, headers, rmps);

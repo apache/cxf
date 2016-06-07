@@ -75,6 +75,7 @@ public class RMTxStore implements RMStore {
            {"LAST_MSG_NO", "DECIMAL(19, 0)"},
            {"ENDPOINT_ID", "VARCHAR(1024)"},
            {"ACKNOWLEDGED", "BLOB"},
+           {"TERMINATED", "CHAR(1)"},
            {"PROTOCOL_VERSION", "VARCHAR(256)"}};
     private static final String[] DEST_SEQUENCES_TABLE_KEYS = {"SEQ_ID"};
     private static final String[][] SRC_SEQUENCES_TABLE_COLS
@@ -90,6 +91,7 @@ public class RMTxStore implements RMStore {
         = {{"SEQ_ID", "VARCHAR(256) NOT NULL"},
            {"MSG_NO", "DECIMAL(19, 0) NOT NULL"},
            {"SEND_TO", "VARCHAR(256)"},
+           {"CREATED_TIME", "DECIMAL(19, 0)"},
            {"CONTENT", "BLOB"},
            {"CONTENT_TYPE", "VARCHAR(1024)"}};
     private static final String[] MESSAGES_TABLE_KEYS = {"SEQ_ID", "MSG_NO"};
@@ -119,27 +121,27 @@ public class RMTxStore implements RMStore {
     private static final String DELETE_SRC_SEQUENCE_STMT_STR =
         "DELETE FROM CXF_RM_SRC_SEQUENCES WHERE SEQ_ID = ?";
     private static final String UPDATE_DEST_SEQUENCE_STMT_STR =
-        "UPDATE CXF_RM_DEST_SEQUENCES SET LAST_MSG_NO = ?, ACKNOWLEDGED = ? WHERE SEQ_ID = ?";
+        "UPDATE CXF_RM_DEST_SEQUENCES SET LAST_MSG_NO = ?, TERMINATED = ?, ACKNOWLEDGED = ? WHERE SEQ_ID = ?";
     private static final String UPDATE_SRC_SEQUENCE_STMT_STR =
         "UPDATE CXF_RM_SRC_SEQUENCES SET CUR_MSG_NO = ?, LAST_MSG = ? WHERE SEQ_ID = ?";
     private static final String CREATE_MESSAGE_STMT_STR 
-        = "INSERT INTO {0} (SEQ_ID, MSG_NO, SEND_TO, CONTENT, CONTENT_TYPE) VALUES(?, ?, ?, ?, ?)";
+        = "INSERT INTO {0} (SEQ_ID, MSG_NO, SEND_TO, CREATED_TIME, CONTENT, CONTENT_TYPE) VALUES(?, ?, ?, ?, ?, ?)";
     private static final String DELETE_MESSAGE_STMT_STR =
         "DELETE FROM {0} WHERE SEQ_ID = ? AND MSG_NO = ?";
     private static final String SELECT_DEST_SEQUENCE_STMT_STR =
-        "SELECT ACKS_TO, LAST_MSG_NO, PROTOCOL_VERSION, ACKNOWLEDGED FROM CXF_RM_DEST_SEQUENCES "
+        "SELECT ACKS_TO, LAST_MSG_NO, PROTOCOL_VERSION, TERMINATED, ACKNOWLEDGED FROM CXF_RM_DEST_SEQUENCES "
         + "WHERE SEQ_ID = ?";
     private static final String SELECT_SRC_SEQUENCE_STMT_STR =
         "SELECT CUR_MSG_NO, LAST_MSG, EXPIRY, OFFERING_SEQ_ID, PROTOCOL_VERSION FROM CXF_RM_SRC_SEQUENCES "
         + "WHERE SEQ_ID = ?";
     private static final String SELECT_DEST_SEQUENCES_STMT_STR =
-        "SELECT SEQ_ID, ACKS_TO, LAST_MSG_NO, PROTOCOL_VERSION, ACKNOWLEDGED FROM CXF_RM_DEST_SEQUENCES "
+        "SELECT SEQ_ID, ACKS_TO, LAST_MSG_NO, PROTOCOL_VERSION, TERMINATED, ACKNOWLEDGED FROM CXF_RM_DEST_SEQUENCES "
         + "WHERE ENDPOINT_ID = ?";
     private static final String SELECT_SRC_SEQUENCES_STMT_STR =
         "SELECT SEQ_ID, CUR_MSG_NO, LAST_MSG, EXPIRY, OFFERING_SEQ_ID, PROTOCOL_VERSION "
         + "FROM CXF_RM_SRC_SEQUENCES WHERE ENDPOINT_ID = ?";
     private static final String SELECT_MESSAGES_STMT_STR =
-        "SELECT MSG_NO, SEND_TO, CONTENT, CONTENT_TYPE FROM {0} WHERE SEQ_ID = ?";
+        "SELECT MSG_NO, SEND_TO, CREATED_TIME, CONTENT, CONTENT_TYPE FROM {0} WHERE SEQ_ID = ?";
     private static final String ALTER_TABLE_STMT_STR =
         "ALTER TABLE {0} ADD {1} {2}";
     private static final String CREATE_INBOUND_MESSAGE_STMT_STR = 
@@ -395,13 +397,14 @@ public class RMTxStore implements RMStore {
                 EndpointReferenceType acksTo = RMUtils.createReference(res.getString(1));  
                 long lm = res.getLong(2);
                 ProtocolVariation pv = decodeProtocolVersion(res.getString(3));
-                InputStream is = res.getBinaryStream(4);
+                boolean t = res.getBoolean(4);
+                InputStream is = res.getBinaryStream(5);
                 SequenceAcknowledgement ack = null;
                 if (null != is) {
                     ack = PersistenceUtils.getInstance()
                         .deserialiseAcknowledgment(is); 
                 }
-                return new DestinationSequence(sid, acksTo, lm, ack, pv);
+                return new DestinationSequence(sid, acksTo, lm, t, ack, pv);
             }
         } catch (SQLException ex) {
             conex = ex;
@@ -521,13 +524,14 @@ public class RMTxStore implements RMStore {
                 EndpointReferenceType acksTo = RMUtils.createReference(res.getString(2));  
                 long lm = res.getLong(3);
                 ProtocolVariation pv = decodeProtocolVersion(res.getString(4));
-                InputStream is = res.getBinaryStream(5);
+                boolean t = res.getBoolean(5);
+                InputStream is = res.getBinaryStream(6);
                 SequenceAcknowledgement ack = null;
                 if (null != is) {
                     ack = PersistenceUtils.getInstance()
                         .deserialiseAcknowledgment(is); 
                 }
-                DestinationSequence seq = new DestinationSequence(sid, acksTo, lm, ack, pv);
+                DestinationSequence seq = new DestinationSequence(sid, acksTo, lm, t, ack, pv);
                 seqs.add(seq);                                                 
             }
         } catch (SQLException ex) {
@@ -596,11 +600,13 @@ public class RMTxStore implements RMStore {
             while (res.next()) {
                 long mn = res.getLong(1);
                 String to = res.getString(2);
-                Blob blob = res.getBlob(3);
-                String contentType = res.getString(4);
+                long ct = res.getLong(3);
+                Blob blob = res.getBlob(4);
+                String contentType = res.getString(5);
                 RMMessage msg = new RMMessage();
                 msg.setMessageNumber(mn);
                 msg.setTo(to);
+                msg.setCreatedTime(ct);
                 CachedOutputStream cos = new CachedOutputStream();
                 IOUtils.copyAndCloseInput(blob.getBinaryStream(), cos);
                 cos.flush();
@@ -752,8 +758,9 @@ public class RMTxStore implements RMStore {
             stmt.setString(1, id);
             stmt.setLong(2, nr);
             stmt.setString(3, to);
-            stmt.setBinaryStream(4, msgin);
-            stmt.setString(5, contentType);
+            stmt.setLong(4, msg.getCreatedTime());
+            stmt.setBinaryStream(5, msgin);
+            stmt.setString(6, contentType);
             stmt.execute();
             if (LOG.isLoggable(Level.FINE)) {
                 LOG.log(Level.FINE, "Successfully stored {0} message number {1} for sequence {2}",
@@ -805,10 +812,11 @@ public class RMTxStore implements RMStore {
             stmt = getStatement(con, UPDATE_DEST_SEQUENCE_STMT_STR);
 
             long lastMessageNr = seq.getLastMessageNumber();
-            stmt.setLong(1, lastMessageNr); 
+            stmt.setLong(1, lastMessageNr);
+            stmt.setString(2, seq.isTerminated() ? "1" : "0");
             InputStream is = PersistenceUtils.getInstance().serialiseAcknowledgment(seq.getAcknowledgment());
-            stmt.setBinaryStream(2, is, is.available()); 
-            stmt.setString(3, seq.getIdentifier().getValue());
+            stmt.setBinaryStream(3, is, is.available()); 
+            stmt.setString(4, seq.getIdentifier().getValue());
             stmt.execute();
         } finally {
             releaseResources(stmt, null);
@@ -884,12 +892,11 @@ public class RMTxStore implements RMStore {
     }
     
     protected void verifyTable(Connection con, String tableName, String[][] tableCols) {
-        List<String[]> newCols = new ArrayList<String[]>();
-        ResultSet rs = null;
         try {
             DatabaseMetaData metadata = con.getMetaData();
-            rs = metadata.getColumns(null, null, tableName, "%");
+            ResultSet rs = metadata.getColumns(null, null, tableName, "%");
             Set<String> dbCols = new HashSet<String>();
+            List<String[]> newCols = new ArrayList<String[]>();
             while (rs.next()) {
                 dbCols.add(rs.getString(4));
             }
@@ -898,26 +905,12 @@ public class RMTxStore implements RMStore {
                     newCols.add(col);
                 }
             }
-        } catch (SQLException ex) {
-            if (LOG.isLoggable(Level.FINE)) {
-                LOG.fine("Table " + tableName + " cannot be verified.");
-            }
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    // ignore
+            if (newCols.size() > 0) {
+                // need to add the new columns
+                if (LOG.isLoggable(Level.FINE)) {
+                    LOG.log(Level.FINE, "Table " + tableName + " needs additional columns");
                 }
-            }
-        }
-        if (newCols.size() > 0) {
-            // need to add the new columns
-            if (LOG.isLoggable(Level.FINE)) {
-                LOG.log(Level.FINE, "Table " + tableName + " needs additional columns");
-            }
-                
-            try { 
+
                 for (String[] newCol : newCols) {
                     Statement st = con.createStatement();
                     try {
@@ -931,9 +924,9 @@ public class RMTxStore implements RMStore {
                         st.close();
                     }
                 }
-            } catch (SQLException ex) {
-                LOG.log(Level.WARNING, "Table " + tableName + " cannot be altered.", ex);
             }
+        } catch (SQLException ex) {
+            LOG.log(Level.WARNING, "Table " + tableName + " cannot be altered.", ex);
         }
     }
 
@@ -965,7 +958,6 @@ public class RMTxStore implements RMStore {
         for (int i = 0; i < SET_SCHEMA_STMT_STRS.length; i++) {
             try {
                 stmt.executeUpdate(MessageFormat.format(SET_SCHEMA_STMT_STRS[i], schemaName));
-                ex0 = null;
                 break;
             } catch (SQLException ex) {
                 ex.setNextException(ex0);

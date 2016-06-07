@@ -19,6 +19,8 @@
 
 package org.apache.cxf.ws.rm;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
@@ -60,5 +62,15 @@ public class RMDeliveryInterceptor extends AbstractRMInterceptor<Message> {
             dest.acknowledge(message);
         }
         dest.processingComplete(message);
+        
+        // close InputStream of RMCaptureInInterceptor, to delete tmp files in filesystem
+        Closeable closable = (Closeable)message.get("org.apache.cxf.ws.rm.content.closeable");
+        if (null != closable) {
+            try {
+                closable.close();
+            } catch (IOException e) {
+                // Ignore
+            }
+        }
     }
 }

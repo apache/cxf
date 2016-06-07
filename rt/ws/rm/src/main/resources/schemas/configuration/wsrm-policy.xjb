@@ -53,4 +53,13 @@
         </jaxb:property>
     </jaxb:bindings>
 
+    <jaxb:bindings schemaLocation="wsrm-manager-types.xsd"
+         node="//xs:complexType[@name='RetryPolicyType']//xs:attribute[@name='interval']">
+        <jaxb:property>
+            <jaxb:baseType>
+                <jaxb:javaType name="java.lang.Long"/>
+            </jaxb:baseType>
+        </jaxb:property>
+    </jaxb:bindings>
+
 </jaxb:bindings>

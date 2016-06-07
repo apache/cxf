@@ -32,6 +32,7 @@ public class RMMessage {
     private String contentType;
     private long messageNumber;
     private String to;
+    private long createdTime;
     
     /**
      * Returns the message number of the message within its sequence.
@@ -118,6 +119,14 @@ public class RMMessage {
      */
     public void setContentType(String contentType) {
         this.contentType = contentType;
+    }
+
+    public long getCreatedTime() {
+        return createdTime;
+    }
+
+    public void setCreatedTime(long createdTime) {
+        this.createdTime = createdTime;
     }
 
 }

@@ -292,6 +292,10 @@ public class RMEndpointTest extends Assert {
         EasyMock.expect(manager.getRetransmissionQueue()).andReturn(queue).anyTimes();
         queue.stop(ss);
         EasyMock.expectLastCall().anyTimes();
+        RedeliveryQueue dqueue = control.createMock(RedeliveryQueue.class);
+        EasyMock.expect(manager.getRedeliveryQueue()).andReturn(dqueue).anyTimes();
+        dqueue.stop(ds);
+        EasyMock.expectLastCall().anyTimes();
         control.replay();
         rme.getDestination().addSequence(ds, false);
         rme.getSource().addSequence(ss, false);

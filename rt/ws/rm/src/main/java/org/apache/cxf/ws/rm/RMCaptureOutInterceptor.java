@@ -291,6 +291,7 @@ public class RMCaptureOutInterceptor extends AbstractRMInterceptor<Message>  {
                     }
                     // serializes the message content and the attachments into
                     // the RMMessage content
+                    msg.setCreatedTime(rmps.getCreatedTime());
                     PersistenceUtils.encodeRMContent(msg, message, is);
                     store.persistOutgoing(ss, msg);
                 }

@@ -68,6 +68,8 @@ public abstract class RMTxStoreTestBase extends Assert {
     private static SequenceAcknowledgement ack1;
     private static SequenceAcknowledgement ack2;
     
+    private static final long TIME = System.currentTimeMillis();
+    
     protected IMocksControl control;
     
     public static void setUpOnce() {
@@ -867,6 +869,7 @@ public abstract class RMTxStoreTestBase extends Assert {
         EasyMock.expect(msg.getTo()).andReturn(to).anyTimes();
 
         EasyMock.expect(msg.getContentType()).andReturn("text/xml").anyTimes();
+        EasyMock.expect(msg.getCreatedTime()).andReturn(TIME);
         byte[] value = ("Message " + mn.longValue()).getBytes();
         ByteArrayInputStream bais = new ByteArrayInputStream(value);
         CachedOutputStream cos = new CachedOutputStream();
@@ -936,6 +939,7 @@ public abstract class RMTxStoreTestBase extends Assert {
             } else {
                 assertNull(msg.getTo());
             }
+            assertEquals(TIME, msg.getCreatedTime());
             try {
                 InputStream actual = msg.getContent().getInputStream();
                 assertEquals(new String("Message " + mn), IOUtils.readStringFromStream(actual));

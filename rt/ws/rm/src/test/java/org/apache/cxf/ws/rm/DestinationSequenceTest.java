@@ -567,7 +567,7 @@ public class DestinationSequenceTest extends Assert {
         
         DestinationSequence seq = new DestinationSequence(id, ref, destination,
             ProtocolVariation.RM10WSA200408);
-        destination.removeSequence(seq);
+        destination.terminateSequence(seq);
         EasyMock.expectLastCall();
         
         Message message = setUpMessage("1");
@@ -601,7 +601,7 @@ public class DestinationSequenceTest extends Assert {
         long lastAppMessage = System.currentTimeMillis() - 30000L;
         EasyMock.expect(rme.getLastControlMessage()).andReturn(0L);
         EasyMock.expect(rme.getLastApplicationMessage()).andReturn(lastAppMessage);
-        destination.removeSequence(seq);
+        destination.terminateSequence(seq);
         EasyMock.expectLastCall();
         control.replay();
         st.run();

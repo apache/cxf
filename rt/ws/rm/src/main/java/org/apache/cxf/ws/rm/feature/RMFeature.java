@@ -123,9 +123,7 @@ public class RMFeature extends AbstractFeature {
         provider.getInInterceptors().add(rmLogicalIn);
         provider.getInInterceptors().add(rmInCodec);
         provider.getInInterceptors().add(rmDelivery);
-        if (null != store) {
-            provider.getInInterceptors().add(rmCaptureIn);
-        }
+        provider.getInInterceptors().add(rmCaptureIn);
 
         provider.getOutInterceptors().add(rmLogicalOut);
         provider.getOutInterceptors().add(rmOutCodec);

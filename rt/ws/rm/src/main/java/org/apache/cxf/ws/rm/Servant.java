@@ -245,7 +245,7 @@ public class Servant implements Invoker {
             return null;
         } 
 
-        destination.removeSequence(terminatedSeq);
+        destination.terminateSequence(terminatedSeq);
         
         // the following may be necessary if the last message for this sequence was a oneway
         // request and hence there was no response to which a last message could have been added
