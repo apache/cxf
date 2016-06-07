@@ -24,7 +24,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.text.SimpleDateFormat;
@@ -43,6 +45,7 @@ import java.util.logging.Logger;
 
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.client.InvocationCallback;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.Form;
@@ -1014,7 +1017,7 @@ public abstract class AbstractClient implements Client {
             = CastUtils.cast((Map<?, ?>)outMessage.get(Message.INVOCATION_CONTEXT));
         return CastUtils.cast((Map<?, ?>)invContext.get(REQUEST_CONTEXT));
     }
-    
+        
     protected List<?> getContentsList(Object body) {
         return body == null ? new MessageContentsList() : new MessageContentsList(body);
     }
@@ -1065,6 +1068,50 @@ public abstract class AbstractClient implements Client {
     
     protected void setPlainOperationNameProperty(Message outMessage, String name) {
         outMessage.getExchange().put("org.apache.cxf.resource.operation.name", name);
+    }
+    
+    protected static Type getCallbackType(InvocationCallback<?> callback) {
+        Class<?> cls = callback.getClass();
+        ParameterizedType pt = findCallbackType(cls);
+        Type actualType = null;
+        for (Type tp : pt.getActualTypeArguments()) {
+            actualType = tp;
+            break;
+        }
+        if (actualType instanceof TypeVariable) { 
+            actualType = InjectionUtils.getSuperType(cls, (TypeVariable<?>)actualType);
+        }
+        return actualType;
+    }
+    
+    protected static ParameterizedType findCallbackType(Class<?> cls) {
+        if (cls == null || cls == Object.class) {
+            return null;
+        }
+        for (Type c2 : cls.getGenericInterfaces()) {
+            if (c2 instanceof ParameterizedType) {
+                ParameterizedType pt = (ParameterizedType)c2;
+                if (InvocationCallback.class.equals(pt.getRawType())) {
+                    return pt;
+                }
+            }
+        }
+        return findCallbackType(cls.getSuperclass());
+    }
+    
+    protected static Class<?> getCallbackClass(Type outType) {
+        Class<?> respClass = null;
+        if (outType instanceof Class) {
+            respClass = (Class<?>)outType;
+        } else if (outType instanceof ParameterizedType) { 
+            ParameterizedType pt = (ParameterizedType)outType;
+            if (pt.getRawType() instanceof Class) {
+                respClass = (Class<?>)pt.getRawType();
+            }
+        } else if (outType == null) { 
+            respClass = Response.class;
+        }
+        return respClass;
     }
     
     protected abstract class AbstractBodyWriter extends AbstractOutDatabindingInterceptor {
@@ -1131,6 +1178,57 @@ public abstract class AbstractClient implements Client {
             }
             
             
+        }
+    }
+    protected abstract class AbstractClientAsyncResponseInterceptor extends AbstractPhaseInterceptor<Message> {
+        AbstractClientAsyncResponseInterceptor() {
+            super(Phase.UNMARSHAL);
+        }
+
+        @Override
+        public void handleMessage(Message message) throws Fault {
+            if (message.getExchange().isSynchronous()) {
+                return;
+            }
+            handleAsyncResponse(message);
+        }
+
+        @Override
+        public void handleFault(Message message) {
+            if (message.getExchange().isSynchronous()) {
+                return;
+            }
+            handleAsyncFault(message);
+        }
+
+        private void handleAsyncResponse(Message message) {
+            JaxrsClientCallback<?> cb = message.getExchange().get(JaxrsClientCallback.class);
+            Response r = null;
+            try {
+                Object[] results = preProcessResult(message);
+                if (results != null && results.length == 1) {
+                    r = (Response)results[0];
+                }
+            } catch (Exception ex) {
+                Throwable t = ex instanceof WebApplicationException 
+                    ? (WebApplicationException)ex 
+                    : ex instanceof ProcessingException 
+                    ? (ProcessingException)ex : new ProcessingException(ex);
+                cb.handleException(message, t);
+                return;
+            }
+            doHandleAsyncResponse(message, r, cb);
+        }
+        
+        protected abstract void doHandleAsyncResponse(Message message, Response r, JaxrsClientCallback<?> cb);
+
+        protected void closeAsyncResponseIfPossible(Response r, Message outMessage, JaxrsClientCallback<?> cb) {
+            if (responseStreamCanBeClosed(outMessage, cb.getResponseClass())) {
+                r.close();
+            }
+        }
+        
+        protected void handleAsyncFault(Message message) {
         }
     }
 }

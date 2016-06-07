@@ -20,9 +20,7 @@ package org.apache.cxf.jaxrs.client;
 
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Collection;
@@ -67,13 +65,10 @@ import org.apache.cxf.jaxrs.impl.UriBuilderImpl;
 import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
-import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.ParameterizedCollectionType;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.phase.AbstractPhaseInterceptor;
-import org.apache.cxf.phase.Phase;
 
 
 /**
@@ -899,34 +894,6 @@ public class WebClient extends AbstractClient {
         return r;
     }
     
-    private ParameterizedType findCallbackType(Class<?> cls) {
-        if (cls == null || cls == Object.class) {
-            return null;
-        }
-        for (Type c2 : cls.getGenericInterfaces()) {
-            if (c2 instanceof ParameterizedType) {
-                ParameterizedType pt = (ParameterizedType)c2;
-                if (InvocationCallback.class.equals(pt.getRawType())) {
-                    return pt;
-                }
-            }
-        }
-        return findCallbackType(cls.getSuperclass());
-    }
-    private Type getCallbackType(InvocationCallback<?> callback) {
-        Class<?> cls = callback.getClass();
-        ParameterizedType pt = findCallbackType(cls);
-        Type actualType = null;
-        for (Type tp : pt.getActualTypeArguments()) {
-            actualType = tp;
-            break;
-        }
-        if (actualType instanceof TypeVariable) { 
-            actualType = InjectionUtils.getSuperType(cls, (TypeVariable<?>)actualType);
-        }
-        return actualType;
-    }
-    
     protected <T> Future<T> doInvokeAsyncCallback(String httpMethod, 
                                                   Object body, 
                                                   Class<?> requestClass,
@@ -934,20 +901,7 @@ public class WebClient extends AbstractClient {
                                                   InvocationCallback<T> callback) {
         
         Type outType = getCallbackType(callback);
-        Class<?> respClass = null;
-        if (outType instanceof Class) {
-            respClass = (Class<?>)outType;
-        } else if (outType instanceof ParameterizedType) { 
-            ParameterizedType pt = (ParameterizedType)outType;
-            if (pt.getRawType() instanceof Class) {
-                respClass = (Class<?>)pt.getRawType();
-            }
-        } else if (outType == null) { 
-            respClass = Response.class;
-        }
-        
-       
-        
+        Class<?> respClass = getCallbackClass(outType);
         return doInvokeAsync(httpMethod, body, requestClass, inType, respClass, outType, callback);
     }
     
@@ -1006,53 +960,33 @@ public class WebClient extends AbstractClient {
         return headers;
     }
     
-    private void handleAsyncResponse(Message message) {
-        JaxrsClientCallback<?> cb = message.getExchange().get(JaxrsClientCallback.class);
-        Response r = null;
-        try {
-            Object[] results = preProcessResult(message);
-            if (results != null && results.length == 1) {
-                r = (Response)results[0];
+    class ClientAsyncResponseInterceptor extends AbstractClientAsyncResponseInterceptor {
+        @Override
+        protected void doHandleAsyncResponse(Message message, Response r, JaxrsClientCallback<?> cb) {
+            if (r == null) {
+                try {
+                    r = handleResponse(message.getExchange().getOutMessage(),
+                                       cb.getResponseClass(),
+                                       cb.getOutGenericType());
+                } catch (Throwable t) {
+                    cb.handleException(message, t);
+                    return;
+                } finally {
+                    completeExchange(message.getExchange(), false);
+                }
             }
-        } catch (Exception ex) {
-            Throwable t = ex instanceof WebApplicationException 
-                ? (WebApplicationException)ex 
-                : ex instanceof ProcessingException 
-                ? (ProcessingException)ex : new ProcessingException(ex);
-            cb.handleException(message, t);
-            return;
-        }
-        if (r == null) {
-            try {
-                r = handleResponse(message.getExchange().getOutMessage(),
-                                   cb.getResponseClass(),
-                                   cb.getOutGenericType());
-            } catch (Throwable t) {
-                cb.handleException(message, t);
-                return;
-            } finally {
-                completeExchange(message.getExchange(), false);
+            if (cb.getResponseClass() == null || Response.class.equals(cb.getResponseClass())) {
+                cb.handleResponse(message, new Object[] {r});
+            } else if (r.getStatus() >= 300) {
+                cb.handleException(message, convertToWebApplicationException(r));
+            } else {
+                cb.handleResponse(message, new Object[] {r.getEntity()});
+                closeAsyncResponseIfPossible(r, message, cb);
             }
-        }
-        if (cb.getResponseClass() == null || Response.class.equals(cb.getResponseClass())) {
-            cb.handleResponse(message, new Object[] {r});
-        } else if (r.getStatus() >= 300) {
-            cb.handleException(message, convertToWebApplicationException(r));
-        } else {
-            cb.handleResponse(message, new Object[] {r.getEntity()});
-            closeAsyncResponseIfPossible(r, message, cb);
         }
     }
     
-    private void closeAsyncResponseIfPossible(Response r, Message outMessage, JaxrsClientCallback<?> cb) {
-        if (responseStreamCanBeClosed(outMessage, cb.getResponseClass())) {
-            r.close();
-        }
-    }
     
-    private void handleAsyncFault(Message message) {
-    }
-
 
     //TODO: retry invocation will not work in case of async request failures for the moment
     @Override
@@ -1292,29 +1226,6 @@ public class WebClient extends AbstractClient {
     // Link to JAX-RS 2.0 SyncInvoker
     public SyncInvoker sync() {
         return new SyncInvokerImpl();
-    }
-    
-    class ClientAsyncResponseInterceptor extends AbstractPhaseInterceptor<Message> {
-        ClientAsyncResponseInterceptor() {
-            super(Phase.UNMARSHAL);
-        }
-
-        @Override
-        public void handleMessage(Message message) throws Fault {
-            if (message.getExchange().isSynchronous()) {
-                return;
-            }
-            handleAsyncResponse(message);
-        }
-
-        @Override
-        public void handleFault(Message message) {
-            if (message.getExchange().isSynchronous()) {
-                return;
-            }
-            handleAsyncFault(message);
-        }
-
     }
     
     private void setEntityHeaders(Entity<?> entity) {
