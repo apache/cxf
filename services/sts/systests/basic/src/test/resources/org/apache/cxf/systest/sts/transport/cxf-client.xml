@@ -83,10 +83,10 @@
     <http:conduit name="https://localhost.*">
         <http:tlsClientParameters disableCNCheck="true">
             <sec:keyManagers keyPassword="ckpass">
-                <sec:keyStore type="jks" password="cspass" resource="clientstore.jks"/>
+                <sec:keyStore type="jks" password="cspass" resource="keys/clientstore.jks"/>
             </sec:keyManagers>
             <sec:trustManagers>
-                <sec:keyStore type="jks" password="cspass" resource="clientstore.jks"/>
+                <sec:keyStore type="jks" password="cspass" resource="keys/clientstore.jks"/>
             </sec:trustManagers>
         </http:tlsClientParameters>
     </http:conduit>

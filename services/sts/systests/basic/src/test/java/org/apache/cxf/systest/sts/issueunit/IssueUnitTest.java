@@ -543,7 +543,7 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
             "org.apache.ws.security.crypto.provider", "org.apache.ws.security.components.crypto.Merlin"
         );
         properties.put("org.apache.ws.security.crypto.merlin.keystore.password", "stsspass");
-        properties.put("org.apache.ws.security.crypto.merlin.keystore.file", "stsstore.jks");
+        properties.put("org.apache.ws.security.crypto.merlin.keystore.file", "keys/stsstore.jks");
 
         return properties;
     }

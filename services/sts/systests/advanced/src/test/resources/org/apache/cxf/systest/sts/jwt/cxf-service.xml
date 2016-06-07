@@ -35,7 +35,7 @@
             <entry key="rs.security.keystore.type" value="jks" />
             <entry key="rs.security.keystore.alias" value="mystskey"/>
             <entry key="rs.security.keystore.password" value="sspass"/>
-            <entry key="rs.security.keystore.file" value="servicestore.jks" />
+            <entry key="rs.security.keystore.file" value="keys/servicestore.jks" />
             <entry key="rs.security.signature.algorithm" value="RS256" />
         </jaxrs:properties>
     </jaxrs:server>
@@ -44,7 +44,7 @@
         <httpj:engine port="${testutil.ports.jwt.Server}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="skpass">
-                    <sec:keyStore type="jks" password="sspass" resource="servicestore.jks"/>
+                    <sec:keyStore type="jks" password="sspass" resource="keys/servicestore.jks"/>
                 </sec:keyManagers>
                 <sec:clientAuthentication want="false" required="false"/>
             </httpj:tlsServerParameters>

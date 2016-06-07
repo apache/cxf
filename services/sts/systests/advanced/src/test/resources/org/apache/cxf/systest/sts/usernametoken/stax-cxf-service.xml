@@ -52,7 +52,7 @@
         <httpj:engine port="${testutil.ports.usernametoken.StaxServer}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="skpass">
-                    <sec:keyStore type="jks" password="sspass" resource="servicestore.jks"/>
+                    <sec:keyStore type="jks" password="sspass" resource="keys/servicestore.jks"/>
                 </sec:keyManagers>
                 <sec:clientAuthentication want="false" required="false"/>
             </httpj:tlsServerParameters>
@@ -61,10 +61,10 @@
     <http:conduit name="https://localhost:.*">
         <http:tlsClientParameters disableCNCheck="true">
             <sec:trustManagers>
-                <sec:keyStore type="jks" password="sspass" resource="servicestore.jks"/>
+                <sec:keyStore type="jks" password="sspass" resource="keys/servicestore.jks"/>
             </sec:trustManagers>
             <sec:keyManagers keyPassword="skpass">
-                <sec:keyStore type="jks" password="sspass" resource="servicestore.jks"/>
+                <sec:keyStore type="jks" password="sspass" resource="keys/servicestore.jks"/>
             </sec:keyManagers>
         </http:tlsClientParameters>
     </http:conduit>
