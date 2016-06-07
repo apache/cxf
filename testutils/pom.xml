@@ -284,6 +284,20 @@
                 <version>2.4</version>
                 <executions>
                     <execution>
+                        <id>key-jar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <classifier>keys</classifier>
+                            <classesDirectory>${basedir}/src/test/resources</classesDirectory>
+                            <includes>
+                                <include>**/*.*</include>
+                            </includes>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <goals>
                             <goal>test-jar</goal>
                         </goals>
