@@ -145,7 +145,7 @@
             <artifactId>cxf-testutils</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
-            <classifier>tests</classifier>
+            <classifier>keys</classifier>
         </dependency>
     </dependencies>
     <build>
