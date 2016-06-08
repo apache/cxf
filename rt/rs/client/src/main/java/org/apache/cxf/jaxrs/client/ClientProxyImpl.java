@@ -793,8 +793,7 @@ public class ClientProxyImpl extends AbstractClient implements
         Class<?> callbackRespClass = getCallbackClass(callbackOutType);
         
         Class<?> methodReturnType = ori.getMethodToInvoke().getReturnType();
-        if (callbackRespClass == Response.class 
-            || callbackRespClass.isAssignableFrom(methodReturnType)
+        if (callbackRespClass.isAssignableFrom(methodReturnType)
             || PrimitiveUtils.canPrimitiveTypeBeAutoboxed(methodReturnType, callbackRespClass)) {
             return callback;    
         } else {
@@ -949,28 +948,16 @@ public class ClientProxyImpl extends AbstractClient implements
     class ClientAsyncResponseInterceptor extends AbstractClientAsyncResponseInterceptor {
         @Override
         protected void doHandleAsyncResponse(Message message, Response r, JaxrsClientCallback<?> cb) {
-            Object entity = null;
-            if (r == null) {
-                try {
-                    entity = handleResponse(message.getExchange().getOutMessage(),
-                                            cb.getResponseClass());
-                } catch (Throwable t) {
-                    cb.handleException(message, t);
-                    return;
-                } finally {
-                    completeExchange(message.getExchange(), false);
-                }
-            }
-            if (cb.getResponseClass() == null || Response.class.equals(cb.getResponseClass())) {
-                cb.handleResponse(message, new Object[] {r});
-            } else if (r != null && r.getStatus() >= 300) {
-                cb.handleException(message, convertToWebApplicationException(r));
-            } else {
-                cb.handleResponse(message, new Object[] {entity});
+            try {
+                Object entity = handleResponse(message.getExchange().getOutMessage(),
+                                               cb.getResponseClass());
+                cb.handleResponse(message, new Object[] {entity});    
+            } catch (Throwable t) {
+                cb.handleException(message, t);
+            } finally {
+                completeExchange(message.getExchange(), false);
                 closeAsyncResponseIfPossible(r, message, cb);
             }
         }
-        
-        
     }
 }
