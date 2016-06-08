@@ -308,14 +308,24 @@ public final class StaxUtils {
         try {
             factory = XMLInputFactory.newInstance();
         } catch (Throwable t) {
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.log(Level.FINE, "XMLInputFactory.newInstance() failed with: ", t);
+            }
             factory = null;
         }
         if (factory == null || !setRestrictionProperties(factory)) {
             try {
                 factory = createWoodstoxFactory();
             } catch (Throwable t) {
-                //ignore for now
+                if (LOG.isLoggable(Level.FINE)) {
+                    LOG.log(Level.FINE, "Cannot create Woodstox XMLInputFactory: ", t);
+                }
             }
+            
+            if (factory == null) {
+                throw new RuntimeException("Failed to create XMLInputFactory.");
+            }
+            
             if (!setRestrictionProperties(factory)) {
                 if (allowInsecureParser) {
                     LOG.log(Level.WARNING, "INSECURE_PARSER_DETECTED", factory.getClass().getName());
