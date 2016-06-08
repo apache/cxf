@@ -51,6 +51,12 @@
             <optional>true</optional>
         </dependency>
         <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-frontend-jaxrs</artifactId>
+            <version>${project.version}</version>
+            <optional>true</optional>
+        </dependency> 
+        <dependency>
             <groupId>${cxf.servlet-api.group}</groupId>
             <artifactId>${cxf.servlet-api.artifact}</artifactId>
             <version>${cxf.servlet-api.version}</version>
