@@ -186,7 +186,7 @@ public class UndertowHTTPServerEngine implements ServerEngine {
         deploymentInfo.setClassLoader(Thread.currentThread().getContextClassLoader());
         deploymentInfo.setDeploymentName("cxf-undertow");
         deploymentInfo.setContextPath(contextName);
-        ServletInfo asyncServlet = new ServletInfo(ServletPathMatches.DEFAULT_SERVLET_NAME, CxfUndertwoServlet.class);
+        ServletInfo asyncServlet = new ServletInfo(ServletPathMatches.DEFAULT_SERVLET_NAME, CxfUndertowServlet.class);
         deploymentInfo.addServlet(asyncServlet);
         servletContainer.addDeployment(deploymentInfo);
         DeploymentManager deploymentManager = servletContainer.getDeployment(deploymentInfo.getDeploymentName());

@@ -30,7 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.cxf.Bus;
 import org.apache.cxf.transport.servlet.AbstractHTTPServlet;
 
-public class CxfUndertwoServlet extends AbstractHTTPServlet {
+public class CxfUndertowServlet extends AbstractHTTPServlet {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
