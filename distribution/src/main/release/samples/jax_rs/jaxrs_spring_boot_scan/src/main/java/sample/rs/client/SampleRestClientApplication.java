@@ -20,7 +20,7 @@ package sample.rs.client;
 
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 
-import sample.rs.service.hello1.HelloService;
+import sample.rs.service.hello1.HelloServiceImpl1;
 
 
 public final class SampleRestClientApplication {
@@ -28,8 +28,8 @@ public final class SampleRestClientApplication {
         
     }
     public static void main(String[] args) {
-        HelloService service = JAXRSClientFactory.create("http://localhost:8080/services/helloservice/", 
-                                  HelloService.class);
+        HelloServiceImpl1 service = JAXRSClientFactory.create("http://localhost:8080/services/helloservice/", 
+                                    HelloServiceImpl1.class);
         System.out.println(service.sayHello("ApacheCxfUser"));
     }  
 }
