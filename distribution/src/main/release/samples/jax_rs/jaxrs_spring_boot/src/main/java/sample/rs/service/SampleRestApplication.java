@@ -28,8 +28,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
-import sample.rs.service.hello1.HelloService;
-import sample.rs.service.hello2.HelloService2;
+import sample.rs.service.hello1.HelloServiceImpl1;
+import sample.rs.service.hello2.HelloServiceImpl2;
 
 @SpringBootApplication
 public class SampleRestApplication {
@@ -44,7 +44,7 @@ public class SampleRestApplication {
     public Server rsServer() {
         JAXRSServerFactoryBean endpoint = new JAXRSServerFactoryBean();
         endpoint.setBus(bus);
-        endpoint.setServiceBeans(Arrays.asList(new HelloService(), new HelloService2()));
+        endpoint.setServiceBeans(Arrays.<Object>asList(new HelloServiceImpl1(), new HelloServiceImpl2()));
         endpoint.setAddress("/");
         endpoint.setFeatures(Arrays.asList(new Swagger2Feature()));
         return endpoint.create();

@@ -16,27 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package sample.rs.service.hello1;
-import javax.ws.rs.GET;
+package sample.rs.service.hello2;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-
-import org.springframework.stereotype.Service;
 
 import io.swagger.annotations.Api;
+import sample.rs.service.HelloService;
+@Path("/sayHello2")
+@Api("/sayHello2")
+public class HelloServiceImpl2 implements HelloService {
  
-@Path("/sayHello")
-@Service
-@Api("/sayHello")
-public class HelloService {
- 
-    @GET
-    @Path("/{a}")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String sayHello(@PathParam("a") String a) {
-        return "Hello " + a + ", Welcome to CXF RS Spring Boot World!!!";
+    public String sayHello(String a) {
+        return "Hello2 " + a + ", Welcome to CXF RS Spring Boot World!!!";
     }
     
 }
