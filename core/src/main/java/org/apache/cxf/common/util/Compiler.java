@@ -184,6 +184,10 @@ public class Compiler {
 
     protected boolean useJava6Compiler(String[] files) {
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+        if (compiler == null) {
+            throw new IllegalStateException(
+                "No compiler detected, make sure you are running on top of a JDK instead of a JRE.");
+        }
         StandardJavaFileManager fileManager = compiler.getStandardFileManager(null, null, null);
         Iterable<? extends JavaFileObject> fileList = fileManager.getJavaFileObjectsFromStrings(Arrays
             .asList(files));
