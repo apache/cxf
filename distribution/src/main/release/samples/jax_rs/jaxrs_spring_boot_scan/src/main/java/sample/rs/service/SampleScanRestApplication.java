@@ -17,7 +17,6 @@
  * under the License.
  */
 package sample.rs.service;
-import org.apache.cxf.jaxrs.spring.SpringComponentScanServer;
 import org.apache.cxf.jaxrs.swagger.Swagger2Feature;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -26,7 +25,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 
 @SpringBootApplication
-@Import(SpringComponentScanServer.class)
 public class SampleScanRestApplication {
     public static void main(String[] args) {
         SpringApplication.run(SampleScanRestApplication.class, args);
@@ -34,8 +32,6 @@ public class SampleScanRestApplication {
  
     @Bean
     public Swagger2Feature swaggerFeature(ApplicationContext context) {
-        // Or create a simple Swagger2Feature @Component-annotated extension
-        // and drop this method if a default feature setup is OK
         return new Swagger2Feature();
     }
     
