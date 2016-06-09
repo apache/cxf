@@ -16,20 +16,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package sample.rs.client;
-
-import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
-
-import sample.rs.service.HelloService;
-
-
-public final class SampleRestClientApplication {
-    private SampleRestClientApplication() {
-        
-    }
-    public static void main(String[] args) {
-        HelloService service = JAXRSClientFactory.create("http://localhost:8080/services/helloservice/", 
-                                    HelloService.class);
-        System.out.println(service.sayHello("ApacheCxfUser"));
-    }  
+package sample.rs.service;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+ 
+@Path("/sayHello")
+public interface HelloService {
+ 
+    @GET
+    @Path("/{a}")
+    @Produces(MediaType.TEXT_PLAIN)
+    String sayHello(@PathParam("a") String a);
+    
 }
