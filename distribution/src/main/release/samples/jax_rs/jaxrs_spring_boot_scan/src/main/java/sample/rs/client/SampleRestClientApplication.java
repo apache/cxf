@@ -18,18 +18,26 @@
  */
 package sample.rs.client;
 
-import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import sample.rs.service.HelloService;
 
 
 public final class SampleRestClientApplication {
-    private SampleRestClientApplication() {
-        
-    }
+    private HelloService helloService;
+    
     public static void main(String[] args) {
-        HelloService service = JAXRSClientFactory.create("http://localhost:8080/services/helloservice/", 
-                                    HelloService.class);
-        System.out.println(service.sayHello("ApacheCxfUser"));
+        ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("sample/rs/client/client.xml");
+        SampleRestClientApplication clientApp = ctx.getBean(SampleRestClientApplication.class);
+        System.out.println(clientApp.getHelloService().sayHello("ApacheCxfUser"));
+        ctx.close();
+    }
+
+    public HelloService getHelloService() {
+        return helloService;
+    }
+
+    public void setHelloService(HelloService helloService) {
+        this.helloService = helloService;
     }  
 }
