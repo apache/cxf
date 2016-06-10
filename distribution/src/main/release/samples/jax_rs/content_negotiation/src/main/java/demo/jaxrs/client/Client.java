@@ -31,7 +31,7 @@ public final class Client {
         // Sent HTTP GET request to query customer info, expect XML
         System.out.println("Sent HTTP GET request to query customer info, expect XML");
         GetMethod get = new GetMethod("http://localhost:9000/customerservice/customers/123");
-        get.addRequestHeader("Accept" , "application/xml");
+        get.addRequestHeader("Accept", "application/xml");
         HttpClient httpclient = new HttpClient();
 
         try {
@@ -47,7 +47,7 @@ public final class Client {
         System.out.println("\n");
         System.out.println("Sent HTTP GET request to query customer info, expect JSON");
         get = new GetMethod("http://localhost:9000/customerservice/customers/123");
-        get.addRequestHeader("Accept" , "application/json");
+        get.addRequestHeader("Accept", "application/json");
         httpclient = new HttpClient();
 
         try {

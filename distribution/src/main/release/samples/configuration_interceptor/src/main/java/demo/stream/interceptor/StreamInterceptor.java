@@ -83,7 +83,7 @@ public class StreamInterceptor extends AbstractPhaseInterceptor<Message> {
     
 
     private class CachedStream extends CachedOutputStream {
-        public CachedStream() {
+        CachedStream() {
             super();
         }
         

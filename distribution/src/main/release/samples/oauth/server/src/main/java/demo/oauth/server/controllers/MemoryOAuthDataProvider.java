@@ -146,8 +146,7 @@ public class MemoryOAuthDataProvider implements OAuthDataProvider {
         return accessToken;
     }
 
-    public AccessToken getAccessToken(String accessToken) throws OAuthServiceException
-    {
+    public AccessToken getAccessToken(String accessToken) throws OAuthServiceException {
         return (AccessToken) oauthTokens.get(accessToken);
     }
 

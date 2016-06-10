@@ -56,7 +56,7 @@ class WebSocketTestClient {
     private WebSocket websocket;
     private String url;
     
-    public WebSocketTestClient(String url) {
+    WebSocketTestClient(String url) {
         this.received = new ArrayList<Object>();
         this.fragments = new ArrayList<Object>();
         this.latch = new CountDownLatch(1);
@@ -214,7 +214,7 @@ class WebSocketTestClient {
         private String contentType;
         private Object entity;
         
-        public Response(Object data) {
+        Response(Object data) {
             this.data = data;
             String line;
             boolean first = true;
