@@ -34,7 +34,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.GrantedAuthorityImpl;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 public class SpringOAuthAuthenticationFilter implements Filter {
@@ -53,7 +53,7 @@ public class SpringOAuthAuthenticationFilter implements Filter {
 
         if (authorities != null) {
             for (String authority : authorities) {
-                grantedAuthorities.add(new GrantedAuthorityImpl(authority));
+                grantedAuthorities.add(new SimpleGrantedAuthority(authority));
             }
 
             Authentication auth = new AnonymousAuthenticationToken(UUID.randomUUID().toString(),
