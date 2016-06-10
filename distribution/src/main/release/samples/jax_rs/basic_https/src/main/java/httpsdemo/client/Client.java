@@ -61,7 +61,7 @@ public final class Client {
         DefaultHttpClient httpclient = new DefaultHttpClient();
         httpclient.getConnectionManager().getSchemeRegistry().register(httpsScheme);
         HttpGet httpget = new HttpGet(BASE_SERVICE_URL + "/123");
-        BasicHeader bh = new BasicHeader("Accept" , "text/xml");
+        BasicHeader bh = new BasicHeader("Accept", "text/xml");
         httpget.addHeader(bh);
         HttpResponse response = httpclient.execute(httpget);
         HttpEntity entity = response.getEntity();

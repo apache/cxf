@@ -90,7 +90,7 @@ public final class Client {
         resolver = new URIResolver(inputFile);
         input = new File(resolver.getURI());
         PostMethod post = new PostMethod("http://localhost:9000/customerservice/customers");
-        post.addRequestHeader("Accept" , "text/xml");
+        post.addRequestHeader("Accept", "text/xml");
         entity = new FileRequestEntity(input, "text/xml; charset=ISO-8859-1");
         post.setRequestEntity(entity);
         httpclient = new HttpClient();

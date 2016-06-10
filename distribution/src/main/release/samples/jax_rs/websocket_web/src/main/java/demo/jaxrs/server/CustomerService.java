@@ -172,6 +172,7 @@ public class CustomerService {
         return (monitors2.remove(key) != null ? "Removed: " : "Already removed: ") + key; 
     }
 
+    // CHECKSTYLE:OFF
     private void sendCustomerEvent(final String msg, final Customer customer) {
         executor.execute(new Runnable() {
             public void run() {
@@ -226,6 +227,8 @@ public class CustomerService {
         });
 
     }
+    // CHECKSTYLE:ON
+    
     final void init() {
         Customer c = new Customer();
         c.setName("John");
