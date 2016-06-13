@@ -43,6 +43,7 @@ import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.wss4j.AttachmentCallbackHandler;
+import org.apache.cxf.ws.security.wss4j.StaxSerializer;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
@@ -444,6 +445,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             } else {
                 try {
                     WSSecEncrypt encr = new WSSecEncrypt();
+                    encr.setEncryptionSerializer(new StaxSerializer());
                     encr.setIdAllocator(wssConfig.getIdAllocator());
                     encr.setCallbackLookup(callbackLookup);
                     encr.setAttachmentCallbackHandler(new AttachmentCallbackHandler(message));
@@ -552,6 +554,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                                      AlgorithmSuite algorithmSuite) {
         try {
             WSSecDKEncrypt dkEncr = new WSSecDKEncrypt();
+            dkEncr.setEncryptionSerializer(new StaxSerializer());
             dkEncr.setIdAllocator(wssConfig.getIdAllocator());
             dkEncr.setCallbackLookup(callbackLookup);
             dkEncr.setAttachmentCallbackHandler(new AttachmentCallbackHandler(message));
