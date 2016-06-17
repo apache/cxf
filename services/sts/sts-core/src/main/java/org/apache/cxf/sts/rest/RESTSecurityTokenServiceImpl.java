@@ -65,8 +65,9 @@ import org.apache.xml.security.keys.content.X509Data;
 public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl implements RESTSecurityTokenService {
 
     public static final Map<String, String> DEFAULT_CLAIM_TYPE_MAP;
-
     public static final Map<String, String> DEFAULT_TOKEN_TYPE_MAP;
+    
+    private static final Map<String, String> DEFAULT_KEY_TYPE_MAP = new HashMap<String, String>();
 
     private static final String CLAIM_TYPE = "ClaimType";
     private static final String CLAIM_TYPE_NS = "http://schemas.xmlsoap.org/ws/2005/05/identity";
@@ -88,6 +89,10 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
         DEFAULT_TOKEN_TYPE_MAP.put("saml1.1", WSConstants.WSS_SAML_TOKEN_TYPE);
         DEFAULT_TOKEN_TYPE_MAP.put("jwt", JWTTokenProvider.JWT_TOKEN_TYPE);
         DEFAULT_TOKEN_TYPE_MAP.put("sct", STSUtils.TOKEN_TYPE_SCT_05_12);
+        
+        DEFAULT_KEY_TYPE_MAP.put("SymmetricKey", STSConstants.SYMMETRIC_KEY_KEYTYPE);
+        DEFAULT_KEY_TYPE_MAP.put("PublicKey", STSConstants.PUBLIC_KEY_KEYTYPE);
+        DEFAULT_KEY_TYPE_MAP.put("Bearer", STSConstants.BEARER_KEY_KEYTYPE);
     }
 
     @Context
@@ -97,7 +102,6 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
     private javax.ws.rs.core.SecurityContext securityContext;
 
     private Map<String, String> claimTypeMap = DEFAULT_CLAIM_TYPE_MAP;
-
     private Map<String, String> tokenTypeMap = DEFAULT_TOKEN_TYPE_MAP;
 
     private String defaultKeyType = STSConstants.BEARER_KEY_KEYTYPE;
@@ -183,17 +187,24 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
         List<String> requestedClaims,
         String appliesTo
     ) {
-        if (tokenTypeMap != null && tokenTypeMap.containsKey(tokenType)) {
-            tokenType = tokenTypeMap.get(tokenType);
+        String tokenTypeToUse = tokenType;
+        if (tokenTypeMap != null && tokenTypeMap.containsKey(tokenTypeToUse)) {
+            tokenTypeToUse = tokenTypeMap.get(tokenTypeToUse);
         }
+        
+        String keyTypeToUse = keyType;
+        if (DEFAULT_KEY_TYPE_MAP.containsKey(keyTypeToUse)) {
+            keyTypeToUse = DEFAULT_KEY_TYPE_MAP.get(keyTypeToUse);
+        }
+        
         ObjectFactory of = new ObjectFactory();
         RequestSecurityTokenType request = of.createRequestSecurityTokenType();
 
-        request.getAny().add(of.createTokenType(tokenType));
+        request.getAny().add(of.createTokenType(tokenTypeToUse));
 
         request.getAny().add(of.createRequestType("http://docs.oasis-open.org/ws-sx/ws-trust/200512/Issue"));
 
-        String desiredKeyType = keyType != null ? keyType : defaultKeyType;
+        String desiredKeyType = keyTypeToUse != null ? keyTypeToUse : defaultKeyType;
         request.getAny().add(of.createKeyType(desiredKeyType));
         
         // Add the TLS client Certificate as the UseKey Element if the KeyType is PublicKey
