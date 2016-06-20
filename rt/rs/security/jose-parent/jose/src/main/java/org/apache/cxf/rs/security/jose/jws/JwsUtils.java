@@ -36,6 +36,7 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
@@ -529,10 +530,17 @@ public final class JwsUtils {
         if ("jwk".equals(storeType)) {
             return JwkUtils.loadPublicJwkSet(m, props);
         } else {
-            //TODO: consider loading all the public keys in the store
-            PublicKey key = KeyManagementUtils.loadPublicKey(m, props);
+            X509Certificate[] certs = null;
+            if (PropertyUtils.isTrue(props.get(JoseConstants.RSSEC_SIGNATURE_INCLUDE_CERT))) {
+                certs = KeyManagementUtils.loadX509CertificateOrChain(m, props);
+            }
+            PublicKey key = certs != null && certs.length > 0 
+                ? certs[0].getPublicKey() : KeyManagementUtils.loadPublicKey(m, props); 
             JsonWebKey jwk = JwkUtils.fromPublicKey(key, props, JoseConstants.RSSEC_SIGNATURE_ALGORITHM);
             jwk.setPublicKeyUse(PublicKeyUse.SIGN);
+            if (certs != null) {
+                jwk.setX509Chain(KeyManagementUtils.encodeX509CertificateChain(certs));
+            }
             return new JsonWebKeys(jwk);
         }
     }
