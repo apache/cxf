@@ -118,6 +118,10 @@ public class AbstractMessageResponseTestBase extends Assert {
         EasyMock.expect(endpointInfo.getName()).andReturn(PORT_NAME).anyTimes();
         EasyMock.expect(endpoint.getEndpointInfo()).andReturn(endpointInfo).anyTimes();
         EasyMock.expect(exchange.get(Endpoint.class)).andReturn(endpoint).anyTimes();
+        EasyMock.expect(endpoint.get("javax.management.ObjectName")).andReturn(null).anyTimes();
+        EasyMock.expect(endpoint.put(EasyMock.eq("javax.management.ObjectName"), EasyMock.anyObject(ObjectName.class)))
+            .andReturn(null).anyTimes();
+        EasyMock.expect(exchange.getEndpoint()).andReturn(endpoint).anyTimes();
         EasyMock.replay(endpointInfo);
         EasyMock.replay(endpoint);
         
@@ -128,9 +132,15 @@ public class AbstractMessageResponseTestBase extends Assert {
       
     protected void setupOperationForMessage() {
         OperationInfo op = EasyMock.createMock(OperationInfo.class);
-        EasyMock.expect(op.getName()).andReturn(OPERATION_NAME);        
-        EasyMock.expect(exchange.get(OperationInfo.class)).andReturn(op);
-        EasyMock.replay(op);
+        BindingOperationInfo bop = EasyMock.createMock(BindingOperationInfo.class);
+        EasyMock.expect(exchange.getBindingOperationInfo()).andReturn(bop);
+        EasyMock.expect(bop.getOperationInfo()).andReturn(op);
+        EasyMock.expect(op.getName()).andReturn(OPERATION_NAME);
+        EasyMock.expect(op.getProperty("javax.management.ObjectName", ObjectName.class)).andReturn(null).anyTimes();
+        op.setProperty(EasyMock.eq("javax.management.ObjectName"),
+                                       EasyMock.anyObject(ObjectName.class));
+        EasyMock.expectLastCall();
+        EasyMock.replay(bop, op);
     }
 
 }
