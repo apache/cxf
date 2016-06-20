@@ -33,6 +33,14 @@ cn: boss
 member: cn=alice,ou=users,dc=example,dc=com
 description: The boss
 
+dn: cn=manager,ou=groups,dc=example,dc=com
+objectClass: groupOfNames
+objectClass: top
+cn: manager
+businessCategory: widgets
+member: cn=bob,ou=other-users,dc=example,dc=com
+description: The boss
+
 # Web server identity/service principal.
 dn: cn=bob,ou=other-users,dc=example,dc=com
 objectclass: top

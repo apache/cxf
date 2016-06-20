@@ -40,6 +40,7 @@ import org.apache.cxf.rt.security.claims.ClaimCollection;
 import org.apache.cxf.sts.claims.ClaimTypes;
 import org.apache.cxf.sts.claims.ClaimsParameters;
 import org.apache.cxf.sts.claims.LdapClaimsHandler;
+import org.apache.cxf.sts.claims.LdapGroupClaimsHandler;
 import org.apache.cxf.sts.claims.ProcessedClaim;
 import org.apache.cxf.sts.claims.ProcessedClaimCollection;
 import org.apache.cxf.ws.security.sts.provider.STSException;
@@ -363,6 +364,78 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
         }
         
         Assert.isTrue(foundCert);
+    }
+    
+    @org.junit.Test
+    public void testRetrieveRolesForAlice() throws Exception {
+        LdapGroupClaimsHandler claimsHandler = 
+            (LdapGroupClaimsHandler)appContext.getBean("testGroupClaimsHandler");
+
+        String user = props.getProperty("claimUser");
+        Assert.notNull(user, "Property 'claimUser' not configured");
+
+        ClaimCollection requestedClaims = new ClaimCollection();
+        Claim claim = new Claim();
+        URI roleURI = URI.create("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role");
+        claim.setClaimType(roleURI);
+        requestedClaims.add(claim);
+
+        ClaimsParameters params = new ClaimsParameters();
+        params.setPrincipal(new CustomTokenPrincipal(user));
+        ProcessedClaimCollection retrievedClaims = 
+            claimsHandler.retrieveClaimValues(requestedClaims, params);
+
+        Assert.isTrue(retrievedClaims.size() == 1);
+        Assert.isTrue(retrievedClaims.get(0).getClaimType().equals(roleURI));
+        Assert.isTrue(retrievedClaims.get(0).getValues().size() == 2);
+    }
+    
+    @org.junit.Test
+    public void testRetrieveRolesForBob() throws Exception {
+        LdapGroupClaimsHandler claimsHandler = 
+            (LdapGroupClaimsHandler)appContext.getBean("testGroupClaimsHandlerOtherUsers");
+
+        String user = props.getProperty("otherClaimUser");
+        Assert.notNull(user, "Property 'claimUser' not configured");
+
+        ClaimCollection requestedClaims = new ClaimCollection();
+        Claim claim = new Claim();
+        URI roleURI = URI.create("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role");
+        claim.setClaimType(roleURI);
+        requestedClaims.add(claim);
+
+        ClaimsParameters params = new ClaimsParameters();
+        params.setPrincipal(new CustomTokenPrincipal(user));
+        ProcessedClaimCollection retrievedClaims = 
+            claimsHandler.retrieveClaimValues(requestedClaims, params);
+
+        Assert.isTrue(retrievedClaims.size() == 1);
+        Assert.isTrue(retrievedClaims.get(0).getClaimType().equals(roleURI));
+        Assert.isTrue(retrievedClaims.get(0).getValues().size() == 2);
+    }
+    
+    @org.junit.Test
+    public void testRetrieveRolesForBobInBusinessCategoryWidgets() throws Exception {
+        LdapGroupClaimsHandler claimsHandler = 
+            (LdapGroupClaimsHandler)appContext.getBean("testGroupClaimsHandlerFilter");
+
+        String user = props.getProperty("otherClaimUser");
+        Assert.notNull(user, "Property 'claimUser' not configured");
+
+        ClaimCollection requestedClaims = new ClaimCollection();
+        Claim claim = new Claim();
+        URI roleURI = URI.create("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role");
+        claim.setClaimType(roleURI);
+        requestedClaims.add(claim);
+
+        ClaimsParameters params = new ClaimsParameters();
+        params.setPrincipal(new CustomTokenPrincipal(user));
+        ProcessedClaimCollection retrievedClaims = 
+            claimsHandler.retrieveClaimValues(requestedClaims, params);
+
+        Assert.isTrue(retrievedClaims.size() == 1);
+        Assert.isTrue(retrievedClaims.get(0).getClaimType().equals(roleURI));
+        Assert.isTrue(retrievedClaims.get(0).getValues().size() == 1);
     }
     
     private ClaimCollection createRequestClaimCollection() {

@@ -50,4 +50,31 @@
             </list>
         </property>
     </bean>
+    
+    <bean id="testGroupClaimsHandler" class="org.apache.cxf.sts.claims.LdapGroupClaimsHandler">
+        <property name="ldapTemplate" ref="ldapTemplate" />
+        <property name="userBaseDN" value="OU=users,DC=example,DC=com" />
+        <property name="groupBaseDN" value="OU=groups,DC=example,DC=com" />
+    </bean>
+    
+    <bean id="testGroupClaimsHandlerOtherUsers" class="org.apache.cxf.sts.claims.LdapGroupClaimsHandler">
+        <property name="ldapTemplate" ref="ldapTemplate" />
+        <property name="userBaseDN" value="OU=other-users,DC=example,DC=com" />
+        <property name="groupBaseDN" value="OU=groups,DC=example,DC=com" />
+    </bean>
+    
+    <bean id="customFilter" class="org.springframework.ldap.filter.EqualsFilter">
+        <constructor-arg>
+            <value>businessCategory</value>
+        </constructor-arg>
+        <constructor-arg>
+            <value>widgets</value>
+        </constructor-arg>
+    </bean>
+    <bean id="testGroupClaimsHandlerFilter" class="org.apache.cxf.sts.claims.LdapGroupClaimsHandler">
+        <property name="ldapTemplate" ref="ldapTemplate" />
+        <property name="userBaseDN" value="OU=other-users,DC=example,DC=com" />
+        <property name="groupBaseDN" value="OU=groups,DC=example,DC=com" />
+        <property name="customFilters" ref="customFilter" />
+    </bean>
 </beans>
