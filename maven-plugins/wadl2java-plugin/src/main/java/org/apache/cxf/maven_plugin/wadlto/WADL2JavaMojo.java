@@ -45,7 +45,7 @@ public class WADL2JavaMojo extends AbstractCodeGeneratorMojo {
     @Parameter
     WadlOption wadlOptions[];
 
-    @Parameter(property = "cxf.wadlRoot", defaultValue = "${basedir}/src/main/resources/wad")
+    @Parameter(property = "cxf.wadlRoot", defaultValue = "${basedir}/src/main/resources/wadl")
     File wadlRoot;
 
     @Parameter(property = "cxf.testWadlRoot", defaultValue = "${basedir}/src/test/resources/wadl")
