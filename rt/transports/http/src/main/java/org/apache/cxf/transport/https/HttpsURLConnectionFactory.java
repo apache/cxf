@@ -46,7 +46,6 @@ import org.apache.cxf.configuration.jsse.TLSClientParameters;
  * This HttpsURLConnectionFactory implements the HttpURLConnectionFactory
  * for using the given SSL Policy to configure TLS connections for "https:"
  * URLs.
- * 
  */
 public class HttpsURLConnectionFactory {
     
@@ -78,13 +77,10 @@ public class HttpsURLConnectionFactory {
      * 
      * 
      * @param proxy This parameter is non-null if connection should be proxied.
-     * @param url   The target URL. This parameter must be an https url.
+     * @param url   The target URL.
      * 
-     * @return The HttpsURLConnection for the given URL.
-     * @throws IOException This exception is thrown if 
-     *         the "url" is not "https" or other IOException
-     *         is thrown. 
-     *                     
+     * @return The HttpURLConnection for the given URL.
+     * @throws IOException
      */
     public HttpURLConnection createConnection(TLSClientParameters tlsClientParameters, 
             Proxy proxy, URL url) throws IOException {
@@ -99,21 +95,14 @@ public class HttpsURLConnectionFactory {
                 tlsClientParameters = new TLSClientParameters();
             }
 
-            Exception ex = null;
             try {
                 decorateWithTLS(tlsClientParameters, connection);
-            } catch (Exception e) {
-                ex = e;
-            } finally {
-                if (ex != null) {
-                    if (ex instanceof IOException) {
-                        throw (IOException) ex;
-                    }
-                    // use exception.initCause(ex) to be java 5 compatible
-                    IOException ioException = new IOException("Error while initializing secure socket");
-                    ioException.initCause(ex);
-                    throw ioException;
+            } catch (Throwable ex) {
+                if (ex instanceof IOException) {
+                    throw (IOException) ex;
                 }
+                IOException ioException = new IOException("Error while initializing secure socket", ex);
+                throw ioException;
             }
         }
 
@@ -230,7 +219,7 @@ public class HttpsURLConnectionFactory {
                     }
                     return;
                 } 
-                //if we cannot set the SSLSocketFactor, we're in serious trouble.
+                //if we cannot set the SSLSocketFactory, we're in serious trouble.
                 throw new IllegalArgumentException("Error decorating connection class " 
                         + connection.getClass().getName(), ex);
             }
