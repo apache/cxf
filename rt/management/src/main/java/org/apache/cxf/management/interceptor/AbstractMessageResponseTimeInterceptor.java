@@ -113,34 +113,43 @@ public abstract class AbstractMessageResponseTimeInterceptor extends AbstractPha
     protected ObjectName getServiceCounterName(Exchange ex) {
         Bus bus = ex.getBus();
         StringBuilder buffer = new StringBuilder();
+        ObjectName serviceCounterName = null;
         if (ex.get("org.apache.cxf.management.service.counter.name") != null) {
             buffer.append((String)ex.get("org.apache.cxf.management.service.counter.name"));
+            try {
+                serviceCounterName = new ObjectName(buffer.toString());
+            } catch (MalformedObjectNameException e) {
+                LOG.log(Level.WARNING, "CREATE_COUNTER_OBJECTNAME_FAILED", e);
+            }
         } else {
             Service service = ex.getService();
             Endpoint endpoint = ex.getEndpoint();
-
-            String serviceName = "\"" + escapePatternChars(service.getName().toString()) + "\"";
-            String portName = "\"" + endpoint.getEndpointInfo().getName().getLocalPart() + "\"";
-
-            buffer.append(ManagementConstants.DEFAULT_DOMAIN_NAME + ":");
-            buffer.append(ManagementConstants.BUS_ID_PROP + "=" + bus.getId() + ",");
-            Message message = ex.getOutMessage();
-            if (isClient(message)) {
-                buffer.append(ManagementConstants.TYPE_PROP + "=" + Counter.PERFORMANCE_COUNTER
-                              + ".Client,");
-            } else {
-                buffer.append(ManagementConstants.TYPE_PROP + "=" + Counter.PERFORMANCE_COUNTER
-                              + ".Server,");
+            serviceCounterName = (ObjectName)endpoint.get("javax.management.ObjectName");
+            if (serviceCounterName == null) {
+                String serviceName = "\"" + escapePatternChars(service.getName().toString()) + "\"";
+                String portName = "\"" + endpoint.getEndpointInfo().getName().getLocalPart() + "\"";
+    
+                buffer.append(ManagementConstants.DEFAULT_DOMAIN_NAME + ":");
+                buffer.append(ManagementConstants.BUS_ID_PROP + "=" + bus.getId() + ",");
+                Message message = ex.getOutMessage();
+                if (isClient(message)) {
+                    buffer.append(ManagementConstants.TYPE_PROP + "=" + Counter.PERFORMANCE_COUNTER
+                                  + ".Client,");
+                } else {
+                    buffer.append(ManagementConstants.TYPE_PROP + "=" + Counter.PERFORMANCE_COUNTER
+                                  + ".Server,");
+                }
+                buffer.append(ManagementConstants.SERVICE_NAME_PROP + "=" + serviceName + ",");
+    
+                buffer.append(ManagementConstants.PORT_NAME_PROP + "=" + portName);
+                
+                try {
+                    serviceCounterName = new ObjectName(buffer.toString());
+                    endpoint.put("javax.management.ObjectName", serviceCounterName);
+                } catch (MalformedObjectNameException e) {
+                    LOG.log(Level.WARNING, "CREATE_COUNTER_OBJECTNAME_FAILED", e);
+                }
             }
-            buffer.append(ManagementConstants.SERVICE_NAME_PROP + "=" + serviceName + ",");
-
-            buffer.append(ManagementConstants.PORT_NAME_PROP + "=" + portName);
-        }
-        ObjectName serviceCounterName = null;
-        try {
-            serviceCounterName = new ObjectName(buffer.toString());
-        } catch (MalformedObjectNameException e) {
-            LOG.log(Level.WARNING, "CREATE_COUNTER_OBJECTNAME_FAILED", e);
         }
         return serviceCounterName;
         
@@ -161,6 +170,12 @@ public abstract class AbstractMessageResponseTimeInterceptor extends AbstractPha
     protected ObjectName getOperationCounterName(Exchange ex, ObjectName sericeCounterName) {
         BindingOperationInfo bop = ex.getBindingOperationInfo();
         OperationInfo opInfo = bop == null ? null : bop.getOperationInfo();
+        if (opInfo != null) {
+            ObjectName o = opInfo.getProperty("javax.management.ObjectName", ObjectName.class);
+            if (o != null) {
+                return o;
+            }
+        }
         String operationName = opInfo == null ? null : "\"" + opInfo.getName().getLocalPart() + "\"";
 
         if (operationName == null) {
@@ -177,16 +192,15 @@ public abstract class AbstractMessageResponseTimeInterceptor extends AbstractPha
         ObjectName operationCounter = null;
         try {
             operationCounter = new ObjectName(operationCounterName);
-            
+            if (opInfo != null) {
+                opInfo.setProperty("javax.management.ObjectName", operationCounter);
+            }
         } catch (MalformedObjectNameException e) {
             LOG.log(Level.WARNING, "CREATE_COUNTER_OBJECTNAME_FAILED", e);
         }
         return operationCounter;
         
     }
-    
-    
-
     protected String escapePatternChars(String value) {
         // This can be replaced if really needed with pattern-based matching
         if (value.lastIndexOf(QUESTION_MARK) != -1) {
