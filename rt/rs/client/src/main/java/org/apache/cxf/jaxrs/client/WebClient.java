@@ -50,6 +50,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.core.UriBuilder;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -57,6 +58,7 @@ import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 import org.apache.cxf.common.util.ClassHelper;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
@@ -86,6 +88,7 @@ public class WebClient extends AbstractClient {
     private static final String REQUEST_ANNS = "request.annotations";
     private static final String RESPONSE_CLASS = "response.class";
     private static final String RESPONSE_TYPE = "response.type";
+    private static final String WEB_CLIENT_OPERATION_REPORTING = "enable.webclient.operation.reporting";
     private BodyWriter bodyWriter = new BodyWriter();
     protected WebClient(String baseAddress) {
         this(convertStringToURI(baseAddress));
@@ -1137,10 +1140,23 @@ public class WebClient extends AbstractClient {
             m.put(Type.class, inGenericType);
         }
         m.getInterceptorChain().add(bodyWriter);
-        setPlainOperationNameProperty(m, httpMethod + ":" + uri.toString());
+        
+        setWebClientOperationProperty(m, httpMethod);
+        
         return m;
     }
     
+    private void setWebClientOperationProperty(Message m, String httpMethod) {
+        Object prop = m.getContextualProperty(WEB_CLIENT_OPERATION_REPORTING);
+        // Enable the operation reporting by default
+        if (prop == null || PropertyUtils.isTrue(prop)) {
+            UriBuilder absPathUri = super.getCurrentBuilder().clone();
+            absPathUri.replaceQuery(null);
+            setPlainOperationNameProperty(m, httpMethod + ":" + absPathUri.build().toString());
+        }
+        
+    }
+
     protected Response doResponse(Message m, 
                                   Class<?> responseClass, 
                                   Type outGenericType) {
