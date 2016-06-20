@@ -62,6 +62,7 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.systest.jaxrs.BookStore.BookInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
@@ -130,7 +131,7 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
     
     @Test
     public void testGetBook() {
-        String address = "http://localhost:" + PORT + "/bookstore/bookheaders/simple";
+        String address = "http://localhost:" + PORT + "/bookstore/bookheaders/simple?a=b";
         doTestGetBook(address, false);
     }
     
@@ -798,6 +799,9 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
 
         @Override
         public void filter(ClientRequestContext context) throws IOException {
+            String opName = 
+                (String)JAXRSUtils.getCurrentMessage().getExchange().get("org.apache.cxf.resource.operation.name");
+            assertFalse(opName.endsWith("?a=b"));
             context.getHeaders().putSingle("Simple", "simple");
             if (context.hasEntity()) {
                 context.getHeaders().putSingle("Content-Type", MediaType.APPLICATION_XML_TYPE);
