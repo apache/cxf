@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.sts.claims;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -97,8 +97,8 @@ public final class LdapUtils {
         String objectClass, String filterAttributeName, String filterAttributeValue,
         String searchAttribute) {
 
-        List<Filter> filters = 
-            Collections.singletonList(new EqualsFilter(filterAttributeName, filterAttributeValue));
+        List<Filter> filters = new ArrayList<>(1);
+        filters.add(new EqualsFilter(filterAttributeName, filterAttributeValue));
         return getAttributeOfEntries(ldapTemplate, baseDN, objectClass, filters, searchAttribute);
     }
     
