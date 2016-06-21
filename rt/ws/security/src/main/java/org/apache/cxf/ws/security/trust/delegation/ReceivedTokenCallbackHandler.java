@@ -47,6 +47,8 @@ import org.apache.wss4j.dom.message.token.UsernameToken;
  */
 public class ReceivedTokenCallbackHandler implements CallbackHandler {
     
+    private boolean useTransformedToken = true;
+    
     @SuppressWarnings("unchecked")
     public void handle(Callback[] callbacks)
         throws IOException, UnsupportedCallbackException {
@@ -93,6 +95,13 @@ public class ReceivedTokenCallbackHandler implements CallbackHandler {
         List<WSSecurityEngineResult> wsSecEngineResults
     ) {
         for (WSSecurityEngineResult wser : wsSecEngineResults) {
+            // First check for a transformed token
+            Object transformedToken = wser.get(WSSecurityEngineResult.TAG_TRANSFORMED_TOKEN);
+            if (useTransformedToken && transformedToken instanceof SamlAssertionWrapper) {
+                return ((SamlAssertionWrapper)transformedToken).getElement();
+            }
+            
+            // Otherwise check the actions
             Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
             if (actInt.intValue() == WSConstants.ST_SIGNED
                 || actInt.intValue() == WSConstants.ST_UNSIGNED) {
@@ -111,6 +120,19 @@ public class ReceivedTokenCallbackHandler implements CallbackHandler {
             }
         }
         return null;
+    }
+
+    public boolean isUseTransformedToken() {
+        return useTransformedToken;
+    }
+
+    /**
+     * Set whether to use the transformed token if it is available from a previous security result.
+     * It false, it uses the original "received" token instead. The default is "true".
+     * @param useTransformedToken whether to use the transformed token if it is available
+     */
+    public void setUseTransformedToken(boolean useTransformedToken) {
+        this.useTransformedToken = useTransformedToken;
     }
     
 }
