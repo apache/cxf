@@ -520,16 +520,12 @@ public abstract class ProviderFactory {
     
     protected void setBusProviders() {
         List<Object> extensions = new LinkedList<Object>(); 
-        final String alreadySetProp = "bus.providers.set." + this.hashCode();
-        if (bus.getProperty(alreadySetProp) == null) {
-            addBusExtension(extensions,
-                            MessageBodyReader.class,
-                            MessageBodyWriter.class,
-                            ExceptionMapper.class);
-            if (!extensions.isEmpty()) {
-                setProviders(true, true, extensions.toArray());
-                bus.setProperty(alreadySetProp, "");
-            }
+        addBusExtension(extensions,
+                        MessageBodyReader.class,
+                        MessageBodyWriter.class,
+                        ExceptionMapper.class);
+        if (!extensions.isEmpty()) {
+            setProviders(true, true, extensions.toArray());
         }
     }
     
