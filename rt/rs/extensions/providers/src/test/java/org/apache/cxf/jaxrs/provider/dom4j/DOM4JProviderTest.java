@@ -65,7 +65,7 @@ public class DOM4JProviderTest extends Assert {
     private org.dom4j.Document readXMLBom() throws Exception {
         byte[] bom = new byte[]{(byte)239, (byte)187, (byte)191};
         assertEquals("efbbbf", StringUtils.toHexString(bom));
-        byte[] strBytes = "<a/>".getBytes(StandardCharsets.UTF_8);
+        byte[] strBytes = "<a/>".getBytes("UTF-8");
         InputStream is = new SequenceInputStream(new ByteArrayInputStream(bom),
                                                  new ByteArrayInputStream(strBytes));
         DOM4JProvider p = new DOM4JProvider();

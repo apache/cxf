@@ -60,6 +60,7 @@ public class BaseGreeterTimeoutImpl extends Assert implements Greeter {
                     Thread.sleep(ms + 1000);
                 }
             } catch (InterruptedException ignore) {
+                // expected
             }
         }
         return "Hello " + me;
