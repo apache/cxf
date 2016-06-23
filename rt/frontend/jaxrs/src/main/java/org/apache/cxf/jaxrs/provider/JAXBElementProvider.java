@@ -310,7 +310,7 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
         MediaType m, MultivaluedMap<String, Object> headers, OutputStream os) 
         throws IOException {
         try {
-            String encoding = HttpUtils.getSetEncoding(m, headers, null);
+            String encoding = HttpUtils.getSetEncoding(m, headers, StandardCharsets.UTF_8.name());
             if (InjectionUtils.isSupportedCollectionOrArray(cls)) {
                 marshalCollection(cls, obj, genericType, encoding, os, m, anns);
             } else {
