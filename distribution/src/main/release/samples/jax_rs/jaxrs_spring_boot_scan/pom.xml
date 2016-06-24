@@ -26,6 +26,19 @@
             <artifactId>cxf-rt-rs-service-description</artifactId>
             <version>${cxf.version}</version>
         </dependency>
+        <!-- Eureka Service Discovery Client -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-eureka</artifactId>
+            <version>1.0.0.RELEASE</version>
+        </dependency>
+        <!-- Actuator Endpoints --> 
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-actuator</artifactId>
+            <version>1.3.5.RELEASE</version>
+        </dependency>
+        
         <dependency>
             <groupId>io.swagger</groupId>
             <artifactId>swagger-jaxrs</artifactId>

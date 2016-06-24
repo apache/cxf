@@ -19,11 +19,17 @@
 package sample.rs.service;
 import org.apache.cxf.jaxrs.swagger.Swagger2Feature;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.actuate.autoconfigure.ExportMetricWriter;
+import org.springframework.boot.actuate.metrics.Metric;
+import org.springframework.boot.actuate.metrics.writer.Delta;
+import org.springframework.boot.actuate.metrics.writer.MetricWriter;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
+@EnableEurekaClient
 public class SampleScanRestApplication {
     public static void main(String[] args) {
         SpringApplication.run(SampleScanRestApplication.class, args);
@@ -33,5 +39,29 @@ public class SampleScanRestApplication {
     public Swagger2Feature swaggerFeature(ApplicationContext context) {
         return new Swagger2Feature();
     }
-    
+    @Bean
+    @ExportMetricWriter
+    public MetricWriter metricWriter() {
+            return new MetricWriter() {
+
+                @Override
+                public void set(Metric<?> arg0) {
+                    // TODO Auto-generated method stub
+                    
+                }
+
+                @Override
+                public void increment(Delta<?> arg0) {
+                    // TODO Auto-generated method stub
+                    
+                }
+
+                @Override
+                public void reset(String arg0) {
+                    // TODO Auto-generated method stub
+                    
+                }
+                
+            };
+    }
 }
