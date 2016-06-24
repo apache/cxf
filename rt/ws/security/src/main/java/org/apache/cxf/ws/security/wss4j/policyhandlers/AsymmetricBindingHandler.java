@@ -19,6 +19,7 @@
 
 package org.apache.cxf.ws.security.wss4j.policyhandlers;
 
+import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -481,13 +482,13 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                     if (!isRequestor() && securityToken != null 
                         && securityToken.getX509Certificate() != null) {
                         encr.setUseThisCert(securityToken.getX509Certificate());
-                    } else { /* TODO when WSS4J 2.1.5 is released else if (!isRequestor() && securityToken != null 
+                    } else if (!isRequestor() && securityToken != null 
                         && securityToken.getKey() instanceof PublicKey) {
                         encr.setUseThisPublicKey((PublicKey)securityToken.getKey());
-                    } */
+                    } else {
                         setEncryptionUser(encr, encrToken, false, crypto);
                     }
-                    if (!encr.isCertSet() // TODO when WSS4J 2.1.5 is released&& encr.getUseThisPublicKey() == null
+                    if (!encr.isCertSet() && encr.getUseThisPublicKey() == null
                         && crypto == null) {
                         unassertPolicy(recToken, "Missing security configuration. "
                                 + "Make sure jaxws:client element is configured " 
