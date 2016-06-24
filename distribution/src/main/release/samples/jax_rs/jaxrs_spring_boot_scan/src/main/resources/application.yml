@@ -1,0 +1,21 @@
+server:
+  port: ${vcap.application.port:8080}
+  servlet-path: /system
+
+cxf:
+  path: /services/helloservice
+  jaxrs:
+    component-scan: true
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${vcap.services.eureka-service.credentials.uri:http://127.0.0.1:8761}/eureka/
+  instance:
+    statusPageUrlPath: /system/info
+    healthCheckUrlPath: /system/health 
+    
+---
+spring:
+  profiles: cloud        
+
