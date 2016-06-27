@@ -21,14 +21,17 @@ package org.apache.cxf.transport.servlet.servicelist;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.transport.AbstractDestination;
 import org.apache.cxf.transport.servlet.ServletDestination;
 
 public class UnformattedServiceListWriter implements ServiceListWriter {
     boolean renderWsdlList;
-
-    public UnformattedServiceListWriter(boolean renderWsdlList) {
+    Bus bus;
+    public UnformattedServiceListWriter(boolean renderWsdlList, Bus bus) {
         this.renderWsdlList = renderWsdlList;
+        this.bus = bus;
     }
 
     public String getContentType() {
@@ -71,7 +74,21 @@ public class UnformattedServiceListWriter implements ServiceListWriter {
                                                   AbstractDestination[] destinations) throws IOException {
         for (AbstractDestination sd : destinations) {
             String address = getAbsoluteAddress(baseAddress, sd);
-            writer.write(address + "?_wadl\n");
+            boolean wadlAvailable = bus != null 
+                && PropertyUtils.isTrue(bus.getProperty("wadl.service.descrition.available"));
+            boolean swaggerAvailable = bus != null 
+                && PropertyUtils.isTrue(bus.getProperty("swagger.service.descrition.available"));
+            if (!wadlAvailable && !swaggerAvailable) {
+                writer.write(address + "\n");
+                return;
+            }
+            if (wadlAvailable) {
+                writer.write(address + "?_wadl\n");
+            }
+            if (swaggerAvailable) {
+                writer.write(address + "/swagger.json\n");
+            }
+            
         }
     }
 

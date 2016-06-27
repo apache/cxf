@@ -100,7 +100,7 @@ public final class ServerProviderFactory extends ProviderFactory {
     }
     
     private static ProviderInfo<ContainerRequestFilter> createWadlGenerator(Bus bus) {
-        Object provider = createProvider(WADL_PROVIDER_NAME);
+        Object provider = createProvider(WADL_PROVIDER_NAME, bus);
         if (provider == null) {
             return null;
         } else {

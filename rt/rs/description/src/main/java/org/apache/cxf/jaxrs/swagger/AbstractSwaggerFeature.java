@@ -69,6 +69,7 @@ public abstract class AbstractSwaggerFeature extends AbstractFeature {
             addSwaggerResource(server);
 
             initializeProvider(server.getEndpoint(), bus);
+            bus.setProperty("swagger.service.descrition.available", "true");
         }
     }
 

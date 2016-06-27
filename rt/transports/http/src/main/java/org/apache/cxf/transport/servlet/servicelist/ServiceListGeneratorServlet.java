@@ -21,9 +21,7 @@ package org.apache.cxf.transport.servlet.servicelist;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -88,17 +86,10 @@ public class ServiceListGeneratorServlet extends HttpServlet {
             return;
         }
         List<String> privateEndpoints;
-        Map<String, String> atomMap;
-        
         if (bus != null) {
             privateEndpoints = (List<String>)bus.getProperty("org.apache.cxf.private.endpoints");
-            // TODO : we may introduce a bus extension instead
-
-            atomMap = (Map<String, String>)bus
-                .getProperty("org.apache.cxf.extensions.logging.atom.pull");
         } else {
             privateEndpoints = new ArrayList<String>();
-            atomMap = new HashMap<String, String>();
         }
         
         AbstractDestination[] soapEndpoints = getSOAPEndpoints(destinations, privateEndpoints);
@@ -106,7 +97,7 @@ public class ServiceListGeneratorServlet extends HttpServlet {
         ServiceListWriter serviceListWriter;
         if ("false".equals(request.getParameter("formatted"))) {
             boolean renderWsdlList = "true".equals(request.getParameter("wsdlList"));
-            serviceListWriter = new UnformattedServiceListWriter(renderWsdlList);
+            serviceListWriter = new UnformattedServiceListWriter(renderWsdlList, bus);
         } else {
             String styleSheetPath;
             if (serviceListStyleSheet != null) {
@@ -116,7 +107,7 @@ public class ServiceListGeneratorServlet extends HttpServlet {
                 styleSheetPath = request.getRequestURI() + "/?stylesheet=1";
             }
             serviceListWriter = 
-                new FormattedServiceListWriter(styleSheetPath, title, showForeignContexts, atomMap);
+                new FormattedServiceListWriter(styleSheetPath, title, showForeignContexts, bus);
             
         }
         response.setContentType(serviceListWriter.getContentType());
