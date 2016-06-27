@@ -146,4 +146,38 @@
         </jaxws:inInterceptors>
     </jaxws:endpoint>
     
+     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SignatureEncryptionContentAction" 
+        address="http://localhost:${testutil.ports.swa.Server}/DoubleItSWASignatureEncryptionContentAction" 
+        serviceName="s:DoubleItService" endpointName="s:DoubleItSWASignatureEncryptionContentActionPort" 
+        implementor="org.apache.cxf.systest.ws.swa.DoubleIt3Impl" 
+        wsdlLocation="org/apache/cxf/systest/ws/swa/DoubleItSwa.wsdl">
+        <jaxws:outInterceptors>
+            <bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
+                <constructor-arg>
+                    <map>
+                        <entry key="action" value="Signature Encrypt"/>
+                        <entry key="signatureUser" value="bob"/>
+                        <entry key="signaturePropFile" value="bob.properties"/>
+                        <entry key="signatureKeyIdentifier" value="DirectReference"/>
+                        <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+                        <entry key="encryptionUser" value="alice"/>
+                        <entry key="encryptionPropFile" value="alice.properties"/>
+                    </map>
+                </constructor-arg>
+            </bean>
+        </jaxws:outInterceptors>
+        <jaxws:inInterceptors>
+            <bean class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
+                <constructor-arg>
+                    <map>
+                        <entry key="action" value="Signature Timestamp Encrypt"/>
+                        <entry key="signatureVerificationPropFile" value="bob.properties"/>
+                        <entry key="decryptionPropFile" value="bob.properties"/>
+                        <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+                    </map>
+                </constructor-arg>
+            </bean>
+        </jaxws:inInterceptors>
+    </jaxws:endpoint>
+    
 </beans>
