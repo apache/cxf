@@ -22,6 +22,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Map;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.common.util.PropertyUtils;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.transport.AbstractDestination;
 
@@ -30,15 +33,19 @@ public class FormattedServiceListWriter implements ServiceListWriter {
     private String title;
     private Map<String, String> atomMap;
     private boolean showForeignContexts;
+    private Bus bus;
     
     public FormattedServiceListWriter(String styleSheetPath, 
                                       String title,
                                       boolean showForeignContexts,
-                                      Map<String, String> atomMap) {
+                                      Bus bus) {
         this.styleSheetPath = styleSheetPath;
         this.title = title;
         this.showForeignContexts = showForeignContexts;
-        this.atomMap = atomMap;
+        this.bus = bus;
+        if (bus != null) {
+            this.atomMap = CastUtils.cast((Map<?, ?>)bus.getProperty("org.apache.cxf.extensions.logging.atom.pull"));
+        }
     }
 
     public String getContentType() {
@@ -161,8 +168,18 @@ public class FormattedServiceListWriter implements ServiceListWriter {
         writer.write("<tr><td>");
         writer.write("<span class=\"field\">Endpoint address:</span> " + "<span class=\"value\">"
                      + absoluteURL + "</span>");
-        writer.write("<br/><span class=\"field\">WADL :</span> " + "<a href=\"" + absoluteURL
+        if (bus != null && PropertyUtils.isTrue(bus.getProperty("wadl.service.descrition.available"))) {
+            writer.write("<br/><span class=\"field\">WADL :</span> " + "<a href=\"" + absoluteURL
                      + "?_wadl\">" + absoluteURL + "?_wadl" + "</a>");
+        }
+        if (bus != null && PropertyUtils.isTrue(bus.getProperty("swagger.service.descrition.available"))) {
+            String swaggerPath = "swagger.json";
+            if (!absoluteURL.endsWith("/")) {
+                swaggerPath = "/" + swaggerPath;
+            }
+            writer.write("<br/><span class=\"field\">Swagger :</span> " + "<a href=\"" + absoluteURL
+                     + swaggerPath + "\">" + absoluteURL + swaggerPath + "</a>");
+        }
         addAtomLinkIfNeeded(absoluteURL, atomMap, writer);
         writer.write("</td></tr>");
     }
