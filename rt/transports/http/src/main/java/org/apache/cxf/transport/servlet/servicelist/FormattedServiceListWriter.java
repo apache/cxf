@@ -62,8 +62,12 @@ public class FormattedServiceListWriter implements ServiceListWriter {
         writer.write("</head><body>");
 
         if (soapDestinations.length > 0 || restDestinations.length > 0) {
-            writeSOAPEndpoints(writer, basePath, soapDestinations);
-            writeRESTfulEndpoints(writer, basePath, restDestinations);
+            if (soapDestinations.length > 0) {
+                writeSOAPEndpoints(writer, basePath, soapDestinations);
+            }
+            if (restDestinations.length > 0) {
+                writeRESTfulEndpoints(writer, basePath, restDestinations);
+            }
         } else {
             writer.write("<span class=\"heading\">No services have been found.</span>");
         }
