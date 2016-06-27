@@ -87,7 +87,7 @@
         <cxf.fastinfoset.bundle.version>1.2.13_1</cxf.fastinfoset.bundle.version>
         <cxf.guava.version>18.0</cxf.guava.version>
         <cxf.hazelcast.version>1.9.4</cxf.hazelcast.version>
-        <cxf.httpcomponents.asyncclient.version>4.1.1</cxf.httpcomponents.asyncclient.version>
+        <cxf.httpcomponents.asyncclient.version>4.1.2</cxf.httpcomponents.asyncclient.version>
         <cxf.httpcomponents.asyncclient.version.range>[4.0,4.2)</cxf.httpcomponents.asyncclient.version.range>
         <cxf.httpcomponents.client.version>4.5.2</cxf.httpcomponents.client.version>
         <cxf.httpcomponents.core.version>4.4.4</cxf.httpcomponents.core.version>
