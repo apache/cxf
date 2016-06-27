@@ -1,7 +1,7 @@
 == Spring Boot - Samples - CXF Rest Web Services 
 
-This sample project demonstrates how to use http://projects.spring.io/spring-rs-cxf/[CXF Rest Web Services]
-with Spring Boot. 
+This sample project demonstrates how to use CXF JAX-RS services
+with Spring Boot. This demo has two JAX-RS class resources being deployed in a single JAX-RS endpoint.  
 
 The sample uses Maven. It can be built and run from the command line:
 
