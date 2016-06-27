@@ -157,4 +157,28 @@ public class SWAActionTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
+    @org.junit.Test
+    public void testSWASignatureEncryptionContentAction() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = SWAActionTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        URL wsdl = SWAActionTest.class.getResource("DoubleItSwa.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSWASignatureEncryptionContentActionPort");
+        DoubleItSwaPortType port = 
+                service.getPort(portQName, DoubleItSwaPortType.class);
+        updateAddressPort(port, PORT);
+        
+        DoubleIt3 doubleIt = new DoubleIt3();
+        doubleIt.setNumberToDouble(25);
+        port.doubleIt3(doubleIt, "12345".getBytes());
+        
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
 }
