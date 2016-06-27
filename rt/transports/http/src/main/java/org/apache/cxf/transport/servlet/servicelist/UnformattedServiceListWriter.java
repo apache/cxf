@@ -36,12 +36,16 @@ public class UnformattedServiceListWriter implements ServiceListWriter {
     }
 
     public void writeServiceList(PrintWriter writer,
-                                 String baseAddress,
+                                 String basePath,
                                  AbstractDestination[] soapDestinations,
                                  AbstractDestination[] restDestinations) throws IOException {
         if (soapDestinations.length > 0 || restDestinations.length > 0) {
-            writeUnformattedSOAPEndpoints(writer, baseAddress, soapDestinations);
-            writeUnformattedRESTfulEndpoints(writer, baseAddress, restDestinations);
+            if (soapDestinations.length > 0) {
+                writeUnformattedSOAPEndpoints(writer, basePath, soapDestinations);
+            }
+            if (restDestinations.length > 0) {
+                writeUnformattedRESTfulEndpoints(writer, basePath, restDestinations);
+            }
         } else {
             writer.write("No services have been found.");
         }
