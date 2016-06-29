@@ -45,11 +45,13 @@ import org.apache.cxf.message.MessageUtils;
 public class UriInfoImpl implements UriInfo {
     private static final Logger LOG = LogUtils.getL7dLogger(UriInfoImpl.class);
     private static final String CASE_INSENSITIVE_QUERIES = "org.apache.cxf.http.case_insensitive_queries";
+    private static final String PARSE_QUERY_VALUE_AS_COLLECTION = "parse.query.value.as.collection";
     
     private MultivaluedMap<String, String> templateParams;
     private Message message;
     private OperationResourceInfoStack stack;
     private boolean caseInsensitiveQueries;
+    private boolean queryValueIsCollection;
 
     @SuppressWarnings("unchecked")
     public UriInfoImpl(Message m) {
@@ -63,6 +65,8 @@ public class UriInfoImpl implements UriInfo {
             this.stack = m.get(OperationResourceInfoStack.class);
             this.caseInsensitiveQueries = 
                 MessageUtils.isTrue(m.getContextualProperty(CASE_INSENSITIVE_QUERIES));
+            this.queryValueIsCollection = 
+                MessageUtils.isTrue(m.getContextualProperty(PARSE_QUERY_VALUE_AS_COLLECTION));
         }
     }
 
@@ -110,15 +114,10 @@ public class UriInfoImpl implements UriInfo {
     }
 
     public MultivaluedMap<String, String> getQueryParameters(boolean decode) {
-        
-        if (!caseInsensitiveQueries) {
-            return JAXRSUtils.getStructuredParams((String)message.get(Message.QUERY_STRING), 
-                              "&", decode, decode);
-        }
-        
-        MultivaluedMap<String, String> queries = new MetadataMap<String, String>(false, true);
+        MultivaluedMap<String, String> queries = !caseInsensitiveQueries 
+            ? new MetadataMap<String, String>() : new MetadataMap<String, String>(false, true);
         JAXRSUtils.getStructuredParams(queries, (String)message.get(Message.QUERY_STRING), 
-                                      "&", decode, decode);
+                                      "&", decode, decode, queryValueIsCollection);
         return queries;
         
     }

@@ -848,6 +848,7 @@ public class JAXRSUtilsTest extends Assert {
                                                            messageImpl);
         assertEquals(1, params.size());
         Integer[] intValues = (Integer[])params.get(0);
+        assertEquals(2, intValues.length);
         assertEquals(1, (int)intValues[0]);
         assertEquals(2, (int)intValues[1]);
     }
@@ -865,8 +866,28 @@ public class JAXRSUtilsTest extends Assert {
                                                            messageImpl);
         assertEquals(1, params.size());
         int[] intValues = (int[])params.get(0);
+        assertEquals(2, intValues.length);
         assertEquals(1, intValues[0]);
         assertEquals(2, intValues[1]);
+    }
+    
+    @Test
+    public void testQueryParametersIntegerArrayValueIsColection() throws Exception {
+        Class<?>[] argType = {Integer[].class};
+        Method m = Customer.class.getMethod("testQueryIntegerArray", argType);
+        Message messageImpl = createMessage();
+        messageImpl.put("parse.query.value.as.collection", true);
+        messageImpl.put(Message.QUERY_STRING, "query=1&query=2,3");
+        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, 
+                                                               new ClassResourceInfo(Customer.class)),
+                                                           null, 
+                                                           messageImpl);
+        assertEquals(1, params.size());
+        Integer[] intValues = (Integer[])params.get(0);
+        assertEquals(3, intValues.length);
+        assertEquals(1, (int)intValues[0]);
+        assertEquals(2, (int)intValues[1]);
+        assertEquals(3, (int)intValues[2]);
     }
     
     @SuppressWarnings("unchecked")

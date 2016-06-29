@@ -1241,6 +1241,15 @@ public final class JAXRSUtils {
                                            String sep, 
                                            boolean decode,
                                            boolean decodePlus) {
+        getStructuredParams(queries, query, sep, decode, decodePlus, false);
+    }
+        
+    public static void getStructuredParams(MultivaluedMap<String, String> queries,
+                                           String query, 
+                                           String sep, 
+                                           boolean decode,
+                                           boolean decodePlus,
+                                           boolean valueIsCollection) {    
         if (!StringUtils.isEmpty(query)) {            
             List<String> parts = Arrays.asList(StringUtils.split(query, sep));
             for (String part : parts) {
@@ -1253,17 +1262,34 @@ public final class JAXRSUtils {
                 } else {
                     name = part.substring(0, index);
                     value =  index < part.length() ? part.substring(index + 1) : "";
-                    if (decodePlus && value.contains("+")) {
-                        value = value.replace('+', ' ');
-                    }
-                    if (decode) {
-                        value = (";".equals(sep))
-                            ? HttpUtils.pathDecode(value) : HttpUtils.urlDecode(value); 
-                    }
                 }
-                queries.add(HttpUtils.urlDecode(name), value);
+                if (valueIsCollection) {
+                    for (String s : value.split(",")) {
+                        addStructuredPartToMap(queries, sep, name, s, decode, decodePlus);
+                    }
+                } else {
+                    addStructuredPartToMap(queries, sep, name, value, decode, decodePlus);
+                }
             }
         }
+    }
+    
+    private static void addStructuredPartToMap(MultivaluedMap<String, String> queries,
+                                               String sep, 
+                                               String name,
+                                               String value,
+                                               boolean decode,
+                                               boolean decodePlus) {    
+        
+        if (decodePlus && value.contains("+")) {
+            value = value.replace('+', ' ');
+        }
+        if (decode) {
+            value = (";".equals(sep))
+                ? HttpUtils.pathDecode(value) : HttpUtils.urlDecode(value); 
+        }
+        
+        queries.add(HttpUtils.urlDecode(name), value);
     }
 
     private static Object readFromMessageBody(Class<?> targetTypeClass,

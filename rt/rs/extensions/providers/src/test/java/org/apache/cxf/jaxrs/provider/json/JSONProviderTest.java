@@ -77,6 +77,7 @@ import org.apache.cxf.jaxrs.resources.jaxb.Book2;
 import org.apache.cxf.jaxrs.resources.jaxb.Book2NoRootElement;
 import org.apache.cxf.staxutils.DelegatingXMLStreamWriter;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.cxf.staxutils.transform.TransformUtils;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -1334,6 +1335,34 @@ public class JSONProviderTest extends Assert {
                        new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
         String expected = 
             "{\"tagholder\":{\"attr\":\"attribute\",\"thetag\":{\"group\":\"B\",\"name\":\"A\"}}}";
+        assertEquals(expected, bos.toString());
+    }
+    
+    @Test
+    public void testAttributesAsElementsWithTransform() throws Exception {
+        JSONProvider<TagVO2Holder> provider = new JSONProvider<TagVO2Holder>() {
+            protected XMLStreamWriter createTransformWriterIfNeeded(XMLStreamWriter writer,
+                                                                    OutputStream os,
+                                                                    boolean dropAtXmlLevel) {
+                return TransformUtils.createTransformWriterIfNeeded(writer, os, 
+                                                                    Collections.emptyMap(),
+                                                                    null,
+                                                                    Collections.emptyMap(),
+                                                                    true,
+                                                                    null);
+            }    
+        };
+        provider.setIgnoreNamespaces(true);
+        TagVO2 tag = new TagVO2("A", "B");
+        tag.setAttrInt(123);
+        TagVO2Holder holder = new TagVO2Holder();
+        holder.setTag(tag);
+        
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        provider.writeTo(holder, TagVO2Holder.class, TagVO2Holder.class,
+                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
+        String expected = 
+            "{\"tagholder\":{\"attr\":\"attribute\",\"thetag\":{\"attrInt\":123,\"group\":\"B\",\"name\":\"A\"}}}";
         assertEquals(expected, bos.toString());
     }
     
