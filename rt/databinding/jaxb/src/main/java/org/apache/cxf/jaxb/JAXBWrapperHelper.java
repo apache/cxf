@@ -53,7 +53,7 @@ public class JAXBWrapperHelper extends AbstractWrapperHelper {
     
     @Override
     protected Object getValue(Method method, Object in) throws IllegalAccessException,
-    InvocationTargetException {
+        InvocationTargetException {
         if ("javax.xml.bind.JAXBElement".equals(method.getReturnType().getCanonicalName())) {
             JAXBElement<?> je = (JAXBElement<?>)method.invoke(in);
             return je == null ? je : je.getValue();

@@ -48,7 +48,7 @@ public final class SecurityUtils {
     }
 
     public static CallbackHandler getCallbackHandler(Object o) throws InstantiationException, 
-    IllegalAccessException, ClassNotFoundException {
+        IllegalAccessException, ClassNotFoundException {
         CallbackHandler handler = null;
         if (o instanceof CallbackHandler) {
             handler = (CallbackHandler)o;

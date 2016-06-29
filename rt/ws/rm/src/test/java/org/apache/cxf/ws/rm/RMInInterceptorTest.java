@@ -131,8 +131,8 @@ public class RMInInterceptorTest extends Assert {
         testHandleSequenceAck(true);
     }
     
-    private void testHandleSequenceAck(boolean onServer) throws SequenceFault, RMException, 
-    NoSuchMethodException {
+    private void testHandleSequenceAck(boolean onServer)  
+        throws SequenceFault, RMException, NoSuchMethodException {
         Method m = RMInInterceptor.class.getDeclaredMethod("processAcknowledgments",
             new Class[] {RMEndpoint.class, RMProperties.class, ProtocolVariation.class});
         interceptor =

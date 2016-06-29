@@ -131,7 +131,7 @@ public class DestinationTest extends Assert {
     
     @Test
     public void testAcknowledgeAlreadyAcknowledgedMessage() throws SequenceFault, RMException, 
-    NoSuchMethodException, IOException {
+        NoSuchMethodException, IOException {
         
         Method m1 = Destination.class.getDeclaredMethod("getSequence", new Class[] {Identifier.class});
         destination = EasyMock.createMockBuilder(Destination.class)

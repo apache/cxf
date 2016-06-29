@@ -42,26 +42,23 @@ public class SampleScanRestApplication {
     @Bean
     @ExportMetricWriter
     public MetricWriter metricWriter() {
-            return new MetricWriter() {
+        return new MetricWriter() {
 
-                @Override
-                public void set(Metric<?> arg0) {
-                    // TODO Auto-generated method stub
-                    
-                }
+            @Override
+            public void set(Metric<?> arg0) {
+                // TODO Auto-generated method stub
+            }
 
-                @Override
-                public void increment(Delta<?> arg0) {
-                    // TODO Auto-generated method stub
-                    
-                }
+            @Override
+            public void increment(Delta<?> arg0) {
+                // TODO Auto-generated method stub
+            }
 
-                @Override
-                public void reset(String arg0) {
-                    // TODO Auto-generated method stub
-                    
-                }
-                
-            };
+            @Override
+            public void reset(String arg0) {
+                // TODO Auto-generated method stub
+            }
+            
+        };
     }
 }
