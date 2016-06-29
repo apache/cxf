@@ -37,7 +37,11 @@ public class MemoryClientTokenContextManager implements ClientTokenContextManage
 
     @Override
     public ClientTokenContext getClientTokenContext(MessageContext mc) {
-        return map.get(getKey(mc, false));
+        String key = getKey(mc, false);
+        if (key != null) {
+            return map.get(key);
+        }
+        return null;
     }
 
     @Override
