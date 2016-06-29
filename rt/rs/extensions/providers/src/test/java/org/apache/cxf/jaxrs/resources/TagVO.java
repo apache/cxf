@@ -19,13 +19,14 @@
 
 package org.apache.cxf.jaxrs.resources;
 
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 public class TagVO {
     private String name;
     private String group;
-    
+    private Integer attrInt;
     public TagVO() { 
         
     }
@@ -49,6 +50,15 @@ public class TagVO {
     
     public String getGroup() {
         return group;
+    }
+
+    @XmlAttribute
+    public Integer getAttrInt() {
+        return attrInt;
+    }
+
+    public void setAttrInt(Integer attrInt) {
+        this.attrInt = attrInt;
     }
     
 }

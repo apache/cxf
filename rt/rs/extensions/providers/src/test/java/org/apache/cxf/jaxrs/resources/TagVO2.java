@@ -31,4 +31,5 @@ public class TagVO2 extends TagVO {
     public TagVO2(String name, String group) {
         super(name, group);
     }
+
 }
