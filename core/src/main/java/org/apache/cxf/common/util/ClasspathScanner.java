@@ -75,7 +75,7 @@ public class ClasspathScanner {
     public static Map< Class< ? extends Annotation >, Collection< Class< ? > > > findClasses(
         String basePackage, Class< ? extends Annotation > ... annotations) 
         throws IOException, ClassNotFoundException {
-        return findClasses(Collections.singletonList(basePackage), 
+        return findClasses(parsePackages(basePackage), 
                            Collections.unmodifiableList(Arrays.asList(annotations)));
     }
     
