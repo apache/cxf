@@ -53,6 +53,11 @@ public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
     private String claims;
     private String claimsLocales;
     
+    public OidcClientCodeRequestFilter() {
+        super();
+        setScopes("openid");
+    }
+    
     public void setAuthenticationContextRef(String acr) {
         this.authenticationContextRef = Arrays.asList(StringUtils.split(acr, " "));
     }
