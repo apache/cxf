@@ -275,6 +275,10 @@ public final class OAuthClientUtils {
                                                    boolean setAuthorizationHeader) 
         throws OAuthServiceException {    
         
+        if (accessTokenService == null) {
+            throw new OAuthServiceException(OAuthConstants.SERVER_ERROR);
+        }
+        
         Form form = new Form(grant.toMap());
         if (extraParams != null) {
             for (Map.Entry<String, String> entry : extraParams.entrySet()) {

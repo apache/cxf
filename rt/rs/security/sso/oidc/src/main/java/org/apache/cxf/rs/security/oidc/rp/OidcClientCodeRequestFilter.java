@@ -72,6 +72,9 @@ public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
         }
         OidcClientTokenContextImpl ctx = new OidcClientTokenContextImpl();
         if (at != null) {
+            if (idTokenReader == null) {
+                throw new OAuthServiceException(OAuthConstants.SERVER_ERROR);
+            }
             IdToken idToken = idTokenReader.getIdToken(at, 
                                   requestParams.getFirst(OAuthConstants.AUTHORIZATION_CODE_VALUE),
                                   getConsumer());
