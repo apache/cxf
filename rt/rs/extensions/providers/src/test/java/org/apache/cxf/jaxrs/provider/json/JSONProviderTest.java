@@ -1345,9 +1345,9 @@ public class JSONProviderTest extends Assert {
                                                                     OutputStream os,
                                                                     boolean dropAtXmlLevel) {
                 return TransformUtils.createTransformWriterIfNeeded(writer, os, 
-                                                                    Collections.emptyMap(),
+                                                                    Collections.<String, String>emptyMap(),
                                                                     null,
-                                                                    Collections.emptyMap(),
+                                                                    Collections.<String, String>emptyMap(),
                                                                     true,
                                                                     null);
             }    
