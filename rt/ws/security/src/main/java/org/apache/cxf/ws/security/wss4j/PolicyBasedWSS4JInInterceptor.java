@@ -110,8 +110,9 @@ import org.apache.wss4j.policy.model.Wss11;
  * 
  */
 public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
+    
     private static final Logger LOG = LogUtils.getL7dLogger(PolicyBasedWSS4JInInterceptor.class);
-
+    
     /**
      * 
      */
@@ -126,6 +127,73 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         if (aim != null && !enableStax) {
             super.handleMessage(msg);
         }
+    }
+    
+    /**
+     * TODO - This method can be removed when WSS4J 2.1.7 is released - see WSS-582
+     * 
+     * Load a Crypto instance. Firstly, it tries to use the cryptoPropertyRefId tag to retrieve
+     * a Crypto object via a custom reference Id. Failing this, it tries to load the crypto
+     * instance via the cryptoPropertyFile tag.
+     *
+     * @param requestData the RequestData object
+     * @return a Crypto instance to use for Encryption creation/verification
+     */
+    @Override
+    protected Crypto loadCrypto(
+        String cryptoPropertyFile,
+        String cryptoPropertyRefId,
+        RequestData requestData
+    ) throws WSSecurityException {
+        Object mc = requestData.getMsgContext();
+        Crypto crypto = null;
+
+        //
+        // Try the Property Ref Id first
+        //
+        String refId = getString(cryptoPropertyRefId, mc);
+        if (refId != null) {
+            crypto = cryptos.get(refId);
+            if (crypto == null) {
+                Object obj = getProperty(mc, refId);
+                if (obj instanceof Properties) {
+                    crypto = CryptoFactory.getInstance((Properties)obj,
+                                                       Loader.getClassLoader(CryptoFactory.class),
+                                                       getPasswordEncryptor(requestData));
+                    cryptos.put(refId, crypto);
+                } else if (obj instanceof Crypto) {
+                    // No need to cache this as it's already loaded
+                    crypto = (Crypto)obj;
+                }
+            }
+            if (crypto == null) {
+                LOG.warning("The Crypto reference " + refId + " specified by "
+                    + cryptoPropertyRefId + " could not be loaded"
+                );
+            }
+        }
+
+        //
+        // Now try loading the properties file
+        //
+        if (crypto == null) {
+            String propFile = getString(cryptoPropertyFile, mc);
+            if (propFile != null) {
+                crypto = cryptos.get(propFile);
+                if (crypto == null) {
+                    crypto = loadCryptoFromPropertiesFile(propFile, requestData);
+                    cryptos.put(propFile, crypto);
+                }
+                if (crypto == null) {
+                    LOG.warning(
+                         "The Crypto properties file " + propFile + " specified by "
+                         + cryptoPropertyFile + " could not be loaded or found"
+                    );
+                }
+            }
+        }
+
+        return crypto;
     }
     
     private void handleWSS11(AssertionInfoMap aim, SoapMessage message) {
