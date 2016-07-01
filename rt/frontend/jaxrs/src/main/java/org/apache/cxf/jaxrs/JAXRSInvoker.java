@@ -134,7 +134,7 @@ public class JAXRSInvoker extends AbstractInvoker {
         try {
             return handleFault(new Fault(t), exchange.getInMessage(), null, null);
         } catch (Fault ex) {
-            ar.setUnmappedThrowable(ex.getCause());
+            ar.setUnmappedThrowable(ex.getCause() == null ? ex : ex.getCause());
             if (isSuspended(exchange)) {
                 ar.reset();
                 exchange.getInMessage().getInterceptorChain().unpause();
@@ -197,7 +197,8 @@ public class JAXRSInvoker extends AbstractInvoker {
         } catch (Fault ex) {
             Object faultResponse;
             if (asyncResponse != null) {
-                faultResponse = handleAsyncFault(exchange, asyncResponse, ex.getCause());    
+                faultResponse = handleAsyncFault(exchange, asyncResponse, 
+                                                 ex.getCause() == null ? ex : ex.getCause());    
             } else {
                 faultResponse = handleFault(ex, inMessage, cri, methodToInvoke);
             }
@@ -326,7 +327,8 @@ public class JAXRSInvoker extends AbstractInvoker {
                                                        cri.getServiceClass().getName());
             LOG.severe(errorM.toString());
         }
-        Response excResponse = JAXRSUtils.convertFaultToResponse(ex.getCause(), inMessage);
+        Response excResponse = 
+            JAXRSUtils.convertFaultToResponse(ex.getCause() == null ? ex : ex.getCause(), inMessage);
         if (excResponse == null) {
             inMessage.getExchange().put(Message.PROPOGATE_EXCEPTION, 
                                         ExceptionUtils.propogateException(inMessage));
