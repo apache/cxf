@@ -23,12 +23,13 @@ import java.util.Map;
 import org.apache.cxf.bus.spring.SpringBus;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.spring.SpringComponentScanServer;
+import org.apache.cxf.jaxrs.spring.SpringJaxrsClassesScanServer;
 import org.apache.cxf.transport.servlet.CXFServlet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.autoconfigure.web.EmbeddedServletContainerAutoConfiguration;
 import org.springframework.boot.context.embedded.ServletRegistrationBean;
@@ -77,9 +78,17 @@ public class CxfAutoConfiguration {
     
     @Configuration
     @ConditionalOnClass(JAXRSServerFactoryBean.class)
-    @ConditionalOnProperty(prefix = "cxf", name = "jaxrs.component-scan", havingValue = "true")
+    @ConditionalOnExpression("'${cxf.jaxrs.component-scan}'=='true' && '${cxf.jaxrs.classes-scan}'!='true'")
     @Import(SpringComponentScanServer.class)
-    protected static class JaxRsConfiguration {
+    protected static class JaxRsComponentConfiguration {
+     
+    }
+    
+    @Configuration
+    @ConditionalOnClass(JAXRSServerFactoryBean.class)
+    @ConditionalOnExpression("'${cxf.jaxrs.classes-scan}'=='true' && '${cxf.jaxrs.component-scan}'!='true'")
+    @Import(SpringJaxrsClassesScanServer.class)
+    protected static class JaxRsClassesConfiguration {
      
     }
 
