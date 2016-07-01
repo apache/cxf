@@ -4,6 +4,8 @@ server:
 
 cxf:
   path: /services/helloservice
+  servlet.init: 
+    service-list-path: /info
   jaxrs:
     component-scan: true
 
@@ -12,8 +14,10 @@ eureka:
     serviceUrl:
       defaultZone: ${vcap.services.eureka-service.credentials.uri:http://127.0.0.1:8761}/eureka/
   instance:
-    statusPageUrlPath: /system/info
-    healthCheckUrlPath: /system/health 
+    statusPageUrlPath: /services/helloservice/info
+    healthCheckUrlPath: /system/health
+    metadataMap:
+      instanceId: ${spring.application.name}:${spring.application.instance_id:${random.value}} 
     
 ---
 spring:
