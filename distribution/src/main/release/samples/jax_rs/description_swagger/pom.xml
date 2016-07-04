@@ -140,7 +140,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-rs-service-description</artifactId>
+            <artifactId>cxf-rt-rs-service-description-swagger</artifactId>
             <version>3.2.0-SNAPSHOT</version>
         </dependency>
         <dependency>
