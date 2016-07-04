@@ -119,8 +119,8 @@ public class XMLTypeCreator extends AbstractTypeCreator {
         String path = "/META-INF/cxf/aegis.xsd";
         InputStream is = XMLTypeCreator.class.getResourceAsStream(path);
         if (is != null) {
-            SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
             try {
+                SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
                 Schema aegisSchema = schemaFactory.newSchema(new StreamSource(is));
                 AEGIS_DOCUMENT_BUILDER_FACTORY.setSchema(aegisSchema);
             } catch (Throwable e) {
