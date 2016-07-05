@@ -78,7 +78,7 @@ public abstract class AbstractWrapperHelper implements WrapperHelper {
     }
     
     protected Object getValue(Method method, Object in) throws IllegalAccessException,
-    InvocationTargetException {        
+        InvocationTargetException {        
         return method.invoke(in);    
     }
     
