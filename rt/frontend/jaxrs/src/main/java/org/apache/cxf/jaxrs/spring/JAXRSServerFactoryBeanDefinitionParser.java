@@ -222,9 +222,11 @@ public class JAXRSServerFactoryBeanDefinitionParser extends AbstractBeanDefiniti
                     final Map< Class< ? extends Annotation >, Collection< Class< ? > > > classes =
                         ClasspathScanner.findClasses(basePackages, Provider.class, Path.class);
                                               
-                    this.setServiceBeans(createBeansFromDiscoveredClasses(classes.get(Path.class),
+                    this.setServiceBeans(createBeansFromDiscoveredClasses(context,
+                                                                          classes.get(Path.class),
                                                                           serviceAnnotationClass));
-                    this.setProviders(createBeansFromDiscoveredClasses(classes.get(Provider.class),
+                    this.setProviders(createBeansFromDiscoveredClasses(context,
+                                                                       classes.get(Provider.class),
                                                                        serviceAnnotationClass));
                 } catch (IOException ex) {
                     throw new BeanDefinitionStoreException("I/O failure during classpath scanning", ex);
@@ -256,23 +258,24 @@ public class JAXRSServerFactoryBeanDefinitionParser extends AbstractBeanDefiniti
             } 
             return null;
         }
-        private List<Object> createBeansFromDiscoveredClasses(Collection<Class<?>> classes, 
-                                                              Class<? extends Annotation> serviceClassAnnotation) {
-            AutowireCapableBeanFactory beanFactory = context.getAutowireCapableBeanFactory();
-            final List< Object > providers = new ArrayList< Object >();
-            for (final Class< ? > clazz: classes) {
-                if (serviceClassAnnotation != null && clazz.getAnnotation(serviceClassAnnotation) == null) {
-                    continue;
-                }
-                Object bean = null;
-                try {
-                    bean = beanFactory.createBean(clazz, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, true);
-                } catch (Exception ex) {
-                    bean = beanFactory.createBean(clazz);
-                }
-                providers.add(bean);
+    }
+    static List<Object> createBeansFromDiscoveredClasses(ApplicationContext context,
+                                                         Collection<Class<?>> classes, 
+                                                         Class<? extends Annotation> serviceClassAnnotation) {
+        AutowireCapableBeanFactory beanFactory = context.getAutowireCapableBeanFactory();
+        final List< Object > providers = new ArrayList< Object >();
+        for (final Class< ? > clazz: classes) {
+            if (serviceClassAnnotation != null && clazz.getAnnotation(serviceClassAnnotation) == null) {
+                continue;
             }
-            return providers;
+            Object bean = null;
+            try {
+                bean = beanFactory.createBean(clazz, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, true);
+            } catch (Exception ex) {
+                bean = beanFactory.createBean(clazz);
+            }
+            providers.add(bean);
         }
+        return providers;
     }
 }
