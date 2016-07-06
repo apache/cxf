@@ -21,6 +21,7 @@ package org.apache.cxf.jaxrs.client.spring;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -161,4 +162,27 @@ public class JAXRSClientFactoryBeanDefinitionParser extends AbstractFactoryBeanD
         }
     }
 
+    static Class<?> getServiceClass(Collection<Class<?>> rootClasses) {
+        for (Class<?> cls : rootClasses) {
+            if (cls.isInterface()) {
+                return cls;
+            }
+        }
+        return rootClasses.iterator().next();
+    }
+    static List<Object> getProviders(ApplicationContext context, Collection<Class<?>> providerClasses) {
+        List<Object> providers = new LinkedList<Object>();
+        AutowireCapableBeanFactory beanFactory = context.getAutowireCapableBeanFactory();
+        for (final Class< ? > providerClass: providerClasses) {
+            Object bean = null;
+            try {
+                bean = beanFactory.createBean(providerClass, 
+                                       AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, true);
+            } catch (Exception ex) {
+                bean = beanFactory.createBean(providerClass);
+            }
+            providers.add(bean);
+        }
+        return providers;
+    }
 }

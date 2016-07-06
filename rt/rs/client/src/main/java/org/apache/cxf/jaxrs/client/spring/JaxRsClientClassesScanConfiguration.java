@@ -16,43 +16,45 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.spring;
+package org.apache.cxf.jaxrs.client.spring;
 
 import java.lang.annotation.Annotation;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.Path;
 import javax.ws.rs.ext.Provider;
 
 import org.apache.cxf.common.util.ClasspathScanner;
-import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
+import org.apache.cxf.jaxrs.client.Client;
+import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.service.factory.ServiceConstructionException;
 import org.springframework.beans.factory.annotation.Value;
-public abstract class AbstractJaxrsClassesScanServer extends AbstractSpringConfigurationFactory {
-    @Value("${cxf.jaxrs.classes-scan-packages}")
-    private String basePackages;
+import org.springframework.context.annotation.Bean;
+
+public class JaxRsClientClassesScanConfiguration extends AbstractJaxRsClientConfiguration {
+    @Value("${cxf.jaxrs.client.classes-scan-packages}")
+    private String scanPackages;
     
-    protected AbstractJaxrsClassesScanServer() {
-        
+    @Bean
+    protected Client jaxRsProxyClient() {
+        return super.createClient();
     }
-    protected void setJaxrsResources(JAXRSServerFactoryBean factory) {
+    
+    protected void setJaxrsResources(JAXRSClientFactoryBean factory) {
         try {
-            final Map< Class< ? extends Annotation >, Collection< Class< ? > > > classes =
-                ClasspathScanner.findClasses(basePackages, Provider.class, Path.class);
-                                      
-            List<Object> jaxrsServices = JAXRSServerFactoryBeanDefinitionParser
-                .createBeansFromDiscoveredClasses(super.applicationContext, classes.get(Path.class), null); 
-            List<Object> jaxrsProviders = JAXRSServerFactoryBeanDefinitionParser
-                .createBeansFromDiscoveredClasses(super.applicationContext, classes.get(Provider.class), null);
+            final Map< Class< ? extends Annotation >, Collection< Class< ? > > > classes = 
+                ClasspathScanner.findClasses(scanPackages, Path.class, Provider.class);
             
-            factory.setServiceBeans(jaxrsServices);
-            factory.setProviders(jaxrsProviders);
+            factory.setServiceClass(
+                JAXRSClientFactoryBeanDefinitionParser.getServiceClass(classes.get(Path.class)));
+            factory.setProviders(
+                JAXRSClientFactoryBeanDefinitionParser.getProviders(context, classes.get(Provider.class)));
         } catch (Exception ex) {
-            throw new ServiceConstructionException(ex);
+            throw new ServiceConstructionException(ex);    
         }
         
     }
-        
+
+    
 }
