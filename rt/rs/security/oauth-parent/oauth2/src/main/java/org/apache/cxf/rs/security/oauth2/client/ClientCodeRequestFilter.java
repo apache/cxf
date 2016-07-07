@@ -91,11 +91,7 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
             if (referer != null && referer.startsWith(authorizationServiceUri)) {
                 completeUri = absoluteRequestUri;
                 sameUriRedirect = true;
-            } else {
-                LOG.warning("Complete URI is not initialized, authentication flow can not be completed");
-                rc.abortWith(Response.status(500).build());
-                return;
-            }
+            } 
         }
         
         if (!sameUriRedirect && isStartUriMatched(absoluteRequestUri)) {
@@ -109,6 +105,10 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
             }
             Response codeResponse = createCodeResponse(rc,  ui);
             rc.abortWith(codeResponse);
+        } else if (completeUri == null) {
+            LOG.warning("Complete URI is not initialized, authentication flow can not be completed");
+            rc.abortWith(Response.status(500).build());
+            return;
         } else if (absoluteRequestUri.endsWith(completeUri)) {
             MultivaluedMap<String, String> requestParams = toRequestState(rc, ui);
             processCodeResponse(rc, ui, requestParams);
