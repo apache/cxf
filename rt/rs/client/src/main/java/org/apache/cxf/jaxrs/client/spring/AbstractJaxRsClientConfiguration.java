@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.jaxrs.client.spring;
 
+import javax.ws.rs.ext.Provider;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.jaxrs.client.Client;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
@@ -27,9 +29,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 
 @Import(JaxRsConfig.class)
+@ComponentScan(
+               includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, 
+                                                      value = {Provider.class})
+           )
 public abstract class AbstractJaxRsClientConfiguration implements ApplicationContextAware {
 
     protected ApplicationContext context;
@@ -37,17 +45,27 @@ public abstract class AbstractJaxRsClientConfiguration implements ApplicationCon
     private Bus bus;
     @Value("${cxf.jaxrs.client.address}")
     private String address;
+    @Value("${cxf.jaxrs.client.thread-safe:false}")
+    private Boolean threadSafe;
+    
     
     protected Client createClient() {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         bean.setBus(bus);        
         bean.setAddress(address);
+        bean.setThreadSafe(threadSafe);
         setJaxrsResources(bean);
+        
+        for (String beanName : context.getBeanDefinitionNames()) {
+            if (context.findAnnotationOnBean(beanName, Provider.class) != null) {
+                bean.setProvider(context.getBean(beanName));
+            } 
+        }
+        
         return bean.create();
     }
     
     protected abstract void setJaxrsResources(JAXRSClientFactoryBean factory);
-
     
     @Override
     public void setApplicationContext(ApplicationContext ac) throws BeansException {

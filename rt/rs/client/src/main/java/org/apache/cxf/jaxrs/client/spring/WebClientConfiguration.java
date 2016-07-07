@@ -20,6 +20,7 @@ package org.apache.cxf.jaxrs.client.spring;
 
 import java.lang.annotation.Annotation;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.ws.rs.ext.Provider;
@@ -35,8 +36,12 @@ import org.springframework.context.annotation.Bean;
 
 public class WebClientConfiguration extends AbstractJaxRsClientConfiguration {
 
-    @Value("${cxf.jaxrs.client.classes-scan-packages:''")
+    @Value("${cxf.jaxrs.client.classes-scan-packages:''}")
     private String scanPackages;
+    @Value("${cxf.jaxrs.client.headers.accept:''}")
+    private String accept;
+    @Value("${cxf.jaxrs.client.headers.content-type:''}")
+    private String contentType;
     
     @Bean
     protected Client jaxRsWebClient() {
@@ -57,6 +62,16 @@ public class WebClientConfiguration extends AbstractJaxRsClientConfiguration {
             } catch (Exception ex) {
                 throw new ServiceConstructionException(ex);
             }
+        }
+        Map<String, String> extraHeaders = new HashMap<String, String>();
+        if (!StringUtils.isEmpty(accept)) {
+            extraHeaders.put("Accept", accept);
+        }
+        if (!StringUtils.isEmpty(contentType)) {
+            extraHeaders.put("Content-Type", contentType);
+        }
+        if (!extraHeaders.isEmpty()) {
+            factory.setHeaders(extraHeaders);
         }
     }
 

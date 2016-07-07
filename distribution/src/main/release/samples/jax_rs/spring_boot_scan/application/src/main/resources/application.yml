@@ -8,6 +8,7 @@ cxf:
     service-list-path: /info
   jaxrs:
     component-scan: true
+    classes-scan-packages: org.apache.cxf.jaxrs.swagger
 
 eureka:
   client:

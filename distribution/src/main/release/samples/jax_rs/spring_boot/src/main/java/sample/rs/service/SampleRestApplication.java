@@ -63,7 +63,7 @@ public class SampleRestApplication {
 
         @Override
         public void run(String... runArgs) throws Exception {
-            System.out.println(webClient.accept("text/plain").path("sayHello/ApacheCxfWebClientUser").get(String.class));
+            System.out.println(webClient.path("sayHello/ApacheCxfWebClientUser").get(String.class));
         }
       };
     }
