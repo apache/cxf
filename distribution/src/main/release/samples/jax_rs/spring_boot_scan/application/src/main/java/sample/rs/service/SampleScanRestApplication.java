@@ -36,10 +36,6 @@ public class SampleScanRestApplication {
     }
  
     @Bean
-    public Swagger2Feature swaggerFeature(ApplicationContext context) {
-        return new Swagger2Feature();
-    }
-    @Bean
     @ExportMetricWriter
     public MetricWriter metricWriter() {
             return new MetricWriter() {
