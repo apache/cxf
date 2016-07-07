@@ -119,7 +119,7 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
     }
 
     protected boolean isStartUriMatched(String absoluteRequestUri) {
-        return startUri.equals(WILDCARD) && !absoluteRequestUri.endsWith(completeUri)
+        return startUri.equals(WILDCARD) && (completeUri == null || !absoluteRequestUri.endsWith(completeUri))
             || absoluteRequestUri.endsWith(startUri);
     }
 
