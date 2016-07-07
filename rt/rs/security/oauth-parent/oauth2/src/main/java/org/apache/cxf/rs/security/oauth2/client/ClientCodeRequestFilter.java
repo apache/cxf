@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.annotation.Priority;
 import javax.ws.rs.Priorities;
@@ -36,6 +37,7 @@ import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.MessageContext;
@@ -55,12 +57,14 @@ import org.apache.cxf.rt.security.crypto.CryptoUtils;
 @PreMatching
 @Priority(Priorities.AUTHENTICATION + 1)
 public class ClientCodeRequestFilter implements ContainerRequestFilter {
+    protected static final Logger LOG = LogUtils.getL7dLogger(ClientCodeRequestFilter.class);
+    private static final String WILDCARD = "*";
     @Context
     private MessageContext mc;
     
     private String scopes;
     private String completeUri;
-    private String startUri;
+    private String startUri = "*";
     private String authorizationServiceUri;
     private Consumer consumer;
     private ClientCodeStateManager clientStateManager;
@@ -87,10 +91,14 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
             if (referer != null && referer.startsWith(authorizationServiceUri)) {
                 completeUri = absoluteRequestUri;
                 sameUriRedirect = true;
+            } else {
+                LOG.warning("Complete URI is not initialized, authentication flow can not be completed");
+                rc.abortWith(Response.status(500).build());
+                return;
             }
         }
         
-        if (!sameUriRedirect && absoluteRequestUri.endsWith(startUri)) {
+        if (!sameUriRedirect && isStartUriMatched(absoluteRequestUri)) {
             ClientTokenContext request = getClientTokenContext(rc);
             if (request != null) {
                 setClientCodeRequest(request);
@@ -105,7 +113,14 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
             MultivaluedMap<String, String> requestParams = toRequestState(rc, ui);
             processCodeResponse(rc, ui, requestParams);
             checkSecurityContextEnd(rc, requestParams);
+        } else {
+            rc.abortWith(Response.status(401).build());
         }
+    }
+
+    protected boolean isStartUriMatched(String absoluteRequestUri) {
+        return startUri.equals(WILDCARD) && !absoluteRequestUri.endsWith(completeUri)
+            || absoluteRequestUri.endsWith(startUri);
     }
 
     protected void checkSecurityContextStart(ContainerRequestContext rc) {
