@@ -18,27 +18,46 @@
  */
 package sample.rs.client;
 
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.apache.cxf.jaxrs.client.WebClient;
+import org.apache.cxf.jaxrs.client.spring.EnableJaxRsProxyClient;
+import org.apache.cxf.jaxrs.client.spring.EnableJaxRsWebClient;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.context.annotation.Bean;
 
 import sample.rs.service.HelloService;
 
-
-public final class SampleRestClientApplication {
-    private HelloService helloService;
-    
+@SpringBootApplication
+@EnableJaxRsWebClient
+@EnableJaxRsProxyClient
+public class SampleRestClientApplication {
     public static void main(String[] args) {
-        ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("sample/rs/client/client.xml");
-        SampleRestClientApplication clientApp = ctx.getBean(SampleRestClientApplication.class);
-        System.out.println(clientApp.getHelloService().sayHello("ApacheCxfUser"));
-        ctx.close();
-    }
-
-    public HelloService getHelloService() {
-        return helloService;
-    }
-
-    public void setHelloService(HelloService helloService) {
-        this.helloService = helloService;
+        new SpringApplicationBuilder(SampleRestClientApplication.class)
+            .web(false)
+            .run(args);
     }  
+    @Bean
+    CommandLineRunner initWebClientRunner(final WebClient webClient) {
+      
+      return new CommandLineRunner() {
+
+        @Override
+        public void run(String... runArgs) throws Exception {
+            System.out.println(webClient.path("sayHello/ApacheCxfWebClientUser").get(String.class));
+        }
+      };
+    }
+    @Bean
+    CommandLineRunner initProxyClientRunner(final HelloService client) {
+      
+      return new CommandLineRunner() {
+
+        @Override
+        public void run(String... runArgs) throws Exception {
+            System.out.println(client.sayHello("ApacheCxfProxyUser"));
+        }
+      };
+    }
 }
 

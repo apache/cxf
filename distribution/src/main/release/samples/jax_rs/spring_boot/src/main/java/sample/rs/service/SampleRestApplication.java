@@ -22,12 +22,8 @@ import java.util.Arrays;
 import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
-import org.apache.cxf.jaxrs.client.WebClient;
-import org.apache.cxf.jaxrs.client.spring.EnableJaxRsProxyClient;
-import org.apache.cxf.jaxrs.client.spring.EnableJaxRsWebClient;
 import org.apache.cxf.jaxrs.swagger.Swagger2Feature;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -36,8 +32,6 @@ import sample.rs.service.hello1.HelloServiceImpl1;
 import sample.rs.service.hello2.HelloServiceImpl2;
 
 @SpringBootApplication
-@EnableJaxRsWebClient
-@EnableJaxRsProxyClient
 public class SampleRestApplication {
     @Autowired
     private Bus bus;
@@ -54,28 +48,5 @@ public class SampleRestApplication {
         endpoint.setAddress("/");
         endpoint.setFeatures(Arrays.asList(new Swagger2Feature()));
         return endpoint.create();
-    }
- 
-    @Bean
-    CommandLineRunner initWebClientRunner(final WebClient webClient) {
-      
-      return new CommandLineRunner() {
-
-        @Override
-        public void run(String... runArgs) throws Exception {
-            System.out.println(webClient.path("sayHello/ApacheCxfWebClientUser").get(String.class));
-        }
-      };
-    }
-    @Bean
-    CommandLineRunner initProxyClientRunner(final HelloService client) {
-      
-      return new CommandLineRunner() {
-
-        @Override
-        public void run(String... runArgs) throws Exception {
-            System.out.println(client.sayHello("ApacheCxfProxyUser"));
-        }
-      };
     }
 }
