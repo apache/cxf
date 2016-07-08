@@ -57,7 +57,7 @@ public final class JoseConstants {
     //
     
     /**
-     * The keystore type. Suitable values are "jks" or "jwk".
+     * The keystore type. Suitable values are "jks" or "jwk". The default value is "jwk".
      */
     public static final String RSSEC_KEY_STORE_TYPE = "rs.security.keystore.type";
     
