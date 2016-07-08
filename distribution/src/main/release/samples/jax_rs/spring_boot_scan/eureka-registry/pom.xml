@@ -5,8 +5,8 @@
 
     <parent>
         <groupId>org.springframework.cloud</groupId>
-        <artifactId>spring-cloud-starter-parent</artifactId>
-        <version>1.0.0.RELEASE</version>
+        <artifactId>spring-cloud-dependencies</artifactId>
+        <version>Brixton.RELEASE</version>
     </parent>
 
     <artifactId>eureka-registry-for-cxf</artifactId>

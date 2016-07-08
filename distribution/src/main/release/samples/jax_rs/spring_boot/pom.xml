@@ -28,35 +28,35 @@
         </dependency>
     </dependencies>
     <profiles>
-        <profile>
-            <id>server</id>
-    <build>
-      <defaultGoal>spring-boot:run</defaultGoal>
-      <plugins>
-        <plugin>
-           <groupId>org.springframework.boot</groupId>
-           <artifactId>spring-boot-maven-plugin</artifactId>
-           <configuration>
-               <mainClass>sample.rs.service.SampleRestApplication</mainClass>
-           </configuration>  
-        </plugin>
-      </plugins>
-    </build>
-    </profile>
-    <profile>
-            <id>client</id>
-    <build>
-      <defaultGoal>spring-boot:run</defaultGoal>
-      <plugins>
-        <plugin>
-           <groupId>org.springframework.boot</groupId>
-           <artifactId>spring-boot-maven-plugin</artifactId>
-           <configuration>
-               <mainClass>sample.rs.client.SampleRestClientApplication</mainClass>
-           </configuration>  
-        </plugin>
-      </plugins>
-    </build>
-    </profile>
+       <profile>
+         <id>server</id>
+         <build>
+           <defaultGoal>spring-boot:run</defaultGoal>
+           <plugins>
+             <plugin>
+              <groupId>org.springframework.boot</groupId>
+              <artifactId>spring-boot-maven-plugin</artifactId>
+              <configuration>
+                <mainClass>sample.rs.service.SampleRestApplication</mainClass>
+              </configuration>  
+             </plugin>
+           </plugins>
+          </build>
+       </profile>
+       <profile>
+         <id>client</id>
+         <build>
+           <defaultGoal>spring-boot:run</defaultGoal>
+           <plugins>
+             <plugin>
+              <groupId>org.springframework.boot</groupId>
+              <artifactId>spring-boot-maven-plugin</artifactId>
+              <configuration>
+                <mainClass>sample.rs.client.SampleRestClientApplication</mainClass>
+              </configuration>  
+             </plugin>
+           </plugins>
+          </build>
+       </profile>
     </profiles>
 </project>

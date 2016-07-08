@@ -17,7 +17,6 @@
  * under the License.
  */
 package sample.rs.service;
-import org.apache.cxf.jaxrs.swagger.Swagger2Feature;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.actuate.autoconfigure.ExportMetricWriter;
 import org.springframework.boot.actuate.metrics.Metric;
@@ -25,14 +24,13 @@ import org.springframework.boot.actuate.metrics.writer.Delta;
 import org.springframework.boot.actuate.metrics.writer.MetricWriter;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
 @EnableEurekaClient
-public class SampleScanRestApplication {
+public class SampleRestApplication {
     public static void main(String[] args) {
-        SpringApplication.run(SampleScanRestApplication.class, args);
+        SpringApplication.run(SampleRestApplication.class, args);
     }
  
     @Bean
@@ -60,4 +58,6 @@ public class SampleScanRestApplication {
                 
             };
     }
-}
+    
+    
+ }
