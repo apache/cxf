@@ -55,23 +55,6 @@
               <mainClass>sample.rs.client.SampleRestClientApplication</mainClass>
             </configuration>
         </plugin>
-        <plugin>
-            <groupId>com.spotify</groupId>
-            <artifactId>docker-maven-plugin</artifactId>
-            <version>0.4.9</version>
-              <configuration>
-                  <imageName>${project.groupId}/${project.artifactId}</imageName>
-                  <baseImage>frolvlad/alpine-oraclejdk8:slim</baseImage>
-                  <entryPoint>java -Djava.security.egd=file:/dev/./urandom -jar ${project.build.finalName}.jar</entryPoint>
-                  <resources>
-                     <resource>
-                         <targetPath>/</targetPath>
-                         <directory>${project.build.directory}</directory>
-                         <include>${project.build.finalName}.jar</include>
-                     </resource>
-                  </resources>
-              </configuration>
-         </plugin> 
       </plugins>
     </build>
 </project>

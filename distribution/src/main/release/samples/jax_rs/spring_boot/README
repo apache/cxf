@@ -6,7 +6,7 @@ with Spring Boot. This demo has two JAX-RS class resources being deployed in a s
 The sample uses Maven. It can be built and run from the command line:
 
 ----
-$ mvn spring-boot:run
+$ mvn -Pserver
 ----
 
 http://localhost:8080/services/helloservice/sayHello/ApacheCxfUser
@@ -23,19 +23,6 @@ description of services.
 To run the client from a command line open a new terminal window and run:
 
 ----
-$ mvn exec:java
+$ mvn -Pclient
 ----
 
-Using Docker:
-If you have Docker running on your machine (and appropriate DOCKER_HOST set), 
-you can run
-
-----
-$ mvn docker:build
-----
-
-to create the Docker image.  Once created, you can start the container via:
-
-----
-docker run -p 8080:8080 -t org.apache.cxf.samples/spring-boot-sample-rs-cxf
-----
