@@ -35,9 +35,8 @@ description of services.
 
 
 Before running a command line client check the application has been registered, open a browser 
-and try "http://localhost:8761/eureka/apps". Once you see a registration record, do
-
-To run the client from a command line open a new terminal window and run:
+and try "http://localhost:8761/eureka/apps". Once you see a registration record, 
+open a new terminal window and run the client:
 
 ----
 $ mvn -Pclient
