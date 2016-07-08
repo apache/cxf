@@ -62,6 +62,18 @@ public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
         
         this.setClient(client);
         
+        // OIDC filters test client
+        client = new Client("consumer-id-oidc", "this-is-a-secret", true);
+        client.setRedirectUris(Collections.singletonList("https://localhost:" + servicePort 
+                                                         + "/secured/bookstore/books"));
+        
+        client.getAllowedGrantTypes().add("authorization_code");
+        client.getAllowedGrantTypes().add("refresh_token");
+        
+        client.getRegisteredScopes().add("openid");
+        
+        this.setClient(client);
+        
         // Audience test client
         client = new Client("consumer-id-aud", "this-is-a-secret", true);
         client.setRedirectUris(Collections.singletonList("http://www.blah.apache.org"));

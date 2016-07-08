@@ -228,12 +228,14 @@ public class AbstractTokenService extends AbstractOAuthService {
         try {
             client = getValidClient(clientId);
         } catch (OAuthServiceException ex) {
+            LOG.warning("No valid client found for clientId: " + clientId);
             if (ex.getError() != null) {
                 reportInvalidClient(ex.getError());
                 return null;
             }
         }
         if (client == null) {
+            LOG.warning("No valid client found for clientId: " + clientId);
             reportInvalidClient();
         }
         return client;
