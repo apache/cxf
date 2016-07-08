@@ -18,9 +18,13 @@
  */
 package org.apache.cxf.jaxrs.client.spring;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.ws.rs.ext.Provider;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.client.Client;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.spring.JaxRsConfig;
@@ -47,6 +51,10 @@ public abstract class AbstractJaxRsClientConfiguration implements ApplicationCon
     private String address;
     @Value("${cxf.jaxrs.client.thread-safe:false}")
     private Boolean threadSafe;
+    @Value("${cxf.jaxrs.client.headers.accept:''}")
+    private String accept;
+    @Value("${cxf.jaxrs.client.headers.content-type:''}")
+    private String contentType;
     
     
     protected Client createClient() {
@@ -61,7 +69,16 @@ public abstract class AbstractJaxRsClientConfiguration implements ApplicationCon
                 bean.setProvider(context.getBean(beanName));
             } 
         }
-        
+        Map<String, String> extraHeaders = new HashMap<String, String>();
+        if (!StringUtils.isEmpty(accept)) {
+            extraHeaders.put("Accept", accept);
+        }
+        if (!StringUtils.isEmpty(contentType)) {
+            extraHeaders.put("Content-Type", contentType);
+        }
+        if (!extraHeaders.isEmpty()) {
+            bean.setHeaders(extraHeaders);
+        }
         return bean.create();
     }
     

@@ -27,7 +27,7 @@ import org.springframework.context.annotation.Import;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-@Import(WebClientConfiguration.class)
+@Import(JaxRsWebClientConfiguration.class)
 public @interface EnableJaxRsWebClient {
 
 }
