@@ -27,7 +27,7 @@ import org.springframework.context.annotation.Import;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-@Import(JaxRsClientClassesScanConfiguration.class)
+@Import(JaxRsProxyClientConfiguration.class)
 public @interface EnableJaxRsProxyClient {
 
 }
