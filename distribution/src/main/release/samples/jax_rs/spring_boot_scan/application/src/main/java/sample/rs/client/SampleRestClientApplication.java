@@ -18,26 +18,45 @@
  */
 package sample.rs.client;
 
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import javax.ws.rs.core.UriBuilder;
+
+import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
+import org.springframework.context.annotation.Bean;
 
 import sample.rs.service.HelloService;
 
-
-public final class SampleRestClientApplication {
-    private HelloService helloService;
-    
+@SpringBootApplication
+@EnableEurekaClient
+public class SampleRestClientApplication {
     public static void main(String[] args) {
-        ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("sample/rs/client/client.xml");
-        SampleRestClientApplication clientApp = ctx.getBean(SampleRestClientApplication.class);
-        System.out.println(clientApp.getHelloService().sayHello("ApacheCxfUser"));
-        ctx.close();
-    }
-
-    public HelloService getHelloService() {
-        return helloService;
-    }
-
-    public void setHelloService(HelloService helloService) {
-        this.helloService = helloService;
+        new SpringApplicationBuilder(SampleRestClientApplication.class)
+            .web(false)
+            .run(args);
     }  
+    @Bean
+    CommandLineRunner initDiscoveryClient(final DiscoveryClient discoveryClient) {
+      
+      return new CommandLineRunner() {
+
+        @Override
+        public void run(String... runArgs) throws Exception {
+            //TODO: Wire it in a CXF FailoverStrategy
+            for (ServiceInstance s : discoveryClient.getInstances("jaxrs-hello-world-service")) {
+                UriBuilder ub = UriBuilder.fromUri(s.getUri());
+                if (s.getMetadata().containsKey("servletPath")) {
+                    ub.path(s.getMetadata().get("servletPath"));
+                }
+                HelloService service = JAXRSClientFactory.create(ub.build(), HelloService.class);
+                System.out.println(service.sayHello("ApacheCxfProxyUser"));
+            }
+            
+        }
+      };
+    }
 }

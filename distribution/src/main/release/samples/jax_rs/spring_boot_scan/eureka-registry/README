@@ -1,0 +1,14 @@
+== Spring Boot - Eureka Registry Application 
+
+This sample project shows how to start Eureka Registry.  
+
+
+Run the registry application:
+ 
+----
+$ mvn spring-boot:run
+----
+
+Check the registry is live with typing "http://localhost:8761/eureka/apps" in a browser.
+
+Next run the demo server and once the registration record is available - the command line client.

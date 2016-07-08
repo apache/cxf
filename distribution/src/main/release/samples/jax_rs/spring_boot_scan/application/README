@@ -6,11 +6,20 @@ and deployed in a single JAX-RS endpoint.
 
 The application registers itself with Eureka Registry.  
 
+The client discovers the client address from the registry and invokes it.
 
-The sample uses Maven. It can be built and run from the command line:
+The sample uses Maven. It can be built and run from the command line.
 
-----
+To run the client from a command line:
+
+1. If you have not started a eureka-registry application then build and start it 
+first in the eureka-registry folder in a separate terminal window:
+
 $ mvn spring-boot:run
+
+2. Run the server 
+----
+$ mvn -Pserver
 ----
 
 http://localhost:8080/services/helloservice/sayHello/ApacheCxfUser
@@ -24,9 +33,12 @@ will display "Hello2 ApacheCxfUser, Welcome to CXF RS Spring Boot World!!!"
 http://localhost:8080/services/helloservice/swagger.json will return a Swagger JSON
 description of services.
 
+
+Before running a command line client check the application has been registered, open a browser 
+and try "http://localhost:8761/eureka/apps". Once you see a registration record, do
+
 To run the client from a command line open a new terminal window and run:
 
 ----
-$ mvn exec:java
+$ mvn -Pclient
 ----
-

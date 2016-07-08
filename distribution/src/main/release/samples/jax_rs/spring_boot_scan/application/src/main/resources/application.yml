@@ -1,5 +1,5 @@
 server:
-  port: ${vcap.application.port:8080}
+  port: 8080
   servlet-path: /system
 
 cxf:
@@ -12,15 +12,13 @@ cxf:
 
 eureka:
   client:
+    registerWithEureka: ${register.with.eureka:true}
     serviceUrl:
-      defaultZone: ${vcap.services.eureka-service.credentials.uri:http://127.0.0.1:8761}/eureka/
+      defaultZone: http://127.0.0.1:8761/eureka/
   instance:
     statusPageUrlPath: /services/helloservice/info
     healthCheckUrlPath: /system/health
     metadataMap:
       instanceId: ${spring.application.name}:${spring.application.instance_id:${random.value}} 
-    
----
-spring:
-  profiles: cloud        
+      servletPath: ${cxf.path}
 
