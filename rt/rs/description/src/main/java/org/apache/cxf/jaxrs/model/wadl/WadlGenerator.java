@@ -1067,8 +1067,16 @@ public class WadlGenerator implements ContainerRequestFilter {
                                         StringBuffer beanValidationBuffer) {
     //CHECKSTYLE:ON    
         boolean docAnnAvailable = isDocAvailable(anns);
+        
+        boolean apiParamDocsAvailable = false;
+        ApiParam apiParam = AnnotationUtils.getAnnotation(anns, ApiParam.class);
+        if (apiParam != null && apiParam.value() != null) {
+            apiParamDocsAvailable = true;
+        }
+        
         if (docAnnAvailable || (ori != null && !docProviders.isEmpty()) 
-                || (beanValidationBuffer != null && beanValidationBuffer.length() > 0)) {
+                || (beanValidationBuffer != null && beanValidationBuffer.length() > 0)
+                || apiParamDocsAvailable) {
             sb.append(">");
             if (docAnnAvailable) {
                 handleDocs(anns, sb, category, allowDefault, isJson);
@@ -1080,8 +1088,7 @@ public class WadlGenerator implements ContainerRequestFilter {
             
             addBeanValidationAnnotationsDocs(sb, beanValidationBuffer);
             
-            ApiParam apiParam = AnnotationUtils.getAnnotation(anns, ApiParam.class);
-            if (apiParam != null && apiParam.value() != null) {
+            if (apiParamDocsAvailable) {
                 addDocumentation(sb, apiParam.value());
             }
             
