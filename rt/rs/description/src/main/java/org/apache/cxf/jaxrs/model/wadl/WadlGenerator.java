@@ -961,14 +961,23 @@ public class WadlGenerator implements ContainerRequestFilter {
                 value = "xs:anyType";
             }
         }
+        
+        checkForBeanValidationAnnotations(ori, sb, paramName, anns);
+        
+        
+        boolean stringRestrictionPresent = checkForBeanValidationAnnotationsForString(anns);
+        boolean numericRestrictionPresent = checkForBeanValidationAnnotationsForInteger(anns);
+        
         if (value != null) {
             if (isJson) {
                 value = value.substring(3);
             }
-            sb.append(" type=\"").append(value).append("\"");
+            if (!stringRestrictionPresent && !numericRestrictionPresent) {
+                sb.append(" type=\"").append(value).append("\"");
+            }
+            
         }
         
-        StringBuffer beanValidationBuffer = checkForBeanValidationAnnotations(ori, sb, paramName, anns);
         
         if (type.isEnum()) {
             sb.append(">");
@@ -978,67 +987,59 @@ public class WadlGenerator implements ContainerRequestFilter {
         } else {
             
             addDocsAndCloseElement(ori, pm.getIndex(), sb, anns, "param", DocTarget.PARAM, true, isJson, 
-                    beanValidationBuffer);
+                    stringRestrictionPresent, numericRestrictionPresent, value);
         }
     }
 
-    private void addBeanValidationAnnotationsDocs(StringBuilder sb, StringBuffer beanValidationBuffer) {
-        // add docs if bean-validations are present for information 
-        if (beanValidationBuffer != null && beanValidationBuffer.length() > 0) {
-            addDocumentation(sb, beanValidationBuffer.toString());
-        }
-    }
 
-    private StringBuffer checkForBeanValidationAnnotations(OperationResourceInfo ori, StringBuilder sb,
+    private void checkForBeanValidationAnnotations(OperationResourceInfo ori, StringBuilder sb,
             String paramName, Annotation[] anns) {
-        // TODO JF: Auswertung der Parameter!!
-        NotNull notNull = AnnotationUtils.getAnnotation(anns, javax.validation.constraints.NotNull.class);
+
+    	NotNull notNull = AnnotationUtils.getAnnotation(anns, javax.validation.constraints.NotNull.class);
         if (notNull != null) {
             // parameter is required
             sb.append(" minOccurs=\"1\"");
         }
         
-        StringBuffer beanValidationBuffer = new StringBuffer();
+        // TODO debug output
+//        System.out.println("*** param: " + ori.getAnnotatedMethod().getName() + " " + paramName);
+//        System.out.println("*** anns: " + anns.length);
+//        for (Annotation annotation : anns) {
+//            System.out.println("*** type: " + annotation.annotationType());
+//        }
         
+    }
+
+    private boolean checkForBeanValidationAnnotationsForString(Annotation[] anns) {
+        boolean present = false;
         Size size = AnnotationUtils.getAnnotation(anns, javax.validation.constraints.Size.class);
         if (size != null) {
-            // TODO: we would have to add a simpleType to the XSD with restriction minLength/maxLength
-            // <xs:simpleType name="String_<minLenghth>_<maxLength>">
-            //   <xs:restriction base="xs:string">
-            //     <xs:maxLength value="..."/>
-            //   </xs:restriction>
-            // </xs:simpleType>
-            beanValidationBuffer.append(" minLength: " + size.min());
-            beanValidationBuffer.append(" maxLength: " + size.max());
-        }
-        
-        Min min = AnnotationUtils.getAnnotation(anns, Min.class);
-        if (min != null) {
-            // TODO: we would have to add a simpleType to the XSD with minimum
-            beanValidationBuffer.append(" minimum: " + min.value());
-        }
-        
-        Max max = AnnotationUtils.getAnnotation(anns, Max.class);
-        if (max != null) {
-            // TODO: we would have to add a simpleType to the XSD with minimum
-            beanValidationBuffer.append(" maximum: " + max.value());
+            present = true;
         }
         
         Pattern pattern = AnnotationUtils.getAnnotation(anns, Pattern.class);
         if (pattern != null) {
-            // TODO: we would have to add a simpleType to the XSD with restriction pattern
-            // <xs:pattern value="..."/>
-            
-            beanValidationBuffer.append(" pattern: " + pattern.pattern());
+            present = true;
         }
         
-        // TODO debug output
-        System.out.println("*** param: " + ori.getAnnotatedMethod().getName() + " " + paramName);
-        System.out.println("*** anns: " + anns.length);
-        for (Annotation annotation : anns) {
-            System.out.println("*** type: " + annotation.annotationType());
+        return present;
+    }
+
+    private boolean checkForBeanValidationAnnotationsForInteger(Annotation[] anns) {
+        boolean present = false;
+        
+        Min min = AnnotationUtils.getAnnotation(anns, Min.class);
+        if (min != null) {
+            present = true;
         }
-        return beanValidationBuffer;
+        
+        Max max = AnnotationUtils.getAnnotation(anns, Max.class);
+        if (max != null) {
+            present = true;
+        }
+        
+        return present;
+        
     }
 
     private void setEnumOptions(StringBuilder sb, Class<?> enumClass) {
@@ -1064,7 +1065,9 @@ public class WadlGenerator implements ContainerRequestFilter {
                                         String category, 
                                         boolean allowDefault, 
                                         boolean isJson, 
-                                        StringBuffer beanValidationBuffer) {
+                                        boolean stringRestrictionPresent,
+                                        boolean numericRestrictionPresent,
+                                        String type) {
     //CHECKSTYLE:ON    
         boolean docAnnAvailable = isDocAvailable(anns);
         
@@ -1075,8 +1078,9 @@ public class WadlGenerator implements ContainerRequestFilter {
         }
         
         if (docAnnAvailable || (ori != null && !docProviders.isEmpty()) 
-                || (beanValidationBuffer != null && beanValidationBuffer.length() > 0)
-                || apiParamDocsAvailable) {
+                || apiParamDocsAvailable
+                || stringRestrictionPresent
+                || numericRestrictionPresent) {
             sb.append(">");
             if (docAnnAvailable) {
                 handleDocs(anns, sb, category, allowDefault, isJson);
@@ -1086,10 +1090,46 @@ public class WadlGenerator implements ContainerRequestFilter {
                 handleOperParamJavaDocs(ori, paramIndex, sb);
             }
             
-            addBeanValidationAnnotationsDocs(sb, beanValidationBuffer);
-            
             if (apiParamDocsAvailable) {
                 addDocumentation(sb, apiParam.value());
+            }
+            
+            if (stringRestrictionPresent) {
+                sb.append("<xs:simpleType>");
+                sb.append("  <xs:restriction base=\"xs:string\">");
+            
+                Size size = AnnotationUtils.getAnnotation(anns, javax.validation.constraints.Size.class);
+                if (size != null) {
+                    sb.append("  <xs:minLength value=\"" + size.min() + "\" />");
+                    sb.append("  <xs:maxLength value=\"" + size.max() + "\" />");
+                }
+                
+                javax.validation.constraints.Pattern pattern = 
+                        AnnotationUtils.getAnnotation(anns, javax.validation.constraints.Pattern.class);
+                if (pattern != null) {
+                    sb.append("  <xs:pattern value=\"" + pattern.regexp() + "\" />");
+                }
+                
+                sb.append("  </xs:restriction>");
+                sb.append("</xs:simpleType>");
+            }
+            
+            if (numericRestrictionPresent) {
+                sb.append("<xs:simpleType>");
+                sb.append("  <xs:restriction base=\"" + type + "\">");
+                
+                Min min = AnnotationUtils.getAnnotation(anns, javax.validation.constraints.Min.class);
+                if (min != null) {
+                    sb.append("  <xs:minInclusive value=\"" + min.value() + "\" />");
+                }
+                
+                Max max = AnnotationUtils.getAnnotation(anns, javax.validation.constraints.Max.class);
+                if (max != null) {
+                    sb.append("  <xs:maxInclusive value=\"" + max.value() + "\" />");
+                }
+                
+                sb.append("  </xs:restriction>");
+                sb.append("</xs:simpleType>");
             }
             
             sb.append("</").append(elementName).append(">");
@@ -1180,7 +1220,7 @@ public class WadlGenerator implements ContainerRequestFilter {
                                   getBodyAnnotations(ori, inbound));
                 }
                 addDocsAndCloseElement(ori, inParamIndex, sb, anns, "representation", 
-                                       docCategory, allowDefault, isJson, null);
+                                       docCategory, allowDefault, isJson, false, false, null);
             }
         }
 
