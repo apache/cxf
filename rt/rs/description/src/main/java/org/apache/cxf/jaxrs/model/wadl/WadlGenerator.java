@@ -138,6 +138,9 @@ import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.constants.Constants;
 
+
+import io.swagger.annotations.ApiParam;
+
 public class WadlGenerator implements ContainerRequestFilter {
 
     public static final String WADL_QUERY = "_wadl";
@@ -982,9 +985,7 @@ public class WadlGenerator implements ContainerRequestFilter {
     private void addBeanValidationAnnotationsDocs(StringBuilder sb, StringBuffer beanValidationBuffer) {
         // add docs if bean-validations are present for information 
         if (beanValidationBuffer != null && beanValidationBuffer.length() > 0) {
-            sb.append("<doc>");
-            sb.append(beanValidationBuffer);
-            sb.append("</doc>");
+            addDocumentation(sb, beanValidationBuffer.toString());
         }
     }
 
@@ -1030,11 +1031,6 @@ public class WadlGenerator implements ContainerRequestFilter {
             
             beanValidationBuffer.append(" pattern: " + pattern.pattern());
         }
-        
-        
-        // TODO: ask if Swagger annotation support is welcome?
-        // ApiParam apiParam = AnnotationUtils.getAnnotation(anns, ApiParam.class);
-        // also have to check for @Description, see below
         
         // TODO debug output
         System.out.println("*** param: " + ori.getAnnotatedMethod().getName() + " " + paramName);
@@ -1084,10 +1080,20 @@ public class WadlGenerator implements ContainerRequestFilter {
             
             addBeanValidationAnnotationsDocs(sb, beanValidationBuffer);
             
+            ApiParam apiParam = AnnotationUtils.getAnnotation(anns, ApiParam.class);
+            if (apiParam != null && apiParam.value() != null) {
+                addDocumentation(sb, apiParam.value());
+            }
+            
             sb.append("</").append(elementName).append(">");
+            
         } else {
             sb.append("/>");
         }
+    }
+    
+    private void addDocumentation(StringBuilder sb, String doc) {
+        sb.append("<doc>" + doc + "</doc>");
     }
 
     private boolean isDocAvailable(Annotation[] anns) {
