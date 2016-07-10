@@ -46,6 +46,7 @@ import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -1265,6 +1266,15 @@ public class SourceGenerator {
                     writeAnnotation(sbCode, imports, DefaultValue.class, defaultVal, false, false);
                     sbCode.append(" ");    
                 }
+                
+                // Add BeanValidation annotations
+                // @NotNull
+                if ("true".equals(required)) {
+                    writeAnnotation(sbCode, imports, NotNull.class, null, false, false);
+                    sbCode.append(" ");
+                }
+                
+                
             }
             boolean isRepeating = isRepeatingParam(paramEl);
             String type = enumCreated ? getTypicalClassName(name)
