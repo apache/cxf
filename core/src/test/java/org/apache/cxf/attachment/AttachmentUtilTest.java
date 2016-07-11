@@ -22,53 +22,65 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class AttachmentUtilTest extends Assert {
-    
+
     @Test
     public void testContendDispositionFileNameNoQuotes() {
-        assertEquals("a.txt", 
+        assertEquals("a.txt",
                      AttachmentUtil.getContentDispositionFileName("form-data; filename=a.txt"));
     }
-    
+
     @Test
     public void testContendDispositionFileNameNoQuotesAndType() {
-        assertEquals("a.txt", 
+        assertEquals("a.txt",
                      AttachmentUtil.getContentDispositionFileName("filename=a.txt"));
     }
-    
+
     @Test
     public void testContendDispositionFileNameNoQuotesAndType2() {
-        assertEquals("a.txt", 
+        assertEquals("a.txt",
                      AttachmentUtil.getContentDispositionFileName("name=files; filename=a.txt"));
     }
-    
+
     @Test
     public void testContendDispositionFileNameSpacesNoQuotes() {
-        assertEquals("a.txt", 
+        assertEquals("a.txt",
                      AttachmentUtil.getContentDispositionFileName("form-data; filename = a.txt"));
     }
-    
+
     @Test
     public void testContendDispositionFileNameWithQuotes() {
-        assertEquals("a.txt", 
+        assertEquals("a.txt",
                      AttachmentUtil.getContentDispositionFileName("form-data; filename=\"a.txt\""));
     }
-    
+
     @Test
     public void testContendDispositionFileNameWithQuotesAndSemicolon() {
-        assertEquals("a;txt", 
+        assertEquals("a;txt",
                      AttachmentUtil.getContentDispositionFileName("form-data; filename=\"a;txt\""));
     }
-    
+
     @Test
     public void testContendDispositionFileNameWithQuotesAndSemicolon2() {
-        assertEquals("a;txt", 
+        assertEquals("a;txt",
                      AttachmentUtil.getContentDispositionFileName("filename=\"a;txt\""));
     }
-    
+
     @Test
     public void testContendDispositionFileNameWithQuotesAndSemicolon3() {
-        assertEquals("a;txt", 
+        assertEquals("a;txt",
                      AttachmentUtil.getContentDispositionFileName("name=\"a\";filename=\"a;txt\""));
+    }
+
+    @Test
+    public void testContentDispositionAsterickMode() {
+        assertEquals("a b;txt",
+                   AttachmentUtil.getContentDispositionFileName("name=\"a b\";filename*=UTF-8''a%20btxt"));
+    }
+
+    @Test
+    public void testContentDispositionAsterickModeLowercase() {
+        assertEquals("a b;txt",
+                   AttachmentUtil.getContentDispositionFileName("name=\"a b\";filename*=utf-8''a%20btxt"));
     }
 
     @Test
@@ -77,7 +89,7 @@ public class AttachmentUtilTest extends Assert {
                 AttachmentUtil.getContentDispositionFileName(
                         "filename*=UTF-8''%e4%b8%96%e7%95%8c%e3%83%bc%e3%83%95%e3%82%a1%e3%82%a4%e3%83%ab.txt"));
     }
-    
+
     @Test
     public void testContendDispositionFileNameNoRfc5987() {
         assertEquals("демо-сервис.zip",
@@ -86,4 +98,3 @@ public class AttachmentUtilTest extends Assert {
     }
 
 }
-
