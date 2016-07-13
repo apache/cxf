@@ -103,7 +103,7 @@ public class ContentDisposition {
                     paramValue = sb.toString();
                 }
             }
-            params.put(paramName, paramValue);
+            params.put(paramName.toLowerCase(), paramValue);
         }
         if (extendedFilename != null) {
             params.put("filename", extendedFilename);
