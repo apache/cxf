@@ -94,7 +94,7 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
             } 
         }
         
-        if (!sameUriRedirect && isStartUriMatched(absoluteRequestUri)) {
+        if (!sameUriRedirect && isStartUriMatched(ui, absoluteRequestUri)) {
             ClientTokenContext request = getClientTokenContext(rc);
             if (request != null) {
                 setClientCodeRequest(request);
@@ -118,9 +118,21 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
         }
     }
 
-    protected boolean isStartUriMatched(String absoluteRequestUri) {
-        return startUri.equals(WILDCARD) && (completeUri == null || !absoluteRequestUri.endsWith(completeUri))
-            || absoluteRequestUri.endsWith(startUri);
+    protected boolean isStartUriMatched(UriInfo ui, String absoluteRequestUri) {
+        if (startUri.equals(WILDCARD) && (completeUri == null || !absoluteRequestUri.endsWith(completeUri))) {
+            return true;
+        }
+        if (!absoluteRequestUri.endsWith(startUri)) {
+            return false;
+        }
+        if (startUri.equals(completeUri)) {
+            MultivaluedMap<String, String> queries = ui.getQueryParameters();
+            if (queries.containsKey(OAuthConstants.AUTHORIZATION_CODE_VALUE) 
+                || queries.containsKey(OAuthConstants.ERROR_KEY)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     protected void checkSecurityContextStart(ContainerRequestContext rc) {
