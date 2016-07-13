@@ -73,14 +73,26 @@ public class AttachmentUtilTest extends Assert {
 
     @Test
     public void testContentDispositionAsterickMode() {
-        assertEquals("a b;txt",
-                   AttachmentUtil.getContentDispositionFileName("name=\"a b\";filename*=UTF-8''a%20btxt"));
+        assertEquals("a b.txt",
+                   AttachmentUtil.getContentDispositionFileName("filename=\"bad.txt\"; filename*=UTF-8''a%20b.txt"));
     }
 
     @Test
     public void testContentDispositionAsterickModeLowercase() {
-        assertEquals("a b;txt",
-                   AttachmentUtil.getContentDispositionFileName("name=\"a b\";filename*=utf-8''a%20btxt"));
+        assertEquals("a b.txt",
+                   AttachmentUtil.getContentDispositionFileName("filename*=utf-8''a%20b.txt"));
+    }
+
+    @Test
+    public void testContentDispositionAsterickModeFnUppercase() {
+        assertEquals("a b.txt",
+                   AttachmentUtil.getContentDispositionFileName("FILENAME*=utf-8''a%20b.txt"));
+    }
+
+    @Test
+    public void testContentDispositionFnUppercase() {
+        assertEquals("a b.txt",
+                   AttachmentUtil.getContentDispositionFileName("FILENAME=\"a b.txt\""));
     }
 
     @Test
