@@ -33,7 +33,7 @@ public class ContentDisposition {
             Pattern.compile(CD_HEADER_PARAMS_EXPRESSION);
 
     private static final String CD_HEADER_EXT_PARAMS_EXPRESSION =
-            "(UTF-8|ISO-8859-1)''((?:%[0-9a-f]{2}|\\S)+)";
+            "(?i)(UTF-8|ISO-8859-1)''((?:%[0-9a-f]{2}|\\S)+)";
     private static final Pattern CD_HEADER_EXT_PARAMS_PATTERN =
             Pattern.compile(CD_HEADER_EXT_PARAMS_EXPRESSION);
     private static final Pattern CODEPOINT_ENCODED_VALUE_PATTERN = Pattern.compile("&#[0-9]{4};|\\S");
@@ -60,7 +60,7 @@ public class ContentDisposition {
             String paramName = pair[0].trim();
             String paramValue = pair.length == 2 ? pair[1].trim().replace("\"", "") : "";
             // filename* looks like the only CD param that is human readable
-            // and worthy of the extended encoding support. Other parameters 
+            // and worthy of the extended encoding support. Other parameters
             // can be supported if needed, see the complete list below
             /*
                 http://www.iana.org/assignments/cont-disp/cont-disp.xhtml#cont-disp-2
@@ -74,7 +74,7 @@ public class ContentDisposition {
                 voice               type or use of audio content [RFC2421]
                 handling            whether or not processing is required [RFC3204]
              */
-            if ("filename*".equals(paramName)) {
+            if ("filename*".equalsIgnoreCase(paramName)) {
                 // try to decode the value if it matches the spec
                 try {
                     Matcher matcher = CD_HEADER_EXT_PARAMS_PATTERN.matcher(paramValue);
@@ -87,7 +87,7 @@ public class ContentDisposition {
                 } catch (UnsupportedEncodingException e) {
                     // would be odd not to support UTF-8 or 8859-1
                 }
-            } else if ("filename".equals(paramName) && paramValue.contains("&#")) {
+            } else if ("filename".equalsIgnoreCase(paramName) && paramValue.contains("&#")) {
                 Matcher matcher = CODEPOINT_ENCODED_VALUE_PATTERN.matcher(paramValue);
                 StringBuilder sb = new StringBuilder();
                 while (matcher.find()) {
@@ -103,7 +103,7 @@ public class ContentDisposition {
                     paramValue = sb.toString();
                 }
             }
-            params.put(paramName, paramValue);
+            params.put(paramName.toLowerCase(), paramValue);
         }
         if (extendedFilename != null) {
             params.put("filename", extendedFilename);
@@ -117,7 +117,7 @@ public class ContentDisposition {
     public String getFilename() {
         return params.get("filename");
     }
-    
+
     public String getParameter(String name) {
         return params.get(name);
     }
