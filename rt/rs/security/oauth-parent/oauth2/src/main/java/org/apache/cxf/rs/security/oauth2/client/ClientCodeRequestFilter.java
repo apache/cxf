@@ -58,13 +58,12 @@ import org.apache.cxf.rt.security.crypto.CryptoUtils;
 @Priority(Priorities.AUTHENTICATION + 1)
 public class ClientCodeRequestFilter implements ContainerRequestFilter {
     protected static final Logger LOG = LogUtils.getL7dLogger(ClientCodeRequestFilter.class);
-    private static final String WILDCARD = "*";
     @Context
     private MessageContext mc;
     
     private String scopes;
     private String completeUri;
-    private String startUri = "*";
+    private String startUri;
     private String authorizationServiceUri;
     private Consumer consumer;
     private ClientCodeStateManager clientStateManager;
@@ -85,54 +84,63 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
         UriInfo ui = rc.getUriInfo();
         String absoluteRequestUri = ui.getAbsolutePath().toString();
         
-        boolean sameUriRedirect = false;
         if (completeUri == null) {
             String referer = rc.getHeaderString("Referer");
             if (referer != null && referer.startsWith(authorizationServiceUri)) {
                 completeUri = absoluteRequestUri;
-                sameUriRedirect = true;
             } 
         }
         
-        if (!sameUriRedirect && isStartUriMatched(ui, absoluteRequestUri)) {
+        if (isStartUriMatched(ui, absoluteRequestUri)) {
             ClientTokenContext request = getClientTokenContext(rc);
             if (request != null) {
                 setClientCodeRequest(request);
                 if (completeUri != null) {
                     rc.setRequestUri(URI.create(completeUri));
                 }
+                // let the request continue if the token context is already available
                 return;
             }
-            Response codeResponse = createCodeResponse(rc,  ui);
+            // start the code flow
+            Response codeResponse = createCodeResponse(rc, ui);
             rc.abortWith(codeResponse);
-        } else if (completeUri == null) {
-            LOG.warning("Complete URI is not initialized, authentication flow can not be completed");
-            rc.abortWith(Response.status(500).build());
             return;
-        } else if (absoluteRequestUri.endsWith(completeUri)) {
-            MultivaluedMap<String, String> requestParams = toRequestState(rc, ui);
-            processCodeResponse(rc, ui, requestParams);
-            checkSecurityContextEnd(rc, requestParams);
         } else {
-            rc.abortWith(Response.status(401).build());
-        }
+            // complete the code flow if possible
+            MultivaluedMap<String, String> requestParams = toRequestState(rc, ui);
+            if (codeResponseQueryParamsAvailable(requestParams)
+                && (completeUri == null || absoluteRequestUri.endsWith(completeUri))) {
+                processCodeResponse(rc, ui, requestParams);
+                checkSecurityContextEnd(rc, requestParams);
+                // let the request continue
+                return;
+            }
+        } 
+        // neither the start nor the end of the flow 
+        rc.abortWith(Response.status(401).build());
     }
 
     protected boolean isStartUriMatched(UriInfo ui, String absoluteRequestUri) {
-        if (startUri.equals(WILDCARD) && (completeUri == null || !absoluteRequestUri.endsWith(completeUri))) {
+        // If all request URIs can initiate a code flow then it is a match 
+        // unless the current request URI matches a non-null completeUri 
+        if (startUri == null && completeUri != null && !absoluteRequestUri.endsWith(completeUri)) {
             return true;
         }
-        if (!absoluteRequestUri.endsWith(startUri)) {
-            return false;
-        }
-        if (startUri.equals(completeUri)) {
+        // If completeUri is null or startUri equals to it then check the code flow
+        // response properties, if code parameters are set then it is the end of the flow
+        if (completeUri == null || startUri != null && startUri.equals(completeUri)) {
             MultivaluedMap<String, String> queries = ui.getQueryParameters();
-            if (queries.containsKey(OAuthConstants.AUTHORIZATION_CODE_VALUE) 
-                || queries.containsKey(OAuthConstants.ERROR_KEY)) {
+            if (codeResponseQueryParamsAvailable(queries)) {
                 return false;
             }
         }
-        return true;
+        // Finally compare start URI with the request URI
+        return startUri == null || absoluteRequestUri.endsWith(startUri);
+    }
+
+    private boolean codeResponseQueryParamsAvailable(MultivaluedMap<String, String> queries) {
+        return queries.containsKey(OAuthConstants.AUTHORIZATION_CODE_VALUE) 
+            || queries.containsKey(OAuthConstants.ERROR_KEY);
     }
 
     protected void checkSecurityContextStart(ContainerRequestContext rc) {

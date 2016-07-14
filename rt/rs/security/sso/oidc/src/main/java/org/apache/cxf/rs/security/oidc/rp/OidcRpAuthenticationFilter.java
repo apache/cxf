@@ -47,7 +47,7 @@ import org.apache.cxf.rs.security.oauth2.client.ClientTokenContextManager;
 import org.apache.cxf.rs.security.oidc.common.IdToken;
 
 @PreMatching
-@Priority(Priorities.AUTHENTICATION)
+@Priority(Priorities.AUTHENTICATION + 2)
 public class OidcRpAuthenticationFilter implements ContainerRequestFilter {
     @Context
     private MessageContext mc;
