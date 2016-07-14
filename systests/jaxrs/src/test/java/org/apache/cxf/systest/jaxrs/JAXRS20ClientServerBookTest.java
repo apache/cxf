@@ -66,6 +66,7 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.systest.jaxrs.BookStore.BookInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -649,7 +650,7 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         String address = "http://localhost:" + PORT + "/bookstores";
         List<Object> providers = new ArrayList<Object>();
         providers.add(new ClientCacheRequestFilter());
-        providers.add(new ClientHeaderResponseFilter());
+        providers.add(new ClientHeaderResponseFilter(true));
         WebClient wc = WebClient.create(address, providers);
         Book theBook = new Book("Echo", 123L);
         Response r = wc.post(theBook);
@@ -823,15 +824,26 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
     }
     
     private static class ClientHeaderResponseFilter implements ClientResponseFilter {
-
+        private boolean local;
+        ClientHeaderResponseFilter() {
+            
+        }
+        ClientHeaderResponseFilter(boolean local) {
+            this.local = local;
+        }
         @Override
         public void filter(ClientRequestContext reqContext, 
                            ClientResponseContext respContext) throws IOException {
-            respContext.getHeaders().putSingle(HttpHeaders.LOCATION, "http://localhost/redirect");
+            MultivaluedMap<String, String> headers = respContext.getHeaders();
+            if (!local) {
+                Assert.assertEquals(1, headers.get("Date").size());
+            }
+            headers.putSingle(HttpHeaders.LOCATION, "http://localhost/redirect");
             
         }
         
     }
+    
     
     public static class ClientReaderInterceptor implements ReaderInterceptor {
 

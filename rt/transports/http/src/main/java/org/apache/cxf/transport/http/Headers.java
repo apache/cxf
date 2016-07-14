@@ -492,7 +492,7 @@ public class Headers {
                         sb.append(',');
                     }
                 }
-                response.addHeader(header, sb.toString());
+                response.setHeader(header, sb.toString());
             }
 
             
