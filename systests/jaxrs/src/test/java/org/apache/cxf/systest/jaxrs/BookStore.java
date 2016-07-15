@@ -869,6 +869,10 @@ public class BookStore {
         if (headerSimple != null) {
             builder.header("Simple", headerSimple);
         }
+        String aHeaderValue = httpHeaders.getHeaderString("a");
+        if (aHeaderValue != null) {
+            builder.header("a", aHeaderValue);
+        }
         return builder;
     }
     

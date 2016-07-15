@@ -38,6 +38,7 @@ import javax.ws.rs.client.ClientRequestFilter;
 import javax.ws.rs.client.ClientResponseContext;
 import javax.ws.rs.client.ClientResponseFilter;
 import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.InvocationCallback;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Feature;
@@ -151,8 +152,12 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         Client client = ClientBuilder.newClient();
         client.register((Object)ClientFilterClientAndConfigCheck.class);
         client.property("clientproperty", "somevalue");
-        Book book = client.target(address).request("application/xml").get(Book.class);
+        Invocation.Builder builder = client.target(address).request("application/xml");
+        builder.header("a", "b");
+        Response r = builder.get();
+        Book book = r.readEntity(Book.class);
         assertEquals(124L, book.getId());
+        assertEquals("b", r.getHeaderString("a"));
     }
     
     @Test
