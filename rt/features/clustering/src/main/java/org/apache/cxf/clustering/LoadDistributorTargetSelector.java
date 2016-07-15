@@ -20,6 +20,7 @@ package org.apache.cxf.clustering;
 
 import java.util.List;
 import java.util.logging.Logger;
+
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.message.Exchange;
@@ -65,6 +66,10 @@ public class LoadDistributorTargetSelector extends FailoverTargetSelector {
      */
     public LoadDistributorTargetSelector() {
         super();
+    }
+    
+    public LoadDistributorTargetSelector(String clientBootstrapAddress) {
+        super(clientBootstrapAddress);
     }
 
     /**

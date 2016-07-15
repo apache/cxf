@@ -48,7 +48,7 @@ import org.springframework.context.annotation.FilterType;
 )
 public abstract class AbstractSpringComponentScanServer extends AbstractSpringConfigurationFactory {
 
-    @Value("${cxf.jaxrs.classes-scan-packages:''}")
+    @Value("${cxf.jaxrs.classes-scan-packages:}")
     private String classesScanPackages;
     
     private List<ResourceProvider> resourceProviders = new LinkedList<ResourceProvider>();

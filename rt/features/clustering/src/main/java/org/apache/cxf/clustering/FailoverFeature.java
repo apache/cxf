@@ -39,6 +39,14 @@ public class FailoverFeature extends AbstractFeature {
 
     private FailoverStrategy failoverStrategy;
     private FailoverTargetSelector targetSelector;
+    private String clientBootstrapAddress;
+    
+    public FailoverFeature() {
+        
+    }
+    public FailoverFeature(String clientBootstrapAddress) {
+        this.clientBootstrapAddress = clientBootstrapAddress;
+    }
     
     @Override
     protected void initializeProvider(InterceptorProvider provider, Bus bus) {
@@ -67,7 +75,7 @@ public class FailoverFeature extends AbstractFeature {
     
     public FailoverTargetSelector getTargetSelector() {
         if (this.targetSelector == null) {
-            this.targetSelector = new FailoverTargetSelector();
+            this.targetSelector = new FailoverTargetSelector(clientBootstrapAddress);
         }
         return this.targetSelector;
     }
@@ -82,5 +90,13 @@ public class FailoverFeature extends AbstractFeature {
     
     public FailoverStrategy getStrategy()  {
         return failoverStrategy;
+    }
+
+    public String getClientBootstrapAddress() {
+        return clientBootstrapAddress;
+    }
+
+    public void setClientBootstrapAddress(String clientBootstrapAddress) {
+        this.clientBootstrapAddress = clientBootstrapAddress;
     }
 }
