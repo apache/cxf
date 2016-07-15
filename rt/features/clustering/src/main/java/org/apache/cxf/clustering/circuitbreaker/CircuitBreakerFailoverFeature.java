@@ -34,6 +34,12 @@ public class CircuitBreakerFailoverFeature extends FailoverFeature {
              CircuitBreakerTargetSelector.DEFAULT_TIMEOUT);
     }
     
+    public CircuitBreakerFailoverFeature(String clientBootstrapAddress) {
+        this(CircuitBreakerTargetSelector.DEFAULT_THESHOLD, 
+             CircuitBreakerTargetSelector.DEFAULT_TIMEOUT,
+             clientBootstrapAddress);
+    }
+    
     public CircuitBreakerFailoverFeature(int threshold, long timeout) {
         this.threshold = threshold;
         this.timeout = timeout;

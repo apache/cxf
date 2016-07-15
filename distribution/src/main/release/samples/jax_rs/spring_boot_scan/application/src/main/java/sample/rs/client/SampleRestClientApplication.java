@@ -25,9 +25,9 @@ import javax.ws.rs.core.UriBuilder;
 
 import org.apache.cxf.annotations.Provider;
 import org.apache.cxf.annotations.Provider.Type;
-import org.apache.cxf.clustering.FailoverFeature;
 import org.apache.cxf.clustering.FailoverStrategy;
 import org.apache.cxf.clustering.RandomStrategy;
+import org.apache.cxf.clustering.circuitbreaker.CircuitBreakerFailoverFeature;
 import org.apache.cxf.jaxrs.client.spring.EnableJaxRsProxyClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -69,7 +69,7 @@ public class SampleRestClientApplication {
      */
     @Component
     @Provider(Type.Feature)
-    static class EurekaFailoverFeature extends FailoverFeature {
+    static class EurekaFailoverFeature extends CircuitBreakerFailoverFeature {
         @Autowired
         DiscoveryClient discoveryClient;
         List<String> addresses = new LinkedList<String>();
