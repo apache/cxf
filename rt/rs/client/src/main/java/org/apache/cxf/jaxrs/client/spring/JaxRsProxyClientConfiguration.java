@@ -34,7 +34,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 
 public class JaxRsProxyClientConfiguration extends AbstractJaxRsClientConfiguration {
-    @Value("${cxf.jaxrs.client.classes-scan-packages:''}")
+    @Value("${cxf.jaxrs.client.classes-scan-packages:}")
     private String scanPackages;
     
     @Bean

@@ -35,7 +35,7 @@ import org.springframework.context.annotation.Bean;
 
 public class JaxRsWebClientConfiguration extends AbstractJaxRsClientConfiguration {
 
-    @Value("${cxf.jaxrs.client.classes-scan-packages:''}")
+    @Value("${cxf.jaxrs.client.classes-scan-packages:}")
     private String scanPackages;
     
     @Bean

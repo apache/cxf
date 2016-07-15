@@ -75,6 +75,13 @@ public class CircuitBreakerTargetSelector extends FailoverTargetSelector {
         this.timeout = timeout;
     }
     
+    public CircuitBreakerTargetSelector(final int threshold, final long timeout,
+                                        final String clientBootstrapAddress) {
+        super(clientBootstrapAddress);
+        this.threshold = threshold;
+        this.timeout = timeout;
+    }
+    
     public CircuitBreakerTargetSelector() {
         this(DEFAULT_THESHOLD, DEFAULT_TIMEOUT);
     }

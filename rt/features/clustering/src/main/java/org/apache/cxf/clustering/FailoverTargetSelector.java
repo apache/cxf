@@ -55,11 +55,17 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
         = new ConcurrentHashMap<InvocationKey, InvocationContext>();
     protected FailoverStrategy failoverStrategy;
     private boolean supportNotAvailableErrorsOnly = true;
+    private String clientBootstrapAddress;
     /**
      * Normal constructor.
      */
     public FailoverTargetSelector() {
         super();
+    }
+    
+    public FailoverTargetSelector(String clientBootstrapAddress) {
+        super();
+        this.setClientBootstrapAddress(clientBootstrapAddress);
     }
     
     /**
@@ -85,6 +91,16 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
         
         InvocationKey key = new InvocationKey(exchange);
         if (getInvocationContext(key) == null) {
+            
+            if (getClientBootstrapAddress() != null
+                && getClientBootstrapAddress().equals(message.get(Message.ENDPOINT_ADDRESS))) {
+                List<String> addresses = failoverStrategy.getAlternateAddresses(exchange); 
+                if (addresses != null && !addresses.isEmpty()) {
+                    getEndpoint().getEndpointInfo().setAddress(addresses.get(0));
+                    message.put(Message.ENDPOINT_ADDRESS, addresses.get(0));
+                }
+            }
+            
             Endpoint endpoint = exchange.getEndpoint();
             BindingOperationInfo bindingOperationInfo =
                 exchange.getBindingOperationInfo();
@@ -406,6 +422,14 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
 
     public void setSupportNotAvailableErrorsOnly(boolean support) {
         this.supportNotAvailableErrorsOnly = support;
+    }
+
+    public String getClientBootstrapAddress() {
+        return clientBootstrapAddress;
+    }
+
+    public void setClientBootstrapAddress(String clientBootstrapAddress) {
+        this.clientBootstrapAddress = clientBootstrapAddress;
     }
 
     /**

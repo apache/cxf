@@ -19,12 +19,10 @@
 
 package org.apache.cxf.clustering.circuitbreaker;
 
+
 import org.apache.cxf.clustering.CircuitBreakerTargetSelector;
 import org.apache.cxf.clustering.FailoverFeature;
 import org.apache.cxf.clustering.FailoverTargetSelector;
-
-import static org.apache.cxf.clustering.CircuitBreakerTargetSelector.DEFAULT_THESHOLD;
-import static org.apache.cxf.clustering.CircuitBreakerTargetSelector.DEFAULT_TIMEOUT;
 
 public class CircuitBreakerFailoverFeature extends FailoverFeature {
     private int threshold;
@@ -32,10 +30,17 @@ public class CircuitBreakerFailoverFeature extends FailoverFeature {
     private FailoverTargetSelector targetSelector;
     
     public CircuitBreakerFailoverFeature() {
-        this(DEFAULT_THESHOLD, DEFAULT_TIMEOUT);
+        this(CircuitBreakerTargetSelector.DEFAULT_THESHOLD, 
+             CircuitBreakerTargetSelector.DEFAULT_TIMEOUT);
     }
     
     public CircuitBreakerFailoverFeature(int threshold, long timeout) {
+        this.threshold = threshold;
+        this.timeout = timeout;
+    }
+
+    public CircuitBreakerFailoverFeature(int threshold, long timeout, String clientBootstrapAddress) {
+        super(clientBootstrapAddress);
         this.threshold = threshold;
         this.timeout = timeout;
     }
@@ -43,7 +48,8 @@ public class CircuitBreakerFailoverFeature extends FailoverFeature {
     @Override
     public FailoverTargetSelector getTargetSelector() {
         if (this.targetSelector == null) {
-            this.targetSelector = new CircuitBreakerTargetSelector(threshold, timeout);
+            this.targetSelector = new CircuitBreakerTargetSelector(threshold, timeout, 
+                                                                   super.getClientBootstrapAddress());
         }
         return this.targetSelector;
     }

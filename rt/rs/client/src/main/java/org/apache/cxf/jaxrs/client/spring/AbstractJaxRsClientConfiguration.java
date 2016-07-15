@@ -24,7 +24,10 @@ import java.util.Map;
 import javax.ws.rs.ext.Provider;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.annotations.Provider.Scope;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.feature.Feature;
+import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxrs.client.Client;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.spring.JaxRsConfig;
@@ -40,7 +43,8 @@ import org.springframework.context.annotation.Import;
 @Import(JaxRsConfig.class)
 @ComponentScan(
                includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, 
-                                                      value = {Provider.class})
+                                                      value = {Provider.class,
+                                                               org.apache.cxf.annotations.Provider.class})
            )
 public abstract class AbstractJaxRsClientConfiguration implements ApplicationContextAware {
 
@@ -51,9 +55,9 @@ public abstract class AbstractJaxRsClientConfiguration implements ApplicationCon
     private String address;
     @Value("${cxf.jaxrs.client.thread-safe:false}")
     private Boolean threadSafe;
-    @Value("${cxf.jaxrs.client.headers.accept:''}")
+    @Value("${cxf.jaxrs.client.headers.accept:}")
     private String accept;
-    @Value("${cxf.jaxrs.client.headers.content-type:''}")
+    @Value("${cxf.jaxrs.client.headers.content-type:}")
     private String contentType;
     
     
@@ -67,8 +71,11 @@ public abstract class AbstractJaxRsClientConfiguration implements ApplicationCon
         for (String beanName : context.getBeanDefinitionNames()) {
             if (context.findAnnotationOnBean(beanName, Provider.class) != null) {
                 bean.setProvider(context.getBean(beanName));
+            } else if (context.findAnnotationOnBean(beanName, org.apache.cxf.annotations.Provider.class) != null) {
+                addCxfProvider(bean, context.getBean(beanName));
             } 
         }
+        
         Map<String, String> extraHeaders = new HashMap<String, String>();
         if (!StringUtils.isEmpty(accept)) {
             extraHeaders.put("Accept", accept);
@@ -81,7 +88,21 @@ public abstract class AbstractJaxRsClientConfiguration implements ApplicationCon
         }
         return bean.create();
     }
-    
+    protected void addCxfProvider(JAXRSClientFactoryBean factory, Object provider) {
+        org.apache.cxf.annotations.Provider ann = 
+            provider.getClass().getAnnotation(org.apache.cxf.annotations.Provider.class);
+        if (ann.scope() == Scope.Server) {
+            return;
+        }
+        if (ann.value() == org.apache.cxf.annotations.Provider.Type.Feature) {
+            factory.getFeatures().add((Feature)provider);
+        } else if (ann.value() == org.apache.cxf.annotations.Provider.Type.InInterceptor) {
+            factory.getInInterceptors().add((Interceptor<?>)provider);
+        } else if (ann.value() == org.apache.cxf.annotations.Provider.Type.OutInterceptor) {
+            factory.getOutInterceptors().add((Interceptor<?>)provider);
+        }
+        
+    }
     protected abstract void setJaxrsResources(JAXRSClientFactoryBean factory);
     
     @Override

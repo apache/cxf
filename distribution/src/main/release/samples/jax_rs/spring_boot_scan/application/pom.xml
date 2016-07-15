@@ -28,6 +28,11 @@
             <artifactId>cxf-rt-rs-service-description-swagger</artifactId>
             <version>${cxf.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-features-clustering</artifactId>
+            <version>${cxf.version}</version>
+        </dependency>
         <!-- Eureka Service Discovery Client -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
