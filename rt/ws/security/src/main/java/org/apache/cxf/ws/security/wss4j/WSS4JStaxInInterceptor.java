@@ -208,13 +208,7 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
                 msg, SecurityConstants.ENABLE_NONCE_CACHE, SecurityConstants.NONCE_CACHE_INSTANCE
             );
         }
-        if (nonceCache == null) {
-            securityProperties.setEnableNonceReplayCache(false);
-            securityProperties.setNonceReplayCache(null);
-        } else {
-            securityProperties.setEnableNonceReplayCache(true);
-            securityProperties.setNonceReplayCache(nonceCache);
-        }
+        securityProperties.setNonceReplayCache(nonceCache);
         
         ReplayCache timestampCache = null;
         if (isTimestampCacheRequired(msg, securityProperties)) {
@@ -222,13 +216,7 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
                 msg, SecurityConstants.ENABLE_TIMESTAMP_CACHE, SecurityConstants.TIMESTAMP_CACHE_INSTANCE
             );
         }
-        if (timestampCache == null) {
-            securityProperties.setEnableTimestampReplayCache(false);
-            securityProperties.setTimestampReplayCache(null);
-        } else {
-            securityProperties.setEnableTimestampReplayCache(true);
-            securityProperties.setTimestampReplayCache(timestampCache);
-        }
+        securityProperties.setTimestampReplayCache(timestampCache);
         
         ReplayCache samlCache = null;
         if (isSamlCacheRequired(msg, securityProperties)) {
@@ -237,13 +225,7 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
                 SecurityConstants.SAML_ONE_TIME_USE_CACHE_INSTANCE
             );
         }
-        if (samlCache == null) {
-            securityProperties.setEnableSamlOneTimeUseReplayCache(false);
-            securityProperties.setSamlOneTimeUseReplayCache(null);
-        } else {
-            securityProperties.setEnableSamlOneTimeUseReplayCache(true);
-            securityProperties.setSamlOneTimeUseReplayCache(samlCache);
-        }
+        securityProperties.setSamlOneTimeUseReplayCache(samlCache);
         
         boolean enableRevocation = 
             MessageUtils.isTrue(SecurityUtils.getSecurityPropertyValue(SecurityConstants.ENABLE_REVOCATION, msg));

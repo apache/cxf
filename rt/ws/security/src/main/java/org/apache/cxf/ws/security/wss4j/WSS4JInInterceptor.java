@@ -399,31 +399,22 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
     
     protected void configureReplayCaches(RequestData reqData, List<Integer> actions, SoapMessage msg) 
         throws WSSecurityException {
-        reqData.setEnableNonceReplayCache(false);
         if (isNonceCacheRequired(actions, msg)) {
             ReplayCache nonceCache = 
                 getReplayCache(
                     msg, SecurityConstants.ENABLE_NONCE_CACHE, SecurityConstants.NONCE_CACHE_INSTANCE
                 );
             reqData.setNonceReplayCache(nonceCache);
-            if (nonceCache != null) {
-                reqData.setEnableNonceReplayCache(true);
-            }
         }
         
-        reqData.setEnableTimestampReplayCache(false);
         if (isTimestampCacheRequired(actions, msg)) {
             ReplayCache timestampCache = 
                 getReplayCache(
                     msg, SecurityConstants.ENABLE_TIMESTAMP_CACHE, SecurityConstants.TIMESTAMP_CACHE_INSTANCE
                 );
             reqData.setTimestampReplayCache(timestampCache);
-            if (timestampCache != null) {
-                reqData.setEnableTimestampReplayCache(true);
-            }
         }
         
-        reqData.setEnableSamlOneTimeUseReplayCache(false);
         if (isSamlCacheRequired(actions, msg)) {
             ReplayCache samlCache = 
                 getReplayCache(
@@ -431,9 +422,6 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                     SecurityConstants.SAML_ONE_TIME_USE_CACHE_INSTANCE
                 );
             reqData.setSamlOneTimeUseReplayCache(samlCache);
-            if (samlCache != null) {
-                reqData.setEnableSamlOneTimeUseReplayCache(true);
-            }
         }
     }
     
