@@ -20,6 +20,9 @@ package org.apache.cxf.clustering;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.annotations.EvaluateAllEndpoints;
+import org.apache.cxf.annotations.Provider;
+import org.apache.cxf.annotations.Provider.Scope;
+import org.apache.cxf.annotations.Provider.Type;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ConduitSelector;
@@ -35,6 +38,7 @@ import org.apache.cxf.interceptor.InterceptorProvider;
  */
 @NoJSR250Annotations
 @EvaluateAllEndpoints
+@Provider(value = Type.Feature, scope = Scope.Client)
 public class FailoverFeature extends AbstractFeature {
 
     private FailoverStrategy failoverStrategy;

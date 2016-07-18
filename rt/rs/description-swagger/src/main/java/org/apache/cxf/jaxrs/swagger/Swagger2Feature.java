@@ -37,6 +37,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.cxf.annotations.Provider;
+import org.apache.cxf.annotations.Provider.Scope;
 import org.apache.cxf.annotations.Provider.Type;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Server;
@@ -54,7 +55,7 @@ import io.swagger.jaxrs.config.DefaultReaderConfig;
 import io.swagger.jaxrs.config.ReaderConfig;
 import io.swagger.jaxrs.listing.ApiListingResource;
 
-@Provider(Type.Feature)
+@Provider(value = Type.Feature, scope = Scope.Server)
 public class Swagger2Feature extends AbstractSwaggerFeature {
 
     protected boolean dynamicBasePath;
