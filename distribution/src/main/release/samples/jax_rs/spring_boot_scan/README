@@ -1,0 +1,11 @@
+== Spring Boot Scan Demo == 
+
+This sample project demonstrates how to autodiscover and use CXF JAX-RS services and clients
+with Spring Boot. 
+
+Check eureka-registry/README on how to run Eureka Registry.
+
+Check application/README on how to run a server application.
+
+Check client/README on how to run a command line client.
+

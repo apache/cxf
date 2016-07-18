@@ -34,10 +34,5 @@ http://localhost:8080/services/helloservice/swagger.json will return a Swagger J
 description of services.
 
 
-Before running a command line client check the application has been registered, open a browser 
-and try "http://localhost:8761/eureka/apps". Once you see a registration record, 
-open a new terminal window and run the client:
+Check client/README on how to run a command line client.
 
-----
-$ mvn -Pclient
-----
