@@ -1,0 +1,33 @@
+== Spring Boot - Samples - CXF Rest Client 
+
+This sample project demonstrates how to use CXF JAX-RS client code
+with Spring Boot.
+
+The application registers itself with Eureka Registry.  
+The client discovers the client address from the registry and invokes it.
+
+The sample uses Maven. It can be built and run from the command line.
+
+To run the client from a command line:
+
+1. 
+If you have not started a eureka-registry application then build and start it 
+first in the eureka-registry folder in a separate terminal window:
+
+$ mvn spring-boot:run
+
+If you have not started a demo application then build and start it 
+first in the application folder in a separate terminal window:
+
+----
+$ mvn -Pserver
+----
+
+
+Before running a command line client check the application has been registered, open a browser 
+and try "http://localhost:8761/eureka/apps". Once you see a registration record, 
+open a new terminal window and run the client:
+
+----
+$ mvn -Pclient
+----
