@@ -135,7 +135,7 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
             }
         }
         // Finally compare start URI with the request URI
-        return startUri == null || absoluteRequestUri.endsWith(startUri);
+        return startUri != null && absoluteRequestUri.endsWith(startUri);
     }
 
     private boolean codeResponseQueryParamsAvailable(MultivaluedMap<String, String> queries) {
