@@ -83,15 +83,16 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
         checkSecurityContextStart(rc);
         UriInfo ui = rc.getUriInfo();
         String absoluteRequestUri = ui.getAbsolutePath().toString();
-        
+        boolean sameRedirectUri = false;
         if (completeUri == null) {
             String referer = rc.getHeaderString("Referer");
             if (referer != null && referer.startsWith(authorizationServiceUri)) {
                 completeUri = absoluteRequestUri;
+                sameRedirectUri = true;
             } 
         }
         
-        if (isStartUriMatched(ui, absoluteRequestUri)) {
+        if (isStartUriMatched(ui, absoluteRequestUri, sameRedirectUri)) {
             ClientTokenContext request = getClientTokenContext(rc);
             if (request != null) {
                 setClientCodeRequest(request);
@@ -120,10 +121,11 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
         rc.abortWith(Response.status(401).build());
     }
 
-    protected boolean isStartUriMatched(UriInfo ui, String absoluteRequestUri) {
+    protected boolean isStartUriMatched(UriInfo ui, String absoluteRequestUri, boolean sameRedirectUri) {
         // If all request URIs can initiate a code flow then it is a match 
         // unless the current request URI matches a non-null completeUri 
-        if (startUri == null && completeUri != null && !absoluteRequestUri.endsWith(completeUri)) {
+        if (startUri == null 
+            && (completeUri != null && !absoluteRequestUri.endsWith(completeUri) || !sameRedirectUri)) {
             return true;
         }
         // If completeUri is null or startUri equals to it then check the code flow
