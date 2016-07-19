@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.rs.security.jose.jws;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +42,9 @@ public class JwsHeaders extends JoseHeaders {
     
     public JwsHeaders(Map<String, Object> values) {
         super(values);
+    }
+    public JwsHeaders(String kid) {
+        this(Collections.singletonMap(JoseConstants.HEADER_KEY_ID, kid));
     }
     public JwsHeaders(SignatureAlgorithm sigAlgo) {
         init(sigAlgo);
