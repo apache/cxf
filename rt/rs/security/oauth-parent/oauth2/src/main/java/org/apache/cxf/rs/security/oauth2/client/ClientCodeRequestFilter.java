@@ -124,8 +124,7 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
     protected boolean isStartUriMatched(UriInfo ui, String absoluteRequestUri, boolean sameRedirectUri) {
         // If all request URIs can initiate a code flow then it is a match 
         // unless the current request URI matches a non-null completeUri 
-        if (startUri == null 
-            && (completeUri != null && !absoluteRequestUri.endsWith(completeUri) || !sameRedirectUri)) {
+        if (startUri == null && completeUri != null && !absoluteRequestUri.endsWith(completeUri)) {
             return true;
         }
         // If completeUri is null or startUri equals to it then check the code flow
@@ -137,7 +136,8 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
             }
         }
         // Finally compare start URI with the request URI
-        return startUri != null && absoluteRequestUri.endsWith(startUri);
+        return startUri == null && !sameRedirectUri 
+            || startUri != null && absoluteRequestUri.endsWith(startUri);
     }
 
     private boolean codeResponseQueryParamsAvailable(MultivaluedMap<String, String> queries) {
