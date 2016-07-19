@@ -44,7 +44,7 @@ public class JwsHeaders extends JoseHeaders {
         super(values);
     }
     public JwsHeaders(String kid) {
-        this(Collections.singletonMap(JoseConstants.HEADER_KEY_ID, kid));
+        this(Collections.<String, Object>singletonMap(JoseConstants.HEADER_KEY_ID, kid));
     }
     public JwsHeaders(SignatureAlgorithm sigAlgo) {
         init(sigAlgo);

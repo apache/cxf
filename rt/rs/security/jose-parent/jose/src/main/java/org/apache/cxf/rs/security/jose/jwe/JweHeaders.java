@@ -50,7 +50,7 @@ public class JweHeaders extends JoseHeaders {
         super(values);
     }
     public JweHeaders(String kid) {
-        this(Collections.singletonMap(JoseConstants.HEADER_KEY_ID, kid));
+        this(Collections.<String, Object>singletonMap(JoseConstants.HEADER_KEY_ID, kid));
     }
     public JweHeaders(KeyAlgorithm keyEncAlgo, ContentAlgorithm ctEncAlgo) {
         this(keyEncAlgo, ctEncAlgo, false);

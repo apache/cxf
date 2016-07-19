@@ -143,13 +143,13 @@ public class JweJsonConsumerTest extends Assert {
         // Recipient 1
         JweDecryptionProvider jwe1 = JweUtils.createJweDecryptionProvider(wrapperKey1, keyAlgo, ctAlgo);
         JweDecryptionOutput out1 = consumer.decryptWith(jwe1,
-                                                        Collections.singletonMap("kid", "key1"));
+                                                        Collections.<String, Object>singletonMap("kid", "key1"));
         assertEquals(text, out1.getContentText());
         // Recipient 2
         JweDecryptionProvider jwe2 = JweUtils.createJweDecryptionProvider(wrapperKey2, keyAlgo, ctAlgo);
         
         JweDecryptionOutput out2 = consumer.decryptWith(jwe2,
-                                                        Collections.singletonMap("kid", "key2"));
+                                                        Collections.<String, Object>singletonMap("kid", "key2"));
         assertEquals(text, out2.getContentText());
         
         // Extra AAD
