@@ -52,7 +52,11 @@ public class JweJsonConsumer {
     }
 
     public JweDecryptionOutput decryptWith(JweDecryptionProvider jwe) {
-        JweJsonEncryptionEntry entry = getJweDecryptionEntry(jwe);
+        return decryptWith(jwe, (Map<String, Object>)null);
+    }
+    public JweDecryptionOutput decryptWith(JweDecryptionProvider jwe, 
+                                           Map<String, Object> recipientProps) {
+        JweJsonEncryptionEntry entry = getJweDecryptionEntry(jwe, recipientProps);
         return decryptWith(jwe, entry);
     }
     public JweDecryptionOutput decryptWith(JweDecryptionProvider jwe, JweJsonEncryptionEntry entry) {

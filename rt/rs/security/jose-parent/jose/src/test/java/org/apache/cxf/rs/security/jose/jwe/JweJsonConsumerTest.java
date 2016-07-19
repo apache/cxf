@@ -19,6 +19,7 @@
 package org.apache.cxf.rs.security.jose.jwe;
 
 import java.security.Security;
+import java.util.Collections;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
@@ -127,6 +128,34 @@ public class JweJsonConsumerTest extends Assert {
         assertEquals(text, out.getContentText());
         assertEquals(JweJsonProducerTest.EXTRA_AAD_SOURCE, consumer.getAadText());
     }
+    
+    @Test
+    public void testMultipleRecipients() {
+        final String text = "The true sign of intelligence is not knowledge but imagination.";
+        
+        SecretKey wrapperKey1 = CryptoUtils.createSecretKeySpec(JweJsonProducerTest.WRAPPER_BYTES1, 
+                                                               "AES");
+        SecretKey wrapperKey2 = CryptoUtils.createSecretKeySpec(JweJsonProducerTest.WRAPPER_BYTES2, 
+            "AES");
+        JweJsonConsumer consumer = new JweJsonConsumer(JweJsonProducerTest.MULTIPLE_RECIPIENTS_OUTPUT);
+        KeyAlgorithm keyAlgo = consumer.getSharedUnprotectedHeader().getKeyEncryptionAlgorithm();
+        ContentAlgorithm ctAlgo = consumer.getProtectedHeader().getContentEncryptionAlgorithm();
+        // Recipient 1
+        JweDecryptionProvider jwe1 = JweUtils.createJweDecryptionProvider(wrapperKey1, keyAlgo, ctAlgo);
+        JweDecryptionOutput out1 = consumer.decryptWith(jwe1,
+                                                        Collections.singletonMap("kid", "key1"));
+        assertEquals(text, out1.getContentText());
+        // Recipient 2
+        JweDecryptionProvider jwe2 = JweUtils.createJweDecryptionProvider(wrapperKey2, keyAlgo, ctAlgo);
+        
+        JweDecryptionOutput out2 = consumer.decryptWith(jwe2,
+                                                        Collections.singletonMap("kid", "key2"));
+        assertEquals(text, out2.getContentText());
+        
+        // Extra AAD
+        assertEquals(JweJsonProducerTest.EXTRA_AAD_SOURCE, consumer.getAadText());
+    }
+    
     @Test
     public void testSingleRecipientAllTypeOfHeadersAndAadModified() {
         SecretKey wrapperKey = CryptoUtils.createSecretKeySpec(JweJsonProducerTest.WRAPPER_BYTES1, 

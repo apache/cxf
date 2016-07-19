@@ -102,9 +102,11 @@ public class JweJsonProducerTest extends Assert {
         + "\"recipients\":" 
         + "["
         + "{"
+        + "\"header\":{\"kid\":\"key1\"},"
         + "\"encrypted_key\":\"b3-M9_CRgT3wEBhhXlpb-BoY7vtA4W_N\""
         + "},"
         + "{"
+        + "\"header\":{\"kid\":\"key2\"},"
         + "\"encrypted_key\":\"6a_nnEYO45qB_Vp6N2QbFQ7Cv1uecbiE\""
         + "}"
         + "],"
@@ -277,7 +279,7 @@ public class JweJsonProducerTest extends Assert {
         sharedUnprotectedHeaders.setJsonWebKeysUrl("https://server.example.com/keys.jwks");
         sharedUnprotectedHeaders.setKeyEncryptionAlgorithm(KeyAlgorithm.A128KW);
         
-        List<JweEncryptionProvider> jweList = new LinkedList<JweEncryptionProvider>();
+        List<JweEncryptionProvider> jweProviders = new LinkedList<JweEncryptionProvider>();
         
         KeyEncryptionProvider keyEncryption1 = 
             JweUtils.getSecretKeyEncryptionAlgorithm(wrapperKey1, KeyAlgorithm.A128KW);
@@ -287,8 +289,12 @@ public class JweJsonProducerTest extends Assert {
         KeyEncryptionProvider keyEncryption2 = 
             JweUtils.getSecretKeyEncryptionAlgorithm(wrapperKey2, KeyAlgorithm.A128KW);
         JweEncryptionProvider jwe2 = new JweEncryption(keyEncryption2, contentEncryption);
-        jweList.add(jwe1);
-        jweList.add(jwe2);
+        jweProviders.add(jwe1);
+        jweProviders.add(jwe2);
+        
+        List<JweHeaders> perRecipientHeades = new LinkedList<JweHeaders>();
+        perRecipientHeades.add(new JweHeaders("key1"));
+        perRecipientHeades.add(new JweHeaders("key2"));
         
         JweJsonProducer p = new JweJsonProducer(protectedHeaders,
                                                 sharedUnprotectedHeaders,
@@ -303,7 +309,7 @@ public class JweJsonProducerTest extends Assert {
             }
         };
         
-        String jweJson = p.encryptWith(jweList);
+        String jweJson = p.encryptWith(jweProviders, perRecipientHeades);
         assertEquals(MULTIPLE_RECIPIENTS_OUTPUT, jweJson);
     }
 }

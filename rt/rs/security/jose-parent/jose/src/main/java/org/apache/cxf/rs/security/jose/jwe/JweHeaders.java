@@ -19,6 +19,7 @@
 
 package org.apache.cxf.rs.security.jose.jwe;
 
+import java.util.Collections;
 import java.util.Map;
 
 import org.apache.cxf.common.util.Base64UrlUtility;
@@ -47,6 +48,9 @@ public class JweHeaders extends JoseHeaders {
     
     public JweHeaders(Map<String, Object> values) {
         super(values);
+    }
+    public JweHeaders(String kid) {
+        this(Collections.singletonMap(JoseConstants.HEADER_KEY_ID, kid));
     }
     public JweHeaders(KeyAlgorithm keyEncAlgo, ContentAlgorithm ctEncAlgo) {
         this(keyEncAlgo, ctEncAlgo, false);
