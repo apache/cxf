@@ -134,6 +134,10 @@ public class ContainerRequestContextImpl extends AbstractRequestContextImpl
     public void setSecurityContext(SecurityContext sc) {
         checkContext();
         m.put(SecurityContext.class, sc);
+        if (sc instanceof org.apache.cxf.security.SecurityContext) {
+            m.put(org.apache.cxf.security.SecurityContext.class, 
+                  (org.apache.cxf.security.SecurityContext)sc);
+        }
     }
 
     private void checkNotPreMatch() {
