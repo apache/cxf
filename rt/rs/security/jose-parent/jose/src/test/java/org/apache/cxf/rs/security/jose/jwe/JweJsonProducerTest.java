@@ -284,7 +284,9 @@ public class JweJsonProducerTest extends Assert {
         KeyEncryptionProvider keyEncryption1 = 
             JweUtils.getSecretKeyEncryptionAlgorithm(wrapperKey1, KeyAlgorithm.A128KW);
         ContentEncryptionProvider contentEncryption = 
-            JweUtils.getContentEncryptionProvider(ContentAlgorithm.A128GCM);
+            new AesGcmContentEncryptionAlgorithm(CEK_BYTES, JweCompactReaderWriterTest.INIT_VECTOR_A1,
+                                                 ContentAlgorithm.A128GCM);
+            
         JweEncryptionProvider jwe1 = new JweEncryption(keyEncryption1, contentEncryption);
         KeyEncryptionProvider keyEncryption2 = 
             JweUtils.getSecretKeyEncryptionAlgorithm(wrapperKey2, KeyAlgorithm.A128KW);
@@ -300,14 +302,7 @@ public class JweJsonProducerTest extends Assert {
                                                 sharedUnprotectedHeaders,
                                                 StringUtils.toBytesUTF8(text),
                                                 StringUtils.toBytesUTF8(EXTRA_AAD_SOURCE),
-                                                false) {
-            protected JweEncryptionInput createEncryptionInput(JweHeaders jsonHeaders) {
-                JweEncryptionInput input = super.createEncryptionInput(jsonHeaders);
-                input.setCek(CEK_BYTES);
-                input.setIv(JweCompactReaderWriterTest.INIT_VECTOR_A1);
-                return input;
-            }
-        };
+                                                false);
         
         String jweJson = p.encryptWith(jweProviders, perRecipientHeades);
         assertEquals(MULTIPLE_RECIPIENTS_OUTPUT, jweJson);
