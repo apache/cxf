@@ -122,7 +122,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
     protected Response startAuthorization(MultivaluedMap<String, String> params) {
         // Make sure the end user has authenticated, check if HTTPS is used
         SecurityContext sc = getAndValidateSecurityContext(params);
-        Client client = getClient(params);
+        Client client = getClient(params.getFirst(OAuthConstants.CLIENT_ID), params);
         // Create a UserSubject representing the end user 
         UserSubject userSubject = createUserSubject(sc, params);
         
@@ -351,7 +351,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
             state = recreateRedirectionStateFromParams(params); 
         }
         
-        Client client = getClient(state.getClientId());
+        Client client = getClient(state.getClientId(), params);
         String redirectUri = validateRedirectUri(client, state.getRedirectUri());
         
         // Get the end user decision value
@@ -502,11 +502,11 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
      *         the error is returned directly to the end user without 
      *         following the redirect URI if any
      */
-    protected Client getClient(String clientId) {
+    protected Client getClient(String clientId, MultivaluedMap<String, String> params) {
         Client client = null;
         
         try {
-            client = getValidClient(clientId);
+            client = getValidClient(clientId, params);
         } catch (OAuthServiceException ex) {
             if (ex.getError() != null) {
                 reportInvalidRequestError(ex.getError(), null);
@@ -518,9 +518,6 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         }
         return client;
         
-    }
-    protected Client getClient(MultivaluedMap<String, String> params) {
-        return this.getClient(params.getFirst(OAuthConstants.CLIENT_ID));
     }
     protected String getSupportedGrantType() {
         return this.supportedGrantType;

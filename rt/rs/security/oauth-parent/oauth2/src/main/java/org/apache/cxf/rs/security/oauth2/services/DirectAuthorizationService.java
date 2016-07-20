@@ -109,13 +109,10 @@ public class DirectAuthorizationService extends AbstractOAuthService {
         this.subjectCreator = subjectCreator;
     }
     protected Client getClient(MultivaluedMap<String, String> params) {
-        return getClient(params.getFirst(OAuthConstants.CLIENT_ID));
-    }
-    protected Client getClient(String clientId) {
         Client client = null;
         
         try {
-            client = getValidClient(clientId);
+            client = getValidClient(params.getFirst(OAuthConstants.CLIENT_ID), params);
         } catch (OAuthServiceException ex) {
             if (ex.getError() != null) {
                 reportInvalidRequestError(ex.getError(), null);

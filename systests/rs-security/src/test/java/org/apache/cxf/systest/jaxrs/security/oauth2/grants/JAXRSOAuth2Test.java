@@ -42,6 +42,7 @@ import org.apache.cxf.rs.security.oauth2.client.Consumer;
 import org.apache.cxf.rs.security.oauth2.client.OAuthClientUtils;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenGrant;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
+import org.apache.cxf.rs.security.oauth2.grants.clientcred.ClientCredentialsGrant;
 import org.apache.cxf.rs.security.oauth2.grants.jwt.JwtBearerGrant;
 import org.apache.cxf.rs.security.oauth2.grants.saml.Saml2BearerGrant;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
@@ -58,6 +59,7 @@ import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.common.util.DOM2Writer;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -128,11 +130,24 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
     }
     
     @Test
-    public void testTwoWayTLSAuthentication() throws Exception {
+    public void testTwoWayTLSAuthenticationCustomGrant() throws Exception {
         String address = "https://localhost:" + PORT + "/oauth2/token";
         WebClient wc = createWebClient(address);
         
         ClientAccessToken at = OAuthClientUtils.getAccessToken(wc, new CustomGrant());
+        assertNotNull(at.getTokenKey());
+    }
+    
+    @Test
+    public void testBasicAuthClientCred() throws Exception {
+        String address = "https://localhost:" + PORT + "/oauth2/token";
+        WebClient wc = createWebClient(address);
+        ClientCredentialsGrant grant = new ClientCredentialsGrant();
+        // Pass client_id & client_secret as form properties
+        // (instead WebClient can be initialized with username & password)
+        grant.setClientId("bob");
+        grant.setClientSecret("bobPassword");
+        ClientAccessToken at = OAuthClientUtils.getAccessToken(wc, grant);
         assertNotNull(at.getTokenKey());
     }
     

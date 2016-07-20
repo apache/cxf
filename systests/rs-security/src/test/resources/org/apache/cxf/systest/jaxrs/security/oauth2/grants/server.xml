@@ -74,6 +74,9 @@ under the License.
     <bean id="customGrantHandler" class="org.apache.cxf.systest.jaxrs.security.oauth2.grants.CustomGrantHandler">
         <property name="dataProvider" ref="dataProvider"/>
     </bean>
+    <bean id="clientCredGrantHandler" class="org.apache.cxf.rs.security.oauth2.grants.clientcred.ClientCredentialsGrantHandler">
+        <property name="dataProvider" ref="dataProvider"/>
+    </bean>
     <bean id="oauthJson" class="org.apache.cxf.rs.security.oauth2.provider.OAuthJSONProvider"/>
     <bean id="serviceBean" class="org.apache.cxf.rs.security.oauth2.services.AccessTokenService">
         <property name="dataProvider" ref="dataProvider"/>
@@ -82,6 +85,7 @@ under the License.
                 <ref bean="samlGrantHandler"/>
                 <ref bean="jwtGrantHandler"/>
                 <ref bean="customGrantHandler"/>
+                <ref bean="clientCredGrantHandler"/>
             </list>
         </property>
     </bean>
