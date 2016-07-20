@@ -18,6 +18,9 @@
  */
 package org.apache.cxf.rs.security.oidc.idp;
 
+import java.util.Collections;
+import java.util.List;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -39,6 +42,7 @@ import org.apache.cxf.rs.security.oidc.common.UserInfo;
 public class UserInfoService extends OAuthServerJoseJwtProducer {
     private UserInfoProvider userInfoProvider;
     private OAuthDataProvider oauthDataProvider;
+    private List<String> additionalClaims = Collections.emptyList();
     
     @Context
     private MessageContext mc;
@@ -101,6 +105,15 @@ public class UserInfoService extends OAuthServerJoseJwtProducer {
         if (idToken.getNickName() != null) {
             userInfo.setNickName(idToken.getNickName());
         }
+        
+        if (additionalClaims != null && !additionalClaims.isEmpty()) {
+            for (String additionalClaim : additionalClaims) {
+                if (idToken.containsProperty(additionalClaim)) {
+                    userInfo.setClaim(additionalClaim, idToken.getClaim(additionalClaim));
+                }
+            }
+        }
+        
         //etc
         return userInfo;
     }
@@ -111,5 +124,12 @@ public class UserInfoService extends OAuthServerJoseJwtProducer {
 
     public void setOauthDataProvider(OAuthDataProvider oauthDataProvider) {
         this.oauthDataProvider = oauthDataProvider;
+    }
+
+    /**
+     * Set additional claims to return (if they exist in the IdToken).
+     */
+    public void setAdditionalClaims(List<String> additionalClaims) {
+        this.additionalClaims = additionalClaims;
     }
 }
