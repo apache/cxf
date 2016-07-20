@@ -52,6 +52,7 @@ public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
     private Long maxAgeOffset;
     private String claims;
     private String claimsLocales;
+    private String roleClaim;
     
     public OidcClientCodeRequestFilter() {
         super();
@@ -87,7 +88,9 @@ public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
                                                            ctx.getIdToken(),
                                                            getConsumer()));
             }
-            rc.setSecurityContext(new OidcSecurityContext(ctx));
+            OidcSecurityContext oidcSecCtx = new OidcSecurityContext(ctx);
+            oidcSecCtx.setRoleClaim(roleClaim);
+            rc.setSecurityContext(oidcSecCtx);
         }
         
         return ctx;
@@ -192,5 +195,9 @@ public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
 
     public void setClaimsLocales(String claimsLocales) {
         this.claimsLocales = claimsLocales;
+    }
+    
+    public void setRoleClaim(String roleClaim) {
+        this.roleClaim = roleClaim;
     }
 }

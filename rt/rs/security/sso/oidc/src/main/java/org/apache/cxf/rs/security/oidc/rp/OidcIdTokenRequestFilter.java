@@ -39,6 +39,7 @@ public class OidcIdTokenRequestFilter implements ContainerRequestFilter {
     private String tokenFormParameter = "id_token"; 
     private IdTokenReader idTokenReader;
     private Consumer consumer;
+    private String roleClaim;
     
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
@@ -51,9 +52,12 @@ public class OidcIdTokenRequestFilter implements ContainerRequestFilter {
         
         IdToken idToken = idTokenReader.getIdToken(idTokenParamValue, consumer);
         JAXRSUtils.getCurrentMessage().setContent(IdToken.class, idToken);
-        requestContext.setSecurityContext(new OidcSecurityContext(idToken));
         
+        OidcSecurityContext oidcSecCtx = new OidcSecurityContext(idToken);
+        oidcSecCtx.setRoleClaim(roleClaim);
+        requestContext.setSecurityContext(oidcSecCtx);
     }
+    
     private MultivaluedMap<String, String> toFormData(ContainerRequestContext rc) {
         MultivaluedMap<String, String> requestState = new MetadataMap<String, String>();
         if (MediaType.APPLICATION_FORM_URLENCODED_TYPE.isCompatible(rc.getMediaType())) {
@@ -73,5 +77,9 @@ public class OidcIdTokenRequestFilter implements ContainerRequestFilter {
 
     public void setConsumer(Consumer consumer) {
         this.consumer = consumer;
+    }
+    
+    public void setRoleClaim(String roleClaim) {
+        this.roleClaim = roleClaim;
     }
 }
