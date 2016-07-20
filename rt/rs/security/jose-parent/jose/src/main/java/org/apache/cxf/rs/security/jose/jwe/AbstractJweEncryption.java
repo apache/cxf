@@ -106,15 +106,19 @@ public abstract class AbstractJweEncryption implements JweEncryptionProvider {
         AuthenticationTagProducer authTagProducer = null;
         byte[] cipher = null;
         byte[] authTag = null;
-        if (jweInput.getContent() == null) {
-            c = CryptoUtils.initCipher(createCekSecretKey(state), state.keyProps, 
-                                              Cipher.ENCRYPT_MODE);
-            authTagProducer = getAuthenticationTagProducer(state);
-        } else {
-            byte[] encryptedContent = encryptInternal(state, jweInput.getContent());
-            cipher = getActualCipher(encryptedContent);
-            authTag = getAuthenticationTag(state, encryptedContent);    
-        }
+        if (jweInput.isContentEncryptionRequired()) {
+            if (jweInput.getContent() == null) {
+                // Streaming
+                c = CryptoUtils.initCipher(createCekSecretKey(state), state.keyProps, 
+                                                  Cipher.ENCRYPT_MODE);
+                authTagProducer = getAuthenticationTagProducer(state);
+            } else {
+                byte[] encryptedContent = encryptInternal(state, jweInput.getContent());
+                cipher = getActualCipher(encryptedContent);
+                authTag = getAuthenticationTag(state, encryptedContent);    
+            }
+        } 
+        // else only CEK is encrypted  
         return new JweEncryptionOutput(c, 
                                       state.theHeaders, 
                                       state.jweContentEncryptionKey, 
