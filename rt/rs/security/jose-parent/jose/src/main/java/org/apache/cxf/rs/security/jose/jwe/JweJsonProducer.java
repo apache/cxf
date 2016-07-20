@@ -123,6 +123,7 @@ public class JweJsonProducer {
             JweEncryptionInput input = createEncryptionInput(jsonHeaders);
             if (i > 0) {    
                 input.setContent(null);
+                input.setContentEncryptionRequired(false);
             }
             JweEncryptionOutput state = encryptor.getEncryptionOutput(input);
             byte[] currentCipherText = state.getEncryptedContent();
