@@ -90,17 +90,17 @@ public abstract class AbstractOAuthService {
         return getMessageContext().getUriInfo().getQueryParameters();
     }
     
-    protected Client getValidClient(MultivaluedMap<String, String> params) {
-        return getValidClient(params.getFirst(OAuthConstants.CLIENT_ID));
-    }
     /**
      * Get the {@link Client} reference
      * @param clientId the provided client id
      * @return Client the client reference 
      * @throws {@link OAuthServiceExcepption} if no matching Client is found
      */
-    protected Client getValidClient(String clientId) throws OAuthServiceException {
+    protected Client getValidClient(String clientId, MultivaluedMap<String, String> params)
+        throws OAuthServiceException {
         if (clientId != null) {
+            mc.put(OAuthConstants.CLIENT_SECRET, params.getFirst(OAuthConstants.CLIENT_SECRET));
+            mc.put(OAuthConstants.GRANT_TYPE, params.getFirst(OAuthConstants.GRANT_TYPE));
             return dataProvider.getClient(clientId);
         }
         LOG.fine("No valid client found as the given clientId is null");

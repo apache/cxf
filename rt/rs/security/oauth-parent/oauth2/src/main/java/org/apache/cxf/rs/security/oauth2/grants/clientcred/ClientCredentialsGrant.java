@@ -18,13 +18,16 @@
  */
 package org.apache.cxf.rs.security.oauth2.grants.clientcred;
 
+import javax.ws.rs.core.MultivaluedMap;
+
 import org.apache.cxf.rs.security.oauth2.grants.AbstractGrant;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 public class ClientCredentialsGrant extends AbstractGrant {
     
     private static final long serialVersionUID = 5586488165697954347L;
-
+    private String clientId;
+    private String clientSecret;
     public ClientCredentialsGrant() {
         this(null);
     }
@@ -35,5 +38,25 @@ public class ClientCredentialsGrant extends AbstractGrant {
      
     public ClientCredentialsGrant(String scope, String audience) {
         super(OAuthConstants.CLIENT_CREDENTIALS_GRANT, scope, audience);
+    }
+    
+    public MultivaluedMap<String, String> toMap() {
+        MultivaluedMap<String, String> map = super.toMap();
+        if (clientId != null) {
+            map.putSingle(OAuthConstants.CLIENT_ID, clientId);
+            if (clientSecret != null) {
+                map.putSingle(OAuthConstants.CLIENT_SECRET, clientSecret);
+                
+            }    
+        }
+        return map;
+    }
+
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
+    }
+
+    public void setClientSecret(String clientSecret) {
+        this.clientSecret = clientSecret;
     }
 }

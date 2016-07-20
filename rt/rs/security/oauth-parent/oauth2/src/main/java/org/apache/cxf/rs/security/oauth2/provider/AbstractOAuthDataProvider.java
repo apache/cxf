@@ -219,6 +219,12 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         return new BearerAccessToken(client, accessTokenLifetime);
     }
      
+    protected String getCurrentRequestedGrantType() {
+        return (String)messageContext.get(OAuthConstants.GRANT_TYPE);
+    }
+    protected String getCurrentClientSecret() {
+        return (String)messageContext.get(OAuthConstants.CLIENT_SECRET);
+    }
     protected RefreshToken updateRefreshToken(RefreshToken rt, ServerAccessToken at) {
         linkAccessTokenToRefreshToken(rt, at);
         saveRefreshToken(rt);

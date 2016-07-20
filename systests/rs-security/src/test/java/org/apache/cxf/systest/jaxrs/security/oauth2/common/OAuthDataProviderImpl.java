@@ -22,7 +22,9 @@ import java.io.InputStream;
 import java.security.cert.Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.rs.security.oauth2.common.Client;
@@ -37,7 +39,7 @@ import org.apache.xml.security.utils.ClassLoaderUtils;
  * Extend the DefaultEHCacheCodeDataProvider to allow refreshing of tokens
  */
 public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
-    
+    private Set<String> externalClients = new HashSet<String>();
     public OAuthDataProviderImpl(String servicePort) throws Exception {
         // filters/grants test client
         Client client = new Client("consumer-id", "this-is-a-secret", true);
@@ -119,12 +121,29 @@ public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
         client2.getAllowedGrantTypes().add("custom_grant");
         client2.setApplicationCertificates(Collections.singletonList(encodedCert));
         this.setClient(client2);
+        
+        // external clients (in LDAP/etc) which can be used for client cred
+        externalClients.add("bob:bobPassword");
+        
     }
     
     private Certificate loadCert() throws Exception {
         try (InputStream is = ClassLoaderUtils.getResourceAsStream("keys/Truststore.jks", this.getClass())) {
             return CryptoUtils.loadCertificate(is, new char[]{'p', 'a', 's', 's', 'w', 'o', 'r', 'd'}, "morpit", null);
         }
+    }
+    
+    @Override
+    public Client getClient(String clientId) {
+        Client c = super.getClient(clientId);
+        if (c == null) {
+            String clientSecret = super.getCurrentClientSecret(); 
+            if (externalClients.contains(clientId + ":" + clientSecret)) {
+                c = new Client(clientId, clientSecret, true);
+            }
+        }
+        return c;
+        
     }
     
     @Override
