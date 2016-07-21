@@ -42,6 +42,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
+import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
@@ -87,6 +88,7 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
              + "&jndiURL=tcp://localhost:" + JMS_PORT;
                
         WebClient client = WebClient.create(endpointAddressUrlEncoded);
+        WebClient.getConfig(client).getInInterceptors().add(new LoggingInInterceptor());
         WebClient.getConfig(client).getRequestContext()
             .put(org.apache.cxf.message.Message.REQUEST_URI, "/bookstore/books/123");
         
