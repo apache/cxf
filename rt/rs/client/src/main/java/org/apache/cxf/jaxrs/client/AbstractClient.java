@@ -558,6 +558,17 @@ public abstract class AbstractClient implements Client {
         Exchange exchange = message.getExchange(); 
       
         Exception ex = message.getContent(Exception.class);
+        if (ex == null) {
+            ex = message.getExchange().get(Exception.class);
+        }
+        if (ex == null && !exchange.isOneWay()) {
+            synchronized (exchange) {
+                while (exchange.get("IN_CHAIN_COMPLETE") == null) {
+                    exchange.wait();
+                }
+            }
+        }
+        ex = message.getContent(Exception.class);
         if (ex != null
             || PropertyUtils.isTrue(exchange.get(SERVICE_NOT_AVAIL_PROPERTY))
                 && PropertyUtils.isTrue(exchange.get(COMPLETE_IF_SERVICE_NOT_AVAIL_PROPERTY))) {
@@ -1187,6 +1198,10 @@ public abstract class AbstractClient implements Client {
 
         @Override
         public void handleMessage(Message message) throws Fault {
+            synchronized (message.getExchange()) {
+                message.getExchange().put("IN_CHAIN_COMPLETE", Boolean.TRUE);
+                message.getExchange().notifyAll();
+            }
             if (message.getExchange().isSynchronous()) {
                 return;
             }
@@ -1195,6 +1210,10 @@ public abstract class AbstractClient implements Client {
 
         @Override
         public void handleFault(Message message) {
+            synchronized (message.getExchange()) {
+                message.getExchange().put("IN_CHAIN_COMPLETE", Boolean.TRUE);
+                message.getExchange().notifyAll();
+            }
             if (message.getExchange().isSynchronous()) {
                 return;
             }
