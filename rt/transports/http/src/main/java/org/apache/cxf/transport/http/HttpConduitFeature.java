@@ -22,15 +22,12 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.transport.Conduit;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Programmatically configure a http conduit. This can also be used as a DOSGi
  * intent.
  */
 public class HttpConduitFeature extends AbstractFeature {
-    static final Logger LOG = LoggerFactory.getLogger(HttpConduitFeature.class);
     private HttpConduitConfig conduitConfig;
 
     @Override
