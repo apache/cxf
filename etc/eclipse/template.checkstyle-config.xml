@@ -18,6 +18,11 @@
   under the License.
 -->
 <checkstyle-configurations file-format-version="5.0.0">
-    <check-configuration name="CXF Checks" location="@CHECKSTYLE_CONFIG_FILE@" type="external" description=""/>
-    <check-configuration name="CXF CORBA Checks" location="@CHECKSTYLE_CORBA_CONFIG_FILE@" type="external" description=""/>
+    <check-configuration name="CXF Checks" location="@CHECKSTYLE_CONFIG_FILE@" type="external" description="">
+        <property name="checkstyle.suppressions.file" value="@CHECKSTYLE_SUPPRESSION_FILE@" />
+    </check-configuration>
+    <check-configuration name="CXF CORBA Checks" location="@CHECKSTYLE_CORBA_CONFIG_FILE@" type="external" description="">
+        <property name="checkstyle.suppressions.file" value="@CHECKSTYLE_SUPPRESSION_FILE@" />
+    </check-configuration>
+
 </checkstyle-configurations>
