@@ -276,14 +276,17 @@
                                         <whichresource resource="/cxf-eclipse-checkstyle" property="eclipse.checkstyle.url" />
                                         <whichresource resource="/cxf-checkstyle.xml" property="checkstyle.url" />
                                         <whichresource resource="/cxf-checkstyle-corba.xml" property="corba.checkstyle.url" />
+                                        <whichresource resource="/cxf-checkstyle-suppressions.xml" property="checkstyle.suppression.url" />
                                         <mkdir dir="${full.eclipse.workspace}/.metadata/.plugins/org.eclipse.core.runtime/.settings" />
                                         <mkdir dir="${full.eclipse.workspace}/.metadata/.plugins/com.atlassw.tools.eclipse.checkstyle" />
                                         <mkdir dir="${full.eclipse.workspace}/.metadata/.plugins/net.sourceforge.pmd.eclipse" />
                                         <get src="${checkstyle.url}" dest="${full.eclipse.workspace}/cxf-checkstyle.xml" />
+                                        <get src="${checkstyle.suppression.url}" dest="${full.eclipse.workspace}/cxf-checkstyle-suppressions.xml" />
                                         <get src="${corba.checkstyle.url}" dest="${full.eclipse.workspace}/cxf-checkstyle-corba.xml" />
                                         <!-- Add checkstyle config -->
                                         <copy file="${basedir}/etc/eclipse/template.checkstyle-config.xml" tofile="${full.eclipse.workspace}/.metadata/.plugins/com.atlassw.tools.eclipse.checkstyle/checkstyle-config.xml" overwrite="no">
                                             <filterset>
+                                                <filter token="CHECKSTYLE_SUPPRESSION_FILE" value="${full.eclipse.workspace}/cxf-checkstyle-suppressions.xml" />
                                                 <filter token="CHECKSTYLE_CONFIG_FILE" value="${full.eclipse.workspace}/cxf-checkstyle.xml" />
                                                 <filter token="CHECKSTYLE_CORBA_CONFIG_FILE" value="${full.eclipse.workspace}/cxf-checkstyle-corba.xml" />
                                                 <filter token="APACHE_HEADER_FILE" value="${full.eclipse.workspace}/apache-header.txt" />
@@ -297,6 +300,7 @@
                                         <!-- Add checkstyle config for 5.0 plugin -->
                                         <copy file="${basedir}/etc/eclipse/template.checkstyle-config.xml" tofile="${full.eclipse.workspace}/.metadata/.plugins/net.sf.eclipsecs.core/checkstyle-config.xml" overwrite="no">
                                             <filterset>
+                                                <filter token="CHECKSTYLE_SUPPRESSION_FILE" value="${full.eclipse.workspace}/cxf-checkstyle-suppressions.xml" />
                                                 <filter token="CHECKSTYLE_CONFIG_FILE" value="${full.eclipse.workspace}/cxf-checkstyle.xml" />
                                                 <filter token="CHECKSTYLE_CORBA_CONFIG_FILE" value="${full.eclipse.workspace}/cxf-checkstyle-corba.xml" />
                                                 <filter token="APACHE_HEADER_FILE" value="${full.eclipse.workspace}/apache-header.txt" />
