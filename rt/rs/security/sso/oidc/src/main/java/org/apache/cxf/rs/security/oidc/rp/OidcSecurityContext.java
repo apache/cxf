@@ -86,9 +86,15 @@ public class OidcSecurityContext extends SimpleSecurityContext implements Securi
     
     @Override
     public boolean isUserInRole(String role) {
-        return roleClaim != null && role != null && oidcContext.getIdToken() != null
-            && oidcContext.getIdToken().containsProperty(roleClaim)
-            && role.equals(oidcContext.getIdToken().getProperty(roleClaim));
+        
+        return roleClaim != null && role != null
+            && (containsClaim(oidcContext.getIdToken(), roleClaim, role) 
+                || containsClaim(oidcContext.getUserInfo(), roleClaim, role));
+    }
+    
+    private boolean containsClaim(AbstractUserInfo userInfo, String claim, String claimValue) {
+        return userInfo != null && userInfo.containsProperty(claim)
+            && claimValue.equals(userInfo.getProperty(claim));
     }
     
     /**
