@@ -22,15 +22,12 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.transport.Destination;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Programmatically configure a http destination. This can also be used as a DOSGi
  * intent.
  */
 public class HttpDestinationFeature extends AbstractFeature {
-    static final Logger LOG = LoggerFactory.getLogger(HttpDestinationFeature.class);
     private HttpDestinationConfig destinationConfig;
 
     @Override
