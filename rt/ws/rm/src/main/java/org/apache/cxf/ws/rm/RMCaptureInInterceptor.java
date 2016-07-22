@@ -108,7 +108,7 @@ public class RMCaptureInInterceptor extends AbstractRMInterceptor<Message> {
         return false;
     }
 
-    private void setCloseable(Message message, CachedOutputStream cos, InputStream is) {
+    private void setCloseable(final Message message, final CachedOutputStream cos, final InputStream is) {
         message.put("org.apache.cxf.ws.rm.content.closeable", new Closeable() {
             @Override
             public void close() throws IOException {
