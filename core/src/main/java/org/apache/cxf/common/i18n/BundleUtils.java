@@ -77,13 +77,21 @@ public final class BundleUtils {
     public static ResourceBundle getBundle(Class<?> cls) {
         
         try {
+            ClassLoader loader = cls.getClassLoader();
+            if (loader == null) {
+                return ResourceBundle.getBundle(getBundleName(cls), Locale.getDefault());
+            }
             return ResourceBundle.getBundle(getBundleName(cls),
                                         Locale.getDefault(),
-                                        cls.getClassLoader());
+                                        loader);
         } catch (MissingResourceException ex) {
+            ClassLoader loader = Thread.currentThread().getContextClassLoader();
+            if (loader == null) {
+                return ResourceBundle.getBundle(getBundleName(cls), Locale.getDefault());
+            }
             return ResourceBundle.getBundle(getBundleName(cls),
                                             Locale.getDefault(),
-                                            Thread.currentThread().getContextClassLoader());
+                                            loader);
             
         }
     }
@@ -98,13 +106,21 @@ public final class BundleUtils {
      */
     public static ResourceBundle getBundle(Class<?> cls, String name) {
         try {
+            ClassLoader loader = cls.getClassLoader();
+            if (loader == null) {
+                return ResourceBundle.getBundle(getBundleName(cls, name), Locale.getDefault());
+            }
             return ResourceBundle.getBundle(getBundleName(cls, name),
                                             Locale.getDefault(),
-                                            cls.getClassLoader());
+                                            loader);
         } catch (MissingResourceException ex) {
+            ClassLoader loader = Thread.currentThread().getContextClassLoader();
+            if (loader == null) {
+                return ResourceBundle.getBundle(getBundleName(cls, name), Locale.getDefault());
+            }
             return ResourceBundle.getBundle(getBundleName(cls, name),
                                             Locale.getDefault(),
-                                            Thread.currentThread().getContextClassLoader());
+                                            loader);
             
         }
     }
