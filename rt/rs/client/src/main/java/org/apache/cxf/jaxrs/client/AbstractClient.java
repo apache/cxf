@@ -564,7 +564,7 @@ public abstract class AbstractClient implements Client {
         if (ex == null && !exchange.isOneWay()) {
             synchronized (exchange) {
                 while (exchange.get("IN_CHAIN_COMPLETE") == null) {
-                    exchange.wait();
+                    exchange.wait(cfg.getSynchronousTimeout());
                 }
             }
         }
