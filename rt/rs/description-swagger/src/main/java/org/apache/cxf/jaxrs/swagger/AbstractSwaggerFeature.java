@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.jaxrs.swagger;
 
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,10 +33,12 @@ import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 
 public abstract class AbstractSwaggerFeature extends AbstractFeature {
 
+    protected static final String SWAGGER_UI_RESOURCE_ROOT;
     private static final boolean SWAGGER_JAXRS_AVAILABLE;
-
+    
     static {
         SWAGGER_JAXRS_AVAILABLE = isSwaggerJaxRsAvailable();
+        SWAGGER_UI_RESOURCE_ROOT = checkSwaggerUiResourceRoot();
     }
 
     protected boolean scan = true;
@@ -60,20 +64,41 @@ public abstract class AbstractSwaggerFeature extends AbstractFeature {
             return false;
         }    
     }
+    private static String checkSwaggerUiResourceRoot() {
+        try {
+            ClassLoader cl = AbstractSwaggerFeature.class.getClassLoader();
+            if (cl instanceof URLClassLoader) {
+                final String resourcesRootStart = "META-INF/resources/webjars/swagger-ui/";
+                for (URL url : ((URLClassLoader)cl).getURLs()) {
+                    String urlStr = url.toString();
+                    if (urlStr.contains("/swagger-ui") && urlStr.toString().endsWith(".jar")) {
+                        urlStr = urlStr.substring(0, urlStr.length() - 4);
+                        String version = urlStr.substring(urlStr.lastIndexOf("/swagger-ui") + 12);
+                        return "jar:" + url.toString() + "!/"
+                                 +  resourcesRootStart + version + "/";
+                    }
+                }
+                
+            }
+        } catch (Throwable ex) {
+            // ignore
+        }   
+        return null;
+    }
 
     @Override
     public void initialize(Server server, Bus bus) {
         if (!activateOnlyIfJaxrsSupported || SWAGGER_JAXRS_AVAILABLE) {
             calculateDefaultResourcePackage(server);
             calculateDefaultBasePath(server);
-            addSwaggerResource(server);
+            addSwaggerResource(server, bus);
 
             initializeProvider(server.getEndpoint(), bus);
-            bus.setProperty("swagger.service.descrition.available", "true");
+            bus.setProperty("swagger.service.description.available", "true");
         }
     }
 
-    protected abstract void addSwaggerResource(Server server);
+    protected abstract void addSwaggerResource(Server server, Bus bus);
 
     protected abstract void setBasePathByAddress(String address);
 

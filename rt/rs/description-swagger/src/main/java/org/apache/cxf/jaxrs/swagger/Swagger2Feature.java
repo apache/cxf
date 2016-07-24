@@ -22,12 +22,18 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import javax.servlet.ServletContext;
+import javax.ws.rs.GET;
+import javax.ws.rs.HttpMethod;
+import javax.ws.rs.NotFoundException;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
@@ -36,6 +42,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.annotations.Provider;
 import org.apache.cxf.annotations.Provider.Scope;
 import org.apache.cxf.annotations.Provider.Type;
@@ -73,13 +80,22 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
     private boolean scanAllResources;
 
     private String ignoreRoutes;
+    
+    private boolean supportSwaggerUi = true;
 
     @Override
-    protected void addSwaggerResource(Server server) {
+    protected void addSwaggerResource(Server server, Bus bus) {
+        List<Object> swaggerResources = new LinkedList<Object>();
         ApiListingResource apiListingResource = new ApiListingResource();
+        swaggerResources.add(apiListingResource);
+        if (SWAGGER_UI_RESOURCE_ROOT != null && supportSwaggerUi) {
+            swaggerResources.add(new SwaggerUIService());
+            bus.setProperty("swagger.service.ui.available", "true");
+        }
         JAXRSServiceFactoryBean sfb =
                 (JAXRSServiceFactoryBean) server.getEndpoint().get(JAXRSServiceFactoryBean.class.getName());
-        sfb.setResourceClassesFromBeans(Collections.<Object>singletonList(apiListingResource));
+        sfb.setResourceClassesFromBeans(swaggerResources);
+        
         List<ClassResourceInfo> cris = sfb.getClassResourceInfo();
 
         List<Object> providers = new ArrayList<>();
@@ -92,6 +108,9 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
                 }
             }
         }
+        if (SWAGGER_UI_RESOURCE_ROOT != null && supportSwaggerUi) {
+            providers.add(new SwaggerUIFilter());
+        }
         providers.add(new Swagger2Serializers(dynamicBasePath, replaceTags, javadocProvider, cris));
         providers.add(new ReaderConfigFilter());
         ((ServerProviderFactory) server.getEndpoint().get(
@@ -100,7 +119,8 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         BeanConfig beanConfig = new BeanConfig();
         beanConfig.setResourcePackage(getResourcePackage());
         beanConfig.setVersion(getVersion());
-        beanConfig.setBasePath(getBasePath());
+        String basePath = getBasePath();
+        beanConfig.setBasePath(basePath);
         beanConfig.setHost(getHost());
         beanConfig.setSchemes(getSchemes());
         beanConfig.setTitle(getTitle());
@@ -185,7 +205,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
             setBasePath(address);
         }
     }
-
+    
     @PreMatching
     protected static class SwaggerContainerRequestFilter extends ApiListingResource implements ContainerRequestFilter {
 
@@ -255,6 +275,46 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
                 rc.setIgnoredRoutes(routes);
             }
             mc.getServletContext().setAttribute(ReaderConfig.class.getName(), rc);
+        }
+    }
+    @Path("api-docs")
+    public static class SwaggerUIService {
+        private static final String FAVICON_ICO = "favicon.ico";
+        @GET
+        @Path("{resource:.*}")
+        public Response getResource(@Context UriInfo uriInfo, @PathParam("resource") String resourcePath) {
+            if (FAVICON_ICO.equals(resourcePath)) {        
+                return Response.status(404).build();
+            }
+            if (StringUtils.isEmpty(resourcePath) || "/".equals(resourcePath)) {        
+                resourcePath = "index.html";
+            }
+            if (resourcePath.startsWith("/")) {
+                resourcePath = resourcePath.substring(1);
+            }
+            
+            try {
+                URL resourceURL = URI.create(SWAGGER_UI_RESOURCE_ROOT + resourcePath).toURL();
+                return Response.ok(resourceURL.openStream()).build();
+            } catch (IOException ex) {
+                throw new NotFoundException(ex);
+            }
+        }
+    }
+    @PreMatching
+    protected static class SwaggerUIFilter implements ContainerRequestFilter {
+        private static final Pattern PATTERN = 
+            Pattern.compile(".*[.]js|/css/.*|/images/.*|/lib/.*|.*ico|/fonts/.*"); 
+        
+        @Override
+        public void filter(ContainerRequestContext rc) throws IOException {
+            if (HttpMethod.GET.equals(rc.getRequest().getMethod())) {
+                UriInfo ui = rc.getUriInfo();
+                String path = "/" + ui.getPath();
+                if (PATTERN.matcher(path).matches()) {
+                    rc.setRequestUri(URI.create("api-docs" + path));
+                }
+            }
         }
     }
 }
