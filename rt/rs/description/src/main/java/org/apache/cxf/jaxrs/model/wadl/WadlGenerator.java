@@ -199,7 +199,7 @@ public class WadlGenerator implements ContainerRequestFilter {
     
     public WadlGenerator(Bus bus) {
         this.bus = bus;
-        this.bus.setProperty("wadl.service.descrition.available", "true");
+        this.bus.setProperty("wadl.service.description.available", "true");
     }
 
     @Override

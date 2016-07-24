@@ -36,6 +36,7 @@ import com.wordnik.swagger.jaxrs.listing.ApiDeclarationProvider;
 import com.wordnik.swagger.jaxrs.listing.ApiListingResourceJSON;
 import com.wordnik.swagger.jaxrs.listing.ResourceListingProvider;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServiceFactoryBean;
 import org.apache.cxf.jaxrs.ext.MessageContext;
@@ -44,7 +45,7 @@ import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 public class SwaggerFeature extends AbstractSwaggerFeature {
 
     @Override
-    protected void addSwaggerResource(Server server) {
+    protected void addSwaggerResource(Server server, Bus bus) {
         ApiListingResourceJSON apiListingResource = new ApiListingResourceJSON();
         if (!runAsFilter) {
             List<Object> serviceBeans = new ArrayList<Object>();

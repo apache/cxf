@@ -168,12 +168,15 @@ public class FormattedServiceListWriter implements ServiceListWriter {
         writer.write("<tr><td>");
         writer.write("<span class=\"field\">Endpoint address:</span> " + "<span class=\"value\">"
                      + absoluteURL + "</span>");
-        if (bus != null && PropertyUtils.isTrue(bus.getProperty("wadl.service.descrition.available"))) {
+        if (bus != null && PropertyUtils.isTrue(bus.getProperty("wadl.service.description.available"))) {
             writer.write("<br/><span class=\"field\">WADL :</span> " + "<a href=\"" + absoluteURL
                      + "?_wadl\">" + absoluteURL + "?_wadl" + "</a>");
         }
-        if (bus != null && PropertyUtils.isTrue(bus.getProperty("swagger.service.descrition.available"))) {
+        if (bus != null && PropertyUtils.isTrue(bus.getProperty("swagger.service.description.available"))) {
             String swaggerPath = "swagger.json";
+            if (PropertyUtils.isTrue(bus.getProperty("swagger.service.ui.available"))) {
+                swaggerPath = "api-docs?url=/" + swaggerPath;
+            }
             if (!absoluteURL.endsWith("/")) {
                 swaggerPath = "/" + swaggerPath;
             }
