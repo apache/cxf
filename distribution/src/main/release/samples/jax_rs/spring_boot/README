@@ -20,6 +20,11 @@ will display "Hello2 ApacheCxfUser, Welcome to CXF RS Spring Boot World!!!"
 http://localhost:8080/services/helloservice/swagger.json will return a Swagger JSON
 description of services.
 
+To view the Swagger document using Swagger-UI, use your Browser to 
+open the Swagger-UI page at
+
+  http://localhost:8080/services/helloservice/api-docs?url=/services/helloservice/swagger.json
+
 To run the client from a command line open a new terminal window and run:
 
 ----
