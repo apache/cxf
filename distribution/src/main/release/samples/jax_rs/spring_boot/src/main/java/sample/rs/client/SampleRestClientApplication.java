@@ -31,7 +31,10 @@ import sample.rs.service.HelloService;
 @SpringBootApplication
 @EnableJaxRsWebClient
 @EnableJaxRsProxyClient
-public class SampleRestClientApplication {
+public final class SampleRestClientApplication {
+    private SampleRestClientApplication() {
+    }
+    
     public static void main(String[] args) {
         new SpringApplicationBuilder(SampleRestClientApplication.class)
             .web(false)
@@ -40,24 +43,24 @@ public class SampleRestClientApplication {
     @Bean
     CommandLineRunner initWebClientRunner(final WebClient webClient) {
       
-      return new CommandLineRunner() {
+        return new CommandLineRunner() {
 
-        @Override
-        public void run(String... runArgs) throws Exception {
-            System.out.println(webClient.path("sayHello/ApacheCxfWebClientUser").get(String.class));
-        }
-      };
+            @Override
+            public void run(String... runArgs) throws Exception {
+                System.out.println(webClient.path("sayHello/ApacheCxfWebClientUser").get(String.class));
+            }
+        };
     }
     @Bean
     CommandLineRunner initProxyClientRunner(final HelloService client) {
       
-      return new CommandLineRunner() {
+        return new CommandLineRunner() {
 
-        @Override
-        public void run(String... runArgs) throws Exception {
-            System.out.println(client.sayHello("ApacheCxfProxyUser"));
-        }
-      };
+            @Override
+            public void run(String... runArgs) throws Exception {
+                System.out.println(client.sayHello("ApacheCxfProxyUser"));
+            }
+        };
     }
 }
 
