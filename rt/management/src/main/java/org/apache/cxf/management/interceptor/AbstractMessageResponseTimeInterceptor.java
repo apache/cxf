@@ -38,6 +38,7 @@ import org.apache.cxf.message.FaultMode;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.service.Service;
+import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.OperationInfo;
 
 public abstract class AbstractMessageResponseTimeInterceptor extends AbstractPhaseInterceptor<Message> {
@@ -172,7 +173,7 @@ public abstract class AbstractMessageResponseTimeInterceptor extends AbstractPha
     }
     
     protected ObjectName getOperationCounterName(Exchange ex, ObjectName sericeCounterName) {
-        BindingOperationInfo bop = ex.getBindingOperationInfo();
+        BindingOperationInfo bop = ex.get(BindingOperationInfo.class);
         OperationInfo opInfo = bop == null ? null : bop.getOperationInfo();
         if (opInfo != null) {
             ObjectName o = opInfo.getProperty("javax.management.ObjectName", ObjectName.class);
