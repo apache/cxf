@@ -20,6 +20,7 @@ package org.apache.cxf.transport.servlet.servicelist;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URI;
 import java.util.Map;
 
 import org.apache.cxf.Bus;
@@ -175,7 +176,14 @@ public class FormattedServiceListWriter implements ServiceListWriter {
         if (bus != null && PropertyUtils.isTrue(bus.getProperty("swagger.service.description.available"))) {
             String swaggerPath = "swagger.json";
             if (PropertyUtils.isTrue(bus.getProperty("swagger.service.ui.available"))) {
-                swaggerPath = "api-docs?url=/" + swaggerPath;
+                URI uri = URI.create(absoluteURL);
+                String schemePath = uri.getScheme() + "://" + uri.getHost() 
+                    + (uri.getPort() == -1 ? "" : ":" + uri.getPort());
+                String relPath = absoluteURL.substring(schemePath.length());
+                if (!relPath.endsWith("/")) {
+                    relPath += "/";
+                }
+                swaggerPath = "api-docs?url=" + relPath + swaggerPath;
             }
             if (!absoluteURL.endsWith("/")) {
                 swaggerPath = "/" + swaggerPath;
