@@ -68,15 +68,9 @@
         <cxf.abdera.version>1.1.3</cxf.abdera.version>
         <cxf.activemq.version>5.12.0</cxf.activemq.version>
         <cxf.ahc.version>1.9.8</cxf.ahc.version>
-<<<<<<< HEAD
-        <cxf.apacheds.version>2.0.0-M22</cxf.apacheds.version>
+        <cxf.apacheds.version>2.0.0-M23</cxf.apacheds.version>
         <cxf.atmosphere.version>2.3.7</cxf.atmosphere.version>
         <cxf.atmosphere.version.range>[2.0,2.4)</cxf.atmosphere.version.range>
-=======
-        <cxf.apacheds.version>2.0.0-M23</cxf.apacheds.version>
-        <cxf.atmosphere.version>2.4.3</cxf.atmosphere.version>
-        <cxf.atmosphere.version.range>[2.4,3.0)</cxf.atmosphere.version.range>
->>>>>>> 9b2bda5... Updating Apache DS
         <cxf.axiom.version>1.2.14</cxf.axiom.version>
         <cxf.bcprov.version>1.54</cxf.bcprov.version>
         <cxf.cglib.bundle.version>2.2_2</cxf.cglib.bundle.version>
