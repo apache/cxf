@@ -1,4 +1,4 @@
-Apache CXF 3.0.9 Release Notes
+Apache CXF 3.0.10 Release Notes
 
 1. Overview
 
@@ -22,7 +22,7 @@ Users are encourage to review the migration guide at:
 http://cxf.apache.org/docs/30-migration-guide.html
 for further information and requirements for upgrading from 2.7.x.
 
-3.0.9 fixes over 24 JIRA issues reported by users and the community.
+3.0.10 fixes over 42 JIRA issues reported by users and the community.
 
 
 
@@ -68,36 +68,53 @@ for caveats when upgrading from CXF 2.7.x to 3.0.0
 
 
 ** Bug
-    * [CXF-6492] - AbstractHTTPDestination class incorrectly assume only one empty space after "Basic" in Authorization header value. 
-    * [CXF-6764] - Should add RI JAXB Namespacemapper support
-    * [CXF-6769] - Underscores in values of FIQL search expressions are incorrectly escaped
-    * [CXF-6772] - HttpClientPolicy browserType is reported as BrowserType header 
-    * [CXF-6787] - not sufficient WadlGenerator presence detection
-    * [CXF-6793] - InvocationCallback doesn't try to get response class type
-    * [CXF-6799] - java.lang.ClassCastException: sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl cannot be cast to java.lang.reflect.TypeVariable
-    * [CXF-6805] - cxf-rt-transports-http adds Content-Type header to GET request
-    * [CXF-6806] - don't mark the optional "encoding" parameter as required for cxf-java2wadl-plugin
-    * [CXF-6810] - JAX-RS Client one way requests do not work with jms-transport
-    * [CXF-6812] - WebTargetImpl should always check if client is closed first
-    * [CXF-6823] - Duplicate injectedProviders in ProviderFactory impacting throughput by ~30%
-    * [CXF-6828] - [OAuth] AbstractGrant set wrong value(scope) for audience
-    * [CXF-6832] - Attachment content-disposition modification-date not parsed correctly
-    * [CXF-6838] - AsyncResponse doesn't use 204 when body is empty
+    * [CXF-6463] - AbstractHTTPDestination.cacheInput() throws NullPointerException if HttpServletRequest returns null for getInputStream()
+    * [CXF-6510] - LoggingOutInterceptor: formatLoggingMessage method is not used in every case
+    * [CXF-6646] - CXF 3.x WSRM message may not be retrieved from database
+    * [CXF-6729] -  Version 1 NewCookie is not compliant with RFC 2109
+    * [CXF-6842] - Unwrap exception nested with WebApplicationException
+    * [CXF-6845] - Some methods in MessageUtils prone to NPE
+    * [CXF-6850] - javax.ws.rs.core.Request implementation doesn't match Accept-Encoding: *  for  any encoding value
+    * [CXF-6851] - JAXRS 2 Feature not supported on server side?
+    * [CXF-6854] - Application subclass can't be injected into an application lass field
+    * [CXF-6855] - ElementClass annotation is ignored on JAX-RS service interface when generating the WADL
+    * [CXF-6867] - Envelope and Body element prefixes changed when processing messages without headers
+    * [CXF-6868] - empty Authorization header result in server error
+    * [CXF-6878] - Protect against other exception during consuming left-over data
+    * [CXF-6883] - Crypto caching issues in the WS-Security code
+    * [CXF-6884] - Don't include Signature/EncryptedKey Elements if there are no references to be signed/encrypted
+    * [CXF-6886] - CXF 3.x WSRM attachments are not retransmitted
+    * [CXF-6890] - "afirmative" is mispelled in debug output
+    * [CXF-6891] - IOUtils.isEmpty() doesn't reinclude byte in stream.
+    * [CXF-6901] - UriBuilder may lose resolved query templates
+    * [CXF-6906] - UriBuilder ignores a query component if URI contains templates
+    * [CXF-6917] - SuperClass and Interface's Annotations are ignored when the Method contains ParameterAnnotation
+    * [CXF-6923] - org.omg.CORBA.TIMEOUT is not handled with Jacorb implementation
+    * [CXF-6927] - check if msv is available in Stax2ValidationUtils to avoid the NCDFE when use IBM JDK
+    * [CXF-6933] - WadlGenerator doesn't honor multiple Descriptions for same DocTarget
+    * [CXF-6943] - Dead lock on Async Response when timeout is set
+    * [CXF-6948] - WebClient may cause JMX CounterRepository OOM if a request URI varies a lot  
+    * [CXF-6957] - JAX-RS: ExceptionMapper not called for Fault
+    * [CXF-6966] - Using CXF in JDK endorsed dir as JAX-WS impl crashes
+    * [CXF-6967] - Content Disposition filename should be case-insensitive
+    * [CXF-6970] - HTTP response headers are always set with HttpServletResponse.addHeader
 
 ** Improvement
-    * [CXF-5193] - Support fixed data type
-    * [CXF-6774] - Allow ClientImpl to be thread-safe
-    * [CXF-6786] - avoid Error log from NamePasswordCallbackHandler
-    * [CXF-6802] - Decode ContentDisposition filename encoded with codepoints only
-    * [CXF-6831] - should be able to configure the certStore key type
-    * [CXF-6840] - xsd:import without schemaLocation does not get resolved in SchemaHandler
+    * [CXF-6875] - Update Apache Mina from 2.0.9 to 2.0.13
+    * [CXF-6877] - Have @SchemaValidation working on service endpoint implementation class method
+    * [CXF-6903] - add a NameDigestPasswordCallbackHandler for JAASLoginInterceptor
+    * [CXF-6910] - don't need setSocketTimeout when create ahc RequestConfig
+    * [CXF-6912] - introduce CONNECTION_MAX_IDLE property for AHC
+    * [CXF-6918] - Print the XMLInputFactory implementation class when throwing "Cannot create a secure XMLInputFactory"
+    * [CXF-6935] - Better error message than java.lang.NullPointerException - org.apache.cxf.common.util.Compiler.useJava6Compiler(Compiler.java:187) when running on a JRE instead of JDK
+    * [CXF-6949] - Add support to the ReceivedTokenCalbackHandler to return a transformed token
 
-** New Feature
-    * [CXF-6085] - JWE JSON Serialization
+** Task
+    * [CXF-6853] - Support encoded value in @ApplicationPath
+    * [CXF-6858] - Upgrade Xalan bundle to 2.7.2_3
+    * [CXF-6895] - Create DOM4JProvider test reading an XML sequence with BOM
+    * [CXF-6938] - Setting the providers on a bus causes a leak if this bus is used by per-request clients
+    * [CXF-6971] - Update Jettison version to 1.3.8
 
-** Test
-    * [CXF-6797] - a lot tests failure on 3.1.x-fixes/3.0.x-fixes branch with java8
 
-** Wish
-    * [CXF-6790] - change accessibility of WadlGenerator.getBaseUri(...) to protected
 
