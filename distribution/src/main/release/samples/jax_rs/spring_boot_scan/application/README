@@ -38,5 +38,10 @@ open the Swagger-UI page at
 
   http://localhost:8080/services/helloservice/api-docs?url=/services/helloservice/swagger.json
 
+or access it from the CXF Services page:
+
+  http://localhost:8080/services/helloservice/services
+  and follow a Swagger link.
+
 Check client/README on how to run a command line client.
 
