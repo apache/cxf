@@ -27,6 +27,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
+import java.util.logging.Logger;
 
 import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
@@ -41,11 +43,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.apache.cxf.binding.soap.SoapMessage;
-<<<<<<< HEAD
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
-=======
->>>>>>> 97fc24b... Removing "TODO" code due to impending WSS4J release
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.MapNamespaceContext;
@@ -81,13 +80,11 @@ import org.apache.cxf.ws.security.wss4j.policyvalidators.UsernameTokenPolicyVali
 import org.apache.cxf.ws.security.wss4j.policyvalidators.WSS11PolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.X509TokenPolicyValidator;
 import org.apache.wss4j.common.crypto.Crypto;
-<<<<<<< HEAD
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.JasyptPasswordEncryptor;
-=======
->>>>>>> 97fc24b... Removing "TODO" code due to impending WSS4J release
 import org.apache.wss4j.common.crypto.PasswordEncryptor;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.Loader;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDataRef;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
@@ -113,6 +110,8 @@ import org.apache.wss4j.policy.model.Wss11;
  * 
  */
 public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
+
+    private static final Logger LOG = LogUtils.getL7dLogger(PolicyBasedWSS4JInInterceptor.class);
     
     /**
      * 
