@@ -279,11 +279,11 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
     }
     @Path("api-docs")
     public static class SwaggerUIService {
-        private static final String FAVICON_ICO = "favicon.ico";
+        private static final String FAVICON = "favicon";
         @GET
         @Path("{resource:.*}")
         public Response getResource(@Context UriInfo uriInfo, @PathParam("resource") String resourcePath) {
-            if (FAVICON_ICO.equals(resourcePath)) {        
+            if (resourcePath.contains(FAVICON)) {        
                 return Response.status(404).build();
             }
             if (StringUtils.isEmpty(resourcePath) || "/".equals(resourcePath)) {        
