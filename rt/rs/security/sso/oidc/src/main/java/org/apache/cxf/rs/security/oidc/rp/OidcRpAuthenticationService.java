@@ -30,6 +30,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
+import org.apache.cxf.common.util.UrlUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.rs.security.oauth2.client.ClientTokenContextManager;
 
@@ -61,7 +62,7 @@ public class OidcRpAuthenticationService {
             String basePath = (String)mc.get("http.base.path");
             redirectUri = UriBuilder.fromUri(basePath).path(defaultLocation).build();
         } else if (location != null) {
-            redirectUri = URI.create(location);
+            redirectUri = URI.create(UrlUtils.urlDecode(location));
         }
         if (redirectUri != null) {
             return Response.seeOther(redirectUri).build();
