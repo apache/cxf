@@ -54,21 +54,25 @@ public class OidcRpAuthenticationFilter implements ContainerRequestFilter {
     private ClientTokenContextManager stateManager;
     private String redirectUri;
     private String roleClaim;
+    private boolean addRequestUriAsRedirectQuery;
     
     public void filter(ContainerRequestContext rc) {
         if (checkSecurityContext(rc)) {
             return;
         } else if (redirectUri != null) {
-            URI redirectAddress = null;
+            UriBuilder redirectBuilder = null;
             if (redirectUri.startsWith("/")) {
                 String basePath = (String)mc.get("http.base.path");
-                redirectAddress = UriBuilder.fromUri(basePath).path(redirectUri).build();
+                redirectBuilder = UriBuilder.fromUri(basePath).path(redirectUri);
             } else if (redirectUri.startsWith("http")) {
-                redirectAddress = URI.create(redirectUri);
+                redirectBuilder = UriBuilder.fromUri(URI.create(redirectUri));
             } else {
-                UriBuilder ub = rc.getUriInfo().getBaseUriBuilder().path(redirectUri);
-                redirectAddress = ub.build();
+                redirectBuilder = rc.getUriInfo().getBaseUriBuilder().path(redirectUri);
             }
+            if (addRequestUriAsRedirectQuery) {
+                redirectBuilder.queryParam("state", rc.getUriInfo().getRequestUri().toString());
+            }
+            URI redirectAddress = redirectBuilder.build();
             rc.abortWith(Response.seeOther(redirectAddress)
                            .header(HttpHeaders.CACHE_CONTROL, "no-cache, no-store")
                            .header("Pragma", "no-cache") 
@@ -123,5 +127,9 @@ public class OidcRpAuthenticationFilter implements ContainerRequestFilter {
     
     public void setRoleClaim(String roleClaim) {
         this.roleClaim = roleClaim;
+    }
+    
+    public void setAddRequestUriAsRedirectQuery(boolean addRequestUriAsRedirectQuery) {
+        this.addRequestUriAsRedirectQuery = addRequestUriAsRedirectQuery;
     }
 }
