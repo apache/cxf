@@ -187,7 +187,7 @@ public class ServletController {
                     }
                 }
             }
-            if (d != null) {
+            if (d != null && d.getMessageObserver() != null) {
                 Bus bus = d.getBus();
                 ClassLoaderHolder orig = null;
                 try {
