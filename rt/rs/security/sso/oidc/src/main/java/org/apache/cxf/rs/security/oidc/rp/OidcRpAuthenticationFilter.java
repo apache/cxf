@@ -53,6 +53,7 @@ public class OidcRpAuthenticationFilter implements ContainerRequestFilter {
     private MessageContext mc;
     private ClientTokenContextManager stateManager;
     private String redirectUri;
+    private String roleClaim;
     
     public void filter(ContainerRequestContext rc) {
         if (checkSecurityContext(rc)) {
@@ -95,7 +96,10 @@ public class OidcRpAuthenticationFilter implements ContainerRequestFilter {
         newTokenContext.setUserInfo(tokenContext.getUserInfo());
         newTokenContext.setState(toRequestState(rc));
         JAXRSUtils.getCurrentMessage().setContent(ClientTokenContext.class, newTokenContext);
-        rc.setSecurityContext(new OidcSecurityContext(newTokenContext));
+        
+        OidcSecurityContext oidcSecCtx = new OidcSecurityContext(newTokenContext);
+        oidcSecCtx.setRoleClaim(roleClaim);
+        rc.setSecurityContext(oidcSecCtx);
         return true;
     }
     private MultivaluedMap<String, String> toRequestState(ContainerRequestContext rc) {
@@ -115,5 +119,9 @@ public class OidcRpAuthenticationFilter implements ContainerRequestFilter {
     }
     public void setClientTokenContextManager(ClientTokenContextManager manager) {
         this.stateManager = manager;
+    }
+    
+    public void setRoleClaim(String roleClaim) {
+        this.roleClaim = roleClaim;
     }
 }
