@@ -721,7 +721,10 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
                 }
                 cause = cause.getCause();
             }
-            sb.append(linked.getMessage()).append(". ");
+            String msg = linked.getMessage();
+            if (sb.lastIndexOf(msg) == -1) {
+                sb.append(msg).append(". ");
+            }
         }
         Throwable t = linked != null ? linked : e.getCause() != null ? e.getCause() : e;
         String message = new org.apache.cxf.common.i18n.Message("JAXB_EXCEPTION", 
