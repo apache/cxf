@@ -18,9 +18,9 @@
  */
 package org.apache.cxf.systest.jaxrs;
 
+import java.util.Collections;
 import java.util.Set;
 
-import javax.inject.Inject;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
@@ -33,14 +33,16 @@ import org.apache.cxf.systest.jaxrs.cdi.BookStore;
 
 @ApplicationPath("/custom")
 public class BookStoreCustomApplication extends Application {
-    @Inject private BookStore bookStore;
-    
     @Override
     public Set< Object > getSingletons() {
-        return Sets.< Object >newHashSet(
-            bookStore, 
+        return Sets.newHashSet(
             new JacksonJsonProvider(),
             new ValidationExceptionMapper(),
             new JAXRSBeanValidationFeature());
+    }
+
+    @Override
+    public Set<Class<?>> getClasses() {
+        return Collections.<Class<?>>singleton(BookStore.class);
     }
 }
