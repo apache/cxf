@@ -139,7 +139,8 @@ public abstract class AbstractImplicitGrantService extends RedirectionBasedGrant
     protected void finalizeResponse(StringBuilder sb, OAuthRedirectionState state) {
         if (state.getState() != null) {
             sb.append("&");
-            sb.append(OAuthConstants.STATE).append("=").append(state.getState());   
+            String stateParam = state.getState();
+            sb.append(OAuthConstants.STATE).append("=").append(HttpUtils.urlEncode(stateParam));   
         }
         if (reportClientId) {
             sb.append("&").append(OAuthConstants.CLIENT_ID).append("=").append(state.getClientId());
