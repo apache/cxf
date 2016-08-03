@@ -56,7 +56,7 @@
             javax.annotation;version="${cxf.osgi.javax.annotation.version}",
             javax.xml.bind*;version="${cxf.osgi.javax.bind.version}",
             javax.xml.stream*;version="${cxf.osgi.javax.stream.version}",
-            javax.validation*;resolution:=optional;version="${cxf.validation.api.package.version}", 
+            javax.validation*;resolution:=optional;version="${cxf.validation.api.package.version}",
             com.sun.xml.bind.api;resolution:=optional,
             com.sun.xml.bind.api.impl;resolution:=optional,
             com.sun.xml.internal.bind.api;resolution:=optional,
@@ -222,6 +222,11 @@
             <artifactId>spring-osgi-core</artifactId>
             <optional>true</optional>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.4</version>
         </dependency>
     </dependencies>
     <build>
