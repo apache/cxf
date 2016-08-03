@@ -27,12 +27,14 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 public class StaxSTSServer extends AbstractBusTestServerBase {
 
+    private String context;
+    
     public StaxSTSServer() {
 
     }
 
     protected void run()  {
-        URL busFile = StaxSTSServer.class.getResource("stax-cxf-servlet.xml");
+        URL busFile = StaxSTSServer.class.getResource(context);
         Bus busLocal = new SpringBusFactory().createBus(busFile);
         BusFactory.setDefaultBus(busLocal);
         setBus(busLocal);
@@ -42,5 +44,9 @@ public class StaxSTSServer extends AbstractBusTestServerBase {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+    
+    public void setContext(String context) {
+        this.context = context;
     }
 }
