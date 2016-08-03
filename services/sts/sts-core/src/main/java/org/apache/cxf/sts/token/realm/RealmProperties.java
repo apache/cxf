@@ -41,6 +41,7 @@ public class RealmProperties {
     
     private static final Logger LOG = LogUtils.getL7dLogger(RealmProperties.class);
     
+    private String name;
     private String issuer;
     private String signatureAlias;
     private Crypto signatureCrypto;
@@ -57,6 +58,22 @@ public class RealmProperties {
         return issuer;
     }
     
+    /**
+     * Get the name of this realm
+     * @return realmA
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Set the name of this realm
+     * @param name the name of this realm
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
     /**
      * Set the issuer of this realm
      * @param issuer the issuer of this realm
