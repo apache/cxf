@@ -32,7 +32,7 @@ public class STSServer extends AbstractBusTestServerBase {
     }
 
     protected void run()  {
-        URL busFile = STSServer.class.getResource("cxf-sts-transport.xml");
+        URL busFile = STSServer.class.getResource("cxf-issuer-sts-transport.xml");
         Bus busLocal = new SpringBusFactory().createBus(busFile);
         BusFactory.setDefaultBus(busLocal);
         setBus(busLocal);

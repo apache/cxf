@@ -64,12 +64,9 @@ public class UsernameOnBehalfOfCachingTest extends AbstractBusClientServerTestBa
             // set this to false to fork
             launchServer(Server.class, true)
         );
-        assertTrue(
-                   "Server failed to launch",
-                   // run the server in the same process
-                   // set this to false to fork
-                   launchServer(STSServer.class, true)
-        );
+        STSServer stsServer = new STSServer();
+        stsServer.setContext("cxf-x509.xml");
+        assertTrue(launchServer(stsServer));
     }
     
     @org.junit.AfterClass

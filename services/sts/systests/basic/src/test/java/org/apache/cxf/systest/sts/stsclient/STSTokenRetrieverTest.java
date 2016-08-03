@@ -98,12 +98,13 @@ public class STSTokenRetrieverTest extends AbstractBusClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue(
-                   "Server failed to launch",
-                   // run the server in the same process
-                   // set this to false to fork
-                   launchServer(STSServer.class, true)
-        );
+        STSServer stsServer = new STSServer();
+        stsServer.setContext("cxf-transport.xml");
+        assertTrue(launchServer(stsServer));
+        
+        stsServer = new STSServer();
+        stsServer.setContext("cxf-x509.xml");
+        assertTrue(launchServer(stsServer));
     }
     
     @AfterClass

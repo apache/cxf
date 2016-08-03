@@ -35,41 +35,41 @@
         <ref bean="utDelegationHandler"/>
     </util:list>
     
-    <bean id="transportIssueDelegate" class="org.apache.cxf.sts.operation.TokenIssueOperation">
-        <property name="tokenProviders" ref="transportTokenProviders"/>
-        <property name="tokenValidators" ref="transportTokenValidators"/>
-        <property name="services" ref="transportService"/>
-        <property name="stsProperties" ref="transportSTSProperties"/>
+    <bean id="issueDelegate" class="org.apache.cxf.sts.operation.TokenIssueOperation">
+        <property name="tokenProviders" ref="tokenProviders"/>
+        <property name="tokenValidators" ref="tokenValidators"/>
+        <property name="services" ref="service"/>
+        <property name="stsProperties" ref="stsProperties"/>
         <property name="delegationHandlers" ref="delegationHandlers"/>
         <property name="claimsManager" ref="claimsManager"/>
     </bean>
-    <bean id="transportValidateDelegate" class="org.apache.cxf.sts.operation.TokenValidateOperation">
-        <property name="tokenValidators" ref="transportTokenValidators"/>
-        <property name="stsProperties" ref="transportSTSProperties"/>
+    <bean id="validateDelegate" class="org.apache.cxf.sts.operation.TokenValidateOperation">
+        <property name="tokenValidators" ref="tokenValidators"/>
+        <property name="stsProperties" ref="stsProperties"/>
     </bean>
-    <bean id="transportUTTokenValidator" class="org.apache.cxf.sts.token.validator.UsernameTokenValidator">
+    <bean id="utTokenValidator" class="org.apache.cxf.sts.token.validator.UsernameTokenValidator">
     </bean>
-    <util:list id="transportTokenValidators">
-        <ref bean="transportSamlTokenValidator"/>
-        <ref bean="transportUTTokenValidator"/>
+    <util:list id="tokenValidators">
+        <ref bean="samlTokenValidator"/>
+        <ref bean="utTokenValidator"/>
     </util:list>
-    <util:list id="transportTokenProviders">
-        <ref bean="transportSamlTokenProvider"/>
+    <util:list id="tokenProviders">
+        <ref bean="samlTokenProvider"/>
     </util:list>
-    <bean id="transportSamlTokenValidator" class="org.apache.cxf.sts.token.validator.SAMLTokenValidator">
+    <bean id="samlTokenValidator" class="org.apache.cxf.sts.token.validator.SAMLTokenValidator">
         <property name="samlRealmCodec" ref="samlRealmCodec"/>
     </bean>
-    <bean id="transportSamlTokenProvider" class="org.apache.cxf.sts.token.provider.SAMLTokenProvider">
+    <bean id="samlTokenProvider" class="org.apache.cxf.sts.token.provider.SAMLTokenProvider">
         <property name="realmMap" ref="realms"/>
     </bean>
     <bean id="stsProviderBean" class="org.apache.cxf.ws.security.sts.provider.SecurityTokenServiceProvider">
-        <property name="issueOperation" ref="transportIssueDelegate"/>
-        <property name="validateOperation" ref="transportValidateDelegate"/>
+        <property name="issueOperation" ref="issueDelegate"/>
+        <property name="validateOperation" ref="validateDelegate"/>
     </bean>
-    <bean id="transportService" class="org.apache.cxf.sts.service.StaticService">
-        <property name="endpoints" ref="transportEndpoints"/>
+    <bean id="service" class="org.apache.cxf.sts.service.StaticService">
+        <property name="endpoints" ref="endpoints"/>
     </bean>
-    <util:list id="transportEndpoints">
+    <util:list id="endpoints">
         <value>http(s)?://localhost:(\d)*/doubleit/services/doubleit.*</value>
     </util:list>
     <bean id="samlRealmCodec" class="org.apache.cxf.systest.sts.common.SAMLRealmCNCodec"/>
@@ -83,7 +83,7 @@
             <property name="type" value="FederatedIdentity"/>
         </bean>
     </util:list>
-    <bean id="transportSTSProperties" class="org.apache.cxf.sts.StaticSTSProperties">
+    <bean id="stsProperties" class="org.apache.cxf.sts.StaticSTSProperties">
         <property name="signaturePropertiesFile" value="stsKeystore.properties"/>
         <property name="signatureUsername" value="mystskey"/>
         <property name="callbackHandlerClass" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
