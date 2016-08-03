@@ -25,7 +25,11 @@ public class SAMLRealmCNCodec implements SAMLRealmCodec {
 
     @Override
     public String getRealmFromToken(SamlAssertionWrapper assertion) {
-        return assertion.getIssuerString();
+        String issuer = assertion.getIssuerString();
+        if (issuer != null && issuer.contains("a-issuer")) {
+            return issuer;
+        }
+        return null;
     }
 }
 
