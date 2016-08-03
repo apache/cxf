@@ -24,26 +24,10 @@
             <cxf:logging/>
         </cxf:features>
     </cxf:bus>
-    <bean id="utSTSProviderBean" class="org.apache.cxf.sts.provider.DefaultSecurityTokenServiceProvider">
-        <property name="services" ref="utService"/>
-        <property name="stsProperties" ref="utSTSProperties"/>
-    </bean>
-    <bean id="utService" class="org.apache.cxf.sts.service.StaticService">
-        <property name="endpoints" ref="utEndpoints"/>
-    </bean>
-    <util:list id="utEndpoints">
-        <value>http://localhost:(\d)*/(doubleit|metrowsp)/services/doubleit(UT|.*symmetric.*|.*)
-                </value>
-    </util:list>
-    <bean id="utSTSProperties" class="org.apache.cxf.sts.StaticSTSProperties">
-        <property name="signaturePropertiesFile" value="stsKeystore.properties"/>
-        <property name="signatureUsername" value="mystskey"/>
-        <property name="callbackHandlerClass" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
-        <property name="encryptionPropertiesFile" value="stsKeystore.properties"/>
-        <property name="issuer" value="DoubleItSTSIssuer"/>
-        <property name="encryptionUsername" value="myservicekey"/>
-    </bean>
-    <jaxws:endpoint xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/" id="UTSTS" implementor="#utSTSProviderBean" address="http://localhost:${testutil.ports.StaxSTSServer.2}/SecurityTokenService/UT" wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/deployment/ws-trust-1.4-service.wsdl" serviceName="ns1:SecurityTokenService" endpointName="ns1:UT_Port">
+    
+    <import resource="cxf-sts.xml" />
+    
+    <jaxws:endpoint xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/" id="UTSTS" implementor="#stsProviderBean" address="http://localhost:${testutil.ports.StaxSTSServer.2}/SecurityTokenService/UT" wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/deployment/ws-trust-1.4-service.wsdl" serviceName="ns1:SecurityTokenService" endpointName="ns1:UT_Port">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
             <entry key="security.signature.properties" value="stsKeystore.properties"/>
