@@ -25,72 +25,15 @@
         </cxf:features>
     </cxf:bus>
     
-    <import resource="realms.xml" />
+    <import resource="cxf-sts.xml" />
     
-    <bean id="hokDelegationHandler" class="org.apache.cxf.sts.token.delegation.HOKDelegationHandler"/>
-    <bean id="transportIssueDelegate" class="org.apache.cxf.sts.operation.TokenIssueOperation">
-        <property name="tokenProviders" ref="transportTokenProviders"/>
-        <property name="tokenValidators" ref="transportTokenValidators"/>
-        <property name="services" ref="transportService"/>
-        <property name="stsProperties" ref="transportSTSProperties"/>
-        <property name="delegationHandlers" ref="hokDelegationHandler"/>
-    </bean>
-    <bean id="transportValidateDelegate" class="org.apache.cxf.sts.operation.TokenValidateOperation">
-        <property name="tokenValidators" ref="transportTokenValidators"/>
-        <property name="stsProperties" ref="transportSTSProperties"/>
-    </bean>
-    <util:list id="transportTokenValidators">
-        <ref bean="transportSamlTokenValidator"/>
-    </util:list>
-    <util:list id="transportTokenProviders">
-        <ref bean="transportSamlTokenProvider"/>
-    </util:list>
-    <bean id="transportSamlTokenValidator" class="org.apache.cxf.sts.token.validator.SAMLTokenValidator">
-        <property name="samlRealmCodec" ref="samlRealmCodec"/>
-    </bean>
-    <bean id="transportSamlTokenProvider" class="org.apache.cxf.sts.token.provider.SAMLTokenProvider">
-        <property name="realmMap" ref="realms"/>
-    </bean>
-    <bean id="transportSTSProviderBean" class="org.apache.cxf.ws.security.sts.provider.SecurityTokenServiceProvider">
-        <property name="issueOperation" ref="transportIssueDelegate"/>
-        <property name="validateOperation" ref="transportValidateDelegate"/>
-    </bean>
-    <bean id="transportService" class="org.apache.cxf.sts.service.StaticService">
-        <property name="endpoints" ref="transportEndpoints"/>
-    </bean>
-    <util:list id="transportEndpoints">
-        <value>https://localhost:(\d)*/doubleit/services/doubleittransport.*
-        </value>
-    </util:list>
-    <bean id="samlRealmCodec" class="org.apache.cxf.systest.sts.common.SAMLRealmCNCodec"/>
-    <bean id="customRealmParser" class="org.apache.cxf.systest.sts.common.UriRealmParser"/>
-    <bean id="identityMapper" class="org.apache.cxf.systest.sts.common.CustomIdentityMapper"/>
-    <util:list id="relationships">
-        <bean class="org.apache.cxf.sts.token.realm.Relationship">
-            <property name="sourceRealm" value="a-issuer"/>
-            <property name="targetRealm" value="b-issuer"/>
-            <property name="identityMapper" ref="identityMapper"/>
-            <property name="type" value="FederatedIdentity"/>
-        </bean>
-    </util:list>
-    <bean id="transportSTSProperties" class="org.apache.cxf.sts.StaticSTSProperties">
-        <property name="signaturePropertiesFile" value="stsKeystore.properties"/>
-        <property name="signatureUsername" value="mystskey"/>
-        <property name="callbackHandlerClass" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
-        <property name="encryptionPropertiesFile" value="stsKeystore.properties"/>
-        <property name="issuer" value="DoubleItSTSIssuer"/>
-        <property name="encryptionUsername" value="myservicekey"/>
-        <property name="realmParser" ref="customRealmParser"/>
-        <property name="relationships" ref="relationships"/>
-        <property name="samlRealmCodec" ref="samlRealmCodec"/>
-    </bean>
-    <jaxws:endpoint xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/" id="transportSTS" implementor="#transportSTSProviderBean" address="https://localhost:${testutil.ports.StaxSTSServer}/SecurityTokenService/Transport" wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/deployment/ws-trust-1.4-service.wsdl" serviceName="ns1:SecurityTokenService" endpointName="ns1:Transport_Port" depends-on="ClientAuthHttpsSettings">
+    <jaxws:endpoint xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/" id="transportSTS" implementor="#stsProviderBean" address="https://localhost:${testutil.ports.StaxSTSServer}/SecurityTokenService/Transport" wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/deployment/ws-trust-1.4-service.wsdl" serviceName="ns1:SecurityTokenService" endpointName="ns1:Transport_Port" depends-on="ClientAuthHttpsSettings">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/" id="transportSTS-realmB" implementor="#transportSTSProviderBean" address="https://localhost:${testutil.ports.StaxSTSServer}/SecurityTokenService/b-issuer/Transport" wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/deployment/ws-trust-1.4-service.wsdl" serviceName="ns1:SecurityTokenService" endpointName="ns1:Transport_SAML_Port" depends-on="ClientAuthHttpsSettings">
+    <jaxws:endpoint xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/" id="transportSTS-realmB" implementor="#stsProviderBean" address="https://localhost:${testutil.ports.StaxSTSServer}/SecurityTokenService/b-issuer/Transport" wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/deployment/ws-trust-1.4-service.wsdl" serviceName="ns1:SecurityTokenService" endpointName="ns1:Transport_SAML_Port" depends-on="ClientAuthHttpsSettings">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
             <entry key="security.signature.properties" value="stsKeystore.properties"/>
