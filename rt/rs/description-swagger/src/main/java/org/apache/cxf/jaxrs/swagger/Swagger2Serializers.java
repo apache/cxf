@@ -23,6 +23,7 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -140,6 +141,15 @@ public class Swagger2Serializers extends SwaggerSerializers {
                     }
                 }
             }
+        }
+        if (replaceTags && data.getTags() != null) {
+            Collections.sort(data.getTags(), new Comparator<Tag>() {
+
+                @Override
+                public int compare(final Tag tag1, final Tag tag2) {
+                    return tag1.getName().compareTo(tag2.getName());
+                }
+            });
         }
 
         super.writeTo(data, type, genericType, annotations, mediaType, headers, out);
