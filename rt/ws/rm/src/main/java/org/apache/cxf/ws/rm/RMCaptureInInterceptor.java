@@ -64,7 +64,7 @@ public class RMCaptureInInterceptor extends AbstractRMInterceptor<Message> {
        
         // all messages are initially captured as they cannot be distinguished at this phase
         // Non application messages temp files are released (cos.releaseTempFileHold()) in RMInInterceptor
-        if (!MessageUtils.isTrue(message.getContextualProperty(Message.ROBUST_ONEWAY))
+        if (!isGET(message) && !MessageUtils.isTrue(message.getContextualProperty(Message.ROBUST_ONEWAY))
             && (getManager().getStore() != null || (getManager().getDestinationPolicy() != null && getManager()
                 .getDestinationPolicy().getRetryPolicy() != null))) {
 
