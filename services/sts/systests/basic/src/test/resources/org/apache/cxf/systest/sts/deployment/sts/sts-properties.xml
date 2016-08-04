@@ -19,32 +19,27 @@
 -->
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:cxf="http://cxf.apache.org/core" xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:sec="http://cxf.apache.org/configuration/security" xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration" xmlns:test="http://apache.org/hello_world_soap_http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util" xsi:schemaLocation="         http://cxf.apache.org/core         http://cxf.apache.org/schemas/core.xsd         http://www.springframework.org/schema/beans         http://www.springframework.org/schema/beans/spring-beans-2.0.xsd         http://cxf.apache.org/jaxws                                              http://cxf.apache.org/schemas/jaxws.xsd         http://cxf.apache.org/configuration/security         http://cxf.apache.org/schemas/configuration/security.xsd         http://cxf.apache.org/transports/http-jetty/configuration         http://cxf.apache.org/schemas/configuration/http-jetty.xsd         http://www.springframework.org/schema/util         http://www.springframework.org/schema/util/spring-util-2.0.xsd">
     
-    <!-- Realms -->
-    <bean id="realmA" class="org.apache.cxf.sts.token.realm.RealmProperties">
-        <property name="issuer" value="a-issuer"/>
-        <property name="name" value="a-issuer"/>
+    <import resource="realms.xml" />
+    
+    <bean id="encProperties" class="org.apache.cxf.sts.service.EncryptionProperties">
+        <property name="encryptionAlgorithm" value="http://www.w3.org/2001/04/xmlenc#aes128-cbc"/>
+        <property name="keyWrapAlgorithm" value="http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p"/>
     </bean>
     
-    <bean id="realmB" class="org.apache.cxf.sts.token.realm.RealmProperties">
-        <property name="issuer" value="b-issuer"/>
-        <property name="name" value="b-issuer"/>
+    <bean id="samlRealmCodec" class="org.apache.cxf.systest.sts.common.SAMLRealmCNCodec"/>
+    <bean id="customRealmParser" class="org.apache.cxf.systest.sts.common.UriRealmParser"/>
+    
+    <bean id="stsProperties" class="org.apache.cxf.sts.StaticSTSProperties">
+        <property name="signaturePropertiesFile" value="stsKeystore.properties"/>
+        <property name="signatureUsername" value="mystskey"/>
+        <property name="callbackHandlerClass" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+        <property name="encryptionPropertiesFile" value="stsKeystore.properties"/>
+        <property name="issuer" value="DoubleItSTSIssuer"/>
+        <property name="encryptionUsername" value="myservicekey"/>
+        <property name="encryptionProperties" ref="encProperties"/>
+        <property name="realmParser" ref="customRealmParser"/>
+        <property name="relationships" ref="relationships"/>
+        <property name="samlRealmCodec" ref="samlRealmCodec"/>
     </bean>
-    
-    <util:map id="realms">
-        <entry key="#{realmA.getName()}" value-ref="realmA"/>
-        <entry key="#{realmB.getName()}" value-ref="realmB"/>
-    </util:map>
-    
-    <!-- Relationships between realms -->
-    <bean id="identityMapper" class="org.apache.cxf.systest.sts.common.CustomIdentityMapper"/>
-    
-    <util:list id="relationships">
-        <bean class="org.apache.cxf.sts.token.realm.Relationship">
-            <property name="sourceRealm" value="a-issuer"/>
-            <property name="targetRealm" value="b-issuer"/>
-            <property name="identityMapper" ref="identityMapper"/>
-            <property name="type" value="FederatedIdentity"/>
-        </bean>
-    </util:list>
     
 </beans>
