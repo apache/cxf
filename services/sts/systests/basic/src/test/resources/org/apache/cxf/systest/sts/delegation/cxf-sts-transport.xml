@@ -24,6 +24,9 @@
             <cxf:logging/>
         </cxf:features>
     </cxf:bus>
+    
+    <import resource="../deployment/sts/realms.xml" />
+     
     <bean id="samlDelegationHandler" class="org.apache.cxf.sts.token.delegation.SAMLDelegationHandler"/>
     <bean id="transportUTSTSProviderBean" class="org.apache.cxf.ws.security.sts.provider.SecurityTokenServiceProvider">
         <property name="issueOperation" ref="transportIssueDelegate2"/>
@@ -83,16 +86,6 @@
         <value>https://localhost:(\d)*/doubleit/services/doubleittransport.*
         </value>
     </util:list>
-    <bean id="realmA" class="org.apache.cxf.sts.token.realm.RealmProperties">
-        <property name="issuer" value="a-issuer"/>
-    </bean>
-    <bean id="realmB" class="org.apache.cxf.sts.token.realm.RealmProperties">
-        <property name="issuer" value="b-issuer"/>
-    </bean>
-    <util:map id="realms">
-        <entry key="a-issuer" value-ref="realmA"/>
-        <entry key="b-issuer" value-ref="realmB"/>
-    </util:map>
     <bean id="samlRealmCodec" class="org.apache.cxf.systest.sts.common.SAMLRealmCNCodec"/>
     <bean id="customRealmParser" class="org.apache.cxf.systest.sts.common.UriRealmParser"/>
     <bean id="identityMapper" class="org.apache.cxf.systest.sts.common.CustomIdentityMapper"/>
