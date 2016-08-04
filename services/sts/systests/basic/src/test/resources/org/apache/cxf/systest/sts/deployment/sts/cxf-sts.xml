@@ -26,13 +26,11 @@
     </cxf:bus>
     
     <import resource="realms.xml" />
-    
-    <bean id="hokDelegationHandler" class="org.apache.cxf.sts.token.delegation.HOKDelegationHandler"/>
-    <bean id="utDelegationHandler" class="org.apache.cxf.sts.token.delegation.UsernameTokenDelegationHandler"/>
+    <import resource="sts-properties.xml" />
     
     <util:list id="delegationHandlers">
-        <ref bean="hokDelegationHandler"/>
-        <ref bean="utDelegationHandler"/>
+        <bean class="org.apache.cxf.sts.token.delegation.HOKDelegationHandler" />
+        <bean class="org.apache.cxf.sts.token.delegation.UsernameTokenDelegationHandler" />
     </util:list>
     
     <bean id="issueDelegate" class="org.apache.cxf.sts.operation.TokenIssueOperation">
@@ -47,18 +45,13 @@
         <property name="tokenValidators" ref="tokenValidators"/>
         <property name="stsProperties" ref="stsProperties"/>
     </bean>
-    <bean id="utTokenValidator" class="org.apache.cxf.sts.token.validator.UsernameTokenValidator">
-    </bean>
     <util:list id="tokenValidators">
-        <ref bean="samlTokenValidator"/>
-        <ref bean="utTokenValidator"/>
+        <bean class="org.apache.cxf.sts.token.validator.SAMLTokenValidator" />
+        <bean class="org.apache.cxf.sts.token.validator.UsernameTokenValidator" />
     </util:list>
     <util:list id="tokenProviders">
         <ref bean="samlTokenProvider"/>
     </util:list>
-    <bean id="samlTokenValidator" class="org.apache.cxf.sts.token.validator.SAMLTokenValidator">
-        <property name="samlRealmCodec" ref="samlRealmCodec"/>
-    </bean>
     <bean id="samlTokenProvider" class="org.apache.cxf.sts.token.provider.SAMLTokenProvider">
         <property name="realmMap" ref="realms"/>
     </bean>
@@ -72,35 +65,6 @@
     <util:list id="endpoints">
         <value>http(s)?://localhost:(\d)*/doubleit/services/doubleit.*</value>
     </util:list>
-    <bean id="samlRealmCodec" class="org.apache.cxf.systest.sts.common.SAMLRealmCNCodec"/>
-    <bean id="customRealmParser" class="org.apache.cxf.systest.sts.common.UriRealmParser"/>
-    <bean id="identityMapper" class="org.apache.cxf.systest.sts.common.CustomIdentityMapper"/>
-    <util:list id="relationships">
-        <bean class="org.apache.cxf.sts.token.realm.Relationship">
-            <property name="sourceRealm" value="a-issuer"/>
-            <property name="targetRealm" value="b-issuer"/>
-            <property name="identityMapper" ref="identityMapper"/>
-            <property name="type" value="FederatedIdentity"/>
-        </bean>
-    </util:list>
-    
-    <bean id="encProperties" class="org.apache.cxf.sts.service.EncryptionProperties">
-        <property name="encryptionAlgorithm" value="http://www.w3.org/2001/04/xmlenc#aes128-cbc"/>
-        <property name="keyWrapAlgorithm" value="http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p"/>
-    </bean>
-    
-    <bean id="stsProperties" class="org.apache.cxf.sts.StaticSTSProperties">
-        <property name="signaturePropertiesFile" value="stsKeystore.properties"/>
-        <property name="signatureUsername" value="mystskey"/>
-        <property name="callbackHandlerClass" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
-        <property name="encryptionPropertiesFile" value="stsKeystore.properties"/>
-        <property name="issuer" value="DoubleItSTSIssuer"/>
-        <property name="encryptionUsername" value="myservicekey"/>
-        <property name="encryptionProperties" ref="encProperties"/>
-        <property name="realmParser" ref="customRealmParser"/>
-        <property name="relationships" ref="relationships"/>
-        <property name="samlRealmCodec" ref="samlRealmCodec"/>
-    </bean>
     
     <bean id="claimsManager" class="org.apache.cxf.sts.claims.ClaimsManager">
         <property name="claimHandlers" ref="customClaimsHandler"/>

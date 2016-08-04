@@ -29,7 +29,7 @@
     
     <!-- Override UsernameTokenValidator -->
     <util:list id="tokenValidators">
-        <ref bean="samlTokenValidator"/>
+        <bean class="org.apache.cxf.sts.token.validator.SAMLTokenValidator" />
         <bean class="org.apache.cxf.systest.sts.username_onbehalfof.UsernameTokenValidator"/>
     </util:list>
     

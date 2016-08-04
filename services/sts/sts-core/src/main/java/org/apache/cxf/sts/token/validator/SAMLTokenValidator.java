@@ -231,8 +231,12 @@ public class SAMLTokenValidator implements TokenValidator {
            
             // Get the realm of the SAML token
             String tokenRealm = null;
-            if (samlRealmCodec != null) {
-                tokenRealm = samlRealmCodec.getRealmFromToken(assertion);
+            SAMLRealmCodec codec = samlRealmCodec;
+            if (codec == null) {
+                codec = stsProperties.getSamlRealmCodec();
+            }
+            if (codec != null) {
+                tokenRealm = codec.getRealmFromToken(assertion);
                 // verify the realm against the cached token
                 if (secToken != null) {
                     Map<String, Object> props = secToken.getProperties();
