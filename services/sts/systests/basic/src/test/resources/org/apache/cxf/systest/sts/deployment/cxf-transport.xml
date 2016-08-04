@@ -25,7 +25,7 @@
         </cxf:features>
     </cxf:bus>
     
-    <import resource="cxf-sts.xml" />
+    <import resource="sts/cxf-sts.xml" />
         
     <jaxws:endpoint xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/" id="transportSTS" implementor="#stsProviderBean" address="https://localhost:${testutil.ports.STSServer}/SecurityTokenService/Transport" wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/deployment/ws-trust-1.4-service.wsdl" serviceName="ns1:SecurityTokenService" endpointName="ns1:Transport_Port" depends-on="ClientAuthHttpsSettings">
         <jaxws:properties>
