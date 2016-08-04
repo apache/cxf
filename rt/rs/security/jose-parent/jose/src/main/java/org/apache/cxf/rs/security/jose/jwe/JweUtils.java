@@ -508,6 +508,11 @@ public final class JweUtils {
     }
     public static JweEncryptionProvider createJweEncryptionProvider(PublicKey key,
                                                                     KeyAlgorithm keyAlgo,
+                                                                    ContentAlgorithm contentEncryptionAlgo) {
+        return createJweEncryptionProvider(key, keyAlgo, contentEncryptionAlgo, null);
+    }
+    public static JweEncryptionProvider createJweEncryptionProvider(PublicKey key,
+                                                                    KeyAlgorithm keyAlgo,
                                                                     ContentAlgorithm contentEncryptionAlgo,
                                                                     String compression) {
         KeyEncryptionProvider keyEncryptionProvider = getPublicKeyEncryptionProvider(key, keyAlgo);
@@ -520,6 +525,11 @@ public final class JweUtils {
     }
     public static JweEncryptionProvider createJweEncryptionProvider(SecretKey key,
                                                                     KeyAlgorithm keyAlgo,
+                                                                    ContentAlgorithm contentEncryptionAlgo) {
+        return createJweEncryptionProvider(key, keyAlgo, contentEncryptionAlgo, null);
+    }
+    public static JweEncryptionProvider createJweEncryptionProvider(SecretKey key,
+                                                                    KeyAlgorithm keyAlgo,
                                                                     ContentAlgorithm contentEncryptionAlgo,
                                                                     String compression) {
         KeyEncryptionProvider keyEncryptionProvider = getSecretKeyEncryptionAlgorithm(key, keyAlgo);
@@ -529,6 +539,10 @@ public final class JweUtils {
         KeyEncryptionProvider keyEncryptionProvider = getSecretKeyEncryptionAlgorithm(key, 
                                                            headers.getKeyEncryptionAlgorithm());
         return createJweEncryptionProvider(keyEncryptionProvider, headers);
+    }
+    public static JweEncryptionProvider createJweEncryptionProvider(JsonWebKey key,
+                                                                    ContentAlgorithm contentEncryptionAlgo) {
+        return createJweEncryptionProvider(key, contentEncryptionAlgo, null);
     }
     public static JweEncryptionProvider createJweEncryptionProvider(JsonWebKey key,
                                                                     ContentAlgorithm contentEncryptionAlgo,
