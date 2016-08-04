@@ -99,8 +99,16 @@ public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
         stsServer.setContext("cxf-ut.xml");
         assertTrue(launchServer(stsServer));
         
+        stsServer = new STSServer();
+        stsServer.setContext("cxf-ut-encrypted.xml");
+        assertTrue(launchServer(stsServer));
+        
         StaxSTSServer staxStsServer = new StaxSTSServer();
         staxStsServer.setContext("stax-cxf-ut.xml");
+        assertTrue(launchServer(staxStsServer));
+        
+        staxStsServer = new StaxSTSServer();
+        staxStsServer.setContext("stax-cxf-ut-encrypted.xml");
         assertTrue(launchServer(staxStsServer));
     }
     
