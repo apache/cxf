@@ -22,8 +22,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
 
@@ -150,41 +150,29 @@ public class JAXRSCdiResourceExtension implements Extension {
     private JAXRSServerFactoryBean createFactoryInstance(final Application application, final BeanManager beanManager) {
 
         final JAXRSServerFactoryBean instance = ResourceUtils.createApplication(application, false, false);
-        final Map< Class< ? >, List< Object > > classified = classifySingletons(application, beanManager);
+        final Map< Class< ? >, List< Object > > classified = classes2singletons(application, beanManager);
         instance.setServiceBeans(classified.get(Path.class));
         instance.setProviders(classified.get(Provider.class));
-        instance.setFeatures(CastUtils.cast(classified.get(Feature.class), Feature.class));
+        instance.getFeatures().addAll(CastUtils.cast(classified.get(Feature.class), Feature.class));
         instance.setBus(bus);
 
         return instance;
     }
 
     /**
-     * JAX-RS application has defined singletons as being instances of any providers, resources and features.
+     * JAX-RS application has defined singletons as being classes of any providers, resources and features.
      * In the JAXRSServerFactoryBean, those should be split around several method calls depending on instance
      * type. At the moment, only the Feature is CXF-specific and should be replaced by JAX-RS Feature implementation.
      * @param application the application instance
-     * @return classified singletons by instance types
+     * @return classified instances of classes by instance types
      */
-    private Map< Class< ? >, List< Object > > classifySingletons(final Application application,
+    private Map< Class< ? >, List< Object > > classes2singletons(final Application application,
                                                                  final BeanManager beanManager) {
-        final Set<Object> singletons = application.getSingletons();
-        final Map< Class< ? >, List< Object > > classified =
-              new HashMap<>();
+        final Map< Class< ? >, List< Object > > classified = new HashMap<>();
 
         classified.put(Feature.class, new ArrayList<>());
         classified.put(Provider.class, new ArrayList<>());
         classified.put(Path.class, new ArrayList<>());
-
-        for (final Object singleton: singletons) {
-            if (singleton instanceof Feature) {
-                classified.get(Feature.class).add(singleton);
-            } else if (singleton.getClass().isAnnotationPresent(Provider.class)) {
-                classified.get(Provider.class).add(singleton);
-            } else if (singleton.getClass().isAnnotationPresent(Path.class)) {
-                classified.get(Path.class).add(singleton);
-            }
-        }
 
         // now loop through the classes
         Set<Class<?>> classes = application.getClasses();
