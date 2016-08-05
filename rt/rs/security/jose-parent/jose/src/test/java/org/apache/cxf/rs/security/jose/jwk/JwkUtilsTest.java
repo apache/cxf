@@ -18,6 +18,10 @@
  */
 package org.apache.cxf.rs.security.jose.jwk;
 
+import java.security.interfaces.RSAPublicKey;
+
+import org.apache.cxf.rs.security.jose.common.JoseUtils;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -60,6 +64,18 @@ public class JwkUtilsTest extends Assert {
         + "\"kty\": \"oct\","
         + "\"k\": \"NGbwp1rC4n85A1SaNxoHow\""
         + "}";
+    @Test
+    public void testRsaKeyModulus() throws Exception {
+        JsonWebKey jwk = JwkUtils.readJwkKey(RSA_KEY);
+        String modulus = jwk.getStringProperty(JsonWebKey.RSA_MODULUS);
+        assertEquals(256, JoseUtils.decode(modulus).length);
+        
+        RSAPublicKey pk = JwkUtils.toRSAPublicKey(jwk);
+        JsonWebKey jwk2 = JwkUtils.fromRSAPublicKey(pk, jwk.getAlgorithm());
+        String modulus2 = jwk2.getStringProperty(JsonWebKey.RSA_MODULUS);
+        assertEquals(256, JoseUtils.decode(modulus2).length);
+        assertEquals(modulus2, modulus);
+    }
     @Test
     public void testRsaKeyThumbprint() throws Exception {
         String thumbprint = JwkUtils.getThumbprint(RSA_KEY);
