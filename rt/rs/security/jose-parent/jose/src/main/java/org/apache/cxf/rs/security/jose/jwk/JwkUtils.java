@@ -488,7 +488,12 @@ public final class JwkUtils {
             }
             jwk.setAlgorithm(algo);
         }
-        String encodedModulus = Base64UrlUtility.encode(modulus.toByteArray());
+        byte[] modulusBytes = modulus.toByteArray();
+        int extraBytesLength = modulusBytes.length - modulus.bitLength() / 8;
+        if (extraBytesLength > 0) {
+            modulusBytes = Arrays.copyOfRange(modulusBytes, extraBytesLength, modulusBytes.length);
+        }
+        String encodedModulus = Base64UrlUtility.encode(modulusBytes);
         jwk.setProperty(JsonWebKey.RSA_MODULUS, encodedModulus);
         return jwk;
     }
