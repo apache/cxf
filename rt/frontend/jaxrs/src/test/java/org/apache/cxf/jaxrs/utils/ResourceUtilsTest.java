@@ -26,14 +26,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.core.Application;
 import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxrs.Customer;
+import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.Parameter;
@@ -158,6 +161,18 @@ public class ResourceUtilsTest extends Assert {
         assertNotNull(ori);
         assertEquals("GET", ori.getHttpMethod());
     }
+
+    @Test
+    public void shouldCreateApplicationWhichInheritsApplicationPath() throws Exception {
+        JAXRSServerFactoryBean application = ResourceUtils.createApplication(new SuperApplication(), false);
+        assertEquals("/base", application.getAddress());
+    }
+
+    @Test
+    public void shouldCreateApplicationWhichOverridesApplicationPath() throws Exception {
+        JAXRSServerFactoryBean application = ResourceUtils.createApplication(new CustomApplication(), false);
+        assertEquals("/custom", application.getAddress());
+    }
     
     public interface IProductResource {
         @Path("/parts")
@@ -217,5 +232,19 @@ public class ResourceUtilsTest extends Assert {
         public OrderItemsDTO<? extends OrderItemDTO<? extends OrderItem>> getOrders() {
             return null;
         }
+    }
+
+    @ApplicationPath("/base")
+    private static class BaseApplication extends Application {
+
+    }
+
+    private static class SuperApplication extends BaseApplication {
+
+    }
+
+    @ApplicationPath("/custom")
+    private static class CustomApplication extends BaseApplication {
+
     }
 }
