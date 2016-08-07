@@ -851,7 +851,7 @@ public final class ResourceUtils {
         JAXRSServerFactoryBean bean = new JAXRSServerFactoryBean();
         String address = "/";
         if (!ignoreAppPath) {
-            ApplicationPath appPath = app.getClass().getAnnotation(ApplicationPath.class);
+            ApplicationPath appPath = locateApplicationPath(app.getClass());
             if (appPath != null) {
                 address = appPath.value();
             }
@@ -939,21 +939,29 @@ public final class ResourceUtils {
         }
         return true;
     }
-    
+
+    public static ApplicationPath locateApplicationPath(Class<?> appClass) {
+        ApplicationPath appPath = appClass.getAnnotation(ApplicationPath.class);
+        if (appPath == null && appClass.getSuperclass() != Application.class) {
+            return locateApplicationPath(appClass.getSuperclass());
+        }
+        return appPath;
+    }
+
     private static boolean isValidApplicationClass(Class<?> c, Set<Object> singletons) {
         if (!isValidResourceClass(c)) {
             return false;
         }
         for (Object s : singletons) {
             if (c == s.getClass()) {
-                LOG.info("Ignoring per-request resource class " + c.getName() 
+                LOG.info("Ignoring per-request resource class " + c.getName()
                          + " as it is also registered as singleton");
                 return false;
             }
         }
         return true;
     }
-    
+
     //TODO : consider moving JAXBDataBinding.createContext to JAXBUtils
     public static JAXBContext createJaxbContext(Set<Class<?>> classes, Class<?>[] extraClass, 
                                           Map<String, Object> contextProperties) {

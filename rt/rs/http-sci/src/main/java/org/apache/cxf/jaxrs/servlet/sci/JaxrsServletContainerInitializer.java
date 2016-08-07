@@ -40,6 +40,7 @@ import javax.ws.rs.ext.Provider;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.servlet.CXFNonSpringJaxrsServlet;
+import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
 @HandlesTypes({ Application.class, Provider.class, Path.class })
 public class JaxrsServletContainerInitializer implements ServletContainerInitializer {  
@@ -71,7 +72,7 @@ public class JaxrsServletContainerInitializer implements ServletContainerInitial
             }
             // Servlet name is the application class name
             servletName = appClass.getName();
-            ApplicationPath appPath = appClass.getAnnotation(ApplicationPath.class);
+            ApplicationPath appPath = ResourceUtils.locateApplicationPath(appClass);
             // If ApplicationPath is available - use its value as a mapping otherwise get it from 
             // a servlet registration with an application implementation class name 
             if (appPath != null) {
