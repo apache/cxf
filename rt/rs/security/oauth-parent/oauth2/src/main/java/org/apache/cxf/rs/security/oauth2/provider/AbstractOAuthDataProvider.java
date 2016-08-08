@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
+import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenRegistration;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
@@ -46,7 +48,8 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
     private List<String> requiredScopes;
     private List<String> invisibleToClientScopes;
     private boolean supportPreauthorizedTokens;
-    
+    private boolean useJwtFormatForAccessTokens;
+    private OAuthJoseJwtProducer jwtAccessTokenHandler;
     
     protected AbstractOAuthDataProvider() {
     }
@@ -76,7 +79,55 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         at.setResponseType(atReg.getResponseType());
         at.setGrantCode(atReg.getGrantCode());
         at.getExtraProperties().putAll(atReg.getExtraProperties());
+        
+        if (isUseJwtFormatForAccessTokens()) {
+            JwtClaims claims = createJwtAccessToken(at);
+            String jose = processJwtAccessToken(claims);
+            at.setTokenKey(jose);
+        }
+        
         return at;
+    }
+    
+    protected JwtClaims createJwtAccessToken(ServerAccessToken at) {
+        JwtClaims claims = new JwtClaims();
+        claims.setTokenId(at.getTokenKey());
+        claims.setAudience(at.getClient().getClientId());
+        claims.setIssuedAt(at.getIssuedAt());
+        if (at.getExpiresIn() > 0) {
+            claims.setExpiryTime(at.getIssuedAt() + at.getExpiresIn());
+        }
+        if (at.getSubject() != null) {
+            claims.setSubject(at.getSubject().getLogin());
+        }
+        if (at.getIssuer() != null) {
+            claims.setIssuer(at.getIssuer());
+        }
+        if (!at.getScopes().isEmpty()) {
+            claims.setClaim(OAuthConstants.SCOPE, 
+                            OAuthUtils.convertPermissionsToScopeList(at.getScopes()));
+        }
+        // OAuth2 resource indicators (resource server audience)
+        if (at.getAudiences().isEmpty()) {
+            List<String> resourceAudiences = at.getAudiences();
+            claims.setClaim("resource", 
+                            resourceAudiences.size() == 1 ? resourceAudiences.get(0) : resourceAudiences);
+        }
+        
+        //TODO: consider auto-setting all the remaining token properties as claims either optionally 
+        // or if JWE encryption is enabled for the providers be able to choose if they
+        // want to save JOSE token representations only - though the providers can always override
+        // this method too and set the extra claims. If all ServerAccessToken properties are set as claims
+        // then the providers will only have to save ServerAccessToken.getTokenKey() in 
+        // saveAccessToken(ServerAccessToken) which will be a JOSE representation of a given ServerAccessToken
+        // instance but will have to restore ServerAccessToken from it when the runtime requests ServerAccessToken
+        // for the validation purposes. 
+        
+        return claims;
+    }
+
+    protected ServerAccessToken createNewAccessToken(Client client) {
+        return new BearerAccessToken(client, accessTokenLifetime);
     }
     
     @Override
@@ -210,10 +261,6 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         return theScopes.contains(OAuthConstants.REFRESH_TOKEN_SCOPE);
     }
 
-    protected ServerAccessToken createNewAccessToken(Client client) {
-        return new BearerAccessToken(client, accessTokenLifetime);
-    }
-     
     protected String getCurrentRequestedGrantType() {
         return (String)messageContext.get(OAuthConstants.GRANT_TYPE);
     }
@@ -414,6 +461,27 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
             setClient(c);
         }
     }
-    
 
+    public boolean isUseJwtFormatForAccessTokens() {
+        return useJwtFormatForAccessTokens;
+    }
+
+    public void setUseJwtFormatForAccessTokens(boolean useJwtFormatForAccessTokens) {
+        this.useJwtFormatForAccessTokens = useJwtFormatForAccessTokens;
+    }
+
+    public OAuthJoseJwtProducer getJwtAccessTokenHandler() {
+        return jwtAccessTokenHandler;
+    }
+
+    public void setJwtAccessTokenHandler(OAuthJoseJwtProducer jwtAccessTokenHandler) {
+        this.jwtAccessTokenHandler = jwtAccessTokenHandler;
+    }
+    
+    protected String processJwtAccessToken(JwtClaims jwtCliams) {
+        // It will JWS-sign (default) and/or JWE-encrypt
+        OAuthJoseJwtProducer processor = 
+            getJwtAccessTokenHandler() == null ? new OAuthJoseJwtProducer() : getJwtAccessTokenHandler(); 
+        return processor.processJwt(new JwtToken(jwtCliams));
+    }
 }
