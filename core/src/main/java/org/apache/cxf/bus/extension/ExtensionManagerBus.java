@@ -40,6 +40,7 @@ import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.configuration.NullConfigurer;
 import org.apache.cxf.feature.Feature;
+import org.apache.cxf.feature.LiveLoggingFeature;
 import org.apache.cxf.feature.LoggingFeature;
 import org.apache.cxf.interceptor.AbstractBasicInterceptorProvider;
 import org.apache.cxf.resource.DefaultResourceManager;
@@ -411,5 +412,29 @@ public class ExtensionManagerBus extends AbstractBasicInterceptorProvider implem
 
         // otherwise use null so the default will be used
         return null;
+    }
+
+    public void enableLiveLogging(boolean enable) {
+        enableLiveLogging(enable, false);
+    }
+
+    public void enableLiveLogging(boolean enable, boolean pretty) {
+        LiveLoggingFeature liveLoggingFeature;
+        if (enable) {
+            liveLoggingFeature = new LiveLoggingFeature();
+            liveLoggingFeature.setPrettyLogging(pretty);
+            this.features.add(liveLoggingFeature);
+            if (state == BusState.RUNNING || state == BusState.INITIAL) {
+                liveLoggingFeature.initialize(this);
+            }
+        } else {
+            for (Feature feature : this.features) {
+                if ("org.apache.cxf.feature.LiveLoggingFeature".contains(feature.getClass().getName())) {
+                    liveLoggingFeature = (LiveLoggingFeature) feature;
+                    liveLoggingFeature.removeLiveLogging(this);
+                    this.features.remove(feature);
+                }
+            }
+        }
     }
 }
