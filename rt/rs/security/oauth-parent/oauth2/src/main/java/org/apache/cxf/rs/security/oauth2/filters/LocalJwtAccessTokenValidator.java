@@ -74,8 +74,13 @@ public class LocalJwtAccessTokenValidator extends JoseJwtConsumer implements Acc
         }
         Object resourceAud = claims.getClaim("resource");
         if (resourceAud != null) {
-            atv.setAudiences(resourceAud instanceof List ? CastUtils.cast((List<?>)resourceAud) 
-                : Collections.<String>singletonList((String)resourceAud));
+            List<String> auds = null;
+            if (resourceAud instanceof List) {
+                auds = CastUtils.cast((List<?>)resourceAud);
+            } else {
+                auds = Collections.singletonList((String)resourceAud);
+            } 
+            atv.setAudiences(auds);
         }
         if (claims.getIssuer() != null) {
             atv.setTokenIssuer(claims.getIssuer());
