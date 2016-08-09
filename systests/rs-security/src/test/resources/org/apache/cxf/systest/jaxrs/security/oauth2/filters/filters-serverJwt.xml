@@ -85,12 +85,12 @@ under the License.
       
    <bean id="tvServiceClient" factory-bean="tvServiceClientFactory" factory-method="createWebClient"/>
  
-   <bean id="tokenValidator" class="org.apache.cxf.rs.security.oauth2.filters.AccessTokenValidatorClient">
+   <bean id="remoteTokenValidator" class="org.apache.cxf.rs.security.oauth2.filters.AccessTokenValidatorClient">
        <property name="tokenValidatorClient" ref="tvServiceClient"/>
    </bean>
      
-   <bean id="oAuthFilter" class="org.apache.cxf.rs.security.oauth2.filters.OAuthRequestFilter">
-       <property name="tokenValidator" ref="tokenValidator"/>
+   <bean id="oAuthFilterRemoteValidation" class="org.apache.cxf.rs.security.oauth2.filters.OAuthRequestFilter">
+       <property name="tokenValidator" ref="remoteTokenValidator"/>
    </bean>
    
    <jaxrs:server 
@@ -100,8 +100,28 @@ under the License.
            <ref bean="serviceBean"/>
        </jaxrs:serviceBeans>
        <jaxrs:providers>
-           <ref bean="oAuthFilter"/>
+           <ref bean="oAuthFilterRemoteValidation"/>
        </jaxrs:providers>
+   </jaxrs:server>
+   
+   <bean id="localTokenValidator" class="org.apache.cxf.rs.security.oauth2.filters.LocalJwtAccessTokenValidator"/>
+     
+   <bean id="oAuthFilterLocalValidation" class="org.apache.cxf.rs.security.oauth2.filters.OAuthRequestFilter">
+       <property name="tokenValidator" ref="localTokenValidator"/>
+   </bean>
+   
+   <jaxrs:server 
+       depends-on="tls-config" 
+       address="https://localhost:${testutil.ports.jaxrs-oauth2-filtersJwt}/securedLocalValidation">
+       <jaxrs:serviceBeans>
+           <ref bean="serviceBean"/>
+       </jaxrs:serviceBeans>
+       <jaxrs:providers>
+           <ref bean="oAuthFilterLocalValidation"/>
+       </jaxrs:providers>
+       <jaxrs:properties>
+            <entry key="rs.security.signature.in.properties" value="org/apache/cxf/systest/jaxrs/security/alice.rs.properties"/>
+       </jaxrs:properties>
    </jaxrs:server>
    
    <http:conduit name="https://localhost.*">

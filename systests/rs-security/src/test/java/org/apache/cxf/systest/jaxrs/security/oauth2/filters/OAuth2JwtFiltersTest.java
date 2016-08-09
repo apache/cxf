@@ -50,7 +50,16 @@ public class OAuth2JwtFiltersTest extends AbstractBusClientServerTestBase {
                    launchServer(BookServerOAuth2ServiceJwt.class, true));
     }
     @org.junit.Test
-    public void testServiceWithJwtTokenAndScope() throws Exception {
+    public void testServiceWithJwtToken() throws Exception {
+        String rsAddress = "https://localhost:" + PORT + "/secured/bookstore/books";
+        doTestServiceWithJwtTokenAndScope(rsAddress);
+    }
+    @org.junit.Test
+    public void testServiceWithJwtTokenAndLocalValidation() throws Exception {
+        String rsAddress = "https://localhost:" + PORT + "/securedLocalValidation/bookstore/books";
+        doTestServiceWithJwtTokenAndScope(rsAddress);
+    }
+    private void doTestServiceWithJwtTokenAndScope(String rsAddress) throws Exception {
         URL busFile = OAuth2JwtFiltersTest.class.getResource("client.xml");
         
         // Get Authorization Code
@@ -84,8 +93,7 @@ public class OAuth2JwtFiltersTest extends AbstractBusClientServerTestBase {
         assertEquals("consumer-id", claims.getAudience());
         assertEquals("alice", claims.getSubject());
         // Now invoke on the service with the access token
-        String address = "https://localhost:" + PORT + "/secured/bookstore/books";
-        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
+        WebClient client = WebClient.create(rsAddress, OAuth2TestUtils.setupProviders(),
                                             busFile.toString());
         client.header("Authorization", "Bearer " + accessToken.getTokenKey());
         
@@ -95,5 +103,18 @@ public class OAuth2JwtFiltersTest extends AbstractBusClientServerTestBase {
         Book returnedBook = response.readEntity(Book.class);
         assertEquals(returnedBook.getName(), "book");
         assertEquals(returnedBook.getId(), 123L);
+    }
+    
+    @org.junit.Test
+    public void testServiceLocalValidationWithNoToken() throws Exception {
+        URL busFile = OAuth2FiltersTest.class.getResource("client.xml");
+        
+        // Now invoke on the service with the faked access token
+        String address = "https://localhost:" + PORT + "/securedLocalValidation/bookstore/books";
+        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(), 
+                                            busFile.toString());
+        
+        Response response = client.post(new Book("book", 123L));
+        assertNotEquals(response.getStatus(), 200);
     }
 }

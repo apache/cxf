@@ -115,7 +115,7 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
                             OAuthUtils.convertPermissionsToScopeList(at.getScopes()));
         }
         // OAuth2 resource indicators (resource server audience)
-        if (at.getAudiences().isEmpty()) {
+        if (!at.getAudiences().isEmpty()) {
             List<String> resourceAudiences = at.getAudiences();
             claims.setClaim("resource", 
                             resourceAudiences.size() == 1 ? resourceAudiences.get(0) : resourceAudiences);
