@@ -18,15 +18,17 @@
   under the License.
 -->
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:cxf="http://cxf.apache.org/core" xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:sec="http://cxf.apache.org/configuration/security" xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration" xmlns:test="http://apache.org/hello_world_soap_http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util" xsi:schemaLocation="         http://cxf.apache.org/core         http://cxf.apache.org/schemas/core.xsd         http://www.springframework.org/schema/beans         http://www.springframework.org/schema/beans/spring-beans-2.0.xsd         http://cxf.apache.org/jaxws                                              http://cxf.apache.org/schemas/jaxws.xsd         http://cxf.apache.org/configuration/security         http://cxf.apache.org/schemas/configuration/security.xsd         http://cxf.apache.org/transports/http-jetty/configuration         http://cxf.apache.org/schemas/configuration/http-jetty.xsd         http://www.springframework.org/schema/util         http://www.springframework.org/schema/util/spring-util-2.0.xsd">
-    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
     <cxf:bus>
         <cxf:features>
             <cxf:logging/>
         </cxf:features>
     </cxf:bus>
     
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="location" value="classpath:org/apache/cxf/systest/sts/deployment/sts/sts.properties"/>
+    </bean>
+    
     <import resource="realms.xml" />
-    <import resource="sts-properties.xml" />
     
     <util:list id="delegationHandlers">
         <bean class="org.apache.cxf.sts.token.delegation.HOKDelegationHandler" />
@@ -70,6 +72,27 @@
         <property name="claimHandlers" ref="customClaimsHandler"/>
     </bean>
     <bean id="customClaimsHandler" class="org.apache.cxf.systest.sts.deployment.CustomClaimsHandler">
+    </bean>
+    
+     <bean id="encProperties" class="org.apache.cxf.sts.service.EncryptionProperties">
+        <property name="encryptionAlgorithm" value="http://www.w3.org/2001/04/xmlenc#aes128-cbc"/>
+        <property name="keyWrapAlgorithm" value="http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p"/>
+    </bean>
+    
+    <bean id="samlRealmCodec" class="org.apache.cxf.systest.sts.common.SAMLRealmCNCodec"/>
+    <bean id="customRealmParser" class="org.apache.cxf.systest.sts.common.UriRealmParser"/>
+    
+    <bean id="stsProperties" class="org.apache.cxf.sts.StaticSTSProperties">
+        <property name="signaturePropertiesFile" value="${signature.properties}"/>
+        <property name="signatureUsername" value="${signature.username}"/>
+        <property name="callbackHandlerClass" value="${callback.handler}"/>
+        <property name="encryptionPropertiesFile" value="${encryption.properties}"/>
+        <property name="issuer" value="${issuer}"/>
+        <property name="encryptionUsername" value="${encryption.username}"/>
+        <property name="encryptionProperties" ref="encProperties"/>
+        <property name="realmParser" ref="customRealmParser"/>
+        <property name="relationships" ref="relationships"/>
+        <property name="samlRealmCodec" ref="samlRealmCodec"/>
     </bean>
         
 </beans>
