@@ -26,6 +26,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.text.StrTokenizer;
+
 public class ContentDisposition {
     private static final String CD_HEADER_PARAMS_EXPRESSION =
         "(([\\w-]+( )?\\*?=( )?\"[^\"]+\")|([\\w-]+( )?\\*?=( )?[^;]+))";
@@ -56,9 +58,11 @@ public class ContentDisposition {
         String extendedFilename = null;
         Matcher m = CD_HEADER_PARAMS_PATTERN.matcher(tempValue);
         while (m.find()) {
-            String[] pair = m.group().trim().split("=");
-            String paramName = pair[0].trim();
-            String paramValue = pair.length == 2 ? pair[1].trim().replace("\"", "") : "";
+            String[] extPair = new StrTokenizer(m.group().trim(), "*=").getTokenArray();
+            String[] pair = extPair.length == 2 ? new String[] {extPair[0] + "*", extPair[1]}
+                : new StrTokenizer(m.group().trim(), '=', '\"').getTokenArray();
+            String paramName = pair.length == 2 ? pair[0].trim() : "";
+            String paramValue = pair.length == 2 ? pair[1].trim() : "";
             // filename* looks like the only CD param that is human readable
             // and worthy of the extended encoding support. Other parameters
             // can be supported if needed, see the complete list below
