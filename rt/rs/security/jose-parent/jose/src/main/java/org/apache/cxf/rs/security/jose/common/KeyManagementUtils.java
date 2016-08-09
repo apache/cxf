@@ -129,6 +129,15 @@ public final class KeyManagementUtils {
             throw new JoseException(ex);
         }
     }
+    public static PublicKey loadPublicKey(String keyStorePropLoc, Bus bus) {
+        try {
+            Properties props = JoseUtils.loadProperties(keyStorePropLoc, bus);
+            return KeyManagementUtils.loadPublicKey(null, props);
+        } catch (Exception ex) {
+            LOG.warning("Public key can not be loaded");
+            throw new JoseException(ex);
+        }
+    }
     private static String getMessageProperty(Message m, String keyStoreLocPropPreferred, 
                                              String keyStoreLocPropDefault) {
         String propLoc = 
@@ -168,6 +177,18 @@ public final class KeyManagementUtils {
         try {
             Properties props = JoseUtils.loadProperties(keyStoreLoc, bus);
             return loadPrivateKey(m, props, keyOper);
+        } catch (Exception ex) {
+            throw new SecurityException(ex);
+        }
+    }
+    public static PrivateKey loadPrivateKey(String keyStorePropLoc,
+                                            char[] keyPassword,
+                                            String keyAlias,
+                                            Bus bus) {
+        try {
+            Properties props = JoseUtils.loadProperties(keyStorePropLoc, bus);
+            KeyStore keyStore = loadPersistKeyStore(null, props);
+            return CryptoUtils.loadPrivateKey(keyStore, keyPassword, keyAlias);
         } catch (Exception ex) {
             throw new SecurityException(ex);
         }
