@@ -97,8 +97,15 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         if (at.getExpiresIn() > 0) {
             claims.setExpiryTime(at.getIssuedAt() + at.getExpiresIn());
         }
-        if (at.getSubject() != null) {
-            claims.setSubject(at.getSubject().getLogin());
+        UserSubject userSubject = at.getSubject();
+        if (userSubject != null) {
+            if (userSubject.getId() != null) {
+                claims.setSubject(userSubject.getId());
+                claims.setClaim("preferred_username", userSubject.getLogin());
+            } else {
+                claims.setSubject(userSubject.getLogin());
+            }
+            
         }
         if (at.getIssuer() != null) {
             claims.setIssuer(at.getIssuer());
