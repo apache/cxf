@@ -45,6 +45,7 @@ import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.rs.security.saml.DeflateEncoderDecoder;
 import org.apache.cxf.rs.security.saml.sso.state.RequestState;
 import org.apache.cxf.rs.security.saml.sso.state.ResponseState;
@@ -69,6 +70,8 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
     private TokenReplayCache<String> replayCache;
 
     private MessageContext messageContext;
+    private String applicationURL;
+    private boolean parseApplicationURLFromRelayState;
     
     @Context 
     public void setMessageContext(MessageContext mc) {
@@ -201,6 +204,31 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
     }
     
     protected RequestState processRelayState(String relayState) {
+        if (isSupportUnsolicited()) {
+            String urlToForwardTo = applicationURL;
+            if (relayState != null && relayState.getBytes().length > 0 && relayState.getBytes().length < 80) {
+                // First see if we have a valid RequestState
+                RequestState requestState = getStateProvider().removeRequestState(relayState);
+                if (requestState != null && !isStateExpired(requestState.getCreatedAt(), 0)) {
+                    return requestState;
+                }
+                
+                // Otherwise get the application URL from the RelayState if supported
+                if (parseApplicationURLFromRelayState) {
+                    urlToForwardTo = relayState;
+                }
+            }
+            
+            // Otherwise create a new one for the IdP initiated case
+            return new RequestState(urlToForwardTo,
+                                    getIdpServiceAddress(),
+                                    null,
+                                    getIssuerId(JAXRSUtils.getCurrentMessage()),
+                                    "/",
+                                    null,
+                                    new Date().getTime());
+        }
+        
         if (relayState == null) {
             reportError("MISSING_RELAY_STATE");
             throw ExceptionUtils.toBadRequestException(null, null);
@@ -218,6 +246,7 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
             reportError("EXPIRED_REQUEST_STATE");
             throw ExceptionUtils.toBadRequestException(null, null);
         }
+
         return requestState;
     }
     
@@ -348,4 +377,29 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
     public void setEnforceResponseSigned(boolean enforceResponseSigned) {
         this.enforceResponseSigned = enforceResponseSigned;
     }
+
+    public String getApplicationURL() {
+        return applicationURL;
+    }
+
+    /**
+     * Set the Application URL to forward to, for the unsolicited IdP case.
+     * @param applicationURL
+     */
+    public void setApplicationURL(String applicationURL) {
+        this.applicationURL = applicationURL;
+    }
+
+    public boolean isParseApplicationURLFromRelayState() {
+        return parseApplicationURLFromRelayState;
+    }
+
+    /**
+     * Whether to parse the application URL to forward to from the RelayState, for the unsolicted IdP case.
+     * @param parseApplicationURLFromRelayState
+     */
+    public void setParseApplicationURLFromRelayState(boolean parseApplicationURLFromRelayState) {
+        this.parseApplicationURLFromRelayState = parseApplicationURLFromRelayState;
+    }
+
 }
