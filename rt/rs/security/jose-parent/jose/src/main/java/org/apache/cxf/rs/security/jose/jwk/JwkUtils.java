@@ -52,6 +52,7 @@ import org.apache.cxf.jaxrs.json.basic.JsonMapObjectReaderWriter;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.rs.security.jose.common.JoseConstants;
+import org.apache.cxf.rs.security.jose.common.JoseException;
 import org.apache.cxf.rs.security.jose.common.JoseHeaders;
 import org.apache.cxf.rs.security.jose.common.JoseUtils;
 import org.apache.cxf.rs.security.jose.common.KeyManagementUtils;
@@ -357,7 +358,10 @@ public final class JwkUtils {
         return KeyManagementUtils.toX509CertificateChain(base64EncodedChain);
     }
     public static JsonWebKey fromECPublicKey(ECPublicKey pk, String curve) {
-        JsonWebKey jwk = prepareECJwk(curve);
+        return fromECPublicKey(pk, curve, null);
+    }
+    public static JsonWebKey fromECPublicKey(ECPublicKey pk, String curve, String kid) {    
+        JsonWebKey jwk = prepareECJwk(curve, kid);
         jwk.setProperty(JsonWebKey.EC_X_COORDINATE, 
                         Base64UrlUtility.encode(pk.getW().getAffineX().toByteArray()));
         jwk.setProperty(JsonWebKey.EC_Y_COORDINATE, 
@@ -365,13 +369,19 @@ public final class JwkUtils {
         return jwk;
     }
     public static JsonWebKey fromECPrivateKey(ECPrivateKey pk, String curve) {
-        JsonWebKey jwk = prepareECJwk(curve);
+        return fromECPrivateKey(pk, curve, null);
+    }
+    public static JsonWebKey fromECPrivateKey(ECPrivateKey pk, String curve, String kid) {
+        JsonWebKey jwk = prepareECJwk(curve, kid);
         jwk.setProperty(JsonWebKey.EC_PRIVATE_KEY, 
                         Base64UrlUtility.encode(pk.getS().toByteArray()));
         return jwk;
     }
     public static JsonWebKey fromRSAPublicKey(RSAPublicKey pk, String algo) {
-        JsonWebKey jwk = prepareRSAJwk(pk.getModulus(), algo);
+        return fromRSAPublicKey(pk, algo, null);
+    }
+    public static JsonWebKey fromRSAPublicKey(RSAPublicKey pk, String algo, String kid) {
+        JsonWebKey jwk = prepareRSAJwk(pk.getModulus(), algo, kid);
         String encodedPublicExponent = Base64UrlUtility.encode(pk.getPublicExponent().toByteArray());
         jwk.setProperty(JsonWebKey.RSA_PUBLIC_EXP, encodedPublicExponent);
         return jwk;
@@ -407,6 +417,9 @@ public final class JwkUtils {
             return CryptoUtils.getRSAPrivateKey(encodedModulus, encodedPrivateExponent);
         } else {
             String encodedPublicExponent = (String)jwk.getProperty(JsonWebKey.RSA_PUBLIC_EXP);
+            if (encodedPublicExponent == null) {
+                throw new JoseException("JWK without the public exponent can not be converted to RSAPrivateKey");
+            }
             String encodedPrimeQ = (String)jwk.getProperty(JsonWebKey.RSA_SECOND_PRIME_FACTOR);
             String encodedPrimeExpP = (String)jwk.getProperty(JsonWebKey.RSA_FIRST_PRIME_CRT);
             String encodedPrimeExpQ = (String)jwk.getProperty(JsonWebKey.RSA_SECOND_PRIME_CRT);
@@ -422,11 +435,16 @@ public final class JwkUtils {
         }
     }
     public static JsonWebKey fromRSAPrivateKey(RSAPrivateKey pk, String algo) {
-        JsonWebKey jwk = prepareRSAJwk(pk.getModulus(), algo);
+        return fromRSAPrivateKey(pk, algo, null);
+    }
+    public static JsonWebKey fromRSAPrivateKey(RSAPrivateKey pk, String algo, String kid) {
+        JsonWebKey jwk = prepareRSAJwk(pk.getModulus(), algo, kid);
         String encodedPrivateExponent = Base64UrlUtility.encode(pk.getPrivateExponent().toByteArray());
         jwk.setProperty(JsonWebKey.RSA_PRIVATE_EXP, encodedPrivateExponent);
         if (pk instanceof RSAPrivateCrtKey) {
             RSAPrivateCrtKey pkCrt = (RSAPrivateCrtKey)pk;
+            jwk.setProperty(JsonWebKey.RSA_PUBLIC_EXP, 
+                            Base64UrlUtility.encode(pkCrt.getPublicExponent().toByteArray()));
             jwk.setProperty(JsonWebKey.RSA_FIRST_PRIME_FACTOR, 
                             Base64UrlUtility.encode(pkCrt.getPrimeP().toByteArray()));
             jwk.setProperty(JsonWebKey.RSA_SECOND_PRIME_FACTOR, 
@@ -458,11 +476,17 @@ public final class JwkUtils {
                                                AlgorithmUtils.toJavaName(jwk.getAlgorithm()));
     }
     public static JsonWebKey fromSecretKey(SecretKey secretKey, String algo) {
+        return fromSecretKey(secretKey, algo, null);
+    }
+    public static JsonWebKey fromSecretKey(SecretKey secretKey, String algo, String kid) {
         if (!AlgorithmUtils.isOctet(algo)) {
             throw new JwkException("Invalid algorithm");
         }
         JsonWebKey jwk = new JsonWebKey();
         jwk.setKeyType(KeyType.OCTET);
+        if (kid != null) {
+            jwk.setKeyId(kid);
+        }
         jwk.setAlgorithm(algo);
         String encodedSecretKey = Base64UrlUtility.encode(secretKey.getEncoded());
         jwk.setProperty(JsonWebKey.OCTET_KEY_VALUE, encodedSecretKey);
@@ -479,7 +503,7 @@ public final class JwkUtils {
         KeyDecryptionProvider keyDecryption = new PbesHmacAesWrapKeyDecryptionAlgorithm(password);
         return new AesCbcHmacJweDecryption(keyDecryption);
     }
-    private static JsonWebKey prepareRSAJwk(BigInteger modulus, String algo) {
+    private static JsonWebKey prepareRSAJwk(BigInteger modulus, String algo, String kid) {
         JsonWebKey jwk = new JsonWebKey();
         jwk.setKeyType(KeyType.RSA);
         if (algo != null) {
@@ -487,6 +511,9 @@ public final class JwkUtils {
                 throw new JwkException("Invalid algorithm");
             }
             jwk.setAlgorithm(algo);
+        }
+        if (kid != null) {
+            jwk.setKeyId(kid);
         }
         byte[] modulusBytes = modulus.toByteArray();
         int extraBytesLength = modulusBytes.length - modulus.bitLength() / 8;
@@ -497,9 +524,12 @@ public final class JwkUtils {
         jwk.setProperty(JsonWebKey.RSA_MODULUS, encodedModulus);
         return jwk;
     }
-    private static JsonWebKey prepareECJwk(String curve) {
+    private static JsonWebKey prepareECJwk(String curve, String kid) {
         JsonWebKey jwk = new JsonWebKey();
         jwk.setKeyType(KeyType.EC);
+        if (kid != null) {
+            jwk.setKeyId(kid);
+        }
         jwk.setProperty(JsonWebKey.EC_CURVE, curve);
         return jwk;
     }
