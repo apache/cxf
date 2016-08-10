@@ -262,6 +262,9 @@ public class SAMLSSOResponseValidator {
         if (requestId != null && !requestId.equals(subjectConfData.getInResponseTo())) {
             LOG.fine("The InResponseTo String does match the original request id " + requestId);
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
+        } else if (requestId == null && subjectConfData.getInResponseTo() != null) {
+            LOG.fine("No InResponseTo String is allowed for the unsolicted case");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
         
     }

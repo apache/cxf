@@ -28,7 +28,9 @@ import javax.annotation.PreDestroy;
 import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.jaxrs.impl.UriInfoImpl;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.saml.sso.state.SPStateManager;
 import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.wss4j.common.crypto.Crypto;
@@ -47,6 +49,9 @@ public class AbstractSSOSpHandler {
     private CallbackHandler callbackHandler;
     private String callbackHandlerClass;
     private String signatureUsername;
+    private String idpServiceAddress;
+    private String issuerId;
+    private boolean supportUnsolicited;
     
     static {
         OpenSAMLUtil.initSamlEngine();
@@ -203,4 +208,35 @@ public class AbstractSSOSpHandler {
         return signatureUsername;
     }
     
+    public void setIdpServiceAddress(String idpServiceAddress) {
+        this.idpServiceAddress = idpServiceAddress;
+    }
+
+    public String getIdpServiceAddress() {
+        return idpServiceAddress;
+    }
+    
+    public void setIssuerId(String issuerId) {
+        this.issuerId = issuerId;
+    }
+    
+    protected String getIssuerId(Message m) {
+        if (issuerId == null) {
+            return new UriInfoImpl(m).getBaseUri().toString();
+        } else {
+            return issuerId;
+        }
+    }
+    
+    public boolean isSupportUnsolicited() {
+        return supportUnsolicited;
+    }
+
+    /**
+     * Whether to support unsolicited IdP initiated login or not. The default
+     * is false.
+     */
+    public void setSupportUnsolicited(boolean supportUnsolicited) {
+        this.supportUnsolicited = supportUnsolicited;
+    }
 }

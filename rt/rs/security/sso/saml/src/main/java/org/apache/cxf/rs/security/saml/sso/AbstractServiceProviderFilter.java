@@ -75,8 +75,6 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
     protected static final ResourceBundle BUNDLE = 
         BundleUtils.getBundle(AbstractServiceProviderFilter.class);
     
-    private String idpServiceAddress;
-    private String issuerId;
     private String assertionConsumerServiceAddress;
     private AuthnRequestBuilder authnRequestBuilder = new DefaultAuthnRequestBuilder();
     private boolean signRequest;
@@ -106,29 +104,9 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
         this.assertionConsumerServiceAddress = assertionConsumerServiceAddress;
     }
 
-    public void setIssuerId(String issuerId) {
-        this.issuerId = issuerId;
-    }
-    
-    public void setIdpServiceAddress(String idpServiceAddress) {
-        this.idpServiceAddress = idpServiceAddress;
-    }
-
-    public String getIdpServiceAddress() {
-        return idpServiceAddress;
-    }
-    
     @PreDestroy
     public void close() {
         super.close();
-    }
-    
-    private String getIssuerId(Message m) {
-        if (issuerId == null) {
-            return new UriInfoImpl(m).getBaseUri().toString();
-        } else {
-            return issuerId;
-        }
     }
     
     protected boolean checkSecurityContext(Message m) {
@@ -142,16 +120,18 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
             return false;    
         }
         
-        Cookie relayStateCookie = cookies.get(SSOConstants.RELAY_STATE);
-        if (relayStateCookie == null) {
-            reportError("MISSING_RELAY_COOKIE");
-            return false;
-        }
-        String originalRelayState = responseState.getRelayState();
-        if (!originalRelayState.equals(relayStateCookie.getValue())) {
-            // perhaps the response state should also be removed
-            reportError("INVALID_RELAY_STATE");
-            return false;
+        if (!isSupportUnsolicited()) {
+            Cookie relayStateCookie = cookies.get(SSOConstants.RELAY_STATE);
+            if (relayStateCookie == null) {
+                reportError("MISSING_RELAY_COOKIE");
+                return false;
+            }
+            String originalRelayState = responseState.getRelayState();
+            if (!originalRelayState.equals(relayStateCookie.getValue())) {
+                // perhaps the response state should also be removed
+                reportError("INVALID_RELAY_STATE");
+                return false;
+            }
         }
         try {
             String assertion = responseState.getAssertion();
@@ -241,7 +221,7 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
                 m, getIssuerId(m), getAbsoluteAssertionServiceAddress(m)
             );
         if (isSignRequest()) {
-            authnRequest.setDestination(idpServiceAddress);
+            authnRequest.setDestination(getIdpServiceAddress());
             signAuthnRequest(authnRequest);
         }
         Element authnRequestElement = OpenSAMLUtil.toDom(authnRequest, doc);
