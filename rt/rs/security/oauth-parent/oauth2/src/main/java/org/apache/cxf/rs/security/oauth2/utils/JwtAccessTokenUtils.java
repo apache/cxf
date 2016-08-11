@@ -92,11 +92,15 @@ public final class JwtAccessTokenUtils {
         if (grantType != null) {
             at.setGrantType(grantType);
         }
-        String grantCode = claims.getStringProperty("grant_code");
+        String grantCode = claims.getStringProperty(OAuthConstants.AUTHORIZATION_CODE_GRANT);
         if (grantCode != null) {
             at.setGrantCode(grantCode);
         }
-       
+        String codeVerifier = claims.getStringProperty(OAuthConstants.AUTHORIZATION_CODE_VERIFIER);
+        if (codeVerifier != null) {
+            at.setClientCodeVerifier(codeVerifier);
+        }
+        
         Map<String, String> extraProperties = CastUtils.cast((Map<?, ?>)claims.getClaim("extra_propertirs"));
         if (extraProperties != null) {
             at.getExtraProperties().putAll(extraProperties);

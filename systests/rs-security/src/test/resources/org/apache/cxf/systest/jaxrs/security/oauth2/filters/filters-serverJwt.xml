@@ -85,12 +85,39 @@ under the License.
       
    <bean id="tvServiceClient" factory-bean="tvServiceClientFactory" factory-method="createWebClient"/>
  
+   <bean id="tvServiceClientFactory2" class="org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean">
+         <property name="address" value="https://localhost:${testutil.ports.jaxrs-oauth2-serviceJwt}/services2/validate"/>
+         <property name="headers">
+            <map>
+               <entry key="Accept" value="application/json"/>
+               <entry key="Content-Type" value="application/x-www-form-urlencoded"/>
+            </map>
+         </property>
+         <property name="providers">
+             <list>
+                 <ref bean="jackson"/>
+             </list>
+         </property>
+         <property name="username" value="service"/>
+         <property name="password" value="service-pass"/>
+   </bean>
+      
+   <bean id="tvServiceClient2" factory-bean="tvServiceClientFactory2" factory-method="createWebClient"/>
+ 
    <bean id="remoteTokenValidator" class="org.apache.cxf.rs.security.oauth2.filters.AccessTokenValidatorClient">
        <property name="tokenValidatorClient" ref="tvServiceClient"/>
    </bean>
      
    <bean id="oAuthFilterRemoteValidation" class="org.apache.cxf.rs.security.oauth2.filters.OAuthRequestFilter">
        <property name="tokenValidator" ref="remoteTokenValidator"/>
+   </bean>
+   
+   <bean id="remoteTokenValidator2" class="org.apache.cxf.rs.security.oauth2.filters.AccessTokenValidatorClient">
+       <property name="tokenValidatorClient" ref="tvServiceClient2"/>
+   </bean>
+     
+   <bean id="oAuthFilterRemoteValidation2" class="org.apache.cxf.rs.security.oauth2.filters.OAuthRequestFilter">
+       <property name="tokenValidator" ref="remoteTokenValidator2"/>
    </bean>
    
    <jaxrs:server 
@@ -104,10 +131,21 @@ under the License.
        </jaxrs:providers>
    </jaxrs:server>
    
-   <bean id="localTokenValidator" class="org.apache.cxf.rs.security.oauth2.filters.JwtAccessTokenValidator"/>
+   <jaxrs:server 
+       depends-on="tls-config" 
+       address="https://localhost:${testutil.ports.jaxrs-oauth2-filtersJwt}/secured2">
+       <jaxrs:serviceBeans>
+           <ref bean="serviceBean"/>
+       </jaxrs:serviceBeans>
+       <jaxrs:providers>
+           <ref bean="oAuthFilterRemoteValidation2"/>
+       </jaxrs:providers>
+   </jaxrs:server>
+   
+   <bean id="jwtTokenValidator" class="org.apache.cxf.rs.security.oauth2.filters.JwtAccessTokenValidator"/>
      
    <bean id="oAuthFilterLocalValidation" class="org.apache.cxf.rs.security.oauth2.filters.OAuthRequestFilter">
-       <property name="tokenValidator" ref="localTokenValidator"/>
+       <property name="tokenValidator" ref="jwtTokenValidator"/>
    </bean>
    
    <jaxrs:server 

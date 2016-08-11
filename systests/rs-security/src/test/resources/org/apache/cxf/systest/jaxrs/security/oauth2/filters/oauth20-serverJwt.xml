@@ -79,12 +79,30 @@ under the License.
        <property name="dataProvider" ref="oauthProvider"/>
    </bean>
    
+   <bean id="oauthProvider2" class="org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuthDataProviderImpl">
+       <constructor-arg><value>${testutil.ports.jaxrs-oauth2-filtersJwt}</value></constructor-arg>
+       <property name="useJwtFormatForAccessTokens" value="true"/>
+       <property name="storeJwtTokenKeyOnly" value="true"/>
+   </bean>
+   
+   <bean id="authorizationService2" class="org.apache.cxf.rs.security.oauth2.services.AuthorizationCodeGrantService">
+      <property name="dataProvider" ref="oauthProvider2"/>
+   </bean>
+   
+   <bean id="tokenService2" class="org.apache.cxf.rs.security.oauth2.services.AccessTokenService">
+      <property name="dataProvider" ref="oauthProvider2"/>
+   </bean>
+   
+   <bean id="tokenValidateService2" class="org.apache.cxf.rs.security.oauth2.services.AccessTokenValidatorService">
+       <property name="dataProvider" ref="oauthProvider2"/>
+   </bean>
+   
    <bean id="callbackHandler" class="org.apache.cxf.systest.jaxrs.security.oauth2.common.CallbackHandlerImpl"/>
    <bean id="basicAuthFilter" class="org.apache.cxf.systest.jaxrs.security.oauth2.common.WSS4JBasicAuthFilter">
        <property name="callbackHandler" ref="callbackHandler"/>
    </bean>
    
-   <jaxrs:server 
+   <jaxrs:server id="oauthServer1"
        depends-on="tls-config" 
        address="https://localhost:${testutil.ports.jaxrs-oauth2-serviceJwt}/services">
        <jaxrs:serviceBeans>
@@ -97,6 +115,22 @@ under the License.
        </jaxrs:providers>
        <jaxrs:properties>
             <entry key="rs.security.signature.out.properties" value="org/apache/cxf/systest/jaxrs/security/alice.rs.properties"/>
+            <entry key="rs.security.signature.key.password.provider" value-ref="keyPasswordProvider"/>
+       </jaxrs:properties>
+   </jaxrs:server>
+   <jaxrs:server id="oauthServer2"
+       depends-on="tls-config" 
+       address="https://localhost:${testutil.ports.jaxrs-oauth2-serviceJwt}/services2">
+       <jaxrs:serviceBeans>
+           <ref bean="authorizationService2"/>
+           <ref bean="tokenService2"/>
+           <ref bean="tokenValidateService2"/>
+       </jaxrs:serviceBeans>
+       <jaxrs:providers>
+           <ref bean="basicAuthFilter"/>
+       </jaxrs:providers>
+       <jaxrs:properties>
+            <entry key="rs.security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/alice.rs.properties"/>
             <entry key="rs.security.signature.key.password.provider" value-ref="keyPasswordProvider"/>
        </jaxrs:properties>
    </jaxrs:server>
