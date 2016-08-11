@@ -140,17 +140,7 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         }
         // ServerAccessToken 'nonce' property, if available, can be ignored for the purpose for persisting it
         // further as a JWT claim - as it is only used once by (OIDC) IdTokenResponseFilter
-        // to set IdToken nonce property with the filter havinh an access to the current ServerAccessToken instance
-        
-        //TODO: consider auto-setting all the remaining token properties as claims either optionally 
-        // or if JWE encryption is enabled for the providers be able to choose if they
-        // want to save JOSE token representations only - though the providers can always override
-        // this method too and set the extra claims. If all ServerAccessToken properties are set as claims
-        // then the providers will only have to save ServerAccessToken.getTokenKey() in 
-        // saveAccessToken(ServerAccessToken) which will be a JOSE representation of a given ServerAccessToken
-        // instance but will have to restore ServerAccessToken from it when the runtime requests ServerAccessToken
-        // for the validation purposes. 
-        
+        // to set IdToken nonce property with the filter having an access to the current ServerAccessToken instance
         return claims;
     }
 
