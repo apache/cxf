@@ -38,7 +38,7 @@ import org.apache.cxf.rs.security.oauth2.provider.AccessTokenValidator;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
-public class LocalJwtAccessTokenValidator extends JoseJwtConsumer implements AccessTokenValidator {
+public class JwtAccessTokenValidator extends JoseJwtConsumer implements AccessTokenValidator {
 
     public List<String> getSupportedAuthorizationSchemes() {
         return Collections.singletonList(OAuthConstants.BEARER_AUTHORIZATION_SCHEME);
@@ -72,7 +72,7 @@ public class LocalJwtAccessTokenValidator extends JoseJwtConsumer implements Acc
         if (claims.getExpiryTime() != null) {
             atv.setTokenLifetime(claims.getExpiryTime() - atv.getTokenIssuedAt());
         }
-        Object resourceAud = claims.getClaim("resource");
+        Object resourceAud = claims.getClaim(OAuthConstants.RESOURCE_INDICATOR);
         if (resourceAud != null) {
             List<String> auds = null;
             if (resourceAud instanceof List) {
@@ -85,7 +85,7 @@ public class LocalJwtAccessTokenValidator extends JoseJwtConsumer implements Acc
         if (claims.getIssuer() != null) {
             atv.setTokenIssuer(claims.getIssuer());
         }
-        Object scope = claims.getClaim("scope");
+        Object scope = claims.getClaim(OAuthConstants.SCOPE);
         if (scope != null) {
             String[] scopes = scope instanceof String 
                 ? scope.toString().split(" ") : CastUtils.cast((List<?>)scope).toArray(new String[]{});

@@ -104,7 +104,7 @@ under the License.
        </jaxrs:providers>
    </jaxrs:server>
    
-   <bean id="localTokenValidator" class="org.apache.cxf.rs.security.oauth2.filters.LocalJwtAccessTokenValidator"/>
+   <bean id="localTokenValidator" class="org.apache.cxf.rs.security.oauth2.filters.JwtAccessTokenValidator"/>
      
    <bean id="oAuthFilterLocalValidation" class="org.apache.cxf.rs.security.oauth2.filters.OAuthRequestFilter">
        <property name="tokenValidator" ref="localTokenValidator"/>

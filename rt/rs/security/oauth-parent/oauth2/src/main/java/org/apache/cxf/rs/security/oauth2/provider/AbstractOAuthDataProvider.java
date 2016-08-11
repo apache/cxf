@@ -117,11 +117,11 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         // OAuth2 resource indicators (resource server audience)
         if (!at.getAudiences().isEmpty()) {
             List<String> resourceAudiences = at.getAudiences();
-            claims.setClaim("resource", 
+            claims.setClaim(OAuthConstants.RESOURCE_INDICATOR, 
                             resourceAudiences.size() == 1 ? resourceAudiences.get(0) : resourceAudiences);
         }
-        for (Map.Entry<String, String> entry : at.getExtraProperties().entrySet()) {
-            claims.setClaim(entry.getKey(), entry.getValue());
+        if (!at.getExtraProperties().isEmpty()) {
+            claims.setClaim("extra_properties", at.getExtraProperties());
         }
         // Can be used to check at RS/etc which grant was used to get this token issued
         if (at.getGrantType() != null) {
@@ -131,12 +131,12 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         // (and is no longer valid) when this token was issued; relevant only if the authorization
         // code flow was used
         if (at.getGrantCode() != null) {
-            claims.setClaim("grant_code", at.getGrantType());
+            claims.setClaim(OAuthConstants.AUTHORIZATION_CODE_GRANT, at.getGrantCode());
         }
         // Can be used to link the clients (especially public ones) to this token
         // to have a knowledge which client instance is using this token - might be handy at the RS/etc
         if (at.getClientCodeVerifier() != null) {
-            claims.setClaim("code_verifier", at.getClientCodeVerifier());
+            claims.setClaim(OAuthConstants.AUTHORIZATION_CODE_VERIFIER, at.getClientCodeVerifier());
         }
         // ServerAccessToken 'nonce' property, if available, can be ignored for the purpose for persisting it
         // further as a JWT claim - as it is only used once by (OIDC) IdTokenResponseFilter
