@@ -120,6 +120,27 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
             claims.setClaim("resource", 
                             resourceAudiences.size() == 1 ? resourceAudiences.get(0) : resourceAudiences);
         }
+        for (Map.Entry<String, String> entry : at.getExtraProperties().entrySet()) {
+            claims.setClaim(entry.getKey(), entry.getValue());
+        }
+        // Can be used to check at RS/etc which grant was used to get this token issued
+        if (at.getGrantType() != null) {
+            claims.setClaim(OAuthConstants.GRANT_TYPE, at.getGrantType());
+        }
+        // Can be used to check the original code grant value which was removed from the storage
+        // (and is no longer valid) when this token was issued; relevant only if the authorization
+        // code flow was used
+        if (at.getGrantCode() != null) {
+            claims.setClaim("grant_code", at.getGrantType());
+        }
+        // Can be used to link the clients (especially public ones) to this token
+        // to have a knowledge which client instance is using this token - might be handy at the RS/etc
+        if (at.getClientCodeVerifier() != null) {
+            claims.setClaim("code_verifier", at.getClientCodeVerifier());
+        }
+        // ServerAccessToken 'nonce' property, if available, can be ignored for the purpose for persisting it
+        // further as a JWT claim - as it is only used once by (OIDC) IdTokenResponseFilter
+        // to set IdToken nonce property with the filter havinh an access to the current ServerAccessToken instance
         
         //TODO: consider auto-setting all the remaining token properties as claims either optionally 
         // or if JWE encryption is enabled for the providers be able to choose if they
