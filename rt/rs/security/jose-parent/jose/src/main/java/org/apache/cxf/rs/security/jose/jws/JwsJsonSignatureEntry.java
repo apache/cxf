@@ -25,12 +25,13 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.json.basic.JsonMapObjectReaderWriter;
+import org.apache.cxf.jaxrs.json.basic.JsonObject;
 import org.apache.cxf.rs.security.jose.common.JoseConstants;
 import org.apache.cxf.rs.security.jose.common.JoseUtils;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 
 
-public class JwsJsonSignatureEntry {
+public class JwsJsonSignatureEntry implements JsonObject {
     protected static final Logger LOG = LogUtils.getL7dLogger(JwsJsonSignatureEntry.class);
     private String jwsPayload;
     private String encodedProtectedHeader;

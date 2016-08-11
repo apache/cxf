@@ -107,12 +107,12 @@ public class JsonMapObjectReaderWriter {
         } else if (Map.class.isAssignableFrom(value.getClass())) {
             toJsonInternal(out, (Map<String, Object>)value);
         } else {
-            boolean stringOrEnum = value.getClass() == String.class || value.getClass().isEnum();
-            if (stringOrEnum) {
+            boolean quotesNeeded = checkQuotesNeeded(value);
+            if (quotesNeeded) {
                 out.append("\"");
             }
             out.append(value.toString());
-            if (stringOrEnum) {
+            if (quotesNeeded) {
                 out.append("\"");
             }
         }
@@ -123,6 +123,11 @@ public class JsonMapObjectReaderWriter {
         
     }
     
+    private boolean checkQuotesNeeded(Object value) {
+        Class<?> cls = value.getClass();
+        return !(Number.class.isAssignableFrom(cls) || Boolean.class == cls
+            || JsonObject.class.isAssignableFrom(cls));
+    }
     protected void formatIfNeeded(Output out) {
         if (format) {
             out.append("\r\n ");
