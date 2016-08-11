@@ -51,19 +51,27 @@ public class OAuth2JwtFiltersTest extends AbstractBusClientServerTestBase {
     }
     @org.junit.Test
     public void testServiceWithJwtToken() throws Exception {
+        String oauthServiceAddress = "https://localhost:" + OAUTH_PORT + "/services/";
         String rsAddress = "https://localhost:" + PORT + "/secured/bookstore/books";
-        doTestServiceWithJwtTokenAndScope(rsAddress);
+        doTestServiceWithJwtTokenAndScope(oauthServiceAddress, rsAddress);
+    }
+    @org.junit.Test
+    public void testServiceWithJwtTokenStoredAsJoseKey() throws Exception {
+        String oauthServiceAddress = "https://localhost:" + OAUTH_PORT + "/services2/";
+        String rsAddress = "https://localhost:" + PORT + "/secured2/bookstore/books";
+        doTestServiceWithJwtTokenAndScope(oauthServiceAddress, rsAddress);
     }
     @org.junit.Test
     public void testServiceWithJwtTokenAndLocalValidation() throws Exception {
+        String oauthServiceAddress = "https://localhost:" + OAUTH_PORT + "/services/";
         String rsAddress = "https://localhost:" + PORT + "/securedLocalValidation/bookstore/books";
-        doTestServiceWithJwtTokenAndScope(rsAddress);
+        doTestServiceWithJwtTokenAndScope(oauthServiceAddress, rsAddress);
     }
-    private void doTestServiceWithJwtTokenAndScope(String rsAddress) throws Exception {
+    private void doTestServiceWithJwtTokenAndScope(String oauthService, String rsAddress) throws Exception {
         URL busFile = OAuth2JwtFiltersTest.class.getResource("client.xml");
         
         // Get Authorization Code
-        String oauthService = "https://localhost:" + OAUTH_PORT + "/services/";
+        
 
         WebClient oauthClient = WebClient.create(oauthService, OAuth2TestUtils.setupProviders(), 
                                                  "alice", "security", busFile.toString());
