@@ -20,6 +20,7 @@
 package org.apache.cxf.jaxrs.json.basic;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -38,6 +39,13 @@ public class JsonMapObjectReaderWriterTest extends Assert {
         String json = new JsonMapObjectReaderWriter().toJson(map);
         assertEquals("{\"a\":\"aValue\",\"b\":123,\"c\":[\"cValue\"],\"claim\":null}", 
                      json);
+    }
+    @Test
+    public void testWriteDateProperty() throws Exception {
+        Date date = new Date();
+        Map<String, Object> map = Collections.singletonMap("createdAt", date);
+        String json = new JsonMapObjectReaderWriter().toJson(map);
+        assertEquals("{\"createdAt\":\"" + date.toString() + "\"}", json);
     }
     @Test
     public void testReadMap() throws Exception {
