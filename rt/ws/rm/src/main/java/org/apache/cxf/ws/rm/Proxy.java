@@ -68,6 +68,9 @@ public class Proxy {
     // REVISIT assumption there is only a single outstanding offer
     private Identifier offeredIdentifier;
     
+    //hold the sequence message context
+    private Map<String, Object> sequenceContext;
+    
 
     public Proxy(RMEndpoint rme) {
         reliableEndpoint = rme;
@@ -87,7 +90,7 @@ public class Proxy {
         RMConstants constants = protocol.getConstants();
         OperationInfo oi = reliableEndpoint.getEndpoint(protocol).getEndpointInfo()
             .getService().getInterface().getOperation(constants.getSequenceAckOperationName());
-        invoke(oi, protocol, new Object[] {ds});
+        invoke(oi, protocol, new Object[] {ds}, this.sequenceContext);
     }
     
     void terminate(SourceSequence ss) throws RMException {
@@ -100,7 +103,7 @@ public class Proxy {
         ts.setIdentifier(ss.getIdentifier());
         ts.setLastMsgNumber(ss.getCurrentMessageNr());
         EncoderDecoder codec = protocol.getCodec();
-        invoke(oi, protocol, new Object[] {codec.convertToSend(ts)});
+        invoke(oi, protocol, new Object[] {codec.convertToSend(ts)}, this.sequenceContext);
     }
     
     void terminate(DestinationSequence ds) throws RMException {
@@ -113,7 +116,7 @@ public class Proxy {
         ts.setIdentifier(ds.getIdentifier());
         ts.setLastMsgNumber(ds.getLastMessageNumber());
         EncoderDecoder codec = protocol.getCodec();
-        invoke(oi, protocol, new Object[] {codec.convertToSend(ts)});
+        invoke(oi, protocol, new Object[] {codec.convertToSend(ts)}, this.sequenceContext);
     }
     
     void createSequenceResponse(final Object createResponse, ProtocolVariation protocol) throws RMException {
@@ -131,6 +134,7 @@ public class Proxy {
     public CreateSequenceResponseType createSequence(EndpointReferenceType defaultAcksTo, RelatesToType relatesTo, 
              boolean isServer, final ProtocolVariation protocol, final Exchange exchange, Map<String, Object> context) 
         throws RMException {
+        this.sequenceContext = context;
         SourcePolicyType sp = reliableEndpoint.getManager().getSourcePolicy();
         CreateSequenceType create = new CreateSequenceType();        
 
