@@ -40,6 +40,10 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 public class JwtAccessTokenValidator extends JoseJwtConsumer implements AccessTokenValidator {
 
+    private static final String USERNAME_CLAIM = "username";
+    
+    private String usernameClaim = USERNAME_CLAIM;
+    
     public List<String> getSupportedAuthorizationSchemes() {
         return Collections.singletonList(OAuthConstants.BEARER_AUTHORIZATION_SCHEME);
     }
@@ -61,8 +65,9 @@ public class JwtAccessTokenValidator extends JoseJwtConsumer implements AccessTo
     private AccessTokenValidation convertClaimsToValidation(JwtClaims claims) {
         AccessTokenValidation atv = new AccessTokenValidation();
         atv.setInitialValidationSuccessful(true);
-        if (claims.getAudience() != null) {
-            atv.setClientId(claims.getAudience());
+        String clientId = claims.getStringProperty(OAuthConstants.CLIENT_ID);
+        if (clientId != null) {
+            atv.setClientId(clientId);
         }
         if (claims.getIssuedAt() != null) {
             atv.setTokenIssuedAt(claims.getIssuedAt());
@@ -72,15 +77,9 @@ public class JwtAccessTokenValidator extends JoseJwtConsumer implements AccessTo
         if (claims.getExpiryTime() != null) {
             atv.setTokenLifetime(claims.getExpiryTime() - atv.getTokenIssuedAt());
         }
-        Object resourceAud = claims.getClaim(OAuthConstants.RESOURCE_INDICATOR);
-        if (resourceAud != null) {
-            List<String> auds = null;
-            if (resourceAud instanceof List) {
-                auds = CastUtils.cast((List<?>)resourceAud);
-            } else {
-                auds = Collections.singletonList((String)resourceAud);
-            } 
-            atv.setAudiences(auds);
+        List<String> audiences = claims.getAudiences();
+        if (audiences != null && !audiences.isEmpty()) {
+            atv.setAudiences(claims.getAudiences());
         }
         if (claims.getIssuer() != null) {
             atv.setTokenIssuer(claims.getIssuer());
@@ -97,7 +96,7 @@ public class JwtAccessTokenValidator extends JoseJwtConsumer implements AccessTo
             }
             atv.setTokenScopes(perms);
         }
-        String username = (String)claims.getClaim("preferred_username");
+        String username = (String)claims.getClaim(usernameClaim);
         if (username != null) {
             UserSubject userSubject = new UserSubject(username);
             if (claims.getSubject() != null) {
@@ -108,6 +107,10 @@ public class JwtAccessTokenValidator extends JoseJwtConsumer implements AccessTo
             atv.setTokenSubject(new UserSubject(claims.getSubject()));
         }
         return atv;
+    }
+
+    public void setUsernameClaim(String usernameClaim) {
+        this.usernameClaim = usernameClaim;
     }
 
 }

@@ -92,7 +92,7 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
     protected JwtClaims createJwtAccessToken(ServerAccessToken at) {
         JwtClaims claims = new JwtClaims();
         claims.setTokenId(at.getTokenKey());
-        claims.setAudience(at.getClient().getClientId());
+        claims.setClaim(OAuthConstants.CLIENT_ID, at.getClient().getClientId());
         claims.setIssuedAt(at.getIssuedAt());
         if (at.getExpiresIn() > 0) {
             claims.setExpiryTime(at.getIssuedAt() + at.getExpiresIn());
@@ -101,11 +101,9 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         if (userSubject != null) {
             if (userSubject.getId() != null) {
                 claims.setSubject(userSubject.getId());
-                claims.setClaim("preferred_username", userSubject.getLogin());
-            } else {
-                claims.setSubject(userSubject.getLogin());
             }
-            
+            // to be consistent with the token introspection response
+            claims.setClaim("username", userSubject.getLogin());
         }
         if (at.getIssuer() != null) {
             claims.setIssuer(at.getIssuer());
@@ -117,8 +115,11 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         // OAuth2 resource indicators (resource server audience)
         if (!at.getAudiences().isEmpty()) {
             List<String> resourceAudiences = at.getAudiences();
-            claims.setClaim(OAuthConstants.RESOURCE_INDICATOR, 
-                            resourceAudiences.size() == 1 ? resourceAudiences.get(0) : resourceAudiences);
+            if (resourceAudiences.size() == 1) {
+                claims.setAudience(resourceAudiences.get(0));
+            } else {
+                claims.setAudiences(resourceAudiences);
+            }
         }
         if (!at.getExtraProperties().isEmpty()) {
             claims.setClaim("extra_properties", at.getExtraProperties());
