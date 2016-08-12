@@ -29,6 +29,7 @@ import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
+import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.systest.jaxrs.security.Book;
 import org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuth2TestUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -98,8 +99,8 @@ public class OAuth2JwtFiltersTest extends AbstractBusClientServerTestBase {
             "org/apache/cxf/systest/jaxrs/security/alice.rs.properties", null);
         assertTrue(jwtConsumer.verifySignatureWith(verifier));
         JwtClaims claims = jwtConsumer.getJwtClaims();
-        assertEquals("consumer-id", claims.getAudience());
-        assertEquals("alice", claims.getSubject());
+        assertEquals("consumer-id", claims.getStringProperty(OAuthConstants.CLIENT_ID));
+        assertEquals("alice", claims.getStringProperty("username"));
         // Now invoke on the service with the access token
         WebClient client = WebClient.create(rsAddress, OAuth2TestUtils.setupProviders(),
                                             busFile.toString());

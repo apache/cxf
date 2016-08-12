@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.rs.security.oauth2.utils;
 
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -45,21 +44,16 @@ public final class JwtAccessTokenUtils {
                                                              ClientRegistrationProvider clientProvider) {
         JwtClaims claims = consumer.getJwtToken(jose).getClaims();
        
-        Client c = clientProvider.getClient(claims.getStringProperty(JwtConstants.CLAIM_AUDIENCE));
+        Client c = clientProvider.getClient(claims.getStringProperty(OAuthConstants.CLIENT_ID));
         long issuedAt = claims.getLongProperty(JwtConstants.CLAIM_ISSUED_AT);
         long lifetime = claims.getLongProperty(JwtConstants.CLAIM_EXPIRY) - issuedAt;
         BearerAccessToken at = new BearerAccessToken(c, jose, lifetime, issuedAt);
        
-        Object resourceAud = claims.getClaim(OAuthConstants.RESOURCE_INDICATOR);
-        if (resourceAud != null) {
-            List<String> auds = null;
-            if (resourceAud instanceof List) {
-                auds = CastUtils.cast((List<?>)resourceAud);
-            } else {
-                auds = Collections.singletonList((String)resourceAud);
-            } 
-            at.setAudiences(auds);
+        List<String> audiences = claims.getAudiences();
+        if (audiences != null && !audiences.isEmpty()) {
+            at.setAudiences(claims.getAudiences());
         }
+        
         String issuer = claims.getStringProperty(JwtConstants.CLAIM_ISSUER);
         if (issuer != null) {
             at.setIssuer(issuer);
@@ -76,8 +70,8 @@ public final class JwtAccessTokenUtils {
             }
             at.setScopes(perms);
         }
-        String username = claims.getStringProperty("preferred_username");
-        String subject = claims.getStringProperty(JwtConstants.CLAIM_SUBJECT);
+        String username = claims.getStringProperty("username");
+        String subject = claims.getSubject();
         if (username != null) {
             UserSubject userSubject = new UserSubject(username);
             if (subject != null) {
