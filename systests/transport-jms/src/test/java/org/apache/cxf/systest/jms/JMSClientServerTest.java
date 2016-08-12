@@ -33,6 +33,7 @@ import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Endpoint;
 import javax.xml.ws.Response;
 import javax.xml.ws.soap.AddressingFeature;
+import javax.xml.ws.soap.SOAPFaultException;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.cxf.Bus;
@@ -52,8 +53,11 @@ import org.apache.cxf.hello_world_jms.HelloWorldService;
 import org.apache.cxf.hello_world_jms.NoSuchCodeLitFault;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
+import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
+import org.apache.cxf.transport.jms.JMSConfigFeature;
+import org.apache.cxf.transport.jms.JMSConfiguration;
 import org.apache.cxf.transport.jms.JMSConstants;
 import org.apache.cxf.transport.jms.JMSMessageHeadersType;
 import org.apache.cxf.transport.jms.JMSPropertyType;
@@ -607,6 +611,36 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         String reply = greeter.greetMe(name);
         Assert.assertEquals("Hello " + name, reply);
         ((Closeable)greeter).close();
+    }
+
+    @Test(expected = SOAPFaultException.class)
+    public void testReplyAndReplyToDestinations() throws Exception {
+        JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
+        factory.setWsdlLocation("classpath:/wsdl/jms_test.wsdl");
+        factory.setServiceName(new QName("http://cxf.apache.org/hello_world_jms", "HelloWorldService"));
+        factory.setEndpointName(new QName("http://cxf.apache.org/hello_world_jms", "HelloWorldPort"));
+        factory.setAddress("jms://");
+        JMSConfigFeature feature = new JMSConfigFeature();
+        JMSConfiguration config = new JMSConfiguration();
+        config.setConnectionFactory(new ActiveMQConnectionFactory(broker.getBrokerURL()));
+        config.setRequestURI("test.jmstransport.text");
+        config.setTargetDestination("test.jmstransport.text");
+        // replyDestination and replyToDestination intentionally differ in this test scenario
+        // replyDestination = Destination name to listen on for reply messages
+        config.setReplyDestination("test.jmstransport.text.reply");
+        // replyToDestination = Destination name to send out as replyTo address in the message
+        config.setReplyToDestination("test.jmstransport.text.replyTo");
+        config.setReceiveTimeout(1000L);
+        feature.setJmsConfig(config);
+        factory.getFeatures().add(feature);
+        HelloWorldPortType greeter = factory.create(HelloWorldPortType.class);
+
+        try {
+            greeter.greetMe("FooBar");
+            // Timeout exception should be thrown
+        } finally {
+            ((java.io.Closeable)greeter).close();
+        }
     }
 
 }
