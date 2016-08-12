@@ -68,9 +68,9 @@ public class DefaultEHCacheOAuthDataProvider extends AbstractOAuthDataProvider {
     public DefaultEHCacheOAuthDataProvider(String configFileURL, 
                                                Bus bus,
                                                String clientCacheKey, 
-                                               String accessTokenKey,
-                                               String refreshTokenKey) {
-        createCaches(configFileURL, bus, clientCacheKey, accessTokenKey, refreshTokenKey);
+                                               String accessTokenCacheKey,
+                                               String refreshTokenCacheKey) {
+        createCaches(configFileURL, bus, clientCacheKey, accessTokenCacheKey, refreshTokenCacheKey);
     }
     
     @Override
