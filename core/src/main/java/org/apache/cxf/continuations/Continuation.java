@@ -76,10 +76,4 @@ public interface Continuation {
      * @param o An arbitrary object to associate with the continuation
      */
     void setObject(Object o);
-    
-    /** 
-     * Get the expiry status
-     * @return True if the continuation is expired.
-     */
-    boolean isExpired();
 }
