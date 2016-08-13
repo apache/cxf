@@ -156,6 +156,12 @@ public class JMSContinuation implements Continuation {
     protected synchronized void cancelTimerTask() {
         isCanceled = true;
     }
+    
+    public boolean isExpired() {
+		// Defaulted to FALSE 
+		// TODO if needed additional implementation should be done here.
+		return false;
+	}
 
 
 }
