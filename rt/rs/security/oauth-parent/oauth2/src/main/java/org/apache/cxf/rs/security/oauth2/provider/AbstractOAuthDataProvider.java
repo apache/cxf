@@ -92,13 +92,18 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
     protected JwtClaims createJwtAccessToken(ServerAccessToken at) {
         JwtClaims claims = new JwtClaims();
         claims.setTokenId(at.getTokenKey());
-        claims.setAudience(at.getClient().getClientId());
+        claims.setClaim(OAuthConstants.CLIENT_ID, at.getClient().getClientId());
         claims.setIssuedAt(at.getIssuedAt());
         if (at.getExpiresIn() > 0) {
             claims.setExpiryTime(at.getIssuedAt() + at.getExpiresIn());
         }
-        if (at.getSubject() != null) {
-            claims.setSubject(at.getSubject().getLogin());
+        UserSubject userSubject = at.getSubject();
+        if (userSubject != null) {
+            if (userSubject.getId() != null) {
+                claims.setSubject(userSubject.getId());
+            }
+            // to be consistent with the token introspection response
+            claims.setClaim("username", userSubject.getLogin());
         }
         if (at.getIssuer() != null) {
             claims.setIssuer(at.getIssuer());
@@ -108,21 +113,35 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
                             OAuthUtils.convertPermissionsToScopeList(at.getScopes()));
         }
         // OAuth2 resource indicators (resource server audience)
-        if (at.getAudiences().isEmpty()) {
+        if (!at.getAudiences().isEmpty()) {
             List<String> resourceAudiences = at.getAudiences();
-            claims.setClaim("resource", 
-                            resourceAudiences.size() == 1 ? resourceAudiences.get(0) : resourceAudiences);
+            if (resourceAudiences.size() == 1) {
+                claims.setAudience(resourceAudiences.get(0));
+            } else {
+                claims.setAudiences(resourceAudiences);
+            }
         }
-        
-        //TODO: consider auto-setting all the remaining token properties as claims either optionally 
-        // or if JWE encryption is enabled for the providers be able to choose if they
-        // want to save JOSE token representations only - though the providers can always override
-        // this method too and set the extra claims. If all ServerAccessToken properties are set as claims
-        // then the providers will only have to save ServerAccessToken.getTokenKey() in 
-        // saveAccessToken(ServerAccessToken) which will be a JOSE representation of a given ServerAccessToken
-        // instance but will have to restore ServerAccessToken from it when the runtime requests ServerAccessToken
-        // for the validation purposes. 
-        
+        if (!at.getExtraProperties().isEmpty()) {
+            claims.setClaim("extra_properties", at.getExtraProperties());
+        }
+        // Can be used to check at RS/etc which grant was used to get this token issued
+        if (at.getGrantType() != null) {
+            claims.setClaim(OAuthConstants.GRANT_TYPE, at.getGrantType());
+        }
+        // Can be used to check the original code grant value which was removed from the storage
+        // (and is no longer valid) when this token was issued; relevant only if the authorization
+        // code flow was used
+        if (at.getGrantCode() != null) {
+            claims.setClaim(OAuthConstants.AUTHORIZATION_CODE_GRANT, at.getGrantCode());
+        }
+        // Can be used to link the clients (especially public ones) to this token
+        // to have a knowledge which client instance is using this token - might be handy at the RS/etc
+        if (at.getClientCodeVerifier() != null) {
+            claims.setClaim(OAuthConstants.AUTHORIZATION_CODE_VERIFIER, at.getClientCodeVerifier());
+        }
+        // ServerAccessToken 'nonce' property, if available, can be ignored for the purpose for persisting it
+        // further as a JWT claim - as it is only used once by (OIDC) IdTokenResponseFilter
+        // to set IdToken nonce property with the filter having an access to the current ServerAccessToken instance
         return claims;
     }
 

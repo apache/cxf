@@ -129,6 +129,28 @@ public final class KeyManagementUtils {
             throw new JoseException(ex);
         }
     }
+    public static PublicKey loadPublicKey(String keyStorePropLoc, Bus bus) {
+        try {
+            Properties props = JoseUtils.loadProperties(keyStorePropLoc, bus);
+            return KeyManagementUtils.loadPublicKey(null, props);
+        } catch (Exception ex) {
+            LOG.warning("Public key can not be loaded");
+            throw new JoseException(ex);
+        }
+    }
+    
+    public static PublicKey loadPublicKey(String keyStoreLoc,
+                                          String keyStorePassword,
+                                          String keyAlias,
+                                          Bus bus) {
+        try {
+            KeyStore keyStore = loadKeyStore(keyStoreLoc, null, keyStorePassword, bus);
+            return CryptoUtils.loadPublicKey(keyStore, keyAlias);
+        } catch (Exception ex) {
+            throw new SecurityException(ex);
+        }
+    }
+    
     private static String getMessageProperty(Message m, String keyStoreLocPropPreferred, 
                                              String keyStoreLocPropDefault) {
         String propLoc = 
@@ -168,6 +190,30 @@ public final class KeyManagementUtils {
         try {
             Properties props = JoseUtils.loadProperties(keyStoreLoc, bus);
             return loadPrivateKey(m, props, keyOper);
+        } catch (Exception ex) {
+            throw new SecurityException(ex);
+        }
+    }
+    public static PrivateKey loadPrivateKey(String keyStoreLoc,
+                                            String keyStorePassword,
+                                            String keyAlias,
+                                            String keyPassword,
+                                            Bus bus) {
+        try {
+            KeyStore keyStore = loadKeyStore(keyStoreLoc, null, keyStorePassword, bus);
+            return CryptoUtils.loadPrivateKey(keyStore, 
+                                              keyPassword == null ? new char[]{} : keyPassword.toCharArray(), 
+                                              keyAlias);
+        } catch (Exception ex) {
+            throw new SecurityException(ex);
+        }
+    }
+    
+    public static PrivateKey loadPrivateKey(String keyStorePropLoc,
+                                            Bus bus) {
+        try {
+            Properties props = JoseUtils.loadProperties(keyStorePropLoc, bus);
+            return loadPrivateKey(null, props, null);
         } catch (Exception ex) {
             throw new SecurityException(ex);
         }
@@ -254,10 +300,16 @@ public final class KeyManagementUtils {
         return keyStore;
     }
     public static KeyStore loadKeyStore(Properties props, Bus bus) {
-        String keyStoreType = props.getProperty(JoseConstants.RSSEC_KEY_STORE_TYPE);
         String keyStoreLoc = props.getProperty(JoseConstants.RSSEC_KEY_STORE_FILE);
+        String keyStoreType = props.getProperty(JoseConstants.RSSEC_KEY_STORE_TYPE);
         String keyStorePswd = props.getProperty(JoseConstants.RSSEC_KEY_STORE_PSWD);
         
+        return loadKeyStore(keyStoreLoc, keyStoreType, keyStorePswd, bus);
+    }
+    public static KeyStore loadKeyStore(String keyStoreLoc,
+                                        String keyStoreType,
+                                        String keyStorePswd,
+                                        Bus bus) {
         if (keyStorePswd == null) {
             throw new JoseException("No keystore password was defined");
         }

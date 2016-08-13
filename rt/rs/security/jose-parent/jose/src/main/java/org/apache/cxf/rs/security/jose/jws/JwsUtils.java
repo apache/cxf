@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.message.Message;
@@ -246,8 +247,19 @@ public final class JwsUtils {
         return KeyManagementUtils.loadStoreProperties(m, required, propertiesName, null);
         
     }
+    public static Properties loadSignatureProperties(String propertiesLoc, Bus bus) {
+        try {
+            return JoseUtils.loadProperties(propertiesLoc, bus);
+        } catch (Exception ex) {
+            throw new JwsException(JwsException.Error.NO_INIT_PROPERTIES, ex);
+        }
+    }
     public static JwsSignatureVerifier loadSignatureVerifier(boolean required) {
         return loadSignatureVerifier(null, required);
+    }
+    public static JwsSignatureVerifier loadSignatureVerifier(String propertiesLoc, Bus bus) {
+        Properties props = loadSignatureProperties(propertiesLoc, bus);
+        return loadSignatureVerifier(props, null);
     }
     public static JwsSignatureVerifier loadSignatureVerifier(JwsHeaders headers, boolean required) {
         Properties props = loadSignatureInProperties(required);
@@ -307,6 +319,12 @@ public final class JwsUtils {
         return loadSignatureProvider(PhaseInterceptorChain.getCurrentMessage(),
                                      props, headers, false);
     }
+    
+    public static JwsSignatureProvider loadSignatureProvider(String propertiesLoc, Bus bus) {
+        Properties props = loadSignatureProperties(propertiesLoc, bus);
+        return loadSignatureProvider(props, null);
+    }
+    
     private static JwsSignatureProvider loadSignatureProvider(Message m, 
                                                              Properties props,
                                                              JwsHeaders headers,

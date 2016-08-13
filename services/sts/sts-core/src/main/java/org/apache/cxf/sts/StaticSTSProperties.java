@@ -70,11 +70,11 @@ public class StaticSTSProperties implements STSPropertiesMBean {
      * Load the CallbackHandler, Crypto objects, if necessary.
      */
     public void configureProperties() throws STSException {
-        if (signatureCrypto == null && signatureCryptoProperties != null) {
+        if (signatureCrypto == null && getSignatureCryptoProperties() != null) {
             ResourceManager resourceManager = getResourceManager();
-            Properties sigProperties = SecurityUtils.loadProperties(resourceManager, signatureCryptoProperties);
+            Properties sigProperties = SecurityUtils.loadProperties(resourceManager, getSignatureCryptoProperties());
             if (sigProperties == null) {
-                LOG.fine("Cannot load signature properties using: " + signatureCryptoProperties);
+                LOG.fine("Cannot load signature properties using: " + getSignatureCryptoProperties());
                 throw new STSException("Configuration error: cannot load signature properties");
             }
             try {
@@ -85,11 +85,11 @@ public class StaticSTSProperties implements STSPropertiesMBean {
             }
         }
         
-        if (encryptionCrypto == null && encryptionCryptoProperties != null) {
+        if (encryptionCrypto == null && getEncryptionCryptoProperties() != null) {
             ResourceManager resourceManager = getResourceManager();
-            Properties encrProperties = SecurityUtils.loadProperties(resourceManager, encryptionCryptoProperties);
+            Properties encrProperties = SecurityUtils.loadProperties(resourceManager, getEncryptionCryptoProperties());
             if (encrProperties == null) {
-                LOG.fine("Cannot load encryption properties using: " + encryptionCryptoProperties);
+                LOG.fine("Cannot load encryption properties using: " + getEncryptionCryptoProperties());
                 throw new STSException("Configuration error: cannot load encryption properties");
             }
             try {
@@ -100,11 +100,11 @@ public class StaticSTSProperties implements STSPropertiesMBean {
             }
         }
         
-        if (callbackHandler == null && callbackHandlerClass != null) {
+        if (callbackHandler == null && getCallbackHandlerClass() != null) {
             try {
-                callbackHandler = SecurityUtils.getCallbackHandler(callbackHandlerClass);
+                callbackHandler = SecurityUtils.getCallbackHandler(getCallbackHandlerClass());
                 if (callbackHandler == null) {
-                    LOG.fine("Cannot load CallbackHandler using: " + callbackHandlerClass);
+                    LOG.fine("Cannot load CallbackHandler using: " + getCallbackHandlerClass());
                     throw new STSException("Configuration error: cannot load callback handler");
                 }
             } catch (Exception ex) {
@@ -145,6 +145,10 @@ public class StaticSTSProperties implements STSPropertiesMBean {
         }
     }
     
+    public String getCallbackHandlerClass() {
+        return this.callbackHandlerClass;
+    }
+    
     /**
      * Get the CallbackHandler object.
      * @return the CallbackHandler object.
@@ -180,6 +184,10 @@ public class StaticSTSProperties implements STSPropertiesMBean {
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Setting signature crypto properties: " + signatureCryptoProperties);
         }
+    }
+    
+    public Object getSignatureCryptoProperties() {
+        return this.signatureCryptoProperties;
     }
     
     /**
@@ -236,6 +244,10 @@ public class StaticSTSProperties implements STSPropertiesMBean {
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Setting encryptionProperties: " + encryptionCryptoProperties);
         }
+    }
+    
+    public Object getEncryptionCryptoProperties() {
+        return this.encryptionCryptoProperties;
     }
     
     /**

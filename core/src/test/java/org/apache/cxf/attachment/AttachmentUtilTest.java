@@ -109,4 +109,9 @@ public class AttachmentUtilTest extends Assert {
                 "filename=\"&#1076;&#1077;&#1084;&#1086;-&#1089;&#1077;&#1088;&#1074;&#1080;&#1089;.zip\""));
     }
 
+    @Test
+    public void testContentDispositionFnEquals() {
+        assertEquals("a=b.txt",
+            AttachmentUtil.getContentDispositionFileName("filename=\"a=b.txt\""));
+    }
 }

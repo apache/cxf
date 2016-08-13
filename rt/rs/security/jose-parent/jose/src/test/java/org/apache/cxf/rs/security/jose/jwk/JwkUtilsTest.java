@@ -18,9 +18,13 @@
  */
 package org.apache.cxf.rs.security.jose.jwk;
 
+import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 
+import org.apache.cxf.rs.security.jose.common.JoseException;
 import org.apache.cxf.rs.security.jose.common.JoseUtils;
+import org.apache.cxf.rs.security.jose.common.KeyManagementUtils;
+import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -75,6 +79,38 @@ public class JwkUtilsTest extends Assert {
         String modulus2 = jwk2.getStringProperty(JsonWebKey.RSA_MODULUS);
         assertEquals(256, JoseUtils.decode(modulus2).length);
         assertEquals(modulus2, modulus);
+    }
+    @Test
+    public void testFromToPrivateRsaKey() throws Exception {
+        RSAPrivateKey privateKey1 = 
+            (RSAPrivateKey)KeyManagementUtils.loadPrivateKey("org/apache/cxf/rs/security/jose/jws/alice.jks", 
+                                              "password", 
+                                              "alice", 
+                                              "password",
+                                              null);
+        JsonWebKey jwk1 = JwkUtils.fromRSAPrivateKey(privateKey1, KeyAlgorithm.RSA_OAEP_256.getJwaName());
+        assertNotNull(jwk1.getProperty(JsonWebKey.RSA_PUBLIC_EXP));
+        RSAPrivateKey privateKey2 = JwkUtils.toRSAPrivateKey(jwk1);
+        assertEquals(privateKey2, privateKey1);
+        
+    }
+    @Test
+    public void testToPrivateRsaKeyWithoutE() throws Exception {
+        RSAPrivateKey privateKey1 = 
+            (RSAPrivateKey)KeyManagementUtils.loadPrivateKey("org/apache/cxf/rs/security/jose/jws/alice.jks", 
+                                              "password", 
+                                              "alice", 
+                                              "password",
+                                              null);
+        JsonWebKey jwk1 = JwkUtils.fromRSAPrivateKey(privateKey1, KeyAlgorithm.RSA_OAEP_256.getJwaName());
+        assertNotNull(jwk1.getProperty(JsonWebKey.RSA_PUBLIC_EXP));
+        jwk1.asMap().remove(JsonWebKey.RSA_PUBLIC_EXP);
+        try {
+            JwkUtils.toRSAPrivateKey(jwk1);
+            fail("JWK without the public exponent can not be converted to RSAPrivateKey");
+        } catch (JoseException ex) {
+            // expected
+        }
     }
     @Test
     public void testRsaKeyThumbprint() throws Exception {
