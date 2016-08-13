@@ -214,6 +214,12 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
                 return false;
             }
         }
+
+        public boolean isExpired() {
+    		// Defaulted to FALSE 
+    		// TODO if needed additional implementation should be done here.
+    		return false;
+    	}
         
     }
 }

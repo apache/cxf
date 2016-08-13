@@ -139,4 +139,7 @@ public class JettyContinuationWrapper implements Continuation, ContinuationListe
         //isResumed = true;
     }
     
+	public boolean isExpired() {
+		return continuation.isExpired();
+	}
 }

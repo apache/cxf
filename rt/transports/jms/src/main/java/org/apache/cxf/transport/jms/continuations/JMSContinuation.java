@@ -157,5 +157,10 @@ public class JMSContinuation implements Continuation {
         isCanceled = true;
     }
 
+	public boolean isExpired() {
+		// Defaulted to FALSE 
+		// TODO if needed additional implementation should be done here.
+		return false;
+	}
 
 }
