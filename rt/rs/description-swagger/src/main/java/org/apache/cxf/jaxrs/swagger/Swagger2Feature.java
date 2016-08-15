@@ -82,16 +82,24 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
     private String ignoreRoutes;
     
     private boolean supportSwaggerUi = true;
+    private String swaggerUiVersion;
 
     @Override
     protected void addSwaggerResource(Server server, Bus bus) {
         List<Object> swaggerResources = new LinkedList<Object>();
         ApiListingResource apiListingResource = new ApiListingResource();
         swaggerResources.add(apiListingResource);
-        if (SWAGGER_UI_RESOURCE_ROOT != null && supportSwaggerUi) {
-            swaggerResources.add(new SwaggerUIService());
-            bus.setProperty("swagger.service.ui.available", "true");
+        
+        SwaggerUIService swaggerUiService = null;
+        if (supportSwaggerUi) {
+            String swaggerUiRoot = SwaggerUiResolver.findSwaggerUiRoot(swaggerUiVersion);
+            if (swaggerUiRoot != null) {
+                swaggerUiService = new SwaggerUIService(swaggerUiRoot);
+                swaggerResources.add(swaggerUiService);
+                bus.setProperty("swagger.service.ui.available", "true");
+            }
         }
+        
         JAXRSServiceFactoryBean sfb =
                 (JAXRSServiceFactoryBean) server.getEndpoint().get(JAXRSServiceFactoryBean.class.getName());
         sfb.setResourceClassesFromBeans(swaggerResources);
@@ -108,7 +116,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
                 }
             }
         }
-        if (SWAGGER_UI_RESOURCE_ROOT != null && supportSwaggerUi) {
+        if (swaggerUiService != null) {
             providers.add(new SwaggerUIFilter());
         }
         providers.add(new Swagger2Serializers(dynamicBasePath, replaceTags, javadocProvider, cris));
@@ -280,6 +288,11 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
     @Path("api-docs")
     public static class SwaggerUIService {
         private static final String FAVICON = "favicon";
+        private String swaggerUiRoot;
+        public SwaggerUIService(String swaggerUiRoot) {
+            this.swaggerUiRoot = swaggerUiRoot;
+        }
+        
         @GET
         @Path("{resource:.*}")
         public Response getResource(@Context UriInfo uriInfo, @PathParam("resource") String resourcePath) {
@@ -294,7 +307,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
             }
             
             try {
-                URL resourceURL = URI.create(SWAGGER_UI_RESOURCE_ROOT + resourcePath).toURL();
+                URL resourceURL = URI.create(swaggerUiRoot + resourcePath).toURL();
                 return Response.ok(resourceURL.openStream()).build();
             } catch (IOException ex) {
                 throw new NotFoundException(ex);
@@ -317,4 +330,13 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
             }
         }
     }
+    
+    public void setSwaggerUiVersion(String swaggerUiVersion) {
+        this.swaggerUiVersion = swaggerUiVersion;
+    }
+
+    public void setSupportSwaggerUi(boolean supportSwaggerUi) {
+        this.supportSwaggerUi = supportSwaggerUi;
+    }
+
 }
