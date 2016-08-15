@@ -43,7 +43,7 @@ public class JsonMapObjectReaderWriterTest extends Assert {
     @Test
     public void testWriteDateProperty() throws Exception {
         Date date = new Date();
-        Map<String, Object> map = Collections.singletonMap("createdAt", date);
+        Map<String, Object> map = Collections.<String, Object>singletonMap("createdAt", date);
         String json = new JsonMapObjectReaderWriter().toJson(map);
         assertEquals("{\"createdAt\":\"" + date.toString() + "\"}", json);
     }
