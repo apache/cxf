@@ -107,7 +107,7 @@ public class OAuth2JwtFiltersTest extends AbstractBusClientServerTestBase {
         client.header("Authorization", "Bearer " + accessToken.getTokenKey());
         
         Response response = client.post(new Book("book", 123L));
-        assertEquals(response.getStatus(), 200);
+        assertEquals(200, response.getStatus());
         
         Book returnedBook = response.readEntity(Book.class);
         assertEquals(returnedBook.getName(), "book");

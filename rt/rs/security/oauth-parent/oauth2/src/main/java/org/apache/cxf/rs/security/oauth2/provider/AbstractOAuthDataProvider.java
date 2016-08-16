@@ -35,6 +35,7 @@ import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.tokens.bearer.BearerAccessToken;
 import org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken;
+import org.apache.cxf.rs.security.oauth2.utils.JwtTokenUtils;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 
@@ -48,8 +49,10 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
     private List<String> requiredScopes;
     private List<String> invisibleToClientScopes;
     private boolean supportPreauthorizedTokens;
+    
     private boolean useJwtFormatForAccessTokens;
-    private OAuthJoseJwtProducer jwtAccessTokenHandler;
+    private OAuthJoseJwtProducer jwtAccessTokenProducer;
+    private Map<String, String> jwtAccessTokenClaimMap;
     
     protected AbstractOAuthDataProvider() {
     }
@@ -92,7 +95,12 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
     protected JwtClaims createJwtAccessToken(ServerAccessToken at) {
         JwtClaims claims = new JwtClaims();
         claims.setTokenId(at.getTokenKey());
-        claims.setClaim(OAuthConstants.CLIENT_ID, at.getClient().getClientId());
+        
+        // 'client_id' or 'cid', default client_id
+        String clientIdClaimName = 
+            JwtTokenUtils.getClaimName(OAuthConstants.CLIENT_ID, OAuthConstants.CLIENT_ID, 
+                                             getJwtAccessTokenClaimMap());
+        claims.setClaim(clientIdClaimName, at.getClient().getClientId());
         claims.setIssuedAt(at.getIssuedAt());
         if (at.getExpiresIn() > 0) {
             claims.setExpiryTime(at.getIssuedAt() + at.getExpiresIn());
@@ -102,8 +110,12 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
             if (userSubject.getId() != null) {
                 claims.setSubject(userSubject.getId());
             }
-            // to be consistent with the token introspection response
-            claims.setClaim("username", userSubject.getLogin());
+            
+            // 'username' by default to be consistent with the token introspection response
+            final String usernameProp = "username";
+            String usernameClaimName = 
+                JwtTokenUtils.getClaimName(usernameProp, usernameProp, getJwtAccessTokenClaimMap());
+            claims.setClaim(usernameClaimName, userSubject.getLogin());
         }
         if (at.getIssuer() != null) {
             claims.setIssuer(at.getIssuer());
@@ -144,7 +156,7 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         // to set IdToken nonce property with the filter having an access to the current ServerAccessToken instance
         return claims;
     }
-
+    
     protected ServerAccessToken createNewAccessToken(Client client) {
         return new BearerAccessToken(client, accessTokenLifetime);
     }
@@ -489,18 +501,26 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         this.useJwtFormatForAccessTokens = useJwtFormatForAccessTokens;
     }
 
-    public OAuthJoseJwtProducer getJwtAccessTokenHandler() {
-        return jwtAccessTokenHandler;
+    public OAuthJoseJwtProducer getJwtAccessTokenProducer() {
+        return jwtAccessTokenProducer;
     }
 
-    public void setJwtAccessTokenHandler(OAuthJoseJwtProducer jwtAccessTokenHandler) {
-        this.jwtAccessTokenHandler = jwtAccessTokenHandler;
+    public void setJwtAccessTokenProducer(OAuthJoseJwtProducer jwtAccessTokenProducer) {
+        this.jwtAccessTokenProducer = jwtAccessTokenProducer;
     }
     
     protected String processJwtAccessToken(JwtClaims jwtCliams) {
         // It will JWS-sign (default) and/or JWE-encrypt
         OAuthJoseJwtProducer processor = 
-            getJwtAccessTokenHandler() == null ? new OAuthJoseJwtProducer() : getJwtAccessTokenHandler(); 
+            getJwtAccessTokenProducer() == null ? new OAuthJoseJwtProducer() : getJwtAccessTokenProducer(); 
         return processor.processJwt(new JwtToken(jwtCliams));
+    }
+
+    public Map<String, String> getJwtAccessTokenClaimMap() {
+        return jwtAccessTokenClaimMap;
+    }
+
+    public void setJwtAccessTokenClaimMap(Map<String, String> jwtAccessTokenClaimMap) {
+        this.jwtAccessTokenClaimMap = jwtAccessTokenClaimMap;
     }
 }

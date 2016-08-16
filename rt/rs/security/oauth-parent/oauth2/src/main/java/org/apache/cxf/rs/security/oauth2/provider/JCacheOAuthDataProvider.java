@@ -38,7 +38,7 @@ import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken;
-import org.apache.cxf.rs.security.oauth2.utils.JwtAccessTokenUtils;
+import org.apache.cxf.rs.security.oauth2.utils.JwtTokenUtils;
 
 import static org.apache.cxf.jaxrs.utils.ResourceUtils.getClasspathResourceURL;
 
@@ -199,7 +199,8 @@ public class JCacheOAuthDataProvider extends AbstractOAuthDataProvider {
         ServerAccessToken token = null;
         if (jose != null) {
             JoseJwtConsumer theConsumer = jwtTokenConsumer == null ? new JoseJwtConsumer() : jwtTokenConsumer;
-            token = JwtAccessTokenUtils.createAccessTokenFromJwt(theConsumer, jose, this);
+            token = JwtTokenUtils.createAccessTokenFromJwt(theConsumer, jose, this,
+                                                                 super.getJwtAccessTokenClaimMap());
             if (isExpired(token)) {
                 jwtAccessTokenCache.remove(key);
                 token = null;
@@ -239,7 +240,8 @@ public class JCacheOAuthDataProvider extends AbstractOAuthDataProvider {
             String jose = entry.getValue();
 
             JoseJwtConsumer theConsumer = jwtTokenConsumer == null ? new JoseJwtConsumer() : jwtTokenConsumer;
-            ServerAccessToken token = JwtAccessTokenUtils.createAccessTokenFromJwt(theConsumer, jose, this);
+            ServerAccessToken token = JwtTokenUtils.createAccessTokenFromJwt(theConsumer, jose, this,
+                                                                                   super.getJwtAccessTokenClaimMap());
           
             if (!isExpired(token)) {
                 toRemove.add(entry.getKey());

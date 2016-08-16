@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -36,13 +37,14 @@ import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.provider.AccessTokenValidator;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
+import org.apache.cxf.rs.security.oauth2.utils.JwtTokenUtils;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 public class JwtAccessTokenValidator extends JoseJwtConsumer implements AccessTokenValidator {
 
-    private static final String USERNAME_CLAIM = "username";
+    private static final String USERNAME_PROP = "username";
     
-    private String usernameClaim = USERNAME_CLAIM;
+    private Map<String, String> jwtAccessTokenClaimMap;
     
     public List<String> getSupportedAuthorizationSchemes() {
         return Collections.singletonList(OAuthConstants.BEARER_AUTHORIZATION_SCHEME);
@@ -96,7 +98,9 @@ public class JwtAccessTokenValidator extends JoseJwtConsumer implements AccessTo
             }
             atv.setTokenScopes(perms);
         }
-        String username = (String)claims.getClaim(usernameClaim);
+        String usernameClaimName = 
+            JwtTokenUtils.getClaimName(USERNAME_PROP, USERNAME_PROP, jwtAccessTokenClaimMap);
+        String username = claims.getStringProperty(usernameClaimName);
         if (username != null) {
             UserSubject userSubject = new UserSubject(username);
             if (claims.getSubject() != null) {
@@ -109,8 +113,8 @@ public class JwtAccessTokenValidator extends JoseJwtConsumer implements AccessTo
         return atv;
     }
 
-    public void setUsernameClaim(String usernameClaim) {
-        this.usernameClaim = usernameClaim;
+    public void setJwtAccessTokenClaimMap(Map<String, String> jwtAccessTokenClaimMap) {
+        this.jwtAccessTokenClaimMap = jwtAccessTokenClaimMap;
     }
 
 }
