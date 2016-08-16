@@ -40,8 +40,10 @@ open the Swagger-UI page at
 
 or access it from the CXF Services page:
 
-  http://localhost:8080/services/helloservice/services
+  http://localhost:8080/services/helloservice/info
   and follow a Swagger link.
+(Note - CXF Services page is available by default at the path ending with "/services" - but in this demo
+it has been configured to listen at "/info")
 
 Check client/README on how to run a command line client.
 
