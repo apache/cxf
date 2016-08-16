@@ -26,7 +26,6 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.rs.security.jose.jwt.JoseJwtConsumer;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
-import org.apache.cxf.rs.security.jose.jwt.JwtConstants;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
@@ -34,19 +33,35 @@ import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.provider.ClientRegistrationProvider;
 import org.apache.cxf.rs.security.oauth2.tokens.bearer.BearerAccessToken;
 
-public final class JwtAccessTokenUtils {
-    private JwtAccessTokenUtils() {
+public final class JwtTokenUtils {
+    private JwtTokenUtils() {
         
+    }
+    
+    public static String getClaimName(String tokenProperty, 
+                                      String defaultName,
+                                      Map<String, String> claimsMap) {
+        String claimName = null;
+        if (claimsMap != null) {
+            claimName = claimsMap.get(tokenProperty);
+        }
+        return claimName == null ? defaultName : claimName;
     }
     
     public static ServerAccessToken createAccessTokenFromJwt(JoseJwtConsumer consumer, 
                                                              String jose,
-                                                             ClientRegistrationProvider clientProvider) {
+                                                             ClientRegistrationProvider clientProvider,
+                                                             Map<String, String> claimsMap) {
         JwtClaims claims = consumer.getJwtToken(jose).getClaims();
        
-        Client c = clientProvider.getClient(claims.getStringProperty(OAuthConstants.CLIENT_ID));
-        long issuedAt = claims.getLongProperty(JwtConstants.CLAIM_ISSUED_AT);
-        long lifetime = claims.getLongProperty(JwtConstants.CLAIM_EXPIRY) - issuedAt;
+        // 'client_id' or 'cid', default client_id
+        String clientIdClaimName = 
+            JwtTokenUtils.getClaimName(OAuthConstants.CLIENT_ID, OAuthConstants.CLIENT_ID, claimsMap);
+        String clientId = claims.getStringProperty(clientIdClaimName);
+        Client c = clientProvider.getClient(clientId);
+        
+        long issuedAt = claims.getIssuedAt();
+        long lifetime = claims.getExpiryTime() - issuedAt;
         BearerAccessToken at = new BearerAccessToken(c, jose, lifetime, issuedAt);
        
         List<String> audiences = claims.getAudiences();
@@ -54,7 +69,7 @@ public final class JwtAccessTokenUtils {
             at.setAudiences(claims.getAudiences());
         }
         
-        String issuer = claims.getStringProperty(JwtConstants.CLAIM_ISSUER);
+        String issuer = claims.getIssuer();
         if (issuer != null) {
             at.setIssuer(issuer);
         }
@@ -70,7 +85,10 @@ public final class JwtAccessTokenUtils {
             }
             at.setScopes(perms);
         }
-        String username = claims.getStringProperty("username");
+        final String usernameProp = "username";
+        String usernameClaimName = 
+            JwtTokenUtils.getClaimName(usernameProp, usernameProp, claimsMap);
+        String username = claims.getStringProperty(usernameClaimName);
         String subject = claims.getSubject();
         if (username != null) {
             UserSubject userSubject = new UserSubject(username);

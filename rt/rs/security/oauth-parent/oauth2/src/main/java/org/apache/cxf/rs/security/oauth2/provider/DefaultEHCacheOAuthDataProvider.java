@@ -42,7 +42,7 @@ import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken;
 import org.apache.cxf.rs.security.oauth2.utils.EHCacheUtil;
-import org.apache.cxf.rs.security.oauth2.utils.JwtAccessTokenUtils;
+import org.apache.cxf.rs.security.oauth2.utils.JwtTokenUtils;
 
 public class DefaultEHCacheOAuthDataProvider extends AbstractOAuthDataProvider {
     public static final String CLIENT_CACHE_KEY = "cxf.oauth2.client.cache";
@@ -133,7 +133,8 @@ public class DefaultEHCacheOAuthDataProvider extends AbstractOAuthDataProvider {
             String jose = getCacheValue(accessTokenCache, accessToken, String.class);
             if (jose != null) {
                 JoseJwtConsumer theConsumer = jwtTokenConsumer == null ? new JoseJwtConsumer() : jwtTokenConsumer;
-                at = JwtAccessTokenUtils.createAccessTokenFromJwt(theConsumer, jose, this);
+                at = JwtTokenUtils.createAccessTokenFromJwt(theConsumer, jose, this, 
+                                                                  super.getJwtAccessTokenClaimMap());
             }
         } else {
             at = getCacheValue(accessTokenCache, accessToken, ServerAccessToken.class);
