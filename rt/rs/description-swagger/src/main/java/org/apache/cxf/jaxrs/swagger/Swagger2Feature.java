@@ -22,9 +22,11 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -40,6 +42,7 @@ import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.cxf.Bus;
@@ -288,6 +291,15 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
     @Path("api-docs")
     public static class SwaggerUIService {
         private static final String FAVICON = "favicon";
+        private static final Map<String, String> DEFAULT_STATIC_CONTENT_TYPES;
+        
+        static {
+            DEFAULT_STATIC_CONTENT_TYPES = new HashMap<String, String>();
+            DEFAULT_STATIC_CONTENT_TYPES.put("html", "text/html");
+            DEFAULT_STATIC_CONTENT_TYPES.put("txt", "text/plain");
+            DEFAULT_STATIC_CONTENT_TYPES.put("css", "text/css");
+            DEFAULT_STATIC_CONTENT_TYPES.put("js", "application/javascript");
+        }
         private String swaggerUiRoot;
         public SwaggerUIService(String swaggerUiRoot) {
             this.swaggerUiRoot = swaggerUiRoot;
@@ -308,11 +320,23 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
             
             try {
                 URL resourceURL = URI.create(swaggerUiRoot + resourcePath).toURL();
-                return Response.ok(resourceURL.openStream()).build();
+                
+                String mediaType = null;
+                int ind = resourcePath.lastIndexOf(".");
+                if (ind != -1 && ind < resourcePath.length()) {
+                    mediaType = DEFAULT_STATIC_CONTENT_TYPES.get(resourcePath.substring(ind + 1));
+                }
+                
+                ResponseBuilder rb = Response.ok(resourceURL.openStream());
+                if (mediaType != null) {
+                    rb.type(mediaType);
+                }
+                return rb.build();
             } catch (IOException ex) {
                 throw new NotFoundException(ex);
             }
         }
+        
     }
     @PreMatching
     protected static class SwaggerUIFilter implements ContainerRequestFilter {
