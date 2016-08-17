@@ -86,7 +86,8 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
     
     private boolean supportSwaggerUi = true;
     private String swaggerUiVersion;
-
+    private Map<String, String> swaggerUiMediaTypes;
+    
     @Override
     protected void addSwaggerResource(Server server, Bus bus) {
         List<Object> swaggerResources = new LinkedList<Object>();
@@ -97,7 +98,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         if (supportSwaggerUi) {
             String swaggerUiRoot = SwaggerUiResolver.findSwaggerUiRoot(swaggerUiVersion);
             if (swaggerUiRoot != null) {
-                swaggerUiService = new SwaggerUIService(swaggerUiRoot);
+                swaggerUiService = new SwaggerUIService(swaggerUiRoot, swaggerUiMediaTypes);
                 swaggerResources.add(swaggerUiService);
                 bus.setProperty("swagger.service.ui.available", "true");
             }
@@ -291,18 +292,26 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
     @Path("api-docs")
     public static class SwaggerUIService {
         private static final String FAVICON = "favicon";
-        private static final Map<String, String> DEFAULT_STATIC_CONTENT_TYPES;
+        private static final Map<String, String> DEFAULT_MEDIA_TYPES;
         
         static {
-            DEFAULT_STATIC_CONTENT_TYPES = new HashMap<String, String>();
-            DEFAULT_STATIC_CONTENT_TYPES.put("html", "text/html");
-            DEFAULT_STATIC_CONTENT_TYPES.put("txt", "text/plain");
-            DEFAULT_STATIC_CONTENT_TYPES.put("css", "text/css");
-            DEFAULT_STATIC_CONTENT_TYPES.put("js", "application/javascript");
+            DEFAULT_MEDIA_TYPES = new HashMap<String, String>();
+            DEFAULT_MEDIA_TYPES.put("html", "text/html");
+            DEFAULT_MEDIA_TYPES.put("png", "image/png");
+            DEFAULT_MEDIA_TYPES.put("gif", "image/gif");
+            DEFAULT_MEDIA_TYPES.put("css", "text/css");
+            DEFAULT_MEDIA_TYPES.put("js", "application/javascript");
+            DEFAULT_MEDIA_TYPES.put("eot", "application/vnd.ms-fontobject");
+            DEFAULT_MEDIA_TYPES.put("ttf", "application/font-sfnt");
+            DEFAULT_MEDIA_TYPES.put("svg", "image/svg+xml");
+            DEFAULT_MEDIA_TYPES.put("woff", "application/font-woff");
+            DEFAULT_MEDIA_TYPES.put("woff2", "application/font-woff2");
         }
         private String swaggerUiRoot;
-        public SwaggerUIService(String swaggerUiRoot) {
+        private Map<String, String> mediaTypes;
+        public SwaggerUIService(String swaggerUiRoot, Map<String, String> mediaTypes) {
             this.swaggerUiRoot = swaggerUiRoot;
+            this.mediaTypes = mediaTypes;
         }
         
         @GET
@@ -324,7 +333,12 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
                 String mediaType = null;
                 int ind = resourcePath.lastIndexOf(".");
                 if (ind != -1 && ind < resourcePath.length()) {
-                    mediaType = DEFAULT_STATIC_CONTENT_TYPES.get(resourcePath.substring(ind + 1));
+                    String resourceExt = resourcePath.substring(ind + 1);
+                    if (mediaTypes != null && mediaTypes.containsKey(resourceExt)) {
+                        mediaType = mediaTypes.get(resourceExt);
+                    } else {
+                        mediaType = DEFAULT_MEDIA_TYPES.get(resourceExt);
+                    }
                 }
                 
                 ResponseBuilder rb = Response.ok(resourceURL.openStream());
@@ -361,6 +375,10 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
 
     public void setSupportSwaggerUi(boolean supportSwaggerUi) {
         this.supportSwaggerUi = supportSwaggerUi;
+    }
+
+    public void setSwaggerUiMediaTypes(Map<String, String> swaggerUiMediaTypes) {
+        this.swaggerUiMediaTypes = swaggerUiMediaTypes;
     }
 
 }
