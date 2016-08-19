@@ -127,7 +127,7 @@ public class JettyContinuationWrapper implements Continuation, ContinuationListe
         getMessage().remove(AbstractHTTPDestination.CXF_CONTINUATION_MESSAGE);
         isPending = false;
         pendingTimeout = 0;
-        //REVISIT: isResumed = false;
+        isResumed = false;
         if (callback != null) {
             callback.onComplete();
         }
@@ -136,7 +136,7 @@ public class JettyContinuationWrapper implements Continuation, ContinuationListe
     public void onTimeout(org.eclipse.jetty.continuation.Continuation cont) {
         isPending = false;
         pendingTimeout = 0;
-        //isResumed = true;
+        isResumed = true;
     }
     
 }
