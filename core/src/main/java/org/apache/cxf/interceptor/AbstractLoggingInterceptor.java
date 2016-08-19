@@ -36,6 +36,7 @@ import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.io.CachedOutputStream;
@@ -55,6 +56,7 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
     protected static final String BINARY_CONTENT_MESSAGE = "--- Binary Content ---";
     protected static final String MULTIPART_CONTENT_MESSAGE = "--- Multipart Content ---";
     private static final String MULTIPART_CONTENT_MEDIA_TYPE = "multipart";
+    private static final String  LIVE_LOGGING_PROP = "org.apache.cxf.logging.enable";
     private static final List<String> BINARY_CONTENT_MEDIA_TYPES;
     static {
         BINARY_CONTENT_MEDIA_TYPES = new ArrayList<String>();
@@ -78,9 +80,17 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
         super(id, phase);
     }
     
+    protected static boolean isLoggingDisabledNow(Message message) throws Fault {
+        Object liveLoggingProp = message.getContextualProperty(LIVE_LOGGING_PROP);
+        return liveLoggingProp != null && PropertyUtils.isFalse(liveLoggingProp);
+    }
+    
     protected abstract Logger getLogger();
     
     Logger getMessageLogger(Message message) {
+        if (isLoggingDisabledNow(message)) {
+            return null; 
+        }
         Endpoint ep = message.getExchange().getEndpoint();
         if (ep == null || ep.getEndpointInfo() == null) {
             return getLogger();

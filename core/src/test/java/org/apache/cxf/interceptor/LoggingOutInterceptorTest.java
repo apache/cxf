@@ -24,6 +24,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.HashMap;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
@@ -32,9 +33,11 @@ import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -153,6 +156,10 @@ public class LoggingOutInterceptorTest extends Assert {
         Endpoint endpoint = control.createMock(Endpoint.class);
         EndpointInfo endpointInfo = control.createMock(EndpointInfo.class);
         EasyMock.expect(endpoint.getEndpointInfo()).andReturn(endpointInfo).anyTimes();
+        BindingInfo bindingInfo = control.createMock(BindingInfo.class);
+        EasyMock.expect(endpointInfo.getBinding()).andReturn(bindingInfo).anyTimes();
+        EasyMock.expect(endpointInfo.getProperties()).andReturn(new HashMap<String, Object>()).anyTimes();
+        EasyMock.expect(bindingInfo.getProperties()).andReturn(new HashMap<String, Object>()).anyTimes();
         control.replay();
 
         Message message = new MessageImpl();
