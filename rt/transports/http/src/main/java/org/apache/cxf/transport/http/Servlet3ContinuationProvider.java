@@ -193,7 +193,7 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
         public void onStartAsync(AsyncEvent event) throws IOException {
         }
         public void onTimeout(AsyncEvent event) throws IOException {
-            resume();
+            redispatch();
         }
         
         private Throwable isCausedByIO(final Exception ex) {
