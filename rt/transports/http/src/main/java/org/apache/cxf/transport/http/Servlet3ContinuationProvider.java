@@ -184,6 +184,8 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
                     callback.onError(ex);
                 }
             }
+            isResumed = false;
+            isPending = false;
         }
         public void onError(AsyncEvent event) throws IOException {
             if (callback != null) {
