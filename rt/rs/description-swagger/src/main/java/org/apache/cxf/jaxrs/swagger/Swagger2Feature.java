@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.ws.rs.GET;
 import javax.ws.rs.HttpMethod;
@@ -52,8 +53,10 @@ import org.apache.cxf.annotations.Provider;
 import org.apache.cxf.annotations.Provider.Scope;
 import org.apache.cxf.annotations.Provider.Type;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServiceFactoryBean;
+import org.apache.cxf.jaxrs.ext.ContextProvider;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.model.ApplicationInfo;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
@@ -62,10 +65,12 @@ import org.apache.cxf.jaxrs.model.doc.JavaDocProvider;
 import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.message.Message;
 
 import io.swagger.jaxrs.config.BeanConfig;
 import io.swagger.jaxrs.config.DefaultReaderConfig;
 import io.swagger.jaxrs.config.ReaderConfig;
+import io.swagger.jaxrs.config.SwaggerContextService;
 import io.swagger.jaxrs.listing.ApiListingResource;
 
 @Provider(value = Type.Feature, scope = Scope.Server)
@@ -93,11 +98,11 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
     
     @Override
     protected void addSwaggerResource(Server server, Bus bus) {
-        JAXRSServiceFactoryBean sfb =
-            (JAXRSServiceFactoryBean) server.getEndpoint().get(JAXRSServiceFactoryBean.class.getName());
+        Endpoint endpoint = server.getEndpoint();
+        JAXRSServiceFactoryBean sfb = (JAXRSServiceFactoryBean) endpoint.get(JAXRSServiceFactoryBean.class.getName());
         if (!isScan()) {
-            ServerProviderFactory factory = 
-                (ServerProviderFactory)server.getEndpoint().get(ServerProviderFactory.class.getName());
+            ServerProviderFactory factory =
+                (ServerProviderFactory) endpoint.get(ServerProviderFactory.class.getName());
             ApplicationInfo applicationInfo = factory.getApplicationProvider();
             if (applicationInfo == null) {
                 Set<Class<?>> serviceClasses = new HashSet<Class<?>>();
@@ -105,7 +110,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
                     serviceClasses.add(cri.getServiceClass());
                 }
                 applicationInfo = new ApplicationInfo(new DefaultApplication(serviceClasses), bus);
-                server.getEndpoint().put(Application.class.getName(), applicationInfo);
+                endpoint.put(Application.class.getName(), applicationInfo);
             }
         }
         
@@ -142,10 +147,20 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         }
         providers.add(new Swagger2Serializers(dynamicBasePath, replaceTags, javadocProvider, cris));
         providers.add(new ReaderConfigFilter());
-        ((ServerProviderFactory) server.getEndpoint().get(
+        providers.add(new JaxrsScannerServletConfigProvider(endpoint));
+        ((ServerProviderFactory) endpoint.get(
                 ServerProviderFactory.class.getName())).setUserProviders(providers);
 
         BeanConfig beanConfig = new BeanConfig();
+        if (endpoint.containsKey(SwaggerContextService.CONFIG_ID_KEY)) {
+            beanConfig.setConfigId((String) endpoint.get(SwaggerContextService.CONFIG_ID_KEY));
+        }
+        if (endpoint.containsKey(SwaggerContextService.CONTEXT_ID_KEY)) {
+            beanConfig.setContextId((String) endpoint.get(SwaggerContextService.CONTEXT_ID_KEY));
+        }
+        if (endpoint.containsKey(SwaggerContextService.SCANNER_ID_KEY)) {
+            beanConfig.setScannerId((String) endpoint.get(SwaggerContextService.SCANNER_ID_KEY));
+        }
         beanConfig.setResourcePackage(getResourcePackage());
         beanConfig.setVersion(getVersion());
         String basePath = getBasePath();
@@ -409,5 +424,19 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
             return serviceClasses;
         }
     }
-    
+
+    public static class JaxrsScannerServletConfigProvider implements ContextProvider<ServletConfig> {
+        private final Map<String, Object> properties;
+
+        public JaxrsScannerServletConfigProvider(Map<String, Object> properties) {
+            this.properties = properties;
+        }
+
+        @Override
+        public ServletConfig createContext(Message message) {
+            return new Swagger2ServletConfig((ServletConfig) message.get("HTTP.CONFIG"), properties);
+        }
+    }
+
+
 }
