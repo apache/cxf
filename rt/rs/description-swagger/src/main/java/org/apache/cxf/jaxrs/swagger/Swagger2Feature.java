@@ -40,7 +40,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
-import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -55,7 +54,6 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServiceFactoryBean;
 import org.apache.cxf.jaxrs.ext.MessageContext;
-import org.apache.cxf.jaxrs.model.ApplicationInfo;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.doc.DocumentationProvider;
 import org.apache.cxf.jaxrs.model.doc.JavaDocProvider;
@@ -95,17 +93,10 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
     protected void addSwaggerResource(Server server, Bus bus) {
         JAXRSServiceFactoryBean sfb =
             (JAXRSServiceFactoryBean) server.getEndpoint().get(JAXRSServiceFactoryBean.class.getName());
+        Set<Class<?>> classes = new HashSet<>();
         if (!isScan()) {
-            ServerProviderFactory factory = 
-                (ServerProviderFactory)server.getEndpoint().get(ServerProviderFactory.class.getName());
-            ApplicationInfo applicationInfo = factory.getApplicationProvider();
-            if (applicationInfo == null) {
-                Set<Class<?>> serviceClasses = new HashSet<Class<?>>();
-                for (ClassResourceInfo cri : sfb.getClassResourceInfo()) {
-                    serviceClasses.add(cri.getServiceClass());
-                }
-                applicationInfo = new ApplicationInfo(new DefaultApplication(serviceClasses), bus);
-                server.getEndpoint().put(Application.class.getName(), applicationInfo);
+            for (ClassResourceInfo cri : sfb.getClassResourceInfo()) {
+                classes.add(cri.getServiceClass());
             }
         }
         
@@ -145,7 +136,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         ((ServerProviderFactory) server.getEndpoint().get(
                 ServerProviderFactory.class.getName())).setUserProviders(providers);
 
-        BeanConfig beanConfig = new BeanConfig();
+        BeanConfig beanConfig = new CxfBeanConfig(classes);
         beanConfig.setResourcePackage(getResourcePackage());
         beanConfig.setVersion(getVersion());
         String basePath = getBasePath();
@@ -398,16 +389,5 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
             }
         }
     }
-    
-    protected static class DefaultApplication extends Application {
-        Set<Class<?>> serviceClasses;
-        DefaultApplication(Set<Class<?>> serviceClasses) {
-            this.serviceClasses = serviceClasses;
-        }
-        @Override
-        public Set<Class<?>> getClasses() {
-            return serviceClasses;
-        }
-    }
-    
+
 }
