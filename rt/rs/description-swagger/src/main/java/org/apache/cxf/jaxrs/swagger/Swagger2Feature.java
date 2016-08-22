@@ -102,19 +102,21 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
     protected void addSwaggerResource(Server server, Bus bus) {
         JAXRSServiceFactoryBean sfb =
             (JAXRSServiceFactoryBean) server.getEndpoint().get(JAXRSServiceFactoryBean.class.getName());
+        
+        ApplicationInfo appInfo = null;
         if (!isScan()) {
             ServerProviderFactory factory = 
                 (ServerProviderFactory)server.getEndpoint().get(ServerProviderFactory.class.getName());
-            ApplicationInfo applicationInfo = factory.getApplicationProvider();
-            if (applicationInfo == null) {
+            appInfo = factory.getApplicationProvider();
+            if (appInfo == null) {
                 Set<Class<?>> serviceClasses = new HashSet<Class<?>>();
                 for (ClassResourceInfo cri : sfb.getClassResourceInfo()) {
                     serviceClasses.add(cri.getServiceClass());
                 }
-                applicationInfo = new ApplicationInfo(new DefaultApplication(serviceClasses), bus);
-                server.getEndpoint().put(Application.class.getName(), applicationInfo);
+                appInfo = new ApplicationInfo(new DefaultApplication(serviceClasses), bus);
+                server.getEndpoint().put(Application.class.getName(), appInfo);
             }
-        }
+        } 
         
         List<Object> swaggerResources = new LinkedList<Object>();
         ApiListingResource apiListingResource = new ApiListingResource();
@@ -156,8 +158,9 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
 
         ((ServerProviderFactory) server.getEndpoint().get(
                 ServerProviderFactory.class.getName())).setUserProviders(providers);
-
-        BeanConfig beanConfig = new BeanConfig();
+        BeanConfig beanConfig = appInfo == null 
+            ? new BeanConfig() 
+            : new ApplicationBeanConfig(appInfo.getProvider().getClasses());
         beanConfig.setResourcePackage(getResourcePackage());
         beanConfig.setUsePathBasedConfig(isUsePathBasedConfig());
         beanConfig.setVersion(getVersion());
