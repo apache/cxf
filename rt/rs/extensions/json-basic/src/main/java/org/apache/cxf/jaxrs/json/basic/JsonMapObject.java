@@ -22,7 +22,10 @@ package org.apache.cxf.jaxrs.json.basic;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+
+import org.apache.cxf.helpers.CastUtils;
 
 public class JsonMapObject implements Serializable {
     private static final long serialVersionUID = 2620765136328623790L;
@@ -87,6 +90,14 @@ public class JsonMapObject implements Serializable {
         Object value = getProperty(name);
         if (value != null) {
             return value.toString();
+        } else {
+            return null;
+        }
+    }
+    public List<String> getListStringProperty(String name) {
+        Object value = getProperty(name);
+        if (value != null) {
+            return CastUtils.cast((List<?>)value);
         } else {
             return null;
         }
