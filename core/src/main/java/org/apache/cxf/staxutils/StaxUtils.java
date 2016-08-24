@@ -44,6 +44,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.Location;
 import javax.xml.stream.StreamFilter;
+import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLResolver;
@@ -352,6 +353,11 @@ public final class StaxUtils {
     private static XMLInputFactory createWoodstoxFactory() {
         return WoodstoxHelper.createInputFactory();
     }
+    
+    public static XMLEventFactory createWoodstoxEventFactory() {
+        return WoodstoxHelper.createEventFactory();
+    }
+    
     private static boolean setRestrictionProperties(XMLInputFactory factory) {
         //For now, we can only support Woodstox 4.2.x and newer as none of the other
         //stax parsers support these settings
