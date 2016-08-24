@@ -318,7 +318,7 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
      * out while parsing the stream).
      */
     private static class HeadersProcessor {
-        private static final XMLEventFactory FACTORY = XMLEventFactory.newInstance();
+        private static XMLEventFactory eventFactory;
         private final String ns;
         private final String header;
         private final String body;
@@ -332,6 +332,15 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
         private QName lastStartElementQName;
         private String envelopePrefix;
         private String bodyPrefix;
+        
+        static {
+            try {
+                eventFactory = XMLEventFactory.newInstance();
+            } catch (Throwable t) {
+                //explicity create woodstox event factory as last try
+                eventFactory = StaxUtils.createWoodstoxEventFactory();
+            }
+        }
 
         HeadersProcessor(SoapVersion version) {
             this.header = version.getHeader().getLocalPart();
@@ -348,14 +357,14 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
                 switch (event) {
                 case XMLStreamConstants.START_ELEMENT:
                     read++;
-                    addEvent(FACTORY.createStartElement(new QName(reader.getNamespaceURI(), reader
+                    addEvent(eventFactory.createStartElement(new QName(reader.getNamespaceURI(), reader
                                                             .getLocalName(), reader.getPrefix()), null, null));
                     for (int i = 0; i < reader.getNamespaceCount(); i++) {
-                        addEvent(FACTORY.createNamespace(reader.getNamespacePrefix(i),
+                        addEvent(eventFactory.createNamespace(reader.getNamespacePrefix(i),
                                                          reader.getNamespaceURI(i)));
                     }
                     for (int i = 0; i < reader.getAttributeCount(); i++) {
-                        addEvent(FACTORY.createAttribute(reader.getAttributePrefix(i),
+                        addEvent(eventFactory.createAttribute(reader.getAttributePrefix(i),
                                                          reader.getAttributeNamespace(i),
                                                          reader.getAttributeLocalName(i),
                                                          reader.getAttributeValue(i)));
@@ -367,7 +376,7 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
                     break;
                 case XMLStreamConstants.END_ELEMENT:
                     if (read > 0) {
-                        addEvent(FACTORY.createEndElement(new QName(reader.getNamespaceURI(), reader
+                        addEvent(eventFactory.createEndElement(new QName(reader.getNamespaceURI(), reader
                                                               .getLocalName(), reader.getPrefix()), null));
                     }
                     read--;
@@ -375,14 +384,14 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
                 case XMLStreamConstants.CHARACTERS:
                     String s = reader.getText();
                     if (s != null) {
-                        addEvent(FACTORY.createCharacters(s));
+                        addEvent(eventFactory.createCharacters(s));
                     }
                     break;
                 case XMLStreamConstants.COMMENT:
-                    addEvent(FACTORY.createComment(reader.getText()));
+                    addEvent(eventFactory.createComment(reader.getText()));
                     break;
                 case XMLStreamConstants.CDATA:
-                    addEvent(FACTORY.createCData(reader.getText()));
+                    addEvent(eventFactory.createCData(reader.getText()));
                     break;
                 case XMLStreamConstants.START_DOCUMENT:
                 case XMLStreamConstants.END_DOCUMENT:
