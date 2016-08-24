@@ -25,7 +25,7 @@ import java.util.Map;
 import org.apache.cxf.jaxrs.json.basic.JsonMapObject;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
-public class ClientRegistrationRequest extends JsonMapObject {
+public class ClientRegistration extends JsonMapObject {
     public static final String REDIRECT_URIS = "redirect_uris";
     public static final String RESPONSE_TYPES = "response_types";
     public static final String GRANT_TYPES = "grant_types";
@@ -41,10 +41,10 @@ public class ClientRegistrationRequest extends JsonMapObject {
         
     private static final long serialVersionUID = 7903976943604132150L;
 
-    public ClientRegistrationRequest() {
+    public ClientRegistration() {
     }
     
-    public ClientRegistrationRequest(Map<String, Object> props) {
+    public ClientRegistration(Map<String, Object> props) {
         super(new LinkedHashMap<String, Object>(props));
     }
     

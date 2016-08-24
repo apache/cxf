@@ -18,9 +18,9 @@
  */
 package org.apache.cxf.rs.security.oidc.idp;
 
-import org.apache.cxf.rs.security.oauth2.services.ClientRegistrationRequest;
+import org.apache.cxf.rs.security.oauth2.services.ClientRegistration;
 
-public class OidcClientRegistrationRequest extends ClientRegistrationRequest {
+public class OidcClientRegistration extends ClientRegistration {
 
     private static final long serialVersionUID = -7941815270850562749L;
         
