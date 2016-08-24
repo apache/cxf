@@ -18,157 +18,29 @@
  */
 package org.apache.cxf.jaxrs.swagger;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
+import java.net.URL;
 import java.util.List;
-import java.util.Map;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.ext.MessageBodyWriter;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
-import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.doc.DocumentationProvider;
-import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
-import io.swagger.jaxrs.listing.SwaggerSerializers;
-import io.swagger.models.HttpMethod;
-import io.swagger.models.Operation;
-import io.swagger.models.Path;
 import io.swagger.models.Swagger;
-import io.swagger.models.Tag;
 
-public class Swagger2Serializers extends SwaggerSerializers {
+public interface Swagger2Serializers extends MessageBodyWriter<Swagger> {
 
-    protected final boolean dynamicBasePath;
+    void setDynamicBasePath(boolean dynamicBasePath);
 
-    protected final boolean replaceTags;
+    void setReplaceTags(boolean replaceTags);
 
-    protected final DocumentationProvider javadocProvider;
+    void setJavadocProvider(DocumentationProvider javadocProvider);
 
-    protected final List<ClassResourceInfo> cris;
+    void setClassResourceInfos(List<ClassResourceInfo> classResourceInfos);
 
-    public Swagger2Serializers(
-            final boolean dynamicBasePath,
-            final boolean replaceTags,
-            final DocumentationProvider javadocProvider,
-            final List<ClassResourceInfo> cris) {
+    void setJavaDocPath(String javaDocPath) throws Exception;
 
-        super();
+    void setJavaDocPaths(String... javaDocPaths) throws Exception;
 
-        this.dynamicBasePath = dynamicBasePath;
-        this.replaceTags = replaceTags;
-        this.javadocProvider = javadocProvider;
-        this.cris = cris;
-    }
-
-    @Override
-    public void writeTo(
-            final Swagger data,
-            final Class<?> type,
-            final Type genericType,
-            final Annotation[] annotations,
-            final MediaType mediaType,
-            final MultivaluedMap<String, Object> headers,
-            final OutputStream out) throws IOException {
-
-        if (dynamicBasePath) {
-            MessageContext ctx = JAXRSUtils.createContextValue(
-                    JAXRSUtils.getCurrentMessage(), null, MessageContext.class);
-            data.setBasePath(StringUtils.substringBeforeLast(ctx.getHttpServletRequest().getRequestURI(), "/"));
-        }
-
-        if (replaceTags || javadocProvider != null) {
-            Map<String, ClassResourceInfo> operations = new HashMap<>();
-            Map<Pair<String, String>, OperationResourceInfo> methods = new HashMap<>();
-            for (ClassResourceInfo cri : cris) {
-                for (OperationResourceInfo ori : cri.getMethodDispatcher().getOperationResourceInfos()) {
-                    String normalizedPath = getNormalizedPath(
-                            cri.getURITemplate().getValue(), ori.getURITemplate().getValue());
-
-                    operations.put(normalizedPath, cri);
-                    methods.put(ImmutablePair.of(ori.getHttpMethod(), normalizedPath), ori);
-                }
-            }
-
-            if (replaceTags && data.getTags() != null) {
-                data.getTags().clear();
-            }
-            for (final Map.Entry<String, Path> entry : data.getPaths().entrySet()) {
-                Tag tag = null;
-                if (replaceTags && operations.containsKey(entry.getKey())) {
-                    ClassResourceInfo cri = operations.get(entry.getKey());
-
-                    tag = new Tag();
-                    tag.setName(cri.getURITemplate().getValue());
-                    if (javadocProvider != null) {
-                        tag.setDescription(javadocProvider.getClassDoc(cri));
-                    }
-
-                    data.addTag(tag);
-                }
-
-                for (Map.Entry<HttpMethod, Operation> subentry : entry.getValue().getOperationMap().entrySet()) {
-                    if (replaceTags && tag != null) {
-                        subentry.getValue().setTags(Collections.singletonList(tag.getName()));
-                    }
-
-                    Pair<String, String> key = ImmutablePair.of(subentry.getKey().name(), entry.getKey());
-                    if (methods.containsKey(key) && javadocProvider != null) {
-                        OperationResourceInfo ori = methods.get(key);
-
-                        subentry.getValue().setSummary(javadocProvider.getMethodDoc(ori));
-                        for (int i = 0; i < subentry.getValue().getParameters().size(); i++) {
-                            subentry.getValue().getParameters().get(i).
-                                    setDescription(javadocProvider.getMethodParameterDoc(ori, i));
-                        }
-
-                        if (subentry.getValue().getResponses() != null
-                                && !subentry.getValue().getResponses().isEmpty()) {
-
-                            subentry.getValue().getResponses().entrySet().iterator().next().getValue().
-                                    setDescription(javadocProvider.getMethodResponseDoc(ori));
-                        }
-                    }
-                }
-            }
-        }
-        if (replaceTags && data.getTags() != null) {
-            Collections.sort(data.getTags(), new Comparator<Tag>() {
-
-                @Override
-                public int compare(final Tag tag1, final Tag tag2) {
-                    return tag1.getName().compareTo(tag2.getName());
-                }
-            });
-        }
-
-        super.writeTo(data, type, genericType, annotations, mediaType, headers, out);
-    }
-
-    protected String getNormalizedPath(String classResourcePath, String operationResourcePath) {
-        StringBuilder normalizedPath = new StringBuilder();
-
-        String[] segments = StringUtils.split(classResourcePath + operationResourcePath, "/");
-        for (String segment : segments) {
-            if (!StringUtils.isEmpty(segment)) {
-                normalizedPath.append("/").append(segment);
-            }
-        }
-        // Adapt to Swagger's path expression
-        if (normalizedPath.toString().endsWith(":.*}")) {
-            normalizedPath.setLength(normalizedPath.length() - 4);
-            normalizedPath.append('}');
-        }
-        return StringUtils.EMPTY.equals(normalizedPath.toString()) ? "/" : normalizedPath.toString();
-    }
+    void setJavaDocURLs(URL[] javaDocURLs);
 }

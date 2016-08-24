@@ -61,8 +61,6 @@ import org.apache.cxf.jaxrs.ext.ContextProvider;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.model.ApplicationInfo;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
-import org.apache.cxf.jaxrs.model.doc.DocumentationProvider;
-import org.apache.cxf.jaxrs.model.doc.JavaDocProvider;
 import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
@@ -86,17 +84,15 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
 
     private String ignoreRoutes;
     
-    private boolean supportSwaggerUi = true;
-    private String swaggerUiVersion;
-    private Map<String, String> swaggerUiMediaTypes;
-    
-    private boolean dynamicBasePath;
+    private Swagger2Serializers swagger2Serializers;
 
-    private boolean replaceTags;
+    private boolean supportSwaggerUi = true;
+
+    private String swaggerUiVersion;
+
+    private Map<String, String> swaggerUiMediaTypes;
 
     private boolean usePathBasedConfig;
-
-    private DocumentationProvider javadocProvider;
 
     @Override
     protected void addSwaggerResource(Server server, Bus bus) {
@@ -109,7 +105,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
                 (ServerProviderFactory)server.getEndpoint().get(ServerProviderFactory.class.getName());
             appInfo = factory.getApplicationProvider();
             if (appInfo == null) {
-                Set<Class<?>> serviceClasses = new HashSet<Class<?>>();
+                Set<Class<?>> serviceClasses = new HashSet<>();
                 for (ClassResourceInfo cri : sfb.getClassResourceInfo()) {
                     serviceClasses.add(cri.getServiceClass());
                 }
@@ -118,7 +114,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
             }
         } 
         
-        List<Object> swaggerResources = new LinkedList<Object>();
+        List<Object> swaggerResources = new LinkedList<>();
         ApiListingResource apiListingResource = new ApiListingResource();
         swaggerResources.add(apiListingResource);
         
@@ -149,7 +145,13 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         if (swaggerUiService != null) {
             providers.add(new SwaggerUIFilter());
         }
-        providers.add(new Swagger2Serializers(dynamicBasePath, replaceTags, javadocProvider, cris));
+
+        if (swagger2Serializers == null) {
+            swagger2Serializers = new DefaultSwagger2Serializers();
+        }
+        swagger2Serializers.setClassResourceInfos(cris);
+        providers.add(swagger2Serializers);
+
         providers.add(new ReaderConfigFilter());
         
         if (usePathBasedConfig) {
@@ -227,26 +229,10 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         this.ignoreRoutes = ignoreRoutes;
     }
 
-    public void setDynamicBasePath(final boolean dynamicBasePath) {
-        this.dynamicBasePath = dynamicBasePath;
+    public void setSwagger2Serializers(final Swagger2Serializers swagger2Serializers) {
+        this.swagger2Serializers = swagger2Serializers;
     }
-
-    public void setReplaceTags(final boolean replaceTags) {
-        this.replaceTags = replaceTags;
-    }
-
-    public void setJavaDocPath(final String javaDocPath) throws Exception {
-        this.javadocProvider = new JavaDocProvider(javaDocPath);
-    }
-
-    public void setJavaDocPaths(final String... javaDocPaths) throws Exception {
-        this.javadocProvider = new JavaDocProvider(javaDocPaths);
-    }
-
-    public void setJavaDocURLs(final URL[] javaDocURLs) {
-        this.javadocProvider = new JavaDocProvider(javaDocURLs);
-    }
-
+        
     @Override
     protected void setBasePathByAddress(String address) {
         if (!address.startsWith("/")) {
@@ -273,6 +259,8 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
 
     @javax.ws.rs.ext.Provider
     private class ServletConfigProvider implements ContextProvider<ServletConfig> {
+
+        @Override
         public ServletConfig createContext(Message message) {
             final ServletConfig sc = (ServletConfig)message.get("HTTP.CONFIG");
             
@@ -386,7 +374,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         private static final Map<String, String> DEFAULT_MEDIA_TYPES;
         
         static {
-            DEFAULT_MEDIA_TYPES = new HashMap<String, String>();
+            DEFAULT_MEDIA_TYPES = new HashMap<>();
             DEFAULT_MEDIA_TYPES.put("html", "text/html");
             DEFAULT_MEDIA_TYPES.put("png", "image/png");
             DEFAULT_MEDIA_TYPES.put("gif", "image/gif");
@@ -398,8 +386,11 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
             DEFAULT_MEDIA_TYPES.put("woff", "application/font-woff");
             DEFAULT_MEDIA_TYPES.put("woff2", "application/font-woff2");
         }
-        private String swaggerUiRoot;
-        private Map<String, String> mediaTypes;
+
+        private final String swaggerUiRoot;
+
+        private final Map<String, String> mediaTypes;
+
         public SwaggerUIService(String swaggerUiRoot, Map<String, String> mediaTypes) {
             this.swaggerUiRoot = swaggerUiRoot;
             this.mediaTypes = mediaTypes;
@@ -422,7 +413,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
                 URL resourceURL = URI.create(swaggerUiRoot + resourcePath).toURL();
                 
                 String mediaType = null;
-                int ind = resourcePath.lastIndexOf(".");
+                int ind = resourcePath.lastIndexOf('.');
                 if (ind != -1 && ind < resourcePath.length()) {
                     String resourceExt = resourcePath.substring(ind + 1);
                     if (mediaTypes != null && mediaTypes.containsKey(resourceExt)) {
