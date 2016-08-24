@@ -578,6 +578,8 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             sig.setSignatureAlgorithm(binding.getAlgorithmSuite().getSymmetricSignature());
         }
         sig.setSigCanonicalization(binding.getAlgorithmSuite().getC14n().getValue());
+        AlgorithmSuiteType algType = binding.getAlgorithmSuite().getAlgorithmSuiteType();
+        sig.setDigestAlgo(algType.getDigest());
 
         Document doc = saaj.getSOAPPart();
         sig.prepare(doc, crypto, secHeader);
