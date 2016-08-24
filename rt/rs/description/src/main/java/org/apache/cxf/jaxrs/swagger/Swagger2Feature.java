@@ -20,13 +20,11 @@ package org.apache.cxf.jaxrs.swagger;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-
 import javax.servlet.ServletContext;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
@@ -41,8 +39,6 @@ import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServiceFactoryBean;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
-import org.apache.cxf.jaxrs.model.doc.DocumentationProvider;
-import org.apache.cxf.jaxrs.model.doc.JavaDocProvider;
 import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
@@ -54,12 +50,6 @@ import io.swagger.jaxrs.listing.ApiListingResource;
 
 public class Swagger2Feature extends AbstractSwaggerFeature {
 
-    protected boolean dynamicBasePath;
-
-    protected boolean replaceTags;
-
-    protected DocumentationProvider javadocProvider;
-
     private String host;
 
     private String[] schemes;
@@ -69,12 +59,14 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
     private boolean scanAllResources;
 
     private String ignoreRoutes;
+    
+    private Swagger2Serializers swagger2Serializers;
 
     @Override
     protected void addSwaggerResource(Server server) {
         ApiListingResource apiListingResource = new ApiListingResource();
         JAXRSServiceFactoryBean sfb =
-                (JAXRSServiceFactoryBean) server.getEndpoint().get(JAXRSServiceFactoryBean.class.getName());
+            (JAXRSServiceFactoryBean) server.getEndpoint().get(JAXRSServiceFactoryBean.class.getName());
         sfb.setResourceClassesFromBeans(Collections.<Object>singletonList(apiListingResource));
         List<ClassResourceInfo> cris = sfb.getClassResourceInfo();
 
@@ -88,8 +80,15 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
                 }
             }
         }
-        providers.add(new Swagger2Serializers(dynamicBasePath, replaceTags, javadocProvider, cris));
+
+        if (swagger2Serializers == null) {
+            swagger2Serializers = new DefaultSwagger2Serializers();
+        }
+        swagger2Serializers.setClassResourceInfos(cris);
+        providers.add(swagger2Serializers);
+
         providers.add(new ReaderConfigFilter());
+
         ((ServerProviderFactory) server.getEndpoint().get(
                 ServerProviderFactory.class.getName())).setUserProviders(providers);
 
@@ -150,26 +149,10 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         this.ignoreRoutes = ignoreRoutes;
     }
 
-    public void setDynamicBasePath(final boolean dynamicBasePath) {
-        this.dynamicBasePath = dynamicBasePath;
+    public void setSwagger2Serializers(final Swagger2Serializers swagger2Serializers) {
+        this.swagger2Serializers = swagger2Serializers;
     }
-
-    public void setReplaceTags(final boolean replaceTags) {
-        this.replaceTags = replaceTags;
-    }
-
-    public void setJavaDocPath(final String javaDocPath) throws Exception {
-        this.javadocProvider = new JavaDocProvider(javaDocPath);
-    }
-
-    public void setJavaDocPaths(final String... javaDocPaths) throws Exception {
-        this.javadocProvider = new JavaDocProvider(javaDocPaths);
-    }
-
-    public void setJavaDocURLs(final URL[] javaDocURLs) {
-        this.javadocProvider = new JavaDocProvider(javaDocURLs);
-    }
-
+        
     @Override
     protected void setBasePathByAddress(String address) {
         if (!address.startsWith("/")) {
@@ -181,7 +164,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
             setBasePath(address);
         }
     }
-
+    
     @PreMatching
     protected static class SwaggerContainerRequestFilter extends ApiListingResource implements ContainerRequestFilter {
 
