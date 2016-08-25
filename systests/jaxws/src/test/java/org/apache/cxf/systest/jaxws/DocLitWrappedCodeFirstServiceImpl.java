@@ -190,6 +190,9 @@ public class DocLitWrappedCodeFirstServiceImpl implements DocLitWrappedCodeFirst
             ex.setInts(new int[] {1, 2, 3});
             throw ex;
         }
+        case -4: {
+            throw new RuntimeException("RuntimeException!!");
+        }
         default:
             throw new ServiceTestFault(new ServiceTestFault.ServiceTestDetails(i));
         }
