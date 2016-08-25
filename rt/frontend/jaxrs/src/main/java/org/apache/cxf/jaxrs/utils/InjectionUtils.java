@@ -889,9 +889,21 @@ public final class InjectionUtils {
      //CHECKSTYLE:ON    
         Class<?> type = getCollectionType(rawType);
 
-        Class<?> realType = rawType.isArray() ? rawType.getComponentType() 
-                : InjectionUtils.getActualType(genericType);
-        
+        Class<?> realType = null;
+        Type realGenericType = null;
+        if (rawType.isArray()) {
+            realType = rawType.getComponentType();
+            realGenericType = realType;
+        } else {
+            Type[] types = getActualTypes(genericType);
+            if (types.length == 0 || !(types[0] instanceof ParameterizedType)) {
+                realType = getActualType(genericType);
+                realGenericType = realType;
+            } else {
+                realType = getRawType(types[0]);
+                realGenericType = types[0] == realType ? realType : types[0];
+            }
+        }
         Object theValues = null;
         if (type != null) {
             try {
@@ -912,7 +924,7 @@ public final class InjectionUtils {
             valuesList = checkPathSegment(valuesList, realType, pathParam);
             for (int ind = 0; ind < valuesList.size(); ind++) {
                 Object o = InjectionUtils.handleParameter(valuesList.get(ind), decoded, 
-                                                          realType, realType, paramAnns, pathParam, message);
+                               realType, realGenericType, paramAnns, pathParam, message);
                 addToCollectionValues(theValues, o, ind);
             }
         }
