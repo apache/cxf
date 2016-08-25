@@ -111,6 +111,7 @@ import org.junit.Assert;
 @Path("/bookstore")
 @GZIP(threshold = 1)
 public class BookStore {
+    
     private Map<Long, Book> books = new HashMap<Long, Book>();
     private Map<Long, CD> cds = new HashMap<Long, CD>();
     private long bookId = 123;
@@ -350,6 +351,11 @@ public class BookStore {
             throw new RuntimeException();
         }
         return books.get(id);
+    }
+    
+    @Path("/beanparamsub")
+    public BookStoreSub getBeanParamBookSub() {
+        return new BookStoreSub(this);
     }
     
     @GET
@@ -1839,6 +1845,10 @@ public class BookStore {
         
     }
     
+    public static class BookBeanExtended extends BookBean {
+        
+    }
+    
     public static class BookBeanNested {
         private long id4;
 
@@ -2046,7 +2056,19 @@ public class BookStore {
             arg6.write(sb.toString().getBytes());
         }
     
-    }    
+    }
+    public static class BookStoreSub {
+        BookStore bookStore;
+        public BookStoreSub(BookStore bookStore) {
+            this.bookStore = bookStore;
+        }
+        @GET
+        @Path("/beanparam/{id}")
+        @Produces("application/xml")
+        public Book getBeanParamBook(@BeanParam BookBeanExtended bean) {
+            return bookStore.getBeanParamBook(bean);
+        }
+    }
 }
 
 

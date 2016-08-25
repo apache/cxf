@@ -31,6 +31,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.ws.rs.BeanParam;
 import javax.ws.rs.Priorities;
@@ -91,7 +92,7 @@ public final class ServerProviderFactory extends ProviderFactory {
     private ApplicationInfo application;
     private Set<DynamicFeature> dynamicFeatures = new LinkedHashSet<DynamicFeature>();
     
-    private Map<Class<?>, BeanParamInfo> beanParams = new HashMap<Class<?>, BeanParamInfo>();
+    private Map<Class<?>, BeanParamInfo> beanParams = new ConcurrentHashMap<Class<?>, BeanParamInfo>();
     private ProviderInfo<ContainerRequestFilter> wadlGenerator;
         
     private ServerProviderFactory(Bus bus) {
