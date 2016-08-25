@@ -23,6 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -60,6 +61,7 @@ import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.Customer;
 import org.apache.cxf.jaxrs.Customer.CustomerContext;
+import org.apache.cxf.jaxrs.Customer.MyType;
 import org.apache.cxf.jaxrs.Customer.Query;
 import org.apache.cxf.jaxrs.Customer2;
 import org.apache.cxf.jaxrs.CustomerApplication;
@@ -872,16 +874,18 @@ public class JAXRSUtilsTest extends Assert {
     @Test
     public void testQueryParamAsListWithDefaultValue() throws Exception {
         Class<?>[] argType = {List.class, List.class, List.class, Integer[].class, 
-            List.class, List.class};
+            List.class, List.class, List.class};
         Method m = Customer.class.getMethod("testQueryAsList", argType);
         Message messageImpl = createMessage();
+        ProviderFactory.getInstance(messageImpl)
+            .registerUserProvider(new MyTypeParamConverterProvider());
         messageImpl.put(Message.QUERY_STRING, 
                 "query2=query2Value&query2=query2Value2&query3=1&query3=2&query4");
         List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, 
                                                                new ClassResourceInfo(Customer.class)),
                                                            null, 
                                                            messageImpl);
-        assertEquals(6, params.size());
+        assertEquals(7, params.size());
         List<String> queryList = (List<String>)params.get(0);
         assertNotNull(queryList);
         assertEquals(1, queryList.size());
@@ -913,6 +917,12 @@ public class JAXRSUtilsTest extends Assert {
         List<String> queryList5 = (List<String>)params.get(5);
         assertNotNull(queryList5);
         assertEquals(0, queryList5.size());
+        
+        List<MyType<Integer>> queryList6 = (List<MyType<Integer>>)params.get(6);
+        assertNotNull(queryList6);
+        assertEquals(2, queryList6.size());
+        assertEquals(Integer.valueOf(1), queryList6.get(0).get());
+        assertEquals(Integer.valueOf(2), queryList6.get(1).get());
     }
     
     @Test
@@ -2054,7 +2064,35 @@ public class JAXRSUtilsTest extends Assert {
         e.put(Endpoint.class, endpoint);
         return m;
     }
-    
+    static class MyTypeParamConverterProvider 
+        implements ParamConverterProvider, ParamConverter<MyType<Integer>> {
+
+        @Override
+        public <T> ParamConverter<T> getConverter(Class<T> rawType, Type genericType,
+                                                  Annotation[] annotations) {
+            if (rawType == MyType.class) {
+                Type type = ((ParameterizedType)genericType).getActualTypeArguments()[0];
+                @SuppressWarnings("unchecked")
+                ParamConverter<T> converter = (ParamConverter<T>)this;
+                if (type == Integer.class) {
+                    return converter;
+                }
+            }
+            return null;
+        }
+
+        @Override
+        public MyType<Integer> fromString(String value) {
+            return new MyType<Integer>(Integer.valueOf(value));
+        }
+
+        @Override
+        public String toString(MyType<Integer> value) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+        
+    }
     private static class LocaleParameterHandler implements ParamConverterProvider, ParamConverter<Locale> {
 
         @SuppressWarnings("unchecked")
