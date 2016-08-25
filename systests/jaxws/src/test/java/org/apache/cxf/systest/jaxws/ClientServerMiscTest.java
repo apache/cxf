@@ -39,6 +39,7 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Holder;
 import javax.xml.ws.Service;
+import javax.xml.ws.WebServiceException;
 import javax.xml.ws.soap.SOAPBinding;
 import javax.xml.ws.soap.SOAPFaultException;
 import javax.xml.xpath.XPathConstants;
@@ -621,6 +622,12 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
             assertEquals("Throw user fault -3", ex.getMessage());
         }    
         
+        try {
+            port.throwException(-4);
+            fail("Expected exception not found");
+        } catch (WebServiceException ex) {
+            assertEquals("RuntimeException!!", ex.getMessage());
+        }    
         try {
             Foo foo = new Foo();
             foo.setNameIgnore("DoNoName");

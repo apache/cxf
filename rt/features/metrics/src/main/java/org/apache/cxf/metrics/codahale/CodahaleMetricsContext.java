@@ -89,6 +89,12 @@ public class CodahaleMetricsContext implements MetricsContext, Closeable {
             outgoingData.mark(outSize);
         }
         FaultMode fm = ex.get(FaultMode.class);
+        if (fm == null && ex.getOutFaultMessage() != null) { 
+            fm = ex.getOutFaultMessage().get(FaultMode.class);
+        }
+        if (fm == null && ex.getInMessage() != null) {
+            fm = ex.getInMessage().get(FaultMode.class);
+        }
         if (fm != null) {
             switch (fm) {
             case CHECKED_APPLICATION_FAULT:
