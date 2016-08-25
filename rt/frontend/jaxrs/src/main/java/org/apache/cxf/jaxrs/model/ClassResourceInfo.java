@@ -136,13 +136,12 @@ public class ClassResourceInfo extends BeanResourceInfo {
     }
     
     public ClassResourceInfo getSubResource(Class<?> typedClass, Class<?> instanceClass) {
-        instanceClass = enableStatic ? typedClass : instanceClass;
         return getSubResource(typedClass, instanceClass, null, enableStatic, null);
     }
     
     public ClassResourceInfo getSubResource(Class<?> typedClass, Class<?> instanceClass, Object instance) {
         instanceClass = enableStatic ? typedClass : instanceClass;
-        return getSubResource(typedClass, instanceClass, instance, enableStatic, null);
+        return getSubResource(typedClass, instanceClass, instance, enableStatic, JAXRSUtils.getCurrentMessage());
     }
     
     public ClassResourceInfo getSubResource(Class<?> typedClass, 
@@ -157,6 +156,9 @@ public class ClassResourceInfo extends BeanResourceInfo {
             cri = ResourceUtils.createClassResourceInfo(typedClass, instanceClass, this, false, resolveContexts,
                                                         getBus());
             if (cri != null) {
+                if (message != null) {
+                    cri.initBeanParamInfo(ServerProviderFactory.getInstance(message));
+                }
                 subResources.putIfAbsent(key, cri);
             }
         }
@@ -297,29 +299,31 @@ public class ClassResourceInfo extends BeanResourceInfo {
     }
     
     public void initBeanParamInfo(ServerProviderFactory factory) {
-        Set<OperationResourceInfo> oris = getMethodDispatcher().getOperationResourceInfos();
-        for (OperationResourceInfo ori : oris) {
-            List<Parameter> params = ori.getParameters();
-            for (Parameter param : params) {
-                if (param.getType() == ParameterType.BEAN) {
-                    Class<?> cls = ori.getMethodToInvoke().getParameterTypes()[param.getIndex()];
-                    BeanParamInfo bpi = new BeanParamInfo(cls, getBus());
+        if (factory != null) {
+            Set<OperationResourceInfo> oris = getMethodDispatcher().getOperationResourceInfos();
+            for (OperationResourceInfo ori : oris) {
+                List<Parameter> params = ori.getParameters();
+                for (Parameter param : params) {
+                    if (param.getType() == ParameterType.BEAN) {
+                        Class<?> cls = ori.getMethodToInvoke().getParameterTypes()[param.getIndex()];
+                        BeanParamInfo bpi = new BeanParamInfo(cls, getBus());
+                        factory.addBeanParamInfo(bpi);
+                    }
+                }
+            }
+            List<Method> methods =  super.getParameterMethods();
+            for (Method m : methods) {
+                if (m.getAnnotation(BeanParam.class) != null) {
+                    BeanParamInfo bpi = new BeanParamInfo(m.getParameterTypes()[0], getBus());
                     factory.addBeanParamInfo(bpi);
                 }
             }
-        }
-        List<Method> methods =  super.getParameterMethods();
-        for (Method m : methods) {
-            if (m.getAnnotation(BeanParam.class) != null) {
-                BeanParamInfo bpi = new BeanParamInfo(m.getParameterTypes()[0], getBus());
-                factory.addBeanParamInfo(bpi);
-            }
-        }
-        List<Field> fields = super.getParameterFields();
-        for (Field f : fields) {
-            if (f.getAnnotation(BeanParam.class) != null) {
-                BeanParamInfo bpi = new BeanParamInfo(f.getType(), getBus());
-                factory.addBeanParamInfo(bpi);
+            List<Field> fields = super.getParameterFields();
+            for (Field f : fields) {
+                if (f.getAnnotation(BeanParam.class) != null) {
+                    BeanParamInfo bpi = new BeanParamInfo(f.getType(), getBus());
+                    factory.addBeanParamInfo(bpi);
+                }
             }
         }
     }

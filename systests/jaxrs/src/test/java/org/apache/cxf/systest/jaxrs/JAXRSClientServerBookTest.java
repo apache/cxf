@@ -394,6 +394,12 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testUseParamBeanWebClientSubResource() {
+        String address = "http://localhost:" + PORT + "/bookstore/beanparamsub/beanparam";
+        doTestUseParamBeanWebClient(address);
+    }
+    
+    @Test
     public void testUseParamBeanWebClient2() {
         String address = "http://localhost:" + PORT + "/bookstore/beanparam2";
         doTestUseParamBeanWebClient(address);
