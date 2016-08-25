@@ -132,6 +132,11 @@ public class Java2WADLMojo extends AbstractMojo {
     /**
      * @parameter default-value="true"
      */
+    private boolean incrementNamespacePrefix;
+    
+    /**
+     * @parameter default-value="true"
+     */
     private boolean singleResourceMultipleMethods;
    
     /**
@@ -246,6 +251,7 @@ public class Java2WADLMojo extends AbstractMojo {
     
     private void setExtraProperties(WadlGenerator wg) {
         wg.setSingleResourceMultipleMethods(singleResourceMultipleMethods);
+        wg.setIncrementNamespacePrefix(incrementNamespacePrefix);
         wg.setUseSingleSlashResource(useSingleSlashResource);
         wg.setIncludeDefaultWadlSchemaLocation(includeDefaultWadlSchemaLocation);
         wg.setIgnoreForwardSlash(ignoreForwardSlash);

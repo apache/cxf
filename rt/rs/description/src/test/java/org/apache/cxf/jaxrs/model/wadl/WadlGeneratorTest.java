@@ -223,6 +223,28 @@ public class WadlGeneratorTest extends Assert {
     }
     
     @Test
+    public void testSingleRootResourceNoPrefixIncrement() throws Exception {
+        WadlGenerator wg = new WadlGenerator();
+        wg.setApplicationTitle("My Application");
+        wg.setNamespacePrefix("ns");
+        wg.setIncrementNamespacePrefix(false);
+        ClassResourceInfo cri = 
+            ResourceUtils.createClassResourceInfo(BookStore.class, BookStore.class, true, true);
+        Message m = mockMessage("http://localhost:8080/baz", "/bookstore/1", WadlGenerator.WADL_QUERY, cri);
+        Response r = handleRequest(wg, m);
+        checkResponse(r);
+        Document doc = StaxUtils.read(new StringReader(r.getEntity().toString()));
+        checkDocs(doc.getDocumentElement(), "My Application", "", "");
+        checkGrammars(doc.getDocumentElement(), "thebook", "books", "thebook2s", "thebook2", "thechapter");
+        List<Element> els = getWadlResourcesInfo(doc, "http://localhost:8080/baz", 1);
+        checkBookStoreInfo(els.get(0), 
+                           "ns:thebook", 
+                           "ns:thebook2", 
+                           "ns:thechapter",
+                           "ns:books");
+    }
+    
+    @Test
     public void testTwoSchemasSameNs() throws Exception {
         WadlGenerator wg = new WadlGenerator();
         wg.setApplicationTitle("My Application");

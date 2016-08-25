@@ -171,6 +171,7 @@ public class WadlGenerator implements ContainerRequestFilter {
     private boolean checkAbsolutePathSlash;
     private boolean keepRelativeDocLinks;
     private boolean usePathParamsToCompareOperations = true;
+    private boolean incrementNamespacePrefix = true;
         
     private boolean ignoreMessageWriters = true;
     private boolean ignoreRequests;
@@ -1563,15 +1564,23 @@ public class WadlGenerator implements ContainerRequestFilter {
 
     private String getPrefix(String ns, Map<Class<?>, QName> clsMap) {
         String prefix = null;
+        int index = 0;
         for (QName name : clsMap.values()) {
+            String currentPrefix = name.getPrefix();
+            if (currentPrefix.startsWith(nsPrefix)) {
+                int currentIndex = currentPrefix.equals(nsPrefix) ? 0 
+                    : Integer.valueOf(currentPrefix.substring(nsPrefix.length()));
+                if (currentIndex > index) {
+                    index = currentIndex;
+                }
+            }
             if (name.getNamespaceURI().equals(ns)) {
-                prefix = name.getPrefix();
+                prefix = currentPrefix;
                 break;
             }
         }
-        if (prefix == null) {
-            int size = new HashSet<>(clsMap.values()).size();
-            prefix = nsPrefix + (size + 1);
+        if (StringUtils.isEmpty(prefix)) {
+            prefix = index == 0 && !incrementNamespacePrefix ? nsPrefix : nsPrefix + (index + 1);
         }
         return prefix;
     }
@@ -2235,6 +2244,10 @@ public class WadlGenerator implements ContainerRequestFilter {
 
     public void setConvertResourcesToDOM(boolean convertResourcesToDOM) {
         this.convertResourcesToDOM = convertResourcesToDOM;
+    }
+
+    public void setIncrementNamespacePrefix(boolean incrementNamespacePrefix) {
+        this.incrementNamespacePrefix = incrementNamespacePrefix;
     }
 
     private static class SchemaConverter extends DelegatingXMLStreamWriter {
