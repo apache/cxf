@@ -338,8 +338,11 @@ public class JettyHTTPServerEngineFactory {
                 
                 mBeanContainer = (Container.Listener) cls.
                     getConstructor(MBeanServer.class).newInstance(mbs);
-                
-                cls.getMethod("start", (Class<?>[]) null).invoke(mBeanContainer, (Object[]) null);
+                try {
+                    cls.getMethod("start", (Class<?>[]) null).invoke(mBeanContainer, (Object[]) null);
+                } catch (NoSuchMethodException mex) {
+                    //ignore, Jetty 9.1 removed this methods and it's not needed anymore
+                }
             } catch (Throwable ex) {
                 //ignore - just won't instrument jetty.  Probably don't have the
                 //jetty-management jar available
