@@ -56,6 +56,7 @@ import javax.ws.rs.HeaderParam;
 import javax.ws.rs.MatrixParam;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.HttpHeaders;
@@ -582,7 +583,9 @@ public class WadlGenerator implements ContainerRequestFilter {
         if (!handleDocs(anns, sb, DocTarget.METHOD, true, isJson)) {
             handleOperJavaDocs(ori, sb);
         }
-        if (getMethod(ori).getParameterTypes().length != 0 || !classParams.isEmpty()) {
+        int numOfParams = getMethod(ori).getParameterTypes().length;
+        if ((numOfParams > 1 || numOfParams == 1 && !ori.isAsync()) || !classParams.isEmpty()) {
+            
             startMethodRequestTag(sb, ori);
             handleDocs(anns, sb, DocTarget.REQUEST, false, isJson);
 
@@ -604,7 +607,7 @@ public class WadlGenerator implements ContainerRequestFilter {
         }
         startMethodResponseTag(sb, ori);
         Class<?> returnType = getMethod(ori).getReturnType();
-        boolean isVoid = void.class == returnType;
+        boolean isVoid = void.class == returnType && !ori.isAsync();
         ResponseStatus responseStatus = getMethod(ori).getAnnotation(ResponseStatus.class);
         if (responseStatus != null) {
             setResponseStatus(sb, responseStatus.value());
@@ -752,7 +755,7 @@ public class WadlGenerator implements ContainerRequestFilter {
                                    ElementQNameResolver qnameResolver, Map<Class<?>, QName> clsMap,
                                    OperationResourceInfo ori, Parameter pm, boolean isJson) {
         Class<?> cls = getMethod(ori).getParameterTypes()[pm.getIndex()];
-        if (pm.getType() == ParameterType.REQUEST_BODY) {
+        if (pm.getType() == ParameterType.REQUEST_BODY && cls != AsyncResponse.class) {
             handleRepresentation(sb, jaxbTypes, qnameResolver, clsMap, ori, cls, isJson, true);
             return;
         }
@@ -1003,7 +1006,7 @@ public class WadlGenerator implements ContainerRequestFilter {
         }
 
         Method opMethod = getMethod(ori);
-        boolean isPrimitive = InjectionUtils.isPrimitive(type);
+        boolean isPrimitive = InjectionUtils.isPrimitive(type) && !ori.isAsync();
         for (MediaType mt : types) {
 
             sb.append("<representation");

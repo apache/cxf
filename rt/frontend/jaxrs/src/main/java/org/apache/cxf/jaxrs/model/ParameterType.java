@@ -29,6 +29,5 @@ public enum ParameterType {
     BEAN,
     
     REQUEST_BODY,
-    CONTEXT,
-    UNKNOWN
+    CONTEXT
 }
