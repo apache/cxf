@@ -68,6 +68,6 @@ final class HttpServiceTrackerCust implements ServiceTrackerCustomizer {
         servProps.put(Constants.SERVICE_PID,  CXF_CONFIG_PID);
         servletPublisherReg = context.registerService(ManagedService.class.getName(),
                                                       servletExporter, servProps);
-        return null;
+        return httpService;
     }
 }
