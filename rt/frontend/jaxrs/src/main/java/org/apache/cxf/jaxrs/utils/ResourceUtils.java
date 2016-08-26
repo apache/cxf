@@ -306,7 +306,7 @@ public final class ResourceUtils {
             Path path = AnnotationUtils.getMethodAnnotation(annotatedMethod, Path.class);
             
             if (httpMethod != null || path != null) {
-                if (!checkAsyncResponse(m)) {
+                if (!checkAsyncResponse(annotatedMethod)) {
                     continue;
                 }
                 
