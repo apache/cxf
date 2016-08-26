@@ -63,6 +63,14 @@ public abstract class AbstractJAXRSContinuationsTest extends AbstractBusClientSe
         Response r = wc.get(Response.class);
         assertEquals(204, r.getStatus());
     }
+    @Test
+    public void testCustomStatusFromInterface() throws Exception {
+        WebClient wc = WebClient.create("http://localhost:" + getPort() + getBaseAddress() 
+            + "/books/async/nocontentInterface");
+        wc.accept("text/plain");
+        Response r = wc.get(Response.class);
+        assertEquals(206, r.getStatus());
+    }
     
     @Test
     public void testUnmappedAfterTimeout() throws Exception {

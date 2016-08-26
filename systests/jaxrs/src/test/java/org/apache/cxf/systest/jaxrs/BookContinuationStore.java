@@ -44,7 +44,7 @@ import javax.ws.rs.core.Response;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 
 @Path("/bookstore")
-public class BookContinuationStore {
+public class BookContinuationStore implements BookAsyncInterface {
 
     private Map<String, String> books = new HashMap<String, String>();
     private Executor executor = new ThreadPoolExecutor(5, 5, 0, TimeUnit.SECONDS,
@@ -71,8 +71,13 @@ public class BookContinuationStore {
     @GET
     @Path("/books/nocontent")
     @Produces("text/plain")
-    public void getBookNoContent(@Suspended AsyncResponse async) {
+    public void getBookNoContent(AsyncResponse async) {
         async.resume(null);
+    }
+    
+
+    public void getBookNoContentInterface(@Suspended AsyncResponse async) {
+        async.resume(Response.status(206).build());
     }
     
     @GET
@@ -280,6 +285,8 @@ public class BookContinuationStore {
         }
         
     }
+    
+    
 }
 
 
