@@ -34,6 +34,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
@@ -156,8 +158,8 @@ public class BookStore extends AbstractStore<Book> implements BookDescription {
     @GET
     @Path("chapter2")
     @ElementClass(response = Chapter.class)
-    public Response getChapter2() {
-        return Response.ok().entity(new Chapter(1)).build();
+    public void getChapterAsync(@Suspended AsyncResponse async) {
+        async.resume(Response.ok().entity(new Chapter(1)).build());
     }
     
     @Path("form")

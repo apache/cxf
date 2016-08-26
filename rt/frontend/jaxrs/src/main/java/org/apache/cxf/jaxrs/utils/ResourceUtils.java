@@ -625,13 +625,13 @@ public final class ResourceUtils {
             Method method = ori.getAnnotatedMethod() == null ? ori.getMethodToInvoke() : ori.getAnnotatedMethod();
             Class<?> realReturnType = method.getReturnType();
             Class<?> cls = realReturnType;
-            if (cls == Response.class) {
+            if (cls == Response.class || ori.isAsync()) {
                 cls = getActualJaxbType(cls, method, false);
             }
             Type type = method.getGenericReturnType();
             if (jaxbOnly) {
-                checkJaxbType(resource.getServiceClass(), cls, realReturnType == Response.class ? cls : type, types, 
-                    method.getAnnotations(), jaxbWriter);
+                checkJaxbType(resource.getServiceClass(), cls, realReturnType == Response.class || ori.isAsync() 
+                    ? cls : type, types, method.getAnnotations(), jaxbWriter);
             } else {
                 types.getAllTypes().put(cls, type);
             }
@@ -639,14 +639,15 @@ public final class ResourceUtils {
             for (Parameter pm : ori.getParameters()) {
                 if (pm.getType() == ParameterType.REQUEST_BODY) {
                     Class<?> inType = method.getParameterTypes()[pm.getIndex()];
-                    Type paramType = method.getGenericParameterTypes()[pm.getIndex()];
-                    if (jaxbOnly) {
-                        checkJaxbType(resource.getServiceClass(), inType, paramType, types, 
-                                      method.getParameterAnnotations()[pm.getIndex()], jaxbWriter);
-                    } else {
-                        types.getAllTypes().put(inType, paramType);
+                    if (inType != AsyncResponse.class) {
+                        Type paramType = method.getGenericParameterTypes()[pm.getIndex()];
+                        if (jaxbOnly) {
+                            checkJaxbType(resource.getServiceClass(), inType, paramType, types, 
+                                          method.getParameterAnnotations()[pm.getIndex()], jaxbWriter);
+                        } else {
+                            types.getAllTypes().put(inType, paramType);
+                        }
                     }
-                    
                 }
             }
             
