@@ -240,6 +240,14 @@ Examples:
                     <annotation>encoding</annotation>
                 </associatedArgument>
             </option>
+            <option id="beanValidation" maxOccurs="1">
+                <annotation>
+                    Specifies that javax.validation.Valid annotation needs to be added to
+                    methods which return data entities and method parameters which represent
+                    data entities    
+                </annotation>
+                <switch>beanValidation</switch>
+            </option>
             <option id="validate" maxOccurs="1">
                 <annotation>
                     Specifies that the WADL is validated before generating the code. Using 
