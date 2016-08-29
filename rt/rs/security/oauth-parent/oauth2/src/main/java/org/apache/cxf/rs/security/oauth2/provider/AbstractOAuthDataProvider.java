@@ -246,19 +246,25 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         }
         if (requestedScopes.isEmpty()) {
             return Collections.emptyList();
-        } else if (!permissionMap.isEmpty()) {
+        } else {
             List<OAuthPermission> list = new ArrayList<OAuthPermission>();
             for (String scope : requestedScopes) {
-                OAuthPermission permission = permissionMap.get(scope);
-                if (permission == null) {
-                    throw new OAuthServiceException("Unexpected scope: " + scope);
-                }
-                list.add(permission);
+                list.add(convertSingleScopeToPermission(client, scope));
             }
-            return list;
-        } else {
-            throw new OAuthServiceException("Requested scopes can not be mapped");
+            if (!list.isEmpty()) {
+                return list;
+            }
+        } 
+        throw new OAuthServiceException("Requested scopes can not be mapped");
+        
+    }
+
+    protected OAuthPermission convertSingleScopeToPermission(Client client, String scope) {
+        OAuthPermission permission = permissionMap.get(scope);
+        if (permission == null) {
+            throw new OAuthServiceException("Unexpected scope: " + scope);
         }
+        return permission;
     }
 
     @Override
