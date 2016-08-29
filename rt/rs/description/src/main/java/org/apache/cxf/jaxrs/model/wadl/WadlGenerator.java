@@ -48,7 +48,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import javax.ws.rs.BeanParam;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.Encoded;
@@ -133,6 +138,9 @@ import org.apache.cxf.staxutils.DelegatingXMLStreamWriter;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.constants.Constants;
+
+
+import io.swagger.annotations.ApiParam;
 
 public class WadlGenerator implements ContainerRequestFilter {
 
@@ -958,20 +966,85 @@ public class WadlGenerator implements ContainerRequestFilter {
                 value = "xs:anyType";
             }
         }
+        
+        checkForBeanValidationAnnotations(ori, sb, paramName, anns);
+        
+        
+        boolean stringRestrictionPresent = checkForBeanValidationAnnotationsForString(anns);
+        boolean numericRestrictionPresent = checkForBeanValidationAnnotationsForInteger(anns);
+        
         if (value != null) {
             if (isJson) {
                 value = value.substring(3);
             }
-            sb.append(" type=\"").append(value).append("\"");
+            if (!stringRestrictionPresent && !numericRestrictionPresent) {
+                sb.append(" type=\"").append(value).append("\"");
+            }
+            
         }
+        
+        
         if (type.isEnum()) {
             sb.append(">");
             handleDocs(anns, sb, DocTarget.PARAM, true, isJson);
             setEnumOptions(sb, type);
             sb.append("</param>");
         } else {
-            addDocsAndCloseElement(ori, pm.getIndex(), sb, anns, "param", DocTarget.PARAM, true, isJson);
+            
+            addDocsAndCloseElement(ori, pm.getIndex(), sb, anns, "param", DocTarget.PARAM, true, isJson, 
+                    stringRestrictionPresent, numericRestrictionPresent, value);
         }
+    }
+
+
+    private void checkForBeanValidationAnnotations(OperationResourceInfo ori, StringBuilder sb,
+            String paramName, Annotation[] anns) {
+
+    	NotNull notNull = AnnotationUtils.getAnnotation(anns, javax.validation.constraints.NotNull.class);
+        if (notNull != null) {
+            // parameter is required
+            sb.append(" minOccurs=\"1\"");
+        }
+        
+        // TODO debug output
+//        System.out.println("*** param: " + ori.getAnnotatedMethod().getName() + " " + paramName);
+//        System.out.println("*** anns: " + anns.length);
+//        for (Annotation annotation : anns) {
+//            System.out.println("*** type: " + annotation.annotationType());
+//        }
+        
+    }
+
+    private boolean checkForBeanValidationAnnotationsForString(Annotation[] anns) {
+        boolean present = false;
+        Size size = AnnotationUtils.getAnnotation(anns, javax.validation.constraints.Size.class);
+        if (size != null) {
+            present = true;
+        }
+        
+        Pattern pattern = AnnotationUtils.getAnnotation(anns, Pattern.class);
+        if (pattern != null) {
+            present = true;
+        }
+        
+        return present;
+    }
+
+    private boolean checkForBeanValidationAnnotationsForInteger(Annotation[] anns) {
+        boolean present = false;
+        
+        Min min = AnnotationUtils.getAnnotation(anns, Min.class);
+        if (min != null) {
+            present = true;
+        }
+        
+        Max max = AnnotationUtils.getAnnotation(anns, Max.class);
+        if (max != null) {
+            present = true;
+        }
+        
+        return present;
+        
     }
 
     private void setEnumOptions(StringBuilder sb, Class<?> enumClass) {
@@ -996,10 +1069,23 @@ public class WadlGenerator implements ContainerRequestFilter {
                                         String elementName,
                                         String category, 
                                         boolean allowDefault, 
-                                        boolean isJson) {
+                                        boolean isJson, 
+                                        boolean stringRestrictionPresent,
+                                        boolean numericRestrictionPresent,
+                                        String type) {
     //CHECKSTYLE:ON    
         boolean docAnnAvailable = isDocAvailable(anns);
-        if (docAnnAvailable || (ori != null && !docProviders.isEmpty())) {
+        
+        boolean apiParamDocsAvailable = false;
+        ApiParam apiParam = AnnotationUtils.getAnnotation(anns, ApiParam.class);
+        if (apiParam != null && apiParam.value() != null) {
+            apiParamDocsAvailable = true;
+        }
+        
+        if (docAnnAvailable || (ori != null && !docProviders.isEmpty()) 
+                || apiParamDocsAvailable
+                || stringRestrictionPresent
+                || numericRestrictionPresent) {
             sb.append(">");
             if (docAnnAvailable) {
                 handleDocs(anns, sb, category, allowDefault, isJson);
@@ -1008,10 +1094,58 @@ public class WadlGenerator implements ContainerRequestFilter {
             } else if (DocTarget.PARAM.equals(category)) {
                 handleOperParamJavaDocs(ori, paramIndex, sb);
             }
+            
+            if (apiParamDocsAvailable) {
+                addDocumentation(sb, apiParam.value());
+            }
+            
+            if (stringRestrictionPresent) {
+                sb.append("<xs:simpleType>");
+                sb.append("  <xs:restriction base=\"xs:string\">");
+            
+                Size size = AnnotationUtils.getAnnotation(anns, javax.validation.constraints.Size.class);
+                if (size != null) {
+                    sb.append("  <xs:minLength value=\"" + size.min() + "\" />");
+                    sb.append("  <xs:maxLength value=\"" + size.max() + "\" />");
+                }
+                
+                javax.validation.constraints.Pattern pattern = 
+                        AnnotationUtils.getAnnotation(anns, javax.validation.constraints.Pattern.class);
+                if (pattern != null) {
+                    sb.append("  <xs:pattern value=\"" + pattern.regexp() + "\" />");
+                }
+                
+                sb.append("  </xs:restriction>");
+                sb.append("</xs:simpleType>");
+            }
+            
+            if (numericRestrictionPresent) {
+                sb.append("<xs:simpleType>");
+                sb.append("  <xs:restriction base=\"" + type + "\">");
+                
+                Min min = AnnotationUtils.getAnnotation(anns, javax.validation.constraints.Min.class);
+                if (min != null) {
+                    sb.append("  <xs:minInclusive value=\"" + min.value() + "\" />");
+                }
+                
+                Max max = AnnotationUtils.getAnnotation(anns, javax.validation.constraints.Max.class);
+                if (max != null) {
+                    sb.append("  <xs:maxInclusive value=\"" + max.value() + "\" />");
+                }
+                
+                sb.append("  </xs:restriction>");
+                sb.append("</xs:simpleType>");
+            }
+            
             sb.append("</").append(elementName).append(">");
+            
         } else {
             sb.append("/>");
         }
+    }
+    
+    private void addDocumentation(StringBuilder sb, String doc) {
+        sb.append("<doc>" + doc + "</doc>");
     }
 
     private boolean isDocAvailable(Annotation[] anns) {
@@ -1091,7 +1225,7 @@ public class WadlGenerator implements ContainerRequestFilter {
                                   getBodyAnnotations(ori, inbound));
                 }
                 addDocsAndCloseElement(ori, inParamIndex, sb, anns, "representation", 
-                                       docCategory, allowDefault, isJson);
+                                       docCategory, allowDefault, isJson, false, false, null);
             }
         }
 
