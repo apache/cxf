@@ -39,7 +39,7 @@ public class Server {
         context.addServlet(servletHolder, "/*");  
         servletHolder.setInitParameter("jaxrs.serviceClasses", Sample.class.getName());
         servletHolder.setInitParameter("jaxrs.features", 
-            Swagger2Feature.class.getName() + "(basePath=/ usePathBasedConfig=true)");
+            Swagger2Feature.class.getName());
         servletHolder.setInitParameter("jaxrs.providers", StringUtils.join(
             new String[] {
                 MultipartProvider.class.getName(),
