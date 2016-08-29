@@ -56,8 +56,9 @@ public class HttpAuthenticationFaultHandler extends AbstractPhaseInterceptor<Mes
             resp.setHeader("WWW-Authenticate", authenticationType + " realm=\"" + realm + "\"");
             resp.setContentType("text/plain");
             try {
-                resp.getWriter().write(ex.getMessage());
-                resp.getWriter().flush();
+                resp.getOutputStream().write(ex.getMessage().getBytes());
+                resp.getOutputStream().flush();
+                message.getInterceptorChain().setFaultObserver(null); //avoid return soap fault
                 message.getInterceptorChain().abort();
             } catch (IOException e) {
                 // TODO
@@ -72,4 +73,5 @@ public class HttpAuthenticationFaultHandler extends AbstractPhaseInterceptor<Mes
     public void setRealm(String realm) {
         this.realm = realm;
     }
+    
 }
