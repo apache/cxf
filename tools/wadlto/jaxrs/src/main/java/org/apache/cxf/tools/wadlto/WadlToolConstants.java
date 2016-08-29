@@ -43,6 +43,7 @@ public final class WadlToolConstants {
     public static final String CFG_SCHEMA_TYPE_MAP = "schemaTypeMap";
     public static final String CFG_MEDIA_TYPE_MAP = "mediaTypeMap";
     public static final String CFG_MULTIPLE_XML_REPS = "supportMultipleXmlReps";
+    public static final String CFG_BEAN_VALIDATION = "beanValidation";
     
     public static final String CFG_CATALOG = ToolConstants.CFG_CATALOG;
     public static final String CFG_BINDING = ToolConstants.CFG_BINDING;

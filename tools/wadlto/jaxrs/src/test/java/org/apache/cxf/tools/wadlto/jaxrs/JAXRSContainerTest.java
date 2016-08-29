@@ -456,6 +456,28 @@ public class JAXRSContainerTest extends ProcessorTestBase {
         assertEquals("id", methodPathParam1.value());
     }
     
+    @Test
+    public void testBeanValidation() {
+        try {
+            JAXRSContainer container = new JAXRSContainer(null);
+
+            ToolContext context = new ToolContext();
+            context.put(WadlToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
+            context.put(WadlToolConstants.CFG_WADLURL, getLocation("/wadl/resourceSameTargetNsSchemas.xml"));
+            context.put(WadlToolConstants.CFG_BEAN_VALIDATION, "true");
+            //context.put(WadlToolConstants.CFG_COMPILE, "true");
+
+            container.setContext(context);
+            container.execute();
+
+            assertNotNull(output.list());
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
+    
     @Test    
     public void testCodeGenWithImportedSchemaAndResourceSet() {
         try {

@@ -133,6 +133,8 @@ public class SourceGenerator {
     private static final Map<String, Class<?>> HTTP_METHOD_ANNOTATIONS;
     private static final Map<String, Class<?>> PARAM_ANNOTATIONS;
     private static final String PLAIN_PARAM_STYLE = "plain";
+    private static final String BEAN_VALID_SIMPLE_NAME = "Valid";
+    private static final String BEAN_VALID_FULL_NAME = "javax.validation." + BEAN_VALID_SIMPLE_NAME;
     private static final Set<String> RESOURCE_LEVEL_PARAMS;
     private static final Map<String, String> AUTOBOXED_PRIMITIVES_MAP;
     private static final Map<String, String> XSD_SPECIFIC_TYPE_MAP;
@@ -218,6 +220,7 @@ public class SourceGenerator {
     private Map<String, String> mediaTypesMap = Collections.emptyMap();
     private Bus bus;
     private boolean supportMultipleRepsWithElements;
+    private boolean supportBeanValidation;
     private boolean validateWadl;    
     private SchemaCollection schemaCollection = new SchemaCollection();
     private String encoding;
@@ -662,7 +665,7 @@ public class SourceGenerator {
             }
         }
     }
-    
+        
     private void addImport(Set<String> imports, String clsName) {
         if (imports == null || clsName.startsWith("java.lang") || !clsName.contains(".")) {
             return;
@@ -760,8 +763,14 @@ public class SourceGenerator {
                         writeCustomHttpMethod(info, classPackage, methodName, sbMethodCode, imports);    
                     }
                     writeFormatAnnotations(requestReps, sbMethodCode, imports, true, null);
-                    writeFormatAnnotations(getWadlElements(getOKResponse(responseEls), "representation"),
+                    List<Element> responseReps = getWadlElements(getOKResponse(responseEls), "representation");
+                    writeFormatAnnotations(responseReps,
                                            sbMethodCode, imports, false, requestRepWithElement);
+                    if (supportBeanValidation && !responseRequired 
+                        && isRepWithElementAvailable(responseReps, info.getGrammarInfo())) {
+                        addImport(imports, BEAN_VALID_FULL_NAME);
+                        sbMethodCode.append("@").append(BEAN_VALID_SIMPLE_NAME).append(getLineSep()).append(TAB);
+                    }
                 }
                 if (!isRoot && !"/".equals(currentPath)) {
                     writeAnnotation(sbMethodCode, imports, Path.class, currentPath, true, true);
@@ -1013,6 +1022,18 @@ public class SourceGenerator {
         return duplicatesCount > 0;
     }
     
+    private boolean isRepWithElementAvailable(List<Element> repElements,
+                                              GrammarInfo gInfo) {
+        for (Element el : repElements) {
+            String value = el.getAttribute("element");
+            if (value.length() > 0 
+                && (value.contains(":") || gInfo.isSchemaWithoutTargetNamespace())) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
     private List<Element> getParameters(Element resourceEl, List<Element> inheritedParams, 
                                         boolean isSubresourceMethod) {
         List<Element> inParamElements = new LinkedList<Element>();
@@ -1232,6 +1253,7 @@ public class SourceGenerator {
             }
         }
                   
+        boolean writeAnnotations = writeAnnotations(info.isInterfaceGenerated());
         for (int i = 0; i < inParamEls.size(); i++) {
     
             Element paramEl = inParamEls.get(i);
@@ -1250,7 +1272,7 @@ public class SourceGenerator {
                     enumCreated = true;
                 }
             }
-            if (writeAnnotations(info.isInterfaceGenerated())) {
+            if (writeAnnotations) {
                 String required = paramEl.getAttribute("required");
                 if (Multipart.class.equals(paramAnn) && "false".equals(required)) {
                     writeAnnotation(sbCode, imports, paramAnn, null, false, false);
@@ -1294,10 +1316,15 @@ public class SourceGenerator {
         }
         String elementParamType = null;
         String elementParamName = null;
+        boolean writeBeanValidation = false;
         if (!form) {
             if (!jaxpRequired) {    
                 elementParamType = getElementRefName(repElement, info, imports, false);
                 if (elementParamType != null) {
+                    if (writeAnnotations && supportBeanValidation 
+                        && isRepWithElementAvailable(Collections.singletonList(repElement), info.getGrammarInfo())) {
+                        writeBeanValidation = true; 
+                    }
                     int lastIndex = elementParamType.lastIndexOf('.');
                     if (lastIndex != -1) {
                         elementParamType = elementParamType.substring(lastIndex + 1);
@@ -1328,6 +1355,11 @@ public class SourceGenerator {
             if (inParamEls.size() > 0) {
                 sbCode.append(", ");
             }
+            if (writeBeanValidation) {
+                addImport(imports, BEAN_VALID_FULL_NAME);
+                sbCode.append("@").append(BEAN_VALID_SIMPLE_NAME).append(" ");
+            }
+            
             sbCode.append(elementParamType).append(" ").append(elementParamName);
         }
         if (sbMethodDocs != null && repElement != null) {
@@ -1337,10 +1369,12 @@ public class SourceGenerator {
             if (inParamEls.size() > 0 || elementParamType != null) {
                 sbCode.append(", ");
             }
-            addImport(imports, Suspended.class.getName());
+            if (writeAnnotations) {
+                addImport(imports, Suspended.class.getName());
+                sbCode.append("@").append(Suspended.class.getSimpleName()).append(" ");        
+            }
             addImport(imports, AsyncResponse.class.getName());
-            sbCode.append("@").append(Suspended.class.getSimpleName()).append(" ")
-                .append(AsyncResponse.class.getSimpleName()).append(" ").append("async");
+            sbCode.append(AsyncResponse.class.getSimpleName()).append(" ").append("async");
         }
     }
     
@@ -1996,6 +2030,10 @@ public class SourceGenerator {
 
     public void setCreateJavaDocs(boolean createJavaDocs) {
         this.createJavaDocs = createJavaDocs;
+    }
+
+    public void setSupportBeanValidation(boolean supportBeanValidation) {
+        this.supportBeanValidation = supportBeanValidation;
     }
 
     private static class GrammarInfo {
