@@ -236,6 +236,14 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
                                                 UserSubject userSubject,
                                                 List<String> requestedScope, 
                                                 List<OAuthPermission> permissions) {
+        return noConsentForRequestedScopes(params, client, userSubject, requestedScope, permissions);
+    }
+    
+    protected boolean noConsentForRequestedScopes(MultivaluedMap<String, String> params,
+                                                  Client client, 
+                                                  UserSubject userSubject,
+                                                  List<String> requestedScope, 
+                                                  List<OAuthPermission> permissions) {
         return scopesRequiringNoConsent != null 
                && requestedScope != null
                && requestedScope.size() == scopesRequiringNoConsent.size()
