@@ -61,5 +61,10 @@
             <version>0.6.4</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>javax.validation</groupId>
+            <artifactId>validation-api</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>
