@@ -20,9 +20,12 @@
 package org.apache.cxf.systest.jaxrs.reactive;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.Future;
 
 import javax.ws.rs.core.GenericType;
+
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
@@ -85,10 +88,35 @@ public class JAXRSReactiveTest extends AbstractBusClientServerTestBase {
     @Test
     public void testGetHelloWorldJson() throws Exception {
         String address = "http://localhost:" + PORT + "/reactive/textJson";
-        WebClient wc = WebClient.create(address);
-        String text = wc.accept("application/json").get(String.class);
-        assertTrue("{\"audience\":\"World\",\"greeting\":\"Hello\"}".equals(text)
-                   || "{\"greeting\":\"Hello\",\"audience\":\"World\"}".equals(text));
+        WebClient wc = WebClient.create(address,
+                                        Collections.singletonList(new JacksonJsonProvider()));
+        HelloWorldBean bean = wc.accept("application/json").get(HelloWorldBean.class);
+        assertEquals("Hello", bean.getGreeting());
+        assertEquals("World", bean.getAudience());
+    }
+    @Test
+    public void testGetHelloWorldJsonList() throws Exception {
+        String address = "http://localhost:" + PORT + "/reactive/textJsonList";
+        doTestGetHelloWorldJsonList(address);
+    }
+    @Test
+    public void testGetHelloWorldJsonImplicitList() throws Exception {
+        String address = "http://localhost:" + PORT + "/reactive/textJsonImplicitList";
+        doTestGetHelloWorldJsonList(address);
+    }
+    private void doTestGetHelloWorldJsonList(String address) throws Exception {
+        WebClient wc = WebClient.create(address,
+                                        Collections.singletonList(new JacksonJsonProvider()));
+        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000);
+        GenericType<List<HelloWorldBean>> genericResponseType = new GenericType<List<HelloWorldBean>>() {        
+        };
+        
+        List<HelloWorldBean> beans = wc.accept("application/json").get(genericResponseType);
+        assertEquals(2, beans.size());
+        assertEquals("Hello", beans.get(0).getGreeting());
+        assertEquals("World", beans.get(0).getAudience());
+        assertEquals("Ciao", beans.get(1).getGreeting());
+        assertEquals("World", beans.get(1).getAudience());
     }
     
     private Observable<String> getObservable(Future<String> future) {

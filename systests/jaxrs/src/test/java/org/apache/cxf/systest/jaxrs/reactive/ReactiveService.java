@@ -20,14 +20,18 @@
 package org.apache.cxf.systest.jaxrs.reactive;
 
 
+import java.util.Arrays;
+import java.util.List;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 
+import org.apache.cxf.jaxrs.provider.rx.AbstractAsyncSubscriber;
+
 import rx.Observable;
-import rx.Subscriber;
 
 
 @Path("/reactive")
@@ -45,33 +49,45 @@ public class ReactiveService {
     @Path("textAsync")
     public void getTextAsync(@Suspended final AsyncResponse ar) {
         Observable.just("Hello, ").map(s -> s + "world!")
-            .subscribe(new AsyncResponseSubscriber(ar));
+            .subscribe(new StringAsyncSubscriber(ar));
         
     }
     
     @GET
     @Produces("application/json")
     @Path("textJson")
-    public Observable<HelloWorldBean> getJsonText() {
+    public Observable<HelloWorldBean> getJson() {
         return Observable.just(new HelloWorldBean());
     }
     
-    private class AsyncResponseSubscriber extends Subscriber<String> {
+    @GET
+    @Produces("application/json")
+    @Path("textJsonImplicitList")
+    public Observable<HelloWorldBean> getJsonImplicitList() {
+        HelloWorldBean bean1 = new HelloWorldBean();
+        HelloWorldBean bean2 = new HelloWorldBean();
+        bean2.setGreeting("Ciao");
+        return Observable.just(bean1, bean2);
+    }
+    @GET
+    @Produces("application/json")
+    @Path("textJsonList")
+    public Observable<List<HelloWorldBean>> getJsonList() {
+        HelloWorldBean bean1 = new HelloWorldBean();
+        HelloWorldBean bean2 = new HelloWorldBean();
+        bean2.setGreeting("Ciao");
+        return Observable.just(Arrays.asList(bean1, bean2));
+    }
+    
+    private class StringAsyncSubscriber extends AbstractAsyncSubscriber<String> {
         
         private StringBuilder sb = new StringBuilder();
-        private AsyncResponse ar;
-        
-        AsyncResponseSubscriber(AsyncResponse ar) {
-            this.ar = ar;
+        StringAsyncSubscriber(AsyncResponse ar) {
+            super(ar);
         }
         @Override
         public void onCompleted() {
-            ar.resume(sb.toString());
-        }
-
-        @Override
-        public void onError(Throwable arg0) {
-            // TODO Auto-generated method stub
+            super.resume(sb.toString());
         }
 
         @Override

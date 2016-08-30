@@ -23,6 +23,7 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.provider.rx.ObservableWriter;
@@ -42,6 +43,7 @@ public class ReactiveServer extends AbstractBusTestServerBase {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setProvider(new ObservableWriter<Object>());
         sf.setProvider(new JacksonJsonProvider());
+        sf.getOutInterceptors().add(new LoggingOutInterceptor());
         sf.setResourceClasses(ReactiveService.class);
         sf.setResourceProvider(ReactiveService.class,
                                new SingletonResourceProvider(new ReactiveService(), true));
