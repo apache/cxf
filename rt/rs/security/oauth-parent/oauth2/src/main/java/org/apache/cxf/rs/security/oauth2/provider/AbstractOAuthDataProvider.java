@@ -254,7 +254,7 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         } else {
             List<OAuthPermission> list = new ArrayList<OAuthPermission>();
             for (String scope : requestedScopes) {
-                list.add(convertSingleScopeToPermission(client, scope));
+                convertSingleScopeToPermission(client, scope, list);
             }
             if (!list.isEmpty()) {
                 return list;
@@ -264,12 +264,14 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         
     }
 
-    protected OAuthPermission convertSingleScopeToPermission(Client client, String scope) {
+    protected void convertSingleScopeToPermission(Client client, 
+                                                  String scope,
+                                                  List<OAuthPermission> perms) {
         OAuthPermission permission = permissionMap.get(scope);
         if (permission == null) {
             throw new OAuthServiceException("Unexpected scope: " + scope);
         }
-        return permission;
+        perms.add(permission);
     }
 
     @Override
