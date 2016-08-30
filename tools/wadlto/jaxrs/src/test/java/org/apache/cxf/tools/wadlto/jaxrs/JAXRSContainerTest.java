@@ -27,11 +27,13 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.List;
 
+import javax.validation.Valid;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
 import org.apache.cxf.helpers.FileUtils;
@@ -465,12 +467,40 @@ public class JAXRSContainerTest extends ProcessorTestBase {
             context.put(WadlToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
             context.put(WadlToolConstants.CFG_WADLURL, getLocation("/wadl/resourceSameTargetNsSchemas.xml"));
             context.put(WadlToolConstants.CFG_BEAN_VALIDATION, "true");
-            //context.put(WadlToolConstants.CFG_COMPILE, "true");
+            context.put(WadlToolConstants.CFG_COMPILE, "true");
 
             container.setContext(context);
             container.execute();
 
             assertNotNull(output.list());
+            
+            List<File> files = FileUtils.getFilesRecurse(output, ".+\\." + "class" + "$");
+            assertEquals(4, files.size());
+            assertTrue(checkContains(files, "application.Resource.class"));
+            @SuppressWarnings("resource")
+            ClassLoader loader = new URLClassLoader(new URL[] {output.toURI().toURL() });
+            
+            Class<?> test1 = loader.loadClass("application.Resource");
+            Method[] test1Methods = test1.getDeclaredMethods();
+            assertEquals(1, test1Methods.length);
+            Method m = test1Methods[0];
+            assertEquals(5, m.getAnnotations().length);
+            assertNotNull(m.getAnnotation(Valid.class));
+            assertNotNull(m.getAnnotation(Path.class));
+            assertNotNull(m.getAnnotation(Consumes.class));
+            assertNotNull(m.getAnnotation(Produces.class));
+            assertNotNull(m.getAnnotation(PUT.class));
+            
+            Class<?>[] paramTypes = m.getParameterTypes();
+            assertEquals(2, paramTypes.length);
+            Annotation[][] paramAnns = m.getParameterAnnotations();
+            assertEquals(String.class, paramTypes[0]);
+            assertEquals(1, paramAnns[0].length);
+            PathParam methodPathParam1 = (PathParam)paramAnns[0][0];
+            assertEquals("id", methodPathParam1.value());
+            
+            assertEquals(1, paramAnns[1].length);
+            assertTrue(paramAnns[1][0] instanceof Valid);
             
         } catch (Exception e) {
             e.printStackTrace();
