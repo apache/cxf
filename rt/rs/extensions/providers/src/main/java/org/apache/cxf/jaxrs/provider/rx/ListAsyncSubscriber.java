@@ -16,28 +16,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.jaxrs.reactive;
+package org.apache.cxf.jaxrs.provider.rx;
 
-public class HelloWorldBean {
-    private String greeting;
-    private String audience = "World";
-    public HelloWorldBean() {
-        this("Hello");
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.ws.rs.container.AsyncResponse;
+
+public class ListAsyncSubscriber<T> extends AbstractAsyncSubscriber<T> {
+    
+    private List<T> beans = new LinkedList<T>();
+    public ListAsyncSubscriber(AsyncResponse ar) {
+        super(ar);
     }
-    public HelloWorldBean(String greeting) {
-        this.greeting = greeting;
+    @Override
+    public void onCompleted() {
+        super.resume(beans);
+    }
+
+    @Override
+    public void onNext(T bean) {
+        beans.add(bean);
     }
     
-    public String getGreeting() {
-        return greeting;
-    }
-    public void setGreeting(String greeting) {
-        this.greeting = greeting;
-    }
-    public String getAudience() {
-        return audience;
-    }
-    public void setAudience(String audience) {
-        this.audience = audience;
-    }
 }

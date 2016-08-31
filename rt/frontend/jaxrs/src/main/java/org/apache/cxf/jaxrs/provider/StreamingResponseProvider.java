@@ -34,8 +34,8 @@ import javax.ws.rs.ext.Providers;
 import org.apache.cxf.jaxrs.ext.StreamingResponse;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 
-public class StreamingResponseProvider<T> implements 
-    MessageBodyWriter<StreamingResponse<T>> {
+public class StreamingResponseProvider<T> extends AbstractConfigurableProvider 
+    implements MessageBodyWriter<StreamingResponse<T>> {
 
     @Context
     private Providers providers;

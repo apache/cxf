@@ -18,7 +18,11 @@
  */
 package org.apache.cxf.jaxrs.provider.rx;
 
+import java.util.List;
+
 import javax.ws.rs.container.AsyncResponse;
+
+import org.apache.cxf.jaxrs.ext.StreamingResponse;
 
 import rx.Subscriber;
 
@@ -30,6 +34,14 @@ public abstract class AbstractAsyncSubscriber<T> extends Subscriber<T> {
         this.ar = ar;
     }
     public void resume(T response) {
+        ar.resume(response);
+    }
+    
+    public void resume(List<T> response) {
+        ar.resume(response);
+    }
+    
+    public void resume(StreamingResponse<T> response) {
         ar.resume(response);
     }
 

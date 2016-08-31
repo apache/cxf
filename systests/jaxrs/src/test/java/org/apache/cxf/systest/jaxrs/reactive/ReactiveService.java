@@ -30,8 +30,11 @@ import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 
 import org.apache.cxf.jaxrs.provider.rx.AbstractAsyncSubscriber;
+import org.apache.cxf.jaxrs.provider.rx.JsonStreamingAsyncSubscriber;
+import org.apache.cxf.jaxrs.provider.rx.ListAsyncSubscriber;
 
 import rx.Observable;
+import rx.schedulers.Schedulers;
 
 
 @Path("/reactive")
@@ -65,9 +68,35 @@ public class ReactiveService {
     @Path("textJsonImplicitList")
     public Observable<HelloWorldBean> getJsonImplicitList() {
         HelloWorldBean bean1 = new HelloWorldBean();
-        HelloWorldBean bean2 = new HelloWorldBean();
-        bean2.setGreeting("Ciao");
+        HelloWorldBean bean2 = new HelloWorldBean("Ciao");
         return Observable.just(bean1, bean2);
+    }
+    @GET
+    @Produces("application/json")
+    @Path("textJsonImplicitListAsync")
+    public void getJsonImplicitListAsync(@Suspended AsyncResponse ar) {
+        final HelloWorldBean bean1 = new HelloWorldBean();
+        final HelloWorldBean bean2 = new HelloWorldBean("Ciao");
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException ex) {
+                    // ignore
+                }  
+                Observable.just(bean1, bean2).subscribe(new ListAsyncSubscriber<HelloWorldBean>(ar));
+            }
+        }).start();
+        
+    }
+    @GET
+    @Produces("application/json")
+    @Path("textJsonImplicitListAsyncStream")
+    public void getJsonImplicitListStreamingAsync(@Suspended AsyncResponse ar) {
+        Observable.just("Hello", "Ciao")
+            .map(s -> new HelloWorldBean(s))
+            .subscribeOn(Schedulers.computation())
+            .subscribe(new JsonStreamingAsyncSubscriber<HelloWorldBean>(ar));
     }
     @GET
     @Produces("application/json")

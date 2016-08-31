@@ -104,6 +104,16 @@ public class JAXRSReactiveTest extends AbstractBusClientServerTestBase {
         String address = "http://localhost:" + PORT + "/reactive/textJsonImplicitList";
         doTestGetHelloWorldJsonList(address);
     }
+    @Test
+    public void testGetHelloWorldJsonImplicitListAsync() throws Exception {
+        String address = "http://localhost:" + PORT + "/reactive/textJsonImplicitListAsync";
+        doTestGetHelloWorldJsonList(address);
+    }
+    @Test
+    public void testGetHelloWorldJsonImplicitListAsyncStream() throws Exception {
+        String address = "http://localhost:" + PORT + "/reactive/textJsonImplicitListAsyncStream";
+        doTestGetHelloWorldJsonList(address);
+    }
     private void doTestGetHelloWorldJsonList(String address) throws Exception {
         WebClient wc = WebClient.create(address,
                                         Collections.singletonList(new JacksonJsonProvider()));
