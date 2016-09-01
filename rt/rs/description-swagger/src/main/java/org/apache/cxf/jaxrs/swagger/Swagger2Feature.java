@@ -93,7 +93,15 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
     private Map<String, String> swaggerUiMediaTypes;
 
     private boolean usePathBasedConfig;
-
+    
+    private boolean dynamicBasePath;
+    
+    @Override
+    protected void calculateDefaultBasePath(Server server) {
+        dynamicBasePath = true;
+        super.calculateDefaultBasePath(server);
+    }
+    
     @Override
     protected void addSwaggerResource(Server server, Bus bus) {
         JAXRSServiceFactoryBean sfb =
@@ -150,6 +158,8 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
             swagger2Serializers = new DefaultSwagger2Serializers();
         }
         swagger2Serializers.setClassResourceInfos(cris);
+        swagger2Serializers.setDynamicBasePath(dynamicBasePath);
+        
         providers.add(swagger2Serializers);
 
         providers.add(new ReaderConfigFilter());
@@ -179,6 +189,8 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         beanConfig.setScan(isScan());
         beanConfig.setPrettyPrint(isPrettyPrint());
         beanConfig.setFilterClass(getFilterClass());
+        
+        swagger2Serializers.setBeanConfig(beanConfig);
     }
 
     public boolean isUsePathBasedConfig() {
@@ -255,6 +267,10 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
 
     public void setSwaggerUiMediaTypes(Map<String, String> swaggerUiMediaTypes) {
         this.swaggerUiMediaTypes = swaggerUiMediaTypes;
+    }
+
+    public void setDynamicBasePath(boolean dynamicBasePath) {
+        this.dynamicBasePath = dynamicBasePath;
     }
 
     @javax.ws.rs.ext.Provider

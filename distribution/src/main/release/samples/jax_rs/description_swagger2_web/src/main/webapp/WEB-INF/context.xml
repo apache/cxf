@@ -42,7 +42,6 @@
 
     <!-- Swagger2Feature for the first Endpoint -->  
     <bean id="swagger2Feature" class="org.apache.cxf.jaxrs.swagger.Swagger2Feature">
-        <property name="basePath" value="/app/swaggerSample"/>
         <property name="usePathBasedConfig" value="true"/>
         <property name="scan" value="false"/>
     </bean>
@@ -66,7 +65,6 @@
 
     <!-- Swagger2Feature for the second Endpoint -->  
     <bean id="swagger2Feature2" class="org.apache.cxf.jaxrs.swagger.Swagger2Feature">
-        <property name="basePath" value="/app/swaggerSample2"/>
         <property name="usePathBasedConfig" value="true"/>
         <property name="scan" value="false"/>
     </bean>
