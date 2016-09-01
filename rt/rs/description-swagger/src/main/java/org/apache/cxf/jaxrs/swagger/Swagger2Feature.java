@@ -33,6 +33,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import javax.annotation.Priority;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.ws.rs.GET;
@@ -40,12 +41,12 @@ import javax.ws.rs.HttpMethod;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriInfo;
@@ -63,7 +64,6 @@ import org.apache.cxf.jaxrs.model.ApplicationInfo;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
-import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 
 import io.swagger.jaxrs.config.BeanConfig;
@@ -126,12 +126,22 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         ApiListingResource apiListingResource = new ApiListingResource();
         swaggerResources.add(apiListingResource);
         
-        SwaggerUIService swaggerUiService = null;
+        List<Object> providers = new ArrayList<>();
+        if (runAsFilter) {
+            providers.add(new SwaggerContainerRequestFilter(appInfo == null ? null : appInfo.getProvider()));
+        }
+        
         if (supportSwaggerUi) {
             String swaggerUiRoot = SwaggerUiResolver.findSwaggerUiRoot(swaggerUiVersion);
             if (swaggerUiRoot != null) {
-                swaggerUiService = new SwaggerUIService(swaggerUiRoot, swaggerUiMediaTypes);
-                swaggerResources.add(swaggerUiService);
+                SwaggerUIService swaggerUiService = new SwaggerUIService(swaggerUiRoot, swaggerUiMediaTypes);
+                if (!runAsFilter) {
+                    swaggerResources.add(swaggerUiService);
+                } else {
+                    providers.add(new SwaggerUIServiceFilter(swaggerUiService));
+                }
+                providers.add(new SwaggerUIResourceFilter());
+                
                 bus.setProperty("swagger.service.ui.available", "true");
             }
         }
@@ -139,21 +149,14 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         sfb.setResourceClassesFromBeans(swaggerResources);
         
         List<ClassResourceInfo> cris = sfb.getClassResourceInfo();
-
-        List<Object> providers = new ArrayList<>();
-        if (runAsFilter) {
-            providers.add(new SwaggerContainerRequestFilter());
-        } else {
+        if (!runAsFilter) {
             for (ClassResourceInfo cri : cris) {
                 if (ApiListingResource.class == cri.getResourceClass()) {
                     InjectionUtils.injectContextProxies(cri, apiListingResource);
                 }
             }
         }
-        if (swaggerUiService != null) {
-            providers.add(new SwaggerUIFilter());
-        }
-
+        
         if (swagger2Serializers == null) {
             swagger2Serializers = new DefaultSwagger2Serializers();
         }
@@ -172,7 +175,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
                 ServerProviderFactory.class.getName())).setUserProviders(providers);
         BeanConfig beanConfig = appInfo == null 
             ? new BeanConfig() 
-            : new ApplicationBeanConfig(appInfo.getProvider().getClasses());
+            : new ApplicationBeanConfig(appInfo.getProvider());
         beanConfig.setResourcePackage(getResourcePackage());
         beanConfig.setUsePathBasedConfig(isUsePathBasedConfig());
         beanConfig.setVersion(getVersion());
@@ -315,36 +318,30 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
     @PreMatching
     protected static class SwaggerContainerRequestFilter extends ApiListingResource implements ContainerRequestFilter {
 
-        protected static final MediaType APPLICATION_YAML_TYPE = JAXRSUtils.toMediaType("application/yaml");
-
-        protected static final String APIDOCS_LISTING_PATH = "swagger";
-
-        protected static final String APIDOCS_LISTING_PATH_JSON = APIDOCS_LISTING_PATH + ".json";
-
-        protected static final String APIDOCS_LISTING_PATH_YAML = APIDOCS_LISTING_PATH + ".yaml";
+        protected static final String APIDOCS_LISTING_PATH_JSON = "swagger.json";
+        protected static final String APIDOCS_LISTING_PATH_YAML = "swagger.yaml";
 
         @Context
         protected MessageContext mc;
+
+        private Application app;
+        public SwaggerContainerRequestFilter(Application app) {
+            this.app = app;
+        }
 
         @Override
         public void filter(ContainerRequestContext requestContext) throws IOException {
             UriInfo ui = mc.getUriInfo();
 
-            List<MediaType> mediaTypes = mc.getHttpHeaders().getAcceptableMediaTypes();
-
             Response response = null;
-            if ((ui.getPath().endsWith(APIDOCS_LISTING_PATH)
-                    && !JAXRSUtils.intersectMimeTypes(mediaTypes, MediaType.APPLICATION_JSON_TYPE).isEmpty())
-                    || ui.getPath().endsWith(APIDOCS_LISTING_PATH_JSON)) {
+            if (ui.getPath().endsWith(APIDOCS_LISTING_PATH_JSON)) {
 
                 response = getListingJsonResponse(
-                        null, mc.getServletContext(), mc.getServletConfig(), mc.getHttpHeaders(), ui);
-            } else if ((ui.getPath().endsWith(APIDOCS_LISTING_PATH)
-                    && !JAXRSUtils.intersectMimeTypes(mediaTypes, APPLICATION_YAML_TYPE).isEmpty())
-                    || ui.getPath().endsWith(APIDOCS_LISTING_PATH_YAML)) {
+                        app, mc.getServletContext(), mc.getServletConfig(), mc.getHttpHeaders(), ui);
+            } else if (ui.getPath().endsWith(APIDOCS_LISTING_PATH_YAML)) {
 
                 response = getListingYamlResponse(
-                        null, mc.getServletContext(), mc.getServletConfig(), mc.getHttpHeaders(), ui);
+                        app, mc.getServletContext(), mc.getServletConfig(), mc.getHttpHeaders(), ui);
             }
 
             if (response != null) {
@@ -384,6 +381,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
             mc.getServletContext().setAttribute(ReaderConfig.class.getName(), rc);
         }
     }
+    
     @Path("api-docs")
     public static class SwaggerUIService {
         private static final String FAVICON = "favicon";
@@ -415,11 +413,11 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         @GET
         @Path("{resource:.*}")
         public Response getResource(@Context UriInfo uriInfo, @PathParam("resource") String resourcePath) {
-            if (resourcePath.contains(FAVICON)) {        
-                return Response.status(404).build();
-            }
             if (StringUtils.isEmpty(resourcePath) || "/".equals(resourcePath)) {        
                 resourcePath = "index.html";
+            }
+            if (resourcePath.contains(FAVICON)) {        
+                return Response.status(404).build();
             }
             if (resourcePath.startsWith("/")) {
                 resourcePath = resourcePath.substring(1);
@@ -451,7 +449,8 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         
     }
     @PreMatching
-    protected static class SwaggerUIFilter implements ContainerRequestFilter {
+    @Priority(Priorities.USER)
+    protected static class SwaggerUIResourceFilter implements ContainerRequestFilter {
         private static final Pattern PATTERN = 
             Pattern.compile(".*[.]js|/css/.*|/images/.*|/lib/.*|.*ico|/fonts/.*"); 
         
@@ -466,7 +465,28 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
             }
         }
     }
-    
+    @PreMatching
+    @Priority(Priorities.USER + 1)
+    protected static class SwaggerUIServiceFilter implements ContainerRequestFilter {
+        private SwaggerUIService uiService;
+        SwaggerUIServiceFilter(SwaggerUIService uiService) {
+            this.uiService = uiService;
+        }
+        @Override
+        public void filter(ContainerRequestContext rc) throws IOException {
+            if (HttpMethod.GET.equals(rc.getRequest().getMethod())) {
+                UriInfo ui = rc.getUriInfo();
+                String path = ui.getPath();
+                int uiPathIndex = path.lastIndexOf("api-docs");
+                if (uiPathIndex >= 0) {
+                    String resourcePath = uiPathIndex + 8 < path.length() 
+                        ? path.substring(uiPathIndex + 8) : "";
+                    rc.abortWith(uiService.getResource(ui, resourcePath));    
+                }
+            }
+            
+        }
+    }
     protected static class DefaultApplication extends Application {
         Set<Class<?>> serviceClasses;
         DefaultApplication(Set<Class<?>> serviceClasses) {
