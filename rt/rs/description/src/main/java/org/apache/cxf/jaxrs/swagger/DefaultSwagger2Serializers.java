@@ -42,6 +42,7 @@ import org.apache.cxf.jaxrs.model.doc.DocumentationProvider;
 import org.apache.cxf.jaxrs.model.doc.JavaDocProvider;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
+import io.swagger.jaxrs.config.BeanConfig;
 import io.swagger.jaxrs.listing.SwaggerSerializers;
 import io.swagger.models.HttpMethod;
 import io.swagger.models.Operation;
@@ -59,6 +60,7 @@ public class DefaultSwagger2Serializers extends SwaggerSerializers implements Sw
 
     protected List<ClassResourceInfo> cris;
 
+    protected BeanConfig beanConfig;
     @Override
     public void writeTo(
             final Swagger data,
@@ -72,7 +74,12 @@ public class DefaultSwagger2Serializers extends SwaggerSerializers implements Sw
         if (dynamicBasePath) {
             MessageContext ctx = JAXRSUtils.createContextValue(
                     JAXRSUtils.getCurrentMessage(), null, MessageContext.class);
-            data.setBasePath(StringUtils.substringBeforeLast(ctx.getHttpServletRequest().getRequestURI(), "/"));
+            String currentBasePath = StringUtils.substringBeforeLast(ctx.getHttpServletRequest().getRequestURI(), "/");
+            if (!currentBasePath.equals(beanConfig.getBasePath())) {
+                data.setBasePath(currentBasePath);
+                data.setHost(beanConfig.getHost());
+                data.setInfo(beanConfig.getInfo());
+            }
         }
 
         if (replaceTags || javadocProvider != null) {
@@ -194,5 +201,11 @@ public class DefaultSwagger2Serializers extends SwaggerSerializers implements Sw
     @Override
     public void setJavaDocURLs(final URL[] javaDocURLs) {
         this.javadocProvider = new JavaDocProvider(javaDocURLs);
+    }
+
+    @Override
+    public void setBeanConfig(BeanConfig beanConfig) {
+        this.beanConfig = beanConfig;
+        
     }
 }

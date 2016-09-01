@@ -82,7 +82,7 @@ public abstract class AbstractSwaggerFeature extends AbstractFeature {
         }
     }
     
-    private void calculateDefaultBasePath(Server server) {
+    protected void calculateDefaultBasePath(Server server) {
         if (getBasePath() == null || getBasePath().length() == 0) {
             String address = server.getEndpoint().getEndpointInfo().getAddress();
             setBasePathByAddress(address);

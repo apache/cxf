@@ -62,6 +62,15 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
     
     private Swagger2Serializers swagger2Serializers;
 
+    private boolean dynamicBasePath;
+   
+    @Override
+    protected void calculateDefaultBasePath(Server server) {
+        dynamicBasePath = true;
+        super.calculateDefaultBasePath(server);
+    }
+ 
+
     @Override
     protected void addSwaggerResource(Server server) {
         ApiListingResource apiListingResource = new ApiListingResource();
@@ -85,6 +94,8 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
             swagger2Serializers = new DefaultSwagger2Serializers();
         }
         swagger2Serializers.setClassResourceInfos(cris);
+        swagger2Serializers.setDynamicBasePath(dynamicBasePath);
+
         providers.add(swagger2Serializers);
 
         providers.add(new ReaderConfigFilter());
@@ -107,6 +118,8 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         beanConfig.setScan(isScan());
         beanConfig.setPrettyPrint(isPrettyPrint());
         beanConfig.setFilterClass(getFilterClass());
+
+        swagger2Serializers.setBeanConfig(beanConfig);
     }
 
     public String getHost() {
