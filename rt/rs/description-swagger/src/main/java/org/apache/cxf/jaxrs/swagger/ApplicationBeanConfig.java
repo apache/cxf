@@ -21,18 +21,22 @@ package org.apache.cxf.jaxrs.swagger;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.ws.rs.core.Application;
+
 import io.swagger.jaxrs.config.BeanConfig;
 
 public class ApplicationBeanConfig extends BeanConfig {
-    private Set<Class<?>> classes;
-    public ApplicationBeanConfig(Set<Class<?>> classes) {
-        this.classes = classes;
+    private Application app;
+    public ApplicationBeanConfig(Application app) {
+        this.app = app;
     }
     @Override
     public Set<Class<?>> classes() {
         Set<Class<?>> allClasses = new HashSet<Class<?>>();       
-        allClasses.addAll(super.classes());
-        allClasses.addAll(classes);
-        return classes;
+        allClasses.addAll(app.getClasses());
+        for (Object singleton : app.getSingletons()) {
+            allClasses.add(singleton.getClass());
+        }
+        return allClasses;
     }
 }
