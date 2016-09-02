@@ -272,10 +272,6 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         this.swaggerUiMediaTypes = swaggerUiMediaTypes;
     }
 
-    public void setDynamicBasePath(boolean dynamicBasePath) {
-        this.dynamicBasePath = dynamicBasePath;
-    }
-
     @javax.ws.rs.ext.Provider
     private class ServletConfigProvider implements ContextProvider<ServletConfig> {
 
