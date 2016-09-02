@@ -29,9 +29,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 
-import org.apache.cxf.jaxrs.provider.rx.AbstractAsyncSubscriber;
-import org.apache.cxf.jaxrs.provider.rx.JsonStreamingAsyncSubscriber;
-import org.apache.cxf.jaxrs.provider.rx.ListAsyncSubscriber;
+import org.apache.cxf.jaxrs.rx.AbstractAsyncSubscriber;
+import org.apache.cxf.jaxrs.rx.JsonStreamingAsyncSubscriber;
+import org.apache.cxf.jaxrs.rx.ListAsyncSubscriber;
 
 import rx.Observable;
 import rx.schedulers.Schedulers;

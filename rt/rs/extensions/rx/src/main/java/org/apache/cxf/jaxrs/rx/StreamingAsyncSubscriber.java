@@ -16,17 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.provider.rx;
+package org.apache.cxf.jaxrs.rx;
 
 import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.TimeoutHandler;
 
-import org.apache.commons.codec.binary.StringUtils;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.ext.StreamingResponse;
 
 public class StreamingAsyncSubscriber<T> extends AbstractAsyncSubscriber<T> {
@@ -38,7 +39,7 @@ public class StreamingAsyncSubscriber<T> extends AbstractAsyncSubscriber<T> {
     private long pollTimeout;
     private long asyncTimeout;
     private volatile boolean completed;
-    private volatile boolean firstWriteDone;
+    private AtomicBoolean firstWriteDone = new AtomicBoolean();
     public StreamingAsyncSubscriber(AsyncResponse ar, String openTag, String closeTag, String sep) {
         this(ar, openTag, closeTag, "", 1000);
     }
@@ -85,25 +86,23 @@ public class StreamingAsyncSubscriber<T> extends AbstractAsyncSubscriber<T> {
         @Override
         public void writeTo(Writer<T> writer) throws IOException {
             if (openTag != null) {
-                writer.getEntityStream().write(StringUtils.getBytesUtf8(openTag));
+                writer.getEntityStream().write(StringUtils.toBytesUTF8(openTag));
             }
             while (!completed || queue.size() > 0) {
                 try {
                     T bean = queue.poll(pollTimeout, TimeUnit.MILLISECONDS);
                     if (bean != null) {
-                        if (firstWriteDone) {
-                            writer.getEntityStream().write(StringUtils.getBytesUtf8(separator));
+                        if (firstWriteDone.getAndSet(true)) {
+                            writer.getEntityStream().write(StringUtils.toBytesUTF8(separator));
                         }
                         writer.write(bean);
-                        firstWriteDone = true;
-                        
                     }
                 } catch (InterruptedException ex) {
                     // ignore
                 }
             }
             if (closeTag != null) {
-                writer.getEntityStream().write(StringUtils.getBytesUtf8(closeTag));
+                writer.getEntityStream().write(StringUtils.toBytesUTF8(closeTag));
             }
             
         }

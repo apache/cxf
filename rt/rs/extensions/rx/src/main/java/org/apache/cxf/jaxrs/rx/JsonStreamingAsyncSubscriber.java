@@ -16,27 +16,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.provider.rx;
-
-import java.util.LinkedList;
-import java.util.List;
+package org.apache.cxf.jaxrs.rx;
 
 import javax.ws.rs.container.AsyncResponse;
 
-public class ListAsyncSubscriber<T> extends AbstractAsyncSubscriber<T> {
-    
-    private List<T> beans = new LinkedList<T>();
-    public ListAsyncSubscriber(AsyncResponse ar) {
-        super(ar);
+public class JsonStreamingAsyncSubscriber<T> extends StreamingAsyncSubscriber<T> {
+    public JsonStreamingAsyncSubscriber(AsyncResponse ar) {
+        this(ar, 1000);
     }
-    @Override
-    public void onCompleted() {
-        super.resume(beans);
+    public JsonStreamingAsyncSubscriber(AsyncResponse ar, long pollTimeout) {
+        this(ar, pollTimeout, 0);
     }
-
-    @Override
-    public void onNext(T bean) {
-        beans.add(bean);
+    public JsonStreamingAsyncSubscriber(AsyncResponse ar, long pollTimeout, long asyncTimeout) {
+        super(ar, "[", "]", ",", pollTimeout, asyncTimeout);
     }
     
 }
