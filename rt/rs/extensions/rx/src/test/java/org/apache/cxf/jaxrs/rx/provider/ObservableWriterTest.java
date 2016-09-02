@@ -16,41 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.rx;
 
-import java.util.List;
+package org.apache.cxf.jaxrs.rx.provider;
 
-import javax.ws.rs.container.AsyncResponse;
+import org.junit.Assert;
+import org.junit.Test;
 
-import org.apache.cxf.jaxrs.ext.StreamingResponse;
+public class ObservableWriterTest extends Assert {
 
-import rx.Subscriber;
-
-public abstract class AbstractAsyncSubscriber<T> extends Subscriber<T> {
     
-    private AsyncResponse ar;
-    
-    protected AbstractAsyncSubscriber(AsyncResponse ar) {
-        this.ar = ar;
+    @Test
+    public void testIsWriteable() {
     }
-    public void resume(T response) {
-        ar.resume(response);
-    }
-    
-    public void resume(List<T> response) {
-        ar.resume(response);
-    }
-    
-    public void resume(StreamingResponse<T> response) {
-        ar.resume(response);
-    }
-
-    @Override
-    public void onError(Throwable t) {
-        ar.resume(t);
-    }
-    
-    protected AsyncResponse getAsyncResponse() {
-        return ar;
-    }
+       
 }

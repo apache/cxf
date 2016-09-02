@@ -29,7 +29,7 @@ import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.provider.StreamingResponseProvider;
-import org.apache.cxf.jaxrs.rx.ObservableWriter;
+import org.apache.cxf.jaxrs.rx.provider.ObservableWriter;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
     

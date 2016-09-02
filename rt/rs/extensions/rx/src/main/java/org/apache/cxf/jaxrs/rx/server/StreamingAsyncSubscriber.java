@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.rx;
+package org.apache.cxf.jaxrs.rx.server;
 
 import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
