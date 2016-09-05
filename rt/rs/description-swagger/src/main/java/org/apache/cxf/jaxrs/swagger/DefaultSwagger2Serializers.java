@@ -49,6 +49,7 @@ import io.swagger.models.Operation;
 import io.swagger.models.Path;
 import io.swagger.models.Swagger;
 import io.swagger.models.Tag;
+import io.swagger.models.parameters.Parameter;
 
 public class DefaultSwagger2Serializers extends SwaggerSerializers implements Swagger2Serializers {
 
@@ -61,6 +62,7 @@ public class DefaultSwagger2Serializers extends SwaggerSerializers implements Sw
     protected List<ClassResourceInfo> cris;
 
     protected BeanConfig beanConfig;
+
     @Override
     public void writeTo(
             final Swagger data,
@@ -127,6 +129,7 @@ public class DefaultSwagger2Serializers extends SwaggerSerializers implements Sw
                             subentry.getValue().getParameters().get(i).
                                     setDescription(javadocProvider.getMethodParameterDoc(ori, i));
                         }
+                        addParameters(subentry.getValue().getParameters());
 
                         if (subentry.getValue().getResponses() != null
                                 && !subentry.getValue().getResponses().isEmpty()) {
@@ -168,6 +171,22 @@ public class DefaultSwagger2Serializers extends SwaggerSerializers implements Sw
         return StringUtils.EMPTY.equals(normalizedPath.toString()) ? "/" : normalizedPath.toString();
     }
 
+    /**
+     * Allows to add parameters to the list, related to an {@link Operation} instance; the method is invoked
+     * for all instances available.
+     *
+     * @param parameters list of parameters defined for an {@link Operation}
+     * @see io.swagger.models.parameters.HeaderParameter
+     * @see io.swagger.models.parameters.CookieParameter
+     * @see io.swagger.models.parameters.PathParameter
+     * @see io.swagger.models.parameters.BodyParameter
+     * @see io.swagger.models.parameters.QueryParameter
+     * @see io.swagger.models.parameters.RefParameter
+     */
+    protected void addParameters(final List<Parameter> parameters) {
+        // does nothing by default
+    }
+
     @Override
     public void setDynamicBasePath(final boolean dynamicBasePath) {
         this.dynamicBasePath = dynamicBasePath;
@@ -181,6 +200,7 @@ public class DefaultSwagger2Serializers extends SwaggerSerializers implements Sw
         this.javadocProvider = javadocProvider;
     }
 
+    @Override
     public void setClassResourceInfos(final List<ClassResourceInfo> classResourceInfos) {
         this.cris = classResourceInfos;
     }
@@ -200,6 +220,6 @@ public class DefaultSwagger2Serializers extends SwaggerSerializers implements Sw
     @Override
     public void setBeanConfig(BeanConfig beanConfig) {
         this.beanConfig = beanConfig;
-        
+
     }
 }
