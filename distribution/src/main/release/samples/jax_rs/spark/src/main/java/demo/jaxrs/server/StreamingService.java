@@ -20,6 +20,7 @@ package demo.jaxrs.server;
 
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Iterator;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -77,8 +78,8 @@ public class StreamingService {
         final JavaDStream<String> words = receiverStream.flatMap(
             new FlatMapFunction<String, String>() {
                 @Override 
-                public Iterable<String> call(String x) {
-                    return Arrays.asList(x.split(" "));
+                public Iterator<String> call(String x) {
+                    return Arrays.asList(x.split(" ")).iterator();
                 }
             });
         final JavaPairDStream<String, Integer> pairs = words.mapToPair(
