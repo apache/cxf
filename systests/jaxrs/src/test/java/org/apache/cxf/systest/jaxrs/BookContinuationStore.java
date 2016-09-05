@@ -70,7 +70,7 @@ public class BookContinuationStore implements BookAsyncInterface {
     @GET
     @Path("/books/resumeFromFastThread")
     @Produces("text/plain")
-    public void getBookDescriptionResumeFromFastThread(@Suspended AsyncResponse async) {
+    public void getBookDescriptionResumeFromFastThread(@Suspended final AsyncResponse async) {
         executor.execute(new Runnable() {
             public void run() {
                 try {
