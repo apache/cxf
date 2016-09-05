@@ -18,13 +18,11 @@
  */
 package org.apache.cxf.jaxrs.swagger;
 
-import java.net.URL;
 import java.util.List;
 
 import javax.ws.rs.ext.MessageBodyWriter;
 
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
-import org.apache.cxf.jaxrs.model.doc.DocumentationProvider;
 
 import io.swagger.jaxrs.config.BeanConfig;
 import io.swagger.models.Swagger;
@@ -35,15 +33,5 @@ public interface Swagger2Serializers extends MessageBodyWriter<Swagger> {
     
     void setDynamicBasePath(boolean dynamicBasePath);
 
-    void setReplaceTags(boolean replaceTags);
-
-    void setJavadocProvider(DocumentationProvider javadocProvider);
-
     void setClassResourceInfos(List<ClassResourceInfo> classResourceInfos);
-
-    void setJavaDocPath(String javaDocPath) throws Exception;
-
-    void setJavaDocPaths(String... javaDocPaths) throws Exception;
-
-    void setJavaDocURLs(URL[] javaDocURLs);
 }

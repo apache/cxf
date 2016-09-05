@@ -105,7 +105,8 @@ public class DefaultSwagger2Serializers extends SwaggerSerializers implements Sw
                     ClassResourceInfo cri = operations.get(entry.getKey());
 
                     tag = new Tag();
-                    tag.setName(cri.getURITemplate().getValue());
+                    String tagName = StringUtils.removeStart(cri.getURITemplate().getValue(), "/");
+                    tag.setName(StringUtils.isEmpty(tagName) ? "_" : tagName);
                     if (javadocProvider != null) {
                         tag.setDescription(javadocProvider.getClassDoc(cri));
                     }
@@ -173,32 +174,26 @@ public class DefaultSwagger2Serializers extends SwaggerSerializers implements Sw
         this.dynamicBasePath = dynamicBasePath;
     }
 
-    @Override
     public void setReplaceTags(final boolean replaceTags) {
         this.replaceTags = replaceTags;
     }
 
-    @Override
     public void setJavadocProvider(final DocumentationProvider javadocProvider) {
         this.javadocProvider = javadocProvider;
     }
 
-    @Override
     public void setClassResourceInfos(final List<ClassResourceInfo> classResourceInfos) {
         this.cris = classResourceInfos;
     }
 
-    @Override
     public void setJavaDocPath(final String javaDocPath) throws Exception {
         this.javadocProvider = new JavaDocProvider(javaDocPath);
     }
 
-    @Override
     public void setJavaDocPaths(final String... javaDocPaths) throws Exception {
         this.javadocProvider = new JavaDocProvider(javaDocPaths);
     }
 
-    @Override
     public void setJavaDocURLs(final URL[] javaDocURLs) {
         this.javadocProvider = new JavaDocProvider(javaDocURLs);
     }
