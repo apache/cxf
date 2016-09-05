@@ -137,6 +137,9 @@ public class JAXRSContinuationsServlet3Test extends AbstractJAXRSContinuationsTe
     protected String getBaseAddress() {
         return "/async/bookstore";
     }
+    protected String getBaseAddress2() {
+        return "/async2/bookstore";
+    }
     
     protected String getPort() {
         return PORT;

@@ -31,7 +31,7 @@
     
     <bean class="org.apache.cxf.systest.jaxrs.BookContinuationStore" id="serviceBean"/>
     
-    <jaxrs:server id="bookservice" address="/async">
+    <jaxrs:server id="bookserviceAsync" address="/async">
         <jaxrs:serviceBeans>
             <ref bean="serviceBean"/>
             <bean class="org.apache.cxf.systest.jaxrs.AsyncResource"/>
@@ -44,8 +44,24 @@
             <entry key="disconnected.client.exception.class" value="org.eclipse.jetty.io.EofException"/>
         </jaxrs:properties>
     </jaxrs:server>
+    <jaxrs:server id="bookserviceAsync2" address="/async2">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+            <bean class="org.apache.cxf.systest.jaxrs.AsyncResource"/>
+            <bean class="org.apache.cxf.systest.jaxrs.AsyncResource2"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <bean class="org.apache.cxf.systest.jaxrs.BookContinuationFilter"/>
+        </jaxrs:providers>        
+        <jaxrs:properties>
+            <entry key="disconnected.client.exception.class" value="org.eclipse.jetty.io.EofException"/>
+        </jaxrs:properties>
+        <jaxrs:invoker>
+            <bean class="org.apache.cxf.systest.jaxrs.SlowJAXRSInvoker"/>
+        </jaxrs:invoker>
+    </jaxrs:server>
     
-    <jaxrs:server id="bookservice2" address="/asyncexecutor">
+    <jaxrs:server id="bookserviceAsync3" address="/asyncexecutor">
     
         <jaxrs:executor>
             <ref bean="workerPool" />
