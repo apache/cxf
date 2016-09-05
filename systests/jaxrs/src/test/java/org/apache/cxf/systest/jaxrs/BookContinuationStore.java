@@ -67,6 +67,21 @@ public class BookContinuationStore implements BookAsyncInterface {
     public void getBookDescriptionImmediateResume(@Suspended AsyncResponse async) {
         async.resume("immediateResume");
     }
+    @GET
+    @Path("/books/resumeFromFastThread")
+    @Produces("text/plain")
+    public void getBookDescriptionResumeFromFastThread(@Suspended AsyncResponse async) {
+        executor.execute(new Runnable() {
+            public void run() {
+                try {
+                    Thread.sleep(1000);
+                } catch (Exception ex) {
+                    // ignore    
+                }
+                async.resume("resumeFromFastThread");
+            }
+        });
+    }
     
     @GET
     @Path("/books/nocontent")

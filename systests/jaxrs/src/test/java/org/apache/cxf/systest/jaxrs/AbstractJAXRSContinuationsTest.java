@@ -55,6 +55,14 @@ public abstract class AbstractJAXRSContinuationsTest extends AbstractBusClientSe
         String str = wc.get(String.class);
         assertEquals("immediateResume", str);
     }
+    @Test
+    public void testResumeFromFastAppThread() throws Exception {
+        WebClient wc = WebClient.create("http://localhost:" + getPort() + getBaseAddress2() 
+            + "/books/resumeFromFastThread");
+        wc.accept("text/plain");
+        String str = wc.get(String.class);
+        assertEquals("resumeFromFastThread", str);
+    }
     
     @Test
     public void testNoContent() throws Exception {
@@ -245,6 +253,9 @@ public abstract class AbstractJAXRSContinuationsTest extends AbstractBusClientSe
     }
     
     protected String getBaseAddress() {
+        return "/bookstore";
+    }
+    protected String getBaseAddress2() {
         return "/bookstore";
     }
     
