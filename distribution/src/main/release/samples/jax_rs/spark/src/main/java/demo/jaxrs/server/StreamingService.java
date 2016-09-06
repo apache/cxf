@@ -66,11 +66,13 @@ public class StreamingService {
             JavaStreamingContext jssc = new JavaStreamingContext(sparkConf, Durations.seconds(1));
             JavaReceiverInputDStream<String> receiverStream = 
                 jssc.receiverStream(new InputStreamReceiver(is));
-            
+            SparkStreamingOutput streamOut = new SparkStreamingOutput(jssc, 
+                                                                createOutputDStream(receiverStream));
+            jssc.addStreamingListener(new SparkStreamingListener(streamOut));
+                                        
             executor.execute(new Runnable() {
                 public void run() {
-                     async.resume(new SparkStreamingOutput(jssc, 
-                                      createOutputDStream(receiverStream)));
+                     async.resume(streamOut);
                 }
             });
         } catch (Exception ex) {

@@ -29,15 +29,6 @@ import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.function.VoidFunction;
 import org.apache.spark.streaming.api.java.JavaPairDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
-import org.apache.spark.streaming.scheduler.StreamingListener;
-import org.apache.spark.streaming.scheduler.StreamingListenerBatchCompleted;
-import org.apache.spark.streaming.scheduler.StreamingListenerBatchStarted;
-import org.apache.spark.streaming.scheduler.StreamingListenerBatchSubmitted;
-import org.apache.spark.streaming.scheduler.StreamingListenerOutputOperationCompleted;
-import org.apache.spark.streaming.scheduler.StreamingListenerOutputOperationStarted;
-import org.apache.spark.streaming.scheduler.StreamingListenerReceiverError;
-import org.apache.spark.streaming.scheduler.StreamingListenerReceiverStarted;
-import org.apache.spark.streaming.scheduler.StreamingListenerReceiverStopped;
 
 public class SparkStreamingOutput implements StreamingOutput {
     private JavaPairDStream<String, Integer> wordCounts;
@@ -52,7 +43,6 @@ public class SparkStreamingOutput implements StreamingOutput {
     @Override
     public void write(final OutputStream output) throws IOException, WebApplicationException {
         wordCounts.foreachRDD(new OutputFunction(output));
-        jssc.addStreamingListener(new SparkStreamingListener());
         jssc.start();
         awaitTermination();
         jssc.stop(false);
@@ -75,7 +65,7 @@ public class SparkStreamingOutput implements StreamingOutput {
         }
     }
     
-    private synchronized void setBatchCompleted() {
+    public synchronized void setBatchCompleted() {
         batchCompleted = true;
     }
     
@@ -105,43 +95,5 @@ public class SparkStreamingOutput implements StreamingOutput {
         }
         
     }
-    private class SparkStreamingListener implements StreamingListener {
-
-        @Override
-        public void onBatchCompleted(StreamingListenerBatchCompleted event) {
-            // as soon as the batch is finished we let the streaming context go
-            // but this may need to be revisited if a given InputStream happens to be processed in
-            // multiple batches ?
-            setBatchCompleted();
-        }
-
-        @Override
-        public void onBatchStarted(StreamingListenerBatchStarted event) {
-        }
-
-        @Override
-        public void onBatchSubmitted(StreamingListenerBatchSubmitted event) {
-        }
-
-        @Override
-        public void onOutputOperationCompleted(StreamingListenerOutputOperationCompleted event) {
-        }
-
-        @Override
-        public void onOutputOperationStarted(StreamingListenerOutputOperationStarted event) {
-        }
-
-        @Override
-        public void onReceiverError(StreamingListenerReceiverError event) {
-        }
-
-        @Override
-        public void onReceiverStarted(StreamingListenerReceiverStarted event) {
-        }
-
-        @Override
-        public void onReceiverStopped(StreamingListenerReceiverStopped arg0) {
-        }
-        
-    }
+    
 }
