@@ -21,6 +21,7 @@ package demo.jaxrs.server;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -36,9 +37,11 @@ import javax.ws.rs.container.Suspended;
 
 import org.apache.spark.SparkConf;
 import org.apache.spark.SparkException;
+import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.PairFunction;
+import org.apache.spark.api.java.function.VoidFunction;
 import org.apache.spark.streaming.Durations;
 import org.apache.spark.streaming.api.java.JavaDStream;
 import org.apache.spark.streaming.api.java.JavaPairDStream;
@@ -65,10 +68,12 @@ public class StreamingService {
         try {
             JavaReceiverInputDStream<String> receiverStream = 
                 jssc.receiverStream(new InputStreamReceiver(is));
-            SparkStreamingOutput streamOut = new SparkStreamingOutput(jssc, 
-                                                                createOutputDStream(receiverStream));
+            SparkStreamingOutput streamOut = new SparkStreamingOutput(jssc);
             jssc.addStreamingListener(new SparkStreamingListener(streamOut));
-                                        
+            JavaPairDStream<String, Integer> wordCounts = createOutputDStream(receiverStream);
+            wordCounts.foreachRDD(new OutputFunction(streamOut));
+            jssc.start();
+                                                    
             executor.execute(new Runnable() {
                 public void run() {
                      async.resume(streamOut);
@@ -111,6 +116,20 @@ public class StreamingService {
                 }
             });
     }
-   
+    private static class OutputFunction implements VoidFunction<JavaPairRDD<String, Integer>> {
+        private static final long serialVersionUID = 1L;
+        private SparkStreamingOutput streamOut;
+        OutputFunction(SparkStreamingOutput streamOut) {
+            this.streamOut = streamOut;
+        }
+        @Override
+        public void call(JavaPairRDD<String, Integer> rdd) {
+            for (Map.Entry<String, Integer> entry : rdd.collectAsMap().entrySet()) {
+                String value = entry.getKey() + " : " + entry.getValue() + "\r\n";
+                streamOut.addResponseEntry(value);
+            }
+        }
+        
+    }
     
 }

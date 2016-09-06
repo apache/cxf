@@ -11,14 +11,15 @@ import org.apache.spark.streaming.scheduler.StreamingListenerReceiverStarted;
 import org.apache.spark.streaming.scheduler.StreamingListenerReceiverStopped;
 
 public class SparkStreamingListener implements StreamingListener {
-    private SparkStreamingOutput sparkStreamingOutput;
+    private SparkStreamingOutput streamOutput;
 
-    public SparkStreamingListener(SparkStreamingOutput sparkStreamingOutput) {
-        this.sparkStreamingOutput = sparkStreamingOutput;
+    public SparkStreamingListener(SparkStreamingOutput streamOutput) {
+        this.streamOutput = streamOutput;
     }
 
     @Override
     public void onBatchCompleted(StreamingListenerBatchCompleted event) {
+        streamOutput.setSparkBatchCompleted();
     }
 
     @Override
@@ -31,7 +32,6 @@ public class SparkStreamingListener implements StreamingListener {
 
     @Override
     public void onOutputOperationCompleted(StreamingListenerOutputOperationCompleted event) {
-        sparkStreamingOutput.setOperationCompleted();
     }
 
     @Override

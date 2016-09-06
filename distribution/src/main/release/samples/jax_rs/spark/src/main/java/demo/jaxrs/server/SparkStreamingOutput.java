@@ -20,72 +20,49 @@ package demo.jaxrs.server;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Map;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.StreamingOutput;
 
-import org.apache.spark.api.java.JavaPairRDD;
-import org.apache.spark.api.java.function.VoidFunction;
-import org.apache.spark.streaming.api.java.JavaPairDStream;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 
 public class SparkStreamingOutput implements StreamingOutput {
-    private JavaPairDStream<String, Integer> wordCounts;
+    private BlockingQueue<String> responseQueue = new LinkedBlockingQueue<String>();
+    
     private JavaStreamingContext jssc;
-    private boolean operationCompleted;
-    public SparkStreamingOutput(JavaStreamingContext jssc, JavaPairDStream<String, Integer> wordCounts) {
+    private volatile boolean sparkBatchCompleted;
+    public SparkStreamingOutput(JavaStreamingContext jssc) {
         this.jssc = jssc;
-        this.wordCounts = wordCounts;
     }
 
     @Override
     public void write(final OutputStream output) throws IOException, WebApplicationException {
-        wordCounts.foreachRDD(new OutputFunction(output));
-        jssc.start();
-        waitForOperationCompleted();
-        jssc.stop(false);
-        jssc.close();
-    }
-
-    private synchronized void waitForOperationCompleted() {
-        while (!operationCompleted) {
+        while (!sparkBatchCompleted || !responseQueue.isEmpty()) {
             try {
-                wait();
-            } catch (InterruptedException e) {
-                return;
-            }
-        }
-    }
-    
-    
-    public synchronized void setOperationCompleted() {
-        this.operationCompleted = true;
-        notify();
-    }
-
-
-    // This dedicated class was introduced to validate that when Spark is running it does not
-    // fail the processing due to OutputStream being one of the fields in the serializable class,
-    private class OutputFunction implements VoidFunction<JavaPairRDD<String, Integer>> {
-        private static final long serialVersionUID = 1L;
-        private OutputStream os;
-        OutputFunction(OutputStream os) {
-            this.os = os;
-        }
-        @Override
-        public void call(JavaPairRDD<String, Integer> rdd) {
-            for (Map.Entry<String, Integer> entry : rdd.collectAsMap().entrySet()) {
-                String value = entry.getKey() + " : " + entry.getValue() + "\r\n";
-                try {
-                    os.write(value.getBytes());
-                    os.flush();
-                } catch (IOException ex) {
-                    throw new WebApplicationException(); 
+                String responseEntry = responseQueue.poll(1, TimeUnit.MILLISECONDS);
+                if (responseEntry != null) {
+                    output.write(StringUtils.toBytesUTF8(responseEntry));
+                    output.flush();
                 }
+            } catch (InterruptedException e) {
+                // continue;
             }
         }
         
+        jssc.stop(false);
+        jssc.close();
     }
     
+    
+    public void setSparkBatchCompleted() {
+        this.sparkBatchCompleted = true;
+    }
+
+    public void addResponseEntry(String value) {
+        responseQueue.add(value);
+    }
 }
