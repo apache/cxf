@@ -99,7 +99,7 @@ public class SparkStreamingOutput implements StreamingOutput {
                     throw new WebApplicationException(); 
                 }
             }
-            // Right now we assume by the time we call it the batch the whole InputStream has been
+            // Right now we assume by the time we call it the whole InputStream has been
             // processed
             releaseStreamingContext();
         }
@@ -116,27 +116,27 @@ public class SparkStreamingOutput implements StreamingOutput {
         }
 
         @Override
-        public void onBatchStarted(StreamingListenerBatchStarted arg0) {
+        public void onBatchStarted(StreamingListenerBatchStarted event) {
         }
 
         @Override
-        public void onBatchSubmitted(StreamingListenerBatchSubmitted arg0) {
+        public void onBatchSubmitted(StreamingListenerBatchSubmitted event) {
         }
 
         @Override
-        public void onOutputOperationCompleted(StreamingListenerOutputOperationCompleted arg0) {
+        public void onOutputOperationCompleted(StreamingListenerOutputOperationCompleted event) {
         }
 
         @Override
-        public void onOutputOperationStarted(StreamingListenerOutputOperationStarted arg0) {
+        public void onOutputOperationStarted(StreamingListenerOutputOperationStarted event) {
         }
 
         @Override
-        public void onReceiverError(StreamingListenerReceiverError arg0) {
+        public void onReceiverError(StreamingListenerReceiverError event) {
         }
 
         @Override
-        public void onReceiverStarted(StreamingListenerReceiverStarted arg0) {
+        public void onReceiverStarted(StreamingListenerReceiverStarted event) {
         }
 
         @Override

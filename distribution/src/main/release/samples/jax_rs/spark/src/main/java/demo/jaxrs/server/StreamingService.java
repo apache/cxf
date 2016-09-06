@@ -21,14 +21,18 @@ package demo.jaxrs.server;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.StreamingOutput;
+import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.container.Suspended;
 
 import org.apache.spark.SparkConf;
 import org.apache.spark.SparkException;
@@ -46,6 +50,8 @@ import scala.Tuple2;
 
 @Path("/")
 public class StreamingService {
+    private Executor executor = new ThreadPoolExecutor(5, 5, 0, TimeUnit.SECONDS,
+                                                       new ArrayBlockingQueue<Runnable>(10));
     private SparkConf sparkConf;
     public StreamingService(SparkConf sparkConf) {
         this.sparkConf = sparkConf;
@@ -55,19 +61,24 @@ public class StreamingService {
     @Path("/stream")
     @Consumes("text/plain")
     @Produces("text/plain")
-    public StreamingOutput getStream(InputStream is) {
+    public void getStream(@Suspended AsyncResponse async, InputStream is) {
         try {
             JavaStreamingContext jssc = new JavaStreamingContext(sparkConf, Durations.seconds(1));
             JavaReceiverInputDStream<String> receiverStream = 
                 jssc.receiverStream(new InputStreamReceiver(is));
-            return new SparkStreamingOutput(jssc, 
-                                            createOutputDStream(receiverStream));
+            
+            executor.execute(new Runnable() {
+                public void run() {
+                     async.resume(new SparkStreamingOutput(jssc, 
+                                      createOutputDStream(receiverStream)));
+                }
+            });
         } catch (Exception ex) {
             // the compiler does not allow to catch SparkException directly
             if (ex instanceof SparkException) {
-                throw new WebApplicationException(Response.status(503).header("Retry-After", "60").build());
+                async.cancel(60);
             } else {
-                throw new WebApplicationException(ex);
+                async.resume(new WebApplicationException(ex));
             }
         }
     }

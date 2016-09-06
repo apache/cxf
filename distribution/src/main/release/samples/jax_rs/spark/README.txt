@@ -9,7 +9,7 @@ mvn exec:java
 
 Next do: 
 
-curl -X POST -H "Accept: text/plain" -H "Content-Type: text/plain" -d "Hello Spark" https://localhost:9000/stream
+curl -X POST -H "Accept: text/plain" -H "Content-Type: text/plain" -d "Hello Spark" http://localhost:9000/stream
 
 Limitations: 
 
