@@ -72,6 +72,7 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
     private MessageContext messageContext;
     private String applicationURL;
     private boolean parseApplicationURLFromRelayState;
+    private String assertionConsumerServiceAddress;
     
     @Context 
     public void setMessageContext(MessageContext mc) {
@@ -334,8 +335,11 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
     ) {
         try {
             SAMLSSOResponseValidator ssoResponseValidator = new SAMLSSOResponseValidator();
-            ssoResponseValidator.setAssertionConsumerURL(
-                messageContext.getUriInfo().getAbsolutePath().toString());
+            String racsAddress = assertionConsumerServiceAddress;
+            if (racsAddress == null) {
+                racsAddress = messageContext.getUriInfo().getAbsolutePath().toString();
+            }
+            ssoResponseValidator.setAssertionConsumerURL(racsAddress);
 
             ssoResponseValidator.setClientAddress(
                  messageContext.getHttpServletRequest().getRemoteAddr());
@@ -400,6 +404,14 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
      */
     public void setParseApplicationURLFromRelayState(boolean parseApplicationURLFromRelayState) {
         this.parseApplicationURLFromRelayState = parseApplicationURLFromRelayState;
+    }
+
+    public String getAssertionConsumerServiceAddress() {
+        return assertionConsumerServiceAddress;
+    }
+
+    public void setAssertionConsumerServiceAddress(String assertionConsumerServiceAddress) {
+        this.assertionConsumerServiceAddress = assertionConsumerServiceAddress;
     }
 
 }
