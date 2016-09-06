@@ -608,7 +608,10 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
     }
     
     protected Element cloneElement(Element el) {
-        return (Element)secHeader.getSecurityHeader().getOwnerDocument().importNode(el, true);
+        if (!secHeader.getSecurityHeader().getOwnerDocument().equals(el.getOwnerDocument())) {
+            return (Element)secHeader.getSecurityHeader().getOwnerDocument().importNode(el, true);
+        }
+        return el;
     }
 
     protected void addSignatureParts(List<SupportingToken> tokenList, List<WSEncryptionPart> sigParts) {
