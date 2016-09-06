@@ -33,8 +33,7 @@ import org.apache.spark.streaming.api.java.JavaStreamingContext;
 public class SparkStreamingOutput implements StreamingOutput {
     private JavaPairDStream<String, Integer> wordCounts;
     private JavaStreamingContext jssc;
-    private boolean sparkDone;
-    private boolean batchCompleted;
+    private boolean operationCompleted;
     public SparkStreamingOutput(JavaStreamingContext jssc, JavaPairDStream<String, Integer> wordCounts) {
         this.jssc = jssc;
         this.wordCounts = wordCounts;
@@ -44,13 +43,13 @@ public class SparkStreamingOutput implements StreamingOutput {
     public void write(final OutputStream output) throws IOException, WebApplicationException {
         wordCounts.foreachRDD(new OutputFunction(output));
         jssc.start();
-        awaitTermination();
+        waitForOperationCompleted();
         jssc.stop(false);
         jssc.close();
     }
 
-    private synchronized void awaitTermination() {
-        while (!sparkDone) {
+    private synchronized void waitForOperationCompleted() {
+        while (!operationCompleted) {
             try {
                 wait();
             } catch (InterruptedException e) {
@@ -58,18 +57,14 @@ public class SparkStreamingOutput implements StreamingOutput {
             }
         }
     }
-    private synchronized void releaseStreamingContext() {
-        if (batchCompleted) {
-            sparkDone = true;
-            notify();
-        }
+    
+    
+    public synchronized void setOperationCompleted() {
+        this.operationCompleted = true;
+        notify();
     }
-    
-    public synchronized void setBatchCompleted() {
-        batchCompleted = true;
-    }
-    
-    
+
+
     // This dedicated class was introduced to validate that when Spark is running it does not
     // fail the processing due to OutputStream being one of the fields in the serializable class,
     private class OutputFunction implements VoidFunction<JavaPairRDD<String, Integer>> {
@@ -89,9 +84,6 @@ public class SparkStreamingOutput implements StreamingOutput {
                     throw new WebApplicationException(); 
                 }
             }
-            // Right now we assume by the time we call it the whole InputStream has been
-            // processed
-            releaseStreamingContext();
         }
         
     }

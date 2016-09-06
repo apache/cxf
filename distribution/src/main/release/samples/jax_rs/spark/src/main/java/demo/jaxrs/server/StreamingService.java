@@ -52,9 +52,9 @@ import scala.Tuple2;
 public class StreamingService {
     private Executor executor = new ThreadPoolExecutor(5, 5, 0, TimeUnit.SECONDS,
                                                        new ArrayBlockingQueue<Runnable>(10));
-    private SparkConf sparkConf;
+    private JavaStreamingContext jssc;
     public StreamingService(SparkConf sparkConf) {
-        this.sparkConf = sparkConf;
+        jssc = new JavaStreamingContext(sparkConf, Durations.seconds(1));
     }
     
     @POST
@@ -63,7 +63,6 @@ public class StreamingService {
     @Produces("text/plain")
     public void getStream(@Suspended AsyncResponse async, InputStream is) {
         try {
-            JavaStreamingContext jssc = new JavaStreamingContext(sparkConf, Durations.seconds(1));
             JavaReceiverInputDStream<String> receiverStream = 
                 jssc.receiverStream(new InputStreamReceiver(is));
             SparkStreamingOutput streamOut = new SparkStreamingOutput(jssc, 

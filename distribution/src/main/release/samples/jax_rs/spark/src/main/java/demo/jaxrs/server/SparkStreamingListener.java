@@ -19,10 +19,6 @@ public class SparkStreamingListener implements StreamingListener {
 
     @Override
     public void onBatchCompleted(StreamingListenerBatchCompleted event) {
-        // as soon as the batch is finished we let the streaming context go
-        // but this may need to be revisited if a given InputStream happens to be processed in
-        // multiple batches ?
-        sparkStreamingOutput.setBatchCompleted();
     }
 
     @Override
@@ -35,6 +31,7 @@ public class SparkStreamingListener implements StreamingListener {
 
     @Override
     public void onOutputOperationCompleted(StreamingListenerOutputOperationCompleted event) {
+        sparkStreamingOutput.setOperationCompleted();
     }
 
     @Override
