@@ -66,19 +66,17 @@ public class StreamingService {
     @Produces("text/plain")
     public void getStream(@Suspended AsyncResponse async, InputStream is) {
         try {
+            SparkStreamingOutput streamOut = new SparkStreamingOutput(jssc);
+            SparkStreamingListener sparkListener =  new SparkStreamingListener(streamOut);
+            jssc.addStreamingListener(sparkListener);
+            
             JavaReceiverInputDStream<String> receiverStream = 
                 jssc.receiverStream(new InputStreamReceiver(is));
-            SparkStreamingOutput streamOut = new SparkStreamingOutput(jssc);
-            jssc.addStreamingListener(new SparkStreamingListener(streamOut));
             JavaPairDStream<String, Integer> wordCounts = createOutputDStream(receiverStream);
             wordCounts.foreachRDD(new OutputFunction(streamOut));
             jssc.start();
                                                     
-            executor.execute(new Runnable() {
-                public void run() {
-                     async.resume(streamOut);
-                }
-            });
+            executor.execute(new SparkJob(async, sparkListener));
         } catch (Exception ex) {
             // the compiler does not allow to catch SparkException directly
             if (ex instanceof SparkException) {
