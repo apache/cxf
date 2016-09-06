@@ -21,18 +21,15 @@ package demo.jaxrs.server;
 
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
-import org.apache.spark.SparkConf;
 
 
 public class Server {
 
     protected Server() throws Exception {
-        SparkConf sparkConf = new SparkConf().setMaster("local[*]").setAppName("JAX-RS Spark Connect");
-        
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setResourceClasses(StreamingService.class);
         sf.setResourceProvider(StreamingService.class, 
-            new SingletonResourceProvider(new StreamingService(sparkConf)));
+            new SingletonResourceProvider(new StreamingService()));
         sf.setAddress("http://localhost:9000/");
 
         sf.create();
