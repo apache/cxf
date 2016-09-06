@@ -70,12 +70,7 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
     private TokenReplayCache<String> replayCache;
 
     private MessageContext messageContext;
-<<<<<<< HEAD
-=======
-    private String applicationURL;
-    private boolean parseApplicationURLFromRelayState;
     private String assertionConsumerServiceAddress;
->>>>>>> dac029e... CXF-7039 - JAX-RS Security SAML web SSO consumer service can not validate SAML response behind reverse proxy
     
     @Context 
     public void setMessageContext(MessageContext mc) {
@@ -362,40 +357,9 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
     public void setEnforceResponseSigned(boolean enforceResponseSigned) {
         this.enforceResponseSigned = enforceResponseSigned;
     }
-<<<<<<< HEAD
-=======
-
-    public String getApplicationURL() {
-        return applicationURL;
-    }
-
-    /**
-     * Set the Application URL to forward to, for the unsolicited IdP case.
-     * @param applicationURL
-     */
-    public void setApplicationURL(String applicationURL) {
-        this.applicationURL = applicationURL;
-    }
-
-    public boolean isParseApplicationURLFromRelayState() {
-        return parseApplicationURLFromRelayState;
-    }
-
-    /**
-     * Whether to parse the application URL to forward to from the RelayState, for the unsolicted IdP case.
-     * @param parseApplicationURLFromRelayState
-     */
-    public void setParseApplicationURLFromRelayState(boolean parseApplicationURLFromRelayState) {
-        this.parseApplicationURLFromRelayState = parseApplicationURLFromRelayState;
-    }
-
-    public String getAssertionConsumerServiceAddress() {
-        return assertionConsumerServiceAddress;
-    }
 
     public void setAssertionConsumerServiceAddress(String assertionConsumerServiceAddress) {
         this.assertionConsumerServiceAddress = assertionConsumerServiceAddress;
     }
 
->>>>>>> dac029e... CXF-7039 - JAX-RS Security SAML web SSO consumer service can not validate SAML response behind reverse proxy
 }
