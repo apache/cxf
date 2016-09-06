@@ -44,14 +44,20 @@ public class SwaggerUiResolver {
                 final String resourcesRootStart = "META-INF/resources/webjars/swagger-ui/";
                 for (URL url : ((URLClassLoader)cl).getURLs()) {
                     String urlStr = url.toString();
-                    if (urlStr.contains("/swagger-ui") && urlStr.toString().endsWith(".jar")) {
-                        urlStr = urlStr.substring(0, urlStr.length() - 4);
-                        String version = urlStr.substring(urlStr.lastIndexOf("/swagger-ui") + 12);
-                        if (swaggerUiVersion != null && !swaggerUiVersion.equals(version)) {
-                            continue;
+                    int swaggerUiIndex = urlStr.lastIndexOf("/swagger-ui-"); 
+                    if (swaggerUiIndex != -1) {
+                        boolean urlEndsWithJarSep = urlStr.endsWith(".jar!/");
+                        if (urlEndsWithJarSep || urlStr.endsWith(".jar")) {
+                            int offset = urlEndsWithJarSep ? 6 : 4;
+                            String version = urlStr.substring(swaggerUiIndex + 12, urlStr.length() - offset);
+                            if (swaggerUiVersion != null && !swaggerUiVersion.equals(version)) {
+                                continue;
+                            }
+                            if (!urlEndsWithJarSep) {
+                                urlStr = "jar:" + urlStr + "!/";
+                            }
+                            return urlStr + resourcesRootStart + version + "/";
                         }
-                        return "jar:" + url.toString() + "!/"
-                                 +  resourcesRootStart + version + "/";
                     }
                 }
                 
