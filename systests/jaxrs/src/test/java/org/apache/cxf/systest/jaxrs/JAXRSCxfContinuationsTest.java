@@ -124,4 +124,22 @@ public class JAXRSCxfContinuationsTest extends AbstractBusClientServerTestBase {
         }
         
     }
+
+    @Test
+    public void testEncodedURL() throws Exception {
+        String id = "A%20B%20C"; // "A B C"
+        GetMethod get = new GetMethod("http://localhost:" + PORT + "/bookstore/books/" + id);
+        HttpClient httpclient = new HttpClient();
+
+        try {
+            int result = httpclient.executeMethod(get);
+            assertEquals("Encoded path '/" + id + "' is not handled successfully",
+                         200, result);
+            assertEquals("Book description for id " + id + " is wrong",
+                         "CXF in Action A B C", get.getResponseBodyAsString());
+        } finally {
+            // Release current connection to the connection pool once you are done
+            get.releaseConnection();
+        }
+    }
 }

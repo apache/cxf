@@ -16,11 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.transport.servlet.servicelist;
+package org.apache.cxf.transport.servlet;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.cxf.transport.servlet.BaseUrlHelper;
 import org.easymock.EasyMock;
 
 import org.junit.Assert;
@@ -34,9 +33,9 @@ public class BaseUrlHelperTest {
         EasyMock.expectLastCall().andReturn(new StringBuffer(requestUrl));
 
         req.getContextPath();
-        EasyMock.expectLastCall().andReturn(contextPath);
+        EasyMock.expectLastCall().andReturn(contextPath).anyTimes();
         req.getServletPath();
-        EasyMock.expectLastCall().andReturn(servletPath);
+        EasyMock.expectLastCall().andReturn(servletPath).anyTimes();
 
         req.getPathInfo();
         EasyMock.expectLastCall().andReturn(pathInfo).times(2);
