@@ -87,7 +87,7 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
                              inMessage.getExchange().getInMessage());
             callback = inMessage.getExchange().get(ContinuationCallback.class);
             blockRestart = PropertyUtils.isTrue(inMessage.getContextualProperty(BLOCK_RESTART));
-            context = req.startAsync(req, resp);
+            context = req.startAsync();
             context.addListener(this);
         }
 
