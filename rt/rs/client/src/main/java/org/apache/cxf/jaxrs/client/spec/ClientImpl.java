@@ -39,6 +39,7 @@ import javax.ws.rs.core.Link;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 
+import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.jaxrs.client.ClientConfiguration;
 import org.apache.cxf.jaxrs.client.ClientProviderFactory;
@@ -55,6 +56,15 @@ public class ClientImpl implements Client {
     private static final String HTTP_AUTOREDIRECT_PROP = "http.autoredirect";
     private static final String HTTP_RESPONSE_AUTOCLOSE_PROP = "http.response.stream.auto.close";
     private static final String THREAD_SAFE_CLIENT_PROP = "thread.safe.client";
+    private static final String THREAD_SAFE_CLIENT_STATE_CLEANUP_PROP = "thread.safe.client.state.cleanup.period";
+    private static final Boolean DEFAULT_THREAD_SAFETY_CLIENT_STATUS;
+    private static final Integer THREAD_SAFE_CLIENT_STATE_CLEANUP_PERIOD;
+    static  {
+        DEFAULT_THREAD_SAFETY_CLIENT_STATUS = 
+            Boolean.parseBoolean(SystemPropertyAction.getPropertyOrNull(THREAD_SAFE_CLIENT_PROP));
+        THREAD_SAFE_CLIENT_STATE_CLEANUP_PERIOD = 
+            getIntValue(SystemPropertyAction.getPropertyOrNull(THREAD_SAFE_CLIENT_STATE_CLEANUP_PROP));
+    }
     
     private Configurable<Client> configImpl;
     private TLSConfiguration secConfig;
@@ -325,8 +335,18 @@ public class ClientImpl implements Client {
                 JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
                 bean.setAddress(uri.toString());
                 Boolean threadSafe = getBooleanValue(configProps.get(THREAD_SAFE_CLIENT_PROP));
-                if (threadSafe != null) {
-                    bean.setThreadSafe(threadSafe);
+                if (threadSafe == null) {
+                    threadSafe = DEFAULT_THREAD_SAFETY_CLIENT_STATUS;
+                }
+                bean.setThreadSafe(threadSafe);
+                if (threadSafe) {
+                    Integer cleanupPeriod = getIntValue(configProps.get(THREAD_SAFE_CLIENT_PROP));
+                    if (cleanupPeriod == null) {
+                        cleanupPeriod = THREAD_SAFE_CLIENT_STATE_CLEANUP_PERIOD;
+                    }
+                    if (cleanupPeriod != null) {
+                        bean.setSecondsToKeepState(cleanupPeriod);
+                    }
                 }
                 targetClient = bean.createWebClient();
                 ClientImpl.this.baseClients.add(targetClient);
