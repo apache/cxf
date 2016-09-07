@@ -169,6 +169,7 @@ public class BookCxfContinuationStore {
         books.put("3", "CXF in Action3");
         books.put("4", "CXF in Action4");
         books.put("5", "CXF in Action5");
+        books.put("A B C", "CXF in Action A B C");
     }
      
 }

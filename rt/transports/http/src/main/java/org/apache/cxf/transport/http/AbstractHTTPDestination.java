@@ -409,7 +409,7 @@ public abstract class AbstractHTTPDestination
      * Propogate in the message a TLSSessionInfo instance representative  
      * of the TLS-specific information in the HTTP request.
      * 
-     * @param req the Jetty request
+     * @param request the Jetty request
      * @param message the Message
      */
     private static void propogateSecureSession(HttpServletRequest request,

@@ -47,7 +47,12 @@ public final class BaseUrlHelper {
             
             URI uri = URI.create(reqPrefix);
             sb.append(uri.getScheme()).append("://").append(uri.getRawAuthority());
-            sb.append(request.getContextPath()).append(request.getServletPath());
+            if (request.getContextPath() != null) {
+                sb.append(request.getContextPath());
+            }
+            if (request.getServletPath() != null) {
+                sb.append(request.getServletPath());
+            }
             
             reqPrefix = sb.toString();
         }
