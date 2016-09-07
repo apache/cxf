@@ -55,9 +55,9 @@ public class ServletControllerTest extends Assert {
         req.getPathInfo();
         EasyMock.expectLastCall().andReturn(pathInfo).anyTimes();
         req.getContextPath();
-        EasyMock.expectLastCall().andReturn("");
+        EasyMock.expectLastCall().andReturn("").anyTimes();
         req.getServletPath();
-        EasyMock.expectLastCall().andReturn("");
+        EasyMock.expectLastCall().andReturn("").anyTimes();
         req.setAttribute(Message.BASE_PATH, "http://localhost:8080");
         EasyMock.expectLastCall().anyTimes();
         req.getRequestURI();
@@ -98,9 +98,9 @@ public class ServletControllerTest extends Assert {
         req.getPathInfo();
         EasyMock.expectLastCall().andReturn(null).anyTimes();
         req.getContextPath();
-        EasyMock.expectLastCall().andReturn("");
+        EasyMock.expectLastCall().andReturn("").anyTimes();
         req.getServletPath();
-        EasyMock.expectLastCall().andReturn("");
+        EasyMock.expectLastCall().andReturn("").anyTimes();
         req.getRequestURI();
         EasyMock.expectLastCall().andReturn("/services").times(2);
         
