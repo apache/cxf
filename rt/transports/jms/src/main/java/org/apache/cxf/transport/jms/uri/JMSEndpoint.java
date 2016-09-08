@@ -85,6 +85,7 @@ public class JMSEndpoint {
     private boolean useConduitIdSelector = true;
     private String username;
     private int concurrentConsumers = 1;
+    private boolean oneSessionPerConnection;
 
     /**
      * @param uri
@@ -476,4 +477,15 @@ public class JMSEndpoint {
         }
     }
     
+    public boolean isOneSessionPerConnection() {
+        return oneSessionPerConnection;
+    }
+    
+    public void setOneSessionPerConnection(String oneSessionPerConnection) {
+        this.oneSessionPerConnection = Boolean.valueOf(oneSessionPerConnection);
+    }
+    
+    public void setOneSessionPerConnection(boolean oneSessionPerConnection) {
+        this.oneSessionPerConnection = oneSessionPerConnection;
+    }
 }

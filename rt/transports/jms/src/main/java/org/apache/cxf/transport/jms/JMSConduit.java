@@ -46,10 +46,12 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.transport.AbstractConduit;
+import org.apache.cxf.transport.jms.util.AbstractMessageListenerContainer;
 import org.apache.cxf.transport.jms.util.JMSListenerContainer;
 import org.apache.cxf.transport.jms.util.JMSSender;
 import org.apache.cxf.transport.jms.util.JMSUtil;
 import org.apache.cxf.transport.jms.util.MessageListenerContainer;
+import org.apache.cxf.transport.jms.util.PollingMessageListenerContainer;
 import org.apache.cxf.transport.jms.util.ResourceCloser;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
@@ -135,7 +137,17 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
         assertIsNotTextMessageAndMtom(outMessage);
 
         try (ResourceCloser closer = new ResourceCloser()) {
-            Connection c = getConnection();
+            Connection c;
+            if (jmsConfig.isOneSessionPerConnection()) {
+                try {
+                    c = closer.register(JMSFactory.createConnection(jmsConfig));
+                } catch (JMSException e) {
+                    throw JMSUtil.convertJmsException(e);
+                }
+                c.start();
+            } else {
+                c = getConnection();
+            }
             Session session = closer.register(c.createSession(false, 
                                                               Session.AUTO_ACKNOWLEDGE));
             
@@ -146,8 +158,10 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
             }
         } catch (JMSException e) {
             // Close connection so it will be refreshed on next try
-            ResourceCloser.close(connection);
-            this.connection = null;
+            if (!jmsConfig.isOneSessionPerConnection()) {
+                ResourceCloser.close(connection);
+                this.connection = null;
+            }
             this.staticReplyDestination = null;
             if (this.jmsListener != null) {
                 this.jmsListener.shutdown();
@@ -174,9 +188,19 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
                         // An option for this might be a good idea for people who do not plan to share queues.
                         return;
                     }
-                    MessageListenerContainer container = new MessageListenerContainer(getConnection(), 
-                                                                                      staticReplyDestination, 
-                                                                                      this);
+
+                    AbstractMessageListenerContainer container;
+
+                    if (jmsConfig.isOneSessionPerConnection()) {
+                        container = new PollingMessageListenerContainer(jmsConfig, true, this);
+                    } else {
+                        container = new MessageListenerContainer(getConnection(), staticReplyDestination, this);
+                    }
+
+                    container.setConcurrentConsumers(jmsConfig.getConcurrentConsumers());
+                    container.setTransactionManager(jmsConfig.getTransactionManager());
+                    container.setTransacted(jmsConfig.isSessionTransacted());
+                    container.setDurableSubscriptionName(jmsConfig.getDurableSubscriptionName());
                     container.setMessageSelector(messageSelector);
                     Object executor = bus.getProperty(JMSFactory.JMS_CONDUIT_EXECUTOR);
                     if (executor instanceof Executor) {
