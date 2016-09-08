@@ -25,6 +25,7 @@ import java.util.List;
 import javax.ws.rs.ext.ParamConverterProvider;
 
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.jaxrs.ext.search.ParamConverterUtils;
 import org.apache.cxf.jaxrs.ext.search.tika.TikaContentExtractor.TikaContent;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.DoubleField;
@@ -37,9 +38,7 @@ import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.Parser;
-
-import static org.apache.cxf.jaxrs.ext.search.ParamConverterUtils.getString;
-import static org.apache.cxf.jaxrs.ext.search.ParamConverterUtils.getValue;
+import org.apache.tika.sax.ToTextContentHandler;
 
 public class TikaLuceneContentExtractor {
     private final LuceneDocumentMetadata defaultDocumentMetadata;    
@@ -171,7 +170,8 @@ public class TikaLuceneContentExtractor {
                                 boolean extractContent, 
                                 boolean extractMetadata) {
         
-        TikaContent content = extractor.extract(in, extractContent);
+        TikaContent content = 
+            extractor.extract(in, extractContent ? new ToTextContentHandler() : null);
         
         if (content == null) {
             return null;
@@ -214,20 +214,25 @@ public class TikaLuceneContentExtractor {
         if (type != null) {
             if (Number.class.isAssignableFrom(type)) {
                 if (Double.class.isAssignableFrom(type)) {
-                    return new DoubleField(name, getValue(Double.class, provider, value), Store.YES);
+                    return new DoubleField(name, 
+                        ParamConverterUtils.getValue(Double.class, provider, value), Store.YES);
                 } else if (Float.class.isAssignableFrom(type)) {
-                    return new FloatField(name, getValue(Float.class, provider, value), Store.YES);
+                    return new FloatField(name, 
+                        ParamConverterUtils.getValue(Float.class, provider, value), Store.YES);
                 } else if (Long.class.isAssignableFrom(type)) {
-                    return new LongField(name, getValue(Long.class, provider, value), Store.YES);
+                    return new LongField(name, 
+                        ParamConverterUtils.getValue(Long.class, provider, value), Store.YES);
                 } else if (Integer.class.isAssignableFrom(type) || Byte.class.isAssignableFrom(type)) {
-                    return new IntField(name, getValue(Integer.class, provider, value), Store.YES);
+                    return new IntField(name, 
+                        ParamConverterUtils.getValue(Integer.class, provider, value), Store.YES);
                 }
             } else if (Date.class.isAssignableFrom(type)) {
-                final Date date = getValue(Date.class, provider, value);                
+                final Date date = ParamConverterUtils.getValue(Date.class, provider, value);                
                 Field field = null;
                 
                 if (date != null) {
-                    field = new StringField(name, getString(Date.class, provider, date), Store.YES);
+                    field = new StringField(name, 
+                                            ParamConverterUtils.getString(Date.class, provider, date), Store.YES);
                 } else {
                     field = new StringField(name, value, Store.YES); 
                 }
