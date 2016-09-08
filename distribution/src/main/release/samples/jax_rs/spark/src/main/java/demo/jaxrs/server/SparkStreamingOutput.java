@@ -35,16 +35,18 @@ public class SparkStreamingOutput implements StreamingOutput {
     
     private JavaStreamingContext jssc;
     private volatile boolean sparkBatchCompleted;
+    private volatile boolean outputWriteDone;
     public SparkStreamingOutput(JavaStreamingContext jssc) {
         this.jssc = jssc;
     }
 
     @Override
     public void write(final OutputStream output) throws IOException, WebApplicationException {
-        while (!sparkBatchCompleted || !responseQueue.isEmpty()) {
+        while (!sparkBatchCompleted || !outputWriteDone || !responseQueue.isEmpty()) {
             try {
                 String responseEntry = responseQueue.poll(1, TimeUnit.MILLISECONDS);
                 if (responseEntry != null) {
+                    outputWriteDone = true;
                     output.write(StringUtils.toBytesUTF8(responseEntry));
                     output.flush();
                 }

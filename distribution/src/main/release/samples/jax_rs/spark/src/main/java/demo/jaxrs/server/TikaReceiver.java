@@ -16,31 +16,28 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package demo.jaxrs.server;
 
-import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
-import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
+import org.apache.cxf.jaxrs.ext.search.tika.TikaContentExtractor.TikaContent;
+import org.apache.spark.storage.StorageLevel;
+import org.apache.spark.streaming.receiver.Receiver;
 
+public class TikaReceiver extends Receiver<String> {
 
-public class Server {
-
-    protected Server() throws Exception {
-        JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
-        sf.setResourceClasses(StreamingService.class);
-        sf.setResourceProvider(StreamingService.class, 
-            new SingletonResourceProvider(new StreamingService()));
-        sf.setAddress("http://localhost:9000/spark");
-
-        sf.create();
+    private static final long serialVersionUID = 1L;
+    private TikaContent tikaContent;
+    
+    public TikaReceiver(TikaContent tikaContent) {
+        super(StorageLevel.MEMORY_ONLY());
+        this.tikaContent = tikaContent;
     }
-
-    public static void main(String args[]) throws Exception {
-        new Server();
-        System.out.println("Server ready...");
-        Thread.sleep(60 * 60 * 1000);
-        System.out.println("Server exiting");
-        System.exit(0);
+    @Override
+    public void onStart() {
+        super.store(tikaContent.getContent());
+    }
+    @Override
+    public void onStop() {
+        // complete
     }
     
 }

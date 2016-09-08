@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -35,6 +36,11 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 
+import org.apache.cxf.common.util.Base64Utility;
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.apache.cxf.jaxrs.ext.multipart.Multipart;
+import org.apache.cxf.jaxrs.ext.search.tika.TikaContentExtractor;
+import org.apache.cxf.jaxrs.ext.search.tika.TikaContentExtractor.TikaContent;
 import org.apache.spark.SparkConf;
 import org.apache.spark.SparkException;
 import org.apache.spark.api.java.JavaPairRDD;
@@ -47,6 +53,8 @@ import org.apache.spark.streaming.api.java.JavaDStream;
 import org.apache.spark.streaming.api.java.JavaPairDStream;
 import org.apache.spark.streaming.api.java.JavaReceiverInputDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
+import org.apache.spark.streaming.receiver.Receiver;
+import org.apache.tika.parser.pdf.PDFParser;
 
 import scala.Tuple2;
 
@@ -59,20 +67,35 @@ public class StreamingService {
     }
     
     @POST
+    @Path("/multipart")
+    @Consumes("multipart/form-data")
+    @Produces("text/plain")
+    public void processMultipartStream(@Suspended AsyncResponse async, 
+                                       @Multipart("file") Attachment att) {
+        TikaContentExtractor tika = new TikaContentExtractor(new PDFParser());
+        TikaContent tikaContent = tika.extract(att.getObject(InputStream.class));
+        processStream(async, new TikaReceiver(tikaContent));
+    }
+    
+    @POST
     @Path("/stream")
     @Consumes("text/plain")
     @Produces("text/plain")
-    public void getStream(@Suspended AsyncResponse async, InputStream is) {
+    public void processSimpleStream(@Suspended AsyncResponse async, InputStream is) {
+        processStream(async, new InputStreamReceiver(is));
+    }
+
+    private void processStream(AsyncResponse async, Receiver<String> receiver) {
         try {
-            SparkConf sparkConf = new SparkConf().setMaster("local[*]").setAppName("JAX-RS Spark Connect");
+            SparkConf sparkConf = new SparkConf().setMaster("local[*]")
+                .setAppName("JAX-RS Spark Connect " + getRandomId());
             JavaStreamingContext jssc = new JavaStreamingContext(sparkConf, Durations.seconds(1)); 
             
             SparkStreamingOutput streamOut = new SparkStreamingOutput(jssc);
             SparkStreamingListener sparkListener =  new SparkStreamingListener(streamOut);
             jssc.addStreamingListener(sparkListener);
             
-            JavaReceiverInputDStream<String> receiverStream = 
-                jssc.receiverStream(new InputStreamReceiver(is));
+            JavaReceiverInputDStream<String> receiverStream = jssc.receiverStream(receiver);
             JavaPairDStream<String, Integer> wordCounts = createOutputDStream(receiverStream);
             wordCounts.foreachRDD(new OutputFunction(streamOut));
             jssc.start();
@@ -86,6 +109,12 @@ public class StreamingService {
                 async.resume(new WebApplicationException(ex));
             }
         }
+    }
+    
+    private static String getRandomId() {
+        byte[] bytes = new byte[10];
+        new Random().nextBytes(bytes);
+        return Base64Utility.encode(bytes);
     }
 
     @SuppressWarnings("serial")
