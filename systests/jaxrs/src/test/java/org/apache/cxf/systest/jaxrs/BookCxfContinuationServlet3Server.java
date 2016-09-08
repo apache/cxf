@@ -26,7 +26,7 @@ import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.transport.servlet.CXFNonSpringServlet;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.servlet.ServletHandler;
+import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 
 public class BookCxfContinuationServlet3Server extends AbstractBusTestServerBase {
@@ -52,9 +52,10 @@ public class BookCxfContinuationServlet3Server extends AbstractBusTestServerBase
 
     private Server httpServer(CXFNonSpringServlet cxf) {
         Server server = new Server(Integer.parseInt(PORT));
-        ServletHandler handler = new ServletHandler();
-        server.setHandler(handler);
-        handler.addServletWithMapping(new ServletHolder(cxf), "/*");
+        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
+        context.setContextPath("/");
+        context.addServlet(new ServletHolder(cxf), "/*");
+        server.setHandler(context);
         return server;
     }
 
