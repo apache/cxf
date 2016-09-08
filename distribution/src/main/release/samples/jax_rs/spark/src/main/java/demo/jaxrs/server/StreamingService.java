@@ -20,6 +20,7 @@ package demo.jaxrs.server;
 
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
@@ -35,6 +36,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
+import javax.ws.rs.core.MediaType;
 
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
@@ -54,6 +56,7 @@ import org.apache.spark.streaming.api.java.JavaPairDStream;
 import org.apache.spark.streaming.api.java.JavaReceiverInputDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.apache.spark.streaming.receiver.Receiver;
+import org.apache.tika.parser.odf.OpenDocumentParser;
 import org.apache.tika.parser.pdf.PDFParser;
 
 import scala.Tuple2;
@@ -61,6 +64,12 @@ import scala.Tuple2;
 
 @Path("/")
 public class StreamingService {
+    private static final Map<String, MediaType> MEDIA_TYPE_TABLE;
+    static {
+        MEDIA_TYPE_TABLE = new HashMap<String, MediaType>();
+        MEDIA_TYPE_TABLE.put("pdf", MediaType.valueOf("application/pdf"));
+        MEDIA_TYPE_TABLE.put("odt", MediaType.valueOf("application/vnd.oasis.opendocument.text"));
+    }
     private Executor executor = new ThreadPoolExecutor(5, 5, 0, TimeUnit.SECONDS,
                                                        new ArrayBlockingQueue<Runnable>(10));
     public StreamingService() {
@@ -72,8 +81,22 @@ public class StreamingService {
     @Produces("text/plain")
     public void processMultipartStream(@Suspended AsyncResponse async, 
                                        @Multipart("file") Attachment att) {
-        TikaContentExtractor tika = new TikaContentExtractor(new PDFParser());
-        TikaContent tikaContent = tika.extract(att.getObject(InputStream.class));
+        TikaContentExtractor tika = new TikaContentExtractor(
+            Arrays.asList(new PDFParser(), new OpenDocumentParser()));
+        
+        MediaType mediaType = att.getContentType();
+        if (mediaType == null) {
+            String fileName = att.getContentDisposition().getFilename();
+            if (fileName != null) {
+                int extDot = fileName.lastIndexOf('.');
+                if (extDot > 0) {
+                    mediaType = MEDIA_TYPE_TABLE.get(fileName.substring(extDot + 1));
+                }
+            }
+        }
+        
+        TikaContent tikaContent = tika.extract(att.getObject(InputStream.class),
+                                               mediaType);
         processStream(async, new TikaReceiver(tikaContent));
     }
     
