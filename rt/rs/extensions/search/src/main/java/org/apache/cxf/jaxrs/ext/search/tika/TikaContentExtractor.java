@@ -88,93 +88,103 @@ public class TikaContentExtractor {
      * the detector could be run against input stream in order to ensure that parser supports this
      * type of content. 
      * @param in input stream to extract the content and metadata from  
-     * @return the extracted content or null if extraction is not possible or was unsuccessful
+     * @return the extracted content and metadata or null if extraction is not possible or was unsuccessful
      */
     public TikaContent extract(final InputStream in) {
-        return extract(in, true);
+        return extract(in, (javax.ws.rs.core.MediaType)null);
     }
     
     /**
-     * Extract the metadata only from the input stream. Depending on media type validation,
-     * the detector could be run against input stream in order to ensure that parser supports this
-     * type of content. 
-     * @param in input stream to extract the metadata from  
-     * @return the extracted content or null if extraction is not possible or was unsuccessful
+     * Extract the content and metadata from the input stream with a media type hint. 
+     * @param in input stream to extract the content and metadata from  
+     * @param mt JAX-RS MediaType of the stream content
+     * @return the extracted content and metadata or null if extraction is not possible or was unsuccessful
      */
-    public TikaContent extractMetadata(final InputStream in) {
-        return extract(in, false);
+    public TikaContent extract(final InputStream in, javax.ws.rs.core.MediaType mt) {
+        return extract(in, new ToTextContentHandler(), mt);
     }
     
-    /**
-     * Extract the metadata only from the input stream. Depending on media type validation,
-     * the detector could be run against input stream in order to ensure that parser supports this
-     * type of content. 
-     * @param in input stream to extract the metadata from  
-     * @return the extracted metadata converted to SearchBean or null if extraction is not possible 
-     *         or was unsuccessful
-     */
-    public SearchBean extractMetadataToSearchBean(final InputStream in) {
-        TikaContent tc = extractMetadata(in);
-        if (tc == null) {
-            return null;
-        }
-        Metadata metadata = tc.getMetadata();
-        SearchBean bean = new SearchBean();
-        for (final String property: metadata.names()) {
-            bean.set(property, metadata.get(property));
-        }
-        return bean;
-    }
     /**
      * Extract the content and metadata from the input stream. Depending on media type validation,
      * the detector could be run against input stream in order to ensure that parser supports this
      * type of content. 
-     * @param in input stream to extract the metadata from 
+     * @param in input stream to extract the content and metadata from 
      * @param handler custom ContentHandler 
-     * @return the extracted metadata converted to SearchBean or null if extraction is not possible 
+     * @return the extracted content and metadata or null if extraction is not possible 
      *         or was unsuccessful
      */
     public TikaContent extract(final InputStream in, final ContentHandler handler) {
-        return extract(in, handler, null);
+        return extract(in, handler, (javax.ws.rs.core.MediaType)null);
     }
+    
+    /**
+     * Extract the content and metadata from the input stream with a media type hint. 
+     * @param in input stream to extract the content and metadata from 
+     * @param handler custom ContentHandler 
+     * @param mt JAX-RS MediaType of the stream content
+     * @return the extracted content and metadata or null if extraction is not possible 
+     *         or was unsuccessful
+     */
+    public TikaContent extract(final InputStream in, final ContentHandler handler, 
+                               javax.ws.rs.core.MediaType mt) {
+        return extract(in, handler, mt, (ParseContext)null);
+    }
+    
     /**
      * Extract the content and metadata from the input stream. Depending on media type validation,
      * the detector could be run against input stream in order to ensure that parser supports this
      * type of content. 
-     * @param in input stream to extract the metadata from 
+     * @param in input stream to extract the content and metadata from 
      * @param handler custom ContentHandler
      * @param context custom context 
-     * @return the extracted metadata converted to SearchBean or null if extraction is not possible 
+     * @return the extracted content and metadata or null if extraction is not possible 
      *         or was unsuccessful
      */
     public TikaContent extract(final InputStream in, final ContentHandler handler, ParseContext context) {
+        return extract(in, handler, (javax.ws.rs.core.MediaType)null, context);
+    }
+    
+    /**
+     * Extract the content and metadata from the input stream with a media type hint
+     * type of content. 
+     * @param in input stream to extract the metadata from 
+     * @param handler custom ContentHandler
+     * @param mt JAX-RS MediaType of the stream content
+     * @param context custom context 
+     * @return the extracted content and metadata or null if extraction is not possible 
+     *         or was unsuccessful
+     */
+    public TikaContent extract(final InputStream in, final ContentHandler handler, 
+                               javax.ws.rs.core.MediaType mtHint, ParseContext context) {    
         if (in == null) {
             return null;
         }
+        if (context == null) {
+            context = new ParseContext();
+        }
+        final Metadata metadata = new Metadata();            
         
         try {
-            final Metadata metadata = new Metadata();            
             // Try to validate that input stream media type is supported by the parser
             MediaType mediaType = null;
+            if (mtHint != null) {
+                mediaType = MediaType.parse(mtHint.toString());
+            } else if (detector != null && in.markSupported()) {
+                mediaType = detector.detect(in, metadata);
+            } 
+            
             Parser parser = null;
             for (Parser p : parsers) {
-                if (detector != null && in.markSupported()) {
-                    mediaType = detector.detect(in, metadata);
-                    if (mediaType != null && p.getSupportedTypes(context).contains(mediaType)) {
-                        parser = p;
-                        break;
-                    }
-                } else {
-                    parser = p;
-                    break;
+                if (mediaType != null && !p.getSupportedTypes(context).contains(mediaType)) {
+                    continue;
                 }
+                parser = p;
+                break;
             }
             if (parser == null) {
                 return null;
             }
-            if (context == null) {
-                context = new ParseContext();
-            }
+            
             try {
                 parser.parse(in, handler, metadata, context);
             } catch (Exception ex) {
@@ -199,11 +209,38 @@ public class TikaContentExtractor {
      
         return null;
     }
-    
-    TikaContent extract(final InputStream in, boolean extractContent) {
-        final ToTextContentHandler handler = extractContent ? new ToTextContentHandler() : null;
-        return extract(in, handler, null);
+    /**
+     * Extract the metadata only from the input stream. Depending on media type validation,
+     * the detector could be run against input stream in order to ensure that parser supports this
+     * type of content. 
+     * @param in input stream to extract the metadata from  
+     * @return the extracted content or null if extraction is not possible or was unsuccessful
+     */
+    public TikaContent extractMetadata(final InputStream in) {
+        return extract(in, (ContentHandler)null);
     }
+    
+    /**
+     * Extract the metadata only from the input stream. Depending on media type validation,
+     * the detector could be run against input stream in order to ensure that parser supports this
+     * type of content. 
+     * @param in input stream to extract the metadata from  
+     * @return the extracted metadata converted to SearchBean or null if extraction is not possible 
+     *         or was unsuccessful
+     */
+    public SearchBean extractMetadataToSearchBean(final InputStream in) {
+        TikaContent tc = extractMetadata(in);
+        if (tc == null) {
+            return null;
+        }
+        Metadata metadata = tc.getMetadata();
+        SearchBean bean = new SearchBean();
+        for (final String property: metadata.names()) {
+            bean.set(property, metadata.get(property));
+        }
+        return bean;
+    }
+    
     
     /**
      * Extracted content, metadata and media type container
