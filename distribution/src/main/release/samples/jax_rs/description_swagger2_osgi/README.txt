@@ -6,7 +6,7 @@ using JAX-RS 2.0 (JSR-339). In this demo, the Swagger2Feature is configured usin
 
 Building and running the demo
 ---------------------------------------
-(Note this demo currently uses the snapshot version of some componens)
+(Note this demo currently uses the snapshot version of some components)
 
 From the base directory of this sample (i.e., where this README file is
 located), the Maven pom.xml file can be used to build and run the demo. 
@@ -52,11 +52,11 @@ Install this demo bundle (using the appropriate bundle version number)
 
 Optionally, installed the following bundles if they are missed:
 
-  install -s mvn:com.fasterxml.jackson.core/jackson-core/2.4.6  
-  install -s mvn:com.fasterxml.jackson.core/jackson-annotations/2.4.6
-  install -s mvn:com.fasterxml.jackson.core/jackson-databind/2.4.6 
-  install -s mvn:com.fasterxml.jackson.jaxrs/jackson-jaxrs-base/2.4.6  
-  install -s mvn:com.fasterxml.jackson.jaxrs/jackson-jaxrs-json-provider/2.4.6  
+  install -s mvn:com.fasterxml.jackson.core/jackson-core/2.6.6  
+  install -s mvn:com.fasterxml.jackson.core/jackson-annotations/2.6.6
+  install -s mvn:com.fasterxml.jackson.core/jackson-databind/2.6.6 
+  install -s mvn:com.fasterxml.jackson.jaxrs/jackson-jaxrs-base/2.6.6  
+  install -s mvn:com.fasterxml.jackson.jaxrs/jackson-jaxrs-json-provider/2.6.6  
   install -s mvn:javax.annotation/javax.annotation-api/1.2
 
 You can verify if the CXF JAX-RS Swagger2 Blueprint Demo is installed and started.
