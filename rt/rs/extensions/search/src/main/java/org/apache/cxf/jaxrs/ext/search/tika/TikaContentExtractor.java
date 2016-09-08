@@ -20,6 +20,7 @@ package org.apache.cxf.jaxrs.ext.search.tika;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
@@ -50,7 +51,7 @@ public class TikaContentExtractor {
      * @param parser parser instance
      */
     public TikaContentExtractor(final Parser parser) {
-        this(parser, true);
+        this(parser, false);
     }
     
     /**
@@ -157,7 +158,7 @@ public class TikaContentExtractor {
             MediaType mediaType = null;
             Parser parser = null;
             for (Parser p : parsers) {
-                if (detector != null) {
+                if (detector != null && in.markSupported()) {
                     mediaType = detector.detect(in, metadata);
                     if (mediaType != null && p.getSupportedTypes(context).contains(mediaType)) {
                         parser = p;
@@ -165,6 +166,7 @@ public class TikaContentExtractor {
                     }
                 } else {
                     parser = p;
+                    break;
                 }
             }
             if (parser == null) {
@@ -186,7 +188,7 @@ public class TikaContentExtractor {
                     throw ex;
                 }
             }
-            return new TikaContent(handler, metadata, mediaType);
+            return new TikaContent(handler == null ? null : handler.toString(), metadata, mediaType);
         } catch (final IOException ex) {
             LOG.log(Level.WARNING, "Unable to extract media type from input stream", ex);
         } catch (final SAXException ex) {
@@ -206,12 +208,13 @@ public class TikaContentExtractor {
     /**
      * Extracted content, metadata and media type container
      */
-    public static class TikaContent {
-        private ContentHandler contentHandler;
+    public static class TikaContent implements Serializable {
+        private static final long serialVersionUID = -1240120543378490963L;
+        private String content;
         private Metadata metadata;
         private MediaType mediaType;
-        public TikaContent(ContentHandler contentHandler, Metadata metadata, MediaType mediaType) {
-            this.contentHandler = contentHandler;
+        public TikaContent(String content, Metadata metadata, MediaType mediaType) {
+            this.content = content;
             this.metadata = metadata;
             this.mediaType = mediaType;
         }
@@ -221,7 +224,7 @@ public class TikaContentExtractor {
          *         to parse the content  
          */
         public String getContent() {
-            return contentHandler == null ? null : contentHandler.toString();
+            return content;
         }
         /**
          * Return the metadata
