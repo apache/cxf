@@ -207,32 +207,41 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
                                 StringWriter stringWriter,
                                 String contentType) 
         throws Exception {
-        // Just transform the XML message when the cos has content
         if (isPrettyLogging() 
             && contentType != null 
             && contentType.indexOf("xml") >= 0 
             && stringWriter.getBuffer().length() > 0) {
-
-            StringWriter swriter = new StringWriter();
-            XMLStreamWriter xwriter = StaxUtils.createXMLStreamWriter(swriter);
-            xwriter = new PrettyPrintXMLStreamWriter(xwriter, 2);
-            StaxUtils.copy(new StreamSource(new StringReader(stringWriter.getBuffer().toString())), xwriter);
-            xwriter.close();
-            
-            String result = swriter.toString();
-            if (result.length() < limit || limit == -1) {
-                builder.append(swriter.toString());
-            } else {
-                builder.append(swriter.toString().substring(0, limit));
+            try {
+                writePrettyPayload(builder, stringWriter, contentType);
+                return;
+            } catch (Exception ex) { 
+                // log it as is    
             }
-
+        }
+        StringBuffer buffer = stringWriter.getBuffer();
+        if (buffer.length() > limit) {
+            builder.append(buffer.subSequence(0, limit));
         } else {
-            StringBuffer buffer = stringWriter.getBuffer();
-            if (buffer.length() > limit) {
-                builder.append(buffer.subSequence(0, limit));
-            } else {
-                builder.append(buffer);
-            }
+            builder.append(buffer);
+        }
+    }
+    protected void writePrettyPayload(StringBuilder builder, 
+                                StringWriter stringWriter,
+                                String contentType) 
+        throws Exception {
+        // Just transform the XML message when the cos has content
+        
+        StringWriter swriter = new StringWriter();
+        XMLStreamWriter xwriter = StaxUtils.createXMLStreamWriter(swriter);
+        xwriter = new PrettyPrintXMLStreamWriter(xwriter, 2);
+        StaxUtils.copy(new StreamSource(new StringReader(stringWriter.getBuffer().toString())), xwriter);
+        xwriter.close();
+        
+        String result = swriter.toString();
+        if (result.length() < limit || limit == -1) {
+            builder.append(swriter.toString());
+        } else {
+            builder.append(swriter.toString().substring(0, limit));
         }
     }
 
