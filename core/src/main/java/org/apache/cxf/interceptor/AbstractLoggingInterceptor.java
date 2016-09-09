@@ -21,6 +21,7 @@ package org.apache.cxf.interceptor;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -164,18 +165,18 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
     }
 
     protected void writePayload(StringBuilder builder, CachedOutputStream cos,
-                                String encoding, String contentType) 
-        throws Exception {
+                                String encoding, String contentType)
+            throws Exception {
         // Just transform the XML message when the cos has content
-        if (isPrettyLogging() && (contentType != null && contentType.indexOf("xml") >= 0 
-            && contentType.toLowerCase().indexOf("multipart/related") < 0) && cos.size() > 0) {
+        if (isPrettyLogging() && ((contentType != null) && contentType.contains("xml")
+                && !contentType.toLowerCase().contains("multipart/related")) && (cos.size() > 0)) {
 
             StringWriter swriter = new StringWriter();
+
             XMLStreamWriter xwriter = StaxUtils.createXMLStreamWriter(swriter);
             xwriter = new PrettyPrintXMLStreamWriter(xwriter, 2);
-            InputStream in = cos.getInputStream();
-            try {
-                StaxUtils.copy(new StreamSource(in), xwriter);
+            try (InputStream in = cos.getInputStream()) {
+                StaxUtils.copy(new StreamSource(new InputStreamReader(in, encoding)), xwriter);
             } catch (XMLStreamException xse) {
                 //ignore
             } finally {
@@ -185,16 +186,14 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
                 } catch (XMLStreamException xse2) {
                     //ignore
                 }
-                in.close();
-            }
-            
-            String result = swriter.toString();
-            if (result.length() < limit || limit == -1) {
-                builder.append(swriter.toString());
-            } else {
-                builder.append(swriter.toString().substring(0, limit));
             }
 
+            String result = swriter.toString();
+            if (result.length() < limit || limit == -1) {
+                builder.append(result);
+            } else {
+                builder.append(result.substring(0, limit));
+            }
         } else {
             if (StringUtils.isEmpty(encoding)) {
                 cos.writeCacheTo(builder, limit);
@@ -203,6 +202,7 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
             }
         }
     }
+
     protected void writePayload(StringBuilder builder, 
                                 StringWriter stringWriter,
                                 String contentType) 
