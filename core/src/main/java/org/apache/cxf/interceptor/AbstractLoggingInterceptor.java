@@ -21,6 +21,7 @@ package org.apache.cxf.interceptor;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -157,15 +158,15 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
                                 String encoding, String contentType) 
         throws Exception {
         // Just transform the XML message when the cos has content
-        if (isPrettyLogging() && (contentType != null && contentType.indexOf("xml") >= 0 
-            && contentType.toLowerCase().indexOf("multipart/related") < 0) && cos.size() > 0) {
+        if (isPrettyLogging() && contentType != null && contentType.contains("xml") 
+            && !contentType.toLowerCase().contains("multipart/related") && cos.size() > 0) {
 
             StringWriter swriter = new StringWriter();
             XMLStreamWriter xwriter = StaxUtils.createXMLStreamWriter(swriter);
             xwriter = new PrettyPrintXMLStreamWriter(xwriter, 2);
             InputStream in = cos.getInputStream();
             try {
-                StaxUtils.copy(new StreamSource(in), xwriter);
+                StaxUtils.copy(new StreamSource(new InputStreamReader(in, encoding)), xwriter);
             } catch (XMLStreamException xse) {
                 //ignore
             } finally {
@@ -180,9 +181,9 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
             
             String result = swriter.toString();
             if (result.length() < limit || limit == -1) {
-                builder.append(swriter.toString());
+                builder.append(result);
             } else {
-                builder.append(swriter.toString().substring(0, limit));
+                builder.append(result.substring(0, limit));
             }
 
         } else {
@@ -199,7 +200,7 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
         throws Exception {
         if (isPrettyLogging() 
             && contentType != null 
-            && contentType.indexOf("xml") >= 0 
+            && contentType.contains("xml")
             && stringWriter.getBuffer().length() > 0) {
             try {
                 writePrettyPayload(builder, stringWriter, contentType);
