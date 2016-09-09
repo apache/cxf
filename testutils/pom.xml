@@ -240,6 +240,7 @@
                                     </dependencies>
                                 </wsdlOption>
                             </wsdlOptions>
+                            <additionalJvmArgs>${cxf.codegen.jvmArgs}</additionalJvmArgs>
                         </configuration>
                         <goals>
                             <goal>wsdl2java</goal>
@@ -266,6 +267,8 @@
                                     </extensionArgs>
                                 </xsdOption>
                             </xsdOptions>
+                            <fork>${xf.xjcplugin.forkmode}</fork>
+                            <additionalJvmArgs>${cxf.xjc.jvmArgs}</additionalJvmArgs>
                         </configuration>
                         <goals>
                             <goal>xsdtojava</goal>

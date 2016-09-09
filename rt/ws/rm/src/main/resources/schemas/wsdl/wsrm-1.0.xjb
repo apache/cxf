@@ -22,7 +22,7 @@
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
   xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
   jaxb:extensionBindingPrefixes="xjc">
-    <jaxb:bindings schemaLocation="http://schemas.xmlsoap.org/ws/2004/08/addressing" node="/xs:schema">
+    <jaxb:bindings schemaLocation="../../../../../../../../core/src/main/resources/schemas/wsdl/addressing.xsd" node="/xs:schema">
         <jaxb:schemaBindings>
             <jaxb:package name="org.apache.cxf.ws.addressing.v200408"/>
         </jaxb:schemaBindings>

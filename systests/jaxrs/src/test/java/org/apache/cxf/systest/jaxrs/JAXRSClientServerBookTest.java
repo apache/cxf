@@ -159,7 +159,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     @Test
     public void testNonExistent() throws Exception {
-        String address = "http://localhostt/bookstore";
+        String address = "http://168.168.168.168/bookstore";
         WebClient wc = WebClient.create(address, 
                                         Collections.singletonList(new BookServer.TestResponseFilter()));
         try {

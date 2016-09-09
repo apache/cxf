@@ -36,6 +36,7 @@ import org.apache.cxf.no_body_parts.types.Operation1Response;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.TestUtil;
 
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -59,6 +60,13 @@ public class JaxWsDynamicClientTest extends AbstractBusClientServerTestBase {
             hexString.append(Integer.toHexString(0xFF & messageDigest[i]));
         }
         return hexString.toString();
+    }
+    
+    @Before
+    public void setUp() throws Exception {
+        if (System.getProperty("java.version").startsWith("9")) {
+            System.setProperty("org.apache.cxf.common.util.Compiler-fork", "true");
+        }
     }
 
     @BeforeClass

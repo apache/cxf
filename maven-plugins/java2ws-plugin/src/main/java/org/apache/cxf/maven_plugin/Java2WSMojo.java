@@ -240,7 +240,10 @@ public class Java2WSMojo extends AbstractMojo {
         List<String> args = new ArrayList<String>();
 
         if (fork) {
-            args.add(additionalJvmArgs);
+            String[] split = additionalJvmArgs.split("\\s+");
+            for (String each : split) {
+                args.add(each);
+            }
             // @see JavaToWS#isExitOnFinish()
             args.add("-DexitOnFinish=true");
         }

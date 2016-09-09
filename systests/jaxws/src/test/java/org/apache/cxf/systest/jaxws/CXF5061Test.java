@@ -61,6 +61,9 @@ public class CXF5061Test extends AbstractBusClientServerTestBase {
     
     @Test
     public void testCxf5061() throws Exception {
+        if (System.getProperty("java.version").startsWith("9")) {
+            System.setProperty("org.apache.cxf.common.util.Compiler-fork", "true");
+        }
         //using dcf to generate client from the wsdl which ensure the wsdl is valid
         JaxWsDynamicClientFactory dcf = JaxWsDynamicClientFactory.newInstance();
         dcf.createClient(ADDRESS + "?wsdl");

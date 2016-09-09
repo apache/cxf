@@ -160,6 +160,11 @@ public class Compiler {
             // check if java.home is jre home
             javacstr = SystemPropertyAction.getProperty("java.home") + fsep + ".." + fsep + "bin" + fsep
                        + platformjavacname;
+        } else if (new File(SystemPropertyAction.getProperty("java.home") + fsep + "bin" + fsep
+                            + platformjavacname).exists()) {
+            //java9
+            javacstr = SystemPropertyAction.getProperty("java.home") + fsep + "bin" + fsep
+                + platformjavacname;
         }
         list.add(javacstr);
         // End of honoring java.home for used javac
@@ -171,6 +176,11 @@ public class Compiler {
 
         //fix for CXF-2081, set maximum heap of this VM to javac.
         list.add("-J-Xmx" + maxMemory);
+        
+        if (System.getProperty("java.version").startsWith("9")) {
+            list.add("-addmods");
+            list.add("java.activation,java.annotations.common,java.corba,java.transaction,java.xml.bind,java.xml.ws");
+        }
 
         addArgs(list);
         int classpathIdx = list.indexOf("-classpath");

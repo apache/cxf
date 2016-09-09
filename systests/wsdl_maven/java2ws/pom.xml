@@ -52,6 +52,8 @@
                         <id>process-classes</id>
                         <phase>process-classes</phase>
                         <configuration>
+                            <fork>${cxf.codegenplugin.forkmode}</fork>
+                            <additionalJvmArgs>${cxf.codegen.jvmArgs}</additionalJvmArgs>
                             <className>org.apache.cxf.systests.java2ws.HelloWorld</className>
                             <genWsdl>true</genWsdl>
                             <verbose>true</verbose>

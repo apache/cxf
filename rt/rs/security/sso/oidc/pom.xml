@@ -33,6 +33,7 @@
     <properties>
         <hibernate.em.version>4.1.0.Final</hibernate.em.version>
         <hsqldb.version>1.8.0.10</hsqldb.version>
+        <compilerArguments>-Aopenjpa.source=7 -Aopenjpa.metamodel=true</compilerArguments>
     </properties>
     <dependencies>
         <dependency>
@@ -83,6 +84,14 @@
             <version>${hibernate.em.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-jta_1.1_spec</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
+        </dependency>
     </dependencies>
     <build>
        <plugins>
@@ -96,9 +105,9 @@
 		     <goals>
 		       <goal>process</goal>
 		     </goals>
-		     <phase>generate-sources</phase>
+		     <phase>generate-resources</phase>
 		     <configuration>
-               <compilerArguments>-Aopenjpa.source=7 -Aopenjpa.metamodel=true</compilerArguments>
+               <compilerArguments>${compilerArguments}</compilerArguments>
 		       <processors>
 		         <processor>org.apache.openjpa.persistence.meta.AnnotationProcessor6</processor>
 	           </processors>
@@ -165,4 +174,66 @@
             -->
         </plugins>
       </build>
+      <profiles>
+        <profile>
+            <id>myjava9</id>
+            <properties>
+                <compilerArguments>-Xpatch:java.annotations.common=${project.basedir}/target//java9/javax.annotation-api-1.2.jar -addmods java.se.ee,java.activation,java.xml.ws,java.xml.bind -Aopenjpa.source=7 -Aopenjpa.metamodel=true</compilerArguments>
+            </properties>
+            <activation>
+                <jdk>9</jdk>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <version>2.10</version>
+                        <executions>
+                            <execution>
+                                <id>copy</id>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>javax.annotation</groupId>
+                                            <artifactId>javax.annotation-api</artifactId>
+                                            <type>jar</type>
+                                            <overWrite>false</overWrite>
+                                            <outputDirectory>${project.basedir}/target/java9</outputDirectory>
+                                        </artifactItem>
+                                    </artifactItems>
+                                    <overWriteReleases>false</overWriteReleases>
+                                    <overWriteSnapshots>true</overWriteSnapshots>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>org.apache.geronimo.specs</groupId>
+                                            <artifactId>geronimo-jta_1.1_spec</artifactId>
+                                            <type>jar</type>
+                                            <overWrite>false</overWrite>
+                                            <outputDirectory>${project.basedir}/target/java9</outputDirectory>
+                                            <excludes>**/xa/*.class</excludes>
+                                        </artifactItem>
+                                    </artifactItems>
+                                    <overWriteReleases>false</overWriteReleases>
+                                    <overWriteSnapshots>true</overWriteSnapshots>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+      </profiles>
 </project>

@@ -30,6 +30,7 @@ import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.replaceConfigurationFile;
 
 
 @RunWith(PaxExam.class)
@@ -53,6 +54,8 @@ public class BundlesAndNamespacesTest extends CXFOSGiTestSupport {
     public Option[] config() {
         return new Option[]{
                 cxfBaseConfig(),
+                replaceConfigurationFile("etc/org.ops4j.pax.logging.cfg", 
+                    getConfigFile("/etc/org.ops4j.pax.logging.cfg")),
                 features(cxfUrl, "cxf-core", "cxf-jaxws"),
                 logLevel(LogLevel.INFO)};
     }

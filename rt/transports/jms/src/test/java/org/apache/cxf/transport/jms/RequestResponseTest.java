@@ -30,6 +30,7 @@ import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.MessageObserver;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class RequestResponseTest extends AbstractJMSTester {
@@ -83,7 +84,7 @@ public class RequestResponseTest extends AbstractJMSTester {
         sendAndReceiveMessages(ei, true);
     }
     
-    @Test
+    @Ignore
     public void testRequestTopicResponseStaticQueue() throws Exception {
         EndpointInfo ei = setupServiceInfo("http://cxf.apache.org/jms_simple", "/wsdl/jms_spec_testsuite.wsdl",
                          "JMSSimpleService002X", "SimplePortTopicRequestQueueResponse");

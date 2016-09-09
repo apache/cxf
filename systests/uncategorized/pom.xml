@@ -396,5 +396,59 @@
                 </dependency>
             </dependencies>
         </profile>
+        <profile>
+            <id>myjava9</id>
+            <activation>
+                <jdk>9</jdk>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <version>2.10</version>
+                        <executions>
+                            <execution>
+                                <id>copy</id>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>org.apache.geronimo.specs</groupId>
+                                            <artifactId>geronimo-jta_1.1_spec</artifactId>
+                                            <type>jar</type>
+                                            <overWrite>false</overWrite>
+                                            <outputDirectory>${project.basedir}/target/java9</outputDirectory>
+                                            <excludes>**/xa/*.class</excludes>
+                                        </artifactItem>
+                                    </artifactItems>
+                                    <overWriteReleases>false</overWriteReleases>
+                                    <overWriteSnapshots>true</overWriteSnapshots>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <includes>
+                                <include>**/*Test.java</include>
+                                <include>**/*TestCase.java</include>
+                                <include>**/*TestCases.java</include>
+                            </includes>
+                            <excludes>
+                                <exclude>**/*$*</exclude>
+                                <exclude>**/*CorbaTimeoutTest.java</exclude>
+                                <exclude>**/*CORBADocLitClientTypeTest.java</exclude>
+                            </excludes>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 </project>

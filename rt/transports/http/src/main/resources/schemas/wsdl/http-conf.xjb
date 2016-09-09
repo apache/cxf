@@ -23,7 +23,7 @@
   xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc" 
   jaxb:extensionBindingPrefixes="xjc">
 
-    <jaxb:bindings schemaLocation="http://schemas.xmlsoap.org/wsdl/2003-02-11.xsd" node="/xs:schema">
+    <jaxb:bindings schemaLocation="../../../../../../../../core/src/main/resources/schemas/wsdl/wsdl.xsd" node="/xs:schema">
         <jaxb:schemaBindings>
             <jaxb:package name="org.apache.cxf.wsdl"/>
         </jaxb:schemaBindings>

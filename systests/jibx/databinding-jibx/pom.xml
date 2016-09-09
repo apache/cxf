@@ -116,6 +116,7 @@
                     <!--load>true</load-->
                     <!--validate>true</validate-->
                     <!--verify>true</verify-->
+                    <verbose>true</verbose>
                     <includes>
                         <include>${hello.world.binding.file}</include>
                         <include>${doc.lit.bare.binding.file}</include>

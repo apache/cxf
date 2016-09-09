@@ -865,6 +865,9 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testDynamicClientExceptions() throws Exception {
+        if (System.getProperty("java.version").startsWith("9")) {
+            System.setProperty("org.apache.cxf.common.util.Compiler-fork", "true");
+        }
         JaxWsDynamicClientFactory dcf = 
             JaxWsDynamicClientFactory.newInstance();
         URL wsdlURL = new URL(ServerMisc.DOCLIT_CODEFIRST_URL + "?wsdl");

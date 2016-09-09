@@ -97,6 +97,8 @@
                             <goal>xsdtojava</goal>
                         </goals>
                         <configuration>
+                            <fork>${cxf.xjcplugin.forkmode}</fork>
+                            <additionalJvmArgs>${cxf.xjc.jvmArgs}</additionalJvmArgs>
                             <extensions>
                                 <extension>org.apache.cxf.xjcplugins:cxf-xjc-dv:${cxf.xjc-utils.version}</extension>
                             </extensions>

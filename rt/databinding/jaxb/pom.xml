@@ -48,6 +48,8 @@
                         <id>generate-sources</id>
                         <phase>generate-test-sources</phase>
                         <configuration>
+                            <fork>${cxf.xjcplugin.forkmode}</fork>
+                            <additionalJvmArgs>${cxf.xjc.jvmArgs}</additionalJvmArgs>
                             <testSourceRoot>${basedir}/target/generated/src/test/java</testSourceRoot>
                             <xsdOptions>
                                 <xsdOption>

@@ -31,8 +31,6 @@
     <description>Apache CXF Servlet Container Initializer Integration System Tests</description>
     <url>http://cxf.apache.org</url>
     <properties>
-        <cxf.surefire.fork.vmargs>-XX:MaxPermSize=192m</cxf.surefire.fork.vmargs>
-        <cxf.server.launcher.vmargs>-XX:MaxPermSize=192m</cxf.server.launcher.vmargs>
         <cxf.jetty.version>${cxf.jetty9.version}</cxf.jetty.version>
     </properties>
     <dependencies>

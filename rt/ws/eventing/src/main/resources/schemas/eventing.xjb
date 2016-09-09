@@ -10,7 +10,7 @@
             <class implClass="org.apache.cxf.ws.eventing.addressing.EndpointReferenceType" />
         </bindings>
     </bindings-->
-    <bindings schemaLocation="http://www.w3.org/2006/03/addressing/ws-addr.xsd">
+    <bindings schemaLocation="ws-addr.xsd">
         <schemaBindings map="false"/>
         <bindings node="//xs:complexType[@name='EndpointReferenceType']">
             <class ref="org.apache.cxf.ws.addressing.EndpointReferenceType"/>

@@ -62,7 +62,9 @@ public abstract class AbstractCodeGenTest extends ProcessorTestBase {
     @Before
     public void setUp() throws Exception {
         processor = new JAXWSContainer(null);
-    
+        if (System.getProperty("java.version").startsWith("9")) {
+            System.setProperty("org.apache.cxf.common.util.Compiler-fork", "true");
+        }
     }
 
     @After
