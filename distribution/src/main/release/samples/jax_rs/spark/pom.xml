@@ -60,11 +60,6 @@
             </exclusions>  
         </dependency>
         <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty</artifactId>
-            <version>3.7.0.Final</version>
-        </dependency> 
-        <dependency>
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-core</artifactId>
             <version>2.0-SNAPSHOT</version>
@@ -81,13 +76,6 @@
         </dependency>
     </dependencies>
 
-    <repositories>
-      <repository> 
-       <id>repo</id>
-       <url>http://mvnrepository.com/artifact</url>  
-      </repository>
-    </repositories>
-     
     <build>
         <plugins>
             <plugin>
