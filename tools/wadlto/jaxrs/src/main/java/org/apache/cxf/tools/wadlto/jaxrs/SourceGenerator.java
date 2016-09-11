@@ -47,6 +47,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -79,7 +81,7 @@ import javax.xml.validation.Validator;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
-
+import org.w3c.dom.NodeList;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -1274,6 +1276,7 @@ public class SourceGenerator {
                     sbCode.append(" ");
                 }
                 
+                checkForBeanValidationsBasedOnSimpleType(sbCode, imports, paramEl);
                 
             }
             boolean isRepeating = isRepeatingParam(paramEl);
@@ -1353,6 +1356,89 @@ public class SourceGenerator {
             sbCode.append("@").append(Suspended.class.getSimpleName()).append(" ")
                 .append(AsyncResponse.class.getSimpleName()).append(" ").append("async");
         }
+    }
+
+    private void checkForBeanValidationsBasedOnSimpleType(StringBuilder sbCode, Set<String> imports, Element paramEl) {
+        NodeList children = paramEl.getChildNodes();
+        for (int nodeLevel1Index = 0; nodeLevel1Index < children.getLength(); nodeLevel1Index++) {
+            Node paramNodeLevel1 = children.item(nodeLevel1Index);
+            
+            if ("xs:simpleType".equals(paramNodeLevel1.getNodeName())) {
+                NodeList children2 = paramNodeLevel1.getChildNodes();
+                for (int nodeLevel2Index = 0; nodeLevel2Index < children2.getLength(); nodeLevel2Index++) {
+                    Node paramNodeLevel2 = children2.item(nodeLevel2Index);
+                    
+                    if ("xs:restriction".equals(paramNodeLevel2.getNodeName())) {
+                        NodeList children3 = paramNodeLevel2.getChildNodes();
+                        
+                        addSimpleTypeBeanValidationAnnotations(sbCode, imports, children3);
+                    }
+                    
+                    
+                    
+                
+                }
+            }
+                
+            
+        
+        }
+    }
+
+    private void addSimpleTypeBeanValidationAnnotations(StringBuilder sbCode, Set<String> imports, NodeList children3) {
+        String minLength = null;
+        String maxLength = null;
+        String regexp = null;
+        
+        for (int nodeLevel3Index = 0; nodeLevel3Index < children3.getLength(); nodeLevel3Index++) {
+            Node paramNodeLevel3 = children3.item(nodeLevel3Index);
+            
+            if ("xs:minLength".equals(paramNodeLevel3.getNodeName())) {
+                minLength = getNodeElementAttribute(paramNodeLevel3);
+            }
+            
+            if ("xs:maxLength".equals(paramNodeLevel3.getNodeName())) {
+                maxLength = getNodeElementAttribute(paramNodeLevel3);
+            }
+            
+            if ("xs:pattern".equals(paramNodeLevel3.getNodeName())) {
+                regexp = getNodeElementAttribute(paramNodeLevel3);
+            }
+        }
+        
+        if (minLength != null || maxLength != null) {
+            writeAnnotation(sbCode, imports, Size.class, null, false, false);
+            
+            sbCode.append("(");
+            if (minLength != null) {
+                LOG.info("minLength: " + minLength);
+                sbCode.append("min=" + minLength);    
+            }
+            if (maxLength != null) {
+                LOG.info("maxLength: " + maxLength);
+                if (minLength != null) {
+                    sbCode.append(",");
+                }
+                sbCode.append("max=" + maxLength);
+            }
+            sbCode.append(") ");
+            
+        }
+        
+        if (regexp != null) {
+            writeAnnotation(sbCode, imports, Pattern.class, null, false, false);
+            LOG.info("pattern.regexp: " + regexp);
+            sbCode.append("(regexp=\"" + regexp + "\") ");    
+        }
+    }
+    
+    private String getNodeElementAttribute(Node node) {
+        String value = null;
+        if (node.getNodeType() == Node.ELEMENT_NODE) {
+            Element mynode3Elem = (Element)node;
+            value = mynode3Elem.getAttribute("value");
+        }
+        return value;
     }
     
     private boolean isRepeatingParam(Element paramEl) {
