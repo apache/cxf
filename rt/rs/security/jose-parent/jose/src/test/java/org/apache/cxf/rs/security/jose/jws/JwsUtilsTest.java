@@ -37,6 +37,21 @@ import org.junit.Test;
 
 public class JwsUtilsTest extends Assert {
     @Test
+    public void testLoadSignatureProviderFromJKS() throws Exception {
+        Properties p = new Properties();
+        p.put(JoseConstants.RSSEC_KEY_STORE_FILE, 
+            "org/apache/cxf/rs/security/jose/jws/alice.jks");
+        p.put(JoseConstants.RSSEC_KEY_STORE_PSWD, "password");
+        p.put(JoseConstants.RSSEC_KEY_PSWD, "password");
+        p.put(JoseConstants.RSSEC_KEY_STORE_ALIAS, "alice");
+        JwsHeaders headers = new JwsHeaders();
+        JwsSignatureProvider jws = JwsUtils.loadSignatureProvider(createMessage(),
+                                                                  p, 
+                                                                  headers);
+        assertNotNull(jws);
+        assertEquals("alice", headers.getKeyId());
+    }
+    @Test
     public void testLoadVerificationKey() throws Exception {
         Properties p = new Properties();
         p.put(JoseConstants.RSSEC_KEY_STORE_FILE, 
@@ -83,6 +98,7 @@ public class JwsUtilsTest extends Assert {
         Exchange e = new ExchangeImpl();
         e.put(Bus.class, BusFactory.getThreadDefaultBus());
         m.setExchange(e);
+        m.put(JoseConstants.RSSEC_SIGNATURE_INCLUDE_KEY_ID, "true");
         e.setInMessage(m);
         return m;
     }
