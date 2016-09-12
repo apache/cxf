@@ -176,6 +176,11 @@
         <bundle start-level="40">mvn:io.netty/netty-codec-http/${cxf.netty.version}</bundle>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-transports-http-netty-server/${project.version}</bundle>
     </feature>
+    <feature name="cxf-http-undertow" version="${project.version}" resolver="(obr)">
+        <feature version="[3,4)">cxf-http</feature>
+        <feature>pax-http-undertow</feature>
+        <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-transports-http-undertow/${project.version}</bundle>
+    </feature>
     <feature name="cxf-bindings-soap" version="${project.version}" resolver="(obr)">
         <feature version="${project.version}">cxf-wsdl</feature>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-bindings-xml/${project.version}</bundle>
