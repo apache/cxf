@@ -149,7 +149,7 @@
     </build>
     <profiles>
         <profile>
-            <id>myjava9</id>
+            <id>java9</id>
             <activation>
                 <jdk>9</jdk>
             </activation>

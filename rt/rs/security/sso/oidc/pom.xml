@@ -176,7 +176,7 @@
       </build>
       <profiles>
         <profile>
-            <id>myjava9</id>
+            <id>java9</id>
             <properties>
                 <compilerArguments>-Xpatch:java.annotations.common=${project.basedir}/target//java9/javax.annotation-api-1.2.jar -addmods java.se.ee,java.activation,java.xml.ws,java.xml.bind -Aopenjpa.source=7 -Aopenjpa.metamodel=true</compilerArguments>
             </properties>
