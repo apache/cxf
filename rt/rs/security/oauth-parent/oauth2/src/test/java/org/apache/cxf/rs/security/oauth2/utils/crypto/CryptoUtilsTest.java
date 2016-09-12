@@ -48,7 +48,6 @@ import org.apache.cxf.rt.security.crypto.KeyProperties;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class CryptoUtilsTest extends Assert {
@@ -131,8 +130,8 @@ public class CryptoUtilsTest extends Assert {
         // compare tokens
         compareAccessTokens(token, token2);
     }
-    
-    @Ignore
+   
+    @Test
     public void testBearerTokenJSONCertificate() throws Exception {
         if ("IBM Corporation".equals(System.getProperty("java.vendor"))) {
             return;
@@ -189,6 +188,7 @@ public class CryptoUtilsTest extends Assert {
         assertEquals("id", c2.getSubject().getId());
     }
     
+        
     @Test
     public void testCodeGrantJSON() throws Exception {
         Client c = new Client("client", "secret", true);
