@@ -40,8 +40,8 @@
     
     <util:list id="relationships">
         <bean class="org.apache.cxf.sts.token.realm.Relationship">
-            <property name="sourceRealm" value="a-issuer"/>
-            <property name="targetRealm" value="b-issuer"/>
+            <property name="sourceRealm" value="#{realmA.getName()}"/>
+            <property name="targetRealm" value="#{realmB.getName()}"/>
             <property name="identityMapper" ref="identityMapper"/>
             <property name="type" value="FederatedIdentity"/>
         </bean>
