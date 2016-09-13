@@ -178,7 +178,7 @@ public class Compiler {
         list.add("-J-Xmx" + maxMemory);
         
         if (System.getProperty("java.version").startsWith("9")) {
-            list.add("-addmods");
+            list.add("--add-modules");
             list.add("java.activation,java.annotations.common,java.corba,java.transaction,java.xml.bind,java.xml.ws");
         }
 
