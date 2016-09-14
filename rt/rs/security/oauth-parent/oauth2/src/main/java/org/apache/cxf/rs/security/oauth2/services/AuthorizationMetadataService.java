@@ -25,6 +25,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.cxf.jaxrs.json.basic.JsonMapObjectReaderWriter;
@@ -76,7 +77,7 @@ public class AuthorizationMetadataService {
         if (endpointAddress.startsWith("https")) {
             return endpointAddress;
         } else {
-            return baseUri + endpointAddress; 
+            return UriBuilder.fromUri(baseUri).path(endpointAddress).build().toString(); 
         }
     }
 
