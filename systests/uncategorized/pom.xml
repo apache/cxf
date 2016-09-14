@@ -105,6 +105,22 @@
             </plugin>
         </plugins>
     </build>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.jacorb</groupId>
+                <artifactId>jacorb</artifactId>
+                <version>3.7</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.jacorb</groupId>
+                <artifactId>jacorb-omgapi</artifactId>
+                <version>3.7</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -381,7 +397,6 @@
         <dependency>
             <groupId>org.jacorb</groupId>
             <artifactId>jacorb</artifactId>
-            <version>3.7</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -424,6 +439,13 @@
                                             <outputDirectory>${project.basedir}/target/java9</outputDirectory>
                                             <excludes>**/xa/*.class</excludes>
                                         </artifactItem>
+                                        <artifactItem>
+                                            <groupId>org.jacorb</groupId>
+                                            <artifactId>jacorb-omgapi</artifactId>
+                                            <type>jar</type>
+                                            <overWrite>false</overWrite>
+                                            <outputDirectory>${project.basedir}/target/java9-jacorb</outputDirectory>
+                                        </artifactItem>
                                     </artifactItems>
                                     <overWriteReleases>false</overWriteReleases>
                                     <overWriteSnapshots>true</overWriteSnapshots>
@@ -435,6 +457,17 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
+                            <argLine>
+                                ${cxf.surefire.fork.vmargs}
+                                --patch-module java.corba=target/java9-jacorb
+                                --add-exports=java.corba/org.omg.CONV_FRAME=ALL-UNNAMED
+                                --add-exports=java.corba/org.omg.CORBA_2_5=ALL-UNNAMED
+                                --add-exports=java.corba/org.omg.CSIIOP=ALL-UNNAMED
+                                --add-exports=java.corba/org.omg.ETF=ALL-UNNAMED
+                                --add-exports=java.corba/org.omg.GIOP=ALL-UNNAMED
+                                --add-exports=java.corba/org.omg.PortableGroup=ALL-UNNAMED
+                                --add-exports=java.corba/org.omg.SSLIOP=ALL-UNNAMED
+                            </argLine>
                             <includes>
                                 <include>**/*Test.java</include>
                                 <include>**/*TestCase.java</include>
