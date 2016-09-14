@@ -106,6 +106,8 @@ public final class StaxUtils {
         "org.apache.cxf.stax.maxAttributeSize";
     public static final String MAX_TEXT_LENGTH = 
         "org.apache.cxf.stax.maxTextLength";
+    public static final String MIN_TEXT_SEGMENT =
+        "org.apache.cxf.stax.minTextSegment";
     public static final String MAX_ELEMENT_COUNT = 
         "org.apache.cxf.stax.maxElementCount";
     public static final String MAX_XML_CHARACTERS = 
@@ -138,6 +140,7 @@ public final class StaxUtils {
     private static int maxAttributeCount = 500; 
     private static int maxAttributeSize = 64 * 1024; //64K per attribute, likely just "list" will hit
     private static int maxTextLength = 128 * 1024 * 1024;  //128M - more than this should DEFINITLEY use MTOM 
+    private static int minTextSegment = 64; // Same default as woodstox
     private static long maxElementCount = Long.MAX_VALUE;
     private static long maxXMLCharacters = Long.MAX_VALUE;
     
@@ -158,6 +161,7 @@ public final class StaxUtils {
         maxAttributeCount = getInteger(MAX_ATTRIBUTE_COUNT, maxAttributeCount); 
         maxAttributeSize = getInteger(MAX_ATTRIBUTE_SIZE, maxAttributeSize);
         maxTextLength = getInteger(MAX_TEXT_LENGTH, maxTextLength); 
+        minTextSegment = getInteger(MIN_TEXT_SEGMENT, minTextSegment);
         maxElementCount = getLong(MAX_ELEMENT_COUNT, maxElementCount);
         maxXMLCharacters = getLong(MAX_XML_CHARACTERS, maxXMLCharacters);
         
@@ -361,16 +365,15 @@ public final class StaxUtils {
     private static boolean setRestrictionProperties(XMLInputFactory factory) {
         //For now, we can only support Woodstox 4.2.x and newer as none of the other
         //stax parsers support these settings
-        if (setProperty(factory, "com.ctc.wstx.maxAttributesPerElement", maxAttributeCount)
-            && setProperty(factory, "com.ctc.wstx.maxAttributeSize", maxAttributeSize)
-            && setProperty(factory, "com.ctc.wstx.maxChildrenPerElement", innerElementCountThreshold)
-            && setProperty(factory, "com.ctc.wstx.maxElementCount", maxElementCount)
-            && setProperty(factory, "com.ctc.wstx.maxElementDepth", innerElementLevelThreshold)
-            && setProperty(factory, "com.ctc.wstx.maxCharacters", maxXMLCharacters)
-            && setProperty(factory, "com.ctc.wstx.maxTextLength", maxTextLength)) {
-            return true;
-        }
-        return false;
+        final boolean wstxMaxs = setProperty(factory, "com.ctc.wstx.maxAttributesPerElement", maxAttributeCount)
+                    && setProperty(factory, "com.ctc.wstx.maxAttributeSize", maxAttributeSize)
+                    && setProperty(factory, "com.ctc.wstx.maxChildrenPerElement", innerElementCountThreshold)
+                    && setProperty(factory, "com.ctc.wstx.maxElementCount", maxElementCount)
+                    && setProperty(factory, "com.ctc.wstx.maxElementDepth", innerElementLevelThreshold)
+                    && setProperty(factory, "com.ctc.wstx.maxCharacters", maxXMLCharacters)
+                    && setProperty(factory, "com.ctc.wstx.maxTextLength", maxTextLength);
+        return wstxMaxs
+            && setProperty(factory, "com.ctc.wstx.minTextSegment", minTextSegment);
     }
 
     private static boolean setProperty(XMLInputFactory f, String p, Object o) {
