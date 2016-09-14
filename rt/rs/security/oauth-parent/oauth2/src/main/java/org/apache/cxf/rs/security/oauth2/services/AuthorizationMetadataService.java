@@ -46,6 +46,7 @@ public class AuthorizationMetadataService {
         prepareConfigurationData(cfg, baseUri);
         
         JsonMapObjectReaderWriter writer = new JsonMapObjectReaderWriter();
+        writer.setFormat(true);
         return writer.toJson(cfg);
     }
     
@@ -71,7 +72,7 @@ public class AuthorizationMetadataService {
     }
 
     protected static String calculateEndpointAddress(String endpointAddress, String baseUri, String defRelAddress) {
-        endpointAddress = endpointAddress == null ? endpointAddress : defRelAddress;
+        endpointAddress = endpointAddress != null ? endpointAddress : defRelAddress;
         if (endpointAddress.startsWith("https")) {
             return endpointAddress;
         } else {
