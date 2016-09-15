@@ -31,17 +31,12 @@ import javax.ws.rs.ext.Provider;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.validation.ResponseConstraintViolationException;
-import org.springframework.expression.Expression;
-import org.springframework.expression.ExpressionParser;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
 
 @Provider
 public class ValidationExceptionMapper implements ExceptionMapper< ValidationException > {
     private static final Logger LOG = LogUtils.getL7dLogger(ValidationExceptionMapper.class);
     
     private boolean addMessageToResponse;
-    
-    private Expression messageExpression;
     
     @Override
     public Response toResponse(ValidationException exception) {
@@ -71,14 +66,9 @@ public class ValidationExceptionMapper implements ExceptionMapper< ValidationExc
         return rb.build();
     }
     String getMessage(ConstraintViolation< ?> violation) {
-        String message;
-        if (messageExpression == null) {
-            message = violation.getRootBeanClass().getSimpleName()
+        String message = violation.getRootBeanClass().getSimpleName()
                     + "." + violation.getPropertyPath()
                     + ": " + violation.getMessage();
-        } else {
-            message = messageExpression.getValue(violation, String.class);
-        }
         return message;
 
     }
@@ -89,17 +79,5 @@ public class ValidationExceptionMapper implements ExceptionMapper< ValidationExc
     public void setAddMessageToResponse(boolean addMessageToResponse) {
         this.addMessageToResponse = addMessageToResponse;
     }
-
-    /**
-     * Sets message template in SpEL expression. Expression will be evaluated in 
-     * ConstraintViolation context. 
-     * Example: rootBeanClass.simpleName + '.' + propertyPath + ': ' + message
-     * @param messageTemplate 
-     */
-    public void setMessageTemplate(String messageTemplate) {
-        ExpressionParser parser = new SpelExpressionParser();
-        this.messageExpression = parser.parseExpression(messageTemplate);
-    }
-    
     
 }
