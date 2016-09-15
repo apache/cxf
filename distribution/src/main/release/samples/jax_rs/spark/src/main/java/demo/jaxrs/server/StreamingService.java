@@ -55,11 +55,6 @@ import org.apache.spark.streaming.api.java.JavaPairDStream;
 import org.apache.spark.streaming.api.java.JavaReceiverInputDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.apache.spark.streaming.receiver.Receiver;
-import org.apache.tika.parser.AutoDetectParser;
-import org.apache.tika.parser.ParseContext;
-import org.apache.tika.parser.Parser;
-import org.apache.tika.parser.odf.OpenDocumentParser;
-import org.apache.tika.parser.pdf.PDFParser;
 
 import scala.Tuple2;
 
@@ -71,6 +66,7 @@ public class StreamingService {
         MEDIA_TYPE_TABLE = new HashMap<String, MediaType>();
         MEDIA_TYPE_TABLE.put("pdf", MediaType.valueOf("application/pdf"));
         MEDIA_TYPE_TABLE.put("odt", MediaType.valueOf("application/vnd.oasis.opendocument.text"));
+        MEDIA_TYPE_TABLE.put("odp", MediaType.valueOf("application/vnd.oasis.opendocument.presentation"));
     }
     private Executor executor = new ThreadPoolExecutor(5, 5, 0, TimeUnit.SECONDS,
                                                        new ArrayBlockingQueue<Runnable>(10));
@@ -83,9 +79,6 @@ public class StreamingService {
     @Produces("text/plain")
     public void processMultipartStream(@Suspended AsyncResponse async, 
                                        @Multipart("file") Attachment att) {
-        TikaContentExtractor tika = new TikaContentExtractor(
-            Arrays.asList(new PDFParser(), new OpenDocumentParser()));
-        
         MediaType mediaType = att.getContentType();
         if (mediaType == null) {
             String fileName = att.getContentDisposition().getFilename();
@@ -97,8 +90,7 @@ public class StreamingService {
             }
         }
         
-        ParseContext context = new ParseContext();
-        context.set(Parser.class, new AutoDetectParser());
+        TikaContentExtractor tika = new TikaContentExtractor();
         TikaContent tikaContent = tika.extract(att.getObject(InputStream.class),
                                                mediaType);
         processStream(async, new TikaReceiver(tikaContent));
