@@ -90,6 +90,12 @@ public class ValidationExceptionMapper implements ExceptionMapper< ValidationExc
         this.addMessageToResponse = addMessageToResponse;
     }
 
+    /**
+     * Sets message template in SpEL expression. Expression will be evaluated in 
+     * ConstraintViolation context. 
+     * Example: rootBeanClass.simpleName + '.' + propertyPath + ': ' + message
+     * @param messageTemplate 
+     */
     public void setMessageTemplate(String messageTemplate) {
         ExpressionParser parser = new SpelExpressionParser();
         this.messageExpression = parser.parseExpression(messageTemplate);
