@@ -71,14 +71,12 @@ public class JsonMapObjectReaderWriter {
 
     protected void toJsonInternal(Output out, Map<String, Object> map) {
         out.append("{");
-        formatIfNeeded(out);
         for (Iterator<Map.Entry<String, Object>> it = map.entrySet().iterator(); it.hasNext();) {
             Map.Entry<String, Object> entry = it.next();
             out.append("\"").append(entry.getKey()).append("\"");
             out.append(":");
             toJsonInternal(out, entry.getValue(), it.hasNext());
         }
-        formatIfNeeded(out);
         out.append("}");
     }
     
