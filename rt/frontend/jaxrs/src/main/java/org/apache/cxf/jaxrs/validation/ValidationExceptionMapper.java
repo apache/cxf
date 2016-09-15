@@ -41,16 +41,16 @@ public class ValidationExceptionMapper implements ExceptionMapper< ValidationExc
     @Override
     public Response toResponse(ValidationException exception) {
         Response.Status errorStatus = Response.Status.INTERNAL_SERVER_ERROR;
-        StringBuilder responseBody= new StringBuilder(512);
+        StringBuilder responseBody = new StringBuilder(512);
         if (exception instanceof ConstraintViolationException) { 
             
             final ConstraintViolationException constraint = (ConstraintViolationException) exception;
             
             for (final ConstraintViolation< ? > violation: constraint.getConstraintViolations()) {
-                String message=getMessage(violation);
+                String message = getMessage(violation);
 
                 LOG.log(Level.WARNING, message);
-                if(addMessageToResponse){
+                if (addMessageToResponse) {
                     responseBody.append(message).append("\n");
                 }
             }
@@ -60,17 +60,17 @@ public class ValidationExceptionMapper implements ExceptionMapper< ValidationExc
             }
         } 
         Response.ResponseBuilder rb=JAXRSUtils.toResponseBuilder(errorStatus);
-        if(addMessageToResponse){
+        if (addMessageToResponse) {
             rb.entity(responseBody.toString());
         }
         return rb.build();
     }
     String getMessage(ConstraintViolation< ?> violation) {
-        String message = violation.getRootBeanClass().getSimpleName()
-                    + "." + violation.getPropertyPath()
-                    + ": " + violation.getMessage();
+        String message = "Value '" + violation.getInvalidValue().toString() 
+                + "' of " + violation.getRootBeanClass().getSimpleName()
+                + "." + violation.getPropertyPath()
+                + ": " + violation.getMessage();
         return message;
-
     }
     /**
      * Controls whether to add an constraint validation message to Response or not,
