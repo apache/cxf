@@ -36,6 +36,7 @@ import org.apache.tika.detect.Detector;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.mime.MediaType;
+import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.Parser;
 import org.apache.tika.sax.ToTextContentHandler;
@@ -45,6 +46,13 @@ public class TikaContentExtractor {
     
     private final List<Parser> parsers;
     private final Detector detector;
+    
+    /**
+     * Create new Tika-based content extractor using AutoDetectParser.  
+     */
+    public TikaContentExtractor() {
+        this(new AutoDetectParser(), false);
+    }
     
     /**
      * Create new Tika-based content extractor using the provided parser instance.  
@@ -159,9 +167,6 @@ public class TikaContentExtractor {
         if (in == null) {
             return null;
         }
-        if (context == null) {
-            context = new ParseContext();
-        }
         final Metadata metadata = new Metadata();            
         
         try {
@@ -171,19 +176,36 @@ public class TikaContentExtractor {
                 mediaType = MediaType.parse(mtHint.toString());
             } else if (detector != null && in.markSupported()) {
                 mediaType = detector.detect(in, metadata);
-            } 
+            }
+            if (mediaType != null) {
+                metadata.set(Metadata.CONTENT_TYPE, mediaType.toString());
+            }
             
             Parser parser = null;
-            for (Parser p : parsers) {
-                if (mediaType != null && !p.getSupportedTypes(context).contains(mediaType)) {
-                    continue;
+            if (parsers.size() == 1) {
+                parser = parsers.get(0);
+            } else {
+                for (Parser p : parsers) {
+                    if (mediaType != null && !p.getSupportedTypes(context).contains(mediaType)) {
+                        continue;
+                    }
+                    parser = p;
+                    break;
                 }
-                parser = p;
-                break;
             }
             if (parser == null) {
                 return null;
             }
+            
+            if (context == null) {
+                context = new ParseContext();
+            }
+            if (context.get(Parser.class) == null) {
+                // to process the embedded attachments
+                context.set(Parser.class, 
+                            parser instanceof AutoDetectParser ? parser : new AutoDetectParser());
+            }
+            
             
             try {
                 parser.parse(in, handler, metadata, context);
