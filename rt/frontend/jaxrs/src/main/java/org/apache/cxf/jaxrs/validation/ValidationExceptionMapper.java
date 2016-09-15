@@ -36,24 +36,48 @@ import org.apache.cxf.validation.ResponseConstraintViolationException;
 public class ValidationExceptionMapper implements ExceptionMapper< ValidationException > {
     private static final Logger LOG = LogUtils.getL7dLogger(ValidationExceptionMapper.class);
     
+    private boolean addMessageToResponse;
+    
     @Override
     public Response toResponse(ValidationException exception) {
         Response.Status errorStatus = Response.Status.INTERNAL_SERVER_ERROR;
+        StringBuilder responseBody = new StringBuilder(512);
         if (exception instanceof ConstraintViolationException) { 
             
             final ConstraintViolationException constraint = (ConstraintViolationException) exception;
             
             for (final ConstraintViolation< ? > violation: constraint.getConstraintViolations()) {
-                LOG.log(Level.WARNING, 
-                    violation.getRootBeanClass().getSimpleName() 
-                    + "." + violation.getPropertyPath() 
-                    + ": " + violation.getMessage());
+                String message = getMessage(violation);
+
+                LOG.log(Level.WARNING, message);
+                if (addMessageToResponse) {
+                    responseBody.append(message).append("\n");
+                }
             }
             
             if (!(constraint instanceof ResponseConstraintViolationException)) {
                 errorStatus = Response.Status.BAD_REQUEST;
             }
         } 
-        return JAXRSUtils.toResponse(errorStatus);
+        Response.ResponseBuilder rb=JAXRSUtils.toResponseBuilder(errorStatus);
+        if (addMessageToResponse) {
+            rb.entity(responseBody.toString());
+        }
+        return rb.build();
     }
+    String getMessage(ConstraintViolation< ?> violation) {
+        String message = "Value '" + violation.getInvalidValue().toString() 
+                + "' of " + violation.getRootBeanClass().getSimpleName()
+                + "." + violation.getPropertyPath()
+                + ": " + violation.getMessage();
+        return message;
+    }
+    /**
+     * Controls whether to add an constraint validation message to Response or not,
+     * @param addMessageToResponse add a constraint validation message to Respons
+     */
+    public void setAddMessageToResponse(boolean addMessageToResponse) {
+        this.addMessageToResponse = addMessageToResponse;
+    }
+    
 }
