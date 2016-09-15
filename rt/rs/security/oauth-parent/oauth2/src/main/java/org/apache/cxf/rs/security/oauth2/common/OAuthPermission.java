@@ -20,10 +20,16 @@ package org.apache.cxf.rs.security.oauth2.common;
 
 import java.util.LinkedList;
 import java.util.List;
-
+import javax.persistence.Cacheable;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.OrderColumn;
 import javax.xml.bind.annotation.XmlRootElement;
+
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.FetchMode;
 
 /**
  * Provides the complete information about a given opaque permission.
@@ -34,23 +40,36 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement
 @Entity
+@Cacheable
 public class OAuthPermission extends Permission {
     private static final long serialVersionUID = -6486616235830491290L;
     private List<String> httpVerbs = new LinkedList<String>();
     private List<String> uris = new LinkedList<String>();
-    
+
     public OAuthPermission() {
-        
+
     }
-    
+
     public OAuthPermission(String permission) {
         this(permission, null);
     }
-    
+
     public OAuthPermission(String permission, String description) {
         super(permission, description);
     }
-    
+
+    /**
+     * Gets the optional list of HTTP verbs
+     * @return the list of HTTP verbs
+     */
+    @ElementCollection(fetch = FetchType.EAGER)
+    @OrderColumn
+    @org.hibernate.annotations.Fetch(FetchMode.SUBSELECT)
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    public List<String> getHttpVerbs() {
+        return httpVerbs;
+    }
+
     /**
      * Sets the optional list of HTTP verbs, example,
      * "GET" and "POST", etc
@@ -61,12 +80,15 @@ public class OAuthPermission extends Permission {
     }
 
     /**
-     * Gets the optional list of HTTP verbs
-     * @return the list of HTTP verbs
+     * Gets the optional list of relative request URIs
+     * @return the list of URIs
      */
-    @ElementCollection
-    public List<String> getHttpVerbs() {
-        return httpVerbs;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @OrderColumn
+    @org.hibernate.annotations.Fetch(FetchMode.SUBSELECT)
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    public List<String> getUris() {
+        return uris;
     }
 
     /**
@@ -77,33 +99,25 @@ public class OAuthPermission extends Permission {
         this.uris = uri;
     }
 
-    /**
-     * Gets the optional list of relative request URIs
-     * @return the list of URIs
-     */
-    @ElementCollection
-    public List<String> getUris() {
-        return uris;
-    }
-    
     @Override
     public boolean equals(Object object) {
         if (!(object instanceof OAuthPermission) || !super.equals(object)) {
             return false;
         }
-        OAuthPermission that = (OAuthPermission)object;
+        OAuthPermission that = (OAuthPermission) object;
         if (getHttpVerbs() != null && that.getHttpVerbs() == null
-            || getHttpVerbs() == null && that.getHttpVerbs() != null
-            || getHttpVerbs() != null && !getHttpVerbs().equals(that.getHttpVerbs())) { 
+                || getHttpVerbs() == null && that.getHttpVerbs() != null
+                || getHttpVerbs() != null && !getHttpVerbs().equals(that.getHttpVerbs())) {
             return false;
         }
         if (getUris() != null && that.getUris() == null // NOPMD
-            || getUris() == null && that.getUris() != null // NOPMD
-            || getUris() != null && !getUris().equals(that.getUris())) { // NOPMD
+                || getUris() == null && that.getUris() != null // NOPMD
+                || getUris() != null && !getUris().equals(that.getUris())) { // NOPMD
             return false;
         }
         return true;
     }
+
     @Override
     public int hashCode() {
         int hashCode = super.hashCode();
