@@ -60,7 +60,7 @@ public class ValidationExceptionMapper implements ExceptionMapper< ValidationExc
             }
             ResponseBuilder rb = JAXRSUtils.toResponseBuilder(errorStatus);
             if (responseBody != null) {
-                rb.entity(responseBody);
+                rb.entity(responseBody.toString());
             }
             return rb.build();
         } else {
@@ -68,8 +68,10 @@ public class ValidationExceptionMapper implements ExceptionMapper< ValidationExc
         }
     }
     private String getMessage(ConstraintViolation<?> violation) {
-        return violation.getRootBeanClass().getSimpleName() 
-            + "." + violation.getPropertyPath() 
+        return "Value " 
+            + (violation.getInvalidValue() != null ? "'" + violation.getInvalidValue().toString() + "'" : "(null)")
+            + " of " + violation.getRootBeanClass().getSimpleName()
+            + "." + violation.getPropertyPath()
             + ": " + violation.getMessage();
     }
     /**
