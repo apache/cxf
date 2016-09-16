@@ -552,6 +552,6 @@ public class ClientImpl implements Client {
         return o instanceof Integer ? (Integer)o : o instanceof String ? Integer.valueOf(o.toString()) : null;
     }
     private static Boolean getBooleanValue(Object o) {
-        return o instanceof Boolean ? (Boolean)o : o instanceof Boolean ? Boolean.valueOf(o.toString()) : null;
+        return o instanceof Boolean ? (Boolean)o : o instanceof String ? Boolean.valueOf(o.toString()) : null;
     }
 }
