@@ -111,6 +111,14 @@ import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.ws.commons.schema.XmlSchema;
+import org.apache.ws.commons.schema.XmlSchemaFacet;
+import org.apache.ws.commons.schema.XmlSchemaMaxLengthFacet;
+import org.apache.ws.commons.schema.XmlSchemaMinLengthFacet;
+import org.apache.ws.commons.schema.XmlSchemaPatternFacet;
+import org.apache.ws.commons.schema.XmlSchemaSimpleType;
+import org.apache.ws.commons.schema.XmlSchemaSimpleTypeContent;
+import org.apache.ws.commons.schema.XmlSchemaSimpleTypeRestriction;
+import org.apache.ws.commons.schema.XmlSchemaType;
 import org.apache.ws.commons.schema.constants.Constants;
 
 public class SourceGenerator {
@@ -224,6 +232,9 @@ public class SourceGenerator {
     private boolean supportMultipleRepsWithElements;
     private boolean validateWadl;    
     private SchemaCollection schemaCollection = new SchemaCollection();
+
+    private Map<String, String> wadlPrefixMap = new HashMap<String, String>();
+
     private String encoding;
     private boolean createJavaDocs;
     
@@ -293,6 +304,9 @@ public class SourceGenerator {
     
     public void generateSource(String wadl, File srcDir, String codeType) {
         Application app = readWadl(wadl, wadlPath);
+        // scan for prefixes used in WADL
+        wadlPrefixMap = createWadlPrefixMap(app);
+
         Set<String> typeClassNames = new HashSet<String>();
         GrammarInfo gInfo = generateSchemaCodeAndInfo(app, typeClassNames, srcDir);
         if (!CODE_TYPE_GRAMMAR.equals(codeType)) {
@@ -1276,7 +1290,7 @@ public class SourceGenerator {
                     sbCode.append(" ");
                 }
                 
-                checkForBeanValidationsBasedOnSimpleType(sbCode, imports, paramEl);
+                checkForBeanValidations(sbCode, imports, paramEl);
                 
             }
             boolean isRepeating = isRepeatingParam(paramEl);
@@ -1358,7 +1372,74 @@ public class SourceGenerator {
         }
     }
 
-    private void checkForBeanValidationsBasedOnSimpleType(StringBuilder sbCode, Set<String> imports, Element paramEl) {
+    private void checkForBeanValidations(StringBuilder sbCode, Set<String> imports, Element paramEl) {
+        LOG.fine("checking for BeanValidations for parameter " + paramEl.getAttribute("name"));
+
+        checkForBeanValidationsBasedOnInlineSimpleType(sbCode, imports, paramEl);
+        
+        checkForBeanValidationBasedOnSchemaType(sbCode, imports, paramEl);
+
+    }
+
+    private void checkForBeanValidationBasedOnSchemaType(StringBuilder sbCode, Set<String> imports,
+            Element paramEl) {
+        // type reference to schema
+        String type = paramEl.getAttribute("type");
+        
+        if (type != null && type.indexOf(":") >= 0) {
+            LOG.fine("checking bean validation for type: " + type);
+            String typeWithoutPrefix = org.apache.commons.lang.StringUtils.substringAfter(type, ":");
+            String prefix = org.apache.commons.lang.StringUtils.substringBefore(type, ":");
+            LOG.fine("prefix: " + prefix);
+
+            String namespaceURI = wadlPrefixMap.get(prefix);
+            QName schemaTypeQName = new QName(namespaceURI, typeWithoutPrefix);
+            LOG.fine("schemaTypeQName: " + schemaTypeQName);
+            XmlSchemaType schemaType = schemaCollection.getTypeByQName(schemaTypeQName);
+
+            if (schemaType instanceof XmlSchemaSimpleType) {
+                LOG.fine("detected simple type");
+                XmlSchemaSimpleType schemaSimpleType = (XmlSchemaSimpleType) schemaType;
+
+                XmlSchemaSimpleTypeContent xmlSchemaContent = schemaSimpleType.getContent();
+                if (xmlSchemaContent instanceof XmlSchemaSimpleTypeRestriction) {
+                    XmlSchemaSimpleTypeRestriction restriction = (XmlSchemaSimpleTypeRestriction) xmlSchemaContent;
+                    QName baseTypeName = restriction.getBaseTypeName();
+
+                    addBeanValidationForFacets(sbCode, imports, restriction, baseTypeName);
+
+                }
+
+            }
+
+        }
+    }
+
+    private void addBeanValidationForFacets(StringBuilder sbCode, Set<String> imports,
+            XmlSchemaSimpleTypeRestriction restriction, QName baseTypeName) {
+        if ("string".equals(baseTypeName.getLocalPart())) {
+            LOG.fine("detected simple type string");
+            addBeanValidationForStringFacets(sbCode, imports, restriction);
+        }
+    }
+
+    private Map<String, String> createWadlPrefixMap(Application app) {
+        // since NamespaceContext length is 0 here, check for prefixes
+        // in
+        // WADL application element
+        Map<String, String> result = new HashMap<String, String>();
+        NamedNodeMap map = app.getAppElement().getAttributes();
+        for (int i = 0; i < map.getLength(); i++) {
+            Node mynode = map.item(i);
+            String wadlDeclaredPrefix = mynode.getLocalName();
+            String wadlDeclaredNamespaceURI = mynode.getNodeValue();
+            result.put(wadlDeclaredPrefix, wadlDeclaredNamespaceURI);
+        }
+        return result;
+    }
+
+    private void checkForBeanValidationsBasedOnInlineSimpleType(StringBuilder sbCode, Set<String> imports,
+            Element paramEl) {
         NodeList children = paramEl.getChildNodes();
         for (int nodeLevel1Index = 0; nodeLevel1Index < children.getLength(); nodeLevel1Index++) {
             Node paramNodeLevel1 = children.item(nodeLevel1Index);
@@ -1385,6 +1466,34 @@ public class SourceGenerator {
         }
     }
 
+    private void addBeanValidationForStringFacets(StringBuilder sbCode, Set<String> imports,
+            XmlSchemaSimpleTypeRestriction restriction) {
+        String minLength = null;
+        String maxLength = null;
+        String regexp = null;
+
+        for (XmlSchemaFacet facet : restriction.getFacets()) {
+
+            if (facet instanceof XmlSchemaMinLengthFacet) {
+                minLength = (String) facet.getValue();
+                LOG.fine("detected minLength: " + minLength);
+            }
+
+            if (facet instanceof XmlSchemaMaxLengthFacet) {
+                maxLength = (String) facet.getValue();
+                LOG.fine("detected maxLength: " + maxLength);
+            }
+
+            if (facet instanceof XmlSchemaPatternFacet) {
+                regexp = (String) facet.getValue();
+                LOG.fine("detected regexp: " + regexp);
+            }
+        }
+
+        writeBeanValidationAnnotations(sbCode, imports, minLength, maxLength, regexp);
+    }
+
+
     private void addSimpleTypeBeanValidationAnnotations(StringBuilder sbCode, Set<String> imports, NodeList children3) {
         String minLength = null;
         String maxLength = null;
@@ -1406,6 +1515,11 @@ public class SourceGenerator {
             }
         }
         
+        writeBeanValidationAnnotations(sbCode, imports, minLength, maxLength, regexp);
+    }
+
+    private void writeBeanValidationAnnotations(StringBuilder sbCode, Set<String> imports, String minLength,
+            String maxLength, String regexp) {
         if (minLength != null || maxLength != null) {
             writeAnnotation(sbCode, imports, Size.class, null, false, false);
             
