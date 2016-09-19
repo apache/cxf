@@ -457,6 +457,9 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
+                            <systemPropertyVariables>
+                                <org.omg.CORBA.ORBClass>com.sun.corba.se.impl.orb.ORBImpl</org.omg.CORBA.ORBClass>
+                            </systemPropertyVariables>
                             <argLine>
                                 ${cxf.surefire.fork.vmargs}
                                 --patch-module java.corba=target/java9-jacorb
@@ -467,17 +470,13 @@
                                 --add-exports=java.corba/org.omg.GIOP=ALL-UNNAMED
                                 --add-exports=java.corba/org.omg.PortableGroup=ALL-UNNAMED
                                 --add-exports=java.corba/org.omg.SSLIOP=ALL-UNNAMED
+                                --add-exports=java.corba/com.sun.corba.se.spi.orb=ALL-UNNAMED
                             </argLine>
                             <includes>
                                 <include>**/*Test.java</include>
                                 <include>**/*TestCase.java</include>
                                 <include>**/*TestCases.java</include>
                             </includes>
-                            <excludes>
-                                <exclude>**/*$*</exclude>
-                                <exclude>**/*CorbaTimeoutTest.java</exclude>
-                                <exclude>**/*CORBADocLitClientTypeTest.java</exclude>
-                            </excludes>
                         </configuration>
                     </plugin>
                 </plugins>

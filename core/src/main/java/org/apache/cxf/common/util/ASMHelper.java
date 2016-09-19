@@ -372,6 +372,14 @@ public class ASMHelper {
         public Class<?> lookupDefinedClass(String name) {
             return defined.get(name.replace('/', '.'));
         }
+
+        @Override
+        protected Class<?> findClass(String name) throws ClassNotFoundException {
+            if (name.endsWith("package-info")) {
+                return getParent().loadClass(name);
+            }
+            return super.findClass(name);
+        }
         
         public Class<?> defineClass(String name, byte bytes[]) {
             Class<?> ret = defined.get(name.replace('/', '.'));
