@@ -45,14 +45,14 @@ public class OutboundSseEventImpl implements OutboundSseEvent {
         private Object data;
 
         @Override
-        public Builder id(String id) {
-            this.id = id;
+        public Builder id(String newId) {
+            this.id = newId;
             return this;
         }
 
         @Override
-        public Builder name(String name) {
-            this.name = name;
+        public Builder name(String newName) {
+            this.name = newName;
             return this;
         }
 
@@ -63,36 +63,36 @@ public class OutboundSseEventImpl implements OutboundSseEvent {
         }
 
         @Override
-        public Builder mediaType(MediaType mediaType) {
-            this.mediaType = mediaType;
+        public Builder mediaType(MediaType newMediaType) {
+            this.mediaType = newMediaType;
             return this;
         }
 
         @Override
-        public Builder comment(String comment) {
-            this.comment = comment;
-            return this;
-        }
-
-        @Override
-        @SuppressWarnings("rawtypes")
-        public Builder data(Class type, Object data) {
-            this.type = type;
-            this.data= data;
+        public Builder comment(String newComment) {
+            this.comment = newComment;
             return this;
         }
 
         @Override
         @SuppressWarnings("rawtypes")
-        public Builder data(GenericType type, Object data) {
-            this.genericType = type.getType();
-            this.data= data;
+        public Builder data(Class newType, Object newData) {
+            this.type = newType;
+            this.data = newData;
             return this;
         }
 
         @Override
-        public Builder data(Object data) {
-            this.data = data;
+        @SuppressWarnings("rawtypes")
+        public Builder data(GenericType newType, Object newData) {
+            this.genericType = newType.getType();
+            this.data = newData;
+            return this;
+        }
+
+        @Override
+        public Builder data(Object newData) {
+            this.data = newData;
             return this;
         }
 
@@ -111,7 +111,7 @@ public class OutboundSseEventImpl implements OutboundSseEvent {
         }
         
     }
-    
+    //CHECKSTYLE:OFF
     OutboundSseEventImpl(String id, String name, String comment, long reconnectDelay, 
             Class<?> type, Type genericType, MediaType mediaType, Object data) {
         this.id = id;
@@ -123,6 +123,7 @@ public class OutboundSseEventImpl implements OutboundSseEvent {
         this.mediaType = mediaType;
         this.data = data;
     }
+    //CHECKSTYLE:ON
     
     @Override
     public String getId() {

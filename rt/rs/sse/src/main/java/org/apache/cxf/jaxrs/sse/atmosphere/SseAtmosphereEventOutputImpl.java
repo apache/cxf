@@ -41,7 +41,7 @@ public class SseAtmosphereEventOutputImpl implements SseEventOutput {
     
     private final AtmosphereResource resource;
     private final MessageBodyWriter<OutboundSseEvent> writer;
-    private volatile boolean closed = false;
+    private volatile boolean closed;
     
     public SseAtmosphereEventOutputImpl(final MessageBodyWriter<OutboundSseEvent> writer, 
             final AtmosphereResource resource) {

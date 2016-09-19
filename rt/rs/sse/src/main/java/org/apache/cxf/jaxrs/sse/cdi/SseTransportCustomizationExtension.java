@@ -22,7 +22,7 @@ import org.apache.cxf.cdi.extension.JAXRSServerFactoryCustomizationExtension;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.transport.sse.SseHttpTransportFactory;
 
-public class SseTransportCustomizationExtension implements JAXRSServerFactoryCustomizationExtension{
+public class SseTransportCustomizationExtension implements JAXRSServerFactoryCustomizationExtension {
     @Override
     public void customize(final JAXRSServerFactoryBean bean) {
         bean.setTransportId(SseHttpTransportFactory.TRANSPORT_ID);
