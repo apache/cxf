@@ -36,8 +36,10 @@ public class SparkStreamingOutput implements StreamingOutput {
     private JavaStreamingContext jssc;
     private volatile boolean sparkBatchCompleted;
     private volatile boolean outputWriteDone;
+    private long startAt;
     public SparkStreamingOutput(JavaStreamingContext jssc) {
         this.jssc = jssc;
+        this.startAt = System.currentTimeMillis();
     }
 
     @Override
@@ -57,6 +59,7 @@ public class SparkStreamingOutput implements StreamingOutput {
         
         jssc.stop(false);
         jssc.close();
+        System.out.println("Total processing time in millisecs: " + (System.currentTimeMillis() - startAt));
     }
     
     

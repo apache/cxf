@@ -29,6 +29,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Random;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Executor;
@@ -52,13 +53,12 @@ import org.apache.cxf.jaxrs.ext.search.tika.TikaContentExtractor.TikaContent;
 import org.apache.spark.SparkConf;
 import org.apache.spark.SparkException;
 import org.apache.spark.api.java.JavaPairRDD;
+import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.VoidFunction;
 import org.apache.spark.streaming.Durations;
 import org.apache.spark.streaming.api.java.JavaDStream;
 import org.apache.spark.streaming.api.java.JavaPairDStream;
-import org.apache.spark.streaming.api.java.JavaReceiverInputDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
-import org.apache.spark.streaming.receiver.Receiver;
 
 import scala.Tuple2;
 
@@ -74,7 +74,11 @@ public class StreamingService {
     }
     private Executor executor = new ThreadPoolExecutor(5, 5, 0, TimeUnit.SECONDS,
                                                        new ArrayBlockingQueue<Runnable>(10));
-    public StreamingService() {
+    
+    private String receiverType;
+    
+    public StreamingService(String receiverType) {
+        this.receiverType = receiverType;
     }
     
     @POST
@@ -97,7 +101,7 @@ public class StreamingService {
         TikaContentExtractor tika = new TikaContentExtractor();
         TikaContent tikaContent = tika.extract(att.getObject(InputStream.class),
                                                mediaType);
-        processStream(async, new StringListReceiver(getStringsFromString(tikaContent.getContent())));
+        processStream(async, getStringsFromString(tikaContent.getContent()));
     }
     
     @POST
@@ -105,10 +109,10 @@ public class StreamingService {
     @Consumes("text/plain")
     @Produces("text/plain")
     public void processSimpleStream(@Suspended AsyncResponse async, InputStream is) {
-        processStream(async, new StringListReceiver(getStringsFromInputStream(is)));
+        processStream(async, getStringsFromInputStream(is));
     }
 
-    private void processStream(AsyncResponse async, Receiver<String> receiver) {
+    private void processStream(AsyncResponse async, List<String> inputStrings) {
         try {
             SparkConf sparkConf = new SparkConf().setMaster("local[*]")
                 .setAppName("JAX-RS Spark Connect " + getRandomId());
@@ -118,7 +122,17 @@ public class StreamingService {
             SparkStreamingListener sparkListener =  new SparkStreamingListener(streamOut);
             jssc.addStreamingListener(sparkListener);
             
-            JavaReceiverInputDStream<String> receiverStream = jssc.receiverStream(receiver);
+            JavaDStream<String> receiverStream = null;
+            if ("queue".equals(receiverType)) {
+               Queue<JavaRDD<String>> rddQueue = new LinkedList<>();
+               for (int i = 0; i < 30; i++) {
+                   rddQueue.add(jssc.sparkContext().parallelize(inputStrings));
+               }
+               receiverStream = jssc.queueStream(rddQueue);
+            } else {
+               receiverStream = jssc.receiverStream(new StringListReceiver(inputStrings));
+            }
+            
             JavaPairDStream<String, Integer> wordCounts = createOutputDStream(receiverStream);
             wordCounts.foreachRDD(new OutputFunction(streamOut));
             jssc.start();
@@ -135,7 +149,7 @@ public class StreamingService {
     }
     
     private static JavaPairDStream<String, Integer> createOutputDStream(
-            JavaReceiverInputDStream<String> receiverStream) {
+        JavaDStream<String> receiverStream) {
         final JavaDStream<String> words = 
             receiverStream.flatMap(x -> splitInputString(x));
             

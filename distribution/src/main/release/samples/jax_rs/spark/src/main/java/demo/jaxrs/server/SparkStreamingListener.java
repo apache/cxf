@@ -31,6 +31,7 @@ import org.apache.spark.streaming.scheduler.StreamingListenerReceiverStopped;
 public class SparkStreamingListener implements StreamingListener {
     private SparkStreamingOutput streamOutput;
     private boolean batchStarted;
+    private long batchStartAt;
     
     public SparkStreamingListener(SparkStreamingOutput streamOutput) {
         this.streamOutput = streamOutput;
@@ -38,12 +39,15 @@ public class SparkStreamingListener implements StreamingListener {
 
     @Override
     public void onBatchCompleted(StreamingListenerBatchCompleted event) {
+        System.out.println("Batch processing time in millisecs: " + (System.currentTimeMillis() - batchStartAt));
+        
         streamOutput.setSparkBatchCompleted();
     }
 
     @Override
     public synchronized void onBatchStarted(StreamingListenerBatchStarted event) {
         batchStarted = true;
+        batchStartAt = System.currentTimeMillis();
         notify();
     }
 

@@ -25,18 +25,21 @@ import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 
 public class Server {
 
-    protected Server() throws Exception {
+    protected Server(String args[]) throws Exception {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setResourceClasses(StreamingService.class);
+        
+        String receiverType = args.length == 1 && args[0].equals("-receiverType=queue") ?
+            "queue" : "string";
         sf.setResourceProvider(StreamingService.class, 
-            new SingletonResourceProvider(new StreamingService()));
+            new SingletonResourceProvider(new StreamingService(receiverType)));
         sf.setAddress("http://localhost:9000/spark");
 
         sf.create();
     }
 
     public static void main(String args[]) throws Exception {
-        new Server();
+        new Server(args);
         System.out.println("Server ready...");
         Thread.sleep(60 * 60 * 1000);
         System.out.println("Server exiting");
