@@ -154,11 +154,26 @@
         <feature>http</feature>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-transports-http/${project.version}</bundle>
     </feature>
+    <!--
+      This feature can be used to depend on the feature providing a HttpDestinationFactory extension
+      without depending on the actual provider (see cxf-wsn for example).
+      It will install cxf-http-jetty by default, unless the user explicitly installs a different
+      provider, such as cxf-http-undertow.
+      -->
+    <feature name="cxf-http-provider" version="${project.version}">
+        <feature dependency="true" version="${project.version}">cxf-http-jetty</feature>
+        <requirement>
+            cxf.http.provider
+        </requirement>
+    </feature>
     <feature name="cxf-http-jetty" version="${project.version}">
         <feature version="${project.version}">cxf-http</feature>
         <feature version="[7,10)">jetty</feature>
         <feature>aries-blueprint</feature>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-transports-http-jetty/${project.version}</bundle>
+        <capability>
+            cxf.http.provider;name=jetty
+        </capability>
     </feature>
     <feature name="cxf-http-async" version="${project.version}">
         <feature version="${project.version}">cxf-http</feature>
@@ -166,6 +181,9 @@
         <bundle start-level="40">mvn:org.apache.httpcomponents/httpclient-osgi/${cxf.httpcomponents.client.version}</bundle>
         <bundle start-level="40">mvn:org.apache.httpcomponents/httpasyncclient-osgi/${cxf.httpcomponents.asyncclient.version}</bundle>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-transports-http-hc/${project.version}</bundle>
+        <capability>
+            cxf.http.provider;name=async
+        </capability>
     </feature>
     <feature name="cxf-http-netty-client" version="${project.version}">
         <feature version="${project.version}">cxf-http</feature>
@@ -187,12 +205,18 @@
         <bundle start-level="40">mvn:io.netty/netty-codec/${cxf.netty.version}</bundle>
         <bundle start-level="40">mvn:io.netty/netty-codec-http/${cxf.netty.version}</bundle>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-transports-http-netty-server/${project.version}</bundle>
+        <capability>
+            cxf.http.provider;name=netty
+        </capability>
     </feature>
     <feature name="cxf-http-undertow" version="${project.version}">
         <feature version="${project.version}">cxf-http</feature>
         <feature>pax-http-undertow</feature>
 		<feature>aries-blueprint</feature>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-transports-http-undertow/${project.version}</bundle>
+        <capability>
+            cxf.http.provider;name=undertow
+        </capability>
     </feature>
     <feature name="cxf-bindings-soap" version="${project.version}">
         <feature version="${project.version}">cxf-wsdl</feature>
@@ -401,7 +425,7 @@
         <feature version="${project.version}">cxf-bindings-corba</feature>
         <feature version="${project.version}">cxf-bindings-coloc</feature>
         <feature version="${project.version}">cxf-bindings-object</feature>
-        <feature version="${project.version}">cxf-http-jetty</feature>
+        <feature version="${project.version}">cxf-http-provider</feature>
         <feature version="${project.version}">cxf-transports-local</feature>
         <feature version="${project.version}">cxf-transports-jms</feature>
         <feature version="${project.version}">cxf-transports-udp</feature>
@@ -450,7 +474,7 @@
         <feature>spring</feature>
         <feature>aries-blueprint</feature>
         <feature version="${project.version}">cxf-wsn-api</feature>
-        <feature version="${project.version}">cxf-http-jetty</feature>
+        <feature version="${project.version}">cxf-http-provider</feature>
         <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.aopalliance/1.0_6</bundle>
         <bundle dependency="true">mvn:org.apache.geronimo.specs/geronimo-jms_1.1_spec/1.1.1</bundle>
         <bundle dependency="true">mvn:org.apache.geronimo.specs/geronimo-j2ee-management_1.1_spec/1.0.1</bundle>
