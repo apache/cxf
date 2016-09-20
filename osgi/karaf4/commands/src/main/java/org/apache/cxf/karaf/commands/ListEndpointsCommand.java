@@ -34,7 +34,10 @@ import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.apache.karaf.shell.api.console.Terminal;
+import org.apache.karaf.shell.support.table.ShellTable;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.Configuration;
@@ -60,6 +63,12 @@ public class ListEndpointsCommand extends CXFController implements Action {
         description = "Display full address of an endpoint ", required = false, multiValued = false)
     boolean fullAddress;
 
+    @Option(name = "--no-format", description = "Disable table rendered output", required = false, multiValued = false)
+    boolean noFormat;
+
+    @Reference(optional = true)
+    Terminal terminal;
+
     @Override
     public Object execute() throws Exception {
         List<Bus> busses;
@@ -73,12 +82,18 @@ public class ListEndpointsCommand extends CXFController implements Action {
                 busses = Collections.emptyList();
             }
         }
-        System.out.println(String.format(HEADER_FORMAT, 
-                                         "Name", "State", "Address", "BusID"));
+
+        ShellTable table = new ShellTable();
+        if (terminal != null && terminal.getWidth() > 0) {
+            table.size(terminal.getWidth());
+        }
+        table.column("Name");
+        table.column("State");
+        table.column("Address");
+        table.column("BusID");
         for (Bus b : busses) {
             ServerRegistry reg = b.getExtension(ServerRegistry.class);
             List<Server> servers = reg.getServers();
-            
             for (Server serv : servers) {
                 String qname = serv.getEndpoint().getEndpointInfo().getName().getLocalPart();
                 String started = serv.isStarted() ? "Started" : "Stopped";
@@ -87,9 +102,10 @@ public class ListEndpointsCommand extends CXFController implements Action {
                     address = toFullAddress(address);
                 }
                 String busId = b.getId();
-                System.out.println(String.format(OUTPUT_FORMAT, qname, started, address, busId));
+                table.addRow().addContent(qname, started, address, busId);
             }
         }
+        table.print(System.out, !noFormat);
         return null;
     }
     
