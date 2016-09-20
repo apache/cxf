@@ -16,7 +16,6 @@ Using either UNIX or Windows:
 
   mvn install
 
-
 Starting Karaf (refer to http://karaf.apache.org/manual/latest-3.0.x/quick-start.html)
 
   bin/karaf
@@ -49,15 +48,6 @@ for this demo bundle.
 Install this demo bundle (using the appropriate bundle version number)
   
   install -s mvn:org.apache.cxf.samples/jax_rs_description_swagger2_osgi/3.n.m
-
-Optionally, installed the following bundles if they are missed:
-
-  install -s mvn:com.fasterxml.jackson.core/jackson-core/2.6.6  
-  install -s mvn:com.fasterxml.jackson.core/jackson-annotations/2.6.6
-  install -s mvn:com.fasterxml.jackson.core/jackson-databind/2.6.6 
-  install -s mvn:com.fasterxml.jackson.jaxrs/jackson-jaxrs-base/2.6.6  
-  install -s mvn:com.fasterxml.jackson.jaxrs/jackson-jaxrs-json-provider/2.6.6  
-  install -s mvn:javax.annotation/javax.annotation-api/1.2
 
 You can verify if the CXF JAX-RS Swagger2 Blueprint Demo is installed and started.
 
