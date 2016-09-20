@@ -18,19 +18,12 @@
  */
 package demo.jaxrs.server;
 
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.StringReader;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.Random;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -45,7 +38,6 @@ import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.MediaType;
 
-import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import org.apache.cxf.jaxrs.ext.search.tika.TikaContentExtractor;
@@ -59,8 +51,6 @@ import org.apache.spark.streaming.Durations;
 import org.apache.spark.streaming.api.java.JavaDStream;
 import org.apache.spark.streaming.api.java.JavaPairDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
-
-import scala.Tuple2;
 
 
 @Path("/")
@@ -101,7 +91,7 @@ public class StreamingService {
         TikaContentExtractor tika = new TikaContentExtractor();
         TikaContent tikaContent = tika.extract(att.getObject(InputStream.class),
                                                mediaType);
-        processStream(async, getStringsFromString(tikaContent.getContent()));
+        processStream(async, SparkUtils.getStringsFromString(tikaContent.getContent()));
     }
     
     @POST
@@ -109,13 +99,13 @@ public class StreamingService {
     @Consumes("text/plain")
     @Produces("text/plain")
     public void processSimpleStream(@Suspended AsyncResponse async, InputStream is) {
-        processStream(async, getStringsFromInputStream(is));
+        processStream(async, SparkUtils.getStringsFromInputStream(is));
     }
 
     private void processStream(AsyncResponse async, List<String> inputStrings) {
         try {
             SparkConf sparkConf = new SparkConf().setMaster("local[*]")
-                .setAppName("JAX-RS Spark Connect " + getRandomId());
+                .setAppName("JAX-RS Spark Connect " + SparkUtils.getRandomId());
             JavaStreamingContext jssc = new JavaStreamingContext(sparkConf, Durations.seconds(1)); 
             
             SparkStreamingOutput streamOut = new SparkStreamingOutput(jssc);
@@ -133,7 +123,7 @@ public class StreamingService {
                receiverStream = jssc.receiverStream(new StringListReceiver(inputStrings));
             }
             
-            JavaPairDStream<String, Integer> wordCounts = createOutputDStream(receiverStream);
+            JavaPairDStream<String, Integer> wordCounts = SparkUtils.createOutputDStream(receiverStream);
             wordCounts.foreachRDD(new OutputFunction(streamOut));
             jssc.start();
                                                     
@@ -148,31 +138,7 @@ public class StreamingService {
         }
     }
     
-    private static JavaPairDStream<String, Integer> createOutputDStream(
-        JavaDStream<String> receiverStream) {
-        final JavaDStream<String> words = 
-            receiverStream.flatMap(x -> splitInputString(x));
-            
-        final JavaPairDStream<String, Integer> pairs = words.mapToPair(s -> {
-                    return new Tuple2<String, Integer>(s, 1);
-                });
-        return pairs.reduceByKey((i1, i2) -> {
-                    return i1 + i2;
-                });
-    }
-    private static Iterator<String> splitInputString(String x) {
-        List<String> list = new LinkedList<String>();
-        for (String s : Arrays.asList(x.split(" "))) {
-            s = s.trim();
-            if (s.endsWith(":") || s.endsWith(",") || s.endsWith(";") || s.endsWith(".")) {
-                s = s.substring(0, s.length() - 1);
-            }
-            if (!s.isEmpty()) {
-                list.add(s);
-            }
-        }
-        return list.iterator();
-    }
+    
     private static class OutputFunction implements VoidFunction<JavaPairRDD<String, Integer>> {
         private static final long serialVersionUID = 1L;
         private SparkStreamingOutput streamOut;
@@ -188,28 +154,5 @@ public class StreamingService {
         }
         
     }
-    private static String getRandomId() {
-        byte[] bytes = new byte[10];
-        new Random().nextBytes(bytes);
-        return Base64Utility.encode(bytes);
-    }
-    private List<String> getStringsFromInputStream(InputStream is) {
-        return getStringsFromReader(new BufferedReader(new InputStreamReader(is)));
-    }
-    private List<String> getStringsFromString(String s) {
-        return getStringsFromReader(new BufferedReader(new StringReader(s)));
-    }
-    private List<String> getStringsFromReader(BufferedReader reader) {
-        
-        List<String> inputStrings = new LinkedList<String>();
-        String userInput = null;
-        try {
-            while ((userInput = reader.readLine()) != null) {
-                inputStrings.add(userInput);
-            }
-        } catch (IOException ex) {
-            throw new WebApplicationException(ex);
-        }
-        return inputStrings;
-    }
+    
 }
