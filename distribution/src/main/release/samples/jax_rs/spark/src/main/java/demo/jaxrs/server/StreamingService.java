@@ -18,7 +18,11 @@
  */
 package demo.jaxrs.server;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -93,7 +97,7 @@ public class StreamingService {
         TikaContentExtractor tika = new TikaContentExtractor();
         TikaContent tikaContent = tika.extract(att.getObject(InputStream.class),
                                                mediaType);
-        processStream(async, new TikaReceiver(tikaContent));
+        processStream(async, new StringListReceiver(getStringsFromString(tikaContent.getContent())));
     }
     
     @POST
@@ -101,7 +105,7 @@ public class StreamingService {
     @Consumes("text/plain")
     @Produces("text/plain")
     public void processSimpleStream(@Suspended AsyncResponse async, InputStream is) {
-        processStream(async, new InputStreamReceiver(is));
+        processStream(async, new StringListReceiver(getStringsFromInputStream(is)));
     }
 
     private void processStream(AsyncResponse async, Receiver<String> receiver) {
@@ -145,15 +149,12 @@ public class StreamingService {
     private static Iterator<String> splitInputString(String x) {
         List<String> list = new LinkedList<String>();
         for (String s : Arrays.asList(x.split(" "))) {
-            s = s.replaceAll("[\\s\n\r]", " ").trim();
-            for (String s2 : Arrays.asList(s.split(" "))) {
-                s2 = s2.trim();
-                if (s2.endsWith(":") || s2.endsWith(",") || s2.endsWith(";") || s2.endsWith(".")) {
-                    s2 = s2.substring(0, s2.length() - 1);
-                }
-                if (!s2.isEmpty()) {
-                    list.add(s2);
-                }
+            s = s.trim();
+            if (s.endsWith(":") || s.endsWith(",") || s.endsWith(";") || s.endsWith(".")) {
+                s = s.substring(0, s.length() - 1);
+            }
+            if (!s.isEmpty()) {
+                list.add(s);
             }
         }
         return list.iterator();
@@ -177,5 +178,24 @@ public class StreamingService {
         byte[] bytes = new byte[10];
         new Random().nextBytes(bytes);
         return Base64Utility.encode(bytes);
+    }
+    private List<String> getStringsFromInputStream(InputStream is) {
+        return getStringsFromReader(new BufferedReader(new InputStreamReader(is)));
+    }
+    private List<String> getStringsFromString(String s) {
+        return getStringsFromReader(new BufferedReader(new StringReader(s)));
+    }
+    private List<String> getStringsFromReader(BufferedReader reader) {
+        
+        List<String> inputStrings = new LinkedList<String>();
+        String userInput = null;
+        try {
+            while ((userInput = reader.readLine()) != null) {
+                inputStrings.add(userInput);
+            }
+        } catch (IOException ex) {
+            throw new WebApplicationException(ex);
+        }
+        return inputStrings;
     }
 }
