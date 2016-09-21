@@ -14,11 +14,11 @@ mvn exec:java -Dexec.mainClass=demo.jaxrs.server.simple.Server
 or 
 
 mvn exec:java -Dexec.mainClass=demo.jaxrs.server.simple.Server -DexecArgs=-receiverType=queue
-(Uses Spark Queue Receiver initialized with a parallelized data set)
+(uses Spark Queue Receiver initialized with a parallelized data set)
 
 In both cases a new streaming context is created on every request. 
 
-You cam also try: 
+You can also try: 
 
 mvn exec:java -Dexec.mainClass=demo.jaxrs.server.socket.Server
 
