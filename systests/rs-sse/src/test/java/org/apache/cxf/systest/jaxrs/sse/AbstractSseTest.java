@@ -61,6 +61,8 @@ public abstract class AbstractSseTest extends AbstractBusClientServerTestBase {
         
         assertThat(response, containsString("id: 4"));
         assertThat(response, containsString("data: " + toJson("New Book #4", 4)));
+        
+        r.close();
     }
     
     @Test
@@ -82,6 +84,8 @@ public abstract class AbstractSseTest extends AbstractBusClientServerTestBase {
         
         assertThat(response, containsString("id: 152"));
         assertThat(response, containsString("data: " + toJson("New Book #154", 154)));
+        
+        r.close();
     }
     
     @Test
@@ -91,6 +95,8 @@ public abstract class AbstractSseTest extends AbstractBusClientServerTestBase {
         
         final Book[] books = r.readEntity(Book[].class);
         assertThat(Arrays.asList(books), hasItems(new Book("New Book #1", 1), new Book("New Book #2", 2)));
+        
+        r.close();
     }
     
     @Test

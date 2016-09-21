@@ -36,6 +36,7 @@ import org.apache.cxf.jaxrs.sse.atmosphere.SseAtmosphereInterceptor;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transport.servlet.ServletDestination;
+import org.atmosphere.cache.UUIDBroadcasterCache;
 import org.atmosphere.cpr.ApplicationConfig;
 import org.atmosphere.cpr.AtmosphereFramework;
 import org.atmosphere.cpr.AtmosphereRequestImpl;
@@ -58,6 +59,7 @@ public class AtmosphereSseServletDestination extends ServletDestination {
         framework.addInitParameter(ApplicationConfig.WEBSOCKET_SUPPORT, "true");
         framework.addInitParameter(ApplicationConfig.DISABLE_ATMOSPHEREINTERCEPTOR, "true");
         framework.addInitParameter(ApplicationConfig.CLOSE_STREAM_ON_CANCEL, "true");
+        framework.setBroadcasterCacheClassName(UUIDBroadcasterCache.class.getName());
         framework.addAtmosphereHandler("/", new DestinationHandler());
         framework.init();
         

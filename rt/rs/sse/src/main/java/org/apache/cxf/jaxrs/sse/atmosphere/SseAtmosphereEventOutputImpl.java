@@ -34,6 +34,7 @@ import javax.ws.rs.sse.SseEventOutput;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.atmosphere.cpr.AtmosphereResource;
+import org.atmosphere.cpr.AtmosphereResponse;
 import org.atmosphere.cpr.Broadcaster;
 
 public class SseAtmosphereEventOutputImpl implements SseEventOutput {
@@ -69,10 +70,13 @@ public class SseAtmosphereEventOutputImpl implements SseEventOutput {
             resource.removeFromAllBroadcasters();
             
             try {
-                if (!resource.getResponse().isCommitted()) {
+                final AtmosphereResponse response = resource.getResponse();
+                if (!response.isCommitted()) {
                     LOG.fine("Response is not committed, flushing buffer");
-                    resource.getResponse().flushBuffer();
+                    response.flushBuffer();
                 }
+                
+                response.closeStreamOrWriter();
             } finally {
                 resource.close();
                 broadcaster.destroy();
