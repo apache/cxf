@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package demo.jaxrs.server;
+package demo.jaxrs.server.simple;
 
 import javax.ws.rs.container.AsyncResponse;
 

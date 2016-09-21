@@ -16,29 +16,32 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package demo.jaxrs.server;
+package demo.jaxrs.server.socket;
 
+import java.io.BufferedReader;
+import java.io.PrintStream;
 import java.util.List;
 
-import org.apache.spark.storage.StorageLevel;
-import org.apache.spark.streaming.receiver.Receiver;
+import javax.ws.rs.container.AsyncResponse;
 
-public class StringListReceiver extends Receiver<String> {
-
-    private static final long serialVersionUID = 1L;
+public class SparkJob implements Runnable {
+    private AsyncResponse ac;
+    private BufferedReader sparkInputStream;
+    private PrintStream sparkOutputStream;
     private List<String> inputStrings;
-    
-    public StringListReceiver(List<String> inputStrings) {
-        super(StorageLevel.MEMORY_ONLY());
+    public SparkJob(AsyncResponse ac, BufferedReader sparkInputStream,
+                          PrintStream sparkOutputStream, List<String> inputStrings) {
+        this.ac = ac;
         this.inputStrings = inputStrings;
+        this.sparkInputStream = sparkInputStream;
+        this.sparkOutputStream = sparkOutputStream;
     }
     @Override
-    public void onStart() {
-        super.store(inputStrings.iterator());
+    public void run() {
+        for (String s : inputStrings) {
+            sparkOutputStream.println(s);
+        }
+        ac.resume(new SparkStreamingOutput(sparkInputStream));
     }
-    @Override
-    public void onStop() {
-        // complete
-    }
-    
+
 }

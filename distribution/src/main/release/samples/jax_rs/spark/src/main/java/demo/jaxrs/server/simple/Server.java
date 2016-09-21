@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package demo.jaxrs.server;
+package demo.jaxrs.server.simple;
 
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;

@@ -90,7 +90,6 @@
                 </executions>
                 <configuration>
                     <executable>java</executable>
-                    <mainClass>demo.jaxrs.server.Server</mainClass>
                 </configuration>
             </plugin>
         </plugins>

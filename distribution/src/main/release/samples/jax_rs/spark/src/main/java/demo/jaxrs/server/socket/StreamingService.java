@@ -16,14 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package demo.jaxrs.server;
+package demo.jaxrs.server.socket;
 
+import java.io.BufferedReader;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -33,7 +33,6 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.MediaType;
@@ -42,15 +41,8 @@ import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import org.apache.cxf.jaxrs.ext.search.tika.TikaContentExtractor;
 import org.apache.cxf.jaxrs.ext.search.tika.TikaContentExtractor.TikaContent;
-import org.apache.spark.SparkConf;
-import org.apache.spark.SparkException;
-import org.apache.spark.api.java.JavaPairRDD;
-import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.function.VoidFunction;
-import org.apache.spark.streaming.Durations;
-import org.apache.spark.streaming.api.java.JavaDStream;
-import org.apache.spark.streaming.api.java.JavaPairDStream;
-import org.apache.spark.streaming.api.java.JavaStreamingContext;
+
+import demo.jaxrs.server.SparkUtils;
 
 
 @Path("/")
@@ -65,10 +57,12 @@ public class StreamingService {
     private Executor executor = new ThreadPoolExecutor(5, 5, 0, TimeUnit.SECONDS,
                                                        new ArrayBlockingQueue<Runnable>(10));
     
-    private String receiverType;
+    private PrintStream sparkOutputStream;
+    private BufferedReader sparkInputStream;
     
-    public StreamingService(String receiverType) {
-        this.receiverType = receiverType;
+    public StreamingService(BufferedReader sparkInputStream, PrintStream sparkOutputStream) {
+        this.sparkInputStream = sparkInputStream;
+        this.sparkOutputStream = sparkOutputStream;
     }
     
     @POST
@@ -103,56 +97,9 @@ public class StreamingService {
     }
 
     private void processStream(AsyncResponse async, List<String> inputStrings) {
-        try {
-            SparkConf sparkConf = new SparkConf().setMaster("local[*]")
-                .setAppName("JAX-RS Spark Connect " + SparkUtils.getRandomId());
-            JavaStreamingContext jssc = new JavaStreamingContext(sparkConf, Durations.seconds(1)); 
-            
-            SparkStreamingOutput streamOut = new SparkStreamingOutput(jssc);
-            SparkStreamingListener sparkListener =  new SparkStreamingListener(streamOut);
-            jssc.addStreamingListener(sparkListener);
-            
-            JavaDStream<String> receiverStream = null;
-            if ("queue".equals(receiverType)) {
-               Queue<JavaRDD<String>> rddQueue = new LinkedList<>();
-               for (int i = 0; i < 30; i++) {
-                   rddQueue.add(jssc.sparkContext().parallelize(inputStrings));
-               }
-               receiverStream = jssc.queueStream(rddQueue);
-            } else {
-               receiverStream = jssc.receiverStream(new StringListReceiver(inputStrings));
-            }
-            
-            JavaPairDStream<String, Integer> wordCounts = SparkUtils.createOutputDStream(receiverStream);
-            wordCounts.foreachRDD(new OutputFunction(streamOut));
-            jssc.start();
-                                                    
-            executor.execute(new SparkJob(async, sparkListener));
-        } catch (Exception ex) {
-            // the compiler does not allow to catch SparkException directly
-            if (ex instanceof SparkException) {
-                async.cancel(60);
-            } else {
-                async.resume(new WebApplicationException(ex));
-            }
-        }
+        executor.execute(
+            new SparkJob(async, sparkInputStream, sparkOutputStream, inputStrings));
     }
     
-    
-    private static class OutputFunction implements VoidFunction<JavaPairRDD<String, Integer>> {
-        private static final long serialVersionUID = 1L;
-        private SparkStreamingOutput streamOut;
-        OutputFunction(SparkStreamingOutput streamOut) {
-            this.streamOut = streamOut;
-        }
-        @Override
-        public void call(JavaPairRDD<String, Integer> rdd) {
-            for (Map.Entry<String, Integer> entry : rdd.collectAsMap().entrySet()) {
-                String value = entry.getKey() + " : " + entry.getValue() + "\n";
-                streamOut.addResponseEntry(value);
-            }
-        }
-        
-    }
     
 }

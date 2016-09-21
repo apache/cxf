@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package demo.jaxrs.server;
+package demo.jaxrs.server.simple;
 
 import org.apache.spark.streaming.scheduler.StreamingListener;
 import org.apache.spark.streaming.scheduler.StreamingListenerBatchCompleted;
