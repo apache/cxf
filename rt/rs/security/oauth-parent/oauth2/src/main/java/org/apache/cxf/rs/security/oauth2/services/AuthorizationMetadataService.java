@@ -32,12 +32,21 @@ import org.apache.cxf.jaxrs.json.basic.JsonMapObjectReaderWriter;
 
 @Path("oauth-authorization-server")
 public class AuthorizationMetadataService {
-
     private String issuer;
+    // Required
     private String authorizationEndpointAddress;
+    // Optional if only an implicit flow is used
+    private boolean tokenEndpointNotAvailable;
     private String tokenEndpointAddress;
+    // Optional
+    private boolean tokenRevocationEndpointNotAvailable;
     private String tokenRevocationEndpointAddress;
+    // Required for OIDC, optional otherwise
+    private boolean jwkEndpointNotAvailable;
     private String jwkEndpointAddress;
+    // Optional
+    private boolean dynamicRegistrationEndpointNotAvailable;
+    private String dynamicRegistrationEndpointAddress;
     
     @GET
     @Produces("application/json")
@@ -59,17 +68,29 @@ public class AuthorizationMetadataService {
             calculateEndpointAddress(authorizationEndpointAddress, baseUri, "/idp/authorize");
         cfg.put("authorization_endpoint", theAuthorizationEndpointAddress);
         // Token Endpoint
-        String theTokenEndpointAddress = 
-            calculateEndpointAddress(tokenEndpointAddress, baseUri, "/oauth2/token");
-        cfg.put("token_endpoint", theTokenEndpointAddress);
+        if (!isTokenEndpointNotAvailable()) {
+            String theTokenEndpointAddress = 
+                calculateEndpointAddress(tokenEndpointAddress, baseUri, "/oauth2/token");
+            cfg.put("token_endpoint", theTokenEndpointAddress);
+        }
         // Token Revocation Endpoint
-        String theTokenRevocationEndpointAddress = 
-            calculateEndpointAddress(tokenRevocationEndpointAddress, baseUri, "/oauth2/revoke");
-        cfg.put("revocation_endpoint", theTokenRevocationEndpointAddress);
+        if (!isTokenRevocationEndpointNotAvailable()) {
+            String theTokenRevocationEndpointAddress = 
+                calculateEndpointAddress(tokenRevocationEndpointAddress, baseUri, "/oauth2/revoke");
+            cfg.put("revocation_endpoint", theTokenRevocationEndpointAddress);
+        }
         // Jwks Uri Endpoint
-        String theJwkEndpointAddress = 
-            calculateEndpointAddress(jwkEndpointAddress, baseUri, "/jwk/keys");
-        cfg.put("jwks_uri", theJwkEndpointAddress);
+        if (!isJwkEndpointNotAvailable()) {
+            String theJwkEndpointAddress = 
+                calculateEndpointAddress(jwkEndpointAddress, baseUri, "/jwk/keys");
+            cfg.put("jwks_uri", theJwkEndpointAddress);
+        }
+        // Dynamic Registration Endpoint
+        if (!isDynamicRegistrationEndpointNotAvailable()) {
+            String theDynamicRegistrationEndpointAddress = 
+                calculateEndpointAddress(dynamicRegistrationEndpointAddress, baseUri, "/dynamic/register");
+            cfg.put("registration_endpoint", theDynamicRegistrationEndpointAddress);
+        }
     }
 
     protected static String calculateEndpointAddress(String endpointAddress, String baseUri, String defRelAddress) {
@@ -108,6 +129,45 @@ public class AuthorizationMetadataService {
 
     public void setTokenRevocationEndpointAddress(String tokenRevocationEndpointAddress) {
         this.tokenRevocationEndpointAddress = tokenRevocationEndpointAddress;
+    }
+
+    public void setTokenRevocationEndpointNotAvailable(boolean tokenRevocationEndpointNotAvailable) {
+        this.tokenRevocationEndpointNotAvailable = tokenRevocationEndpointNotAvailable;
+    }
+    public boolean isTokenRevocationEndpointNotAvailable() {
+        return tokenRevocationEndpointNotAvailable;
+    }
+
+    public void setJwkEndpointNotAvailable(boolean jwkEndpointNotAvailable) {
+        this.jwkEndpointNotAvailable = jwkEndpointNotAvailable;
+    }
+    
+    public boolean isJwkEndpointNotAvailable() {
+        return jwkEndpointNotAvailable;
+    }
+
+    public boolean isTokenEndpointNotAvailable() {
+        return tokenEndpointNotAvailable;
+    }
+
+    public void setTokenEndpointNotAvailable(boolean tokenEndpointNotAvailable) {
+        this.tokenEndpointNotAvailable = tokenEndpointNotAvailable;
+    }
+
+    public boolean isDynamicRegistrationEndpointNotAvailable() {
+        return dynamicRegistrationEndpointNotAvailable;
+    }
+
+    public void setDynamicRegistrationEndpointNotAvailable(boolean dynamicRegistrationEndpointNotAvailable) {
+        this.dynamicRegistrationEndpointNotAvailable = dynamicRegistrationEndpointNotAvailable;
+    }
+
+    public String getDynamicRegistrationEndpointAddress() {
+        return dynamicRegistrationEndpointAddress;
+    }
+
+    public void setDynamicRegistrationEndpointAddress(String dynamicRegistrationEndpointAddress) {
+        this.dynamicRegistrationEndpointAddress = dynamicRegistrationEndpointAddress;
     }
     
 }
