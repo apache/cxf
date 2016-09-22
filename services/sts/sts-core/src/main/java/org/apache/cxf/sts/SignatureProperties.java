@@ -42,6 +42,7 @@ public class SignatureProperties {
         // Default signature algorithms
         acceptedSignatureAlgorithms.add(WSConstants.RSA_SHA1);
         acceptedSignatureAlgorithms.add(signatureAlgorithm);
+        acceptedSignatureAlgorithms.add("http://www.w3.org/2001/04/xmldsig-more#rsa-sha512");
         
         // Default c14n algorithms
         acceptedC14nAlgorithms.add(c14nAlgorithm);
