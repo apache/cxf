@@ -18,14 +18,17 @@
  */
 package org.apache.cxf.rs.security.oauth2.provider;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
 import javax.persistence.TypedQuery;
 
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.rs.security.oauth2.common.AccessTokenRegistration;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
@@ -46,7 +49,7 @@ import org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken;
  * </ul>
  */
 public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
-    private static final String CLIENT_QUERY =  "SELECT client FROM Client client"
+    private static final String CLIENT_QUERY = "SELECT client FROM Client client"
             + " INNER JOIN client.resourceOwnerSubject ros";
 
     private EntityManagerFactory entityManagerFactory;
@@ -78,12 +81,18 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
 
     protected <T> T executeInTransaction(EntityManagerOperation<T> operation) {
         EntityManager em = getEntityManager();
+        EntityTransaction transaction = null;
         T value;
         try {
-            beginIfNeeded(em);
+            transaction = beginIfNeeded(em);
             value = operation.execute(em);
             flushIfNeeded(em);
             commitIfNeeded(em);
+        } catch (RuntimeException e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            throw e;
         } finally {
             closeIfNeeded(em);
         }
@@ -103,7 +112,8 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
                         client.setResourceOwnerSubject(sub);
                     }
                 }
-                boolean clientExists = em.createQuery("SELECT count(client) from Client client where id = :id",
+                boolean clientExists = em.createQuery("SELECT count(client) from Client client "
+                                + "where client.clientId = :id",
                         Long.class)
                         .setParameter("id", client.getClientId())
                         .getSingleResult() > 0 ? true : false;
@@ -215,6 +225,28 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
         });
     }
 
+    @Override
+    protected ServerAccessToken doCreateAccessToken(AccessTokenRegistration atReg) {
+        ServerAccessToken at = super.doCreateAccessToken(atReg);
+        // we override this in order to get rid of elementCollections directly injected
+        // from another entity
+        // this can be the case when using multiple cmt dataProvider operation in a single entityManager
+        // lifespan
+        if (at.getAudiences() != null) {
+            at.setAudiences(new ArrayList<String>(at.getAudiences()));
+        }
+        if (at.getExtraProperties() != null) {
+            at.setExtraProperties(new HashMap<String, String>(at.getExtraProperties()));
+        }
+        if (at.getScopes() != null) {
+            at.setScopes(new ArrayList<OAuthPermission>(at.getScopes()));
+        }
+        if (at.getParameters() != null) {
+            at.setParameters(new HashMap<String, String>(at.getParameters()));
+        }
+        return at;
+    }
+
     protected void saveAccessToken(final ServerAccessToken serverToken) {
         executeInTransaction(new EntityManagerOperation<Void>() {
             @Override
@@ -237,6 +269,11 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
                 } else {
                     sub = em.merge(serverToken.getSubject());
                     serverToken.setSubject(sub);
+                }
+                // ensure we have a managed association
+                // (needed for OpenJPA : InvalidStateException: Encountered unmanaged object)
+                if (serverToken.getClient() != null) {
+                    serverToken.setClient(em.find(Client.class, serverToken.getClient().getClientId()));
                 }
 
                 em.persist(serverToken);
@@ -346,8 +383,10 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
      *
      * This method needs to be overridden in a CMT environment.
      */
-    protected void beginIfNeeded(EntityManager em) {
-        em.getTransaction().begin();
+    protected EntityTransaction beginIfNeeded(EntityManager em) {
+        EntityTransaction tx = em.getTransaction();
+        tx.begin();
+        return tx;
     }
 
     /**

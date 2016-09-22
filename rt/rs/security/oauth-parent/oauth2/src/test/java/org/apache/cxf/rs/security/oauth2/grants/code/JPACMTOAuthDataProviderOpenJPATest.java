@@ -18,17 +18,15 @@
  */
 package org.apache.cxf.rs.security.oauth2.grants.code;
 
-import org.junit.After;
-import org.junit.Before;
+import org.apache.cxf.rs.security.oauth2.provider.JPAOAuthDataProviderTest;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
- * Runs the same tests as JPACodeDataProviderTest but within a Spring Managed Transaction.
+ * Runs the same tests as JPAOAuthDataProviderTest but within a Spring Managed Transaction.
  *
  * Spring spawns a transaction before each call to <code><oauthProvider</code>.
  *
@@ -41,25 +39,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("JPACMTCodeDataProvider.xml")
 @DirtiesContext
-@ActiveProfiles("hibernate")
-public class JPACMTCodeDataProviderTest extends JPACodeDataProviderTest {
-
-    @Autowired
-    private JPACMTCodeDataProvider oauthProvider;
-
-    @Override
-    protected JPACodeDataProvider getProvider() {
-        return this.oauthProvider;
-    }
-
-    @Before
-    @Override
-    public void setUp() {
-        initializeProvider(oauthProvider);
-    }
-
-    @After
-    @Override
-    public void tearDown() {
-    }
+@ActiveProfiles(value = "openJPA", inheritProfiles = false)
+public class JPACMTOAuthDataProviderOpenJPATest extends JPAOAuthDataProviderTest {
 }

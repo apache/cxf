@@ -13,6 +13,7 @@
         <class>org.apache.cxf.rs.security.oauth2.common.ServerAccessToken</class>
         <class>org.apache.cxf.rs.security.oauth2.common.AccessToken</class>
         <class>org.apache.cxf.rs.security.oauth2.common.OAuthPermission</class>
+        <class>org.apache.cxf.rs.security.oauth2.common.Permission</class>
         <class>org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken</class>
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
         <shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
@@ -40,6 +41,7 @@
         <class>org.apache.cxf.rs.security.oauth2.common.ServerAccessToken</class>
         <class>org.apache.cxf.rs.security.oauth2.common.AccessToken</class>
         <class>org.apache.cxf.rs.security.oauth2.common.OAuthPermission</class>
+        <class>org.apache.cxf.rs.security.oauth2.common.Permission</class>
         <class>org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken</class>
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
         <shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
@@ -52,6 +54,9 @@
             <property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema"/>
             <property name="openjpa.jdbc.EagerFetchMode" value="parallel"/>
             <property name="openjpa.MaxFetchDepth" value="20"/>
+            <!--
+            <property name="openjpa.Log" value="DefaultLevel=WARN, Runtime=TRACE, Tool=INFO"/>
+            -->
         </properties>
     </persistence-unit>
 

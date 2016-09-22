@@ -47,7 +47,7 @@ public class JPACodeDataProviderTest extends Assert {
             fail("Exception during HSQL database init.");
         }
         try {
-            emFactory = Persistence.createEntityManagerFactory("testUnitHibernate");
+            emFactory = Persistence.createEntityManagerFactory(getPersistenceUnitName());
             provider = new JPACodeDataProvider();
             getProvider().setEntityManagerFactory(emFactory);
             initializeProvider(provider);
@@ -55,6 +55,10 @@ public class JPACodeDataProviderTest extends Assert {
             ex.printStackTrace();
             fail("Exception during JPA EntityManager creation.");
         }
+    }
+
+    protected String getPersistenceUnitName() {
+        return "testUnitHibernate";
     }
 
     protected void initializeProvider(JPACodeDataProvider dataProvider) {

@@ -58,6 +58,11 @@ public class JPACodeDataProvider extends JPAOAuthDataProvider implements Authori
                         grant.setSubject(sub);
                     }
                 }
+                // ensure we have a managed association
+                // (needed for OpenJPA : InvalidStateException: Encountered unmanaged object)
+                if (grant.getClient() != null) {
+                    grant.setClient(em.find(Client.class, grant.getClient().getClientId()));
+                }
                 em.persist(grant);
                 return null;
             }

@@ -18,12 +18,9 @@
  */
 package org.apache.cxf.rs.security.oauth2.provider;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
@@ -34,7 +31,6 @@ import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -42,20 +38,12 @@ import org.junit.Test;
 
 public class JPAOAuthDataProviderTest extends Assert {
     protected EntityManagerFactory emFactory;
-    private Connection connection;
     private JPAOAuthDataProvider provider;
 
     @Before
     public void setUp() throws Exception {
         try {
-            Class.forName("org.hsqldb.jdbcDriver");
-            connection = DriverManager.getConnection("jdbc:hsqldb:mem:oauth-jpa", "sa", "");
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            fail("Exception during HSQL database init.");
-        }
-        try {
-            emFactory = Persistence.createEntityManagerFactory("testUnitHibernate");
+            emFactory = Persistence.createEntityManagerFactory(getPersistenceUnitName());
             provider = new JPAOAuthDataProvider();
             provider.setEntityManagerFactory(emFactory);
             initializeProvider(provider);
@@ -63,6 +51,10 @@ public class JPAOAuthDataProviderTest extends Assert {
             ex.printStackTrace();
             fail("Exception during JPA EntityManager creation.");
         }
+    }
+
+    protected String getPersistenceUnitName() {
+        return "testUnitHibernate";
     }
 
     protected void initializeProvider(JPAOAuthDataProvider dataProvider) {
@@ -249,7 +241,7 @@ public class JPAOAuthDataProviderTest extends Assert {
             ex.printStackTrace();    
         } finally {    
             try {
-                connection.createStatement().execute("SHUTDOWN");
+                //connection.createStatement().execute("SHUTDOWN");
             } catch (Throwable ex) {
                 ex.printStackTrace();
             }

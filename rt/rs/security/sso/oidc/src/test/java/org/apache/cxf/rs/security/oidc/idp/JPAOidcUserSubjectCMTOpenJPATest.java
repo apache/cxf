@@ -16,8 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.oauth2.grants.code;
+package org.apache.cxf.rs.security.oidc.idp;
 
+import org.apache.cxf.rs.security.oauth2.provider.JPAOAuthDataProvider;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -27,28 +28,17 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-/**
- * Runs the same tests as JPACodeDataProviderTest but within a Spring Managed Transaction.
- *
- * Spring spawns a transaction before each call to <code><oauthProvider</code>.
- *
- * Note : this test needs <code>@DirtiesContext</code>, otherwise
- * spring tests cache and reuse emf across test classes
- * while non spring unit tests are closing emf (hence connection exception: closed).
- *
- * @author agonzalez
- */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("JPACMTCodeDataProvider.xml")
+@ContextConfiguration("JPAOidcUserSubjectCMTTest.xml")
 @DirtiesContext
-@ActiveProfiles("hibernate")
-public class JPACMTCodeDataProviderTest extends JPACodeDataProviderTest {
+@ActiveProfiles("openJPA")
+public class JPAOidcUserSubjectCMTOpenJPATest extends JPAOidcUserSubjectTest {
 
     @Autowired
-    private JPACMTCodeDataProvider oauthProvider;
+    private JPAOAuthDataProvider oauthProvider;
 
     @Override
-    protected JPACodeDataProvider getProvider() {
+    protected JPAOAuthDataProvider getProvider() {
         return this.oauthProvider;
     }
 

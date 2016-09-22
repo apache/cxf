@@ -24,6 +24,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -33,10 +34,15 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  *
  * Spring spawns a transaction before each call to <code><oauthProvider</code>.
  *
+ * Note : this test needs <code>@DirtiesContext</code>, otherwise
+ * spring tests cache and reuse emf across test classes
+ * while non spring unit tests are closing emf (hence connection exception: closed).
+ *
  * @author agonzalez
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("JPACMTCodeDataProvider.xml")
+@DirtiesContext
 @ActiveProfiles("hibernate")
 public class JPACMTOAuthDataProviderTest extends JPAOAuthDataProviderTest {
 

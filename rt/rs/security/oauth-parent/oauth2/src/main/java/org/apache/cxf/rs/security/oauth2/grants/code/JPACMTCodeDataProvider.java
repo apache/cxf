@@ -19,6 +19,7 @@
 package org.apache.cxf.rs.security.oauth2.grants.code;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
 import javax.persistence.PersistenceContext;
 
 public class JPACMTCodeDataProvider extends JPACodeDataProvider {
@@ -42,7 +43,8 @@ public class JPACMTCodeDataProvider extends JPACodeDataProvider {
      * Doesn't do anything, beginning tx is handled by container.
      */
     @Override
-    protected void beginIfNeeded(EntityManager em) {
+    protected EntityTransaction beginIfNeeded(EntityManager em) {
+        return null;
     }
 
     /**
