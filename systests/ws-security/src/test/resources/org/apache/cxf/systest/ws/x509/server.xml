@@ -39,6 +39,11 @@
             </httpj:tlsServerParameters>
         </httpj:engine>
     </httpj:engine-factory>
+    
+    <bean id="policyLoader" class="org.apache.cxf.systest.ws.x509.SHA512PolicyLoader" >
+          <constructor-arg ref="cxf"/>
+    </bean>
+    
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SymmetricErrorMessage" address="http://localhost:${testutil.ports.x509.Server}/DoubleItX509SymmetricErrorMessage" serviceName="s:DoubleItService" endpointName="s:DoubleItSymmetricErrorMessagePort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItX509.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
@@ -119,6 +124,14 @@
         </jaxws:properties>
     </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Asymmetric" address="http://localhost:${testutil.ports.x509.Server}/DoubleItX509Asymmetric" serviceName="s:DoubleItService" endpointName="s:DoubleItAsymmetricIssuerSerialPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItX509.wsdl">
+        <jaxws:properties>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+            <entry key="security.signature.properties" value="bob.properties"/>
+            <entry key="security.encryption.properties" value="alice.properties"/>
+            <entry key="security.encryption.username" value="alice"/>
+        </jaxws:properties>
+    </jaxws:endpoint>
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="AsymmetricSHA512" address="http://localhost:${testutil.ports.x509.Server}/DoubleItX509AsymmetricSHA512" serviceName="s:DoubleItService" endpointName="s:DoubleItAsymmetricSHA512Port" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItX509.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>
