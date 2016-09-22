@@ -104,6 +104,10 @@ public class GCMTest extends AbstractBusClientServerTestBase {
     
     @org.junit.Test
     public void testAESGCM128() throws Exception {
+        if (!unrestrictedPoliciesInstalled) {
+            return;
+        }
+        
         //
         // This test fails with the IBM JDK 7
         // IBM JDK 7 appears to require a GCMParameter class to be used, which
