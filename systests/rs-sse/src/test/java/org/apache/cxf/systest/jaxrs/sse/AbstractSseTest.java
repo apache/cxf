@@ -45,27 +45,6 @@ public abstract class AbstractSseTest extends AbstractBusClientServerTestBase {
     private final ObjectMapper mapper = new ObjectMapper();
     
     @Test
-    public void testBooksStreamIsReturned() throws JsonProcessingException {
-        Response r = createWebClient("/rest/api/bookstore/sse/100").get();
-        assertEquals(Status.OK.getStatusCode(), r.getStatus());
-        
-        final String response = r.readEntity(String.class);
-        assertThat(response, containsString("id: 1"));
-        assertThat(response, containsString("data: " + toJson("New Book #1", 1)));
-        
-        assertThat(response, containsString("id: 2"));
-        assertThat(response, containsString("data: " + toJson("New Book #2", 2)));
-        
-        assertThat(response, containsString("id: 3"));
-        assertThat(response, containsString("data: " + toJson("New Book #3", 3)));
-        
-        assertThat(response, containsString("id: 4"));
-        assertThat(response, containsString("data: " + toJson("New Book #4", 4)));
-        
-        r.close();
-    }
-    
-    @Test
     public void testBooksStreamIsReturnedFromLastEventId() throws JsonProcessingException {
         Response r = createWebClient("/rest/api/bookstore/sse/100")
             .header(HttpHeaders.LAST_EVENT_ID_HEADER, 150)

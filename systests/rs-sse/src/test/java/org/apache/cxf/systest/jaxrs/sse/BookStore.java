@@ -40,8 +40,13 @@ import javax.ws.rs.sse.SseBroadcaster;
 import javax.ws.rs.sse.SseContext;
 import javax.ws.rs.sse.SseEventOutput;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Path("/api/bookstore")
 public class BookStore {
+    private static final Logger LOG = LoggerFactory.getLogger(BookStore.class);
+
     private final CountDownLatch latch = new CountDownLatch(2);
     private final AtomicReference<SseBroadcaster> broadcaster = 
         new AtomicReference<SseBroadcaster>();
@@ -84,8 +89,8 @@ public class BookStore {
                     output.write(createStatsEvent(sseContext.newEvent().name("book"), id + 4));
                     Thread.sleep(200);
                     output.close();
-                } catch (final InterruptedException | IOException e) {
-                    e.printStackTrace();
+                } catch (final InterruptedException | IOException ex) {
+                    LOG.error("Communication error", ex);
                 }
             }
         }.start();
@@ -117,9 +122,15 @@ public class BookStore {
     
     @POST
     @Path("broadcast/close")
-    public void stop() throws InterruptedException {
-        // Await a least 2 clients to be broadcasted over 
-        latch.await(2, TimeUnit.SECONDS);
+    public void stop() {
+        try {
+            // Await a least 2 clients to be broadcasted over 
+            if (!latch.await(2, TimeUnit.SECONDS)) {
+                LOG.warn("Not enough clients have been connected, closing broadcaster anyway");
+            }
+        } catch (final InterruptedException ex) {
+            LOG.error("Wait has been interrupted", ex);
+        }
         
         if (broadcaster.get() != null) {
             broadcaster.get().close();
