@@ -78,15 +78,19 @@ public class HTTPUndertowTransportActivator
                                        this, servProps);
         
         mbeanServerTracker = new ServiceTracker(ctx, MBeanServer.class.getName(), null);
-        BlueprintNameSpaceHandlerFactory nsHandlerFactory = new BlueprintNameSpaceHandlerFactory() {
-            
-            @Override
-            public Object createNamespaceHandler() {
-                return new HTTPUndertowTransportNamespaceHandler();
-            }
-        };
-        NamespaceHandlerRegisterer.register(context, nsHandlerFactory,
-                                            "http://cxf.apache.org/transports/http-undertow/configuration");  
+        try {
+            BlueprintNameSpaceHandlerFactory nsHandlerFactory = new BlueprintNameSpaceHandlerFactory() {
+
+                @Override
+                public Object createNamespaceHandler() {
+                    return new HTTPUndertowTransportNamespaceHandler();
+                }
+            };
+            NamespaceHandlerRegisterer.register(context, nsHandlerFactory,
+                    "http://cxf.apache.org/transports/http-undertow/configuration");
+        } catch (NoClassDefFoundError e) {
+            // Blueprint not available, ignore
+        }
     }
 
     public void stop(BundleContext ctx) throws Exception {
