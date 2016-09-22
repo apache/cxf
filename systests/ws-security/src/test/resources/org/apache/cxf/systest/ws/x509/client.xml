@@ -24,6 +24,11 @@
             <cxf:logging/>
         </cxf:features>
     </cxf:bus>
+    
+    <bean id="policyLoader" class="org.apache.cxf.systest.ws.x509.SHA512PolicyLoader" >
+          <constructor-arg ref="cxf"/>
+    </bean>
+    
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSymmetricErrorMessagePort" createdFromAPI="true">
         <jaxws:properties>
             <entry key="security.encryption.properties" value="bob.properties"/>
@@ -104,6 +109,15 @@
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricIssuerSerialPort" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="security.encryption.properties" value="bob.properties"/>
+            <entry key="security.encryption.username" value="bob"/>
+            <entry key="security.signature.properties" value="alice.properties"/>
+            <entry key="security.signature.username" value="alice"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+        </jaxws:properties>
+    </jaxws:client>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricSHA512Port" createdFromAPI="true">
         <jaxws:properties>
             <entry key="security.encryption.properties" value="bob.properties"/>
             <entry key="security.encryption.username" value="bob"/>

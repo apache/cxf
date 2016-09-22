@@ -169,7 +169,6 @@
     <feature name="cxf-http-jetty" version="${project.version}">
         <feature version="${project.version}">cxf-http</feature>
         <feature version="[7,10)">jetty</feature>
-        <feature>aries-blueprint</feature>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-transports-http-jetty/${project.version}</bundle>
         <capability>
             cxf.http.provider;name=jetty
@@ -181,9 +180,6 @@
         <bundle start-level="40">mvn:org.apache.httpcomponents/httpclient-osgi/${cxf.httpcomponents.client.version}</bundle>
         <bundle start-level="40">mvn:org.apache.httpcomponents/httpasyncclient-osgi/${cxf.httpcomponents.asyncclient.version}</bundle>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-transports-http-hc/${project.version}</bundle>
-        <capability>
-            cxf.http.provider;name=async
-        </capability>
     </feature>
     <feature name="cxf-http-netty-client" version="${project.version}">
         <feature version="${project.version}">cxf-http</feature>
@@ -212,7 +208,6 @@
     <feature name="cxf-http-undertow" version="${project.version}">
         <feature version="${project.version}">cxf-http</feature>
         <feature>pax-http-undertow</feature>
-		<feature>aries-blueprint</feature>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-transports-http-undertow/${project.version}</bundle>
         <capability>
             cxf.http.provider;name=undertow
@@ -270,7 +265,7 @@
         <feature version="${project.version}">cxf-rs-security-jose</feature>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-rs-security-oauth2/${project.version}</bundle>
     </feature>
-    <feature name="cxf-jackson" version="${project.version}" resolver="(obr)">
+    <feature name="cxf-jackson" version="${project.version}">
         <bundle start-level="35">mvn:com.fasterxml.jackson.core/jackson-core/${cxf.jackson.version}</bundle>
         <bundle start-level="35">mvn:com.fasterxml.jackson.core/jackson-annotations/${cxf.jackson.version}</bundle>
         <bundle start-level="35">mvn:com.fasterxml.jackson.core/jackson-databind/${cxf.jackson.version}</bundle>
@@ -278,7 +273,7 @@
         <bundle start-level="35">mvn:com.fasterxml.jackson.jaxrs/jackson-jaxrs-base/${cxf.jackson.version}</bundle>
         <bundle start-level="35">mvn:com.fasterxml.jackson.jaxrs/jackson-jaxrs-json-provider/${cxf.jackson.version}</bundle>
     </feature>
-    <feature name="cxf-rs-description-swagger2" version="${project.version}" resolver="(obr)">
+    <feature name="cxf-rs-description-swagger2" version="${project.version}">
         <feature version="${project.version}">cxf-jaxrs</feature>
         <feature version="${project.version}">cxf-jackson</feature>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-rs-service-description-swagger/${project.version}</bundle>
@@ -374,6 +369,9 @@
         <feature version="${project.version}">cxf-http</feature>
         <bundle dependency='true'>mvn:org.atmosphere/atmosphere-runtime/${cxf.atmosphere.version}</bundle>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-transports-websocket/${project.version}</bundle>
+        <capability>
+            cxf.http.provider;name=websocket
+        </capability>
     </feature>
     <feature name="cxf-javascript" version="${project.version}">
         <feature version="${project.version}">cxf-core</feature>
