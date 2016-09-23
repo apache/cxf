@@ -20,16 +20,13 @@ package org.apache.cxf.rs.security.oauth2.common;
 
 import java.util.LinkedList;
 import java.util.List;
+
 import javax.persistence.Cacheable;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.OrderColumn;
 import javax.xml.bind.annotation.XmlRootElement;
-
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.annotations.FetchMode;
 
 /**
  * Provides the complete information about a given opaque permission.
@@ -64,8 +61,6 @@ public class OAuthPermission extends Permission {
      */
     @ElementCollection(fetch = FetchType.EAGER)
     @OrderColumn
-    @org.hibernate.annotations.Fetch(FetchMode.SUBSELECT)
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public List<String> getHttpVerbs() {
         return httpVerbs;
     }
@@ -85,8 +80,6 @@ public class OAuthPermission extends Permission {
      */
     @ElementCollection(fetch = FetchType.EAGER)
     @OrderColumn
-    @org.hibernate.annotations.Fetch(FetchMode.SUBSELECT)
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public List<String> getUris() {
         return uris;
     }
