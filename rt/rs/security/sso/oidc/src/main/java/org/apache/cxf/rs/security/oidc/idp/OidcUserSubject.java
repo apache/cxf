@@ -18,7 +18,10 @@
  */
 package org.apache.cxf.rs.security.oidc.idp;
 
+import javax.persistence.Basic;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Lob;
 
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oidc.common.IdToken;
@@ -26,34 +29,41 @@ import org.apache.cxf.rs.security.oidc.common.UserInfo;
 
 @Entity
 public class OidcUserSubject extends UserSubject {
-    
+
     private static final long serialVersionUID = 8806727177012442229L;
+
     private IdToken idToken;
+
     private UserInfo userInfo;
-    
+
     public OidcUserSubject() {
-        
+
     }
-    
+
     public OidcUserSubject(String login) {
         super(login);
     }
-    
-    public OidcUserSubject(String login, String id) { 
+
+    public OidcUserSubject(String login, String id) {
         super(login, id);
     }
-    
+
     public OidcUserSubject(UserSubject sub) {
         super(sub);
     }
-    
+
+    @Lob
+    @Basic(fetch = FetchType.EAGER)
     public IdToken getIdToken() {
         return idToken;
     }
+
     public void setIdToken(IdToken idToken) {
         this.idToken = idToken;
     }
 
+    @Lob
+    @Basic(fetch = FetchType.EAGER)
     public UserInfo getUserInfo() {
         return userInfo;
     }
