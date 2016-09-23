@@ -50,6 +50,15 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
     public void handleMessage(Message message) throws Fault {
         createExchangeId(message);
         final LogEvent event = new DefaultLogEventMapper().map(message);
+        if (shouldLogContent(event)) {
+            addContent(message, event);
+        } else {
+            event.setPayload(AbstractLoggingInterceptor.CONTENT_SUPPRESSED);
+        }
+        sender.send(event);
+    }
+
+    private void addContent(Message message, final LogEvent event) {
         try {
             CachedOutputStream cos = message.getContent(CachedOutputStream.class);
             if (cos != null) {
@@ -63,8 +72,6 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
         } catch (IOException e) {
             throw new Fault(e);
         }
-
-        sender.send(event);
     }
 
     private void handleOutputStream(final LogEvent event, Message message, CachedOutputStream cos) throws IOException {

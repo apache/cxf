@@ -61,7 +61,6 @@ public class WireTapIn extends AbstractPhaseInterceptor<Message> {
         } catch (Exception e) {
             throw new Fault(e);
         }
-
     }
 
     private void handleReader(Message message, Reader reader) throws IOException {
@@ -103,4 +102,5 @@ public class WireTapIn extends AbstractPhaseInterceptor<Message> {
     public void setThreshold(long threshold) {
         this.threshold = threshold;
     }
+    
 }

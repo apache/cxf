@@ -90,4 +90,22 @@ public class LoggingFeature extends AbstractFeature {
     public void setPrettyLogging(boolean prettyLogging) {
         this.prettyFilter.setPrettyLogging(prettyLogging);
     }
+    
+    /**
+     * Log binary content?
+     * @param logBinary defaults to false 
+     */
+    public void setLogBinary(boolean logBinary) {
+        in.setLogBinary(logBinary);
+        out.setLogBinary(logBinary);
+    }
+    
+    /**
+     * Log multipart content? 
+     * @param logMultipart defaults to true
+     */
+    public void setLogMultipart(boolean logMultipart) {
+        in.setLogMultipart(logMultipart);
+        out.setLogMultipart(logMultipart);
+    }
 }

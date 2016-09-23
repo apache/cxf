@@ -19,6 +19,7 @@
 package org.apache.cxf.ext.logging;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.util.Collections;
 import java.util.List;
@@ -43,8 +44,40 @@ public class RESTLoggingTest {
         server.start();
         WebClient client = createClient(loggingFeature);
         String result = client.get(String.class);
-        Assert.assertEquals("test1", result);
         server.destroy();
+        Assert.assertEquals("test1", result);
+    }
+    
+    @Test
+    public void testBinary() throws IOException {
+        LoggingFeature loggingFeature = new LoggingFeature();
+        TestEventSender sender = new TestEventSender();
+        loggingFeature.setSender(sender);
+        Server server = createServiceBinary(loggingFeature);
+        server.start();
+        WebClient client = createClient(loggingFeature);
+        client.get(InputStream.class).close();
+        loggingFeature.setLogBinary(true);
+        client.get(InputStream.class).close();
+        server.destroy();
+        
+        assertLogged(sender.getEvents().get(0));
+        assertLogged(sender.getEvents().get(1));
+        assertNotLogged(sender.getEvents().get(2));
+        assertNotLogged(sender.getEvents().get(3));
+        
+        assertLogged(sender.getEvents().get(4));
+        assertLogged(sender.getEvents().get(5));
+        assertLogged(sender.getEvents().get(6));
+        assertLogged(sender.getEvents().get(7));
+    }
+
+    private void assertLogged(LogEvent event) {
+        Assert.assertNotEquals(AbstractLoggingInterceptor.CONTENT_SUPPRESSED, event.getPayload());
+    }
+    
+    private void assertNotLogged(LogEvent event) {
+        Assert.assertEquals(AbstractLoggingInterceptor.CONTENT_SUPPRESSED, event.getPayload());
     }
 
     private WebClient createClient(LoggingFeature loggingFeature) {
@@ -59,6 +92,14 @@ public class RESTLoggingTest {
         factory.setAddress(SERVICE_URI);
         factory.setFeatures(Collections.singletonList(loggingFeature));
         factory.setServiceBean(new TestServiceRest());
+        return factory.create();
+    }
+    
+    private Server createServiceBinary(LoggingFeature loggingFeature) {
+        JAXRSServerFactoryBean factory = new JAXRSServerFactoryBean();
+        factory.setAddress(SERVICE_URI);
+        factory.setFeatures(Collections.singletonList(loggingFeature));
+        factory.setServiceBean(new TestServiceRestBinary());
         return factory.create();
     }
     
