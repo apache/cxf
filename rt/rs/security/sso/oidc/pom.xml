@@ -180,36 +180,6 @@
           </execution>
         </executions>
       </plugin>
-      <!--
-      <plugin>
-          <groupId>org.apache.openjpa</groupId>
-          <artifactId>openjpa-maven-plugin</artifactId>
-          <version>${cxf.openjpa.version}</version>
-          <configuration>
-              <includes>
-                 org/apache/cxf/rs/security/oidc/idp/OidcUserSubject.class,
-                 org/apache/cxf/rs/security/oauth2/common/Client.class,
-                 org/apache/cxf/rs/security/oauth2/common/UserSubject.class,
-                 org/apache/cxf/rs/security/oauth2/grants/code/AuthorizationCodeGrant,
-                 org/apache/cxf/rs/security/oauth2/grants/code/ServerAuthorizationCodeGrant.class,
-                 org/apache/cxf/rs/security/oauth2/tokens/bearer/BearerAccessToken.class,
-                 org/apache/cxf/rs/security/oauth2/common/ServerAccessToken.class,
-                 org/apache/cxf/rs/security/oauth2/common/AccessToken.class,
-                 org/apache/cxf/rs/security/oauth2/tokens/refresh/RefreshToken.class,
-                 org/apache/cxf/rs/security/oauth2/common/OAuthPermission.class
-              </includes>
-          </configuration>
-          <executions>
-              <execution>
-                  <id>enhancer</id>
-                  <phase>process-test-classes</phase>
-                  <goals>
-                      <goal>test-enhance</goal>
-                  </goals>
-              </execution>
-          </executions>
-      </plugin>
-      -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
