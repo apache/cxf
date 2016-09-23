@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/aop
+                           http://www.springframework.org/schema/aop/spring-aop.xsd
+                           http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/context
+                           http://www.springframework.org/schema/context/spring-context.xsd
+                           http://www.springframework.org/schema/tx
+                           http://www.springframework.org/schema/tx/spring-tx.xsd
+                           http://www.springframework.org/schema/util
+                           http://www.springframework.org/schema/util/spring-util.xsd">
+
+
+    <bean id="oauthProvider"
+          class="org.apache.cxf.rs.security.oauth2.grants.code.JPACMTCodeDataProvider"
+          init-method="init" destroy-method="close">
+    </bean>
+
+
+    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="entityManagerFactory" ref="entityManagerFactory"/>
+    </bean>
+
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+
+    <aop:config proxy-target-class="true">
+        <aop:pointcut id="oauthProviderOperation"
+                      expression="bean(oauthProvider)"/>
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="oauthProviderOperation"/>
+    </aop:config>
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">
+        <tx:attributes>
+            <tx:method name="*"/>
+        </tx:attributes>
+    </tx:advice>
+
+    <beans profile="hibernate">
+        <bean id="entityManagerFactory"
+              class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+            <!--
+            <property name="dataSource" ref="dataSource"/>
+            -->
+            <!--<property name="jpaVendorAdapter">-->
+                <!--<bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">-->
+                    <!--<property name="showSql" value="true"/>-->
+                    <!--<property name="generateDdl" value="true"/>-->
+                <!--</bean>-->
+            <!--</property>-->
+            <property name="persistenceUnitName" value="testUnitHibernate"/>
+            <property name="jpaPropertyMap">
+                <map>
+                    <entry key="hibernate.jdbc.fetch_size" value="400"/>
+                    <entry key="hibernate.jdbc.batch_size" value="100"/>
+                    <!--<entry key="hibernate.cache.use_second_level_cache" value="true"/>-->
+                    <!--<entry key="hibernate.cache.region.factory_class" value="org.hibernate.cache.ehcache.EhCacheRegionFactory"/>-->
+                </map>
+            </property>
+        </bean>
+    </beans>
+
+    <beans profile="openJPA">
+        <bean id="entityManagerFactory"
+              class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+            <!--
+            <property name="dataSource" ref="dataSource"/>
+            -->
+            <!--<property name="jpaVendorAdapter">-->
+                <!--<bean class="org.springframework.orm.jpa.vendor.OpenJpaVendorAdapter">-->
+                    <!--<property name="showSql" value="true"/>-->
+                    <!--<property name="generateDdl" value="true"/>-->
+                <!--</bean>-->
+            <!--</property>-->
+            <property name="persistenceUnitName" value="testUnitOpenJPA"/>
+            <!--
+            <property name="loadTimeWeaver">
+                <bean class="org.springframework.instrument.classloading.SimpleLoadTimeWeaver"/>
+            </property>
+            -->
+            <!--<property name="jpaPropertyMap">-->
+                <!--<map>-->
+                    <!--<entry key="openjpa.Log" value="slf4j"/>-->
+                    <!--<entry key="openjpa.Log" value="SQL=TRACE"/>-->
+                    <!--<entry key="openjpa.ConnectionFactoryProperties"-->
+                           <!--value="PrintParameters=true, PrettyPrint=true, PrettyPrintLineLength=80"/>-->
+                    <!--<entry key="openjpa.Log" value="DefaultLevel=WARN, Runtime=INFO, Tool=INFO, SQL=TRACE"/>-->
+                <!--</map>-->
+        </bean>
+    </beans>
+</beans>

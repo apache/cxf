@@ -24,10 +24,12 @@ import java.util.List;
 import java.util.Map;
 
 import javax.persistence.ElementCollection;
+import javax.persistence.FetchType;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.OrderColumn;
 
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
@@ -40,7 +42,7 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 @MappedSuperclass
 public abstract class ServerAccessToken extends AccessToken {
     private static final long serialVersionUID = 638776204861456064L;
-    
+
     private String grantType;
     private Client client;
     private List<OAuthPermission> scopes = new LinkedList<OAuthPermission>();
@@ -51,34 +53,34 @@ public abstract class ServerAccessToken extends AccessToken {
     private String responseType;
     private String grantCode;
     private Map<String, String> extraProperties = new LinkedHashMap<String, String>();
-    
+
     protected ServerAccessToken() {
-        
+
     }
-    
-    protected ServerAccessToken(Client client, 
-                                        String tokenType,
-                                        String tokenKey,
-                                        long expiresIn) {
-        this(client, tokenType, tokenKey, expiresIn, OAuthUtils.getIssuedAt());
-    }
-    
-    protected ServerAccessToken(Client client, 
+
+    protected ServerAccessToken(Client client,
                                 String tokenType,
                                 String tokenKey,
-                                long expiresIn, 
+                                long expiresIn) {
+        this(client, tokenType, tokenKey, expiresIn, OAuthUtils.getIssuedAt());
+    }
+
+    protected ServerAccessToken(Client client,
+                                String tokenType,
+                                String tokenKey,
+                                long expiresIn,
                                 long issuedAt) {
         super(tokenType, tokenKey, expiresIn, issuedAt);
         this.client = client;
     }
-    
-    protected ServerAccessToken(ServerAccessToken token, String key) {    
-        super(token.getTokenType(), 
-             key, 
-             token.getExpiresIn(), 
-             token.getIssuedAt(),
-             token.getRefreshToken(),
-             token.getParameters());
+
+    protected ServerAccessToken(ServerAccessToken token, String key) {
+        super(token.getTokenType(),
+                key,
+                token.getExpiresIn(),
+                token.getIssuedAt(),
+                token.getRefreshToken(),
+                token.getParameters());
         this.client = token.getClient();
         this.grantType = token.getGrantType();
         this.scopes = token.getScopes();
@@ -88,6 +90,13 @@ public abstract class ServerAccessToken extends AccessToken {
         this.clientCodeVerifier = token.getClientCodeVerifier();
         this.nonce = token.getNonce();
         this.grantCode = token.getGrantCode();
+    }
+
+    protected static ServerAccessToken validateTokenType(ServerAccessToken token, String expectedType) {
+        if (!token.getTokenType().equals(expectedType)) {
+            throw new OAuthServiceException(OAuthConstants.SERVER_ERROR);
+        }
+        return token;
     }
 
     /**
@@ -102,12 +111,12 @@ public abstract class ServerAccessToken extends AccessToken {
     public void setClient(Client c) {
         this.client = c;
     }
-    
+
     /**
      * Returns a list of opaque permissions/scopes
      * @return the scopes
      */
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     public List<OAuthPermission> getScopes() {
         return scopes;
     }
@@ -118,16 +127,6 @@ public abstract class ServerAccessToken extends AccessToken {
      */
     public void setScopes(List<OAuthPermission> scopes) {
         this.scopes = scopes;
-    }
-    
-    /**
-     * Sets a subject capturing the login name 
-     * the end user used to login to the resource server
-     * when authorizing a given client request
-     * @param subject
-     */
-    public void setSubject(UserSubject subject) {
-        this.subject = subject;
     }
 
     /**
@@ -142,11 +141,13 @@ public abstract class ServerAccessToken extends AccessToken {
     }
 
     /**
-     * Sets the grant type which was used to obtain the access token
-     * @param grantType the grant type
+     * Sets a subject capturing the login name
+     * the end user used to login to the resource server
+     * when authorizing a given client request
+     * @param subject
      */
-    public void setGrantType(String grantType) {
-        this.grantType = grantType;
+    public void setSubject(UserSubject subject) {
+        this.subject = subject;
     }
 
     /**
@@ -156,13 +157,13 @@ public abstract class ServerAccessToken extends AccessToken {
     public String getGrantType() {
         return grantType;
     }
-    
+
     /**
-     * Set the response type
-     * @param responseType the response type
+     * Sets the grant type which was used to obtain the access token
+     * @param grantType the grant type
      */
-    public void setResponseType(String responseType) {
-        this.responseType = responseType;
+    public void setGrantType(String grantType) {
+        this.grantType = grantType;
     }
 
     /**
@@ -172,8 +173,17 @@ public abstract class ServerAccessToken extends AccessToken {
     public String getResponseType() {
         return responseType;
     }
-    
-    @ElementCollection
+
+    /**
+     * Set the response type
+     * @param responseType the response type
+     */
+    public void setResponseType(String responseType) {
+        this.responseType = responseType;
+    }
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @OrderColumn
     public List<String> getAudiences() {
         return audiences;
     }
@@ -181,14 +191,7 @@ public abstract class ServerAccessToken extends AccessToken {
     public void setAudiences(List<String> audiences) {
         this.audiences = audiences;
     }
-    
-    protected static ServerAccessToken validateTokenType(ServerAccessToken token, String expectedType) {
-        if (!token.getTokenType().equals(expectedType)) {
-            throw new OAuthServiceException(OAuthConstants.SERVER_ERROR);
-        }
-        return token;
-    }
-    
+
     public String getClientCodeVerifier() {
         return clientCodeVerifier;
     }
@@ -205,7 +208,7 @@ public abstract class ServerAccessToken extends AccessToken {
         this.nonce = nonce;
     }
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @MapKeyColumn(name = "extraPropName")
     public Map<String, String> getExtraProperties() {
         return extraProperties;
@@ -214,13 +217,6 @@ public abstract class ServerAccessToken extends AccessToken {
     public void setExtraProperties(Map<String, String> extraProperties) {
         this.extraProperties = extraProperties;
     }
-    /**
-     * Set the grant code which was used to request the token
-     * @param grantCode the grant code
-     */
-    public void setGrantCode(String grantCode) {
-        this.grantCode = grantCode;
-    }
 
     /**
      * Get the grant code
@@ -228,5 +224,13 @@ public abstract class ServerAccessToken extends AccessToken {
      */
     public String getGrantCode() {
         return grantCode;
+    }
+
+    /**
+     * Set the grant code which was used to request the token
+     * @param grantCode the grant code
+     */
+    public void setGrantCode(String grantCode) {
+        this.grantCode = grantCode;
     }
 }
