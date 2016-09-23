@@ -34,7 +34,6 @@
         <module>itests</module>
         <module>itests-felix</module>
         <module>karaf</module>
-        <!-- <module>karaf4</module> -->
         <module>repository</module>
     </modules>
 </project>

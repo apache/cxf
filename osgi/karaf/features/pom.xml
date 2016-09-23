@@ -29,66 +29,21 @@
     <description>Apache CXF Karaf Features</description>
     <!-- The validate plugin will export these provided dependencies bundles' export packages first -->
     <dependencies>
+        <!-- Framework distribution -->
         <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.core</artifactId>
-            <version>4.2.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.ops4j.pax.logging</groupId>
-            <artifactId>pax-logging-api</artifactId>
-            <version>${cxf.pax.logging.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.ops4j.pax.logging</groupId>
-            <artifactId>pax-logging-service</artifactId>
-            <version>${cxf.pax.logging.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.felix</groupId>
-            <artifactId>org.apache.felix.framework</artifactId>
-            <version>${cxf.felix.framework.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.felix</groupId>
-            <artifactId>org.apache.felix.configadmin</artifactId>
-            <version>${cxf.felix.configadmin.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.aries.blueprint</groupId>
-            <artifactId>org.apache.aries.blueprint</artifactId>
-            <version>${cxf.aries.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <!-- The dependency for cxf karaf command console -->
-        <dependency>
-            <groupId>org.apache.karaf.shell</groupId>
-            <artifactId>org.apache.karaf.shell.console</artifactId>
+            <groupId>org.apache.karaf.features</groupId>
+            <artifactId>framework</artifactId>
             <version>${cxf.karaf.version}</version>
+            <type>kar</type>
             <scope>provided</scope>
         </dependency>
-        
+
         <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-frontend-jaxws</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-ws-rm</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-ws-security</artifactId>
-            <version>${project.version}</version>
+            <groupId>org.apache.karaf.features</groupId>
+            <artifactId>standard</artifactId>
+            <version>${cxf.karaf.version}</version>
+            <classifier>features</classifier>
+            <type>xml</type>
             <scope>provided</scope>
         </dependency>
     </dependencies>
@@ -135,34 +90,38 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.karaf.tooling</groupId>
+                <artifactId>karaf-maven-plugin</artifactId>
+                <version>${cxf.karaf.version}</version>
+                <executions>
+                    <execution>
+                        <id>verify</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>verify</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>mvn:org.apache.karaf.features/framework/${cxf.karaf.version}/xml/features</descriptor>
+                                <descriptor>mvn:org.apache.karaf.features/standard/${cxf.karaf.version}/xml/features</descriptor>
+                                <descriptor>mvn:org.apache.karaf.features/spring/${cxf.karaf.version}/xml/features</descriptor>
+                                <descriptor>file:${project.build.directory}/classes/features.xml</descriptor>
+                            </descriptors>
+                            <distribution>org.apache.karaf.features:framework</distribution>
+                            <javase>1.8</javase>
+                            <framework>
+                                <feature>framework</feature>
+                            </framework>
+                            <features>
+                                <!--<feature>cxf-*</feature>-->
+                                <feature>cxf-management-web</feature>
+                                <feature>cxf-wsn</feature>
+                            </features>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
-    <profiles>
-        <profile>
-            <id>validate</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.karaf.tooling</groupId>
-                        <artifactId>features-maven-plugin</artifactId>
-                        <version>${cxf.karaf.version}</version>
-                        <configuration>
-                            <file>${project.build.directory}/classes/features.xml</file>
-                            <karafConfig>${project.build.directory}/classes/config.properties</karafConfig>
-                            <jreVersion>jre-1.6</jreVersion>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>validate</id>
-                                <phase>process-resources</phase>
-                                <goals>
-                                    <goal>validate</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 </project>

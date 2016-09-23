@@ -30,7 +30,7 @@
     <name>Apache CXF Karaf Parent</name>
     <description>Apache CXF Karaf Parent</description>
     <modules>
-        <module>features</module>
         <module>commands</module>
+        <module>features</module>
     </modules>
 </project>

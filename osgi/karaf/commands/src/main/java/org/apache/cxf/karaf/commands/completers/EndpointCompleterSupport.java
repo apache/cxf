@@ -23,25 +23,21 @@ import java.util.List;
 import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.endpoint.ServerRegistry;
-import org.apache.cxf.karaf.commands.CXFController;
-import org.apache.karaf.shell.console.Completer;
-import org.apache.karaf.shell.console.completer.StringsCompleter;
+import org.apache.cxf.karaf.commands.internal.CXFController;
+import org.apache.karaf.shell.api.console.CommandLine;
+import org.apache.karaf.shell.api.console.Completer;
+import org.apache.karaf.shell.api.console.Session;
+import org.apache.karaf.shell.support.completers.StringsCompleter;
 
-public abstract class EndpointCompleterSupport implements Completer {
-    
-    private CXFController cxfController;
-
-    public void setController(CXFController controller) {
-        this.cxfController = controller;
-    }
+public abstract class EndpointCompleterSupport extends CXFController implements Completer {
 
     @Override
-    public int complete(final String buffer, 
-                        final int cursor, 
-                        @SuppressWarnings("rawtypes") final List candidates) {
+    public int complete(Session session,
+                        CommandLine commandLine,
+                        List<String> list) {
         StringsCompleter delegate = new StringsCompleter();
         try {
-            List<Bus> busses = cxfController.getBusses();
+            List<Bus> busses = getBusses();
            
             for (Bus b : busses) {
                 ServerRegistry reg = b.getExtension(ServerRegistry.class);
@@ -58,7 +54,7 @@ public abstract class EndpointCompleterSupport implements Completer {
         } catch (Exception e) {
             // Ignore
         }
-        return delegate.complete(buffer, cursor, candidates);
+        return delegate.complete(session, commandLine, list);
     }
     
     /**
