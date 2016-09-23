@@ -80,7 +80,7 @@ public class DynamicRegistrationService extends AbstractOAuthService {
         String[] authParts = AuthorizationUtils.getAuthorizationParts(getMessageContext(), 
                              Collections.singleton(OAuthConstants.BEARER_AUTHORIZATION_SCHEME));
         if (authParts.length != 2 || !authParts[1].equals(accessToken)) {
-            throw ExceptionUtils.toForbiddenException(null, null);
+            throw ExceptionUtils.toNotAuthorizedException(null, null);
         }
     }
 
@@ -141,6 +141,9 @@ public class DynamicRegistrationService extends AbstractOAuthService {
     
     protected Client readClient(String clientId) {
         Client c = clientProvider.getClient(clientId);
+        if (c == null) {
+            throw ExceptionUtils.toNotAuthorizedException(null, null);
+        }
         String regAccessToken = c.getProperties().get(ClientRegistrationResponse.REG_ACCESS_TOKEN);
         // Or check OAuthDataProvider.getAccessToken
         // if OAuthDataProvider.createAccessToken was used
