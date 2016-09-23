@@ -19,16 +19,21 @@
 package org.apache.cxf.systest.jaxrs.sse;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.hasItems;
 
 public abstract class AbstractBroadcasterSseTest extends AbstractSseBaseTest {
     @Test
@@ -60,5 +65,16 @@ public abstract class AbstractBroadcasterSseTest extends AbstractSseBaseTest {
             
             r.close();
         }
+    }
+    
+    @Test
+    public void testBooksAreReturned() throws JsonProcessingException {
+        Response r = createWebClient("/rest/api/bookstore", MediaType.APPLICATION_JSON).get();
+        assertEquals(Status.OK.getStatusCode(), r.getStatus());
+        
+        final Book[] books = r.readEntity(Book[].class);
+        assertThat(Arrays.asList(books), hasItems(new Book("New Book #1", 1), new Book("New Book #2", 2)));
+        
+        r.close();
     }
 }
