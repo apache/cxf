@@ -119,23 +119,25 @@
       <groupId>org.apache.openjpa</groupId>
       <artifactId>openjpa</artifactId>
       <version>${cxf.openjpa.version}</version>
-      <scope>compile</scope>
+      <scope>test</scope>
       <optional>true</optional>
     </dependency>
+    
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-entitymanager</artifactId>
       <version>${hibernate.em.version}</version>
-      <scope>compile</scope>
+      <scope>test</scope>
       <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-ehcache</artifactId>
       <version>${hibernate.em.version}</version>
-      <scope>compile</scope>
+      <scope>test</scope>
       <optional>true</optional>
     </dependency>
+    
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-nop</artifactId>

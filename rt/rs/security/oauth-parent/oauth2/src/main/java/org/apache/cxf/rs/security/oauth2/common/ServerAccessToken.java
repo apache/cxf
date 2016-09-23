@@ -34,10 +34,6 @@ import javax.persistence.OrderColumn;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 
 
 /**
@@ -121,8 +117,6 @@ public abstract class ServerAccessToken extends AccessToken {
      * @return the scopes
      */
     @ManyToMany(fetch = FetchType.EAGER)
-    @Fetch(FetchMode.SUBSELECT)
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public List<OAuthPermission> getScopes() {
         return scopes;
     }
@@ -190,7 +184,6 @@ public abstract class ServerAccessToken extends AccessToken {
 
     @ElementCollection(fetch = FetchType.EAGER)
     @OrderColumn
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public List<String> getAudiences() {
         return audiences;
     }
@@ -217,7 +210,6 @@ public abstract class ServerAccessToken extends AccessToken {
 
     @ElementCollection(fetch = FetchType.EAGER)
     @MapKeyColumn(name = "extraPropName")
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public Map<String, String> getExtraProperties() {
         return extraProperties;
     }
