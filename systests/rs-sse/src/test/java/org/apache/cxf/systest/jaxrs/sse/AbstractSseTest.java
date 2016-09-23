@@ -18,12 +18,7 @@
  */
 package org.apache.cxf.systest.jaxrs.sse;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -31,19 +26,13 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
-import org.apache.cxf.jaxrs.client.WebClient;
-import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.hasItems;
 
-public abstract class AbstractSseTest extends AbstractBusClientServerTestBase {
-    private final ObjectMapper mapper = new ObjectMapper();
-    
+public abstract class AbstractSseTest extends AbstractSseBaseTest {
     @Test
     public void testBooksStreamIsReturnedFromLastEventId() throws JsonProcessingException {
         Response r = createWebClient("/rest/api/bookstore/sse/100")
@@ -77,56 +66,4 @@ public abstract class AbstractSseTest extends AbstractBusClientServerTestBase {
         
         r.close();
     }
-    
-    @Test
-    public void testBooksStreamIsBroadcasted() throws Exception {
-        final Collection<Future<Response>> results = new ArrayList<>();
-        
-        for (int i = 0; i < 2; ++i) {
-            results.add(
-                createWebClient("/rest/api/bookstore/broadcast/sse").async().get()
-            );
-        }
-
-        createWebClient("/rest/api/bookstore/broadcast/close")
-            .async()
-            .post(null)
-            .get(4, TimeUnit.SECONDS)
-            .close();
-
-        for (final Future<Response> result: results) {
-            final Response r = result.get(1, TimeUnit.SECONDS);
-            assertEquals(Status.OK.getStatusCode(), r.getStatus());
-    
-            final String response = r.readEntity(String.class);
-            assertThat(response, containsString("id: 1000"));
-            assertThat(response, containsString("data: " + toJson("New Book #1000", 1000)));
-            
-            assertThat(response, containsString("id: 2000"));
-            assertThat(response, containsString("data: " + toJson("New Book #2000", 2000)));
-            
-            r.close();
-        }
-    }
-
-    private String toJson(final String name, final Integer id) throws JsonProcessingException {
-        return mapper.writeValueAsString(new Book(name, id));
-    }
-    
-    protected WebClient createWebClient(final String url, final String media) {
-        final List< ? > providers = Arrays.asList(new JacksonJsonProvider());
-        
-        final WebClient wc = WebClient
-            .create("http://localhost:" + getPort() + url, providers)
-            .accept(media);
-        
-        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(5000L);
-        return wc;
-    }
-    
-    protected WebClient createWebClient(final String url) {
-        return createWebClient(url, MediaType.SERVER_SENT_EVENTS);
-    }
-    
-    protected abstract int getPort();
 }
