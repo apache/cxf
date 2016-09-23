@@ -48,18 +48,6 @@ public class ClasspathScanner {
     }    
 
     private static ClasspathScanner getClasspathScanner() { 
-        boolean useSpring = true;
-        String s = SystemPropertyAction.getPropertyOrNull("org.apache.cxf.useSpringClassHelpers");
-        if (!StringUtils.isEmpty(s)) {
-            useSpring = "1".equals(s) || Boolean.parseBoolean(s);
-        }
-        if (useSpring) {
-            try {
-                return new SpringClasspathScanner();
-            } catch (Throwable ex) {
-                // ignore
-            }
-        }
         return new ClasspathScanner();
     }
     

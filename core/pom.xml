@@ -141,6 +141,7 @@
             <groupId>org.codehaus.woodstox</groupId>
             <artifactId>woodstox-core-asl</artifactId>
         </dependency>
+        <!-- 
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-beans</artifactId>
@@ -169,6 +170,7 @@
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>
+        -->
         <dependency>
             <groupId>org.apache.ws.xmlschema</groupId>
             <artifactId>xmlschema-core</artifactId>
@@ -211,6 +213,7 @@
             <optional>true</optional>
             <scope>provided</scope>
         </dependency>
+        <!--
         <dependency>
             <groupId>org.springframework.osgi</groupId>
             <artifactId>spring-osgi-io</artifactId>
@@ -223,6 +226,7 @@
             <optional>true</optional>
             <scope>provided</scope>
         </dependency>
+        -->
     </dependencies>
     <build>
         <plugins>

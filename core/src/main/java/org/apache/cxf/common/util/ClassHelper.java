@@ -38,18 +38,6 @@ public class ClassHelper {
     }
     
     private static ClassHelper getClassHelper() { 
-        boolean useSpring = true;
-        String s = SystemPropertyAction.getPropertyOrNull("org.apache.cxf.useSpringClassHelpers");
-        if (!StringUtils.isEmpty(s)) {
-            useSpring = "1".equals(s) || Boolean.parseBoolean(s);
-        }
-        if (useSpring) {
-            try {
-                return new SpringAopClassHelper();
-            } catch (Throwable ex) {
-                // ignore
-            }
-        }
         return new ClassHelper();
     }
     
