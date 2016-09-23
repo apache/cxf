@@ -18,11 +18,7 @@
  */
 package org.apache.cxf.rs.security.oidc.idp;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.util.Collections;
-
-import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
@@ -31,7 +27,6 @@ import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.provider.JPAOAuthDataProvider;
 import org.apache.cxf.rs.security.oidc.common.IdToken;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -39,30 +34,33 @@ import org.junit.Test;
 
 public class JPAOidcUserSubjectTest extends Assert {
     private EntityManagerFactory emFactory;
-    private Connection connection;
     private JPAOAuthDataProvider provider;
+
     @Before
     public void setUp() throws Exception {
         try {
-            Class.forName("org.hsqldb.jdbcDriver");
-            connection = DriverManager.getConnection("jdbc:hsqldb:mem:oauth-jpa", "sa", "");
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            fail("Exception during HSQL database init.");
-        }
-        try {
-            emFactory = Persistence.createEntityManagerFactory("testUnitHibernate");
-            EntityManager em = emFactory.createEntityManager();
+            emFactory = Persistence.createEntityManagerFactory(getPersistenceUnitName());
             provider = new JPAOAuthDataProvider();
-            provider.setEntityManager(em);
-            provider.setSupportedScopes(Collections.singletonMap("a", "A Scope"));
-            provider.setSupportedScopes(Collections.singletonMap("refreshToken", "RefreshToken"));
+            provider.setEntityManagerFactory(emFactory);
+            initializeProvider(provider);
         } catch (Exception ex) {
             ex.printStackTrace();
             fail("Exception during JPA EntityManager creation.");
         }
     }
 
+    protected JPAOAuthDataProvider getProvider() {
+        return provider;
+    }
+
+    protected void initializeProvider(JPAOAuthDataProvider oauthDataProvider) {
+        oauthDataProvider.setSupportedScopes(Collections.singletonMap("a", "A Scope"));
+        oauthDataProvider.setSupportedScopes(Collections.singletonMap("refreshToken", "RefreshToken"));
+    }
+
+    protected String getPersistenceUnitName() {
+        return "testUnitHibernate";
+    }
     
     @Test
     public void testAccessTokenWithOidcUserSubject() {
@@ -79,8 +77,8 @@ public class JPAOidcUserSubjectTest extends Assert {
         oidcSubject.setIdToken(idToken);
         atr.setSubject(oidcSubject);
         
-        ServerAccessToken at = provider.createAccessToken(atr);
-        ServerAccessToken at2 = provider.getAccessToken(at.getTokenKey());
+        ServerAccessToken at = getProvider().createAccessToken(atr);
+        ServerAccessToken at2 = getProvider().getAccessToken(at.getTokenKey());
         assertEquals(at.getTokenKey(), at2.getTokenKey());
                 
         OidcUserSubject oidcSubject2 = (OidcUserSubject)at2.getSubject();
@@ -93,8 +91,8 @@ public class JPAOidcUserSubjectTest extends Assert {
         oidcSubject3.setIdToken(idToken2);
         atr.setSubject(oidcSubject3);
         
-        ServerAccessToken at3 = provider.createAccessToken(atr);
-        ServerAccessToken at4 = provider.getAccessToken(at3.getTokenKey());
+        ServerAccessToken at3 = getProvider().createAccessToken(atr);
+        ServerAccessToken at4 = getProvider().getAccessToken(at3.getTokenKey());
         OidcUserSubject oidcSubject4 = (OidcUserSubject)at4.getSubject();
         assertEquals(c.getClientId(), oidcSubject4.getIdToken().getAudience());
     }
@@ -105,28 +103,26 @@ public class JPAOidcUserSubjectTest extends Assert {
         c.setRedirectUris(Collections.singletonList("http://client/redirect"));
         c.setClientId(clientId);
         c.setResourceOwnerSubject(new OidcUserSubject(userLogin));
-        provider.setClient(c);
+        getProvider().setClient(c);
         return c;
     }
     
     @After
     public void tearDown() throws Exception {
         try {
-            if (provider != null) {
-                provider.close();
-            }
-            if (emFactory != null) {
-                emFactory.close();
+            if (getProvider() != null) {
+                getProvider().close();
             }
         } catch (Throwable ex) {
             ex.printStackTrace();    
         } finally {    
             try {
-                connection.createStatement().execute("SHUTDOWN");
+                if (getProvider() != null) {
+                    getProvider().close();
+                }
             } catch (Throwable ex) {
                 ex.printStackTrace();
             }
         }
     }
-    
 }
