@@ -40,6 +40,7 @@ public final class LogEvent {
     private String operationName;
     private Map<String, String> headers;
     private boolean binaryContent;
+    private boolean multipartContent;
     private String payload;
     private boolean truncated;
     private File fullContentFile;
@@ -166,6 +167,14 @@ public final class LogEvent {
 
     public void setBinaryContent(boolean binaryContent) {
         this.binaryContent = binaryContent;
+    }
+    
+    public boolean isMultipartContent() {
+        return multipartContent;
+    }
+    
+    public void setMultipartContent(boolean multipartContent) {
+        this.multipartContent = multipartContent;
     }
 
     public String getPayload() {
