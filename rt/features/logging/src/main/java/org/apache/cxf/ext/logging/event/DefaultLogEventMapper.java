@@ -55,6 +55,7 @@ public class DefaultLogEventMapper implements LogEventMapper {
         BINARY_CONTENT_MEDIA_TYPES.add("image/jpeg");
         BINARY_CONTENT_MEDIA_TYPES.add("image/gif");
     }
+    private static final String MULTIPART_CONTENT_MEDIA_TYPE = "multipart";
 
     public LogEvent map(Message message) {
         final LogEvent event = new LogEvent();
@@ -83,6 +84,7 @@ public class DefaultLogEventMapper implements LogEventMapper {
 
         event.setPrincipal(getPrincipal(message));
         event.setBinaryContent(isBinaryContent(message));
+        event.setMultipartContent(isMultipartContent(message));
         setEpInfo(message, event);
         return event;
     }
@@ -169,6 +171,11 @@ public class DefaultLogEventMapper implements LogEventMapper {
     private boolean isBinaryContent(Message message) {
         String contentType = safeGet(message, Message.CONTENT_TYPE);
         return contentType != null && BINARY_CONTENT_MEDIA_TYPES.contains(contentType);
+    }
+    
+    private boolean isMultipartContent(Message message) {
+        String contentType = safeGet(message, Message.CONTENT_TYPE);
+        return contentType != null && contentType.startsWith(MULTIPART_CONTENT_MEDIA_TYPE);
     }
 
     /**
@@ -260,7 +267,7 @@ public class DefaultLogEventMapper implements LogEventMapper {
         return new StringBuffer().append(httpMethod).append('[').append(path).append(']').toString();
     }
     
-    private String safeGet(Message message, String key) {
+    private static String safeGet(Message message, String key) {
         if (!message.containsKey(key)) {
             return null;
         }

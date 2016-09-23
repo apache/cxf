@@ -79,7 +79,7 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
         return newOut;
     }
 
-    private static class LogEventSendingWriter extends FilterWriter {
+    private class LogEventSendingWriter extends FilterWriter {
         StringWriter out2;
         int count;
         Message message;
@@ -126,6 +126,15 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
             if (w2 == null) {
                 w2 = (StringWriter)out;
             }
+            
+            String payload = shouldLogContent(event) ? getPayload(event, w2) : CONTENT_SUPPRESSED;
+            event.setPayload(payload);
+            sender.send(event);
+            message.setContent(Writer.class, out);
+            super.close();
+        }
+
+        private String getPayload(final LogEvent event, StringWriter w2) {
             String ct = (String)message.get(Message.CONTENT_TYPE);
             StringBuilder payload = new StringBuilder();
             try {
@@ -133,10 +142,7 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
             } catch (Exception ex) {
                 // ignore
             }
-            event.setPayload(payload.toString());
-            sender.send(event);
-            message.setContent(Writer.class, out);
-            super.close();
+            return payload.toString();
         }
         
         protected void writePayload(StringBuilder builder, StringWriter stringWriter, String contentType)
@@ -150,7 +156,7 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
         }
     }
 
-    public static class LoggingCallback implements CachedOutputStreamCallback {
+    public class LoggingCallback implements CachedOutputStreamCallback {
 
         private final Message message;
         private final OutputStream origStream;
@@ -170,13 +176,10 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
 
         public void onClose(CachedOutputStream cos) {
             final LogEvent event = new DefaultLogEventMapper().map(message);
-            try {
-                String encoding = (String)message.get(Message.ENCODING);
-                StringBuilder payload = new StringBuilder();
-                writePayload(payload, cos, encoding, event.getContentType());
-                event.setPayload(payload.toString());
-            } catch (Exception ex) {
-                // ignore
+            if (shouldLogContent(event)) {
+                copyPayload(cos, event);
+            } else {
+                event.setPayload(CONTENT_SUPPRESSED);
             }
 
             sender.send(event);
@@ -188,6 +191,17 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
                 // ignore
             }
             message.setContent(OutputStream.class, origStream);
+        }
+
+        private void copyPayload(CachedOutputStream cos, final LogEvent event) {
+            try {
+                String encoding = (String)message.get(Message.ENCODING);
+                StringBuilder payload = new StringBuilder();
+                writePayload(payload, cos, encoding, event.getContentType());
+                event.setPayload(payload.toString());
+            } catch (Exception ex) {
+                // ignore
+            }
         }
         
         protected void writePayload(StringBuilder builder, CachedOutputStream cos, String encoding,

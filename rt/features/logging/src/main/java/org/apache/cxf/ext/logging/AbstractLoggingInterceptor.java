@@ -29,9 +29,12 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 
 public abstract class AbstractLoggingInterceptor extends AbstractPhaseInterceptor<Message> {
     public static final int DEFAULT_LIMIT = 48 * 1024;
+    protected static final String CONTENT_SUPPRESSED = "--- Content suppressed ---";
 
     protected int limit = DEFAULT_LIMIT;
     protected long threshold = -1;
+    protected boolean logBinary;
+    protected boolean logMultipart = true;
 
     protected LogEventSender sender;
 
@@ -60,6 +63,20 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
         if (sender instanceof PrettyLoggingFilter) {
             ((PrettyLoggingFilter)this.sender).setPrettyLogging(prettyLogging);
         }
+    }
+    
+    protected boolean shouldLogContent(LogEvent event) {
+        return event.isBinaryContent() && logBinary 
+            || event.isMultipartContent() && logMultipart
+            || !event.isBinaryContent() && !event.isMultipartContent();
+    }
+    
+    public void setLogBinary(boolean logBinary) {
+        this.logBinary = logBinary;
+    }
+    
+    public void setLogMultipart(boolean logMultipart) {
+        this.logMultipart = logMultipart;
     }
     
     public void createExchangeId(Message message) {
