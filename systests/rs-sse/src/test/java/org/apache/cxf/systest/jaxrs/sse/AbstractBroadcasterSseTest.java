@@ -49,7 +49,7 @@ public abstract class AbstractBroadcasterSseTest extends AbstractSseBaseTest {
         createWebClient("/rest/api/bookstore/broadcast/close")
             .async()
             .post(null)
-            .get(4, TimeUnit.SECONDS)
+            .get(5, TimeUnit.SECONDS)
             .close();
 
         for (final Future<Response> result: results) {

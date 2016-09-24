@@ -125,7 +125,7 @@ public class BookStore {
     public void stop() {
         try {
             // Await a least 2 clients to be broadcasted over 
-            if (!latch.await(2, TimeUnit.SECONDS)) {
+            if (!latch.await(4, TimeUnit.SECONDS)) {
                 LOG.warn("Not enough clients have been connected, closing broadcaster anyway");
             }
         } catch (final InterruptedException ex) {
