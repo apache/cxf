@@ -44,7 +44,7 @@ public abstract class AbstractSseBaseTest extends AbstractBusClientServerTestBas
             .create("http://localhost:" + getPort() + url, providers)
             .accept(media);
         
-        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(5000L);
+        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(8000L);
         return wc;
     }
     
