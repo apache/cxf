@@ -53,7 +53,7 @@ public abstract class AbstractBroadcasterSseTest extends AbstractSseBaseTest {
             .close();
 
         for (final Future<Response> result: results) {
-            final Response r = result.get(1, TimeUnit.SECONDS);
+            final Response r = result.get(3, TimeUnit.SECONDS);
             assertEquals(Status.OK.getStatusCode(), r.getStatus());
     
             final String response = r.readEntity(String.class);
