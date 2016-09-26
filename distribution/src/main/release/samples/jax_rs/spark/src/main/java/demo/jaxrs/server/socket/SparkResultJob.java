@@ -18,38 +18,36 @@
  */
 package demo.jaxrs.server.socket;
 
-import java.io.PrintStream;
-import java.util.List;
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 
-import javax.ws.rs.container.AsyncResponse;
+public class SparkResultJob implements Runnable {
 
-import demo.jaxrs.server.SparkUtils;
-
-public class SparkJob implements Runnable {
-    private AsyncResponse ac;
     private Map<String, BlockingQueue<String>> sparkResponses;
-    private PrintStream sparkOutputStream;
-    private List<String> inputStrings;
-    public SparkJob(AsyncResponse ac, Map<String, BlockingQueue<String>> sparkResponses,
-                          PrintStream sparkOutputStream, List<String> inputStrings) {
-        this.ac = ac;
-        this.inputStrings = inputStrings;
+    private BufferedReader sparkInputStream;
+    public SparkResultJob(Map<String, BlockingQueue<String>> sparkResponses,
+                          BufferedReader sparkInputStream) {
         this.sparkResponses = sparkResponses;
-        this.sparkOutputStream = sparkOutputStream;
+        this.sparkInputStream = sparkInputStream;
     }
+
+    
     @Override
     public void run() {
-        String jobId = SparkUtils.getRandomId();
-        BlockingQueue<String> queue = new LinkedBlockingQueue<String>();
-        sparkResponses.put(jobId, queue);
-        
-        for (String s : inputStrings) {
-            sparkOutputStream.println(jobId + ":" + s);
+        try {
+            String s = null;
+            while ((s = sparkInputStream.readLine()) != null) {
+                int index = s.indexOf(":");
+                String jobId = s.substring(0, index);
+                String value = s.substring(index + 1);
+                sparkResponses.get(jobId).offer(value);
+            }
+        } catch (IOException ex) {
+            // ignore    
         }
-        ac.resume(new SparkStreamingOutput(sparkResponses, jobId, queue));
+
     }
 
 }

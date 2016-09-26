@@ -32,14 +32,23 @@ Next do:
 
 curl -X POST -H "Accept: text/plain" -H "Content-Type: text/plain" -d "Hello Spark" http://localhost:9000/spark/stream
 
-2. PDF/ODT/ODP processing:
+2. Simple one way text processing:
+
+curl -X POST -H "Accept: text/plain" -H "Content-Type: text/plain" -d "Hello Spark" http://localhost:9000/spark/streamOneWay
+
+3. PDF/ODT/ODP processing:
 
 Open multipart.html located in src/main/resources, locate any PDF or OpenOffice text or presentation file available 
 on the local disk and upload.
 
-Note Spark restricts that only a single streaming context can be active in JVM at a given moment of time. 
-This is the error which will be logged if you try to access the demo server concurrently:
-"org.apache.spark.SparkException: Only one SparkContext may be running in this JVM (see SPARK-2243).
+Note Spark restricts that only a single streaming context can be active in JVM at a given moment of time.
+demo.jaxrs.server.simple.Server creates a new context per every request so this is the error which will be logged 
+if you try to access this demo server concurrently:
 
+"org.apache.spark.SparkException: Only one SparkContext may be running in this JVM (see SPARK-2243).
 To ignore this error, set spark.driver.allowMultipleContexts = true".
 
+However demo.jaxrs.server.socket.Server creates only a single context and its JAX-RS frontend can process multiple requests concurrently
+without having to set "spark.driver.allowMultipleContexts = true".
+
+ 

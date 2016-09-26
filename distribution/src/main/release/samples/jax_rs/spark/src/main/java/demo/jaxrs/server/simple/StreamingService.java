@@ -38,6 +38,7 @@ import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.MediaType;
 
+import org.apache.cxf.jaxrs.ext.Oneway;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import org.apache.cxf.jaxrs.ext.search.tika.TikaContentExtractor;
@@ -103,6 +104,13 @@ public class StreamingService {
     public void processSimpleStream(@Suspended AsyncResponse async, InputStream is) {
         processStream(async, SparkUtils.getStringsFromInputStream(is));
     }
+    @POST
+    @Path("/streamOneWay")
+    @Consumes("text/plain")
+    @Oneway
+    public void processSimpleStreamOneWay(InputStream is) {
+        processStreamOneWay(SparkUtils.getStringsFromInputStream(is));
+    }
 
     private void processStream(AsyncResponse async, List<String> inputStrings) {
         try {
@@ -125,7 +133,7 @@ public class StreamingService {
                receiverStream = jssc.receiverStream(new StringListReceiver(inputStrings));
             }
             
-            JavaPairDStream<String, Integer> wordCounts = SparkUtils.createOutputDStream(receiverStream);
+            JavaPairDStream<String, Integer> wordCounts = SparkUtils.createOutputDStream(receiverStream, false);
             wordCounts.foreachRDD(new OutputFunction(streamOut));
             jssc.start();
                                                     
@@ -137,6 +145,31 @@ public class StreamingService {
             } else {
                 async.resume(new WebApplicationException(ex));
             }
+        }
+    }
+    
+    private void processStreamOneWay(List<String> inputStrings) {
+        try {
+            SparkConf sparkConf = new SparkConf().setMaster("local[*]")
+                .setAppName("JAX-RS Spark Connect OneWay " + SparkUtils.getRandomId());
+            JavaStreamingContext jssc = new JavaStreamingContext(sparkConf, Durations.seconds(1)); 
+            
+            JavaDStream<String> receiverStream = null;
+            if ("queue".equals(receiverType)) {
+               Queue<JavaRDD<String>> rddQueue = new LinkedList<>();
+               for (int i = 0; i < 30; i++) {
+                   rddQueue.add(jssc.sparkContext().parallelize(inputStrings));
+               }
+               receiverStream = jssc.queueStream(rddQueue);
+            } else {
+               receiverStream = jssc.receiverStream(new StringListReceiver(inputStrings));
+            }
+            
+            JavaPairDStream<String, Integer> wordCounts = SparkUtils.createOutputDStream(receiverStream, false);
+            wordCounts.foreachRDD(new PrintOutputFunction(jssc));
+            jssc.start();
+        } catch (Exception ex) {
+            // ignore
         }
     }
     
@@ -152,6 +185,25 @@ public class StreamingService {
             for (Map.Entry<String, Integer> entry : rdd.collectAsMap().entrySet()) {
                 String value = entry.getKey() + " : " + entry.getValue() + "\n";
                 streamOut.addResponseEntry(value);
+            }
+        }
+        
+    }
+    private static class PrintOutputFunction implements VoidFunction<JavaPairRDD<String, Integer>> {
+        private static final long serialVersionUID = 1L;
+        private JavaStreamingContext jssc;
+        PrintOutputFunction(JavaStreamingContext jssc) {
+            this.jssc = jssc;
+        }
+        @Override
+        public void call(JavaPairRDD<String, Integer> rdd) {
+            if (!rdd.collectAsMap().isEmpty()) {
+                for (Map.Entry<String, Integer> entry : rdd.collectAsMap().entrySet()) {
+                    String value = entry.getKey() + " : " + entry.getValue();
+                    System.out.println(value);
+                }
+                jssc.stop(false);
+                jssc.close();
             }
         }
         

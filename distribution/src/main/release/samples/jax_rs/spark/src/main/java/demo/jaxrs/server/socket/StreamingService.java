@@ -25,6 +25,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -37,6 +39,7 @@ import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.MediaType;
 
+import org.apache.cxf.jaxrs.ext.Oneway;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import org.apache.cxf.jaxrs.ext.search.tika.TikaContentExtractor;
@@ -56,13 +59,13 @@ public class StreamingService {
     }
     private Executor executor = new ThreadPoolExecutor(5, 5, 0, TimeUnit.SECONDS,
                                                        new ArrayBlockingQueue<Runnable>(10));
-    
+    private Map<String, BlockingQueue<String>> sparkResponses = 
+        new ConcurrentHashMap<String, BlockingQueue<String>>();
     private PrintStream sparkOutputStream;
-    private BufferedReader sparkInputStream;
     
     public StreamingService(BufferedReader sparkInputStream, PrintStream sparkOutputStream) {
-        this.sparkInputStream = sparkInputStream;
         this.sparkOutputStream = sparkOutputStream;
+        executor.execute(new SparkResultJob(sparkResponses, sparkInputStream));
     }
     
     @POST
@@ -98,8 +101,16 @@ public class StreamingService {
 
     private void processStream(AsyncResponse async, List<String> inputStrings) {
         executor.execute(
-            new SparkJob(async, sparkInputStream, sparkOutputStream, inputStrings));
+            new SparkJob(async, sparkResponses, sparkOutputStream, inputStrings));
     }
     
-    
+    @POST
+    @Path("/streamOneWay")
+    @Consumes("text/plain")
+    @Oneway
+    public void processSimpleStreamOneWay(InputStream is) {
+        for (String s : SparkUtils.getStringsFromInputStream(is)) {
+            sparkOutputStream.println("oneway:" + s);
+        }
+    }
 }

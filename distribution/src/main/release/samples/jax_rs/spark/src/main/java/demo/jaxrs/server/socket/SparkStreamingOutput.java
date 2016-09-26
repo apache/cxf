@@ -18,29 +18,44 @@
  */
 package demo.jaxrs.server.socket;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.Map;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.StreamingOutput;
 
 public class SparkStreamingOutput implements StreamingOutput {
-    private BufferedReader sparkInputStream;
-    public SparkStreamingOutput(BufferedReader sparkInputStream) {
-        this.sparkInputStream = sparkInputStream;
+    private Map<String, BlockingQueue<String>> sparkResponses;
+    private String jobId;
+    private BlockingQueue<String> queue;
+    public SparkStreamingOutput(Map<String, BlockingQueue<String>> sparkResponses, String jobId,
+                                BlockingQueue<String> queue) {
+        this.sparkResponses = sparkResponses;
+        this.jobId = jobId;
+        this.queue = queue;
     }
 
     @Override
     public void write(final OutputStream output) throws IOException, WebApplicationException {
-        PrintStream printStream = new PrintStream(output, true);
-        String s = null;
-        while ((s = sparkInputStream.readLine()) != null) {
-            if ("<batchEnd>".equals(s)) {
-                break;
+        PrintStream out = new PrintStream(output, true);
+        try {
+            while (true) {
+                String responseEntry = queue.poll(1, TimeUnit.MILLISECONDS);
+                if (responseEntry != null) {
+                    if ("<batchEnd>".equals(responseEntry)) {
+                        sparkResponses.remove(jobId);
+                        break;
+                    } else {
+                        out.println(responseEntry);
+                    }
+                }
             }
-            printStream.println(s);
+        } catch (InterruptedException ex) {
+            // ignore
         }
         
     }

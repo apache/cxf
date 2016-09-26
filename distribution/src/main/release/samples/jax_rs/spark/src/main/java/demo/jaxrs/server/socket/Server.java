@@ -62,7 +62,7 @@ public class Server {
         JavaDStream<String> receiverStream = jssc.socketTextStream(
             "localhost", 9999, StorageLevels.MEMORY_ONLY);
         
-        JavaPairDStream<String, Integer> wordCounts = SparkUtils.createOutputDStream(receiverStream);
+        JavaPairDStream<String, Integer> wordCounts = SparkUtils.createOutputDStream(receiverStream, true);
         PrintStream sparkResponseOutputStream = new PrintStream(jaxrsResponseClientSocket.getOutputStream(), true);
         wordCounts.foreachRDD(new SocketOutputFunction(sparkResponseOutputStream));
         
@@ -106,12 +106,20 @@ public class Server {
         }
         @Override
         public void call(JavaPairRDD<String, Integer> rdd) {
-            for (Map.Entry<String, Integer> entry : rdd.collectAsMap().entrySet()) {
-                String value = entry.getKey() + " : " + entry.getValue();
-                streamOut.println(value);
-            }
             if (!rdd.collectAsMap().isEmpty()) {
-                streamOut.println("<batchEnd>");
+                String jobId = null;
+                PrintStream printStream = null;
+                for (Map.Entry<String, Integer> entry : rdd.collectAsMap().entrySet()) {
+                    String value = entry.getKey() + " : " + entry.getValue();
+                    if (jobId == null) {
+                        int index = value.indexOf(":");
+                        jobId = value.substring(0, index);
+                        printStream = "oneway".equals(jobId) ? System.out : streamOut;
+                        
+                    }
+                    printStream.println(value);
+                }
+                printStream.println(jobId + ":" + "<batchEnd>");
             }
         }
         

@@ -45,9 +45,9 @@ public final class SparkUtils {
     }
     
     public static JavaPairDStream<String, Integer> createOutputDStream(
-        JavaDStream<String> receiverStream) {
+        JavaDStream<String> receiverStream, boolean withId) {
         final JavaDStream<String> words = 
-            receiverStream.flatMap(x -> splitInputString(x));
+            receiverStream.flatMap(x -> (withId ? splitInputStringWithId(x) : splitInputString(x)));
             
         final JavaPairDStream<String, Integer> pairs = words.mapToPair(s -> {
                     return new Tuple2<String, Integer>(s, 1);
@@ -65,6 +65,23 @@ public final class SparkUtils {
             }
             if (!s.isEmpty()) {
                 list.add(s);
+            }
+        }
+        return list.iterator();
+    }
+    public static Iterator<String> splitInputStringWithId(String x) {
+        int index = x.indexOf(":");
+        String jobId = x.substring(0, index);
+        x = x.substring(index + 1);
+        
+        List<String> list = new LinkedList<String>();
+        for (String s : Arrays.asList(x.split(" "))) {
+            s = s.trim();
+            if (s.endsWith(":") || s.endsWith(",") || s.endsWith(";") || s.endsWith(".")) {
+                s = s.substring(0, s.length() - 1);
+            }
+            if (!s.isEmpty()) {
+                list.add(jobId + ":" + s);
             }
         }
         return list.iterator();
