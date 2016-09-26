@@ -310,9 +310,6 @@ public class AlgorithmSuiteTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
-<<<<<<< HEAD
-}
-=======
     @org.junit.Test
     public void testMultipleAlgorithmSuitesPolicy() throws Exception {
         
@@ -344,4 +341,3 @@ public class AlgorithmSuiteTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
 }
->>>>>>> 434cdaf... Adding a test for multiple algorithm suites
