@@ -183,6 +183,19 @@
             </bean>
         </jaxws:outInterceptors>
     </jaxws:client>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItMultipleAlgSuitesPort" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="security.username" value="Alice"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
+            <entry key="security.encryption.properties" value="bob.properties"/>
+            <entry key="security.encryption.username" value="bob"/>
+        </jaxws:properties>
+        <jaxws:features>
+            <p:policies>
+                <wsp:PolicyReference xmlns:wsp="http://www.w3.org/ns/ws-policy" URI="#DoubleItSymmetric128Policy"/>
+            </p:policies>
+        </jaxws:features>
+    </jaxws:client>
     <wsp:Policy xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:wsp="http://www.w3.org/ns/ws-policy" xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" wsu:Id="DoubleItSymmetric128Policy">
         <wsp:ExactlyOne>
             <wsp:All>
