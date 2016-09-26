@@ -36,6 +36,7 @@ import org.junit.Test;
 public class RESTLoggingTest {
 
     private static final String SERVICE_URI = "http://localhost:5679/testrest";
+    private static final String SERVICE_URI_BINARY = "http://localhost:5680/testrest";
 
     @Test
     public void testSlf4j() throws IOException {
@@ -55,7 +56,7 @@ public class RESTLoggingTest {
         loggingFeature.setSender(sender);
         Server server = createServiceBinary(loggingFeature);
         server.start();
-        WebClient client = createClient(loggingFeature);
+        WebClient client = createClientBinary(loggingFeature);
         client.get(InputStream.class).close();
         loggingFeature.setLogBinary(true);
         client.get(InputStream.class).close();
@@ -95,9 +96,16 @@ public class RESTLoggingTest {
         return factory.create();
     }
     
+    private WebClient createClientBinary(LoggingFeature loggingFeature) {
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setAddress(SERVICE_URI_BINARY + "/test1");
+        bean.setFeatures(Collections.singletonList(loggingFeature));
+        return bean.createWebClient();
+    }
+    
     private Server createServiceBinary(LoggingFeature loggingFeature) {
         JAXRSServerFactoryBean factory = new JAXRSServerFactoryBean();
-        factory.setAddress(SERVICE_URI);
+        factory.setAddress(SERVICE_URI_BINARY);
         factory.setFeatures(Collections.singletonList(loggingFeature));
         factory.setServiceBean(new TestServiceRestBinary());
         return factory.create();
@@ -106,6 +114,7 @@ public class RESTLoggingTest {
     @Test
     public void testEvents() throws MalformedURLException {
         LoggingFeature loggingFeature = new LoggingFeature();
+        loggingFeature.setLogBinary(true);
         TestEventSender sender = new TestEventSender();
         loggingFeature.setSender(sender);
         Server server = createService(loggingFeature);
