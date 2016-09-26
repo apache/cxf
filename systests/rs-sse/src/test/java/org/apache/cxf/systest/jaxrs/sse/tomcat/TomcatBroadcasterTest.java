@@ -22,8 +22,11 @@ package org.apache.cxf.systest.jaxrs.sse.tomcat;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.systest.jaxrs.sse.AbstractBroadcasterSseTest;
 import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
 import org.junit.Ignore;
+import org.junit.runners.MethodSorters;
 
+@FixMethodOrder(MethodSorters.JVM)
 public class TomcatBroadcasterTest extends AbstractBroadcasterSseTest {  
     @Ignore
     public static class EmbeddedTomcatServer extends AbstractTomcatServer {
@@ -45,5 +48,4 @@ public class TomcatBroadcasterTest extends AbstractBroadcasterSseTest {
     protected int getPort() {
         return EmbeddedTomcatServer.PORT;
     }
-
 }
