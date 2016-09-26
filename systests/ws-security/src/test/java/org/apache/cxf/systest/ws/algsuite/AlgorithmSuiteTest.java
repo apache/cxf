@@ -310,4 +310,34 @@ public class AlgorithmSuiteTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
+    @org.junit.Test
+    public void testMultipleAlgorithmSuitesPolicy() throws Exception {
+        
+        if (!SecurityTestUtil.checkUnrestrictedPoliciesInstalled()) {
+            return;
+        }
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = AlgorithmSuiteTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = AlgorithmSuiteTest.class.getResource("DoubleItAlgSuite.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+
+        QName portQName = new QName(NAMESPACE, "DoubleItMultipleAlgSuitesPort");
+        DoubleItPortType port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT);
+
+        // DOM
+        port.doubleIt(25);
+        
+        // Streaming
+        SecurityTestUtil.enableStreaming(port);
+        port.doubleIt(25);
+        
+        bus.shutdown(true);
+    }
 }
