@@ -58,13 +58,15 @@ public class AlgorithmSuiteBuilder implements AssertionBuilder<Element> {
         }
         AlgorithmSuite algorithmSuite = loader.getAlgorithmSuite(bus, spVersion, nestedPolicy);
         if (algorithmSuite == null || algorithmSuite.getAlgorithmSuiteType() == null) {
-            String algorithmSuiteName = null;
-            if (algorithmSuite != null) {
-                algorithmSuiteName = algorithmSuite.getFirstInvalidAlgorithmSuite();
-            }
-            if (algorithmSuiteName == null) {
-                algorithmSuiteName = DOMUtils.getFirstElement(nestedPolicyElement).getLocalName();
-            }
+            // TODO - Make available once we pick up WSS4J 2.1.8/2.0.10
+            //String algorithmSuiteName = null;
+            //if (algorithmSuite != null) {
+                //algorithmSuiteName = algorithmSuite.getFirstInvalidAlgorithmSuite();
+            //}
+            //if (algorithmSuiteName == null) {
+                //algorithmSuiteName = DOMUtils.getFirstElement(nestedPolicyElement).getLocalName();
+            //}
+            String algorithmSuiteName = DOMUtils.getFirstElement(nestedPolicyElement).getLocalName();
             throw new IllegalArgumentException(
                 "Algorithm suite \"" + algorithmSuiteName + "\" is not registered"
             );
