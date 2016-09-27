@@ -105,13 +105,13 @@ public class OIDCDynamicRegistrationTest extends AbstractBusClientServerTestBase
         wc.authorization(new ClientAccessToken("Bearer", regAccessToken));
         ClientRegistration clientRegResp = wc.get(ClientRegistration.class);
         assertNotNull(clientRegResp);
-//        assertEquals("web", clientRegResp.getApplicationType());
-//        assertEquals("dynamic_client", clientRegResp.getClientName());
-//        assertEquals("openid", clientRegResp.getScope());
-//        assertEquals(Collections.singletonList("authorization_code"), 
-//                     clientRegResp.getGrantTypes());
-//        assertEquals(Collections.singletonList("https://a/b/c"), 
-//                     clientRegResp.getRedirectUris());
+        assertEquals("web", clientRegResp.getApplicationType());
+        assertEquals("dynamic_client", clientRegResp.getClientName());
+        assertEquals("openid", clientRegResp.getScope());
+        assertEquals(Collections.singletonList("authorization_code"), 
+                     clientRegResp.getGrantTypes());
+        assertEquals(Collections.singletonList("https://a/b/c"), 
+                     clientRegResp.getRedirectUris());
         
         assertEquals(200, wc.delete().getStatus());
     }
