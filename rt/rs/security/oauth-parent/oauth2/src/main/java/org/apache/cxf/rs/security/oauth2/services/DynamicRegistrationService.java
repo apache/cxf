@@ -160,8 +160,8 @@ public class DynamicRegistrationService extends AbstractOAuthService {
         return initialAccessToken;
     }
 
-    public void setRegistrationAccessToken(String registrationAccessToken) {
-        this.initialAccessToken = registrationAccessToken;
+    public void setInitialAccessToken(String initialAccessToken) {
+        this.initialAccessToken = initialAccessToken;
     }
     
     protected Client createNewClient(ClientRegistration request) {
@@ -175,6 +175,9 @@ public class DynamicRegistrationService extends AbstractOAuthService {
         }
         
         List<String> grantTypes = request.getGrantTypes();
+        if (grantTypes == null) {
+            grantTypes = Collections.singletonList("authorization_code");
+        }
         
         // Client Type
         // https://tools.ietf.org/html/rfc7591 has no this property but
@@ -184,7 +187,7 @@ public class DynamicRegistrationService extends AbstractOAuthService {
             appType = DEFAULT_APPLICATION_TYPE;
         }
         boolean isConfidential = DEFAULT_APPLICATION_TYPE.equals(appType) 
-            && grantTypes != null && grantTypes.contains(OAuthConstants.AUTHORIZATION_CODE_GRANT);
+            && grantTypes.contains(OAuthConstants.AUTHORIZATION_CODE_GRANT);
         
         // Client Secret
         String clientSecret = isConfidential
@@ -193,9 +196,7 @@ public class DynamicRegistrationService extends AbstractOAuthService {
 
         Client newClient = new Client(clientId, clientSecret, isConfidential, clientName);
         
-        if (grantTypes != null) {
-            newClient.setAllowedGrantTypes(grantTypes);
-        }    
+        newClient.setAllowedGrantTypes(grantTypes);
         
         // Client Registration Time
         newClient.setRegisteredAt(System.currentTimeMillis() / 1000);

@@ -62,19 +62,33 @@ under the License.
         </httpj:engine>
     </httpj:engine-factory>
     
-   <bean id="oauthProvider" class="org.apache.cxf.rs.security.oauth2.grants.code.DefaultEHCacheCodeDataProvider">
+   <bean id="oauthProvider" class="org.apache.cxf.systest.jaxrs.security.oidc.MemoryOAuthDataProvider">
    </bean>
    
    <bean id="dynRegService" class="org.apache.cxf.rs.security.oidc.idp.OidcDynamicRegistrationService">
       <property name="clientProvider" ref="oauthProvider"/>
    </bean>
+   <bean id="dynRegServiceWithAt" class="org.apache.cxf.rs.security.oidc.idp.OidcDynamicRegistrationService">
+      <property name="clientProvider" ref="oauthProvider"/>
+      <property name="initialAccessToken" value="123456789"/>
+   </bean>
    
 
    <jaxrs:server 
        depends-on="tls-config" 
-       address="https://localhost:${testutil.ports.jaxrs-oidc-dynreg}/services">
+       address="https://localhost:${testutil.ports.jaxrs-oidc-dynreg}/services/dynamic">
        <jaxrs:serviceBeans>
            <ref bean="dynRegService"/>
+       </jaxrs:serviceBeans>
+       <jaxrs:providers>
+           <bean class="org.apache.cxf.jaxrs.provider.json.JsonMapObjectProvider"/>
+       </jaxrs:providers>
+   </jaxrs:server>
+   <jaxrs:server 
+       depends-on="tls-config" 
+       address="https://localhost:${testutil.ports.jaxrs-oidc-dynreg}/services/dynamicWithAt">
+       <jaxrs:serviceBeans>
+           <ref bean="dynRegServiceWithAt"/>
        </jaxrs:serviceBeans>
        <jaxrs:providers>
            <bean class="org.apache.cxf.jaxrs.provider.json.JsonMapObjectProvider"/>
