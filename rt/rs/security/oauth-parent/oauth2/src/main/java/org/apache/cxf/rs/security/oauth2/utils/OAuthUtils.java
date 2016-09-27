@@ -344,4 +344,15 @@ public final class OAuthUtils {
             return sigAlgo;
         }
     }
+
+    public static String convertListOfScopesToString(List<String> registeredScopes) {
+        StringBuilder sb = new StringBuilder();
+        for (String s : registeredScopes) {
+            if (sb.length() > 0) {
+                sb.append(", ");
+            }
+            sb.append(s);
+        }
+        return sb.toString();
+    }
 }

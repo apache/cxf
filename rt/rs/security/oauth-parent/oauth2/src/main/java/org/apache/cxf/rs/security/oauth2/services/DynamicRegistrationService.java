@@ -135,8 +135,21 @@ public class DynamicRegistrationService extends AbstractOAuthService {
         return fromClientToClientRegistration(client);
     }
 
-    protected ClientRegistration fromClientToClientRegistration(Client client) {
-        return new ClientRegistration();
+    protected ClientRegistration fromClientToClientRegistration(Client c) {
+        ClientRegistration reg = new ClientRegistration();
+        reg.setClientName(c.getApplicationName());
+        reg.setGrantTypes(c.getAllowedGrantTypes());
+        reg.setApplicationType(c.isConfidential() ? "web" : "native");
+        reg.setRedirectUris(c.getRedirectUris());
+        reg.setScope(OAuthUtils.convertListOfScopesToString(c.getRegisteredScopes()));
+        if (c.getApplicationWebUri() != null) {
+            reg.setClientUri(c.getApplicationWebUri());
+        }
+        if (c.getApplicationLogoUri() != null) {
+            reg.setLogoUri(c.getApplicationLogoUri());
+        }
+        //etc
+        return reg;
     }
     
     protected Client readClient(String clientId) {
