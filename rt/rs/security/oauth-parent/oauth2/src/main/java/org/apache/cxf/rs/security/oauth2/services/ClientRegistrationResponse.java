@@ -61,7 +61,7 @@ public class ClientRegistrationResponse extends JsonMapObject {
         return getStringProperty(REG_ACCESS_TOKEN);
     }
     public void setRegistrationClientUri(String at) {
-        super.setProperty(REG_ACCESS_TOKEN, at);
+        super.setProperty(REG_CLIENT_URI, at);
     }
     public String getRegistrationClientUri() {
         return getStringProperty(REG_CLIENT_URI);
