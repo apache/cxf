@@ -377,8 +377,7 @@ public class InvocationBuilderImpl implements Invocation.Builder {
 
     @Override
     public CompletionStageRxInvoker rx() {
-        // TODO: Implementation required (JAX-RS 2.1) 
-        return null;
+        return webClient.rx();
     }
 
     @Override

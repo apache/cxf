@@ -28,12 +28,14 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Future;
 
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.AsyncInvoker;
+import javax.ws.rs.client.CompletionStageRxInvoker;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.InvocationCallback;
 import javax.ws.rs.client.SyncInvoker;
@@ -946,6 +948,44 @@ public class WebClient extends AbstractClient {
         
         return cb.createFuture();
     }
+    
+    protected <T> CompletionStage<T> doInvokeAsyncStage(String httpMethod, 
+                                          Object body, 
+                                          Class<?> requestClass,
+                                          Type inType,
+                                          Class<?> respClass,
+                                          Type outType) {
+        Annotation[] inAnns = null;
+        if (body instanceof Entity) {
+            Entity<?> entity = (Entity<?>)body;
+            setEntityHeaders(entity);
+            body = entity.getEntity();
+            requestClass = body.getClass();
+            inType = body.getClass();
+            inAnns = entity.getAnnotations();
+        }
+        
+        if (body instanceof GenericEntity) {
+            GenericEntity<?> genericEntity = (GenericEntity<?>)body;
+            body = genericEntity.getEntity();
+            requestClass = genericEntity.getRawType();
+            inType = genericEntity.getType();
+        }
+        
+        MultivaluedMap<String, String> headers = prepareHeaders(respClass, body);
+        resetResponse();
+
+        Message m = finalizeMessage(httpMethod, headers, body, requestClass, inType, 
+                                    inAnns, respClass, outType, null, null);
+        
+        m.getExchange().setSynchronous(false);
+        JaxrsClientCallback<T> cb = new JaxrsClientCallback<T>(null, respClass, outType);
+        m.getExchange().put(JaxrsClientCallback.class, cb);
+        
+        doRunInterceptorChain(m);
+        
+        return cb.createCompletionStage();
+    }
 
     
     private MultivaluedMap<String, String> prepareHeaders(Class<?> responseClass, Object body) {
@@ -1242,6 +1282,11 @@ public class WebClient extends AbstractClient {
     // Link to JAX-RS 2.0 SyncInvoker
     public SyncInvoker sync() {
         return new SyncInvokerImpl();
+    }
+    
+    // Link to JAX-RS 2.1 CompletionStageRxInvoker
+    public CompletionStageRxInvoker rx() {
+        return new CompletionStageRxInvokerImpl();
     }
     
     private void setEntityHeaders(Entity<?> entity) {
@@ -1566,5 +1611,134 @@ public class WebClient extends AbstractClient {
         public <T> T method(String method, Entity<?> entity, GenericType<T> genericType) {
             return invoke(method, entity, genericType);
         }
+    }
+    
+    class CompletionStageRxInvokerImpl implements CompletionStageRxInvoker {
+
+        @Override
+        public CompletionStage<Response> get() {
+            return get(Response.class);
+        }
+
+        @Override
+        public <T> CompletionStage<T> get(Class<T> responseType) {
+            return method(HttpMethod.GET, responseType);
+        }
+
+        @Override
+        public <T> CompletionStage<T> get(GenericType<T> responseType) {
+            return method(HttpMethod.GET, responseType);
+        }
+
+        @Override
+        public CompletionStage<Response> put(Entity<?> entity) {
+            return put(entity, Response.class);
+        }
+
+        @Override
+        public <T> CompletionStage<T> put(Entity<?> entity, Class<T> responseType) {
+            return method(HttpMethod.PUT, entity, responseType);
+        }
+
+        @Override
+        public <T> CompletionStage<T> put(Entity<?> entity, GenericType<T> responseType) {
+            return method(HttpMethod.PUT, entity, responseType);
+        }
+
+        @Override
+        public CompletionStage<Response> post(Entity<?> entity) {
+            return post(entity, Response.class);
+        }
+
+        @Override
+        public <T> CompletionStage<T> post(Entity<?> entity, Class<T> responseType) {
+            return method(HttpMethod.POST, entity, responseType);
+        }
+
+        @Override
+        public <T> CompletionStage<T> post(Entity<?> entity, GenericType<T> responseType) {
+            return method(HttpMethod.POST, entity, responseType);
+        }
+
+        @Override
+        public CompletionStage<Response> delete() {
+            return delete(Response.class);
+        }
+
+        @Override
+        public <T> CompletionStage<T> delete(Class<T> responseType) {
+            return method(HttpMethod.DELETE, responseType);
+        }
+
+        @Override
+        public <T> CompletionStage<T> delete(GenericType<T> responseType) {
+            return method(HttpMethod.DELETE, responseType);
+        }
+
+        @Override
+        public CompletionStage<Response> head() {
+            return method(HttpMethod.HEAD);
+        }
+
+        @Override
+        public CompletionStage<Response> options() {
+            return options(Response.class);
+        }
+
+        @Override
+        public <T> CompletionStage<T> options(Class<T> responseType) {
+            return method(HttpMethod.OPTIONS, responseType);
+        }
+
+        @Override
+        public <T> CompletionStage<T> options(GenericType<T> responseType) {
+            return method(HttpMethod.OPTIONS, responseType);
+        }
+
+        @Override
+        public CompletionStage<Response> trace() {
+            return trace(Response.class);
+        }
+
+        @Override
+        public <T> CompletionStage<T> trace(Class<T> responseType) {
+            return method("TRACE", responseType);
+        }
+
+        @Override
+        public <T> CompletionStage<T> trace(GenericType<T> responseType) {
+            return method("TRACE", responseType);
+        }
+
+        @Override
+        public CompletionStage<Response> method(String name) {
+            return method(name, Response.class);
+        }
+
+        @Override
+        public CompletionStage<Response> method(String name, Entity<?> entity) {
+            return method(name, entity, Response.class);
+        }
+
+        @Override
+        public <T> CompletionStage<T> method(String name, Entity<?> entity, Class<T> responseType) {
+            return doInvokeAsyncStage(name, entity, null, null, responseType, responseType);
+        }
+
+        @Override
+        public <T> CompletionStage<T> method(String name, Entity<?> entity, GenericType<T> responseType) {
+            return doInvokeAsyncStage(name, entity, null, null, responseType.getRawType(), responseType.getType());
+        }
+
+        @Override
+        public <T> CompletionStage<T> method(String name, Class<T> responseType) {
+            return doInvokeAsyncStage(name, null, null, null, responseType, responseType);
+        }
+
+        @Override
+        public <T> CompletionStage<T> method(String name, GenericType<T> responseType) {
+            return doInvokeAsyncStage(name, null, null, null, responseType.getRawType(), responseType.getType());
+        }
+             
     }
 }

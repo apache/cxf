@@ -27,8 +27,10 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.function.Consumer;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.NotFoundException;
@@ -59,6 +61,7 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
@@ -264,6 +267,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         assertTrue(((GenericInvocationCallback)callback).getResult().readEntity(Boolean.class));
     }
     
+       
     @Test
     public void testAsyncProxyPrimitiveResponse() throws Exception {
         String address = "http://localhost:" + PORT;
@@ -364,6 +368,26 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         wc.close();
     }
     
+    
+    @Test
+    @Ignore
+    public void testGetBookAsyncStage() throws Exception {
+        String address = "http://localhost:" + PORT + "/bookstore/books";
+        WebClient wc = createWebClient(address);
+        CompletionStage<Book> stage = wc.path("123").rx().get(Book.class);
+        Holder<Book> h = new Holder<Book>();
+        Consumer<Book> action = new Consumer<Book>() {
+
+            @Override
+            public void accept(Book t) {
+                h.value = t;
+                
+            }
+            
+        };
+        stage.thenAccept(action);
+        assertEquals(123L, h.value.getId());
+    }
     
     private WebClient createWebClient(String address) {
         List<Object> providers = new ArrayList<Object>();
