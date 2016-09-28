@@ -53,6 +53,7 @@ public class DynamicRegistrationService {
     private String initialAccessToken;
     private int clientIdSizeInBytes = DEFAULT_CLIENT_ID_SIZE;
     private MessageContext mc;
+    private boolean supportRegistrationAccessTokens = true;
     
     @POST
     @Consumes("application/json")
@@ -129,10 +130,15 @@ public class DynamicRegistrationService {
         // TODO: consider making Client secret time limited
         response.setClientSecretExpiresAt(Long.valueOf(0));
         UriBuilder ub = getMessageContext().getUriInfo().getAbsolutePathBuilder();
-        response.setRegistrationClientUri(ub.path(client.getClientId()).build().toString());
         
-        response.setRegistrationAccessToken(client.getProperties()
-                                            .get(ClientRegistrationResponse.REG_ACCESS_TOKEN));
+        if (supportRegistrationAccessTokens) {
+            // both registration access token and uri are either included or excluded
+            response.setRegistrationClientUri(
+                ub.path(client.getClientId()).build().toString());
+        
+            response.setRegistrationAccessToken(
+                client.getProperties().get(ClientRegistrationResponse.REG_ACCESS_TOKEN));
+        }
         return response;
     }
     
@@ -293,5 +299,9 @@ public class DynamicRegistrationService {
     
     public MessageContext getMessageContext() {
         return mc;
+    }
+
+    public void setSupportRegistrationAccessTokens(boolean supportRegistrationAccessTokens) {
+        this.supportRegistrationAccessTokens = supportRegistrationAccessTokens;
     }
 }
