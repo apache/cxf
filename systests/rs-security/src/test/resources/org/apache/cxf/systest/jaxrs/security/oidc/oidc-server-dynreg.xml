@@ -62,14 +62,13 @@ under the License.
         </httpj:engine>
     </httpj:engine-factory>
     
-   <bean id="oauthProvider" class="org.apache.cxf.systest.jaxrs.security.oidc.MemoryOAuthDataProvider">
-   </bean>
+   <bean id="clientProvider" class="org.apache.cxf.systest.jaxrs.security.oidc.MemoryClientDataProvider"/>
    
    <bean id="dynRegService" class="org.apache.cxf.rs.security.oidc.idp.OidcDynamicRegistrationService">
-      <property name="clientProvider" ref="oauthProvider"/>
+      <property name="clientProvider" ref="clientProvider"/>
    </bean>
    <bean id="dynRegServiceWithAt" class="org.apache.cxf.rs.security.oidc.idp.OidcDynamicRegistrationService">
-      <property name="clientProvider" ref="oauthProvider"/>
+      <property name="clientProvider" ref="clientProvider"/>
       <property name="initialAccessToken" value="123456789"/>
    </bean>
    
