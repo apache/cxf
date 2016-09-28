@@ -33,9 +33,6 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.junit.BeforeClass;
 
-/**
- * Some tests for the OAuth 2.0 filters
- */
 public class OIDCDynamicRegistrationTest extends AbstractBusClientServerTestBase {
     public static final String PORT = OIDCDynRegistrationServer.PORT;
     
@@ -56,14 +53,14 @@ public class OIDCDynamicRegistrationTest extends AbstractBusClientServerTestBase
     }
     @org.junit.Test
     public void testRegisterClient() throws Exception {
-        doRestRegisterClient(null);
+        doTestRegisterClient(null);
     }
     @org.junit.Test
     public void testRegisterClientInitialAccessToken() throws Exception {
-        doRestRegisterClient("123456789");
+        doTestRegisterClient("123456789");
     }
     
-    private void doRestRegisterClient(String initialAccessToken) throws Exception {
+    private void doTestRegisterClient(String initialAccessToken) throws Exception {
         URL busFile = OIDCDynamicRegistrationTest.class.getResource("client.xml");
         String address = "https://localhost:" + PORT + "/services";
         if (initialAccessToken != null) {
