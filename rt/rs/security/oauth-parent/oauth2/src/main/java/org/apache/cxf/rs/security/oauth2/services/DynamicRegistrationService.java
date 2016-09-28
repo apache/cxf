@@ -249,7 +249,8 @@ public class DynamicRegistrationService {
         //TODO: check other properties
         // Add more typed properties like tosUri, policyUri, etc to Client
         // or set them as Client extra properties
-        
+     
+        newClient.setRegisteredDynamically(true);
         return newClient;
     }
 

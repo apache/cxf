@@ -63,7 +63,8 @@ public class Client implements Serializable {
     private UserSubject resourceOwnerSubject;
     private long registeredAt;
     private String homeRealm;
-
+    private boolean registeredDynamically;
+    
     public Client() {
 
     }
@@ -383,5 +384,13 @@ public class Client implements Serializable {
      */
     public void setHomeRealm(String homeRealm) {
         this.homeRealm = homeRealm;
+    }
+
+    public boolean isRegisteredDynamically() {
+        return registeredDynamically;
+    }
+
+    public void setRegisteredDynamically(boolean registeredDynamically) {
+        this.registeredDynamically = registeredDynamically;
     }
 }
