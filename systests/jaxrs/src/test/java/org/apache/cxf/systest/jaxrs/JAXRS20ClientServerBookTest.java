@@ -153,9 +153,7 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         client.register((Object)ClientFilterClientAndConfigCheck.class);
         client.property("clientproperty", "somevalue");
         WebTarget webTarget = client.target(address);
-        //WebClient.getConfig(webTarget);
         Invocation.Builder builder = webTarget.request("application/xml").header("a", "b");
-        WebClient.getConfig(builder);
         
         Response r = builder.get();
         Book book = r.readEntity(Book.class);
