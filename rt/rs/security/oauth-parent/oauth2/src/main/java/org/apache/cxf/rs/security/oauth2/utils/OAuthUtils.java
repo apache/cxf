@@ -21,6 +21,7 @@ package org.apache.cxf.rs.security.oauth2.utils;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
@@ -287,7 +288,7 @@ public final class OAuthUtils {
             if (!StringUtils.isEmpty(scopeString)) {
                 clientToken.setApprovedScope(scopeString);    
             }
-            clientToken.setParameters(serverToken.getParameters());
+            clientToken.setParameters(new HashMap<String, String>(serverToken.getParameters()));
         }
         return clientToken;
     }
@@ -342,5 +343,16 @@ public final class OAuthUtils {
         } else {
             return sigAlgo;
         }
+    }
+
+    public static String convertListOfScopesToString(List<String> registeredScopes) {
+        StringBuilder sb = new StringBuilder();
+        for (String s : registeredScopes) {
+            if (sb.length() > 0) {
+                sb.append(", ");
+            }
+            sb.append(s);
+        }
+        return sb.toString();
     }
 }

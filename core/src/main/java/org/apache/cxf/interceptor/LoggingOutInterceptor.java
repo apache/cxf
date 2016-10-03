@@ -36,9 +36,10 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 
 /**
- * 
+ * @deprecated use the logging module rt/features/logging instead
  */
 @NoJSR250Annotations
+@Deprecated
 public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
     private static final Logger LOG = LogUtils.getLogger(LoggingOutInterceptor.class);
     private static final String LOG_SETUP = LoggingOutInterceptor.class.getName() + ".log-setup";

@@ -21,10 +21,10 @@ package org.apache.cxf.rs.security.oidc.idp;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Response;
 
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.services.ClientRegistration;
-import org.apache.cxf.rs.security.oauth2.services.ClientRegistrationResponse;
 import org.apache.cxf.rs.security.oauth2.services.DynamicRegistrationService;
 
 public class OidcDynamicRegistrationService extends DynamicRegistrationService {
@@ -33,7 +33,7 @@ public class OidcDynamicRegistrationService extends DynamicRegistrationService {
     @POST
     @Consumes("application/json")
     @Produces("application/json")
-    public ClientRegistrationResponse register(OidcClientRegistration request) {
+    public Response register(OidcClientRegistration request) {
         return super.register(request);
     }
     

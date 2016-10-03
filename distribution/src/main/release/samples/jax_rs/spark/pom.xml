@@ -90,9 +90,14 @@
                 </executions>
                 <configuration>
                     <executable>java</executable>
-                    <mainClass>demo.jaxrs.server.Server</mainClass>
                 </configuration>
             </plugin>
         </plugins>
     </build>
+    <repositories>
+      <repository>
+         <id>snapshots</id>
+         <url>https://repository.apache.org/content/repositories/snapshots/</url>
+      </repository> 
+    </repositories> 
 </project>

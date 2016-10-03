@@ -23,6 +23,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.persistence.ElementCollection;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.MappedSuperclass;
@@ -117,7 +118,7 @@ public abstract class AccessToken implements Serializable {
      * Gets token parameters 
      * @return
      */
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @MapKeyColumn(name = "propName")
     public Map<String, String> getParameters() {
         return parameters;

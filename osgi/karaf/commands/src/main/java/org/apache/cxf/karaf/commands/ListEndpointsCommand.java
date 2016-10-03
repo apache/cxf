@@ -27,10 +27,17 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.endpoint.ServerRegistry;
-import org.apache.karaf.shell.commands.Argument;
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
+import org.apache.cxf.karaf.commands.completers.BusCompleter;
+import org.apache.cxf.karaf.commands.internal.CXFController;
+import org.apache.karaf.shell.api.action.Action;
+import org.apache.karaf.shell.api.action.Argument;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.apache.karaf.shell.api.console.Terminal;
+import org.apache.karaf.shell.support.table.ShellTable;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.Configuration;
@@ -39,45 +46,54 @@ import org.osgi.service.cm.ConfigurationAdmin;
 /**
  * 
  */
-@Command(scope = "cxf", name = "list-endpoints", 
+@Command(scope = "cxf", name = "list-endpoints",
     description = "Lists all CXF Endpoints on a Bus.")
-public class ListEndpointsCommand extends OsgiCommandSupport {
+@Service
+public class ListEndpointsCommand extends CXFController implements Action {
     protected static final String HEADER_FORMAT = "%-25s %-10s %-60s %-40s";
     protected static final String OUTPUT_FORMAT = "[%-23s] [%-8s] [%-58s] [%-38s]";
     
-    @Argument(index = 0, name = "bus", 
+    @Argument(index = 0, name = "bus",
         description = "The CXF bus name where to look for the Endpoints", 
         required = false, multiValued = false)
+    @Completion(BusCompleter.class)
     String name;
     
-    @Option(name = "-f", aliases = {"--fulladdress" }, 
+    @Option(name = "-f", aliases = {"--fulladdress" },
         description = "Display full address of an endpoint ", required = false, multiValued = false)
     boolean fullAddress;
-    
-    private CXFController cxfController;
 
-    public void setController(CXFController controller) {
-        this.cxfController = controller;
-    }
+    @Option(name = "--no-format", description = "Disable table rendered output", required = false, multiValued = false)
+    boolean noFormat;
 
-    protected Object doExecute() throws Exception {
+    @Reference(optional = true)
+    Terminal terminal;
+
+    @Override
+    public Object execute() throws Exception {
         List<Bus> busses;
         if (name == null) {
-            busses = cxfController.getBusses();
+            busses = getBusses();
         } else {
-            Bus b = cxfController.getBus(name);
+            Bus b = getBus(name);
             if (b != null) {
-                busses = Collections.singletonList(cxfController.getBus(name));
+                busses = Collections.singletonList(getBus(name));
             } else {
                 busses = Collections.emptyList();
             }
         }
-        System.out.println(String.format(HEADER_FORMAT, 
-                                         "Name", "State", "Address", "BusID"));
+
+        ShellTable table = new ShellTable();
+        if (terminal != null && terminal.getWidth() > 0) {
+            table.size(terminal.getWidth());
+        }
+        table.column("Name");
+        table.column("State");
+        table.column("Address");
+        table.column("BusID");
         for (Bus b : busses) {
             ServerRegistry reg = b.getExtension(ServerRegistry.class);
             List<Server> servers = reg.getServers();
-            
             for (Server serv : servers) {
                 String qname = serv.getEndpoint().getEndpointInfo().getName().getLocalPart();
                 String started = serv.isStarted() ? "Started" : "Stopped";
@@ -86,14 +102,15 @@ public class ListEndpointsCommand extends OsgiCommandSupport {
                     address = toFullAddress(address);
                 }
                 String busId = b.getId();
-                System.out.println(String.format(OUTPUT_FORMAT, qname, started, address, busId));
+                table.addRow().addContent(qname, started, address, busId);
             }
         }
+        table.print(System.out, !noFormat);
         return null;
     }
     
     private String toFullAddress(String address) throws IOException, InvalidSyntaxException {
-        ConfigurationAdmin configAdmin = getConfigurationAdmin();
+        ConfigurationAdmin configAdmin = getConfigAdmin();
         if (address.startsWith("/") && configAdmin != null) {
             String httpPort = null;
             String cxfContext = null;
@@ -126,10 +143,6 @@ public class ListEndpointsCommand extends OsgiCommandSupport {
         return ret;
     }
 
-    private ConfigurationAdmin getConfigurationAdmin() {
-        return cxfController.getConfigAdmin();
-    }
-    
     private String getCXFOSGiServletContext() throws InvalidSyntaxException {
         String ret = null;
         String filter = "(&(" + "objectclass=" + "javax.servlet.Servlet" 
@@ -144,21 +157,20 @@ public class ListEndpointsCommand extends OsgiCommandSupport {
         return ret;
         
     }
-    
+
     private String getHttpOSGiServicePort() throws InvalidSyntaxException {
         String ret = null;
-        String filter = "(&(" + "objectclass=" + "org.osgi.service.http.HttpService" 
-            + "))";
+        String filter = "(&(" + "objectclass=" + "org.osgi.service.http.HttpService"
+                + "))";
 
         ServiceReference ref = getBundleContext().getServiceReferences(null, filter)[0];
-        
-        if (ref != null) {
-            ret = (String)ref.getProperty("org.osgi.service.http.port");
-        } 
-        
-        return ret;
-        
-    }
 
+        if (ref != null) {
+            ret = (String) ref.getProperty("org.osgi.service.http.port");
+        }
+
+        return ret;
+
+    }
 
 }

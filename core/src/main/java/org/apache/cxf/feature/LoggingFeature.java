@@ -33,6 +33,7 @@ import org.apache.cxf.interceptor.LoggingOutInterceptor;
  * By attaching this feature to an endpoint, you
  * can specify logging. If this feature is present, an endpoint will log input
  * and output of ordinary and log messages.
+ * 
  * <pre>
  * <![CDATA[
     <jaxws:endpoint ...>
@@ -42,8 +43,11 @@ import org.apache.cxf.interceptor.LoggingOutInterceptor;
     </jaxws:endpoint>
   ]]>
   </pre>
+ * 
+ * @deprecated use the logging module rt/features/logging instead 
  */
 @NoJSR250Annotations
+@Deprecated
 @Provider(value = Type.Feature)
 public class LoggingFeature extends AbstractFeature {
     private static final int DEFAULT_LIMIT = AbstractLoggingInterceptor.DEFAULT_LIMIT;

@@ -287,6 +287,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
             secData.setApplicationCertificates(client.getApplicationCertificates());
             Map<String, String> extraProperties = client.getProperties();
             secData.setExtraApplicationProperties(extraProperties);
+            secData.setApplicationRegisteredDynamically(client.isRegisteredDynamically());
             String replyTo = getMessageContext().getUriInfo()
                 .getAbsolutePathBuilder().path("decision").build().toString();
             secData.setReplyTo(replyTo);

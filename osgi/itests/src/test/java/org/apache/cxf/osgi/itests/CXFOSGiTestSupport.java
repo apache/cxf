@@ -105,7 +105,7 @@ public class CXFOSGiTestSupport {
         }
         if (karafVersion == null) {
             // setup the default version of it
-            karafVersion = "2.3.6";
+            karafVersion = "4.0.5";
         }
         return karafVersion;
     }

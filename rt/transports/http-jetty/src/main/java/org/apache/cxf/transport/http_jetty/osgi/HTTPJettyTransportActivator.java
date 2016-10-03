@@ -78,15 +78,19 @@ public class HTTPJettyTransportActivator
                                        this, servProps);
         
         mbeanServerTracker = new ServiceTracker(ctx, MBeanServer.class.getName(), null);
-        BlueprintNameSpaceHandlerFactory nsHandlerFactory = new BlueprintNameSpaceHandlerFactory() {
-            
-            @Override
-            public Object createNamespaceHandler() {
-                return new HTTPJettyTransportNamespaceHandler();
-            }
-        };
-        NamespaceHandlerRegisterer.register(context, nsHandlerFactory,
-                                            "http://cxf.apache.org/transports/http-jetty/configuration");  
+        try {
+            BlueprintNameSpaceHandlerFactory nsHandlerFactory = new BlueprintNameSpaceHandlerFactory() {
+
+                @Override
+                public Object createNamespaceHandler() {
+                    return new HTTPJettyTransportNamespaceHandler();
+                }
+            };
+            NamespaceHandlerRegisterer.register(context, nsHandlerFactory,
+                    "http://cxf.apache.org/transports/http-jetty/configuration");
+        } catch (NoClassDefFoundError e) {
+            // Blueprint not available, ignore
+        }
     }
 
     public void stop(BundleContext ctx) throws Exception {

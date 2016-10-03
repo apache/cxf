@@ -37,7 +37,7 @@
         <!-- karaf -->
         <dependency>
             <groupId>org.apache.karaf.shell</groupId>
-            <artifactId>org.apache.karaf.shell.console</artifactId>
+            <artifactId>org.apache.karaf.shell.core</artifactId>
             <version>${cxf.karaf.version}</version>
         </dependency>
         <dependency>
@@ -57,15 +57,21 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.apache.karaf.tooling</groupId>
+                <artifactId>karaf-services-maven-plugin</artifactId>
+                <version>${cxf.karaf.version}</version>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
+                        <Karaf-Commands>*</Karaf-Commands>
                         <Import-Package>
               !org.apache.cxf.karaf.commands,
               org.apache.cxf*;version="[3,4)",
-              org.apache.karaf.shell*;version="[2.3,5)",
+              org.apache.karaf.shell*;version="[4,5)",
               *
                         </Import-Package>
                         <_nouses>true</_nouses>

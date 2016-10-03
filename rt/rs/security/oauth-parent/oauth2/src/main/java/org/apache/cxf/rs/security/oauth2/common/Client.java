@@ -26,10 +26,12 @@ import java.util.Map;
 
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.OneToOne;
+import javax.persistence.OrderColumn;
 
 
 /**
@@ -37,59 +39,60 @@ import javax.persistence.OneToOne;
  */
 @Entity
 public class Client implements Serializable {
-    
+
     private static final long serialVersionUID = -5550840247125850922L;
-    
+
     private String clientId;
     private String clientSecret;
     private String clientIpAddress;
-    
+
     private String applicationName;
     private String applicationDescription;
     private String applicationWebUri;
     private String applicationLogoUri;
     private List<String> applicationCertificates = new LinkedList<String>();
     private List<String> redirectUris = new LinkedList<String>();
-    
+
     private boolean isConfidential;
     private List<String> allowedGrantTypes = new LinkedList<String>();
     private List<String> registeredScopes = new LinkedList<String>();
     private List<String> registeredAudiences = new LinkedList<String>();
-    
+
     private Map<String, String> properties = new HashMap<String, String>();
     private UserSubject subject;
     private UserSubject resourceOwnerSubject;
-    private long registeredAt;    
+    private long registeredAt;
     private String homeRealm;
+    private boolean registeredDynamically;
     
     public Client() {
-        
+
     }
-    
+
     public Client(String clientId, String clientSecret, boolean isConfidential) {
         this.clientId = clientId;
         this.clientSecret = clientSecret;
         this.isConfidential = isConfidential;
     }
 
-    public Client(String clientId, 
+    public Client(String clientId,
                   String clientSecret,
                   boolean isConfidential,
                   String applicationName) {
         this(clientId, clientSecret, isConfidential);
         this.applicationName = applicationName;
     }
-    
-    public Client(String clientId, 
+
+    public Client(String clientId,
                   String clientSecret,
                   boolean isConfidential,
                   String applicationName,
                   String applicationWebUri) {
         this(clientId, clientSecret, isConfidential, applicationName);
         this.applicationWebUri = applicationWebUri;
-        
+
     }
-    
+
     /**
      * Get the client registration id
      * @return the consumer key
@@ -102,7 +105,7 @@ public class Client implements Serializable {
     public void setClientId(String id) {
         clientId = id;
     }
-    
+
     /**
      * Get the client secret
      * @return the consumer key
@@ -114,7 +117,7 @@ public class Client implements Serializable {
     public void setClientSecret(String id) {
         clientSecret = id;
     }
-        
+
     /**
      * Get the name of the third-party application
      * this client represents
@@ -150,27 +153,19 @@ public class Client implements Serializable {
     }
 
     /**
-     * Set the description of the third-party application.
-     * @param applicationDescription the description
-     */
-    public void setApplicationDescription(String applicationDescription) {
-        this.applicationDescription = applicationDescription;
-    }
-
-    /**
      * Get the description of the third-party application.
      * @return the application description
      */
     public String getApplicationDescription() {
         return applicationDescription;
     }
-    
+
     /**
-     * Set the URI pointing to a logo image of the client application
-     * @param logoPath the logo URI
+     * Set the description of the third-party application.
+     * @param applicationDescription the description
      */
-    public void setApplicationLogoUri(String logoPath) {
-        this.applicationLogoUri = logoPath;
+    public void setApplicationDescription(String applicationDescription) {
+        this.applicationDescription = applicationDescription;
     }
 
     /**
@@ -182,14 +177,11 @@ public class Client implements Serializable {
     }
 
     /**
-     * Set the confidentiality status of this client application.
-     * This can be used to restrict which OAuth2 flows this client
-     * can participate in.
-     * 
-     * @param isConf true if the client is confidential
+     * Set the URI pointing to a logo image of the client application
+     * @param logoPath the logo URI
      */
-    public void setConfidential(boolean isConf) {
-        this.isConfidential = isConf;
+    public void setApplicationLogoUri(String logoPath) {
+        this.applicationLogoUri = logoPath;
     }
 
     /**
@@ -198,6 +190,28 @@ public class Client implements Serializable {
      */
     public boolean isConfidential() {
         return isConfidential;
+    }
+
+    /**
+     * Set the confidentiality status of this client application.
+     * This can be used to restrict which OAuth2 flows this client
+     * can participate in.
+     *
+     * @param isConf true if the client is confidential
+     */
+    public void setConfidential(boolean isConf) {
+        this.isConfidential = isConf;
+    }
+
+    /**
+     * Get a list of URIs the AuthorizationService
+     * may return the authorization code to
+     * @return the redirect uris
+     */
+    @ElementCollection(fetch = FetchType.EAGER)
+    @OrderColumn
+    public List<String> getRedirectUris() {
+        return redirectUris;
     }
 
     /**
@@ -210,13 +224,14 @@ public class Client implements Serializable {
     }
 
     /**
-     * Get a list of URIs the AuthorizationService
-     * may return the authorization code to
-     * @return the redirect uris
+     * Get the list of access token grant types this client
+     * can use to obtain the access tokens.
+     * @return the list of grant types
      */
-    @ElementCollection
-    public List<String> getRedirectUris() {
-        return redirectUris;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @OrderColumn
+    public List<String> getAllowedGrantTypes() {
+        return allowedGrantTypes;
     }
 
     /**
@@ -229,30 +244,7 @@ public class Client implements Serializable {
     }
 
     /**
-     * Get the list of access token grant types this client
-     * can use to obtain the access tokens.
-     * @return the list of grant types
-     */
-    @ElementCollection
-    public List<String> getAllowedGrantTypes() {
-        return allowedGrantTypes;
-    }
-
-    /**
-     * Set the {@link UserSubject} representing this Client 
-     * authentication. This property may be set during the registration
-     * in cases where a 3rd party client needs to authenticate first before
-     * registering as OAuth2 client. This property may also wrap a clientId
-     * in cases where a client credentials flow is used   
-     *
-     * @param subject the user subject
-     */
-    public void setSubject(UserSubject subject) {
-        this.subject = subject;
-    }
-
-    /**
-     * Get the {@link UserSubject} representing this Client 
+     * Get the {@link UserSubject} representing this Client
      * authentication
      * @return the user subject
      */
@@ -262,20 +254,20 @@ public class Client implements Serializable {
     }
 
     /**
-     * Set the {@link UserSubject} representing the resource owner 
-     * who has registered this client. This property may be set in cases where
-     * each account (resource) owner registers account specific Clients
+     * Set the {@link UserSubject} representing this Client
+     * authentication. This property may be set during the registration
+     * in cases where a 3rd party client needs to authenticate first before
+     * registering as OAuth2 client. This property may also wrap a clientId
+     * in cases where a client credentials flow is used
      *
-     * @param subject the resource owner user subject
+     * @param subject the user subject
      */
-
-    public void setResourceOwnerSubject(UserSubject resourceOwnerSubject) {
-        this.resourceOwnerSubject = resourceOwnerSubject;
+    public void setSubject(UserSubject subject) {
+        this.subject = subject;
     }
 
-
     /**
-     * Get the {@link UserSubject} representing the resource owner 
+     * Get the {@link UserSubject} representing the resource owner
      * who has registered this client
      * @return the resource owner user subject
      */
@@ -283,12 +275,23 @@ public class Client implements Serializable {
     public UserSubject getResourceOwnerSubject() {
         return resourceOwnerSubject;
     }
-    
+
+    /**
+     * Set the {@link UserSubject} representing the resource owner
+     * who has registered this client. This property may be set in cases where
+     * each account (resource) owner registers account specific Clients
+     *
+     * @param resourceOwnerSubject the resource owner user subject
+     */
+    public void setResourceOwnerSubject(UserSubject resourceOwnerSubject) {
+        this.resourceOwnerSubject = resourceOwnerSubject;
+    }
+
     /**
      * Get the list of additional client properties
      * @return the list of properties
      */
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @MapKeyColumn(name = "name")
     public Map<String, String> getProperties() {
         return properties;
@@ -306,7 +309,8 @@ public class Client implements Serializable {
      * Get the list of registered scopes
      * @return scopes
      */
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
+    @OrderColumn
     public List<String> getRegisteredScopes() {
         return registeredScopes;
     }
@@ -316,7 +320,7 @@ public class Client implements Serializable {
      * Registering the scopes will allow the clients not to include the scopes
      * and delegate to the runtime to enforce that the current request scopes are
      * a subset of the pre-registered scopes.
-     * 
+     *
      * Client Registration service is expected to reject unknown scopes. 
      * @param registeredScopes the scopes
      */
@@ -324,7 +328,8 @@ public class Client implements Serializable {
         this.registeredScopes = registeredScopes;
     }
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
+    @OrderColumn
     public List<String> getRegisteredAudiences() {
         return registeredAudiences;
     }
@@ -337,7 +342,8 @@ public class Client implements Serializable {
         this.registeredAudiences = registeredAudiences;
     }
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
+    @OrderColumn
     public List<String> getApplicationCertificates() {
         return applicationCertificates;
     }
@@ -378,5 +384,13 @@ public class Client implements Serializable {
      */
     public void setHomeRealm(String homeRealm) {
         this.homeRealm = homeRealm;
+    }
+
+    public boolean isRegisteredDynamically() {
+        return registeredDynamically;
+    }
+
+    public void setRegisteredDynamically(boolean registeredDynamically) {
+        this.registeredDynamically = registeredDynamically;
     }
 }

@@ -38,6 +38,7 @@ import org.apache.cxf.BusException;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.transport.DestinationFactory;
@@ -48,6 +49,8 @@ import org.apache.cxf.transport.http.HTTPTransportFactory;
 import org.apache.cxf.transport.servlet.servicelist.ServiceListGeneratorServlet;
 
 public class CXFNonSpringServlet extends AbstractHTTPServlet {
+    public static final String TRANSPORT_ID = "transportId";
+    
     private static final long serialVersionUID = -2437897227486327166L;
     private static final String IGNORE_SERVLET_CONTEXT_RESOLVER = "ignore.servlet.context.resolver";
     
@@ -80,7 +83,7 @@ public class CXFNonSpringServlet extends AbstractHTTPServlet {
             loader = initClassLoader();
             registerServletContextResolver(sc);
             if (destinationRegistry == null) {
-                this.destinationRegistry = getDestinationRegistryFromBus();
+                this.destinationRegistry = getDestinationRegistryFromBusOrDefault(sc.getInitParameter(TRANSPORT_ID));
             }
         }
 
@@ -101,11 +104,12 @@ public class CXFNonSpringServlet extends AbstractHTTPServlet {
         return bus.getExtension(ClassLoader.class);
     }
     
-    protected DestinationRegistry getDestinationRegistryFromBus() {
+    protected DestinationRegistry getDestinationRegistryFromBusOrDefault(final String transportId) {
         DestinationFactoryManager dfm = bus.getExtension(DestinationFactoryManager.class);
         try {
-            DestinationFactory df = dfm
-                .getDestinationFactory("http://cxf.apache.org/transports/http/configuration");
+            DestinationFactory df = StringUtils.isEmpty(transportId)
+                ? dfm.getDestinationFactory("http://cxf.apache.org/transports/http/configuration")
+                    : dfm.getDestinationFactory(transportId);
             if (df instanceof HTTPTransportFactory) {
                 HTTPTransportFactory transportFactory = (HTTPTransportFactory)df;
                 return transportFactory.getRegistry();

@@ -181,6 +181,10 @@
               org.apache.cxf.management.web.browser*,
               org.apache.cxf.management.web.logging.atom*,
             </Export-Package>
+            <Import-Package>
+              javax.servlet*;version="[2,4)",
+              *
+            </Import-Package>
                     </instructions>
                 </configuration>
             </plugin>

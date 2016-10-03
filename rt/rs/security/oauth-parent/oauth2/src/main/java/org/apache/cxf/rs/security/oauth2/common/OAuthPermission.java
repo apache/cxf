@@ -22,11 +22,15 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.persistence.Cacheable;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.OrderColumn;
 import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlRootElement;
+
 
 /**
  * Provides the complete information about a given opaque permission.
@@ -37,6 +41,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement
 @Entity
+@Cacheable
 public class OAuthPermission implements Serializable {
     private static final long serialVersionUID = -6486616235830491290L;
     private List<String> httpVerbs = new LinkedList<String>();
@@ -45,20 +50,29 @@ public class OAuthPermission implements Serializable {
     private String description;
     private boolean isDefaultPermission;
     private boolean invisibleToClient;
-    
     public OAuthPermission() {
-        
+
     }
-    
+
     public OAuthPermission(String permission) {
         this.permission = permission;
     }
-    
+
     public OAuthPermission(String permission, String description) {
         this.description = description;
         this.permission = permission;
     }
-    
+
+    /**
+     * Gets the optional list of HTTP verbs
+     * @return the list of HTTP verbs
+     */
+    @ElementCollection(fetch = FetchType.EAGER)
+    @OrderColumn
+    public List<String> getHttpVerbs() {
+        return httpVerbs;
+    }
+
     /**
      * Sets the optional list of HTTP verbs, example,
      * "GET" and "POST", etc
@@ -69,12 +83,13 @@ public class OAuthPermission implements Serializable {
     }
 
     /**
-     * Gets the optional list of HTTP verbs
-     * @return the list of HTTP verbs
+     * Gets the optional list of relative request URIs
+     * @return the list of URIs
      */
-    @ElementCollection
-    public List<String> getHttpVerbs() {
-        return httpVerbs;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @OrderColumn
+    public List<String> getUris() {
+        return uris;
     }
 
     /**
@@ -85,14 +100,6 @@ public class OAuthPermission implements Serializable {
         this.uris = uri;
     }
 
-    /**
-     * Gets the optional list of relative request URIs
-     * @return the list of URIs
-     */
-    @ElementCollection
-    public List<String> getUris() {
-        return uris;
-    }
     
     /**
      * Gets the permission description
@@ -164,7 +171,6 @@ public class OAuthPermission implements Serializable {
     public void setInvisibleToClient(boolean invisibleToClient) {
         this.invisibleToClient = invisibleToClient;
     }
-    
     @Override
     public boolean equals(Object object) {
         if (!(object instanceof OAuthPermission)) {
@@ -197,7 +203,6 @@ public class OAuthPermission implements Serializable {
         
         return true;
     }
-    
     @Override
     public int hashCode() {
         int hashCode = 17;

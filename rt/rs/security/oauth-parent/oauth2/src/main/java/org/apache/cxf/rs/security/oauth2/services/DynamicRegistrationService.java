@@ -30,11 +30,13 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.provider.ClientRegistrationProvider;
@@ -44,43 +46,48 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
 
 @Path("register")
-public class DynamicRegistrationService extends AbstractOAuthService {
+public class DynamicRegistrationService {
     private static final String DEFAULT_APPLICATION_TYPE = "web";
     private static final Integer DEFAULT_CLIENT_ID_SIZE = 10;
     private ClientRegistrationProvider clientProvider;
     private String initialAccessToken;
     private int clientIdSizeInBytes = DEFAULT_CLIENT_ID_SIZE;
+    private MessageContext mc;
+    private boolean supportRegistrationAccessTokens = true;
+    
     @POST
     @Consumes("application/json")
     @Produces("application/json")
-    public ClientRegistrationResponse register(ClientRegistration request) {
+    public Response register(ClientRegistration request) {
         checkInitialAccessToken();
         Client client = createNewClient(request);
         createRegAccessToken(client);
         clientProvider.setClient(client);
         
-        return fromClientToRegistrationResponse(client);
+        return Response.status(201).entity(fromClientToRegistrationResponse(client)).build();
     }
     
     protected void checkInitialAccessToken() {
         if (initialAccessToken != null) {
-            checkCurrentAccessToken(initialAccessToken);
+            String accessToken = getRequestAccessToken();
+            if (!initialAccessToken.equals(accessToken)) {
+                throw ExceptionUtils.toNotAuthorizedException(null, null);
+            }
         }
         
     }
 
     protected String createRegAccessToken(Client client) {
-        //TODO: Passing AccessTokenRegistration to OAuthDataProvider may be needed
         String regAccessToken = OAuthUtils.generateRandomTokenKey();
         client.getProperties().put(ClientRegistrationResponse.REG_ACCESS_TOKEN, 
                                    regAccessToken);
         return regAccessToken;
     }
-    protected void checkCurrentAccessToken(String accessToken) {
-        String[] authParts = AuthorizationUtils.getAuthorizationParts(getMessageContext(), 
-                             Collections.singleton(OAuthConstants.BEARER_AUTHORIZATION_SCHEME));
-        if (authParts.length != 2 || !authParts[1].equals(accessToken)) {
-            throw ExceptionUtils.toForbiddenException(null, null);
+    protected void checkRegistrationAccessToken(Client c, String accessToken) {
+        String regAccessToken = c.getProperties().get(ClientRegistrationResponse.REG_ACCESS_TOKEN);
+        
+        if (!regAccessToken.equals(accessToken)) {
+            throw ExceptionUtils.toNotAuthorizedException(null, null);
         }
     }
 
@@ -123,10 +130,15 @@ public class DynamicRegistrationService extends AbstractOAuthService {
         // TODO: consider making Client secret time limited
         response.setClientSecretExpiresAt(Long.valueOf(0));
         UriBuilder ub = getMessageContext().getUriInfo().getAbsolutePathBuilder();
-        response.setRegistrationClientUri(ub.path(client.getClientId()).build().toString());
         
-        response.setRegistrationAccessToken(client.getProperties()
-                                            .get(ClientRegistrationResponse.REG_ACCESS_TOKEN));
+        if (supportRegistrationAccessTokens) {
+            // both registration access token and uri are either included or excluded
+            response.setRegistrationClientUri(
+                ub.path(client.getClientId()).build().toString());
+        
+            response.setRegistrationAccessToken(
+                client.getProperties().get(ClientRegistrationResponse.REG_ACCESS_TOKEN));
+        }
         return response;
     }
     
@@ -135,30 +147,41 @@ public class DynamicRegistrationService extends AbstractOAuthService {
         return fromClientToClientRegistration(client);
     }
 
-    protected ClientRegistration fromClientToClientRegistration(Client client) {
-        return new ClientRegistration();
+    protected ClientRegistration fromClientToClientRegistration(Client c) {
+        ClientRegistration reg = new ClientRegistration();
+        reg.setClientName(c.getApplicationName());
+        reg.setGrantTypes(c.getAllowedGrantTypes());
+        reg.setApplicationType(c.isConfidential() ? "web" : "native");
+        reg.setRedirectUris(c.getRedirectUris());
+        reg.setScope(OAuthUtils.convertListOfScopesToString(c.getRegisteredScopes()));
+        if (c.getApplicationWebUri() != null) {
+            reg.setClientUri(c.getApplicationWebUri());
+        }
+        if (c.getApplicationLogoUri() != null) {
+            reg.setLogoUri(c.getApplicationLogoUri());
+        }
+        //etc
+        return reg;
     }
     
     protected Client readClient(String clientId) {
+        String accessToken = getRequestAccessToken();
+                                                 
         Client c = clientProvider.getClient(clientId);
-        String regAccessToken = c.getProperties().get(ClientRegistrationResponse.REG_ACCESS_TOKEN);
-        // Or check OAuthDataProvider.getAccessToken
-        // if OAuthDataProvider.createAccessToken was used
-        
-        validateRegistrationAccessToken(regAccessToken);
+        if (c == null) {
+            throw ExceptionUtils.toNotAuthorizedException(null, null);
+        }
+        checkRegistrationAccessToken(c, accessToken);
         return c;
     }
     
-    protected void validateRegistrationAccessToken(String accessToken) {
-        checkCurrentAccessToken(accessToken);
-    }
-
+    
     public String getInitialAccessToken() {
         return initialAccessToken;
     }
 
-    public void setRegistrationAccessToken(String registrationAccessToken) {
-        this.initialAccessToken = registrationAccessToken;
+    public void setInitialAccessToken(String initialAccessToken) {
+        this.initialAccessToken = initialAccessToken;
     }
     
     protected Client createNewClient(ClientRegistration request) {
@@ -172,6 +195,9 @@ public class DynamicRegistrationService extends AbstractOAuthService {
         }
         
         List<String> grantTypes = request.getGrantTypes();
+        if (grantTypes == null) {
+            grantTypes = Collections.singletonList("authorization_code");
+        }
         
         // Client Type
         // https://tools.ietf.org/html/rfc7591 has no this property but
@@ -181,7 +207,7 @@ public class DynamicRegistrationService extends AbstractOAuthService {
             appType = DEFAULT_APPLICATION_TYPE;
         }
         boolean isConfidential = DEFAULT_APPLICATION_TYPE.equals(appType) 
-            && grantTypes != null && grantTypes.contains(OAuthConstants.AUTHORIZATION_CODE_GRANT);
+            && grantTypes.contains(OAuthConstants.AUTHORIZATION_CODE_GRANT);
         
         // Client Secret
         String clientSecret = isConfidential
@@ -190,9 +216,7 @@ public class DynamicRegistrationService extends AbstractOAuthService {
 
         Client newClient = new Client(clientId, clientSecret, isConfidential, clientName);
         
-        if (grantTypes != null) {
-            newClient.setAllowedGrantTypes(grantTypes);
-        }    
+        newClient.setAllowedGrantTypes(grantTypes);
         
         // Client Registration Time
         newClient.setRegisteredAt(System.currentTimeMillis() / 1000);
@@ -225,7 +249,8 @@ public class DynamicRegistrationService extends AbstractOAuthService {
         //TODO: check other properties
         // Add more typed properties like tosUri, policyUri, etc to Client
         // or set them as Client extra properties
-        
+     
+        newClient.setRegisteredDynamically(true);
         return newClient;
     }
 
@@ -260,7 +285,24 @@ public class DynamicRegistrationService extends AbstractOAuthService {
                        getClientSecretSizeInBytes(request)));
     }
 
+    protected String getRequestAccessToken() {
+        return AuthorizationUtils.getAuthorizationParts(getMessageContext(), 
+                    Collections.singleton(OAuthConstants.BEARER_AUTHORIZATION_SCHEME))[1];
+    }
     protected int getClientSecretSizeInBytes(ClientRegistration request) {
         return 16;
+    }
+
+    @Context 
+    public void setMessageContext(MessageContext context) {
+        this.mc = context;
+    }
+    
+    public MessageContext getMessageContext() {
+        return mc;
+    }
+
+    public void setSupportRegistrationAccessTokens(boolean supportRegistrationAccessTokens) {
+        this.supportRegistrationAccessTokens = supportRegistrationAccessTokens;
     }
 }

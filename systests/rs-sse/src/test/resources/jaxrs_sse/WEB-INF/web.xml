@@ -1,0 +1,28 @@
+<web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+	<servlet>
+		<servlet-name>CXFServlet</servlet-name>
+		<display-name>CXF Servlet</display-name>
+		<servlet-class>org.apache.cxf.jaxrs.servlet.CXFNonSpringJaxrsServlet</servlet-class>    
+		<load-on-startup>1</load-on-startup>
+		<async-supported>true</async-supported>
+		<init-param>
+			<param-name>transportId</param-name>
+			<param-value>http://cxf.apache.org/transports/http/sse</param-value>
+		</init-param>
+		<init-param>
+			<param-name>jaxrs.serviceClasses</param-name>
+			<param-value>org.apache.cxf.systest.jaxrs.sse.BookStore</param-value>
+		</init-param>
+		<init-param>
+			<param-name>jaxrs.providers</param-name>
+			<param-value>com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider</param-value>
+		</init-param>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>CXFServlet</servlet-name>
+		<url-pattern>/rest/*</url-pattern>
+	</servlet-mapping>
+</web-app>

@@ -22,14 +22,11 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.Collections;
 import java.util.List;
-
-import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -39,6 +36,7 @@ public class JPACodeDataProviderTest extends Assert {
     private EntityManagerFactory emFactory;
     private Connection connection;
     private JPACodeDataProvider provider;
+
     @Before
     public void setUp() throws Exception {
         try {
@@ -49,15 +47,26 @@ public class JPACodeDataProviderTest extends Assert {
             fail("Exception during HSQL database init.");
         }
         try {
-            emFactory = Persistence.createEntityManagerFactory("testUnitHibernate");
-            EntityManager em = emFactory.createEntityManager();
+            emFactory = Persistence.createEntityManagerFactory(getPersistenceUnitName());
             provider = new JPACodeDataProvider();
-            provider.setEntityManager(em);
-            provider.setSupportedScopes(Collections.singletonMap("a", "A Scope"));
+            getProvider().setEntityManagerFactory(emFactory);
+            initializeProvider(provider);
         } catch (Exception ex) {
             ex.printStackTrace();
             fail("Exception during JPA EntityManager creation.");
         }
+    }
+
+    protected String getPersistenceUnitName() {
+        return "testUnitHibernate";
+    }
+
+    protected void initializeProvider(JPACodeDataProvider dataProvider) {
+        dataProvider.setSupportedScopes(Collections.singletonMap("a", "A Scope"));
+    }
+
+    protected JPACodeDataProvider getProvider() {
+        return provider;
     }
 
     @Test
@@ -69,24 +78,33 @@ public class JPACodeDataProviderTest extends Assert {
         atr.setApprovedScope(Collections.singletonList("a"));
         atr.setSubject(c.getResourceOwnerSubject());
         
-        ServerAuthorizationCodeGrant grant = provider.createCodeGrant(atr);
+        ServerAuthorizationCodeGrant grant = getProvider().createCodeGrant(atr);
         
-        List<ServerAuthorizationCodeGrant> grants = provider.getCodeGrants(c, c.getResourceOwnerSubject());
+        List<ServerAuthorizationCodeGrant> grants = getProvider().getCodeGrants(c, c.getResourceOwnerSubject());
         assertNotNull(grants);
         assertEquals(1, grants.size());
         assertEquals(grant.getCode(), grants.get(0).getCode());
         
-        grants = provider.getCodeGrants(c, null);
+        grants = getProvider().getCodeGrants(c, null);
         assertNotNull(grants);
         assertEquals(1, grants.size());
         assertEquals(grant.getCode(), grants.get(0).getCode());
         
-        ServerAuthorizationCodeGrant grant2 = provider.removeCodeGrant(grant.getCode());
+        ServerAuthorizationCodeGrant grant2 = getProvider().removeCodeGrant(grant.getCode());
         assertEquals(grant.getCode(), grant2.getCode());
         
-        grants = provider.getCodeGrants(c, null);
+        grants = getProvider().getCodeGrants(c, null);
         assertNotNull(grants);
         assertEquals(0, grants.size());
+    }
+
+    @Test
+    public void testResetClient() {
+        Client c = addClient("111", "bob");
+        c.setClientSecret("newSecret");
+        getProvider().setClient(c);
+        Client savedClient = getProvider().getClient(c.getClientId());
+        assertEquals(c.getClientSecret(), savedClient.getClientSecret());
     }
     
     @Test
@@ -98,13 +116,13 @@ public class JPACodeDataProviderTest extends Assert {
         atr.setApprovedScope(Collections.singletonList("a"));
         atr.setSubject(c.getResourceOwnerSubject());
         
-        provider.createCodeGrant(atr);
+        getProvider().createCodeGrant(atr);
         
-        List<ServerAuthorizationCodeGrant> grants = provider.getCodeGrants(c, c.getResourceOwnerSubject());
+        List<ServerAuthorizationCodeGrant> grants = getProvider().getCodeGrants(c, c.getResourceOwnerSubject());
         assertNotNull(grants);
         assertEquals(1, grants.size());
-        provider.removeClient(c.getClientId());
-        grants = provider.getCodeGrants(c, c.getResourceOwnerSubject());
+        getProvider().removeClient(c.getClientId());
+        grants = getProvider().getCodeGrants(c, c.getResourceOwnerSubject());
         assertNotNull(grants);
         assertEquals(0, grants.size());
     }
@@ -114,14 +132,15 @@ public class JPACodeDataProviderTest extends Assert {
         c.setRedirectUris(Collections.singletonList("http://client/redirect"));
         c.setClientId(clientId);
         c.setResourceOwnerSubject(new UserSubject(userLogin));
-        provider.setClient(c);
+        getProvider().setClient(c);
         return c;
     }
+
     @After
     public void tearDown() throws Exception {
         try {
             if (provider != null) {
-                provider.close();
+                getProvider().close();
             }
             if (emFactory != null) {
                 emFactory.close();

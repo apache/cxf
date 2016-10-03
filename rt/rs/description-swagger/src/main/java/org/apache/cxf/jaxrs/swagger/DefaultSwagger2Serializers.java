@@ -106,8 +106,7 @@ public class DefaultSwagger2Serializers extends SwaggerSerializers implements Sw
                     ClassResourceInfo cri = operations.get(entry.getKey());
 
                     tag = new Tag();
-                    String tagName = StringUtils.removeStart(cri.getURITemplate().getValue(), "/");
-                    tag.setName(StringUtils.isEmpty(tagName) ? "_" : tagName);
+                    tag.setName(cri.getURITemplate().getValue().replaceAll("/", "_"));
                     if (javadocProvider != null) {
                         tag.setDescription(javadocProvider.getClassDoc(cri));
                     }

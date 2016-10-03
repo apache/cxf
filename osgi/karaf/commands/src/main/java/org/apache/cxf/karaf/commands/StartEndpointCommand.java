@@ -24,35 +24,38 @@ import java.util.List;
 import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.endpoint.ServerRegistry;
-import org.apache.karaf.shell.commands.Argument;
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
+import org.apache.cxf.karaf.commands.completers.BusCompleter;
+import org.apache.cxf.karaf.commands.completers.StoppedEndpointCompleter;
+import org.apache.cxf.karaf.commands.internal.CXFController;
+import org.apache.karaf.shell.api.action.Action;
+import org.apache.karaf.shell.api.action.Argument;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 /**
  * 
  */
-@Command(scope = "cxf", name = "start-endpoint", 
+@Command(scope = "cxf", name = "start-endpoint",
     description = "Starts a CXF Endpoint on a Bus.")
-public class StartEndpointCommand extends OsgiCommandSupport {
+@Service
+public class StartEndpointCommand extends CXFController implements Action {
     
     @Argument(index = 0, name = "bus", 
         description = "The CXF bus name where to look for the Endpoint", 
         required = true, multiValued = false)
+    @Completion(BusCompleter.class)
     String busName;
     
-    @Argument(index = 1, name = "endpoint", 
+    @Argument(index = 1, name = "endpoint",
         description = "The Endpoint name to start", 
         required = true, multiValued = false)
+    @Completion(StoppedEndpointCompleter.class)
     String endpoint;
-    
-    private CXFController cxfController;
 
-    public void setController(CXFController controller) {
-        this.cxfController = controller;
-    }
-
-    protected Object doExecute() throws Exception {
-        Bus b = cxfController.getBus(busName);
+    @Override
+    public Object execute() throws Exception {
+        Bus b = getBus(busName);
         ServerRegistry reg = b.getExtension(ServerRegistry.class);
         List<Server> servers = reg.getServers();
         for (Server serv : servers) {

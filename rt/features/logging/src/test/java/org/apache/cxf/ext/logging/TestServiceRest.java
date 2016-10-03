@@ -28,4 +28,5 @@ public class TestServiceRest {
     public String echo(@PathParam("msg") String msg) {
         return msg;
     }
+
 }

@@ -54,6 +54,7 @@ public class OAuthAuthorizationData extends OAuthRedirectionState implements Ser
     private List<OAuthPermission> permissions;
     private List<OAuthPermission> alreadyAuthorizedPermissions;
     private boolean hidePreauthorizedScopesInForm;
+    private boolean applicationRegisteredDynamically;
     
     public OAuthAuthorizationData() {
     }
@@ -255,6 +256,14 @@ public class OAuthAuthorizationData extends OAuthRedirectionState implements Ser
             allPerms.addAll(permissions);
         }
         return allPerms;
+    }
+
+    public boolean isApplicationRegisteredDynamically() {
+        return applicationRegisteredDynamically;
+    }
+
+    public void setApplicationRegisteredDynamically(boolean applicationRegisteredDynamically) {
+        this.applicationRegisteredDynamically = applicationRegisteredDynamically;
     }
 
 }

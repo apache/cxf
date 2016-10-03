@@ -152,8 +152,9 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         Client client = ClientBuilder.newClient();
         client.register((Object)ClientFilterClientAndConfigCheck.class);
         client.property("clientproperty", "somevalue");
-        Invocation.Builder builder = client.target(address)
-            .request("application/xml").header("a", "b");
+        WebTarget webTarget = client.target(address);
+        Invocation.Builder builder = webTarget.request("application/xml").header("a", "b");
+        
         Response r = builder.get();
         Book book = r.readEntity(Book.class);
         assertEquals(124L, book.getId());

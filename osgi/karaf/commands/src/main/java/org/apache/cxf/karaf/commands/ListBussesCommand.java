@@ -22,46 +22,46 @@ package org.apache.cxf.karaf.commands;
 import java.util.List;
 
 import org.apache.cxf.Bus;
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
+import org.apache.cxf.karaf.commands.internal.CXFController;
+import org.apache.karaf.shell.api.action.Action;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.apache.karaf.shell.api.console.Terminal;
+import org.apache.karaf.shell.support.table.ShellTable;
 
 /**
  * 
  */
 @Command(scope = "cxf", name = "list-busses", description = "Lists all CXF Busses.")
-public class ListBussesCommand extends OsgiCommandSupport {
-    protected static final int DEFAULT_BUSID_LENGTH = 38;
-    protected String headerFormat = "%-40s %-20s";
-    protected String outputFormat = "[%-38s] [%-18s]";
-   
-    private CXFController cxfController;
+@Service
+public class ListBussesCommand extends CXFController implements Action {
 
-    public void setController(CXFController controller) {
-        this.cxfController = controller;
-    }
+    @Reference(optional = true)
+    Terminal terminal;
 
-    protected Object doExecute() throws Exception {
-        List<Bus> busses = cxfController.getBusses();
-        renderFormat(busses);
-        System.out.println(String.format(headerFormat, "Name", "State"));
+    @Option(name = "--no-format", description = "Disable table rendered output", required = false, multiValued = false)
+    boolean noFormat;
+
+    @Override
+    public Object execute() throws Exception {
+        List<Bus> busses = getBusses();
+
+        ShellTable table = new ShellTable();
+        if (terminal != null && terminal.getWidth() > 0) {
+            table.size(terminal.getWidth());
+        }
+        table.column("Name");
+        table.column("State");
 
         for (Bus bus : busses) {
+            String name = bus.getId();
             String state = bus.getState().toString();
-            System.out.println(String.format(outputFormat, bus.getId(), state));
+            table.addRow().addContent(name, state);
         }
+        table.print(System.out, !noFormat);
         return null;
     }
 
-    private void renderFormat(List<Bus> busses) {
-        int longestBusId = DEFAULT_BUSID_LENGTH;
-        for (Bus bus : busses) {
-            if (bus.getId().length() > longestBusId) {
-                longestBusId = bus.getId().length();
-            }
-        }
-        if (longestBusId > DEFAULT_BUSID_LENGTH) {
-            headerFormat = "%-" + (longestBusId + 2) + "s %-20s";
-            outputFormat = "[%-" + longestBusId + "s] [%-18s]";
-        }
-    }
 }
