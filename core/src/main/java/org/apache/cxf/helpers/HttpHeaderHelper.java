@@ -69,12 +69,9 @@ public final class HttpHeaderHelper {
         return headerMap.get(getHeaderKey(key));
     }
     
-    public static String getHeaderKey(String key) {
-        if (internalHeaders.containsKey(key)) {
-            return internalHeaders.get(key);
-        } else {
-            return key;
-        }
+    public static String getHeaderKey(final String key) {
+        String headerKey = internalHeaders.get(key);
+        return headerKey == null ? key : headerKey;
     }
     
     public static String findCharset(String contentType) {
