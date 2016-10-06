@@ -20,20 +20,35 @@ package org.apache.cxf.jaxrs.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.io.DelegatingInputStream;
+import org.apache.cxf.jaxrs.utils.FormUtils;
+import org.apache.cxf.jaxrs.utils.HttpUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 
 public class HttpServletRequestFilter extends HttpServletRequestWrapper {
 
     private Message m;
+    private boolean isPostFormRequest;
+    private MultivaluedMap<String, String> formParams;
     public HttpServletRequestFilter(HttpServletRequest request, Message message) {
         super(request);
         m = message;
+        isPostFormRequest = FormUtils.isFormPostRequest(m);
     }
     @Override
     public ServletInputStream getInputStream() throws IOException {
@@ -46,6 +61,64 @@ public class HttpServletRequestFilter extends HttpServletRequestWrapper {
         } else {
             return super.getInputStream();
         }
+    }
+    @Override
+    public String getParameter(String name) {
+        String[] values = this.getParameterValues(name);
+        return values == null ? null : values[0];
+    }
+    @Override
+    public String[] getParameterValues(String name) {
+        String[] value = super.getParameterValues(name);
+        if (value == null && isPostFormRequest) {
+            readFromParamsIfNeeded();
+            value = formParams.get(name).toArray(new String[]{});
+        }
+        return value;
+    }
+    @Override
+    public Map<String, String[]> getParameterMap() {
+        Map<String, String[]> map1 = super.getParameterMap();
+        if (isPostFormRequest) {
+            readFromParamsIfNeeded();
+            Map<String, String[]> map2 = new LinkedHashMap<String, String[]>();
+            map2.putAll(map1);
+            for (Map.Entry<String, List<String>> e : formParams.entrySet()) {
+                map2.put(e.getKey(), e.getValue().toArray(new String[]{}));
+            }
+            return Collections.unmodifiableMap(map2);
+        } else {
+            return map1;
+        }
+    }
+    @Override
+    public Enumeration<String> getParameterNames() {
+        Map<String, String[]> map = this.getParameterMap();
+        final Iterator<String> it = map.keySet().iterator();
+        return new Enumeration<String>() {
+
+            @Override
+            public boolean hasMoreElements() {
+                return it.hasNext();
+            }
+
+            @Override
+            public String nextElement() {
+                return it.next();
+            }
+            
+        };
+    }
+    
+    private void readFromParamsIfNeeded() {
+        if (formParams == null) {
+            formParams = new MetadataMap<String, String>();
+            MediaType mt = JAXRSUtils.toMediaType((String)m.get(Message.CONTENT_TYPE));
+            String enc = HttpUtils.getEncoding(mt, StandardCharsets.UTF_8.name());
+            String body = FormUtils.readBody(m.getContent(InputStream.class), enc);
+            FormUtils.populateMapFromString(formParams, m, body, enc, true);
+        }
+        
     }
 }
 

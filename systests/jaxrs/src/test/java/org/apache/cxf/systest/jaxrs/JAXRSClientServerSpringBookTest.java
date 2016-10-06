@@ -106,7 +106,27 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     @Test
     public void testEchoBookForm() throws Exception {
         String address = "http://localhost:" + PORT + "/bus/thebooksform/bookform";
+        doTestEchoBookForm(address);
+    }
+    @Test
+    public void testEchoBookForm2() throws Exception {
+        String address = "http://localhost:" + PORT + "/bus/thebooksform/bookform2";
+        doTestEchoBookForm(address);
+    }
+    @Test
+    public void testEchoBookForm3() throws Exception {
+        String address = "http://localhost:" + PORT + "/bus/thebooksform/bookform3";
+        doTestEchoBookForm(address);
+    }
+    @Test
+    public void testEchoBookForm4() throws Exception {
+        String address = "http://localhost:" + PORT + "/bus/thebooksform/bookform4";
+        doTestEchoBookForm(address);
+    }
+    private void doTestEchoBookForm(String address) throws Exception {
         WebClient wc = WebClient.create(address);
+        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000L);
+        
         Book b = 
             wc.form(new Form().param("name", "CXFForm").param("id", "125"))
                 .readEntity(Book.class);
@@ -117,7 +137,6 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     public void testEchoBookFormXml() throws Exception {
         String address = "http://localhost:" + PORT + "/bus/thebooksform/bookform";
         WebClient wc = WebClient.create(address);
-        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000L);
         Book b = 
             wc.type("application/xml").post(new Book("CXFFormXml", 125L))
                 .readEntity(Book.class);
