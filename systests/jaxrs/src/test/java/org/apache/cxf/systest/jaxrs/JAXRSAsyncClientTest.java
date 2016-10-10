@@ -375,6 +375,19 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         Book book = stage.toCompletableFuture().join();
         assertEquals(123L, book.getId());
     }
+    @Test
+    public void testGetBookAsyncStage404() throws Exception {
+        String address = "http://localhost:" + PORT + "/bookstore/bookheaders/404";
+        WebClient wc = createWebClient(address);
+        CompletionStage<Book> stage = wc.path("123").rx().get(Book.class);
+        try {
+            stage.toCompletableFuture().get();
+            fail("Exception expected");
+        } catch (ExecutionException ex) {
+            assertTrue(ex.getCause() instanceof NotFoundException);
+        }
+        
+    }
     private WebClient createWebClient(String address) {
         List<Object> providers = new ArrayList<Object>();
         return WebClient.create(address, providers);
