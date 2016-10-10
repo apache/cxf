@@ -376,6 +376,22 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         assertEquals(123L, book.getId());
     }
     @Test
+    public void testGetBookAsyncStageThenAcceptAsync() throws Exception {
+        String address = "http://localhost:" + PORT + "/bookstore/books";
+        WebClient wc = createWebClient(address);
+        CompletionStage<Book> stage = wc.path("123").rx().get(Book.class);
+        Holder<Book> holder = new Holder<Book>();
+        stage.thenApply(v -> {
+            v.setId(v.getId() * 2);
+            return v;
+        }).thenAcceptAsync(v -> {
+            holder.value = v;
+        });
+        Thread.sleep(3000);
+        assertEquals(246L, holder.value.getId());
+    }
+    
+    @Test
     public void testGetBookAsyncStage404() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/bookheaders/404";
         WebClient wc = createWebClient(address);
