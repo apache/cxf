@@ -30,6 +30,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
@@ -321,6 +322,7 @@ public class WebSocketVirtualServletResponse implements HttpServletResponse {
         // the things to consider :
         // - provide a size limit if we are use this buffering
         // - add a chunking mode in the cxf websocket's binding.
+        //CHECKSTYLE:OFF
         return new ServletOutputStream() {
             private InternalByteArrayOutputStream buffer = new InternalByteArrayOutputStream();
 
@@ -358,12 +360,29 @@ public class WebSocketVirtualServletResponse implements HttpServletResponse {
                 }
                 super.close();
             }
+
+            @Override
+            public boolean isReady() {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public void setWriteListener(WriteListener arg0) {
+                throw new UnsupportedOperationException();
+            }
         };
+        //CHECKSTYLE:ON
     }
 
     private static class InternalByteArrayOutputStream extends ByteArrayOutputStream {
         public byte[] getBytes() {
             return buf;
         }
+    }
+
+    @Override
+    public void setContentLengthLong(long arg0) {
+        throw new UnsupportedOperationException();
+        
     }
 }

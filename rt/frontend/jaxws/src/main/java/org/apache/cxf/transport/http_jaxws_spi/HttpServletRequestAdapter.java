@@ -36,6 +36,7 @@ import java.util.Map;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.DispatcherType;
+import javax.servlet.ReadListener;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -46,6 +47,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpUpgradeHandler;
 import javax.servlet.http.Part;
 import javax.xml.ws.spi.http.HttpContext;
 import javax.xml.ws.spi.http.HttpExchange;
@@ -410,5 +412,36 @@ class HttpServletRequestAdapter implements HttpServletRequest {
         public int read() throws IOException {
             return delegate.read();
         }
+
+        @Override
+        public boolean isFinished() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public boolean isReady() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void setReadListener(ReadListener arg0) {
+            throw new UnsupportedOperationException();
+            
+        }
+    }
+
+    @Override
+    public long getContentLengthLong() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String changeSessionId() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public <T extends HttpUpgradeHandler> T upgrade(Class<T> cls) throws IOException, ServletException {
+        throw new UnsupportedOperationException();
     }
 }

@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Locale;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.ws.spi.http.HttpExchange;
@@ -241,5 +242,20 @@ class HttpServletResponseAdapter implements HttpServletResponse {
         public void flush() throws IOException {
             delegate.flush();
         }
+
+        @Override
+        public boolean isReady() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void setWriteListener(WriteListener arg0) {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    @Override
+    public void setContentLengthLong(long arg0) {
+        throw new UnsupportedOperationException();
     }
 }
