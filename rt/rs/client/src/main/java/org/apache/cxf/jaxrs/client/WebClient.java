@@ -29,6 +29,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletionStage;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
 import javax.ws.rs.HttpMethod;
@@ -954,7 +955,8 @@ public class WebClient extends AbstractClient {
                                           Class<?> requestClass,
                                           Type inType,
                                           Class<?> respClass,
-                                          Type outType) {
+                                          Type outType,
+                                          ExecutorService ex) {
         Annotation[] inAnns = null;
         if (body instanceof Entity) {
             Entity<?> entity = (Entity<?>)body;
@@ -979,12 +981,12 @@ public class WebClient extends AbstractClient {
                                     inAnns, respClass, outType, null, null);
         
         m.getExchange().setSynchronous(false);
-        JaxrsClientCallback<T> cb = new JaxrsClientCallback<T>(null, respClass, outType);
+        JaxrsClientStageCallback<T> cb = new JaxrsClientStageCallback<T>(respClass, outType, ex);
         m.getExchange().put(JaxrsClientCallback.class, cb);
         
         doRunInterceptorChain(m);
         
-        return cb.createCompletionStage();
+        return cb.getCompletionStage();
     }
 
     
@@ -1286,7 +1288,10 @@ public class WebClient extends AbstractClient {
     
     // Link to JAX-RS 2.1 CompletionStageRxInvoker
     public CompletionStageRxInvoker rx() {
-        return new CompletionStageRxInvokerImpl();
+        return new CompletionStageRxInvokerImpl(null);
+    }
+    public CompletionStageRxInvoker rx(ExecutorService ex) {
+        return new CompletionStageRxInvokerImpl(ex);
     }
     
     private void setEntityHeaders(Entity<?> entity) {
@@ -1614,7 +1619,11 @@ public class WebClient extends AbstractClient {
     }
     
     class CompletionStageRxInvokerImpl implements CompletionStageRxInvoker {
-
+        private ExecutorService ex;
+        CompletionStageRxInvokerImpl(ExecutorService ex) {
+            this.ex = ex;
+        }
+        
         @Override
         public CompletionStage<Response> get() {
             return get(Response.class);
@@ -1722,22 +1731,22 @@ public class WebClient extends AbstractClient {
 
         @Override
         public <T> CompletionStage<T> method(String name, Entity<?> entity, Class<T> responseType) {
-            return doInvokeAsyncStage(name, entity, null, null, responseType, responseType);
+            return doInvokeAsyncStage(name, entity, null, null, responseType, responseType, ex);
         }
 
         @Override
         public <T> CompletionStage<T> method(String name, Entity<?> entity, GenericType<T> responseType) {
-            return doInvokeAsyncStage(name, entity, null, null, responseType.getRawType(), responseType.getType());
+            return doInvokeAsyncStage(name, entity, null, null, responseType.getRawType(), responseType.getType(), ex);
         }
 
         @Override
         public <T> CompletionStage<T> method(String name, Class<T> responseType) {
-            return doInvokeAsyncStage(name, null, null, null, responseType, responseType);
+            return doInvokeAsyncStage(name, null, null, null, responseType, responseType, ex);
         }
 
         @Override
         public <T> CompletionStage<T> method(String name, GenericType<T> responseType) {
-            return doInvokeAsyncStage(name, null, null, null, responseType.getRawType(), responseType.getType());
+            return doInvokeAsyncStage(name, null, null, null, responseType.getRawType(), responseType.getType(), ex);
         }
              
     }
