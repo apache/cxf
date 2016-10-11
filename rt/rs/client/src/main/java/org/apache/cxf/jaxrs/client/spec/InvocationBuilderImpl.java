@@ -377,7 +377,7 @@ public class InvocationBuilderImpl implements Invocation.Builder {
 
     @Override
     public CompletionStageRxInvoker rx() {
-        return webClient.rx();
+        return rx((ExecutorService)null);
     }
 
     @Override
@@ -388,15 +388,13 @@ public class InvocationBuilderImpl implements Invocation.Builder {
     @SuppressWarnings("rawtypes")
     @Override
     public <T extends RxInvoker> T rx(Class<T> clazz) {
-        // TODO: Implementation required (JAX-RS 2.1)
-        return null;
+        return rx(clazz, (ExecutorService)null);
     }
 
     @SuppressWarnings("rawtypes")
     @Override
     public <T extends RxInvoker> T rx(Class<T> clazz, ExecutorService executorService) {
-        // TODO: Implementation required (JAX-RS 2.1)
-        return null;
+        return webClient.rx(clazz, executorService);
     }
 
     @Override

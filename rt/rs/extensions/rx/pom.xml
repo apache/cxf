@@ -37,6 +37,11 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-rs-client</artifactId>
+            <version>${project.version}</version>
+        </dependency> 
+        <dependency>
           <groupId>io.reactivex</groupId>
           <artifactId>rxjava</artifactId>
           <version>${cxf.rx.java.version}</version>

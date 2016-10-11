@@ -31,12 +31,12 @@ import javax.ws.rs.client.InvocationCallback;
 
 import org.apache.cxf.endpoint.ClientCallback;
 
-class JaxrsClientCallback<T> extends ClientCallback {
+public class JaxrsClientCallback<T> extends ClientCallback {
     private final InvocationCallback<T> handler;
     private final Type outType;
     private final Class<?> responseClass;
     
-    JaxrsClientCallback(final InvocationCallback<T> handler, 
+    public JaxrsClientCallback(final InvocationCallback<T> handler, 
                         Class<?> responseClass, 
                         Type outGenericType) {
         this.handler = handler;

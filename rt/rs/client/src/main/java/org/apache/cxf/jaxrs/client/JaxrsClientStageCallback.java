@@ -21,16 +21,15 @@ package org.apache.cxf.jaxrs.client;
 
 import java.lang.reflect.Type;
 import java.util.Map;
-import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Executor;
 import java.util.function.Supplier;
 
-class JaxrsClientStageCallback<T> extends JaxrsClientCallback<T>  {
+public class JaxrsClientStageCallback<T> extends JaxrsClientCallback<T>  {
     private CompletableFuture<T> cf;
     
-    JaxrsClientStageCallback(Class<?> responseClass, 
+    public JaxrsClientStageCallback(Class<?> responseClass, 
                              Type outGenericType,
                              Executor ex) {
         super(null, responseClass, outGenericType);
@@ -68,7 +67,7 @@ class JaxrsClientStageCallback<T> extends JaxrsClientCallback<T>  {
     public boolean cancel(boolean mayInterruptIfRunning) {
         boolean result = super.cancel(mayInterruptIfRunning);
         if (result) {
-            cf.completeExceptionally(new CancellationException());
+            cf.cancel(mayInterruptIfRunning);
         }
         return result;
     }
@@ -81,8 +80,7 @@ class JaxrsClientStageCallback<T> extends JaxrsClientCallback<T>  {
             try {
                 return (T)JaxrsClientStageCallback.this.get()[0];
             } catch (Exception ex) {
-                //handler.failed((InterruptedException)ex);
-                //throw ex;
+                cf.completeExceptionally(ex);
                 return null;
             }
         }
