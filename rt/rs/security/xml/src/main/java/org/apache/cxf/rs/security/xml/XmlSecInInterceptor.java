@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -61,6 +62,7 @@ import org.apache.xml.security.stax.ext.InboundXMLSec;
 import org.apache.xml.security.stax.ext.XMLSec;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.ext.XMLSecurityProperties;
+import org.apache.xml.security.stax.impl.securityToken.KeyNameSecurityToken;
 import org.apache.xml.security.stax.securityEvent.AlgorithmSuiteSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
@@ -206,6 +208,17 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> {
             if (certs != null && certs.length > 0) {
                 properties.setSignatureVerificationKey(certs[0].getPublicKey());
             }
+        } else if (sigCrypto != null) {
+            Map<String, String> keyNameAliasMap = RSSecurityUtils.getKeyNameAliasLookupMap(message);
+            for (Map.Entry<String, String> mapping: keyNameAliasMap.entrySet()) {
+                CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+                cryptoType.setAlias(mapping.getValue());
+                X509Certificate[] certs = sigCrypto.getX509Certificates(cryptoType);
+                if (certs != null && certs.length > 0) {
+                    properties.getKeyNameMap().put(mapping.getKey(), certs[0].getPublicKey());
+                }
+            }
+
         }
     }
     
@@ -290,6 +303,11 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> {
         SecurityToken token = event.getSecurityToken();
         if (token != null) {
             X509Certificate[] certs = token.getX509Certificates();
+
+            if (certs == null && token.getPublicKey() == null && token instanceof KeyNameSecurityToken) {
+                certs = getX509CertificatesForKeyName(sigCrypto, msg, (KeyNameSecurityToken)token);
+            }
+
             PublicKey publicKey = token.getPublicKey();
             X509Certificate cert = null;
             if (certs != null && certs.length > 0) {
@@ -310,7 +328,22 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> {
             }
         }
     }
-    
+
+    private X509Certificate[] getX509CertificatesForKeyName(Crypto sigCrypto, Message msg, KeyNameSecurityToken token)
+            throws XMLSecurityException {
+        X509Certificate[] certs;
+        KeyNameSecurityToken keyNameSecurityToken = token;
+        String keyName = keyNameSecurityToken.getKeyName();
+        String alias = RSSecurityUtils.getAliasForKeyName(msg, keyName);
+        try {
+            certs = RSSecurityUtils.getCertificates(sigCrypto, alias);
+        } catch (Exception e) {
+            throw new XMLSecurityException("empty", new Object[] {"Error during Signature Trust "
+                    + "validation: " + e.getMessage()});
+        }
+        return certs;
+    }
+
     protected void throwFault(String error, Exception ex) {
         LOG.warning(error);
         Response response = JAXRSUtils.toResponseBuilder(400).entity(error).build();
