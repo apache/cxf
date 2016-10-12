@@ -417,10 +417,8 @@ public class Headers {
         for (Enumeration<String> e = req.getHeaderNames(); e.hasMoreElements();) {
             String fname = e.nextElement();
             String mappedName = HttpHeaderHelper.getHeaderKey(fname);
-            List<String> values;
-            if (headers.containsKey(mappedName)) {
-                values = headers.get(mappedName);
-            } else {
+            List<String> values = headers.get(mappedName);
+            if (values == null) {
                 values = new ArrayList<String>();
                 headers.put(mappedName, values);
             }
@@ -537,18 +535,14 @@ public class Headers {
     }
     
     void removeContentType() {
-        if (headers.containsKey(PROTOCOL_HEADERS_CONTENT_TYPE)) {
-            headers.remove(PROTOCOL_HEADERS_CONTENT_TYPE);
-        }
+        headers.remove(PROTOCOL_HEADERS_CONTENT_TYPE);
     }
 
     public String getAuthorization() {
-        if (headers.containsKey("Authorization")) {
-            List<String> authorizationLines = headers.get("Authorization");
-            if (authorizationLines != null && !authorizationLines.isEmpty()) {
-                return authorizationLines.get(0);
-            }
-        } 
+        List<String> authorizationLines = headers.get("Authorization");
+        if (authorizationLines != null && !authorizationLines.isEmpty()) {
+            return authorizationLines.get(0);
+        }
         return null;
     }
 

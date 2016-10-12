@@ -72,7 +72,8 @@ public final class UrlUtils {
         boolean needDecode = false;
         int escapesCount = 0;
         int i = 0;
-        while (i < value.length()) {
+        final int length = value.length();
+        while (i < length) {
             char ch = value.charAt(i++);
             if (ch == ESCAPE_CHAR) {
                 escapesCount += 1;

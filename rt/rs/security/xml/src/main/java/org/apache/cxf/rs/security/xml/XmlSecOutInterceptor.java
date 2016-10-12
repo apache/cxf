@@ -434,6 +434,8 @@ public class XmlSecOutInterceptor extends AbstractPhaseInterceptor<Message> {
             return SecurityTokenConstants.KeyIdentifier_SkiKeyIdentifier;
         } else if ("KeyValue".equals(keyIdentifier)) {
             return SecurityTokenConstants.KeyIdentifier_KeyValue;
+        } else if ("KeyName".equals(keyIdentifier)) {
+            return SecurityTokenConstants.KeyIdentifier_KeyName;
         }
         return SecurityTokenConstants.KeyIdentifier_X509KeyIdentifier;
     }

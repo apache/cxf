@@ -21,14 +21,15 @@ package org.apache.cxf.systest.jaxrs.reactive;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.Future;
 
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.GenericType;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
+import org.apache.cxf.jaxrs.rx.client.ObservableRxInvoker;
 import org.apache.cxf.jaxrs.rx.provider.ObservableReader;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
@@ -70,15 +71,6 @@ public class JAXRSReactiveTest extends AbstractBusClientServerTestBase {
             new GenericType<Observable<String>>() {        
             };
         Observable<String> obs = wc.accept("text/plain").get(genericResponseType);
-        obs.subscribe(s -> assertResponse(s));
-    }
-    
-    @Test
-    public void testGetHelloWorldAsyncObservable() throws Exception {
-        String address = "http://localhost:" + PORT + "/reactive/textAsync";
-        WebClient wc = WebClient.create(address);
-        Observable<String> obs = 
-            getObservable(wc.accept("text/plain").async().get(String.class));
         obs.subscribe(s -> assertResponse(s));
     }
     
@@ -129,7 +121,34 @@ public class JAXRSReactiveTest extends AbstractBusClientServerTestBase {
         assertEquals("World", beans.get(1).getAudience());
     }
     
-    private Observable<String> getObservable(Future<String> future) {
-        return Observable.from(future);
+    @Test
+    public void testGetHelloWorldAsyncObservable() throws Exception {
+        String address = "http://localhost:" + PORT + "/reactive/textAsync";
+        WebClient wc = WebClient.create(address);
+        Observable<String> obs = wc.accept("text/plain")
+            .rx(ObservableRxInvoker.class)
+            .get(String.class);
+        obs.map(s -> { 
+            return s + s; 
+        });
+        
+        Thread.sleep(3000);
+        
+        obs.subscribe(s -> assertDuplicateResponse(s));
+    }
+    @Test
+    public void testGetHelloWorldAsyncObservable404() throws Exception {
+        String address = "http://localhost:" + PORT + "/reactive/textAsync404";
+        WebClient wc = WebClient.create(address);
+        try {
+            wc.rx(ObservableRxInvoker.class).get(String.class).subscribe(s -> System.out.println());
+            fail("Exception expected");
+        } catch (Throwable ex) {
+            assertTrue(ex.getCause().getCause() instanceof NotFoundException);
+        }
+    }
+    
+    private void assertDuplicateResponse(String s) {
+        assertEquals("Hello, world!Hello, world!", s);
     }
 }

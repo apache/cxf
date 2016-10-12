@@ -20,6 +20,7 @@ package org.apache.cxf.jaxrs.client;
 
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.Arrays;
@@ -29,6 +30,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletionStage;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
 import javax.ws.rs.HttpMethod;
@@ -38,6 +40,7 @@ import javax.ws.rs.client.AsyncInvoker;
 import javax.ws.rs.client.CompletionStageRxInvoker;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.InvocationCallback;
+import javax.ws.rs.client.RxInvoker;
 import javax.ws.rs.client.SyncInvoker;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.EntityTag;
@@ -79,7 +82,7 @@ import org.apache.cxf.message.Message;
  * Http-centric web client
  *
  */
-public class WebClient extends AbstractClient {
+public class WebClient extends AbstractClient implements AsyncClient {
     private static final String REQUEST_CLASS = "request.class";
     private static final String REQUEST_TYPE = "request.type";
     private static final String REQUEST_ANNS = "request.annotations";
@@ -917,44 +920,29 @@ public class WebClient extends AbstractClient {
                                           Class<?> respClass,
                                           Type outType,
                                           InvocationCallback<T> callback) {
-        Annotation[] inAnns = null;
-        if (body instanceof Entity) {
-            Entity<?> entity = (Entity<?>)body;
-            setEntityHeaders(entity);
-            body = entity.getEntity();
-            requestClass = body.getClass();
-            inType = body.getClass();
-            inAnns = entity.getAnnotations();
-        }
-        
-        if (body instanceof GenericEntity) {
-            GenericEntity<?> genericEntity = (GenericEntity<?>)body;
-            body = genericEntity.getEntity();
-            requestClass = genericEntity.getRawType();
-            inType = genericEntity.getType();
-        }
-        
-        MultivaluedMap<String, String> headers = prepareHeaders(respClass, body);
-        resetResponse();
-
-        Message m = finalizeMessage(httpMethod, headers, body, requestClass, inType, 
-                                    inAnns, respClass, outType, null, null);
-        
-        m.getExchange().setSynchronous(false);
         JaxrsClientCallback<T> cb = new JaxrsClientCallback<T>(callback, respClass, outType);
-        m.getExchange().put(JaxrsClientCallback.class, cb);
-        
-        doRunInterceptorChain(m);
-        
+        prepareAsyncClient(httpMethod, body, requestClass, inType, respClass, outType, cb);        
         return cb.createFuture();
     }
     
     protected <T> CompletionStage<T> doInvokeAsyncStage(String httpMethod, 
                                           Object body, 
-                                          Class<?> requestClass,
-                                          Type inType,
                                           Class<?> respClass,
-                                          Type outType) {
+                                          Type outType,
+                                          ExecutorService ex) {
+        JaxrsClientStageCallback<T> cb = new JaxrsClientStageCallback<T>(respClass, outType, ex);
+        prepareAsyncClient(httpMethod, body, null, null, respClass, outType, cb);
+        return cb.getCompletionStage();
+    }
+    
+    @Override
+    public void prepareAsyncClient(String httpMethod, 
+                                   Object body,
+                                   Class<?> requestClass,
+                                   Type inType,
+                                   Class<?> respClass,
+                                   Type outType,
+                                   JaxrsClientCallback<?> cb) {
         Annotation[] inAnns = null;
         if (body instanceof Entity) {
             Entity<?> entity = (Entity<?>)body;
@@ -963,28 +951,24 @@ public class WebClient extends AbstractClient {
             requestClass = body.getClass();
             inType = body.getClass();
             inAnns = entity.getAnnotations();
-        }
-        
+        } 
         if (body instanceof GenericEntity) {
             GenericEntity<?> genericEntity = (GenericEntity<?>)body;
             body = genericEntity.getEntity();
             requestClass = genericEntity.getRawType();
             inType = genericEntity.getType();
         }
-        
+      
         MultivaluedMap<String, String> headers = prepareHeaders(respClass, body);
         resetResponse();
 
         Message m = finalizeMessage(httpMethod, headers, body, requestClass, inType, 
-                                    inAnns, respClass, outType, null, null);
-        
+                                  inAnns, respClass, outType, null, null);
+      
         m.getExchange().setSynchronous(false);
-        JaxrsClientCallback<T> cb = new JaxrsClientCallback<T>(null, respClass, outType);
         m.getExchange().put(JaxrsClientCallback.class, cb);
-        
+      
         doRunInterceptorChain(m);
-        
-        return cb.createCompletionStage();
     }
 
     
@@ -1286,7 +1270,33 @@ public class WebClient extends AbstractClient {
     
     // Link to JAX-RS 2.1 CompletionStageRxInvoker
     public CompletionStageRxInvoker rx() {
-        return new CompletionStageRxInvokerImpl();
+        return rx((ExecutorService)null);
+    }
+    public CompletionStageRxInvoker rx(ExecutorService ex) {
+        return new CompletionStageRxInvokerImpl(ex);
+    }
+    // Link to JAX-RS 2.1 RxInvoker extensions
+    @SuppressWarnings("rawtypes")
+    public <T extends RxInvoker> T rx(Class<T> clazz) {
+        return rx(clazz, (ExecutorService)null);
+    }
+    @SuppressWarnings({
+     "rawtypes", "unchecked"
+    })
+    public <T extends RxInvoker> T rx(Class<T> clazz, ExecutorService executorService) {
+        if (clazz == CompletionStageRxInvoker.class) {
+            return (T)rx(executorService);
+        } else {
+            String implClassName = clazz.getName() + "Impl";
+            try {
+                Constructor c = ClassLoaderUtils.loadClass(implClassName, WebClient.class)
+                    .getConstructor(AsyncClient.class, ExecutorService.class);
+                return (T)c.newInstance(this, executorService);
+            } catch (Throwable t) {
+                throw new ProcessingException(t);
+            }
+        }
+        
     }
     
     private void setEntityHeaders(Entity<?> entity) {
@@ -1614,7 +1624,11 @@ public class WebClient extends AbstractClient {
     }
     
     class CompletionStageRxInvokerImpl implements CompletionStageRxInvoker {
-
+        private ExecutorService ex;
+        CompletionStageRxInvokerImpl(ExecutorService ex) {
+            this.ex = ex;
+        }
+        
         @Override
         public CompletionStage<Response> get() {
             return get(Response.class);
@@ -1722,22 +1736,22 @@ public class WebClient extends AbstractClient {
 
         @Override
         public <T> CompletionStage<T> method(String name, Entity<?> entity, Class<T> responseType) {
-            return doInvokeAsyncStage(name, entity, null, null, responseType, responseType);
+            return doInvokeAsyncStage(name, entity, responseType, responseType, ex);
         }
 
         @Override
         public <T> CompletionStage<T> method(String name, Entity<?> entity, GenericType<T> responseType) {
-            return doInvokeAsyncStage(name, entity, null, null, responseType.getRawType(), responseType.getType());
+            return doInvokeAsyncStage(name, entity, responseType.getRawType(), responseType.getType(), ex);
         }
 
         @Override
         public <T> CompletionStage<T> method(String name, Class<T> responseType) {
-            return doInvokeAsyncStage(name, null, null, null, responseType, responseType);
+            return doInvokeAsyncStage(name, null, responseType, responseType, ex);
         }
 
         @Override
         public <T> CompletionStage<T> method(String name, GenericType<T> responseType) {
-            return doInvokeAsyncStage(name, null, null, null, responseType.getRawType(), responseType.getType());
+            return doInvokeAsyncStage(name, null, responseType.getRawType(), responseType.getType(), ex);
         }
              
     }

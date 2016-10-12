@@ -93,6 +93,34 @@ public class BookStoreSpring {
         return new Book(name, id);
     }
     @POST
+    @Path("/bookform2")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces("application/xml")
+    public Book echoBookForm2(@Context HttpServletRequest req) {
+        String name = req.getParameterValues("name")[0];
+        long id = Long.valueOf(req.getParameter("id"));
+        return new Book(name, id);
+    }
+    @POST
+    @Path("/bookform3")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces("application/xml")
+    public Book echoBookForm3(@Context HttpServletRequest req) {
+        String name = req.getParameterMap().get("name")[0];
+        long id = Long.valueOf(req.getParameter("id"));
+        return new Book(name, id);
+    }
+    @POST
+    @Path("/bookform4")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces("application/xml")
+    public Book echoBookForm4(@Context HttpServletRequest req) {
+        String key = req.getParameterNames().nextElement();
+        String name = req.getParameter(key);
+        long id = Long.valueOf(req.getParameter("id"));
+        return new Book(name, id);
+    }
+    @POST
     @Path("/bookform")
     @Consumes("application/xml")
     @Produces("application/xml")

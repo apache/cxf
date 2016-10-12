@@ -140,7 +140,6 @@
     <cxf:bus name="cxf2" id="cxf2">
        <cxf:properties>
            <entry key="skip.default.json.provider.registration" value="true"/>
-           <entry key="cache.http.request.parameters" value="true"/>
        </cxf:properties>
     </cxf:bus>
     <jaxrs:server id="bookJsonp2" address="/jsonp2" bus="cxf2">

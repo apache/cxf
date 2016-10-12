@@ -1433,16 +1433,16 @@ public final class JAXRSUtils {
         List<MediaType> acceptValues = new ArrayList<MediaType>();
         
         if (types != null) {
-            while (types.length() > 0) {
-                String tp = types;
-                int index = types.indexOf(',');
-                if (index != -1) {
-                    tp = types.substring(0, index);
-                    types = types.substring(index + 1).trim();
-                } else {
-                    types = "";
-                }
-                acceptValues.add(toMediaType(tp));
+            int x = 0;
+            int y = types.indexOf(',');
+            while (y > 0) {
+                acceptValues.add(toMediaType(types.substring(x, y).trim()));
+                x = y + 1;
+                y = types.indexOf(',', x);
+            }
+            String lastMediaType = types.substring(x).trim();
+            if (!lastMediaType.isEmpty()) {
+                acceptValues.add(toMediaType(lastMediaType));
             }
         } else {
             acceptValues.add(ALL_TYPES);
