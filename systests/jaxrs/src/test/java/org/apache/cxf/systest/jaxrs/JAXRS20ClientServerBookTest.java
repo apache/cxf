@@ -50,6 +50,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.MessageBodyReader;
+import javax.ws.rs.ext.ParamConverter;
+import javax.ws.rs.ext.ParamConverterProvider;
 import javax.ws.rs.ext.ReaderInterceptor;
 import javax.ws.rs.ext.ReaderInterceptorContext;
 import javax.ws.rs.ext.WriterInterceptor;
@@ -73,6 +75,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase {
+    
     public static final String PORT = BookServer20.PORT;
     
     @BeforeClass
@@ -151,9 +154,10 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         String address = "http://localhost:" + PORT + "/bookstore/bookheaders/simple";
         Client client = ClientBuilder.newClient();
         client.register((Object)ClientFilterClientAndConfigCheck.class);
+        client.register(new BTypeParamConverterProvider());
         client.property("clientproperty", "somevalue");
         WebTarget webTarget = client.target(address);
-        Invocation.Builder builder = webTarget.request("application/xml").header("a", "b");
+        Invocation.Builder builder = webTarget.request("application/xml").header("a", new BType());
         
         Response r = builder.get();
         Book book = r.readEntity(Book.class);
@@ -896,6 +900,32 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         public boolean configure(FeatureContext context) {
             context.register(new BookInfoReader());
             return true;
+        }
+        
+    }
+    
+    static class BType {
+        public String b() {
+            return "b";
+        }
+    }
+    
+    static class BTypeParamConverterProvider implements ParamConverterProvider, ParamConverter<BType> {
+
+        @SuppressWarnings("unchecked")
+        @Override
+        public <T> ParamConverter<T> getConverter(Class<T> cls, Type t, Annotation[] anns) {
+            return cls == BType.class ? (ParamConverter<T>)this : null;
+        }
+
+        @Override
+        public BType fromString(String s) {
+            return null;
+        }
+
+        @Override
+        public String toString(BType bType) {
+            return bType.b();
         }
         
     }
