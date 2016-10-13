@@ -23,6 +23,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import java.net.Socket;
 import java.net.URL;
 import java.net.URLConnection;
@@ -36,6 +38,8 @@ import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.Link;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.ParamConverter;
+import javax.ws.rs.ext.ParamConverterProvider;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -850,8 +854,9 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
                                          endpointAddress, 
                                          BookStoreNoAnnotations.class,
                                          "classpath:/org/apache/cxf/systest/jaxrs/resources/resources.xml",
+                                         Collections.singletonList(new LongTypeParamConverterProvider()),
                                          null);
-        Book b = bStore.getBook(123L);
+        Book b = bStore.getBook(null);
         assertNotNull(b);
         assertEquals(123L, b.getId());
         assertEquals("CXF in Action", b.getName());
@@ -1001,6 +1006,25 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         
         public void setName(String n) {
             name1 = n;
+        }
+        
+    }
+    static class LongTypeParamConverterProvider implements ParamConverterProvider, ParamConverter<Long> {
+
+        @SuppressWarnings("unchecked")
+        @Override
+        public <T> ParamConverter<T> getConverter(Class<T> cls, Type t, Annotation[] anns) {
+            return cls == Long.class ? (ParamConverter<T>)this : null;
+        }
+
+        @Override
+        public Long fromString(String s) {
+            return null;
+        }
+
+        @Override
+        public String toString(Long l) {
+            return l == null ? "123" : String.valueOf(l);
         }
         
     }
