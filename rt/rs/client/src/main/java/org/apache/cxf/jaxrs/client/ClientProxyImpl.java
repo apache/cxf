@@ -444,7 +444,9 @@ public class ClientProxyImpl extends AbstractClient implements
         for (String varName : methodVars) {
             Parameter p = paramsMap.remove(varName);
             if (p != null) {
-                list.add(convertParamValue(params[p.getIndex()], getParamAnnotations(m, p)));
+                list.add(convertParamValue(params[p.getIndex()],
+                                           m.getParameterTypes()[p.getIndex()],
+                                           getParamAnnotations(m, p)));
             } else if (beanParamValues.containsKey(varName)) {
                 BeanPair pair = beanParamValues.get(varName);
                 list.add(convertParamValue(pair.getValue(), pair.getAnns()));
