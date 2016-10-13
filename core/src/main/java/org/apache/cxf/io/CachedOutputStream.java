@@ -211,8 +211,9 @@ public class CachedOutputStream extends OutputStream {
         }
         doClose();
         currentStream.close();
-        maybeDeleteTempFile(currentStream);
-        postClose();
+        if (!maybeDeleteTempFile(currentStream)) {
+            postClose();
+        }
     }
 
     public boolean equals(Object obj) {
@@ -542,7 +543,8 @@ public class CachedOutputStream extends OutputStream {
             FileUtils.delete(file);
         }
     }
-    private void maybeDeleteTempFile(Object stream) {
+    private boolean maybeDeleteTempFile(Object stream) {
+        boolean postClosedInvoked = false;
         streamList.remove(stream);
         if (!inmem && tempFile != null && streamList.isEmpty() && allowDeleteOfFile) {
             if (currentStream != null) {
@@ -552,11 +554,13 @@ public class CachedOutputStream extends OutputStream {
                 } catch (Exception e) {
                     //ignore
                 }
+                postClosedInvoked = true;
             }
             deleteTempFile();
             currentStream = new LoadingByteArrayOutputStream(1024);
             inmem = true;
         }
+        return postClosedInvoked;
     }
 
     public void setOutputDir(File outputDir) throws IOException {
