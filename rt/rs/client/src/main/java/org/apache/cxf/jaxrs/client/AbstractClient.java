@@ -747,7 +747,10 @@ public abstract class AbstractClient implements Client {
     
     
     protected String convertParamValue(Object pValue, Annotation[] anns) {
-        if (pValue == null) {
+        return convertParamValue(pValue, pValue == null ? null : pValue.getClass(), anns);
+    }
+    protected String convertParamValue(Object pValue, Class<?> pClass, Annotation[] anns) {    
+        if (pValue == null && pClass == null) {
             return null;
         }
         ProviderFactory pf = ClientProviderFactory.getInstance(cfg.getEndpoint());
@@ -760,7 +763,6 @@ public abstract class AbstractClient implements Client {
                 m.getExchange().setOutMessage(m);
                 m.getExchange().put(Endpoint.class, cfg.getEndpoint());
             }
-            Class<?> pClass = pValue.getClass();
             @SuppressWarnings("unchecked")
             ParamConverter<Object> prov = 
                 (ParamConverter<Object>)pf.createParameterHandler(pClass, pClass, anns, m);
@@ -774,7 +776,7 @@ public abstract class AbstractClient implements Client {
                 }
             }
         }
-        return pValue.toString();
+        return pValue == null ? null : pValue.toString();
     }
     
     protected static void reportMessageHandlerProblem(String name, Class<?> cls, MediaType ct, Throwable ex) {
