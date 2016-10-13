@@ -53,10 +53,11 @@ public class WSDLGetOutInterceptor extends AbstractPhaseInterceptor<Message> {
         }
         message.put(Message.CONTENT_TYPE, "text/xml");
         try {
-            StaxUtils.writeDocument(doc, writer, true,
+            StaxUtils.writeDocument(doc, writer,
                                     !MessageUtils.getContextualBoolean(message, 
                                                                        StaxOutInterceptor.FORCE_START_DOCUMENT, 
-                                                                       false));
+                                                                       false),
+                                    true);
         } catch (XMLStreamException e) {
             throw new Fault(e);
         }
