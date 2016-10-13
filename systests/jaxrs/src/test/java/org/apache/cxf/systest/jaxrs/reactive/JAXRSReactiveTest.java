@@ -21,6 +21,7 @@ package org.apache.cxf.systest.jaxrs.reactive;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.GenericType;
@@ -140,14 +141,16 @@ public class JAXRSReactiveTest extends AbstractBusClientServerTestBase {
     public void testGetHelloWorldAsyncObservable404() throws Exception {
         String address = "http://localhost:" + PORT + "/reactive/textAsync404";
         WebClient wc = WebClient.create(address);
-        try {
-            wc.rx(ObservableRxInvoker.class).get(String.class).subscribe(s -> System.out.println());
-            fail("Exception expected");
-        } catch (Throwable ex) {
-            assertTrue(ex.getCause().getCause() instanceof NotFoundException);
-        }
+        wc.rx(ObservableRxInvoker.class).get(String.class).subscribe(
+            s -> {
+                fail("Exception expected");
+            },
+            t -> validateT((ExecutionException)t));
     }
     
+    private void validateT(ExecutionException t) {
+        assertTrue(t.getCause() instanceof NotFoundException);
+    }
     private void assertDuplicateResponse(String s) {
         assertEquals("Hello, world!Hello, world!", s);
     }
