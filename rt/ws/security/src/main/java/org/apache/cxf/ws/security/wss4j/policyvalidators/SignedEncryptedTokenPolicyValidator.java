@@ -23,7 +23,9 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.cxf.ws.policy.AssertionInfo;
+import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.wss4j.policy.SP12Constants;
+import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractToken;
 import org.apache.wss4j.policy.model.IssuedToken;
 import org.apache.wss4j.policy.model.KerberosToken;
@@ -53,6 +55,14 @@ public class SignedEncryptedTokenPolicyValidator extends AbstractSupportingToken
      * Validate policies. 
      */
     public void validatePolicies(PolicyValidatorParameters parameters, Collection<AssertionInfo> ais) {
+        // Tokens must be encrypted even if TLS is used unless we have a TransportBinding policy available
+        if (isTLSInUse(parameters.getMessage())) {
+            AssertionInfo transportAi = 
+                PolicyUtils.getFirstAssertionByLocalname(parameters.getAssertionInfoMap(), 
+                                                         SPConstants.TRANSPORT_BINDING);
+            super.setEnforceEncryptedTokens(transportAi == null);
+        }
+        
         for (AssertionInfo ai : ais) {
             SupportingTokens binding = (SupportingTokens)ai.getAssertion();
             ai.setAsserted(true);
