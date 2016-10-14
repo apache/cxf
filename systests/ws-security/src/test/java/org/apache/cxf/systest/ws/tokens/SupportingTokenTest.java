@@ -68,7 +68,7 @@ public class SupportingTokenTest extends AbstractBusClientServerTestBase {
                    // run the server in the same process
                    // set this to false to fork
                    launchServer(TLSServer.class, true)
-               );
+        );
         assertTrue(
                    "Server failed to launch",
                    // run the server in the same process
