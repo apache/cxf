@@ -86,6 +86,7 @@ public class JMSEndpoint {
     private String username;
     private int concurrentConsumers = 1;
     private boolean oneSessionPerConnection;
+    private String messageSelector;
 
     /**
      * @param uri
@@ -488,4 +489,13 @@ public class JMSEndpoint {
     public void setOneSessionPerConnection(boolean oneSessionPerConnection) {
         this.oneSessionPerConnection = oneSessionPerConnection;
     }
+
+    public String getMessageSelector() {
+        return messageSelector;
+    }
+
+    public void setMessageSelector(String messageSelector) {
+        this.messageSelector = messageSelector;
+    }
+
 }

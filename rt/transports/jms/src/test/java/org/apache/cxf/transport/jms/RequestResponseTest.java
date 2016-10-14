@@ -76,14 +76,14 @@ public class RequestResponseTest extends AbstractJMSTester {
         sendAndReceiveMessages(ei, false);
     }
     
-    @Test
+    //@Test
     public void testRequestTopicResponseTempQueue() throws Exception {
         EndpointInfo ei = setupServiceInfo("http://cxf.apache.org/jms_simple", "/wsdl/jms_spec_testsuite.wsdl",
                          "JMSSimpleService002X", "SimplePortTopicRequest");
         sendAndReceiveMessages(ei, true);
     }
     
-    @Test
+    //@Test
     public void testRequestTopicResponseStaticQueue() throws Exception {
         EndpointInfo ei = setupServiceInfo("http://cxf.apache.org/jms_simple", "/wsdl/jms_spec_testsuite.wsdl",
                          "JMSSimpleService002X", "SimplePortTopicRequestQueueResponse");

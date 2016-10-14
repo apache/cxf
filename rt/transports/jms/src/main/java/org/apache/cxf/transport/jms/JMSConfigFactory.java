@@ -87,6 +87,7 @@ public final class JMSConfigFactory {
         jmsConfig.setPassword(endpoint.getPassword());
         jmsConfig.setConcurrentConsumers(endpoint.getConcurrentConsumers());
         jmsConfig.setOneSessionPerConnection(endpoint.isOneSessionPerConnection());
+        jmsConfig.setMessageSelector(endpoint.getMessageSelector());
 
         TransactionManager tm = getTransactionManager(bus, endpoint);
         jmsConfig.setTransactionManager(tm);

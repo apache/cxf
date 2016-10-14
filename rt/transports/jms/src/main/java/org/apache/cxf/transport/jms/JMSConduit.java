@@ -183,6 +183,10 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
                     staticReplyDestination = jmsConfig.getReplyDestination(session);
                     
                     String messageSelector = JMSFactory.getMessageSelector(jmsConfig, conduitId);
+                    if (jmsConfig.getMessageSelector() != null) {
+                        messageSelector += (messageSelector != null && !messageSelector.isEmpty() ? " AND " : "")
+                                + jmsConfig.getMessageSelector();
+                    }
                     if (messageSelector == null && !jmsConfig.isPubSubDomain()) {
                         // Do not open listener without selector on a queue as we then can not share the queue.
                         // An option for this might be a good idea for people who do not plan to share queues.
