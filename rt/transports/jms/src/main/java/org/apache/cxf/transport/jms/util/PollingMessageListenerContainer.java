@@ -143,41 +143,43 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
                         throw new IllegalStateException("External transactions are not supported in XAPoller");
                     }
                     transactionManager.begin();
-                    Connection connection;
-                    if (jmsConfig != null && jmsConfig.isOneSessionPerConnection()) {
-                        connection = closer.register(createConnection());
-                    } else {
-                        connection = PollingMessageListenerContainer.this.connection;
-                    }
 
-                    /*
-                     * Create session inside transaction to give it the 
-                     * chance to enlist itself as a resource
-                     */
-                    Session session = closer.register(connection.createSession(transacted, acknowledgeMode));
-                    MessageConsumer consumer;
-                    if (jmsConfig != null && jmsConfig.isOneSessionPerConnection()) {
-                        Destination destination;
-                        if (!isReply()) {
-                            destination = jmsConfig.getTargetDestination(session);
-                        } else {
-                            destination = jmsConfig.getReplyDestination(session);
-                        }
-                        consumer = closer.register(createConsumer(destination, session));
-                        connection.start();
-                    } else {
-                        consumer = closer.register(createConsumer(session));
-                    }
-
-                    Message message = consumer.receive(1000);
                     try {
+                        Connection connection;
+                        if (jmsConfig != null && jmsConfig.isOneSessionPerConnection()) {
+                            connection = closer.register(createConnection());
+                        } else {
+                            connection = PollingMessageListenerContainer.this.connection;
+                        }
+
+                        /*
+                         * Create session inside transaction to give it the
+                         * chance to enlist itself as a resource
+                         */
+                        Session session = closer.register(connection.createSession(transacted, acknowledgeMode));
+                        MessageConsumer consumer;
+                        if (jmsConfig != null && jmsConfig.isOneSessionPerConnection()) {
+                            Destination destination;
+                            if (!isReply()) {
+                                destination = jmsConfig.getTargetDestination(session);
+                            } else {
+                                destination = jmsConfig.getReplyDestination(session);
+                            }
+                            consumer = closer.register(createConsumer(destination, session));
+                            connection.start();
+                        } else {
+                            consumer = closer.register(createConsumer(session));
+                        }
+
+                        Message message = consumer.receive(1000);
+
                         if (message != null) {
                             listenerHandler.onMessage(message);
                         }
                         transactionManager.commit();
                     } catch (Throwable e) {
                         LOG.log(Level.WARNING, "Exception while processing jms message in cxf. Rolling back", e);
-                        safeRollBack(session);
+                        safeRollBack();
                     }
                 } catch (Exception e) {
                     LOG.log(Level.WARNING, "Unexpected exception. Restarting session and consumer", e);
@@ -187,7 +189,7 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
 
         }
         
-        private void safeRollBack(Session session) {
+        private void safeRollBack() {
             try {
                 transactionManager.rollback();
             } catch (Exception e) {
