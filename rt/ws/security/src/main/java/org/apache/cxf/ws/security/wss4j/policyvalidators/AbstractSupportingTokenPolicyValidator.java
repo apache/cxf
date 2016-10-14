@@ -93,7 +93,12 @@ public abstract class AbstractSupportingTokenPolicyValidator
     private EncryptedElements encryptedElements;
     private SignedParts signedParts;
     private EncryptedParts encryptedParts;
-
+    private boolean enforceEncryptedTokens = true;
+    
+    protected abstract boolean isSigned();
+    protected abstract boolean isEncrypted();
+    protected abstract boolean isEndorsing();
+    
     /**
      * Set the list of UsernameToken results
      */
@@ -508,7 +513,7 @@ public abstract class AbstractSupportingTokenPolicyValidator
      * Return true if a list of tokens were encrypted, false otherwise.
      */
     private boolean areTokensEncrypted(List<WSSecurityEngineResult> tokens) {
-        if (!isTLSInUse()) {
+        if (enforceEncryptedTokens) {
             for (WSSecurityEngineResult wser : tokens) {
                 Element tokenElement = (Element)wser.get(WSSecurityEngineResult.TAG_TOKEN_ELEMENT);
                 if (tokenElement == null || !isTokenEncrypted(tokenElement)) {
@@ -921,6 +926,12 @@ public abstract class AbstractSupportingTokenPolicyValidator
                 }
             }    
         }
+    }
+    public boolean isEnforceEncryptedTokens() {
+        return enforceEncryptedTokens;
+    }
+    public void setEnforceEncryptedTokens(boolean enforceEncryptedTokens) {
+        this.enforceEncryptedTokens = enforceEncryptedTokens;
     }
 
 }

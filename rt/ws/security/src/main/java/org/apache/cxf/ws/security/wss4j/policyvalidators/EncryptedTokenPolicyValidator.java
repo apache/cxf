@@ -26,6 +26,8 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.cxf.ws.security.policy.PolicyUtils;
+import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractToken;
 import org.apache.wss4j.policy.model.IssuedToken;
@@ -68,6 +70,14 @@ public class EncryptedTokenPolicyValidator extends AbstractSupportingTokenPolicy
     }
     
     private void parsePolicies(Collection<AssertionInfo> ais, Message message) {
+        // Tokens must be encrypted even if TLS is used unless we have a TransportBinding policy available
+        if (isTLSInUse(parameters.getMessage())) {
+            AssertionInfo transportAi = 
+                PolicyUtils.getFirstAssertionByLocalname(parameters.getAssertionInfoMap(), 
+                                                         SPConstants.TRANSPORT_BINDING);
+            super.setEnforceEncryptedTokens(transportAi == null);
+        }
+        
         for (AssertionInfo ai : ais) {
             SupportingTokens binding = (SupportingTokens)ai.getAssertion();
             ai.setAsserted(true);
