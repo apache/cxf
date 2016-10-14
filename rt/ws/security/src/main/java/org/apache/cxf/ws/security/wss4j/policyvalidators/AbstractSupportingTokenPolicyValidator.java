@@ -78,11 +78,12 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSec
     private EncryptedElements encryptedElements;
     private SignedParts signedParts;
     private EncryptedParts encryptedParts;
+    private boolean enforceEncryptedTokens = true;
     
     protected abstract boolean isSigned();
     protected abstract boolean isEncrypted();
     protected abstract boolean isEndorsing();
-
+    
     /**
      * Process UsernameTokens.
      */
@@ -429,7 +430,7 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSec
         return null;
     }
     
-    private boolean isTLSInUse(Message message) {
+    protected boolean isTLSInUse(Message message) {
         // See whether TLS is in use or not
         TLSSessionInfo tlsInfo = message.get(TLSSessionInfo.class);
         return tlsInfo != null;
@@ -480,7 +481,7 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSec
     private boolean areTokensEncrypted(List<WSSecurityEngineResult> tokens,
                                        List<WSSecurityEngineResult> encryptedResults,
                                        Message message) {
-        if (!isTLSInUse(message)) {
+        if (enforceEncryptedTokens) {
             for (WSSecurityEngineResult wser : tokens) {
                 Element tokenElement = (Element)wser.get(WSSecurityEngineResult.TAG_TOKEN_ELEMENT);
                 if (tokenElement == null || !isTokenEncrypted(tokenElement, encryptedResults)) {
@@ -882,6 +883,12 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSec
                 }
             }    
         }
+    }
+    public boolean isEnforceEncryptedTokens() {
+        return enforceEncryptedTokens;
+    }
+    public void setEnforceEncryptedTokens(boolean enforceEncryptedTokens) {
+        this.enforceEncryptedTokens = enforceEncryptedTokens;
     }
 
 }

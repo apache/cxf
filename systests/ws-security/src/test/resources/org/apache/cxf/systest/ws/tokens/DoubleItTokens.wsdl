@@ -71,6 +71,12 @@
         <wsdl:port name="DoubleItEncryptedSupportingPort3" binding="tns:DoubleItStandardBinding">
             <soap:address location="http://localhost:9010/DoubleItEncryptedSupporting3"/>
         </wsdl:port>
+        <wsdl:port name="DoubleItEncryptedSupportingPort4" binding="tns:DoubleItStandardBinding">
+            <soap:address location="https://localhost:9010/DoubleItEncryptedSupporting4"/>
+        </wsdl:port>
+        <wsdl:port name="DoubleItEncryptedSupportingPort5" binding="tns:DoubleItStandardBinding">
+            <soap:address location="https://localhost:9010/DoubleItEncryptedSupporting5"/>
+        </wsdl:port>
         <wsdl:port name="DoubleItSignedEncryptedSupportingPort" binding="tns:DoubleItStandardBinding">
             <soap:address location="http://localhost:9010/DoubleItSignedEncryptedSupporting"/>
         </wsdl:port>
