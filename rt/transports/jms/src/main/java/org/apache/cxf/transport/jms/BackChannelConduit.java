@@ -194,6 +194,7 @@ class BackChannelConduit extends AbstractConduit implements JMSExchangeSender {
         messageProperties.setJMSDeliveryMode(inMessageProperties.getJMSDeliveryMode());
         messageProperties.setJMSPriority(inMessageProperties.getJMSPriority());
         messageProperties.setSOAPJMSRequestURI(inMessageProperties.getSOAPJMSRequestURI());
+        messageProperties.setSOAPJMSSOAPAction(inMessageProperties.getSOAPJMSSOAPAction());
         messageProperties.setSOAPJMSBindingVersion("1.0");
     }
 
