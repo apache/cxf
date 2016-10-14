@@ -24,13 +24,8 @@ import java.util.List;
 
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionInfo;
-<<<<<<< HEAD
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
-=======
-import org.apache.cxf.ws.security.policy.PolicyUtils;
-import org.apache.wss4j.policy.SP12Constants;
->>>>>>> 011725e... CXF-7088 - SignedEncryptedSupportingTokens in WS-Policy and SAML not encrypted being accepted
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractToken;
 import org.apache.wss4j.policy.model.AbstractToken.DerivedKeys;
@@ -54,7 +49,6 @@ public class EndorsingEncryptedTokenPolicyValidator extends AbstractSupportingTo
         setEncrypted(true);
     }
     
-<<<<<<< HEAD
     public boolean validatePolicy(
         AssertionInfoMap aim, 
         Message message,
@@ -77,20 +71,13 @@ public class EndorsingEncryptedTokenPolicyValidator extends AbstractSupportingTo
     }
     
     private void parsePolicies(AssertionInfoMap aim, Collection<AssertionInfo> ais, Message message) {
-=======
-    /**
-     * Validate policies.
-     */
-    public void validatePolicies(PolicyValidatorParameters parameters, Collection<AssertionInfo> ais) {
         // Tokens must be encrypted even if TLS is used unless we have a TransportBinding policy available
-        if (isTLSInUse(parameters.getMessage())) {
+        if (isTLSInUse()) {
             AssertionInfo transportAi = 
-                PolicyUtils.getFirstAssertionByLocalname(parameters.getAssertionInfoMap(), 
-                                                         SPConstants.TRANSPORT_BINDING);
+                getFirstAssertionByLocalname(aim, SPConstants.TRANSPORT_BINDING);
             super.setEnforceEncryptedTokens(transportAi == null);
         }
         
->>>>>>> 011725e... CXF-7088 - SignedEncryptedSupportingTokens in WS-Policy and SAML not encrypted being accepted
         for (AssertionInfo ai : ais) {
             SupportingTokens binding = (SupportingTokens)ai.getAssertion();
             ai.setAsserted(true);

@@ -95,10 +95,6 @@ public abstract class AbstractSupportingTokenPolicyValidator
     private EncryptedParts encryptedParts;
     private boolean enforceEncryptedTokens = true;
     
-    protected abstract boolean isSigned();
-    protected abstract boolean isEncrypted();
-    protected abstract boolean isEndorsing();
-    
     /**
      * Set the list of UsernameToken results
      */
@@ -468,7 +464,7 @@ public abstract class AbstractSupportingTokenPolicyValidator
         return null;
     }
     
-    private boolean isTLSInUse() {
+    protected boolean isTLSInUse() {
         // See whether TLS is in use or not
         TLSSessionInfo tlsInfo = message.get(TLSSessionInfo.class);
         if (tlsInfo != null) {
@@ -934,4 +930,19 @@ public abstract class AbstractSupportingTokenPolicyValidator
         this.enforceEncryptedTokens = enforceEncryptedTokens;
     }
 
+    static AssertionInfo getFirstAssertionByLocalname(
+        AssertionInfoMap aim, String localname
+    ) {
+        Collection<AssertionInfo> sp11Ais = aim.get(new QName(SP11Constants.SP_NS, localname));
+        if (sp11Ais != null && !sp11Ais.isEmpty()) {
+            return sp11Ais.iterator().next();
+        }
+
+        Collection<AssertionInfo> sp12Ais = aim.get(new QName(SP12Constants.SP_NS, localname));
+        if (sp12Ais != null && !sp12Ais.isEmpty()) {
+            return sp12Ais.iterator().next();
+        }
+
+        return null;
+    }
 }
