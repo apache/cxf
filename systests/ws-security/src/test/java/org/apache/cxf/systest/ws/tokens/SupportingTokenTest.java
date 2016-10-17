@@ -45,6 +45,7 @@ public class SupportingTokenTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(Server.class);
     static final String TLS_PORT = allocatePort(TLSServer.class);
     static final String STAX_PORT = allocatePort(StaxServer.class);
+    static final String TLS_STAX_PORT = allocatePort(TLSStaxServer.class);
     
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
@@ -74,6 +75,12 @@ public class SupportingTokenTest extends AbstractBusClientServerTestBase {
                    // run the server in the same process
                    // set this to false to fork
                    launchServer(StaxServer.class, true)
+        );
+        assertTrue(
+                   "Server failed to launch",
+                   // run the server in the same process
+                   // set this to false to fork
+                   launchServer(TLSStaxServer.class, true)
         );
     }
     
@@ -224,9 +231,6 @@ public class SupportingTokenTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testEncryptedSupportingOverTLS() throws Exception {
 
-        if (STAX_PORT.equals(test.getPort())) {
-            return;
-        }
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = SupportingTokenTest.class.getResource("tls-client.xml");
 
@@ -243,7 +247,9 @@ public class SupportingTokenTest extends AbstractBusClientServerTestBase {
         
         if (PORT.equals(test.getPort())) {
             updateAddressPort(port, TLS_PORT);
-        }
+        } else if (STAX_PORT.equals(test.getPort())) {
+            updateAddressPort(port, TLS_STAX_PORT);
+        } 
         
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
@@ -257,6 +263,8 @@ public class SupportingTokenTest extends AbstractBusClientServerTestBase {
         
         if (PORT.equals(test.getPort())) {
             updateAddressPort(port, TLS_PORT);
+        } else if (STAX_PORT.equals(test.getPort())) {
+            updateAddressPort(port, TLS_STAX_PORT);
         }
         
         if (test.isStreaming()) {
