@@ -80,8 +80,12 @@ import org.junit.runner.RunWith;
 
 @CreateKdcServer(
     transports = {
+<<<<<<< HEAD
         // @CreateTransport(protocol = "TCP", address = "127.0.0.1", port=1024)
         @CreateTransport(protocol = "UDP", address = "127.0.0.1")
+=======
+        @CreateTransport(protocol = "KRB", address = "localhost")
+>>>>>>> b72e2b5... Use localhost instead of 127.0.0.1 for the Kerberos tests
         },
     primaryRealm = "service.ws.apache.org",
     kdcPrincipal = "krbtgt/service.ws.apache.org@service.ws.apache.org"
