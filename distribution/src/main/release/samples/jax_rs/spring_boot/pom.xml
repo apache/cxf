@@ -8,12 +8,12 @@
     </parent> 
     <artifactId>spring-boot-sample-rs-cxf</artifactId>
     <groupId>org.apache.cxf.samples</groupId>
-    <version>3.1.7-SNAPSHOT</version>
+    <version>3.1.9-SNAPSHOT</version>
     <name>Spring Boot CXF REST Application</name>
     <description>Spring Boot CXF REST Application</description>
     
     <properties>
-        <cxf.version>3.1.7-SNAPSHOT</cxf.version>
+        <cxf.version>3.1.9-SNAPSHOT</cxf.version>
     </properties>
     <dependencies>
         <dependency>
