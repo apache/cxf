@@ -272,7 +272,6 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         this.swaggerUiMediaTypes = swaggerUiMediaTypes;
     }
 
-    @javax.ws.rs.ext.Provider
     private class ServletConfigProvider implements ContextProvider<ServletConfig> {
 
         @Override
