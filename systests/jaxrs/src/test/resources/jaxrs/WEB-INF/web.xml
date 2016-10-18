@@ -51,6 +51,14 @@
         </init-param>        
         <load-on-startup>1</load-on-startup>
     </servlet>
+    <servlet>
+        <servlet-name>CXFServlet3</servlet-name>
+        <display-name>CXF Servlet3</display-name>
+        <servlet-class>
+                        org.apache.cxf.transport.servlet.CXFServlet
+                </servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
     <servlet-mapping>
         <servlet-name>CXFServlet</servlet-name>
         <url-pattern>/the/*</url-pattern>
@@ -58,6 +66,10 @@
     <servlet-mapping>
         <servlet-name>CXFServlet2</servlet-name>
         <url-pattern>/bus/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CXFServlet3</servlet-name>
+        <url-pattern>/services/list/*</url-pattern>
     </servlet-mapping>
 </web-app>
 <!-- END SNIPPET: webxml -->
