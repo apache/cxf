@@ -123,7 +123,8 @@ public class XkmsCryptoProvider extends CryptoBase {
     public void verifyTrust(
         X509Certificate[] certs, 
         boolean enableRevocation, 
-        Collection<Pattern> subjectCertConstraints
+        Collection<Pattern> subjectCertConstraints,
+        Collection<Pattern> issuerCertConstraints
     ) throws WSSecurityException {
         if (certs != null) {
             LOG.fine(String.format("Verifying certificate id: %s", certs[0].getSubjectDN()));

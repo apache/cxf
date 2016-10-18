@@ -1510,7 +1510,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             cryptoType.setAlias(encrUser);
             X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
             if (certs != null && certs.length > 0) {
-                crypto.verifyTrust(certs, enableRevocation, null);
+                crypto.verifyTrust(certs, enableRevocation, null, null);
             }
         }
         if (crypto != null) {
