@@ -55,6 +55,11 @@ public final class BaseUrlHelper {
             }
             
             reqPrefix = sb.toString();
+        } else {
+            int matrixParamIndex = reqPrefix.indexOf(";");
+            if (matrixParamIndex > 0) {
+                reqPrefix = reqPrefix.substring(0, matrixParamIndex);
+            }
         }
         return reqPrefix;
     }
