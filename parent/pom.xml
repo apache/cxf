@@ -113,7 +113,7 @@
         <cxf.jaxb.impl.version>${cxf.jaxb.version}</cxf.jaxb.impl.version>
         <cxf.jaxb.core.version>${cxf.jaxb.version}</cxf.jaxb.core.version>
         <cxf.jaxb.xjc.version>${cxf.jaxb.version}</cxf.jaxb.xjc.version>
-        <cxf.joda.time.version>2.7</cxf.joda.time.version>
+        <cxf.joda.time.version>2.9.4</cxf.joda.time.version>
         <cxf.jdom.version>1.0</cxf.jdom.version>
         <cxf.jettison.version>1.3.8</cxf.jettison.version>
         <cxf.jetty8.version>8.1.19.v20160209</cxf.jetty8.version>
