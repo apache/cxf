@@ -102,9 +102,17 @@ public class ServiceListGeneratorServlet extends HttpServlet {
             String styleSheetPath;
             if (serviceListStyleSheet != null) {
                 styleSheetPath = request.getContextPath() + "/" + serviceListStyleSheet;
-                
             } else {
-                styleSheetPath = request.getRequestURI() + "/?stylesheet=1";
+                String requestUri = request.getRequestURI();
+                int matrixParamIndex = requestUri.indexOf(";");
+                if (matrixParamIndex > 0) {
+                    requestUri = requestUri.substring(0, matrixParamIndex);
+                }
+                styleSheetPath = requestUri;
+                if (!styleSheetPath.endsWith("/")) {
+                    styleSheetPath += "/";
+                }
+                styleSheetPath += "?stylesheet=1";
             }
             serviceListWriter = 
                 new FormattedServiceListWriter(styleSheetPath, title, showForeignContexts, bus);
