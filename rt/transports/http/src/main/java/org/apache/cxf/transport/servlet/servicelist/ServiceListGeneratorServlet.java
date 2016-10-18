@@ -103,12 +103,20 @@ public class ServiceListGeneratorServlet extends HttpServlet {
             if (serviceListStyleSheet != null) {
                 styleSheetPath = request.getContextPath() + "/" + serviceListStyleSheet;
             } else {
-                String requestUri = request.getRequestURI();
-                int matrixParamIndex = requestUri.indexOf(";");
-                if (matrixParamIndex > 0) {
-                    requestUri = requestUri.substring(0, matrixParamIndex);
+                styleSheetPath = "";
+                String contextPath = request.getContextPath();
+                if (contextPath != null) {
+                    styleSheetPath += contextPath;
                 }
-                styleSheetPath = requestUri;
+                String servletPath = request.getServletPath();
+                if (servletPath != null) {
+                    styleSheetPath += servletPath;
+                }
+                String pathInfo = request.getPathInfo();
+                if (pathInfo != null) {
+                    styleSheetPath += pathInfo;
+                }
+                
                 if (!styleSheetPath.endsWith("/")) {
                     styleSheetPath += "/";
                 }

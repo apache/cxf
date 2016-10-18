@@ -36,9 +36,8 @@ public final class BaseUrlHelper {
      */
     public static String getBaseURL(HttpServletRequest request) {
         String reqPrefix = request.getRequestURL().toString();        
-        String pathInfo = request.getPathInfo() == null ? "" : request.getPathInfo();
-        //fix for CXF-898
-        if (!"/".equals(pathInfo) || reqPrefix.endsWith("/")) {
+        String pathInfo = request.getPathInfo();
+        if (!"/".equals(pathInfo) || reqPrefix.contains(";")) {
             StringBuilder sb = new StringBuilder();
             // request.getScheme(), request.getLocalName() and request.getLocalPort()
             // should be marginally cheaper - provided request.getLocalName() does 
@@ -47,19 +46,16 @@ public final class BaseUrlHelper {
             
             URI uri = URI.create(reqPrefix);
             sb.append(uri.getScheme()).append("://").append(uri.getRawAuthority());
-            if (request.getContextPath() != null) {
-                sb.append(request.getContextPath());
+            String contextPath = request.getContextPath();
+            if (contextPath != null) {
+                sb.append(contextPath);
             }
-            if (request.getServletPath() != null) {
-                sb.append(request.getServletPath());
+            String servletPath = request.getServletPath();
+            if (servletPath != null) {
+                sb.append(servletPath);
             }
             
             reqPrefix = sb.toString();
-        } else {
-            int matrixParamIndex = reqPrefix.indexOf(";");
-            if (matrixParamIndex > 0) {
-                reqPrefix = reqPrefix.substring(0, matrixParamIndex);
-            }
         }
         return reqPrefix;
     }
