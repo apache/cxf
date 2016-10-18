@@ -810,9 +810,15 @@ public final class ResourceUtils {
     public static JAXRSServerFactoryBean createApplication(Application app, boolean ignoreAppPath) {
         return createApplication(app, ignoreAppPath, false);
     }
+    
+    public static JAXRSServerFactoryBean createApplication(Application app, boolean ignoreAppPath,
+            boolean staticSubresourceResolution) {
+        return createApplication(app, ignoreAppPath, staticSubresourceResolution, null);
+    }
+    
     @SuppressWarnings("unchecked")
     public static JAXRSServerFactoryBean createApplication(Application app, boolean ignoreAppPath,
-                                                           boolean staticSubresourceResolution) {
+            boolean staticSubresourceResolution, Bus bus) {
         
         Set<Object> singletons = app.getSingletons();
         verifySingletons(singletons);
@@ -850,6 +856,10 @@ public final class ResourceUtils {
         }
         
         JAXRSServerFactoryBean bean = new JAXRSServerFactoryBean();
+        if (bus != null) {
+            bean.setBus(bus);
+        }
+
         String address = "/";
         if (!ignoreAppPath) {
             ApplicationPath appPath = locateApplicationPath(app.getClass());
