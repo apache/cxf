@@ -146,7 +146,11 @@ public class FormattedServiceListWriter implements ServiceListWriter {
                 return null;
             }
         } else {
-            return basePath + endpointAddress;
+            String address = basePath;
+            if (address.endsWith("/") && endpointAddress.startsWith("/")) { 
+                address = address.substring(0, address.length() - 1);
+            }
+            return address + endpointAddress;
         }
     }
     
