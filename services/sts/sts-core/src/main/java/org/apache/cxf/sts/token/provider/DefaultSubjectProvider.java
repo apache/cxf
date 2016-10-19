@@ -110,7 +110,6 @@ public class DefaultSubjectProvider implements SubjectProvider {
     /**
      * Get the Principal (which is used as the Subject). By default, we check the following (in order):
      *  - A valid OnBehalfOf principal
-     *  - A valid ActAs principal
      *  - A valid principal associated with a token received as ValidateTarget
      *  - The principal associated with the request. We don't need to check to see if it is "valid" here, as it
      *    is not parsed by the STS (but rather the WS-Security layer).
@@ -121,11 +120,6 @@ public class DefaultSubjectProvider implements SubjectProvider {
         //if validation was successful, the principal was set in ReceivedToken 
         if (providerParameters.getTokenRequirements().getOnBehalfOf() != null) {
             ReceivedToken receivedToken = providerParameters.getTokenRequirements().getOnBehalfOf();
-            if (receivedToken.getState().equals(STATE.VALID)) {
-                principal = receivedToken.getPrincipal();
-            }
-        } else if (providerParameters.getTokenRequirements().getActAs() != null) {
-            ReceivedToken receivedToken = providerParameters.getTokenRequirements().getActAs();
             if (receivedToken.getState().equals(STATE.VALID)) {
                 principal = receivedToken.getPrincipal();
             }
