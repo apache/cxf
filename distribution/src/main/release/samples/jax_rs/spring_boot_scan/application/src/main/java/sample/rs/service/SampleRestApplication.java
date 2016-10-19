@@ -17,17 +17,13 @@
  * under the License.
  */
 package sample.rs.service;
-import org.apache.cxf.Bus;
-import org.apache.cxf.feature.Feature;
-import org.apache.cxf.metrics.MetricsFeature;
-import org.apache.cxf.metrics.codahale.CodahaleMetricsProvider;
+import com.codahale.metrics.JmxReporter;
+import com.codahale.metrics.MetricRegistry;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.context.annotation.Bean;
-
-import com.codahale.metrics.JmxReporter;
-import com.codahale.metrics.MetricRegistry;
 
 @SpringBootApplication
 @EnableEurekaClient
@@ -40,11 +36,6 @@ public class SampleRestApplication {
     @Bean(initMethod = "start", destroyMethod = "stop")
     public JmxReporter jmxReporter(MetricRegistry metricRegistry) {
         return JmxReporter.forRegistry(metricRegistry).build();
-    }
-    
-    @Bean
-    public Feature metricsFeature(Bus bus){
-        return new MetricsFeature(new CodahaleMetricsProvider(bus));
     }
     
     public static void main(String[] args) {
