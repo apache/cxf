@@ -54,7 +54,7 @@ import org.apache.cxf.jaxrs.utils.ResourceUtils;
  * Apache CXF portable CDI extension to support initialization of JAX-RS resources.  
  */
 public class JAXRSCdiResourceExtension implements Extension {
-    private Bean< ? > busBean;
+    private boolean hasBus;
     private Bus bus;
 
     private final List< Bean< ? > > applicationBeans = new ArrayList< Bean< ? > >();
@@ -74,16 +74,13 @@ public class JAXRSCdiResourceExtension implements Extension {
             featureBeans.add((Bean< ? extends Feature >)event.getBean());
         } else if (CdiBusBean.CXF.equals(event.getBean().getName())
                 && Bus.class.isAssignableFrom(event.getBean().getBeanClass())) {
-            busBean = event.getBean();
+            hasBus = true;
         }
     }
 
     public void load(@Observes final AfterDeploymentValidation event, final BeanManager beanManager) {
-        bus = (Bus)beanManager.getReference(
-            busBean,
-            busBean.getBeanClass(),
-            beanManager.createCreationalContext(busBean)
-        );
+        // no need of creational context, it only works for app scoped instances anyway
+        bus = (Bus)beanManager.getReference(beanManager.resolve(beanManager.getBeans(CdiBusBean.CXF)), Bus.class, null);
 
         for (final Bean< ? > application: applicationBeans) {
             final Application instance = (Application)beanManager.getReference(
@@ -110,15 +107,13 @@ public class JAXRSCdiResourceExtension implements Extension {
     }
 
     public void injectBus(@Observes final AfterBeanDiscovery event, final BeanManager beanManager) {
-        if (busBean == null) {
+        if (!hasBus) {
             final AnnotatedType< ExtensionManagerBus > busAnnotatedType =
                 beanManager.createAnnotatedType(ExtensionManagerBus.class);
 
             final InjectionTarget<ExtensionManagerBus> busInjectionTarget =
                 beanManager.createInjectionTarget(busAnnotatedType);
-
-            busBean = new CdiBusBean(busInjectionTarget);
-            event.addBean(busBean);
+            event.addBean(new CdiBusBean(busInjectionTarget));
         }
     }
 
