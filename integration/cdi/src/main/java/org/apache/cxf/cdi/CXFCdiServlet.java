@@ -51,7 +51,7 @@ public class CXFCdiServlet extends CXFNonSpringServlet {
             final Set< Bean< ? > > candidates = beanManager.getBeans(CdiBusBean.CXF);
             
             if (!candidates.isEmpty()) {
-                final Bean< ? > candidate = candidates.iterator().next();
+                final Bean< ? > candidate = beanManager.resolve(candidates);
                 
                 bus = (Bus)beanManager.getReference(candidate, Bus.class, 
                     beanManager.createCreationalContext(candidate));                
