@@ -40,7 +40,6 @@ import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.cxf.sts.token.provider.TokenProviderResponse;
 import org.apache.cxf.systest.sts.common.CommonCallbackHandler;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
-import org.apache.cxf.systest.sts.issueunit.IssueUnitTest;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
@@ -90,7 +89,7 @@ public class SAMLDelegationTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testSAMLOnBehalfOf() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = IssueUnitTest.class.getResource("cxf-client.xml");
+        URL busFile = SAMLDelegationTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -127,7 +126,7 @@ public class SAMLDelegationTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testSAMLActAs() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = IssueUnitTest.class.getResource("cxf-client.xml");
+        URL busFile = SAMLDelegationTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -162,29 +161,9 @@ public class SAMLDelegationTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.Test
-    public void testTransportNoDelegationToken() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = IssueUnitTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
-
-        try {
-            requestSecurityToken(SAML2_TOKEN_TYPE, BEARER_KEYTYPE, bus, 
-                                 DEFAULT_ADDRESS, "Transport_Port");
-            fail("Failure expected on no delegation token");
-        } catch (Exception ex) {
-            // expected
-        }
-        
-        bus.shutdown(true);
-    }
-    
-    @org.junit.Test
     public void testTransportForgedDelegationToken() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = IssueUnitTest.class.getResource("cxf-client.xml");
+        URL busFile = SAMLDelegationTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -220,7 +199,7 @@ public class SAMLDelegationTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testTransportUnsignedDelegationToken() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = IssueUnitTest.class.getResource("cxf-client.xml");
+        URL busFile = SAMLDelegationTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);

@@ -128,7 +128,7 @@
                 <sec:trustManagers>
                     <sec:keyStore type="jks" password="stsspass" resource="keys/stsstore.jks"/>
                 </sec:trustManagers>
-                <sec:clientAuthentication want="false" required="false"/>
+                <sec:clientAuthentication want="true" required="false"/>
             </httpj:tlsServerParameters>
         </httpj:engine>
     </httpj:engine-factory>
