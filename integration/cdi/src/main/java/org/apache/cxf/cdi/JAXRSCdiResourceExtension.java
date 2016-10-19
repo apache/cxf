@@ -120,8 +120,11 @@ public class JAXRSCdiResourceExtension implements Extension {
             busBean = new CdiBusBean(busInjectionTarget);
             event.addBean(busBean);
         }
+        if (applicationBeans.isEmpty()) {
+            event.addBean(new DefaultApplicationBean());
+        }
     }
-
+    
     /**
      * Create the JAXRSServerFactoryBean from the application and all discovered service and provider instances.
      * @param application application instance
