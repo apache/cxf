@@ -72,7 +72,10 @@ public class HttpServletRequestFilter extends HttpServletRequestWrapper {
         String[] value = super.getParameterValues(name);
         if (value == null && isPostFormRequest) {
             readFromParamsIfNeeded();
-            value = formParams.get(name).toArray(new String[]{});
+            List<String> values = formParams.get(name);
+            if (values != null) {
+                value = values.toArray(new String[]{});
+            }
         }
         return value;
     }
