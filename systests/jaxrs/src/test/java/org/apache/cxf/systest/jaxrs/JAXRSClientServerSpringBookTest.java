@@ -135,7 +135,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     }
     @Test
     public void testGetServicesPageWithServletPatternMatchOnly2() throws Exception {
-        final String address = "http://localhost:" + PORT + "/services;a=b;/list;a=b/;a=b"; 
+        final String address = "http://localhost:" + PORT + "/services/list/;a=b"; 
         WebClient wc = WebClient.create(address).accept("text/*");
         String s = wc.get(String.class);
         assertTrue(s.contains("href=\"/services/list/?stylesheet=1\""));
