@@ -30,6 +30,7 @@ import org.opensaml.core.xml.XMLObject;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.Attribute;
 import org.opensaml.saml.saml2.core.AttributeStatement;
+import org.opensaml.saml.saml2.core.Subject;
 
 /**
  * This class validates a SAML 2 Assertion and checks that it has a CustomActAs Attribute with
@@ -44,6 +45,13 @@ public class ActAsValidator extends SamlAssertionValidator {
         
         Assertion saml2Assertion = assertion.getSaml2();
         if (saml2Assertion == null) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
+        }
+        
+        // The technical user should be in the Subject
+        Subject subject = saml2Assertion.getSubject();
+        if (subject == null || subject.getNameID() == null
+            || !subject.getNameID().getValue().contains("CN=www.client.com")) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
         
