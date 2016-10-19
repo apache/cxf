@@ -19,10 +19,15 @@
 
 package org.apache.cxf.metrics;
 
+import java.lang.reflect.Constructor;
+import java.util.Collection;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.annotations.Provider;
 import org.apache.cxf.annotations.Provider.Type;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
+import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.Server;
@@ -40,9 +45,9 @@ import org.apache.cxf.metrics.interceptors.MetricsMessageOutInterceptor;
  * 
  */
 @NoJSR250Annotations
-@Provider(value = Type.Feature)
+@Provider(Type.Feature)
 public class MetricsFeature extends AbstractFeature {
-    final MetricsProvider[] providers;
+    MetricsProvider[] providers;
     
     public MetricsFeature() {
         this.providers = null;
@@ -56,6 +61,7 @@ public class MetricsFeature extends AbstractFeature {
     
     @Override
     public void initialize(Server server, Bus bus) {
+        createDefaultProvidersIfNeeded(bus);
         //can optimize for server case and just put interceptors it needs
         Endpoint provider = server.getEndpoint();
         MetricsMessageOutInterceptor out = new MetricsMessageOutInterceptor(providers);
@@ -73,6 +79,7 @@ public class MetricsFeature extends AbstractFeature {
     
     @Override
     public void initialize(Client client, Bus bus) {
+        createDefaultProvidersIfNeeded(bus);
         //can optimize for client case and just put interceptors it needs
         MetricsMessageOutInterceptor out = new MetricsMessageOutInterceptor(providers);
         CountingOutInterceptor countingOut = new CountingOutInterceptor();
@@ -88,6 +95,7 @@ public class MetricsFeature extends AbstractFeature {
     
     @Override
     protected void initializeProvider(InterceptorProvider provider, Bus bus) {
+        createDefaultProvidersIfNeeded(bus);
         //if feature is added to the bus, we need to add all the interceptors
         MetricsMessageOutInterceptor out = new MetricsMessageOutInterceptor(providers);
         CountingOutInterceptor countingOut = new CountingOutInterceptor();
@@ -104,5 +112,26 @@ public class MetricsFeature extends AbstractFeature {
         provider.getOutInterceptors().add(new MetricsMessageClientOutInterceptor(providers));
         provider.getOutFaultInterceptors().add(countingOut);
         provider.getOutFaultInterceptors().add(out);
+    }
+    private void createDefaultProvidersIfNeeded(Bus bus) {
+        if (providers == null) {
+            ConfiguredBeanLocator b = bus.getExtension(ConfiguredBeanLocator.class);
+            if (b != null) {
+                Collection<?> coll = b.getBeansOfType(MetricsProvider.class);
+                if (coll != null) {
+                    providers = coll.toArray(new MetricsProvider[]{});
+                }
+            }
+        }
+        if (providers == null) {
+            try {
+                Class<?> cls = ClassLoaderUtils.loadClass("org.apache.cxf.metrics.codahale.CodahaleMetricsProvider", 
+                                                        MetricsFeature.class);
+                Constructor<?> c = cls.getConstructor(Bus.class);
+                providers = new MetricsProvider[] {(MetricsProvider)c.newInstance(bus)};
+            } catch (Throwable t) {
+                // ignore;
+            }
+        }
     }
 }
