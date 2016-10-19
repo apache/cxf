@@ -45,5 +45,14 @@ or access it from the CXF Services page:
 (Note - CXF Services page is available by default at the path ending with "/services" - but in this demo
 it has been configured to listen at "/info")
 
+http://localhost:8080/system/metrics 
+
+will expose all registered Spring Actuator metrics 
+
+http://localhost:8080/system/health 
+
+will expose all registered Spring Actuator health checks
+
+
 Check client/README on how to run a command line client.
 
