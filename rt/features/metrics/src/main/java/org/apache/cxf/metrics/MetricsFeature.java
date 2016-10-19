@@ -21,7 +21,6 @@ package org.apache.cxf.metrics;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.annotations.Provider;
-import org.apache.cxf.annotations.Provider.Scope;
 import org.apache.cxf.annotations.Provider.Type;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.endpoint.Client;
@@ -41,7 +40,7 @@ import org.apache.cxf.metrics.interceptors.MetricsMessageOutInterceptor;
  * 
  */
 @NoJSR250Annotations
-@Provider(value = Type.Feature, scope = Scope.Server)
+@Provider(value = Type.Feature)
 public class MetricsFeature extends AbstractFeature {
     final MetricsProvider[] providers;
     
