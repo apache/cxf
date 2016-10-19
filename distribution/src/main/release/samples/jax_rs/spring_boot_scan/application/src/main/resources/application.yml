@@ -22,3 +22,7 @@ eureka:
       instanceId: ${spring.application.name}:${spring.application.instance_id:${random.value}} 
       servletPath: ${cxf.path}
 
+endpoints:
+  jmx:
+    enabled: true
+    unique-names: true
