@@ -27,6 +27,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import javax.naming.ldap.LdapName;
+import javax.naming.ldap.Rdn;
 import javax.security.auth.kerberos.KerberosPrincipal;
 import javax.security.auth.x500.X500Principal;
 
@@ -152,10 +154,14 @@ public class DefaultSubjectProvider implements SubjectProvider {
             && principal instanceof X500Principal) {
             // Just use the "cn" instead of the entire DN
             try {
-                String principalName = principal.getName();
-                int index = principalName.indexOf('=');
-                principalName = principalName.substring(index + 1, principalName.indexOf(',', index));
-                subjectName = principalName;
+                LdapName ln = new LdapName(principal.getName());
+
+                for (Rdn rdn : ln.getRdns()) {
+                    if ("CN".equalsIgnoreCase(rdn.getType()) && (rdn.getValue() instanceof String)) {
+                        subjectName = (String)rdn.getValue();
+                        break;
+                    }
+                }
             } catch (Throwable ex) {
                 subjectName = principal.getName();
                 //Ignore, not X500 compliant thus use the whole string as the value
