@@ -25,11 +25,8 @@ import java.util.Properties;
 import javax.xml.bind.JAXBElement;
 
 import org.w3c.dom.Element;
-<<<<<<< HEAD
 import org.apache.cxf.jaxws.context.WebServiceContextImpl;
-=======
 
->>>>>>> 0529afb... Updating ActAs unit tests in the STS code
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.sts.QNameConstants;
@@ -53,7 +50,7 @@ import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.dom.WSConstants;
 
 import org.junit.Assert;
-import org.opensaml.core.xml.XMLObject;
+import org.opensaml.xml.XMLObject;
 
 /**
  * Some unit tests for creating SAML Tokens with an ActAs element.
@@ -89,23 +86,15 @@ public class SAMLProviderActAsTest extends org.junit.Assert {
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
         
-<<<<<<< HEAD
-        Element token = providerResponse.getToken();
-        String tokenString = DOM2Writer.nodeToString(token);
-        assertTrue(tokenString.contains(providerResponse.getTokenId()));
-        assertTrue(tokenString.contains("AttributeStatement"));
-        assertTrue(tokenString.contains("ActAs"));
-        assertTrue(tokenString.contains("bob"));
-=======
         // Verify the token
         Element token = (Element)providerResponse.getToken();
         SamlAssertionWrapper assertion = new SamlAssertionWrapper(token);
         Assert.assertEquals("technical-user", assertion.getSubjectName());
         
         boolean foundActAsAttribute = false;
-        for (org.opensaml.saml.saml1.core.AttributeStatement attributeStatement 
+        for (org.opensaml.saml1.core.AttributeStatement attributeStatement 
             : assertion.getSaml1().getAttributeStatements()) {
-            for (org.opensaml.saml.saml1.core.Attribute attribute : attributeStatement.getAttributes()) {
+            for (org.opensaml.saml1.core.Attribute attribute : attributeStatement.getAttributes()) {
                 if ("ActAs".equals(attribute.getAttributeName())) {
                     for (XMLObject attributeValue : attribute.getAttributeValues()) {
                         Element attributeValueElement = attributeValue.getDOM();
@@ -120,7 +109,6 @@ public class SAMLProviderActAsTest extends org.junit.Assert {
         }
         
         Assert.assertTrue(foundActAsAttribute);
->>>>>>> 0529afb... Updating ActAs unit tests in the STS code
     }
     
     /**
@@ -146,22 +134,15 @@ public class SAMLProviderActAsTest extends org.junit.Assert {
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
         
-<<<<<<< HEAD
-        Element token = providerResponse.getToken();
-        String tokenString = DOM2Writer.nodeToString(token);
-        assertTrue(tokenString.contains(providerResponse.getTokenId()));
-        assertTrue(tokenString.contains("AttributeStatement"));
-        assertTrue(tokenString.contains("ActAs"));
-=======
         // Verify the token
         Element token = (Element)providerResponse.getToken();
         SamlAssertionWrapper assertion = new SamlAssertionWrapper(token);
         Assert.assertEquals("technical-user", assertion.getSubjectName());
         
         boolean foundActAsAttribute = false;
-        for (org.opensaml.saml.saml2.core.AttributeStatement attributeStatement 
+        for (org.opensaml.saml2.core.AttributeStatement attributeStatement 
             : assertion.getSaml2().getAttributeStatements()) {
-            for (org.opensaml.saml.saml2.core.Attribute attribute : attributeStatement.getAttributes()) {
+            for (org.opensaml.saml2.core.Attribute attribute : attributeStatement.getAttributes()) {
                 if ("ActAs".equals(attribute.getName())) {
                     for (XMLObject attributeValue : attribute.getAttributeValues()) {
                         Element attributeValueElement = attributeValue.getDOM();
@@ -176,7 +157,6 @@ public class SAMLProviderActAsTest extends org.junit.Assert {
         }
         
         Assert.assertTrue(foundActAsAttribute);
->>>>>>> 0529afb... Updating ActAs unit tests in the STS code
     }
     
     /**
