@@ -17,27 +17,13 @@
  * under the License.
  */
 package sample.rs.service;
-import com.codahale.metrics.JmxReporter;
-import com.codahale.metrics.MetricRegistry;
-
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
-import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
 @EnableEurekaClient
 public class SampleRestApplication {
-    @Bean
-    public MetricRegistry metricRegistry(){
-        return new MetricRegistry();
-    }
-    
-    @Bean(initMethod = "start", destroyMethod = "stop")
-    public JmxReporter jmxReporter(MetricRegistry metricRegistry) {
-        return JmxReporter.forRegistry(metricRegistry).build();
-    }
-    
     public static void main(String[] args) {
         SpringApplication.run(SampleRestApplication.class, args);
     }
