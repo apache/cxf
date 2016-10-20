@@ -51,7 +51,7 @@ public class ActAsValidator extends SamlAssertionValidator {
         // The technical user should be in the Subject
         Subject subject = saml2Assertion.getSubject();
         if (subject == null || subject.getNameID() == null
-            || !subject.getNameID().getValue().contains("CN=www.client.com")) {
+            || !subject.getNameID().getValue().contains("www.client.com")) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
         
