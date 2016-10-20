@@ -80,7 +80,10 @@ public class JAXRSCdiResourceExtension implements Extension {
 
     public void load(@Observes final AfterDeploymentValidation event, final BeanManager beanManager) {
         // no need of creational context, it only works for app scoped instances anyway
-        bus = (Bus)beanManager.getReference(beanManager.resolve(beanManager.getBeans(CdiBusBean.CXF)), Bus.class, null);
+        final Bean<?> busBean = beanManager.resolve(beanManager.getBeans(CdiBusBean.CXF));
+        bus = (Bus)beanManager.getReference(
+                busBean, Bus.class,
+                beanManager.createCreationalContext(busBean));
 
         for (final Bean< ? > application: applicationBeans) {
             final Application instance = (Application)beanManager.getReference(
