@@ -25,6 +25,7 @@ import java.util.Properties;
 import javax.xml.bind.JAXBElement;
 
 import org.w3c.dom.Element;
+
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.sts.QNameConstants;
@@ -43,8 +44,12 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.dom.WSConstants;
+
+import org.junit.Assert;
+import org.opensaml.core.xml.XMLObject;
 
 /**
  * Some unit tests for creating SAML Tokens with an ActAs element.
@@ -80,12 +85,29 @@ public class SAMLProviderActAsTest extends org.junit.Assert {
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
         
+        // Verify the token
         Element token = (Element)providerResponse.getToken();
-        String tokenString = DOM2Writer.nodeToString(token);
-        assertTrue(tokenString.contains(providerResponse.getTokenId()));
-        assertTrue(tokenString.contains("AttributeStatement"));
-        assertTrue(tokenString.contains("ActAs"));
-        assertTrue(tokenString.contains("bob"));
+        SamlAssertionWrapper assertion = new SamlAssertionWrapper(token);
+        Assert.assertEquals("technical-user", assertion.getSubjectName());
+        
+        boolean foundActAsAttribute = false;
+        for (org.opensaml.saml.saml1.core.AttributeStatement attributeStatement 
+            : assertion.getSaml1().getAttributeStatements()) {
+            for (org.opensaml.saml.saml1.core.Attribute attribute : attributeStatement.getAttributes()) {
+                if ("ActAs".equals(attribute.getAttributeName())) {
+                    for (XMLObject attributeValue : attribute.getAttributeValues()) {
+                        Element attributeValueElement = attributeValue.getDOM();
+                        String text = attributeValueElement.getTextContent();
+                        if (text.contains("bob")) {
+                            foundActAsAttribute = true;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        
+        Assert.assertTrue(foundActAsAttribute);
     }
     
     /**
@@ -95,7 +117,7 @@ public class SAMLProviderActAsTest extends org.junit.Assert {
     public void testDefaultSaml2ActAsAssertion() throws Exception {
         TokenProvider samlTokenProvider = new SAMLTokenProvider();
         
-        String user = "alice";
+        String user = "bob";
         Element saml1Assertion = getSAMLAssertion();
         
         TokenProviderParameters providerParameters = 
@@ -111,11 +133,29 @@ public class SAMLProviderActAsTest extends org.junit.Assert {
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
         
+        // Verify the token
         Element token = (Element)providerResponse.getToken();
-        String tokenString = DOM2Writer.nodeToString(token);
-        assertTrue(tokenString.contains(providerResponse.getTokenId()));
-        assertTrue(tokenString.contains("AttributeStatement"));
-        assertTrue(tokenString.contains("ActAs"));
+        SamlAssertionWrapper assertion = new SamlAssertionWrapper(token);
+        Assert.assertEquals("technical-user", assertion.getSubjectName());
+        
+        boolean foundActAsAttribute = false;
+        for (org.opensaml.saml.saml2.core.AttributeStatement attributeStatement 
+            : assertion.getSaml2().getAttributeStatements()) {
+            for (org.opensaml.saml.saml2.core.Attribute attribute : attributeStatement.getAttributes()) {
+                if ("ActAs".equals(attribute.getName())) {
+                    for (XMLObject attributeValue : attribute.getAttributeValues()) {
+                        Element attributeValueElement = attributeValue.getDOM();
+                        String text = attributeValueElement.getTextContent();
+                        if (text.contains("bob")) {
+                            foundActAsAttribute = true;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        
+        Assert.assertTrue(foundActAsAttribute);
     }
     
     /**
@@ -178,6 +218,7 @@ public class SAMLProviderActAsTest extends org.junit.Assert {
         TokenProvider samlTokenProvider = new SAMLTokenProvider();
         TokenProviderParameters providerParameters = 
             createProviderParameters(WSConstants.WSS_SAML_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, null);
+        providerParameters.setPrincipal(new CustomTokenPrincipal("bob"));
         assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML_TOKEN_TYPE));
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
@@ -206,7 +247,7 @@ public class SAMLProviderActAsTest extends org.junit.Assert {
         keyRequirements.setKeyType(keyType);
         parameters.setKeyRequirements(keyRequirements);
         
-        parameters.setPrincipal(new CustomTokenPrincipal("alice"));
+        parameters.setPrincipal(new CustomTokenPrincipal("technical-user"));
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
