@@ -20,14 +20,18 @@ package org.apache.cxf.jaxrs.spring;
 
 import java.lang.annotation.Annotation;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.ws.rs.Path;
 import javax.ws.rs.ext.Provider;
 
 import org.apache.cxf.annotations.Provider.Scope;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ClasspathScanner;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.feature.Feature;
@@ -48,6 +52,7 @@ import org.springframework.context.annotation.FilterType;
 )
 public abstract class AbstractSpringComponentScanServer extends AbstractSpringConfigurationFactory {
 
+    private static final Logger LOG = LogUtils.getL7dLogger(AbstractSpringComponentScanServer.class);
     @Value("${cxf.jaxrs.classes-scan-packages:}")
     private String classesScanPackages;
     
@@ -92,6 +97,7 @@ public abstract class AbstractSpringComponentScanServer extends AbstractSpringCo
                                           
                 jaxrsProviders.addAll(JAXRSServerFactoryBeanDefinitionParser
                     .createBeansFromDiscoveredClasses(super.applicationContext, classes.get(Provider.class), null));
+                warnIfDuplicatesAvailable(jaxrsProviders);
                 List<Object> cxfProviders = JAXRSServerFactoryBeanDefinitionParser
                     .createBeansFromDiscoveredClasses(super.applicationContext, 
                                                       classes.get(org.apache.cxf.annotations.Provider.class), 
@@ -99,6 +105,7 @@ public abstract class AbstractSpringComponentScanServer extends AbstractSpringCo
                 for (Object cxfProvider : cxfProviders) {
                     addCxfProvider(cxfProvider);
                 }
+                warnIfDuplicatesAvailable(cxfFeatures);
             } catch (Exception ex) {
                 throw new ServiceConstructionException(ex);
             }
@@ -112,6 +119,15 @@ public abstract class AbstractSpringComponentScanServer extends AbstractSpringCo
         
     }
     
+    private static void warnIfDuplicatesAvailable(List<? extends Object> providers) {
+        Set<String> classNames = new HashSet<String>();
+        for (Object o : providers) {
+            if (!classNames.add(o.getClass().getName())) {
+                LOG.warning("Duplicate Provider " + o.getClass().getName() + " has been detected");
+            }
+        }
+        
+    }
     private Object getProviderBean(String beanName) {
         return applicationContext.getBean(beanName);
     }
