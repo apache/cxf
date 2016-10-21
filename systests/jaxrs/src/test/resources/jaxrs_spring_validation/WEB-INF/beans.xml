@@ -35,14 +35,12 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
         <jaxrs:inInterceptors>
             <ref bean="jaxrsValidationInInterceptor" />
         </jaxrs:inInterceptors>
-        <jaxrs:outInterceptors>
-            <ref bean="jaxrsValidationOutInterceptor" />
-        </jaxrs:outInterceptors>
         <jaxrs:serviceBeans>
             <ref bean="bookStoreWithValidation"/>
         </jaxrs:serviceBeans>
         <jaxrs:providers>
             <ref bean="exceptionMapper"/>
+            <ref bean="jaxrsValidationOutInterceptor" />
         </jaxrs:providers>
     </jaxrs:server>
     
