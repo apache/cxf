@@ -19,13 +19,13 @@
 package org.apache.cxf.systest.jaxrs;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
-import com.google.common.collect.Sets;
 
 import org.apache.cxf.jaxrs.validation.JAXRSBeanValidationFeature;
 import org.apache.cxf.jaxrs.validation.ValidationExceptionMapper;
@@ -35,10 +35,11 @@ import org.apache.cxf.systest.jaxrs.cdi.BookStore;
 public class BookStoreCustomApplication extends Application {
     @Override
     public Set< Object > getSingletons() {
-        return Sets.newHashSet(
-            new JacksonJsonProvider(),
-            new ValidationExceptionMapper(),
-            new JAXRSBeanValidationFeature());
+        Set<Object> singletons = new HashSet<>();
+        singletons.add(new JacksonJsonProvider());
+        singletons.add(new ValidationExceptionMapper());
+        singletons.add(new JAXRSBeanValidationFeature());
+        return singletons;
     }
 
     @Override
