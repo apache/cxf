@@ -22,6 +22,8 @@ $ mvn spring-boot:run
 $ mvn -Pserver
 ----
 
+3. Check that the server is deployed:
+
 http://localhost:8080/services/helloservice/sayHello/ApacheCxfUser
 
 will display "Hello ApacheCxfUser, Welcome to CXF RS Spring Boot World!!!"
@@ -30,10 +32,9 @@ http://localhost:8080/services/helloservice/sayHello2/ApacheCxfUser
 
 will display "Hello2 ApacheCxfUser, Welcome to CXF RS Spring Boot World!!!"
 
-
 Check client/README on how to run a command line client.
 
-3. Swagger JSON and UI
+4. Swagger JSON and UI
 
 http://localhost:8080/services/helloservice/swagger.json will return a Swagger JSON
 description of services.
@@ -50,7 +51,7 @@ or access it from the CXF Services page:
 (Note - CXF Services page is available by default at the path ending with "/services" - but in this demo
 it has been configured to listen at "/info")
 
-4. System metrics and health checks 
+5. System metrics and health checks
 
 http://localhost:8080/system/metrics 
 
