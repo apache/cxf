@@ -34,12 +34,10 @@ import org.apache.cxf.rt.security.claims.ClaimCollection;
 import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.StaticSTSProperties;
 import org.apache.cxf.sts.claims.ClaimTypes;
-import org.apache.cxf.sts.claims.ClaimsAttributeStatementProvider;
 import org.apache.cxf.sts.claims.ClaimsHandler;
 import org.apache.cxf.sts.claims.ClaimsManager;
 import org.apache.cxf.sts.claims.StaticClaimsHandler;
 import org.apache.cxf.sts.claims.StaticEndpointClaimsHandler;
-import org.apache.cxf.sts.common.CustomAttributeProvider;
 import org.apache.cxf.sts.common.CustomClaimsHandler;
 import org.apache.cxf.sts.common.PasswordCallbackHandler;
 import org.apache.cxf.sts.request.KeyRequirements;
@@ -90,10 +88,6 @@ public class SAMLClaimsTest extends org.junit.Assert {
         ClaimCollection claims = createClaims();
         providerParameters.setRequestedPrimaryClaims(claims);
         
-        List<AttributeStatementProvider> customProviderList = new ArrayList<AttributeStatementProvider>();
-        customProviderList.add(new CustomAttributeProvider());
-        ((SAMLTokenProvider)samlTokenProvider).setAttributeStatementProviders(customProviderList);
-        
         assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML2_TOKEN_TYPE));
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
@@ -134,10 +128,6 @@ public class SAMLClaimsTest extends org.junit.Assert {
         claim.setClaimType(ClaimTypes.STREETADDRESS);
         secondaryClaims.add(claim);
         providerParameters.setRequestedSecondaryClaims(secondaryClaims);
-        
-        List<AttributeStatementProvider> customProviderList = new ArrayList<AttributeStatementProvider>();
-        customProviderList.add(new CustomAttributeProvider());
-        ((SAMLTokenProvider)samlTokenProvider).setAttributeStatementProviders(customProviderList);
         
         assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML2_TOKEN_TYPE));
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
@@ -184,10 +174,6 @@ public class SAMLClaimsTest extends org.junit.Assert {
         secondaryClaims.setDialect(ClaimTypes.URI_BASE);
         providerParameters.setRequestedSecondaryClaims(secondaryClaims);
         
-        List<AttributeStatementProvider> customProviderList = new ArrayList<AttributeStatementProvider>();
-        customProviderList.add(new CustomAttributeProvider());
-        ((SAMLTokenProvider)samlTokenProvider).setAttributeStatementProviders(customProviderList);
-        
         assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML2_TOKEN_TYPE));
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
@@ -227,10 +213,6 @@ public class SAMLClaimsTest extends org.junit.Assert {
         claim.setClaimType(CLAIM_STATIC_COMPANY);
         claims.add(claim);
         providerParameters.setRequestedPrimaryClaims(claims);
-        
-        List<AttributeStatementProvider> customProviderList = new ArrayList<AttributeStatementProvider>();
-        customProviderList.add(new ClaimsAttributeStatementProvider());
-        ((SAMLTokenProvider)samlTokenProvider).setAttributeStatementProviders(customProviderList);
         
         assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML2_TOKEN_TYPE));
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
@@ -284,10 +266,6 @@ public class SAMLClaimsTest extends org.junit.Assert {
         claim.setClaimType(CLAIM_APPLICATION);
         claims.add(claim);
         providerParameters.setRequestedPrimaryClaims(claims);
-        
-        List<AttributeStatementProvider> customProviderList = new ArrayList<AttributeStatementProvider>();
-        customProviderList.add(new ClaimsAttributeStatementProvider());
-        ((SAMLTokenProvider)samlTokenProvider).setAttributeStatementProviders(customProviderList);
         
         assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML2_TOKEN_TYPE));
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
@@ -344,9 +322,6 @@ public class SAMLClaimsTest extends org.junit.Assert {
         claims.add(claim);
         providerParameters.setRequestedPrimaryClaims(claims);
         
-        List<AttributeStatementProvider> customProviderList = new ArrayList<AttributeStatementProvider>();
-        customProviderList.add(new ClaimsAttributeStatementProvider());
-        ((SAMLTokenProvider)samlTokenProvider).setAttributeStatementProviders(customProviderList);
         assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML2_TOKEN_TYPE));
         
         try {
@@ -376,10 +351,6 @@ public class SAMLClaimsTest extends org.junit.Assert {
         claim.setClaimType(ClaimTypes.MOBILEPHONE);
         claims.add(claim);
         providerParameters.setRequestedPrimaryClaims(claims);
-        
-        List<AttributeStatementProvider> customProviderList = new ArrayList<AttributeStatementProvider>();
-        customProviderList.add(new CustomAttributeProvider());
-        ((SAMLTokenProvider)samlTokenProvider).setAttributeStatementProviders(customProviderList);
         
         assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML2_TOKEN_TYPE));
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
