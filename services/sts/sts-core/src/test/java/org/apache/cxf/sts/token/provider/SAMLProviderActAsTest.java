@@ -19,6 +19,7 @@
 package org.apache.cxf.sts.token.provider;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
@@ -28,10 +29,16 @@ import org.w3c.dom.Element;
 
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.rt.security.claims.Claim;
+import org.apache.cxf.rt.security.claims.ClaimCollection;
 import org.apache.cxf.sts.QNameConstants;
 import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.StaticSTSProperties;
+import org.apache.cxf.sts.claims.ClaimTypes;
+import org.apache.cxf.sts.claims.ClaimsHandler;
+import org.apache.cxf.sts.claims.ClaimsManager;
 import org.apache.cxf.sts.common.CustomAttributeProvider;
+import org.apache.cxf.sts.common.CustomClaimsHandler;
 import org.apache.cxf.sts.common.PasswordCallbackHandler;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.ReceivedToken;
@@ -214,6 +221,73 @@ public class SAMLProviderActAsTest extends org.junit.Assert {
         assertTrue(tokenString.contains("CustomActAs"));
     }
     
+    @org.junit.Test
+    public void testSAML2ActAsUsernameTokenClaims() throws Exception {
+        TokenProvider samlTokenProvider = new SAMLTokenProvider();
+        
+        UsernameTokenType usernameToken = new UsernameTokenType();
+        AttributedString username = new AttributedString();
+        username.setValue("bob");
+        usernameToken.setUsername(username);
+        JAXBElement<UsernameTokenType> usernameTokenType = 
+            new JAXBElement<UsernameTokenType>(
+                QNameConstants.USERNAME_TOKEN, UsernameTokenType.class, usernameToken
+            );
+        
+        TokenProviderParameters providerParameters = 
+            createProviderParameters(
+                WSConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, usernameTokenType
+            );
+        //Principal must be set in ReceivedToken/ActAs
+        providerParameters.getTokenRequirements().getActAs().setPrincipal(
+                new CustomTokenPrincipal(username.getValue()));
+        
+        // Add Claims
+        ClaimsManager claimsManager = new ClaimsManager();
+        ClaimsHandler claimsHandler = new CustomClaimsHandler();
+        claimsManager.setClaimHandlers(Collections.singletonList(claimsHandler));
+        providerParameters.setClaimsManager(claimsManager);
+        
+        ClaimCollection claims = createClaims();
+        providerParameters.setRequestedPrimaryClaims(claims);
+        
+        assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML2_TOKEN_TYPE));
+        TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
+        assertTrue(providerResponse != null);
+        assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
+        
+        // Verify the token
+        Element token = (Element)providerResponse.getToken();
+        SamlAssertionWrapper assertion = new SamlAssertionWrapper(token);
+        Assert.assertEquals("technical-user", assertion.getSubjectName());
+        
+        boolean foundActAsAttribute = false;
+        for (org.opensaml.saml.saml2.core.AttributeStatement attributeStatement 
+            : assertion.getSaml2().getAttributeStatements()) {
+            for (org.opensaml.saml.saml2.core.Attribute attribute : attributeStatement.getAttributes()) {
+                if ("ActAs".equals(attribute.getName())) {
+                    for (XMLObject attributeValue : attribute.getAttributeValues()) {
+                        Element attributeValueElement = attributeValue.getDOM();
+                        String text = attributeValueElement.getTextContent();
+                        if (text.contains("bob")) {
+                            foundActAsAttribute = true;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        
+        Assert.assertTrue(foundActAsAttribute);
+        
+        // Check that claims are also present
+        String tokenString = DOM2Writer.nodeToString(token);
+        assertTrue(tokenString.contains(providerResponse.getTokenId()));
+        assertTrue(tokenString.contains(ClaimTypes.EMAILADDRESS.toString()));
+        assertTrue(tokenString.contains(ClaimTypes.FIRSTNAME.toString()));
+        assertTrue(tokenString.contains(ClaimTypes.LASTNAME.toString()));
+    }
+    
     private Element getSAMLAssertion() throws Exception {
         TokenProvider samlTokenProvider = new SAMLTokenProvider();
         TokenProviderParameters providerParameters = 
@@ -280,6 +354,25 @@ public class SAMLProviderActAsTest extends org.junit.Assert {
         return properties;
     }
     
-  
+    /**
+     * Create a set of parsed Claims
+     */
+    private ClaimCollection createClaims() {
+        ClaimCollection claims = new ClaimCollection();
+        
+        Claim claim = new Claim();
+        claim.setClaimType(ClaimTypes.FIRSTNAME);
+        claims.add(claim);
+        
+        claim = new Claim();
+        claim.setClaimType(ClaimTypes.LASTNAME);
+        claims.add(claim);
+        
+        claim = new Claim();
+        claim.setClaimType(ClaimTypes.EMAILADDRESS);
+        claims.add(claim);
+        
+        return claims;
+    }
     
 }
