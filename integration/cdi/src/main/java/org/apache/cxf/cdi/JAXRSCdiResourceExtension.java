@@ -121,7 +121,7 @@ public class JAXRSCdiResourceExtension implements Extension {
                 beanManager.createInjectionTarget(busAnnotatedType);
             event.addBean(new CdiBusBean(busInjectionTarget));
         }
-        if (applicationBeans.isEmpty()) {
+        if (applicationBeans.isEmpty() && !serviceBeans.isEmpty()) {
             event.addBean(new DefaultApplicationBean());
         }
     }
