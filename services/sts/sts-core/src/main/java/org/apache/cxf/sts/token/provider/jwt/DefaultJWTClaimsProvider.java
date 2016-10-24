@@ -85,6 +85,8 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
         
         handleAudienceRestriction(jwtClaimsProviderParameters, claims);
         
+        handleActAs(jwtClaimsProviderParameters, claims);
+        
         return claims;
     }
     
@@ -115,7 +117,6 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
     /**
      * Get the Principal (which is used as the Subject). By default, we check the following (in order):
      *  - A valid OnBehalfOf principal
-     *  - A valid ActAs principal
      *  - A valid principal associated with a token received as ValidateTarget
      *  - The principal associated with the request. We don't need to check to see if it is "valid" here, as it
      *    is not parsed by the STS (but rather the WS-Security layer).
@@ -128,11 +129,6 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
         //if validation was successful, the principal was set in ReceivedToken 
         if (providerParameters.getTokenRequirements().getOnBehalfOf() != null) {
             ReceivedToken receivedToken = providerParameters.getTokenRequirements().getOnBehalfOf();
-            if (receivedToken.getState().equals(STATE.VALID)) {
-                principal = receivedToken.getPrincipal();
-            }
-        } else if (providerParameters.getTokenRequirements().getActAs() != null) {
-            ReceivedToken receivedToken = providerParameters.getTokenRequirements().getActAs();
             if (receivedToken.getState().equals(STATE.VALID)) {
                 principal = receivedToken.getPrincipal();
             }
@@ -267,6 +263,19 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
             claims.setAudiences(audiences);
         }
         
+    }
+    
+    protected void handleActAs(
+        JWTClaimsProviderParameters jwtClaimsProviderParameters, JwtClaims claims
+    ) {
+        TokenProviderParameters providerParameters = jwtClaimsProviderParameters.getProviderParameters();
+        
+        if (providerParameters.getTokenRequirements().getActAs() != null) {
+            ReceivedToken receivedToken = providerParameters.getTokenRequirements().getActAs();
+            if (receivedToken.getState().equals(STATE.VALID)) {
+                claims.setClaim("ActAs", receivedToken.getPrincipal().getName());
+            }
+        } 
     }
     
     public boolean isUseX500CN() {

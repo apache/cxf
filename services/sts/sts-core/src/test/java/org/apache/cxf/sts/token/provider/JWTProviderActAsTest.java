@@ -88,7 +88,8 @@ public class JWTProviderActAsTest extends org.junit.Assert {
         // Validate the token
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token);
         JwtToken jwt = jwtConsumer.getJwtToken();
-        Assert.assertEquals("bob", jwt.getClaim(JwtConstants.CLAIM_SUBJECT));
+        Assert.assertEquals("technical-user", jwt.getClaim(JwtConstants.CLAIM_SUBJECT));
+        Assert.assertEquals("bob", jwt.getClaim("ActAs"));
     }
     
     /**
@@ -98,7 +99,7 @@ public class JWTProviderActAsTest extends org.junit.Assert {
     public void testJWTActAsAssertion() throws Exception {
         TokenProvider tokenProvider = new JWTTokenProvider();
         
-        String user = "alice";
+        String user = "bob";
         Element saml1Assertion = getSAMLAssertion(user);
         
         TokenProviderParameters providerParameters = 
@@ -120,7 +121,8 @@ public class JWTProviderActAsTest extends org.junit.Assert {
         // Validate the token
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token);
         JwtToken jwt = jwtConsumer.getJwtToken();
-        Assert.assertEquals(user, jwt.getClaim(JwtConstants.CLAIM_SUBJECT));
+        Assert.assertEquals("technical-user", jwt.getClaim(JwtConstants.CLAIM_SUBJECT));
+        Assert.assertEquals("bob", jwt.getClaim("ActAs"));
     }
     
     private Element getSAMLAssertion(String user) throws Exception {
@@ -156,7 +158,7 @@ public class JWTProviderActAsTest extends org.junit.Assert {
         KeyRequirements keyRequirements = new KeyRequirements();
         parameters.setKeyRequirements(keyRequirements);
         
-        parameters.setPrincipal(new CustomTokenPrincipal("alice"));
+        parameters.setPrincipal(new CustomTokenPrincipal("technical-user"));
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
