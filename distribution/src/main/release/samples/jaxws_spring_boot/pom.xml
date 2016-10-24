@@ -56,7 +56,7 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>sample.ws.service.client.HelloClient</mainClass>
+                    <mainClass>sample.ws.SampleWsApplicationClient</mainClass>
                 </configuration>
             </plugin>
 
