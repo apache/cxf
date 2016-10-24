@@ -19,12 +19,15 @@
 package org.apache.cxf.jaxrs.validation;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.annotations.Provider;
+import org.apache.cxf.annotations.Provider.Scope;
+import org.apache.cxf.annotations.Provider.Type;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.validation.BeanValidationInInterceptor;
 import org.apache.cxf.validation.BeanValidationProvider;
 
-
+@Provider(value = Type.Feature, scope = Scope.Server)
 public class JAXRSBeanValidationFeature extends AbstractFeature {
 
     private BeanValidationProvider validationProvider;
