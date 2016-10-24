@@ -390,17 +390,26 @@ public class SAMLTokenProvider extends AbstractSAMLTokenProvider implements Toke
         
         // If no providers have been configured, then default to the ClaimsAttributeStatementProvider
         // If no Claims are available then use the DefaultAttributeStatementProvider
+        // Also handle "ActAs" via the ActAsAttributeStatementProvider
         if (!statementAdded) {
             attrBeanList = new ArrayList<>();
             AttributeStatementProvider attributeProvider = new ClaimsAttributeStatementProvider();
             AttributeStatementBean attributeBean = attributeProvider.getStatement(tokenParameters);
-            if (attributeBean != null) {
+            if (attributeBean != null && attributeBean.getSamlAttributes() != null
+                && !attributeBean.getSamlAttributes().isEmpty()) {
                 attrBeanList.add(attributeBean);
             } else {
                 attributeProvider = new DefaultAttributeStatementProvider();
                 attributeBean = attributeProvider.getStatement(tokenParameters);
                 attrBeanList.add(attributeBean);
             }
+            
+            attributeProvider = new ActAsAttributeStatementProvider();
+            attributeBean = attributeProvider.getStatement(tokenParameters);
+            if (attributeBean != null && attributeBean.getSamlAttributes() != null
+                && !attributeBean.getSamlAttributes().isEmpty()) {
+                attrBeanList.add(attributeBean);
+            } 
         }
         
         // Get the Subject and Conditions
