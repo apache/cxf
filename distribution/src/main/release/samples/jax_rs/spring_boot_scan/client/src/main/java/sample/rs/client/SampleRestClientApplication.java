@@ -44,10 +44,7 @@ import sample.rs.service.HelloService;
 @SpringBootApplication
 @EnableEurekaClient
 @EnableJaxRsProxyClient
-public final class SampleRestClientApplication {
-    private SampleRestClientApplication() {
-    }
-    
+public class SampleRestClientApplication {
     public static void main(String[] args) {
         new SpringApplicationBuilder(SampleRestClientApplication.class)
             .web(false)

@@ -7,8 +7,10 @@ The sample uses Maven. It can be built and run from the command line:
 
 ----
 $ mvn -Pserver
+----
 or
-$ java -jar target/spring-boot-sample-rs-cxf-3.2.0-SNAPSHOT.jar
+----
+$ java -jar target/spring-boot-sample-rs-cxf.jar
 ----
 
 http://localhost:8080/services/helloservice/sayHello/ApacheCxfUser
@@ -37,4 +39,3 @@ To run the client from a command line open a new terminal window and run:
 ----
 $ mvn -Pclient
 ----
-
