@@ -159,6 +159,10 @@ public class ExchangeImpl extends ConcurrentHashMap<String, Object>  implements 
         return super.put(key, value);
     }
 
+    public <T> T remove(Class<T> key) {
+        return key.cast(super.remove(key.getName()));
+    }
+
     private void setMessageContextProperty(Message m, String key, Object value) {
         if (m == null) {
             return;
