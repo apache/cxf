@@ -288,6 +288,102 @@ public class SAMLProviderActAsTest extends org.junit.Assert {
         assertTrue(tokenString.contains(ClaimTypes.LASTNAME.toString()));
     }
     
+    @org.junit.Test
+    public void testIncludeOtherActAsAttributesInTheToken() throws Exception {
+        TokenProvider samlTokenProvider = new SAMLTokenProvider();
+        
+        UsernameTokenType usernameToken = new UsernameTokenType();
+        AttributedString username = new AttributedString();
+        username.setValue("bob");
+        usernameToken.setUsername(username);
+        JAXBElement<UsernameTokenType> usernameTokenType = 
+            new JAXBElement<UsernameTokenType>(
+                QNameConstants.USERNAME_TOKEN, UsernameTokenType.class, usernameToken
+            );
+        
+        TokenProviderParameters providerParameters = 
+            createProviderParameters(
+                WSConstants.WSS_SAML_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, usernameTokenType
+            );
+        //Principal must be set in ReceivedToken/ActAs
+        providerParameters.getTokenRequirements().getActAs().setPrincipal(
+                new CustomTokenPrincipal(username.getValue()));
+        
+        assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML_TOKEN_TYPE));
+        TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
+        assertTrue(providerResponse != null);
+        assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
+        
+        // Verify the token
+        Element token = (Element)providerResponse.getToken();
+        SamlAssertionWrapper assertion = new SamlAssertionWrapper(token);
+        Assert.assertEquals("technical-user", assertion.getSubjectName());
+        
+        boolean foundActAsAttribute = false;
+        for (org.opensaml.saml.saml1.core.AttributeStatement attributeStatement 
+            : assertion.getSaml1().getAttributeStatements()) {
+            for (org.opensaml.saml.saml1.core.Attribute attribute : attributeStatement.getAttributes()) {
+                if ("ActAs".equals(attribute.getAttributeName())) {
+                    for (XMLObject attributeValue : attribute.getAttributeValues()) {
+                        Element attributeValueElement = attributeValue.getDOM();
+                        String text = attributeValueElement.getTextContent();
+                        if (text.contains("bob")) {
+                            foundActAsAttribute = true;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        
+        Assert.assertTrue(foundActAsAttribute);
+        
+        // Now get another token "ActAs" the previous token
+        providerParameters = 
+            createProviderParameters(
+                WSConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, token
+            );
+        //Principal must be set in ReceivedToken/ActAs
+        providerParameters.getTokenRequirements().getActAs().setPrincipal(
+                new CustomTokenPrincipal("service-A"));
+        providerParameters.setPrincipal(new CustomTokenPrincipal("service-A"));
+        
+        assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML2_TOKEN_TYPE));
+        providerResponse = samlTokenProvider.createToken(providerParameters);
+        assertTrue(providerResponse != null);
+        assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
+        
+        // Verify the token
+        token = (Element)providerResponse.getToken();
+        assertion = new SamlAssertionWrapper(token);
+        Assert.assertEquals("service-A", assertion.getSubjectName());
+        
+        String tokenString = DOM2Writer.nodeToString(token);
+        System.out.println(tokenString);
+        
+        boolean foundBob = false;
+        boolean foundTechnical = false;
+        for (org.opensaml.saml.saml2.core.AttributeStatement attributeStatement 
+            : assertion.getSaml2().getAttributeStatements()) {
+            for (org.opensaml.saml.saml2.core.Attribute attribute : attributeStatement.getAttributes()) {
+                if ("ActAs".equals(attribute.getName())) {
+                    for (XMLObject attributeValue : attribute.getAttributeValues()) {
+                        Element attributeValueElement = attributeValue.getDOM();
+                        String text = attributeValueElement.getTextContent();
+                        if (text.contains("bob")) {
+                            foundBob = true;
+                        } else if (text.contains("technical-user")) {
+                            foundTechnical = true;
+                        }
+                    }
+                }
+            }
+        }
+        
+        Assert.assertTrue(foundBob);
+        Assert.assertTrue(foundTechnical);
+    }
+    
     private Element getSAMLAssertion() throws Exception {
         TokenProvider samlTokenProvider = new SAMLTokenProvider();
         TokenProviderParameters providerParameters = 

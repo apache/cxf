@@ -34,6 +34,7 @@ import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.bean.AttributeBean;
 import org.apache.wss4j.common.saml.bean.AttributeStatementBean;
 import org.apache.wss4j.dom.WSConstants;
+import org.opensaml.core.xml.XMLObject;
 
 /**
  * An AttributeStatementProvider implementation to handle "ActAs". It adds an "ActAs "attribute" with the name of
@@ -94,6 +95,35 @@ public class ActAsAttributeStatementProvider implements AttributeStatementProvid
             SamlAssertionWrapper wrapper = new SamlAssertionWrapper((Element)parameter);
             SAMLTokenPrincipal principal = new SAMLTokenPrincipalImpl(wrapper);
             parameterBean.addAttributeValue(principal.getName());
+            
+            // Check for other ActAs attributes here + add them in
+            if (wrapper.getSaml2() != null) {
+                for (org.opensaml.saml.saml2.core.AttributeStatement attributeStatement 
+                    : wrapper.getSaml2().getAttributeStatements()) {
+                    for (org.opensaml.saml.saml2.core.Attribute attribute : attributeStatement.getAttributes()) {
+                        if ("ActAs".equals(attribute.getName())) {
+                            for (XMLObject attributeValue : attribute.getAttributeValues()) {
+                                Element attributeValueElement = attributeValue.getDOM();
+                                String text = attributeValueElement.getTextContent();
+                                parameterBean.addAttributeValue(text);
+                            }
+                        }
+                    }
+                }
+            } else if (wrapper.getSaml1() != null) {
+                for (org.opensaml.saml.saml1.core.AttributeStatement attributeStatement 
+                    : wrapper.getSaml1().getAttributeStatements()) {
+                    for (org.opensaml.saml.saml1.core.Attribute attribute : attributeStatement.getAttributes()) {
+                        if ("ActAs".equals(attribute.getAttributeName())) {
+                            for (XMLObject attributeValue : attribute.getAttributeValues()) {
+                                Element attributeValueElement = attributeValue.getDOM();
+                                String text = attributeValueElement.getTextContent();
+                                parameterBean.addAttributeValue(text);
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         return parameterBean;
