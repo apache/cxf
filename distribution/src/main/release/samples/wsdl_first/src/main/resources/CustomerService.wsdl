@@ -65,33 +65,25 @@
         </xs:schema>
     </wsdl:types>
     <wsdl:message name="getCustomersByNameResponse">
-        <wsdl:part name="parameters" element="tns:getCustomersByNameResponse">
-    </wsdl:part>
+        <wsdl:part name="parameters" element="tns:getCustomersByNameResponse"/>
     </wsdl:message>
     <wsdl:message name="getCustomersByName">
-        <wsdl:part name="parameters" element="tns:getCustomersByName">
-    </wsdl:part>
+        <wsdl:part name="parameters" element="tns:getCustomersByName"/>
     </wsdl:message>
     <wsdl:message name="updateCustomer">
-        <wsdl:part name="parameters" element="tns:updateCustomer">
-    </wsdl:part>
+        <wsdl:part name="parameters" element="tns:updateCustomer"/>
     </wsdl:message>
     <wsdl:message name="NoSuchCustomerException">
-        <wsdl:part name="NoSuchCustomerException" element="tns:NoSuchCustomer">
-    </wsdl:part>
+        <wsdl:part name="NoSuchCustomerException" element="tns:NoSuchCustomer"/>
     </wsdl:message>
     <wsdl:portType name="CustomerService">
         <wsdl:operation name="updateCustomer">
-            <wsdl:input name="updateCustomer" message="tns:updateCustomer">
-    </wsdl:input>
+            <wsdl:input name="updateCustomer" message="tns:updateCustomer"/>
         </wsdl:operation>
         <wsdl:operation name="getCustomersByName">
-            <wsdl:input name="getCustomersByName" message="tns:getCustomersByName">
-    </wsdl:input>
-            <wsdl:output name="getCustomersByNameResponse" message="tns:getCustomersByNameResponse">
-    </wsdl:output>
-            <wsdl:fault name="NoSuchCustomerException" message="tns:NoSuchCustomerException">
-    </wsdl:fault>
+            <wsdl:input name="getCustomersByName" message="tns:getCustomersByName"/>
+            <wsdl:output name="getCustomersByNameResponse" message="tns:getCustomersByNameResponse"/>
+            <wsdl:fault name="NoSuchCustomerException" message="tns:NoSuchCustomerException"/>
         </wsdl:operation>
     </wsdl:portType>
     <wsdl:binding name="CustomerServiceServiceSoapBinding" type="tns:CustomerService">
