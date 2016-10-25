@@ -69,7 +69,7 @@
     <repositories>
         <repository>
             <id>apache.snapshots</id>
-            <url>http://repository.apache.org/snapshots/</url>
+            <url>https://repository.apache.org/snapshots/</url>
             <name>Apache Snapshot Repo</name>
             <snapshots>
                 <enabled>true</enabled>
@@ -82,7 +82,7 @@
     <pluginRepositories>
         <pluginRepository>
             <id>apache.snapshots</id>
-            <url>http://repository.apache.org/snapshots/</url>
+            <url>https://repository.apache.org/snapshots/</url>
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
