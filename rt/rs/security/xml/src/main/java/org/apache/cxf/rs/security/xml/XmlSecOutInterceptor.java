@@ -333,6 +333,10 @@ public class XmlSecOutInterceptor extends AbstractPhaseInterceptor<Message> {
             transform = sigProps.getSignatureC14nTransform();
         }
 
+        if (sigProps.getSignatureLocation() != null) {
+            properties.setSignaturePosition(sigProps.getSignatureLocation());
+        }
+        
         if (elementsToSign == null || elementsToSign.isEmpty()) {
             LOG.fine("No Elements to sign are specified, so the entire request is signed");
             SecurePart securePart =
