@@ -38,4 +38,11 @@ public interface StringMap extends Map<String, Object> {
      * @param value the value
      */
     <T> void put(Class<T> key, T value);
+
+    /**
+     * Convenience method for removing typed objects from the map.
+     * equivalent to:  (T)remove(key.getName());
+     * @param key the key
+     */
+    <T> T remove(Class<T> key);
 }

@@ -23,6 +23,7 @@ import java.net.URL;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.xml.ws.AsyncHandler;
 import javax.xml.ws.Endpoint;
@@ -196,6 +197,26 @@ public class AsyncHTTPConduitTest extends AbstractBusClientServerTestBase {
             public void handleResponse(Response<GreetMeLaterResponse> res) {
             }
         }).get();
+    }
+
+    @Test
+    public void testCallAsyncCallbackInvokedOnlyOnce() throws Exception {
+        // This test is especially targeted for RHEL 6.8
+        updateAddressPort(g, PORT_INV);
+        int repeat = 100;
+        final AtomicInteger count = new AtomicInteger(0);
+        for (int i = 0; i < repeat; i++) {
+            try {
+                g.greetMeAsync(request, new AsyncHandler<GreetMeResponse>() {
+                    public void handleResponse(Response<GreetMeResponse> res) {
+                        count.incrementAndGet();
+                    }
+                }).get();
+            } catch (Exception e) {
+            }
+        }
+        Thread.sleep(1000);
+        assertEquals("Callback should be invoked only once per request", repeat, count.intValue());
     }
         
     @Test
