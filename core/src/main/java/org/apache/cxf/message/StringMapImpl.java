@@ -46,4 +46,8 @@ public class StringMapImpl
     public <T> void put(Class<T> key, T value) {
         put(key.getName(), value);
     }
+
+    public <T> T remove(Class<T> key) {
+        return key.cast(remove(key.getName()));
+    }
 }
