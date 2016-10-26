@@ -1896,7 +1896,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
 
                 Date created = new Date();
                 Date expires = new Date();
-                expires.setTime(created.getTime() + 300000);
+                expires.setTime(created.getTime() + WSS4JUtils.getSecurityTokenLifetime(message));
                 SecurityToken secToken = 
                     new SecurityToken(id, utBuilder.getUsernameTokenElement(), created, expires);
                 

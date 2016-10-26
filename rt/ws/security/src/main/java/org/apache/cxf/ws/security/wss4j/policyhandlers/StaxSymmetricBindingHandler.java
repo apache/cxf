@@ -602,7 +602,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
         
         Date created = new Date();
         Date expires = new Date();
-        expires.setTime(created.getTime() + 300000L);
+        expires.setTime(created.getTime() + WSS4JUtils.getSecurityTokenLifetime(message));
         SecurityToken tempTok = 
             new SecurityToken(IDGenerator.generateID(null), created, expires);
         

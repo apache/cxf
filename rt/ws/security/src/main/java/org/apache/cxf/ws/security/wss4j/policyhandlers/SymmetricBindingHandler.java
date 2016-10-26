@@ -44,6 +44,7 @@ import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.wss4j.AttachmentCallbackHandler;
 import org.apache.cxf.ws.security.wss4j.StaxSerializer;
+import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.bsp.BSPEnforcer;
 import org.apache.wss4j.common.crypto.Crypto;
@@ -914,7 +915,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
 
         Date created = new Date();
         Date expires = new Date();
-        expires.setTime(created.getTime() + 300000);
+        expires.setTime(created.getTime() + WSS4JUtils.getSecurityTokenLifetime(message));
         SecurityToken tempTok = new SecurityToken(
                         id, 
                         encrKey.getEncryptedKeyElement(),
@@ -959,7 +960,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
 
         Date created = new Date();
         Date expires = new Date();
-        expires.setTime(created.getTime() + 300000);
+        expires.setTime(created.getTime() + WSS4JUtils.getSecurityTokenLifetime(message));
         SecurityToken tempTok = 
             new SecurityToken(id, usernameToken.getUsernameTokenElement(), created, expires);
         tempTok.setSecret(secret);
@@ -975,7 +976,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             // Store it in the cache
             Date created = new Date();
             Date expires = new Date();
-            expires.setTime(created.getTime() + 300000);
+            expires.setTime(created.getTime() + WSS4JUtils.getSecurityTokenLifetime(message));
             
             String encryptedKeyID = (String)encryptedKeyResult.get(WSSecurityEngineResult.TAG_ID);
             SecurityToken tempTok = new SecurityToken(encryptedKeyID, created, expires);
@@ -1007,7 +1008,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                     }
                     Date created = new Date();
                     Date expires = new Date();
-                    expires.setTime(created.getTime() + 300000);
+                    expires.setTime(created.getTime() + WSS4JUtils.getSecurityTokenLifetime(message));
                     SecurityToken tempTok = new SecurityToken(utID, created, expires);
 
                     byte[] secret = (byte[])wser.get(WSSecurityEngineResult.TAG_SECRET);

@@ -45,6 +45,7 @@ import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.wss4j.AttachmentCallbackHandler;
 import org.apache.cxf.ws.security.wss4j.StaxSerializer;
+import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
@@ -810,7 +811,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                     || actInt.intValue() == WSConstants.ST_UNSIGNED) {
                     Date created = new Date();
                     Date expires = new Date();
-                    expires.setTime(created.getTime() + 300000);
+                    expires.setTime(created.getTime() + WSS4JUtils.getSecurityTokenLifetime(message));
                     SecurityToken tempTok = new SecurityToken(id, created, expires);
                     tempTok.setSecret((byte[])wser.get(WSSecurityEngineResult.TAG_SECRET));
                     tempTok.setX509Certificate(
