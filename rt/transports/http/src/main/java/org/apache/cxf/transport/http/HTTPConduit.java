@@ -1626,12 +1626,13 @@ public abstract class HTTPConduit
                     if (isOneway(exchange) && responseCode > 300) {
                         throw new HTTPException(responseCode, getResponseMessage(), url.toURL());
                     }
-                    ClientCallback cc = exchange.get(ClientCallback.class);
-                    if (null != cc) {
-                        //REVISIT move the decoupled destination property name into api
-                        Endpoint ep = exchange.getEndpoint();
-                        if (null != ep && null != ep.getEndpointInfo() && null == ep.getEndpointInfo().
+                    //REVISIT move the decoupled destination property name into api
+                    Endpoint ep = exchange.getEndpoint();
+                    if (null != ep && null != ep.getEndpointInfo() && null == ep.getEndpointInfo().
                             getProperty("org.apache.cxf.ws.addressing.MAPAggregator.decoupledDestination")) {
+                        // remove callback so that it won't be invoked twice
+                        ClientCallback cc = exchange.remove(ClientCallback.class);
+                        if (null != cc) {
                             cc.handleResponse(null, null);
                         }
                     }

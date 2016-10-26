@@ -50,7 +50,8 @@ public class ClientOutFaultObserver extends AbstractFaultChainInitiatorObserver 
             return;
         }
         Exception ex = m.getContent(Exception.class);
-        ClientCallback callback = m.getExchange().get(ClientCallback.class);
+        // remove callback so that it won't be invoked twice
+        ClientCallback callback = m.getExchange().remove(ClientCallback.class);
 
         if (callback != null) {
             Map<String, Object> resCtx = CastUtils.cast((Map<?, ?>) m.getExchange().getOutMessage().get(
