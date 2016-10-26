@@ -38,6 +38,7 @@ import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
+import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.bsp.BSPEnforcer;
 import org.apache.wss4j.common.crypto.Crypto;
@@ -329,7 +330,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
 
             Date created = new Date();
             Date expires = new Date();
-            expires.setTime(created.getTime() + 300000);
+            expires.setTime(created.getTime() + WSS4JUtils.getSecurityTokenLifetime(message));
             SecurityToken tempTok = 
                 new SecurityToken(id, usernameToken.getUsernameTokenElement(), created, expires);
             tempTok.setSecret(secret);

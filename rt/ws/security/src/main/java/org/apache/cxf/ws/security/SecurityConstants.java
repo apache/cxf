@@ -290,6 +290,11 @@ public final class SecurityConstants extends org.apache.cxf.rt.security.Security
      */
     public static final String SECURITY_CONTEXT_CREATOR = "ws-security.security.context.creator";
     
+    /**
+     * The security token lifetime value (in milliseconds). The default is "300000" (5 minutes).
+     */
+    public static final String SECURITY_TOKEN_LIFETIME = "ws-security.security.token.lifetime";
+    
     //
     // Validator implementations for validating received security tokens
     //
@@ -411,7 +416,7 @@ public final class SecurityConstants extends org.apache.cxf.rt.security.Security
             CACHE_IDENTIFIER, DELEGATED_CREDENTIAL, KERBEROS_USE_CREDENTIAL_DELEGATION, 
             KERBEROS_IS_USERNAME_IN_SERVICENAME_FORM, KERBEROS_REQUEST_CREDENTIAL_DELEGATION, 
             POLICY_VALIDATOR_MAP, STORE_BYTES_IN_ATTACHMENT, USE_ATTACHMENT_ENCRYPTION_CONTENT_ONLY_TRANSFORM,
-            SYMMETRIC_SIGNATURE_ALGORITHM, SECURITY_CONTEXT_CREATOR
+            SYMMETRIC_SIGNATURE_ALGORITHM, SECURITY_CONTEXT_CREATOR, SECURITY_TOKEN_LIFETIME
         }));
         for (String commonProperty : COMMON_PROPERTIES) {
             s.add(commonProperty);
