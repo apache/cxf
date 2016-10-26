@@ -72,6 +72,21 @@ public final class WSS4JUtils {
     private WSS4JUtils() {
         // complete
     }
+    
+    /**
+     * Get the security token lifetime value (in milliseconds). The default is "300000" (5 minutes).
+     * @return the security token lifetime value in milliseconds
+     */
+    public static long getSecurityTokenLifetime(Message message) {
+        if (message != null) {
+            String tokenLifetime = 
+                (String)message.getContextualProperty(SecurityConstants.SECURITY_TOKEN_LIFETIME);
+            if (tokenLifetime != null) {
+                return Long.parseLong(tokenLifetime);
+            }
+        }
+        return 300000L;
+    }
 
     /**
      * Get a ReplayCache instance. It first checks to see whether caching has been explicitly 
@@ -148,7 +163,7 @@ public final class WSS4JUtils {
         if (existingToken == null || existingToken.isExpired()) {
             Date created = new Date();
             Date expires = new Date();
-            expires.setTime(created.getTime() + 300000);
+            expires.setTime(created.getTime() + getSecurityTokenLifetime(message));
 
             SecurityToken cachedTok = new SecurityToken(securityToken.getId(), created, expires);
             cachedTok.setSHA1(securityToken.getSha1Identifier());
