@@ -139,7 +139,6 @@ public class AsyncHTTPConduitTest extends AbstractBusClientServerTestBase {
         HTTPConduit c = (HTTPConduit)ClientProxy.getClient(g).getConduit();
         c.getClient().setReceiveTimeout(3000);
         try {
-            assertEquals("Hello " + request, g.greetMeLater(-5000));
             Response<GreetMeLaterResponse> future = g.greetMeLaterAsync(-5000L);
             future.get();
             fail();
