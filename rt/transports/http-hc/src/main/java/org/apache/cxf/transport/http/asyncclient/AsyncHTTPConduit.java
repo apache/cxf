@@ -52,11 +52,13 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.jsse.SSLUtils;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
+import org.apache.cxf.endpoint.ClientCallback;
 import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CacheAndWriteOutputStream;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.io.CopyingOutputStream;
+import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.model.EndpointInfo;
@@ -640,6 +642,7 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
         
         protected void handleResponseAsync() throws IOException {
             isAsync = true;
+            new CheckReceiveTimeoutForAsync().start();
         }
         
         protected void closeInputStream() throws IOException {
@@ -853,6 +856,33 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
                 sslState = sslsession.getLocalPrincipal();
                 sslURL = url;
                 sessionLock.notifyAll();
+            }
+        }
+
+        class CheckReceiveTimeoutForAsync extends Thread {
+            public void run() {
+                long startTime = System.currentTimeMillis();
+                while (httpResponse == null && exception == null
+                    && (System.currentTimeMillis() - startTime) < csPolicy.getReceiveTimeout()) {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                if (httpResponse == null) {
+                    outbuf.shutdown();
+                    inbuf.shutdown();
+                    if (exception != null) {
+                        throw new RuntimeException(exception);
+                    }
+
+                    Exchange exchange = outMessage.getExchange();
+                    ClientCallback cc = exchange.get(ClientCallback.class);
+                    if (cc != null) {
+                        cc.handleException(null, new SocketTimeoutException());
+                    }
+                }
             }
         }
 
