@@ -38,6 +38,8 @@ import java.security.cert.Certificate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 
@@ -106,6 +108,8 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
     volatile SSLContext sslContext;
     volatile SSLSession session;
     volatile CloseableHttpAsyncClient client;
+    volatile Timer timer;
+    
 
     public AsyncHTTPConduit(Bus b,
                             EndpointInfo ei, 
@@ -113,6 +117,7 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
                             AsyncHTTPConduitFactory factory) throws IOException {
         super(b, ei, t);
         this.factory = factory;
+        this.timer = new Timer();
     }
 
     public synchronized CloseableHttpAsyncClient getHttpAsyncClient() throws IOException {
@@ -642,7 +647,7 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
         
         protected void handleResponseAsync() throws IOException {
             isAsync = true;
-            new CheckReceiveTimeoutForAsync().start();
+            timer.schedule(new CheckReceiveTimeoutForAsync(), csPolicy.getReceiveTimeout());
         }
         
         protected void closeInputStream() throws IOException {
@@ -859,17 +864,9 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
             }
         }
 
-        class CheckReceiveTimeoutForAsync extends Thread {
+        class CheckReceiveTimeoutForAsync extends TimerTask {
             public void run() {
-                long startTime = System.currentTimeMillis();
-                while (httpResponse == null && exception == null
-                    && (System.currentTimeMillis() - startTime) < csPolicy.getReceiveTimeout()) {
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
+                
                 if (httpResponse == null) {
                     outbuf.shutdown();
                     inbuf.shutdown();
