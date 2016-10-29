@@ -38,7 +38,6 @@ import java.security.cert.Certificate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
@@ -108,8 +107,7 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
     volatile SSLContext sslContext;
     volatile SSLSession session;
     volatile CloseableHttpAsyncClient client;
-    volatile Timer timer;
-    
+        
 
     public AsyncHTTPConduit(Bus b,
                             EndpointInfo ei, 
@@ -117,7 +115,6 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
                             AsyncHTTPConduitFactory factory) throws IOException {
         super(b, ei, t);
         this.factory = factory;
-        this.timer = new Timer();
     }
 
     public synchronized CloseableHttpAsyncClient getHttpAsyncClient() throws IOException {
@@ -647,7 +644,7 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
         
         protected void handleResponseAsync() throws IOException {
             isAsync = true;
-            timer.schedule(new CheckReceiveTimeoutForAsync(), csPolicy.getReceiveTimeout());
+            factory.timer.schedule(new CheckReceiveTimeoutForAsync(), csPolicy.getReceiveTimeout());
         }
         
         protected void closeInputStream() throws IOException {
