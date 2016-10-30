@@ -872,7 +872,8 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
                     }
 
                     Exchange exchange = outMessage.getExchange();
-                    ClientCallback cc = exchange.get(ClientCallback.class);
+                    // remove callback so that it won't be invoked twice
+                    ClientCallback cc = exchange.remove(ClientCallback.class);
                     if (cc != null) {
                         cc.handleException(null, new SocketTimeoutException());
                     }
