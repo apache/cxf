@@ -329,39 +329,40 @@ public final class ResourceUtils {
                     }
                 }
             } else {
-                reportInvalidResourceMethod(m, NOT_RESOURCE_METHOD_MESSAGE_ID);
+                reportInvalidResourceMethod(m, NOT_RESOURCE_METHOD_MESSAGE_ID, Level.FINE);
             }
         }
         cri.setMethodDispatcher(md);
     }
-    
-    private static void reportInvalidResourceMethod(Method m, String messageId) {
-        if (LOG.isLoggable(Level.FINE)) {
-            LOG.fine(new org.apache.cxf.common.i18n.Message(messageId, 
+
+    private static void reportInvalidResourceMethod(Method m, String messageId, Level logLevel) {
+        if (LOG.isLoggable(logLevel)) {
+            LOG.log(logLevel, new org.apache.cxf.common.i18n.Message(messageId, 
                                                              BUNDLE, 
                                                              m.getDeclaringClass().getName(),
                                                              m.getName()).toString());
         }
-        
     }
+
     private static boolean checkAsyncResponse(Method m) {
         Class<?>[] types = m.getParameterTypes();
         for (int i = 0; i < types.length; i++) {
             if (types[i] == AsyncResponse.class) { 
                 if (AnnotationUtils.getAnnotation(m.getParameterAnnotations()[i], Suspended.class) == null) {
-                    reportInvalidResourceMethod(m, NOT_SUSPENDED_ASYNC_MESSAGE_ID);
+                    reportInvalidResourceMethod(m, NOT_SUSPENDED_ASYNC_MESSAGE_ID, Level.FINE);
                     return false;
                 }
                 if (m.getReturnType() == Void.TYPE || m.getReturnType() == Void.class) {
                     return true;
                 } else {
-                    reportInvalidResourceMethod(m, NO_VOID_RETURN_ASYNC_MESSAGE_ID);
+                    reportInvalidResourceMethod(m, NO_VOID_RETURN_ASYNC_MESSAGE_ID, Level.WARNING);
                     return false;
                 }
-            }    
+            }
         }
         return true;
     }
+
     private static ClassResourceInfo getAncestorWithSameServiceClass(ClassResourceInfo parent, Class<?> subClass) {
         if (parent == null) {
             return null;
