@@ -611,7 +611,7 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
             }
             notifyAll();
         }
-        protected synchronized void handleCancelled(){
+        protected synchronized void handleCancelled() {
             notifyAll();
         }
 
