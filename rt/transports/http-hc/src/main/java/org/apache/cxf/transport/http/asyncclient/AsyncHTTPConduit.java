@@ -471,6 +471,7 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
                     outbuf.shutdown();
                 }
                 public void cancelled() {
+                    handleCancelled();
                     inbuf.shutdown();
                     outbuf.shutdown();
                 }
@@ -610,12 +611,15 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
             }
             notifyAll();
         }
+        protected synchronized void handleCancelled(){
+            notifyAll();
+        }
 
         protected synchronized HttpResponse getHttpResponse() throws IOException {
             while (httpResponse == null) {
                 if (exception == null) { //already have an exception, skip waiting
                     try {
-                        wait(csPolicy.getReceiveTimeout());
+                        wait();
                     } catch (InterruptedException e) {
                         throw new IOException(e);
                     }
