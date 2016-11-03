@@ -18,11 +18,15 @@
  */
 package org.apache.cxf.ext.logging.slf4j;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.common.util.CollectionUtils;
 import org.apache.cxf.ext.logging.event.LogEvent;
 import org.apache.cxf.ext.logging.event.LogEventSender;
 import org.slf4j.Logger;
@@ -31,6 +35,8 @@ import org.slf4j.MDC;
 
 public class Slf4jEventSender implements LogEventSender {
     private final String logCategory;
+    private List<String> ignoreHeaders;
+
 
     public Slf4jEventSender(String logCategory) {
         this.logCategory = logCategory;
@@ -61,7 +67,7 @@ public class Slf4jEventSender implements LogEventSender {
             if (event.getFullContentFile() != null) {
                 put(keys, "fullContentFile", event.getFullContentFile().getAbsolutePath());
             }
-            put(keys, "headers", event.getHeaders().toString());
+            put(keys, "headers", filterHeader(event));
             log.info(getLogMessage(event));
         } finally {
             for (String key : keys) {
@@ -69,6 +75,25 @@ public class Slf4jEventSender implements LogEventSender {
             }
         }
         
+    }
+    
+    private String filterHeader(LogEvent event) {
+        if (CollectionUtils.isEmpty(this.ignoreHeaders)) {
+            return event.getHeaders().toString();
+        }
+        Map<String, String> filteredHeader = new HashMap<>();
+        for (String header : event.getHeaders().keySet()) {
+            boolean allow = true;
+            for (String ignoreHdr : ignoreHeaders) {
+                if (header.equalsIgnoreCase(ignoreHdr)) {
+                    allow = false;
+                }
+            }
+            if (allow) {
+                filteredHeader.put(header, event.getHeaders().get(header));
+            }
+        }
+        return filteredHeader.toString();
     }
     
     private String localPart(QName name) {
@@ -84,6 +109,14 @@ public class Slf4jEventSender implements LogEventSender {
             MDC.put(key, value);
             keys.add(key);
         }
+    }
+
+    public List<String> getIgnoreHeaders() {
+        return ignoreHeaders;
+    }
+
+    public void setIgnoreHeaders(List<String> ignoreHeaders) {
+        this.ignoreHeaders = ignoreHeaders;
     }
 
 }

@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.ext.logging;
 
+import java.util.List;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.annotations.Provider;
 import org.apache.cxf.annotations.Provider.Type;
@@ -51,6 +53,7 @@ public class LoggingFeature extends AbstractFeature {
     private LoggingOutInterceptor out;
     private WireTapIn wireTapIn;
     private PrettyLoggingFilter prettyFilter;
+    private List<String> ignoreHeaders;
 
     public LoggingFeature() {
         this.sender = new Slf4jEventSender();
@@ -107,5 +110,14 @@ public class LoggingFeature extends AbstractFeature {
     public void setLogMultipart(boolean logMultipart) {
         in.setLogMultipart(logMultipart);
         out.setLogMultipart(logMultipart);
+    }
+
+    public List<String> getIgnoreHeaders() {
+        return ignoreHeaders;
+    }
+
+    public void setIgnoreHeaders(List<String> ignoreHeaders) {
+        this.ignoreHeaders = ignoreHeaders;
+        ((Slf4jEventSender)this.sender).setIgnoreHeaders(ignoreHeaders);
     }
 }
