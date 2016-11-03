@@ -619,7 +619,11 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
             while (httpResponse == null) {
                 if (exception == null) { //already have an exception, skip waiting
                     try {
-                        wait();
+                        if (isAsync) {
+                            wait();
+                        } else {
+                            wait(csPolicy.getReceiveTimeout());
+                        }
                     } catch (InterruptedException e) {
                         throw new IOException(e);
                     }
