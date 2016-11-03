@@ -1638,6 +1638,7 @@ public abstract class HTTPConduit
                             cc.handleResponse(null, null);
                         }
                     }
+                    exchange.put("IN_CHAIN_COMPLETE", Boolean.TRUE);
                     exchange.setInMessage(inMessage);
                     return;
                 } 

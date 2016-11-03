@@ -778,6 +778,14 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testOnewayWebClient2() throws Exception {
+        WebClient client = WebClient.create("http://localhost:" + PORT + "/bookstore/oneway");
+        Response r = client.post(null);
+        assertEquals(202, r.getStatus());
+        assertFalse(r.getHeaders().isEmpty());
+    }
+    
+    @Test
     public void testBookWithSpace() throws Exception {
         WebClient client = WebClient.create("http://localhost:" + PORT + "/bookstore/").path("the books/123");
         Book book = client.get(Book.class);
