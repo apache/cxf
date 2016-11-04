@@ -49,6 +49,36 @@ public final class PackageUtils {
         return getPackageName(className);
     }
     
+    public static String getSharedPackageName(List<Class<?>> classes) {
+        if (classes.isEmpty()) {
+            return "";
+        }
+        List<List<String>> lParts = new  ArrayList<List<String>>(classes.size());
+        List<String> currentParts = new ArrayList<String>();
+        for (Class<?> cls : classes) {
+            lParts.add(StringUtils.getParts(getPackageName(cls), "\\."));
+        }
+        for (int i = 0; i < lParts.get(0).size(); i++) {
+            int j = 1;
+            for (; j < lParts.size(); j++) {
+                if (i > (lParts.get(j).size() - 1) || !lParts.get(j).get(i).equals(lParts.get(0).get(i))) {
+                    break;
+                }  
+            }
+            if (j == lParts.size()) {
+                currentParts.add(lParts.get(j - 1).get(i));
+            }
+        }
+        StringBuilder sb = new StringBuilder();
+        for (String part : currentParts) {
+            if (sb.length() > 0) {
+                sb.append(".");
+            }
+            sb.append(part);
+        }
+        return sb.toString();
+    }
+    
     public static String parsePackageName(String namespace, String defaultPackageName) {
         String packageName = (defaultPackageName != null && defaultPackageName.trim().length() > 0)
             ? defaultPackageName : null;
