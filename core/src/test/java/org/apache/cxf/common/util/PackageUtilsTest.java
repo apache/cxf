@@ -77,4 +77,20 @@ public class PackageUtilsTest extends Assert {
             Arrays.asList(Annotation.class, Array.class));       
         assertEquals("java.lang", packageName);
     }
+    @Test
+    public void testSharedPackageNameManyClassesCommonRoot4() throws Exception {
+        String packageName = PackageUtils.getSharedPackageName(
+            Arrays.asList(org.apache.cxf.common.util.PackageUtils.class, 
+                    org.apache.cxf.bus.CXFBusFactory.class,
+                    org.apache.cxf.common.jaxb.JAXBContextCache.class));       
+        assertEquals("org.apache.cxf", packageName);
+    }
+    @Test
+    public void testSharedPackageNameManyClassesCommonRoot5() throws Exception {
+        String packageName = PackageUtils.getSharedPackageName(
+            Arrays.asList(java.lang.annotation.Annotation.class, 
+                    org.apache.cxf.bus.CXFBusFactory.class,
+                    org.apache.cxf.common.jaxb.JAXBContextCache.class));       
+        assertEquals("", packageName);
+    }
 }

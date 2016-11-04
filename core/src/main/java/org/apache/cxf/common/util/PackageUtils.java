@@ -20,7 +20,6 @@
 package org.apache.cxf.common.util;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -51,20 +50,23 @@ public final class PackageUtils {
     }
     
     public static String getSharedPackageName(List<Class<?>> classes) {
-        List<String> currentParts = null;
+        if (classes.isEmpty()) {
+            return "";
+        }
+        List<List<String>> lParts = new  ArrayList<List<String>>(classes.size());
+        List<String> currentParts = new ArrayList<String>();
         for (Class<?> cls : classes) {
-            List<String> parts = StringUtils.getParts(getPackageName(cls), "\\.");
-            if (currentParts == null) {
-                currentParts = parts;
-            } else {
-                List<String> subList = Collections.emptyList();
-                for (int i = parts.size() - 1; i > 0; i--) {
-                    subList = parts.subList(0, i + 1);
-                    if (currentParts.equals(subList)) {
-                        break;
-                    }
-                }
-                currentParts.retainAll(subList);
+            lParts.add(StringUtils.getParts(getPackageName(cls), "\\."));
+        }
+        for (int i = 0; i < lParts.get(0).size(); i++) {
+            int j = 1;
+            for (; j < lParts.size(); j++) {
+                if (i > (lParts.get(j).size() - 1) || !lParts.get(j).get(i).equals(lParts.get(0).get(i))) {
+                    break;
+                }  
+            }
+            if (j == lParts.size()) {
+                currentParts.add(lParts.get(j - 1).get(i));
             }
         }
         StringBuilder sb = new StringBuilder();
