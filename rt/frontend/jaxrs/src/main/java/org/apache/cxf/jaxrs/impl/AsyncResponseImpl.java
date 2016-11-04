@@ -259,7 +259,7 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
         }
     }
     
-    public boolean suspendContinuationIfNeeded() {
+    public synchronized boolean suspendContinuationIfNeeded() {
         if (!resumedByApplication && !cont.isPending() && !cont.isResumed()) {
             cont.suspend(AsyncResponse.NO_TIMEOUT);
             initialSuspend = false;
