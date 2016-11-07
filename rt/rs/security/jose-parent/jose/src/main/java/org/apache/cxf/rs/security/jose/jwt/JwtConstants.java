@@ -32,7 +32,8 @@ public final class JwtConstants {
     public static final String JWT_TOKEN = "jwt.token";
     public static final String JWT_CLAIMS = "jwt.claims";
     
-        
+    public static final String EXPECTED_CLAIM_AUDIENCE = "expected.claim.audience";
+    
     private JwtConstants() {
         
     }
