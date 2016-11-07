@@ -21,6 +21,7 @@ package org.apache.cxf.rs.security.oauth2.grants.jwt;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.rs.security.jose.jws.JwsHeaders;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
@@ -37,10 +38,12 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
  * The "JWT Bearer" grant handler
  */
 public abstract class AbstractJwtHandler extends AbstractGrantHandler {
+    
     private Set<String> supportedIssuers; 
     private JwsSignatureVerifier jwsVerifier;
     private int ttl;
     private int clockOffset;
+    private String audience;
         
     protected AbstractJwtHandler(List<String> grants) {
         super(grants);
@@ -54,6 +57,9 @@ public abstract class AbstractJwtHandler extends AbstractGrantHandler {
     }
     
     protected void validateClaims(Client client, JwtClaims claims) {
+        if (getAudience() != null) {
+            JAXRSUtils.getCurrentMessage().put(JwtConstants.EXPECTED_CLAIM_AUDIENCE, getAudience());
+        }
         JwtUtils.validateTokenClaims(claims, ttl, clockOffset, true);
         
         validateIssuer(claims.getIssuer());
@@ -105,5 +111,13 @@ public abstract class AbstractJwtHandler extends AbstractGrantHandler {
 
     public void setClockOffset(int clockOffset) {
         this.clockOffset = clockOffset;
+    }
+
+    public String getAudience() {
+        return audience;
+    }
+
+    public void setAudience(String audience) {
+        this.audience = audience;
     }
 }

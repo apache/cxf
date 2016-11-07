@@ -115,24 +115,19 @@ public final class JwtUtils {
     }
     
     public static void validateJwtAudienceRestriction(JwtClaims claims, Message message) {
-        // Get the endpoint URL
-        String requestURL = null;
-        if (message.getContextualProperty(org.apache.cxf.message.Message.REQUEST_URL) != null) {
-            requestURL = (String)message.getContextualProperty(org.apache.cxf.message.Message.REQUEST_URL);
+        String expectedAudience = (String)message.getContextualProperty(JwtConstants.EXPECTED_CLAIM_AUDIENCE);
+        if (expectedAudience == null) {
+            expectedAudience = (String)message.getContextualProperty(Message.REQUEST_URL);
         }
         
-        if (requestURL != null) {
-            boolean match = false;
+        if (expectedAudience != null) {
             for (String audience : claims.getAudiences()) {
-                if (requestURL.equals(audience)) {
-                    match = true;
-                    break;
+                if (expectedAudience.equals(audience)) {
+                    return;
                 }
             }
-            if (!match) {
-                throw new JwtException("Invalid audience restriction");
-            }
         }
+        throw new JwtException("Invalid audience restriction");
     }
     
     public static void validateTokenClaims(JwtClaims claims, int timeToLive, int clockOffset,
