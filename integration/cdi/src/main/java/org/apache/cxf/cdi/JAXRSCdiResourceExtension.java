@@ -22,17 +22,20 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
 
+import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.spi.AfterBeanDiscovery;
 import javax.enterprise.inject.spi.AfterDeploymentValidation;
 import javax.enterprise.inject.spi.AnnotatedType;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
+import javax.enterprise.inject.spi.BeforeShutdown;
 import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.inject.spi.InjectionTarget;
 import javax.enterprise.inject.spi.ProcessBean;
@@ -58,10 +61,12 @@ public class JAXRSCdiResourceExtension implements Extension {
     private boolean hasBus;
     private Bus bus;
 
-    private final List< Bean< ? > > applicationBeans = new ArrayList< Bean< ? > >();
+    private final Set< Bean< ? > > applicationBeans = new LinkedHashSet< Bean< ? > >();
     private final List< Bean< ? > > serviceBeans = new ArrayList< Bean< ? > >();
     private final List< Bean< ? > > providerBeans = new ArrayList< Bean< ? > >();
     private final List< Bean< ? extends Feature > > featureBeans = new ArrayList< Bean< ? extends Feature > >();
+    private final List< CreationalContext< ? > > disposableCreationalContexts = 
+        new ArrayList< CreationalContext< ? > >();
 
     @SuppressWarnings("unchecked")
     public <T> void collect(@Observes final ProcessBean< T > event) {
@@ -82,15 +87,17 @@ public class JAXRSCdiResourceExtension implements Extension {
     public void load(@Observes final AfterDeploymentValidation event, final BeanManager beanManager) {
         // no need of creational context, it only works for app scoped instances anyway
         final Bean<?> busBean = beanManager.resolve(beanManager.getBeans(CdiBusBean.CXF));
+        
         bus = (Bus)beanManager.getReference(
-                busBean, Bus.class,
+                busBean, 
+                Bus.class,
                 beanManager.createCreationalContext(busBean));
 
         for (final Bean< ? > application: applicationBeans) {
             final Application instance = (Application)beanManager.getReference(
                 application,
                 application.getBeanClass(),
-                beanManager.createCreationalContext(application)
+                createCreationalContext(beanManager, application)
             );
 
             // If there is an application without any singletons and classes defined, we will
@@ -122,7 +129,18 @@ public class JAXRSCdiResourceExtension implements Extension {
             event.addBean(new CdiBusBean(busInjectionTarget));
         }
         if (applicationBeans.isEmpty() && !serviceBeans.isEmpty()) {
-            event.addBean(new DefaultApplicationBean());
+            final DefaultApplicationBean applicationBean = new DefaultApplicationBean();
+            applicationBeans.add(applicationBean);
+            event.addBean(applicationBean);
+        }
+    }
+    
+    /**
+     * Releases created CreationalContext instances 
+     */
+    public void release(@Observes final BeforeShutdown event) {
+        for (final CreationalContext<?> disposableCreationalContext: disposableCreationalContexts) {
+            disposableCreationalContext.release();
         }
     }
     
@@ -294,5 +312,19 @@ public class JAXRSCdiResourceExtension implements Extension {
                 );
             extension.customize(bean);
         }
+    }
+    
+    /**
+     * Creates and collects the CreationalContext instances for future releasing. 
+     * @param beanManager bean manager instance
+     * @param bean bean instance to create CreationalContext for
+     * @return CreationalContext instance
+     */
+    private<T> CreationalContext< T > createCreationalContext(final BeanManager beanManager, Bean< T > bean) {
+        final CreationalContext< T > creationalContext = beanManager.createCreationalContext(bean);
+        if (!(bean instanceof DefaultApplicationBean)) {
+            disposableCreationalContexts.add(creationalContext);
+        }
+        return creationalContext;
     }
 }

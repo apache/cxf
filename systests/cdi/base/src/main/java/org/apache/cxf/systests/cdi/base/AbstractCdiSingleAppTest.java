@@ -35,7 +35,7 @@ import org.junit.Test;
 public abstract class AbstractCdiSingleAppTest extends AbstractBusClientServerTestBase {
     @Test
     public void testInjectedVersionIsProperlyReturned() {
-        Response r = createWebClient("/rest/bookstore/version", MediaType.TEXT_PLAIN).get();
+        Response r = createWebClient(getBasePath() + "/version", MediaType.TEXT_PLAIN).get();
         assertEquals(Response.Status.OK.getStatusCode(), r.getStatus());
         assertEquals("1.0", r.readEntity(String.class));
     }

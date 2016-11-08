@@ -49,7 +49,7 @@ class DefaultApplicationBean extends AbstractCXFBean<DefaultApplication> {
     @Override
     public void destroy(DefaultApplication defaultApplication,
                         CreationalContext<DefaultApplication> creationalContext) {
-
+        creationalContext.release();
     }
 
     @Override
