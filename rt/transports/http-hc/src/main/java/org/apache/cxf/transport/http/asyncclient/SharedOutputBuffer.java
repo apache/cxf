@@ -118,7 +118,6 @@ public class SharedOutputBuffer extends ExpandableBuffer {
 
     public int produceContent(final ContentEncoder encoder, final IOControl ioc) throws IOException {
         if (this.shutdown) {
-            encoder.complete();
             return -1;
         }
         this.lock.lock();
