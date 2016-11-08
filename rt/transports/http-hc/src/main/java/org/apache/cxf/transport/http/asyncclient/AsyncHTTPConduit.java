@@ -38,7 +38,6 @@ import java.security.cert.Certificate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.TimerTask;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 
@@ -53,13 +52,11 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.jsse.SSLUtils;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
-import org.apache.cxf.endpoint.ClientCallback;
 import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CacheAndWriteOutputStream;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.io.CopyingOutputStream;
-import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.model.EndpointInfo;
@@ -650,7 +647,6 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
         
         protected void handleResponseAsync() throws IOException {
             isAsync = true;
-//            factory.timer.schedule(new CheckReceiveTimeoutForAsync(), csPolicy.getReceiveTimeout());
         }
         
         protected void closeInputStream() throws IOException {
@@ -867,28 +863,7 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
             }
         }
 
-        class CheckReceiveTimeoutForAsync extends TimerTask {
-            public void run() {
-                
-                if (httpResponse == null) {
-                    outbuf.shutdown();
-                    inbuf.shutdown();
-                    if (exception != null) {
-                        throw new RuntimeException(exception);
-                    }
-
-                    Exchange exchange = outMessage.getExchange();
-                    // remove callback so that it won't be invoked twice
-                    ClientCallback cc = exchange.remove(ClientCallback.class);
-                    if (cc != null) {
-                        cc.handleException(null, new SocketTimeoutException());
-                    }
-                }
-            }
-        }
-
     }
-
 
     public synchronized SSLContext getSSLContext(TLSClientParameters tlsClientParameters)
         throws GeneralSecurityException {
