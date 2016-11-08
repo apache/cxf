@@ -220,7 +220,9 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
         e.setEntity(entity);
 
         RequestConfig.Builder b = RequestConfig.custom()
-            .setConnectTimeout((int) csPolicy.getConnectionTimeout());
+                .setConnectTimeout((int) csPolicy.getConnectionTimeout())
+                .setSocketTimeout((int) csPolicy.getReceiveTimeout())
+                .setConnectionRequestTimeout((int) csPolicy.getReceiveTimeout());
         Proxy p = proxyFactory.createProxy(csPolicy, uri);
         if (p != null && p.type() != Proxy.Type.DIRECT) {
             InetSocketAddress isa = (InetSocketAddress)p.address();
@@ -471,6 +473,7 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
                     outbuf.shutdown();
                 }
                 public void cancelled() {
+                    handleCancelled();
                     inbuf.shutdown();
                     outbuf.shutdown();
                 }
@@ -610,12 +613,15 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
             }
             notifyAll();
         }
+        protected synchronized void handleCancelled() {
+            notifyAll();
+        }
 
         protected synchronized HttpResponse getHttpResponse() throws IOException {
             while (httpResponse == null) {
                 if (exception == null) { //already have an exception, skip waiting
                     try {
-                        wait(csPolicy.getReceiveTimeout());
+                        wait();
                     } catch (InterruptedException e) {
                         throw new IOException(e);
                     }
@@ -644,7 +650,7 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
         
         protected void handleResponseAsync() throws IOException {
             isAsync = true;
-            factory.timer.schedule(new CheckReceiveTimeoutForAsync(), csPolicy.getReceiveTimeout());
+//            factory.timer.schedule(new CheckReceiveTimeoutForAsync(), csPolicy.getReceiveTimeout());
         }
         
         protected void closeInputStream() throws IOException {
