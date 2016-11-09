@@ -104,13 +104,16 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
             return createErrorResponse(state.getState(), state.getRedirectUri(), OAuthConstants.ACCESS_DENIED);
         }
         String grantCode = processCodeGrant(client, grant.getCode(), grant.getSubject());
-        if (state.getRedirectUri() == null) {
+        if (state.getRedirectUri() == null
+            || OAuthConstants.FORM_RESPONSE_MODE.equals(
+                   state.getExtraProperties().get(OAuthConstants.RESPONSE_MODE))) {
             OOBAuthorizationResponse oobResponse = new OOBAuthorizationResponse();
             oobResponse.setClientId(client.getClientId());
             oobResponse.setClientDescription(client.getApplicationDescription());
             oobResponse.setAuthorizationCode(grantCode);
             oobResponse.setUserId(userSubject.getLogin());
             oobResponse.setExpiresIn(grant.getExpiresIn());
+            oobResponse.setRedirectUri(state.getRedirectUri());
             return deliverOOBResponse(oobResponse);
         } else {
             // return the code by appending it as a query parameter to the redirect URI
