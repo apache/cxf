@@ -25,7 +25,7 @@ public class OOBAuthorizationResponse {
     private String clientDescription;
     private String userId;
     private long expiresIn;
-    
+    private String redirectUri;
     public String getAuthorizationCode() {
         return authorizationCode;
     }
@@ -64,6 +64,14 @@ public class OOBAuthorizationResponse {
 
     public void setClientDescription(String clientDescription) {
         this.clientDescription = clientDescription;
+    }
+
+    public String getRedirectUri() {
+        return redirectUri;
+    }
+
+    public void setRedirectUri(String redirectUri) {
+        this.redirectUri = redirectUri;
     }
     
 }
