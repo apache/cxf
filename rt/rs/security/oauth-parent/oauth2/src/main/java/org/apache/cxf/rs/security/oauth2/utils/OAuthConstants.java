@@ -37,12 +37,15 @@ public final class OAuthConstants {
     public static final String ACCESS_TOKEN = "access_token";
     public static final String ACCESS_TOKEN_TYPE = "token_type";
     public static final String ACCESS_TOKEN_EXPIRES_IN = "expires_in";
-    // CXF-Specific
-    public static final String ACCESS_TOKEN_ISSUED_AT = "issued_at";
     public static final String GRANT_TYPE = "grant_type";
     public static final String RESPONSE_TYPE = "response_type";
     public static final String TOKEN_RESPONSE_TYPE = "token";
     public static final String REFRESH_TOKEN = "refresh_token";
+    public static final String RESPONSE_MODE = "response_mode";
+    public static final String FORM_RESPONSE_MODE = "form_post";
+    // CXF-Specific
+    public static final String ACCESS_TOKEN_ISSUED_AT = "issued_at";
+    
     
     // Well-known grant types
     public static final String AUTHORIZATION_CODE_GRANT = "authorization_code";
