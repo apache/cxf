@@ -26,11 +26,7 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-<<<<<<< HEAD
-        <version>3.0.11-SNAPSHOT</version>
-=======
-        <version>3.1.9-SNAPSHOT</version>
->>>>>>> be7f523... Re-enabling STS itests
+        <version>3.0.12-SNAPSHOT</version>
         <relativePath>../../../../parent/pom.xml</relativePath>
     </parent>
     <dependencies>
