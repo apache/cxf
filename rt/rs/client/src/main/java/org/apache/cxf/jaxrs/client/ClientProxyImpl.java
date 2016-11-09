@@ -795,7 +795,8 @@ public class ClientProxyImpl extends AbstractClient implements
         Class<?> callbackRespClass = getCallbackClass(callbackOutType);
         
         Class<?> methodReturnType = ori.getMethodToInvoke().getReturnType();
-        if (callbackRespClass.isAssignableFrom(methodReturnType)
+        if (Response.class == callbackRespClass
+            || callbackRespClass.isAssignableFrom(methodReturnType)
             || PrimitiveUtils.canPrimitiveTypeBeAutoboxed(methodReturnType, callbackRespClass)) {
             return callback;    
         } else {
