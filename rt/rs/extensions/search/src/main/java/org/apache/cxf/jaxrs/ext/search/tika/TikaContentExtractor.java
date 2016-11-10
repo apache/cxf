@@ -162,7 +162,7 @@ public class TikaContentExtractor {
      * @return the extracted content and metadata or null if extraction is not possible 
      *         or was unsuccessful
      */
-    public TikaContent extract(final InputStream in, final ContentHandler handler, 
+    public TikaContent extract(final InputStream in, ContentHandler handler, 
                                javax.ws.rs.core.MediaType mtHint, ParseContext context) {    
         if (in == null) {
             return null;
@@ -215,12 +215,13 @@ public class TikaContentExtractor {
                 // extraction process. If we get an exception with a null handler then a given parser is still 
                 // not ready to accept null handlers so lets retry with IgnoreContentHandler.
                 if (handler == null) {
-                    parser.parse(in, new IgnoreContentHandler(), metadata, context);
+                    handler = new IgnoreContentHandler();
+                    parser.parse(in, handler, metadata, context);
                 } else {
                     throw ex;
                 }
             }
-            return new TikaContent(handler == null ? null : handler.toString(), metadata, mediaType);
+            return new TikaContent(handler, metadata, mediaType);
         } catch (final IOException ex) {
             LOG.log(Level.WARNING, "Unable to extract media type from input stream", ex);
         } catch (final SAXException ex) {
@@ -269,10 +270,10 @@ public class TikaContentExtractor {
      */
     public static class TikaContent implements Serializable {
         private static final long serialVersionUID = -1240120543378490963L;
-        private String content;
+        private ContentHandler content;
         private Metadata metadata;
         private MediaType mediaType;
-        public TikaContent(String content, Metadata metadata, MediaType mediaType) {
+        public TikaContent(ContentHandler content, Metadata metadata, MediaType mediaType) {
             this.content = content;
             this.metadata = metadata;
             this.mediaType = mediaType;
@@ -283,7 +284,7 @@ public class TikaContentExtractor {
          *         to parse the content  
          */
         public String getContent() {
-            return content;
+            return content instanceof ToTextContentHandler ? content.toString() : null;
         }
         /**
          * Return the metadata
