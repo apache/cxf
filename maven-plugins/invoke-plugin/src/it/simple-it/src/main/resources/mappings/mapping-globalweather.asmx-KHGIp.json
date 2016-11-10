@@ -1,0 +1,18 @@
+{
+  "request" : {
+    "url" : "/globalweather.asmx?wsdl",
+    "method" : "GET"
+  },
+  "response" : {
+    "status" : 200,
+    "bodyFileName" : "body-globalweather.asmx-KHGIp.xml",
+    "headers" : {
+      "Cache-Control" : "private, max-age=0",
+      "Content-Type" : "text/xml; charset=utf-8",
+      "Server" : "Microsoft-IIS/7.0",
+      "X-AspNet-Version" : "4.0.30319",
+      "X-Powered-By" : "ASP.NET",
+      "Date" : "Thu, 03 Nov 2016 10:18:56 GMT"
+    }
+  }
+}
