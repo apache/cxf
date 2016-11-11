@@ -172,9 +172,14 @@ public class JAXRSCdiResourceExtension implements Extension {
 
         final JAXRSServerFactoryBean instance = ResourceUtils.createApplication(application, false, false, bus);
         final Map< Class< ? >, List< Object > > classified = classes2singletons(application, beanManager);
-        instance.setServiceBeans(classified.get(Path.class));
+        
         instance.setProviders(classified.get(Provider.class));
         instance.getFeatures().addAll(CastUtils.cast(classified.get(Feature.class), Feature.class));
+        
+        for (final Object resource: classified.get(Path.class)) {
+            instance.setResourceProvider(resource.getClass(), 
+                new CdiResourceProvider(resource.getClass(), resource));
+        }
 
         return instance;
     }
@@ -201,6 +206,7 @@ public class JAXRSCdiResourceExtension implements Extension {
             classified.get(Provider.class).addAll(loadProviders(beanManager, classes));
             classified.get(Feature.class).addAll(loadFeatures(beanManager, classes));
         }
+        
         return classified;
     }
 
