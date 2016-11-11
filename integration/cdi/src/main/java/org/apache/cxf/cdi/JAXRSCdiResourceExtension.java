@@ -168,10 +168,15 @@ public class JAXRSCdiResourceExtension implements Extension {
     private JAXRSServerFactoryBean createFactoryInstance(final Application application, final BeanManager beanManager) {
 
         final JAXRSServerFactoryBean instance = ResourceUtils.createApplication(application, false, false, bus);
-        final Map< Class< ? >, List< Object > > classified = classifySingletons(application, beanManager);
-        instance.setServiceBeans(classified.get(Path.class));
+        final Map< Class< ? >, List< Object > > classified = classes2singletons(application, beanManager);
+        
         instance.setProviders(classified.get(Provider.class));
-        instance.setFeatures(CastUtils.cast(classified.get(Feature.class), Feature.class));
+        instance.getFeatures().addAll(CastUtils.cast(classified.get(Feature.class), Feature.class));
+        
+        for (final Object resource: classified.get(Path.class)) {
+            instance.setResourceProvider(resource.getClass(), 
+                new CdiResourceProvider(resource.getClass(), resource));
+        }
 
         return instance;
     }
@@ -183,25 +188,14 @@ public class JAXRSCdiResourceExtension implements Extension {
      * @param application the application instance
      * @return classified singletons by instance types
      */
-    private Map< Class< ? >, List< Object > > classifySingletons(final Application application,
+    private Map< Class< ? >, List< Object > > classes2singletons(final Application application,
                                                                  final BeanManager beanManager) {
-        final Set<Object> singletons = application.getSingletons();
         final Map< Class< ? >, List< Object > > classified =
               new HashMap<>();
 
         classified.put(Feature.class, new ArrayList<>());
         classified.put(Provider.class, new ArrayList<>());
         classified.put(Path.class, new ArrayList<>());
-
-        for (final Object singleton: singletons) {
-            if (singleton instanceof Feature) {
-                classified.get(Feature.class).add(singleton);
-            } else if (singleton.getClass().isAnnotationPresent(Provider.class)) {
-                classified.get(Provider.class).add(singleton);
-            } else if (singleton.getClass().isAnnotationPresent(Path.class)) {
-                classified.get(Path.class).add(singleton);
-            }
-        }
 
         // now loop through the classes
         Set<Class<?>> classes = application.getClasses();
@@ -210,6 +204,7 @@ public class JAXRSCdiResourceExtension implements Extension {
             classified.get(Provider.class).addAll(loadProviders(beanManager, classes));
             classified.get(Feature.class).addAll(loadFeatures(beanManager, classes));
         }
+        
         return classified;
     }
 
