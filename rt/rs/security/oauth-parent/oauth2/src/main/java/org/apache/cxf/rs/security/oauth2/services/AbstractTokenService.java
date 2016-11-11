@@ -62,9 +62,14 @@ public class AbstractTokenService extends AbstractOAuthService {
         if (principal == null) {
             String clientId = retrieveClientId(params);
             if (clientId != null) {
-                client = getAndValidateClientFromIdAndSecret(clientId,
-                                              params.getFirst(OAuthConstants.CLIENT_SECRET),
-                                                             params);
+                if (!isMutualTls(sc, getTlsSessionInfo())) {
+                    client = getAndValidateClientFromIdAndSecret(clientId,
+                                                  params.getFirst(OAuthConstants.CLIENT_SECRET),
+                                                                 params);
+                } else {
+                    client = getClient(clientId, params);
+                    // Certificates will be compared below
+                }
             }
         } else {
             String clientId = retrieveClientId(params);
@@ -152,14 +157,17 @@ public class AbstractTokenService extends AbstractOAuthService {
                                                   TLSSessionInfo tlsSessionInfo,
                                                   MultivaluedMap<String, String> params) {
         Client client = null;
-        if (tlsSessionInfo != null && StringUtils.isEmpty(sc.getAuthenticationScheme())) {
-            // Pure 2-way TLS authentication
+        if (isMutualTls(sc, tlsSessionInfo)) {
             String clientId = getClientIdFromTLSCertificates(sc, tlsSessionInfo);
             if (!StringUtils.isEmpty(clientId)) {
                 client = getClient(clientId, params);
             }
         }
         return client;
+    }
+    protected boolean isMutualTls(SecurityContext sc, TLSSessionInfo tlsSessionInfo) {
+        // Pure 2-way TLS authentication
+        return tlsSessionInfo != null && StringUtils.isEmpty(sc.getAuthenticationScheme());
     }
     
     protected String getClientIdFromTLSCertificates(SecurityContext sc, TLSSessionInfo tlsInfo) {
