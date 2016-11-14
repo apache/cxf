@@ -94,6 +94,8 @@ public class ClientProxyImpl extends AbstractClient implements
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(ClientProxyImpl.class);
     private static final String SLASH = "/";
     private static final String BUFFER_PROXY_RESPONSE = "buffer.proxy.response";
+    private static final String METHOD_PARAM_BODY_INDEX = "method.parameter.body.index";
+    private static final String METHOD_PARAMS = "method.parameters";
     
     private ClassResourceInfo cri;
     private ClassLoader proxyLoader;
@@ -225,7 +227,7 @@ public class ClientProxyImpl extends AbstractClient implements
             body == null ? null : body.getClass(), m.getReturnType());
         
         
-        return doChainedInvocation(uri, headers, ori, body, bodyIndex, null, null);
+        return doChainedInvocation(uri, headers, ori, params, body, bodyIndex, null, null);
         
     }
 
@@ -709,14 +711,16 @@ public class ClientProxyImpl extends AbstractClient implements
             }
         }
     }
-    
+    //CHECKSTYLE:OFF
     private Object doChainedInvocation(URI uri, 
                                        MultivaluedMap<String, String> headers, 
                                        OperationResourceInfo ori, 
+                                       Object[] methodParams,
                                        Object body, 
                                        int bodyIndex,
                                        Exchange exchange,
                                        Map<String, Object> invocationContext) throws Throwable {
+    //CHECKSTYLE:ON    
         Bus configuredBus = getConfiguration().getBus();
         Bus origBus = BusFactory.getAndSetThreadDefaultBus(configuredBus);
         ClassLoaderHolder origLoader = null;
@@ -739,14 +743,15 @@ public class ClientProxyImpl extends AbstractClient implements
             outMessage.put(Annotation.class.getName(), 
                            getMethodAnnotations(ori.getAnnotatedMethod(), bodyIndex));
             
+            outMessage.put(METHOD_PARAMS, methodParams);
             if (body != null) {
-                outMessage.put("BODY_INDEX", bodyIndex);
+                outMessage.put(METHOD_PARAM_BODY_INDEX, bodyIndex);
             }
             outMessage.getInterceptorChain().add(bodyWriter);
             
             Map<String, Object> reqContext = getRequestContext(outMessage);
             reqContext.put(OperationResourceInfo.class.getName(), ori);
-            reqContext.put("BODY_INDEX", bodyIndex);
+            reqContext.put(METHOD_PARAM_BODY_INDEX, bodyIndex);
             
             // execute chain    
             doRunInterceptorChain(outMessage);
@@ -780,10 +785,10 @@ public class ClientProxyImpl extends AbstractClient implements
                                  Map<String, Object> invContext) throws Throwable {
         
         Map<String, Object> reqContext = CastUtils.cast((Map<?, ?>)invContext.get(REQUEST_CONTEXT));
-        int bodyIndex = body != null ? (Integer)reqContext.get("BODY_INDEX") : -1;
+        int bodyIndex = body != null ? (Integer)reqContext.get(METHOD_PARAM_BODY_INDEX) : -1;
         OperationResourceInfo ori = 
             (OperationResourceInfo)reqContext.get(OperationResourceInfo.class.getName());
-        return doChainedInvocation(newRequestURI, headers, ori, 
+        return doChainedInvocation(newRequestURI, headers, ori, null,
                                    body, bodyIndex, exchange, invContext);
     }
     
@@ -858,7 +863,7 @@ public class ClientProxyImpl extends AbstractClient implements
             }
             
             Method method = ori.getMethodToInvoke();
-            int bodyIndex = (Integer)outMessage.get("BODY_INDEX");
+            int bodyIndex = (Integer)outMessage.get(METHOD_PARAM_BODY_INDEX);
             
             Annotation[] anns = customAnns != null ? customAnns
                 : getMethodAnnotations(ori.getAnnotatedMethod(), bodyIndex);
