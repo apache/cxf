@@ -20,6 +20,7 @@ package org.apache.cxf.systests.cdi.base;
 
 import java.util.Collection;
 
+import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -36,16 +37,9 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 @Path("/bookstore/")
+@RequestScoped
 public class BookStore {
     @Inject private BookStoreService service;
-    @Inject private String version;
-
-    @GET
-    @Path("/version")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String getVersion() {
-        return version;
-    }
 
     @GET
     @Path("/books/{bookId}")

@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.systest.jaxrs;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -30,9 +30,10 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import org.apache.cxf.jaxrs.validation.JAXRSBeanValidationFeature;
 import org.apache.cxf.jaxrs.validation.ValidationExceptionMapper;
 import org.apache.cxf.systests.cdi.base.BookStore;
+import org.apache.cxf.systests.cdi.base.VersionService;
 
 @ApplicationPath("/v2")
-public class BookStoreCustomApplication extends Application {
+public class BookStoreV2Application extends Application {
     @Override
     public Set< Object > getSingletons() {
         Set<Object> singletons = new HashSet<>();
@@ -44,6 +45,8 @@ public class BookStoreCustomApplication extends Application {
 
     @Override
     public Set<Class<?>> getClasses() {
-        return Collections.<Class<?>>singleton(BookStore.class);
+        Set<Class<?>> classes = new HashSet<>();
+        classes.addAll(Arrays.asList(BookStore.class, VersionService.class));
+        return classes;
     }
 }
