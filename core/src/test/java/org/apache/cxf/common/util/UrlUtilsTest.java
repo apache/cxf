@@ -41,6 +41,16 @@ public class UrlUtilsTest extends Assert {
     public void testUrlDecodeReserved() {
         assertEquals("!$&'()*,;=", UrlUtils.urlDecode("!$&'()*,;="));
     }
+
+    @Test (expected = IllegalArgumentException.class)
+    public void testUrlDecodeIncompleteEscape() {
+        UrlUtils.urlDecode("%2");
+    }
+
+    @Test (expected = IllegalArgumentException.class)
+    public void testUrlDecodeInvalidEscape() {
+        UrlUtils.urlDecode("%2$");
+    }
     
     @Test
     public void testPathDecode() {
