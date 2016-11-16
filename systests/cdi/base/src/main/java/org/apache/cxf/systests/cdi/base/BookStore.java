@@ -38,14 +38,6 @@ import javax.ws.rs.core.UriInfo;
 @Path("/bookstore/")
 public class BookStore {
     @Inject private BookStoreService service;
-    @Inject private String version;
-
-    @GET
-    @Path("/version")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String getVersion() {
-        return version;
-    }
 
     @GET
     @Path("/books/{bookId}")
