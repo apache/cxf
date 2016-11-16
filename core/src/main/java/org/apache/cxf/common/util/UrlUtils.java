@@ -86,7 +86,7 @@ public final class UrlUtils {
         if (needDecode) {
             final byte[] valueBytes = StringUtils.toBytes(value, enc);
             ByteBuffer in = ByteBuffer.wrap(valueBytes);
-            ByteBuffer out = ByteBuffer.allocate(in.capacity() - 2 * escapesCount);
+            ByteBuffer out = ByteBuffer.allocate(in.capacity() - (2 * escapesCount) + 1);
             while (in.hasRemaining()) {
                 final int b = in.get();
                 if (!isPath && b == PLUS_CHAR) {
