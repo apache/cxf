@@ -51,6 +51,7 @@ import org.apache.cxf.bus.extension.ExtensionManagerBus;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
+import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
 /**
@@ -102,10 +103,12 @@ public class JAXRSCdiResourceExtension implements Extension {
             // If there is an application without any singletons and classes defined, we will
             // create a server factory bean with all services and providers discovered.
             if (instance.getSingletons().isEmpty() && instance.getClasses().isEmpty()) {
+                List<ResourceProvider> services = loadServices(beanManager, Collections.<Class<?>>emptySet());
                 final JAXRSServerFactoryBean factory = createFactoryInstance(instance,
-                    loadServices(beanManager, Collections.<Class<?>>emptySet()),
-                    loadProviders(beanManager, Collections.<Class<?>>emptySet()),
-                    loadFeatures(beanManager, Collections.<Class<?>>emptySet()));
+                        Collections.emptyList(), // this is a little iffy, since resources now have providers
+                        loadProviders(beanManager, Collections.<Class<?>>emptySet()),
+                        loadFeatures(beanManager, Collections.<Class<?>>emptySet()));
+                factory.setResourceProviders(services);
                 factory.init();
             } else {
                 // If there is an application with any singletons or classes defined, we will
@@ -172,12 +175,10 @@ public class JAXRSCdiResourceExtension implements Extension {
         
         instance.setProviders(classified.get(Provider.class));
         instance.getFeatures().addAll(CastUtils.cast(classified.get(Feature.class), Feature.class));
-        
-        for (final Object resource: classified.get(Path.class)) {
-            instance.setResourceProvider(resource.getClass(), 
-                new CdiResourceProvider(resource.getClass(), resource));
-        }
 
+        List<ResourceProvider> resourceProviders = this.loadResourceProviders(beanManager,
+                application.getClasses(), serviceBeans);
+        instance.setResourceProviders(resourceProviders);
         return instance;
     }
 
@@ -190,17 +191,14 @@ public class JAXRSCdiResourceExtension implements Extension {
      */
     private Map< Class< ? >, List< Object > > classes2singletons(final Application application,
                                                                  final BeanManager beanManager) {
-        final Map< Class< ? >, List< Object > > classified =
-              new HashMap<>();
+        final Map< Class< ? >, List< Object > > classified = new HashMap<>();
 
         classified.put(Feature.class, new ArrayList<>());
         classified.put(Provider.class, new ArrayList<>());
-        classified.put(Path.class, new ArrayList<>());
 
         // now loop through the classes
         Set<Class<?>> classes = application.getClasses();
         if (!classes.isEmpty()) {
-            classified.get(Path.class).addAll(loadServices(beanManager, classes));
             classified.get(Provider.class).addAll(loadProviders(beanManager, classes));
             classified.get(Feature.class).addAll(loadFeatures(beanManager, classes));
         }
@@ -245,8 +243,8 @@ public class JAXRSCdiResourceExtension implements Extension {
      * @param limitedClasses not null, if empty ignored.  the set of classes to consider as providers
      * @return the references for all discovered JAX-RS providers
      */
-    private List< Object > loadServices(final BeanManager beanManager, Collection<Class<?>> limitedClasses) {
-        return loadBeans(beanManager, limitedClasses, serviceBeans);
+    private List< ResourceProvider > loadServices(final BeanManager beanManager, Collection<Class<?>> limitedClasses) {
+        return loadResourceProviders(beanManager, limitedClasses, serviceBeans);
     }
 
     /**
@@ -269,6 +267,31 @@ public class JAXRSCdiResourceExtension implements Extension {
                             beanManager.createCreationalContext(bean)
                       )
                 );
+            }
+        }
+
+        return instances;
+    }
+
+    /**
+     * Gets references for all beans of a given type
+     * @param beanManager bean manager instance
+     * @param limitedClasses not null, if empty ignored.  the set of classes to consider as providers
+     * @param beans the collection of beans to go through
+     * @return the references for all discovered JAX-RS providers
+     */
+    private List< ResourceProvider > loadResourceProviders(final BeanManager beanManager,
+                                                           Collection<Class<?>> limitedClasses,
+                                                           Collection<Bean<?>> beans) {
+        final List<ResourceProvider> instances = new ArrayList<>();
+
+        for (final Bean< ? > bean: beans) {
+            if (limitedClasses.isEmpty() || limitedClasses.contains(bean.getBeanClass())) {
+                Object instance = beanManager.getReference(
+                        bean,
+                        bean.getBeanClass(),
+                        beanManager.createCreationalContext(bean));
+                instances.add(new CdiResourceProvider(bean.getBeanClass(), instance));
             }
         }
 
