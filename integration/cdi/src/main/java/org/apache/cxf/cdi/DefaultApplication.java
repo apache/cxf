@@ -18,9 +18,11 @@
  */
 package org.apache.cxf.cdi;
 
+import javax.enterprise.inject.Vetoed;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
 @ApplicationPath("/")
+@Vetoed
 public class DefaultApplication extends Application {
 }
