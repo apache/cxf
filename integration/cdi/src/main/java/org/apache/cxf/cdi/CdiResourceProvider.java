@@ -24,12 +24,12 @@ import org.apache.cxf.message.Message;
 public class CdiResourceProvider implements ResourceProvider {
     private final Object instance;
     private final Class<?> resourceClass;
-    
+
     CdiResourceProvider(final Class<?> resourceClass, final Object instance) {
         this.resourceClass = resourceClass;
         this.instance = instance;
     }
-    
+
     @Override
     public Object getInstance(Message m) {
         return instance;

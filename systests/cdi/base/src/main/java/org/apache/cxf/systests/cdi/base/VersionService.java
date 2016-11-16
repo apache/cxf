@@ -18,38 +18,21 @@
  */
 package org.apache.cxf.systests.cdi.base;
 
+import javax.inject.Inject;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+@Path("/bookstore/")
+public class VersionService {
+    @Inject
+    private String version;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.context.Dependent;
-import javax.enterprise.inject.Produces;
-import javax.inject.Named;
-
-@Named
-@ApplicationScoped
-public class BookStoreService {
-    private Map< String, Book> books = new HashMap<>();
-
-    public Book get(final String id) {
-        return books.get(id);
-    }
-
-    public Collection< Book > all() {
-        return books.values();
-    }
-
-    public Book store(final String id, final String name) {
-        final Book book = new Book(name, id);
-        books.put(id, book);
-        return book;
-    }
-
-    @Produces
-    @Dependent
-    public String version() {
-        return "1.0";
+    @GET
+    @Path("/version")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String getVersion() {
+        return version;
     }
 }

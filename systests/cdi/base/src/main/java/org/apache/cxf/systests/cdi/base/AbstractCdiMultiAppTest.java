@@ -42,6 +42,12 @@ public abstract class AbstractCdiMultiAppTest extends AbstractCdiSingleAppTest {
         assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), r.getStatus());
     }
 
+    @Test
+    public void testInjectedVersionIsProperlyReturnedFromV2() {
+        Response r = createWebClient("/rest/v2/bookstore/version", MediaType.TEXT_PLAIN).get();
+        assertEquals(Response.Status.OK.getStatusCode(), r.getStatus());
+        assertEquals("1.0", r.readEntity(String.class));
+    }
 
     protected WebClient createWebClient(final String url) {
         return createWebClient(url, MediaType.APPLICATION_JSON);
