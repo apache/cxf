@@ -21,6 +21,7 @@ package org.apache.cxf.common.util;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -96,8 +97,9 @@ public final class UrlUtils {
                         final int u = digit16((byte) in.get());
                         final int l = digit16((byte) in.get());
                         out.put((byte) ((u << 4) + l));
-                    } catch (final ArrayIndexOutOfBoundsException e) {
-                        throw new RuntimeException("Invalid URL encoding: ", e);
+                    } catch (final BufferUnderflowException e) {
+                        throw new IllegalArgumentException(
+                                "Invalid URL encoding: Incomplete trailing escape (%) pattern");
                     }
                 } else {
                     out.put((byte) b);
@@ -113,7 +115,7 @@ public final class UrlUtils {
     private static int digit16(final byte b) {
         final int i = Character.digit((char) b, RADIX);
         if (i == -1) {
-            throw new RuntimeException("Invalid URL encoding: not a valid digit (radix " + RADIX + "): " + b);
+            throw new IllegalArgumentException("Invalid URL encoding: not a valid digit (radix " + RADIX + "): " + b);
         }
         return i;
     }
