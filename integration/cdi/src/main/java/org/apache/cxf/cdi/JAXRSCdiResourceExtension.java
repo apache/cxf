@@ -61,12 +61,11 @@ public class JAXRSCdiResourceExtension implements Extension {
     private boolean hasBus;
     private Bus bus;
 
-    private final Set< Bean< ? > > applicationBeans = new LinkedHashSet< Bean< ? > >();
-    private final List< Bean< ? > > serviceBeans = new ArrayList< Bean< ? > >();
-    private final List< Bean< ? > > providerBeans = new ArrayList< Bean< ? > >();
-    private final List< Bean< ? extends Feature > > featureBeans = new ArrayList< Bean< ? extends Feature > >();
-    private final List< CreationalContext< ? > > disposableCreationalContexts = 
-        new ArrayList< CreationalContext< ? > >();
+    private final Set< Bean< ? > > applicationBeans = new LinkedHashSet<>();
+    private final List< Bean< ? > > serviceBeans = new ArrayList<>();
+    private final List< Bean< ? > > providerBeans = new ArrayList<>();
+    private final List< Bean< ? extends Feature > > featureBeans = new ArrayList<>();
+    private final List< CreationalContext< ? > > disposableCreationalContexts = new ArrayList<>();
 
     @SuppressWarnings("unchecked")
     public <T> void collect(@Observes final ProcessBean< T > event) {
@@ -264,7 +263,7 @@ public class JAXRSCdiResourceExtension implements Extension {
                       beanManager.getReference(
                             bean,
                             bean.getBeanClass(),
-                            beanManager.createCreationalContext(bean)
+                            createCreationalContext(beanManager, bean)
                       )
                 );
             }
@@ -290,7 +289,7 @@ public class JAXRSCdiResourceExtension implements Extension {
                 Object instance = beanManager.getReference(
                         bean,
                         bean.getBeanClass(),
-                        beanManager.createCreationalContext(bean));
+                        createCreationalContext(beanManager, bean));
                 instances.add(new CdiResourceProvider(bean.getBeanClass(), instance));
             }
         }
@@ -312,7 +311,7 @@ public class JAXRSCdiResourceExtension implements Extension {
                         (Feature) beanManager.getReference(
                                 bean,
                                 bean.getBeanClass(),
-                                beanManager.createCreationalContext(bean)
+                                createCreationalContext(beanManager, bean)
                         )
                 );
             }
