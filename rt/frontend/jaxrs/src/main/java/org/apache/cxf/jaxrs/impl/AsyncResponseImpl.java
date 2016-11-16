@@ -116,12 +116,13 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
     }
     
     private boolean doCancel(String retryAfterHeader) {
-        if (!isSuspended()) {
-            return false;
-        }
         if (cancelled) {
             return true;
         }
+        if (!isSuspended()) {
+            return false;
+        }
+
         cancelled = true;
         ResponseBuilder rb = Response.status(503);
         if (retryAfterHeader != null) {
