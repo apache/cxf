@@ -21,10 +21,8 @@ package org.apache.cxf.cdi;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
 
@@ -50,7 +48,6 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.bus.extension.ExtensionManagerBus;
 import org.apache.cxf.cdi.extension.JAXRSServerFactoryCustomizationExtension;
 import org.apache.cxf.feature.Feature;
-import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
@@ -68,6 +65,40 @@ public class JAXRSCdiResourceExtension implements Extension {
     private final List< CreationalContext< ? > > disposableCreationalContexts = 
         new ArrayList< CreationalContext< ? > >();
 
+    /**
+     * Holder of the classified resource classes, converted to appropriate instance
+     * representations.
+     */
+    private static class ClassifiedClasses {
+        private List< Object > providers = new ArrayList<>();
+        private List< Feature > features = new ArrayList<>();
+        private List< CdiResourceProvider > resourceProviders = new ArrayList<>();
+        
+        public void addProviders(final Collection< Object > others) {
+            this.providers.addAll(others);
+        }
+        
+        public void addFeatures(final Collection< Feature > others) {
+            this.features.addAll(others);
+        }
+        
+        public void addResourceProvider(final CdiResourceProvider other) {
+            this.resourceProviders.add(other);
+        }
+        
+        public List< Object > getProviders() {
+            return providers;
+        }
+        
+        public List< Feature > getFeatures() {
+            return features;
+        }
+        
+        public List<CdiResourceProvider> getResourceProviders() {
+            return resourceProviders;
+        }
+    }
+    
     @SuppressWarnings("unchecked")
     public <T> void collect(@Observes final ProcessBean< T > event) {
         if (event.getAnnotated().isAnnotationPresent(ApplicationPath.class)) {
@@ -171,14 +202,13 @@ public class JAXRSCdiResourceExtension implements Extension {
     private JAXRSServerFactoryBean createFactoryInstance(final Application application, final BeanManager beanManager) {
 
         final JAXRSServerFactoryBean instance = ResourceUtils.createApplication(application, false, false, bus);
-        final Map< Class< ? >, List< Object > > classified = classes2singletons(application, beanManager);
+        final ClassifiedClasses classified = classes2singletons(application, beanManager);
         
-        instance.setProviders(classified.get(Provider.class));
-        instance.getFeatures().addAll(CastUtils.cast(classified.get(Feature.class), Feature.class));
+        instance.setProviders(classified.getProviders());
+        instance.getFeatures().addAll(classified.getFeatures());
         
-        for (final Object resource: classified.get(Path.class)) {
-            instance.setResourceProvider(resource.getClass(), 
-                new CdiResourceProvider(resource.getClass(), resource));
+        for (final CdiResourceProvider resourceProvider: classified.getResourceProviders()) {
+            instance.setResourceProvider(resourceProvider.getResourceClass(), resourceProvider);
         }
 
         return instance;
@@ -191,20 +221,20 @@ public class JAXRSCdiResourceExtension implements Extension {
      * @param application the application instance
      * @return classified instances of classes by instance types
      */
-    private Map< Class< ? >, List< Object > > classes2singletons(final Application application,
-                                                                 final BeanManager beanManager) {
-        final Map< Class< ? >, List< Object > > classified = new HashMap<>();
-
-        classified.put(Feature.class, new ArrayList<>());
-        classified.put(Provider.class, new ArrayList<>());
-        classified.put(Path.class, new ArrayList<>());
+    private ClassifiedClasses classes2singletons(final Application application, final BeanManager beanManager) {
+        final ClassifiedClasses classified = new ClassifiedClasses(); 
 
         // now loop through the classes
         Set<Class<?>> classes = application.getClasses();
         if (!classes.isEmpty()) {
-            classified.get(Path.class).addAll(loadServices(beanManager, classes));
-            classified.get(Provider.class).addAll(loadProviders(beanManager, classes));
-            classified.get(Feature.class).addAll(loadFeatures(beanManager, classes));
+            classified.addProviders(loadProviders(beanManager, classes));
+            classified.addFeatures(loadFeatures(beanManager, classes));
+            
+            for (final Bean< ? > bean: serviceBeans) {
+                if (classes.contains(bean.getBeanClass())) {
+                    classified.addResourceProvider(new CdiResourceProvider(beanManager, bean));
+                }
+            }
         }
         
         return classified;

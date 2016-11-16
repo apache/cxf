@@ -31,6 +31,10 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.startsWith;
+
 public abstract class AbstractCdiMultiAppTest extends AbstractCdiSingleAppTest {
     @Test
     public void testAddOneBookWithValidation() {
@@ -42,6 +46,18 @@ public abstract class AbstractCdiMultiAppTest extends AbstractCdiSingleAppTest {
         assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), r.getStatus());
     }
 
+    @Test
+    public void testGetBookStoreVersion() {
+        Response r1 = createWebClient("/rest/v3/bookstore/versioned/version", MediaType.TEXT_PLAIN).get();
+        assertEquals(Response.Status.OK.getStatusCode(), r1.getStatus());
+        assertThat(r1.readEntity(String.class), startsWith("1.0."));
+        
+        Response r2 = createWebClient("/rest/v3/bookstore/versioned/version", MediaType.TEXT_PLAIN).get();
+        assertEquals(Response.Status.OK.getStatusCode(), r2.getStatus());
+        assertThat(r2.readEntity(String.class), startsWith("1.0."));
+        
+        assertThat(r2.readEntity(String.class), not(equalTo(r1.readEntity(String.class))));
+    }
 
     protected WebClient createWebClient(final String url) {
         return createWebClient(url, MediaType.APPLICATION_JSON);
