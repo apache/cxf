@@ -18,34 +18,51 @@
  */
 package org.apache.cxf.cdi;
 
+import javax.enterprise.context.RequestScoped;
+import javax.enterprise.context.spi.CreationalContext;
+import javax.enterprise.inject.spi.Bean;
+import javax.enterprise.inject.spi.BeanManager;
+
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
 import org.apache.cxf.message.Message;
 
 public class CdiResourceProvider implements ResourceProvider {
-    private final Object instance;
-    private final Class<?> resourceClass;
+    private Object instance;
+    private CreationalContext< ? > context;
     
-    CdiResourceProvider(final Class<?> resourceClass, final Object instance) {
-        this.resourceClass = resourceClass;
-        this.instance = instance;
+    private final BeanManager beanManager;
+    private final Bean< ? > bean;
+    
+    CdiResourceProvider(final BeanManager beanManager, final Bean< ? > bean) {
+        this.beanManager = beanManager;
+        this.bean = bean;
     }
     
     @Override
     public Object getInstance(Message m) {
+        if (instance == null) {
+            context = beanManager.createCreationalContext(bean);
+            instance = beanManager.getReference(bean, bean.getBeanClass(), context);
+        }
+        
         return instance;
     }
 
     @Override
     public void releaseInstance(Message m, Object o) {
+        if (context != null) {
+            context.release();
+            instance = null;
+        }
     }
 
     @Override
     public Class<?> getResourceClass() {
-        return resourceClass;
+        return bean.getBeanClass();
     }
 
     @Override
     public boolean isSingleton() {
-        return true;
+        return !bean.getScope().isAssignableFrom(RequestScoped.class);
     }
 }
