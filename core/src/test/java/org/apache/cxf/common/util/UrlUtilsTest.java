@@ -42,14 +42,51 @@ public class UrlUtilsTest extends Assert {
         assertEquals("!$&'()*,;=", UrlUtils.urlDecode("!$&'()*,;="));
     }
 
-    @Test (expected = IllegalArgumentException.class)
-    public void testUrlDecodeIncompleteEscape() {
-        UrlUtils.urlDecode("%2");
+    @Test
+    public void testUrlDecodeIncompleteEscapePatterns() {
+
+        try {
+            UrlUtils.urlDecode("%");
+            fail();
+        } catch (Throwable e) {
+            assertTrue(e instanceof IllegalArgumentException);
+            assertTrue(e.getMessage().startsWith("Invalid URL encoding"));
+        }
+
+        try {
+            UrlUtils.urlDecode("a%%%%");
+            fail();
+        } catch (Throwable e) {
+            assertTrue(e instanceof IllegalArgumentException);
+            assertTrue(e.getMessage().startsWith("Invalid URL encoding"));
+        }
+
+        try {
+            UrlUtils.urlDecode("a%2B%");
+            fail();
+        } catch (Throwable e) {
+            assertTrue(e instanceof IllegalArgumentException);
+            assertTrue(e.getMessage().startsWith("Invalid URL encoding"));
+        }
+
+        try {
+            UrlUtils.urlDecode("%2");
+            fail();
+        } catch (Throwable e) {
+            assertTrue(e instanceof IllegalArgumentException);
+            assertTrue(e.getMessage().startsWith("Invalid URL encoding"));
+        }
     }
 
-    @Test (expected = IllegalArgumentException.class)
-    public void testUrlDecodeInvalidEscape() {
-        UrlUtils.urlDecode("%2$");
+    @Test
+    public void testUrlDecodeInvalidEscapePattern() {
+        try {
+            UrlUtils.urlDecode("%2$");
+            fail();
+        } catch (Throwable e) {
+            assertTrue(e instanceof IllegalArgumentException);
+            assertTrue(e.getMessage().startsWith("Invalid URL encoding"));
+        }
     }
     
     @Test
