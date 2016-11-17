@@ -22,14 +22,12 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -278,32 +276,17 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         public ServletConfig createContext(Message message) {
             final ServletConfig sc = (ServletConfig)message.get("HTTP.CONFIG");
             
-            if (sc != null && sc.getInitParameter(SwaggerContextService.USE_PATH_BASED_CONFIG) == null) {
-                return new ServletConfig() {
-                    @Override
-                    public String getServletName() {
-                        return sc.getServletName();
-                    }
-                    
-                    @Override
-                    public ServletContext getServletContext() {
-                        return sc.getServletContext();
-                    }
-                    
-                    @Override
-                    public Enumeration<String> getInitParameterNames() {
-                        return sc.getInitParameterNames();
-                    }
-                    
-                    @Override
-                    public String getInitParameter(String name) {
-                        if (Objects.equals(SwaggerContextService.USE_PATH_BASED_CONFIG, name)) {
-                            return "true";
-                        } else {
-                            return sc.getInitParameter(name);
-                        }
-                    }
-                };
+            // When deploying into OSGi container, it is possible to use embedded Jetty
+            // transport. In this case, the ServletConfig is not available and Swagger 
+            // does not take into account certain configuration parameters. To overcome 
+            // that, the ServletConfig is synthesized from ServletContext instance.
+            if (sc == null) {
+                final ServletContext context = (ServletContext)message.get("HTTP.CONTEXT");
+                if (context != null) {
+                    return new SyntheticServletConfig(context);
+                }
+            } else if (sc != null && sc.getInitParameter(SwaggerContextService.USE_PATH_BASED_CONFIG) == null) {
+                return new DelegatingServletConfig(sc);
             }
             
             return sc;
