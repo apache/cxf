@@ -203,7 +203,7 @@ public abstract class AbstractInvoker implements Invoker {
     /**
      * Creates and returns a service object depending on the scope.
      */
-    public abstract Object getServiceObject(final Exchange context);
+    public abstract Object getServiceObject(Exchange context);
 
     /**
      * Called when the invoker is done with the object.   Default implementation

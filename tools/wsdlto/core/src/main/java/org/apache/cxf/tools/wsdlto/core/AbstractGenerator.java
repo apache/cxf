@@ -98,7 +98,7 @@ public abstract class AbstractGenerator implements FrontEndGenerator {
         return writer;
     }
 
-    public abstract void register(final ClassCollector collector, String packageName, String fileName);
+    public abstract void register(ClassCollector collector, String packageName, String fileName);
 
     protected Writer parseOutputName(String packageName, String filename) throws ToolException {
         register(env.get(ClassCollector.class), packageName, filename);

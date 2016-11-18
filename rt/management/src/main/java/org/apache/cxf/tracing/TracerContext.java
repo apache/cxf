@@ -29,14 +29,14 @@ public interface TracerContext {
      * @return the result of the execution 
      * @throws Exception any exception being thrown by the traceable implementation 
      */
-    <T> T continueSpan(final Traceable<T> traceable) throws Exception;
+    <T> T continueSpan(Traceable<T> traceable) throws Exception;
     
     /**
      * Starts a new span in the current thread.
      * @param description span description
      * @return span instance object
      */
-    <T> T startSpan(final String description);
+    <T> T startSpan(String description);
     
     /**
      * Wraps the traceable into a new span, preserving the current span as a parent.
@@ -44,7 +44,7 @@ public interface TracerContext {
      * @param traceable  traceable implementation to be wrapped
      * @return callable to be executed (in current thread or any other thread pool)
      */
-    <T> Callable<T> wrap(final String description, final Traceable<T> traceable);
+    <T> Callable<T> wrap(String description, Traceable<T> traceable);
     
     
     /**

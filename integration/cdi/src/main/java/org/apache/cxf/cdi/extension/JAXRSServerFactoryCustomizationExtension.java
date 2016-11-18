@@ -30,5 +30,5 @@ public interface JAXRSServerFactoryCustomizationExtension {
      * Customize JAX-RS server factory bean before it is being initialized
      * @param bean JAX-RS server factory bean
      */
-    void customize(final JAXRSServerFactoryBean bean);
+    void customize(JAXRSServerFactoryBean bean);
 }

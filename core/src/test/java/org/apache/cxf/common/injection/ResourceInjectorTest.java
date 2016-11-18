@@ -225,9 +225,9 @@ class SubSetterTarget extends SetterTarget {
 }
 
 interface ISetterTarget extends Target {    
-    void setResource1(final String argResource1);    
-    void setResource2(final String argResource2);
-    void setResource3(final CharSequence argResource3);
+    void setResource1(String argResource1);    
+    void setResource2(String argResource2);
+    void setResource3(CharSequence argResource3);
 }
 
 class ProxyClass implements InvocationHandler {
