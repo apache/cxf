@@ -73,6 +73,7 @@ public class HTTPSProxyAuthConduitTest extends HTTPSConduitTest {
     
     @BeforeClass
     public static void startProxy() {
+        System.setProperty("jdk.http.auth.tunneling.disabledSchemes", "");
         proxy = new DefaultHttpProxyServer(PROXY_PORT, requestFilter, new HashMap<String, HttpFilter>());
         proxy.addProxyAuthenticationHandler(new ProxyAuthorizationHandler() {
             public boolean authenticate(String userName, String password) {
