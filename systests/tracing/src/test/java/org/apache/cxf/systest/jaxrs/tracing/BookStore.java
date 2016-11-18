@@ -50,7 +50,7 @@ public class BookStore {
     @Path("/books")
     @Produces(MediaType.APPLICATION_JSON)
     public Collection< Book > getBooks() {
-        try (final TraceScope span =  tracer.startSpan("Get Books")) {
+        try (TraceScope span =  tracer.startSpan("Get Books")) {
             return Arrays.asList(
                 new Book("Apache CXF in Action", UUID.randomUUID().toString()),
                 new Book("Mastering Apache CXF", UUID.randomUUID().toString())

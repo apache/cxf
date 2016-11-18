@@ -108,8 +108,8 @@ public abstract class AbstractValidationInterceptor extends AbstractPhaseInterce
         return method;
     }
     
-    protected abstract void handleValidation(final Message message, final Object resourceInstance,
-                                             final Method method, final List<Object> arguments);
+    protected abstract void handleValidation(Message message, Object resourceInstance,
+                                             Method method, List<Object> arguments);
 
 
     protected BeanValidationProvider getProvider(Message message) {

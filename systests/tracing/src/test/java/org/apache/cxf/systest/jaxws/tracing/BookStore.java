@@ -33,7 +33,7 @@ import org.apache.htrace.core.Tracer;
 public class BookStore implements BookStoreService {
     @WebMethod
     public Collection< Book > getBooks() {
-        try (final TraceScope span = Tracer.curThreadTracer().newScope("Get Books")) {
+        try (TraceScope span = Tracer.curThreadTracer().newScope("Get Books")) {
             return Arrays.asList(
                 new Book("Apache CXF in Action", UUID.randomUUID().toString()),
                 new Book("Mastering Apache CXF", UUID.randomUUID().toString())

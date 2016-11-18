@@ -75,7 +75,7 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
     }
     
     private interface Configurator {
-        void configure(final JaxWsProxyFactoryBean factory);
+        void configure(JaxWsProxyFactoryBean factory);
     }
     
     @BeforeClass
@@ -156,7 +156,7 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
             }
         });
         
-        try (final TraceScope scope = tracer.newScope("test span")) {
+        try (TraceScope scope = tracer.newScope("test span")) {
             assertThat(service.getBooks().size(), equalTo(2));
             assertThat(Tracer.getCurrentSpan(), not(nullValue()));
             

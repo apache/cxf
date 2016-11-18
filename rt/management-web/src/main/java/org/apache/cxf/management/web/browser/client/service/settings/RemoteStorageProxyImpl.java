@@ -136,7 +136,7 @@ public class RemoteStorageProxyImpl implements RemoteStorageProxy {
         protected RemoteSubscription() {
         }
 
-        public final native void setId(@Nullable final String id) /*-{
+        public final native void setId(@Nullable String id) /*-{
             this.id = id;
         }-*/;
 
@@ -145,7 +145,7 @@ public class RemoteStorageProxyImpl implements RemoteStorageProxy {
             return this.id;
         }-*/;
 
-        public final native void setUrl(@Nullable final String url) /*-{
+        public final native void setUrl(@Nullable String url) /*-{
             this.url = url;
         }-*/;
 
@@ -154,7 +154,7 @@ public class RemoteStorageProxyImpl implements RemoteStorageProxy {
             return this.url;
         }-*/;        
 
-        public final native void setName(@Nullable final String name) /*-{
+        public final native void setName(@Nullable String name) /*-{
             this.name = name;
         }-*/;
 
