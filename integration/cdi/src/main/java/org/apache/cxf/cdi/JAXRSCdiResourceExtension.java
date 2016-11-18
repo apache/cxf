@@ -298,7 +298,7 @@ public class JAXRSCdiResourceExtension implements Extension {
                       beanManager.getReference(
                             bean,
                             bean.getBeanClass(),
-                            beanManager.createCreationalContext(bean)
+                            createCreationalContext(beanManager, bean)
                       )
                 );
             }
@@ -313,21 +313,21 @@ public class JAXRSCdiResourceExtension implements Extension {
      * @return the references for all discovered CXF-specific features
      */
     private List< Feature > loadFeatures(final BeanManager beanManager, Collection<Class<?>> limitedClasses) {
-        final List< Feature > services = new ArrayList<>();
+        final List< Feature > features = new ArrayList<>();
         
         for (final Bean< ? extends Feature > bean: featureBeans) {
             if (limitedClasses.isEmpty() || limitedClasses.contains(bean.getBeanClass())) {
-                services.add(
+                features.add(
                         (Feature) beanManager.getReference(
                                 bean,
                                 bean.getBeanClass(),
-                                beanManager.createCreationalContext(bean)
+                                createCreationalContext(beanManager, bean)
                         )
                 );
             }
         }
         
-        return services;
+        return features;
     }
     
     /**
