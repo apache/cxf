@@ -62,7 +62,7 @@ public final class PublicSuffixMatcherLoader {
         if (url == null) {
             throw new IllegalArgumentException("URL is null");
         }
-        try (final InputStream in = url.openStream()) {
+        try (InputStream in = url.openStream()) {
             return load(in);
         }
     }
@@ -71,7 +71,7 @@ public final class PublicSuffixMatcherLoader {
         if (file == null) {
             throw new IllegalArgumentException("File is null");
         }
-        try (final InputStream in = new FileInputStream(file)) {
+        try (InputStream in = new FileInputStream(file)) {
             return load(in);
         }
     }

@@ -235,7 +235,7 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testThatProvidedSpanIsNotClosedWhenActive() throws MalformedURLException {
-        try (final TraceScope scope = tracer.newScope("test span")) {
+        try (TraceScope scope = tracer.newScope("test span")) {
             final Response r = createWebClient("/bookstore/books", htraceClientProvider).get();
             assertEquals(Status.OK.getStatusCode(), r.getStatus());
             
@@ -254,7 +254,7 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
     @Test
     public void testThatProvidedSpanIsNotDetachedWhenActiveUsingAsyncClient() throws Exception {
         final WebClient client = createWebClient("/bookstore/books", htraceClientProvider);
-        try (final TraceScope scope = tracer.newScope("test span")) {
+        try (TraceScope scope = tracer.newScope("test span")) {
             final Future<Response> f = client.async().get();
         
             final Response r = f.get(1, TimeUnit.SECONDS);
