@@ -88,7 +88,7 @@ public class SseAtmosphereEventOutputImpl implements SseEventOutput {
     @Override
     public void write(OutboundSseEvent event) throws IOException {
         if (!closed && writer != null) {
-            try (final ByteArrayOutputStream os = new ByteArrayOutputStream()) {
+            try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
                 writer.writeTo(event, event.getClass(), null, new Annotation [] {}, event.getMediaType(), null, os);
                 
                 // Atmosphere broadcasts asynchronously which is acceptable in most cases.
