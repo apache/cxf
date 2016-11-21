@@ -77,7 +77,7 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
     private boolean applicationCanHandleAccessDenied;
     private CodeVerifierTransformer codeVerifierTransformer;
     private OAuthJoseJwtProducer codeRequestJoseProducer;
-    private boolean useAuthorizationHeader;
+    private boolean useAuthorizationHeader = true;
         
     @Override
     public void filter(ContainerRequestContext rc) throws IOException {
