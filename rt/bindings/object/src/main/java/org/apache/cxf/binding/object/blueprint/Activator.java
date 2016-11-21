@@ -28,15 +28,19 @@ public class Activator implements BundleActivator {
 
     @Override
     public void start(BundleContext context) throws Exception {
-        BlueprintNameSpaceHandlerFactory factory = new BlueprintNameSpaceHandlerFactory() {
-            
-            @Override
-            public Object createNamespaceHandler() {
-                return new ObjectBindingBPHandler();
-            }
-        };
-        NamespaceHandlerRegisterer.register(context, factory,
-                                            "http://cxf.apache.org/blueprint/binding/object");  
+        try {
+            BlueprintNameSpaceHandlerFactory factory = new BlueprintNameSpaceHandlerFactory() {
+                
+                @Override
+                public Object createNamespaceHandler() {
+                    return new ObjectBindingBPHandler();
+                }
+            };
+            NamespaceHandlerRegisterer.register(context, factory,
+                                                "http://cxf.apache.org/blueprint/binding/object");
+        } catch (NoClassDefFoundError error) {
+            // No Blueprint is available
+        }
     }
 
     @Override
