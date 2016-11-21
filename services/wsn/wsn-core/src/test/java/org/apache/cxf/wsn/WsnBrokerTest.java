@@ -201,6 +201,29 @@ public abstract class WsnBrokerTest extends Assert {
         subscription.unsubscribe();
         pullPoint.destroy();
     }
+    
+    @Test
+    public void testPullPointWithQueueName() throws Exception {
+        PullPoint pullPoint = createPullPoint.create("testQueue");
+        Subscription subscription = notificationBroker.subscribe(pullPoint, "myTopic");
+        notificationBroker.notify("myTopic",
+                                  new JAXBElement<String>(new QName("urn:test:org", "foo"), 
+                                                  String.class, "bar"));
+
+        boolean received = false;
+        for (int i = 0; i < 50; i++) {
+            List<NotificationMessageHolderType> messages = pullPoint.getMessages(10);
+            if (!messages.isEmpty()) {
+                received = true;
+                break;
+            }
+            Thread.sleep(100);
+        }
+        assertTrue(received);
+
+        subscription.unsubscribe();
+        pullPoint.destroy();
+    }
 
     @Test
     public void testPublisher() throws Exception {
