@@ -404,7 +404,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             && encrBase instanceof WSSecDKEncrypt) {
             try {
                 Element secondRefList = 
-                    ((WSSecDKEncrypt)encrBase).encryptForExternalRef(null, secondEncrParts);
+                    ((WSSecDKEncrypt)encrBase).encryptForExternalRef(null, secondEncrParts, secHeader);
                 if (secondRefList != null) {
                     ((WSSecDKEncrypt)encrBase).addExternalRefElement(secondRefList, secHeader);
                 }
@@ -424,7 +424,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                 } else {
                     this.insertBeforeBottomUp(secondRefList);
                 }
-                ((WSSecEncrypt)encrBase).encryptForRef(secondRefList, secondEncrParts);
+                ((WSSecEncrypt)encrBase).encryptForRef(secondRefList, secondEncrParts, secHeader);
 
             } catch (WSSecurityException ex) {
                 LOG.log(Level.FINE, ex.getMessage(), ex);
@@ -506,7 +506,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                     List<Element> attachments = encr.getAttachmentEncryptedDataElements();
                     //Encrypt, get hold of the ref list and add it
                     if (externalRef) {
-                        Element refList = encr.encryptForRef(null, encrParts);
+                        Element refList = encr.encryptForRef(null, encrParts, secHeader);
                         if (refList != null) {
                             insertBeforeBottomUp(refList);
                         }
@@ -519,7 +519,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                             this.addEncryptedKeyElement(encryptedKeyElement);
                         }
                     } else {
-                        Element refList = encr.encryptForRef(null, encrParts);
+                        Element refList = encr.encryptForRef(null, encrParts, secHeader);
                         if (refList != null || (attachments != null && !attachments.isEmpty())) {
                             this.addEncryptedKeyElement(encryptedKeyElement);
                         }
@@ -579,7 +579,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             dkEncr.prepare(saaj.getSOAPPart());
 
             addDerivedKeyElement(dkEncr.getdktElement());
-            Element refList = dkEncr.encryptForExternalRef(null, encrParts);
+            Element refList = dkEncr.encryptForExternalRef(null, encrParts, secHeader);
             if (refList != null) {
                 insertBeforeBottomUp(refList);
             }
