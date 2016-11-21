@@ -70,6 +70,8 @@ public class NotificationBroker implements Referencable {
     public static final QName QNAME_MESSAGE_CONTENT = new QName(WSN_URI, "MessageContent");
     
     public static final QName QNAME_INITIAL_TERMINATION_TIME = new QName(WSN_URI, "InitialTerminationTime");
+    
+    public static final QName QNAME_PULLPOINT_QUEUE_NAME = new QName(WSN_URI, "pullPointQueueName");
 
     
     private org.oasis_open.docs.wsn.brw_2.NotificationBroker broker;
