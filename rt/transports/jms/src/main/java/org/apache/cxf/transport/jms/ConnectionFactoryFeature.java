@@ -26,6 +26,7 @@ import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
@@ -47,16 +48,13 @@ public class ConnectionFactoryFeature extends AbstractFeature {
 
     @Override
     public void initialize(Client client, Bus bus) {
-        client.getEndpoint().getOutInterceptors().add(new AbstractPhaseInterceptor<Message>(Phase.PREPARE_SEND) {
-            public void handleMessage(Message message) throws Fault {
-                Conduit conduit = message.getExchange().getConduit(message);
-                if (conduit instanceof JMSConduit) {
-                    JMSConduit jmsConduit = (JMSConduit)conduit;
-                    jmsConduit.getJmsConfig().setConnectionFactory(connectionFactory);
-                }
-            }
-        });
+        client.getEndpoint().getOutInterceptors().add(new JMSConduitConfigOutInterceptor());
         super.initialize(client, bus);
+    }
+    @Override
+    public void initialize(InterceptorProvider provider, Bus bus) {
+        provider.getOutInterceptors().add(new JMSConduitConfigOutInterceptor());
+        super.initialize(provider, bus);
     }
 
     @Override
@@ -68,5 +66,18 @@ public class ConnectionFactoryFeature extends AbstractFeature {
         }
         super.initialize(server, bus);
     }
-    
+    private class JMSConduitConfigOutInterceptor extends AbstractPhaseInterceptor<Message> {
+        JMSConduitConfigOutInterceptor() {
+            super(Phase.PREPARE_SEND);
+        }
+
+        @Override
+        public void handleMessage(Message message) throws Fault {
+            Conduit conduit = message.getExchange().getConduit(message);
+            if (conduit instanceof JMSConduit) {
+                JMSConduit jmsConduit = (JMSConduit)conduit;
+                jmsConduit.getJmsConfig().setConnectionFactory(connectionFactory);
+            }
+        }
+    }
 }
