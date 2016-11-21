@@ -77,6 +77,7 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
     private boolean applicationCanHandleAccessDenied;
     private CodeVerifierTransformer codeVerifierTransformer;
     private OAuthJoseJwtProducer codeRequestJoseProducer;
+    private boolean useAuthorizationHeader;
         
     @Override
     public void filter(ContainerRequestContext rc) throws IOException {
@@ -236,7 +237,7 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
         if (codeParam != null) {
             AuthorizationCodeGrant grant = prepareCodeGrant(codeParam, getAbsoluteRedirectUri(ui));
             grant.setCodeVerifier(state.getFirst(OAuthConstants.AUTHORIZATION_CODE_VERIFIER));
-            at = OAuthClientUtils.getAccessToken(accessTokenServiceClient, consumer, grant);
+            at = OAuthClientUtils.getAccessToken(accessTokenServiceClient, consumer, grant, useAuthorizationHeader);
         }
         ClientTokenContext tokenContext = initializeClientTokenContext(rc, at, requestParams, state);
         if (at != null && clientTokenContextManager != null) {
@@ -419,5 +420,9 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
 
     public void setCodeRequestJoseProducer(OAuthJoseJwtProducer codeRequestJoseProducer) {
         this.codeRequestJoseProducer = codeRequestJoseProducer;
+    }
+    
+    public void setUseAuthorizationHeader(boolean useAuthorizationHeader) {
+        this.useAuthorizationHeader = useAuthorizationHeader;
     }
 }
