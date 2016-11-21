@@ -251,10 +251,10 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                     if (encryptionToken.getDerivedKeys() == DerivedKeys.RequireDerivedKeys 
                         && !secondEncrParts.isEmpty()) {
                         secondRefList = ((WSSecDKEncrypt)encr).encryptForExternalRef(null, 
-                                secondEncrParts);
+                                secondEncrParts, secHeader);
                     } else if (!secondEncrParts.isEmpty()) {
                         //Encrypt, get hold of the ref list and add it
-                        secondRefList = ((WSSecEncrypt)encr).encryptForRef(null, secondEncrParts);
+                        secondRefList = ((WSSecEncrypt)encr).encryptForRef(null, secondEncrParts, secHeader);
                     }
                     if (secondRefList != null) {
                         this.addDerivedKeyElement(secondRefList);
@@ -491,7 +491,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             encrDKTokenElem = dkEncr.getdktElement();
             addDerivedKeyElement(encrDKTokenElem);
             
-            Element refList = dkEncr.encryptForExternalRef(null, encrParts);
+            Element refList = dkEncr.encryptForExternalRef(null, encrParts, secHeader);
             List<Element> attachments = dkEncr.getAttachmentEncryptedDataElements();
             addAttachmentsForEncryption(atEnd, refList, attachments);
 
@@ -601,7 +601,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                         encr.prependBSTElementToHeader(secHeader);
                     }
                    
-                    Element refList = encr.encryptForRef(null, encrParts);
+                    Element refList = encr.encryptForRef(null, encrParts, secHeader);
                     List<Element> attachments = encr.getAttachmentEncryptedDataElements();
                     addAttachmentsForEncryption(atEnd, refList, attachments);
                     
