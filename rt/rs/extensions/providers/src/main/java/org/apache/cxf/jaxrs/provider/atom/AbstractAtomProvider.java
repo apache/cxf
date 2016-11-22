@@ -89,6 +89,7 @@ public abstract class AbstractAtomProvider<T extends Element>
             ParserOptions options = parser.getDefaultParserOptions();
             if (options != null) {
                 options.setAutodetectCharset(autodetectCharset);
+                options.setResolveEntities(false);
             }
         }
         Document<T> doc = parser.parse(is);
