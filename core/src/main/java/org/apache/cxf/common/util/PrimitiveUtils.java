@@ -32,7 +32,8 @@ public final class PrimitiveUtils {
         AUTOBOXED_PRIMITIVES_MAP.put(long.class, Long.class);
         AUTOBOXED_PRIMITIVES_MAP.put(float.class, Float.class);
         AUTOBOXED_PRIMITIVES_MAP.put(double.class, Double.class);
-        AUTOBOXED_PRIMITIVES_MAP.put(boolean.class, Boolean.class);    
+        AUTOBOXED_PRIMITIVES_MAP.put(boolean.class, Boolean.class);
+        AUTOBOXED_PRIMITIVES_MAP.put(void.class, Void.class);
     }
     
     private PrimitiveUtils() {
