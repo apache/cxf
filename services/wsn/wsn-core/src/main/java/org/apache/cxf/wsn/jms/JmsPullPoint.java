@@ -72,7 +72,7 @@ public class JmsPullPoint extends AbstractPullPoint {
         }
     }
 
-    protected void initSession() throws JMSException {
+    protected synchronized void initSession() throws JMSException {
         if (session == null) {
             session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             queue = session.createQueue(getName());
@@ -80,9 +80,21 @@ public class JmsPullPoint extends AbstractPullPoint {
             consumer = session.createConsumer(queue);
         }
     }
+    
+    protected synchronized void closeSession() {
+        if (session != null) {
+            try {
+                session.close();
+            } catch (JMSException inner) {
+                LOGGER.log(Level.FINE, "Error closing session", inner);
+            } finally {
+                session = null;
+            }
+        }
+    }
 
     @Override
-    protected synchronized void store(NotificationMessageHolderType messageHolder) {
+    protected void store(NotificationMessageHolderType messageHolder) {
         try {
             initSession();
             Notify notify = new Notify();
@@ -93,22 +105,15 @@ public class JmsPullPoint extends AbstractPullPoint {
             producer.send(message);
         } catch (JMSException e) {
             LOGGER.log(Level.WARNING, "Error storing message", e);
-            if (session != null) {
-                try {
-                    session.close();
-                } catch (JMSException inner) {
-                    LOGGER.log(Level.FINE, "Error closing session", inner);
-                } finally {
-                    session = null;
-                }
-            }
+            closeSession();
+            
         } catch (JAXBException e) {
             LOGGER.log(Level.WARNING, "Error storing message", e);
         }
     }
 
     @Override
-    protected synchronized List<NotificationMessageHolderType> getMessages(int max) 
+    protected List<NotificationMessageHolderType> getMessages(int max) 
         throws ResourceUnknownFault, UnableToGetMessagesFault {
         try {
             if (max == 0) {
@@ -135,15 +140,7 @@ public class JmsPullPoint extends AbstractPullPoint {
             return messages;
         } catch (JMSException e) {
             LOGGER.log(Level.INFO, "Error retrieving messages", e);
-            if (session != null) {
-                try {
-                    session.close();
-                } catch (JMSException inner) {
-                    LOGGER.log(Level.FINE, "Error closing session", inner);
-                } finally {
-                    session = null;
-                }
-            }
+            closeSession();
             UnableToGetMessagesFaultType fault = new UnableToGetMessagesFaultType();
             throw new UnableToGetMessagesFault("Unable to retrieve messages", fault, e);
         } catch (JAXBException e) {
