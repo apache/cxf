@@ -22,8 +22,8 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -41,16 +41,16 @@ import org.apache.cxf.jaxrs.ext.search.collections.CollectionCheckInfo;
  */
 public class SimpleSearchCondition<T> implements SearchCondition<T> {
 
-    private static Set<ConditionType> supportedTypes = new HashSet<ConditionType>();
+    protected static final Set<ConditionType> SUPPORTED_TYPES = EnumSet.noneOf(ConditionType.class);
     static {
-        supportedTypes.add(ConditionType.EQUALS);
-        supportedTypes.add(ConditionType.NOT_EQUALS);
-        supportedTypes.add(ConditionType.GREATER_THAN);
-        supportedTypes.add(ConditionType.GREATER_OR_EQUALS);
-        supportedTypes.add(ConditionType.LESS_THAN);
-        supportedTypes.add(ConditionType.LESS_OR_EQUALS);
+        SUPPORTED_TYPES.add(ConditionType.EQUALS);
+        SUPPORTED_TYPES.add(ConditionType.NOT_EQUALS);
+        SUPPORTED_TYPES.add(ConditionType.GREATER_THAN);
+        SUPPORTED_TYPES.add(ConditionType.GREATER_OR_EQUALS);
+        SUPPORTED_TYPES.add(ConditionType.LESS_THAN);
+        SUPPORTED_TYPES.add(ConditionType.LESS_OR_EQUALS);
     }
-    private ConditionType joiningType = ConditionType.AND;
+    private final ConditionType joiningType = ConditionType.AND;
     private T condition;
     
     private List<SearchCondition<T>> scts;
@@ -69,7 +69,7 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
         if (condition == null) {
             throw new IllegalArgumentException("condition is null");
         }
-        if (!supportedTypes.contains(cType)) {
+        if (!SUPPORTED_TYPES.contains(cType)) {
             throw new IllegalArgumentException("unsupported condition type: " + cType.name());
         }
         this.condition = condition;
@@ -83,6 +83,8 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
      * per-getter comparison strategy.
      * 
      * @param getters2operators getters names and operators to be used with them during comparison
+     * @param realGetters 
+     * @param propertyTypeInfo 
      * @param condition template object
      */
     public SimpleSearchCondition(Map<String, ConditionType> getters2operators, 
@@ -102,7 +104,7 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
         }
         this.condition = condition;
         for (ConditionType ct : getters2operators.values()) {
-            if (!supportedTypes.contains(ct)) {
+            if (!SUPPORTED_TYPES.contains(ct)) {
                 throw new IllegalArgumentException("unsupported condition type: " + ct.name());
             }
         }
@@ -114,6 +116,7 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
         this(getters2operators, null, null, condition);
     }
     
+    @Override
     public T getCondition() {
         return condition;
     }
@@ -123,6 +126,7 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
      * <p>
      * When constructor with map is used it returns null.
      */
+    @Override
     public ConditionType getConditionType() {
         if (scts.size() > 1) {
             return joiningType;
@@ -131,6 +135,7 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
         }
     }
 
+    @Override
     public List<SearchCondition<T>> getSearchConditions() {
         if (scts.size() > 1) {
             return Collections.unmodifiableList(scts);
@@ -145,9 +150,9 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
                                                       ConditionType sharedType) {
         if (isBuiltIn(condition)) {
             return Collections.singletonList(
-                (SearchCondition<T>)new PrimitiveSearchCondition<T>(null, condition, null, sharedType, condition));
+                (SearchCondition<T>)new PrimitiveSearchCondition<>(null, condition, null, sharedType, condition));
         } else {
-            List<SearchCondition<T>> list = new ArrayList<SearchCondition<T>>();
+            List<SearchCondition<T>> list = new ArrayList<>();
             Map<String, Object> get2val = getGettersAndValues();
             
             Set<String> keySet = get2val != null ? get2val.keySet()
@@ -172,8 +177,8 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
                 CollectionCheckInfo checkInfo = tInfo != null ? tInfo.getCollectionCheckInfo() : null;
                 
                 PrimitiveSearchCondition<T> pc = checkInfo == null 
-                    ? new PrimitiveSearchCondition<T>(realGetter, rval, genType, ct, condition)
-                    : new CollectionCheckCondition<T>(realGetter, rval, genType, ct, condition, checkInfo);    
+                    ? new PrimitiveSearchCondition<>(realGetter, rval, genType, ct, condition)
+                    : new CollectionCheckCondition<>(realGetter, rval, genType, ct, condition, checkInfo);    
                 
                 list.add(pc);
                 
@@ -250,6 +255,7 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
      * 
      * @throws IllegalAccessException when security manager disallows reflective call of getters.
      */
+    @Override
     public boolean isMet(T pojo) {
         for (SearchCondition<T> sc : scts) {
             if (!sc.isMet(pojo)) {
@@ -268,8 +274,8 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
      */
     private Map<String, Object> getGettersAndValues() {
         if (!SearchBean.class.isAssignableFrom(condition.getClass())) {
-            Map<String, Object> getters2values = new HashMap<String, Object>();
-            Beanspector<T> beanspector = new Beanspector<T>(condition);
+            Map<String, Object> getters2values = new HashMap<>();
+            Beanspector<T> beanspector = new Beanspector<>(condition);
             for (String getter : beanspector.getGettersNames()) {
                 Object value = getValue(beanspector, getter, condition);
                 getters2values.put(getter, value);
@@ -295,8 +301,9 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
     }
 
 
+    @Override
     public List<T> findAll(Collection<T> pojos) {
-        List<T> result = new ArrayList<T>();
+        List<T> result = new ArrayList<>();
         for (T pojo : pojos) {
             if (isMet(pojo)) {
                 result.add(pojo);
@@ -309,6 +316,7 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
         return SearchUtils.toSQL(this, table, columns);
     }
     
+    @Override
     public PrimitiveStatement getStatement() {
         if (scts.size() == 1) {
             return scts.get(0).getStatement();
@@ -317,9 +325,9 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
         }
     }
 
+    @Override
     public void accept(SearchConditionVisitor<T, ?> visitor) {
         visitor.visit(this);
     }
-    
     
 }

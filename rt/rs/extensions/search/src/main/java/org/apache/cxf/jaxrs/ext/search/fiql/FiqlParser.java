@@ -71,7 +71,7 @@ public class FiqlParser<T> extends AbstractSearchConditionParser<T> {
     
     static {
         // operatorsMap
-        OPERATORS_MAP = new HashMap<String, ConditionType>();
+        OPERATORS_MAP = new HashMap<>();
         OPERATORS_MAP.put(GT, ConditionType.GREATER_THAN);
         OPERATORS_MAP.put(GE, ConditionType.GREATER_OR_EQUALS);
         OPERATORS_MAP.put(LT, ConditionType.LESS_THAN);
@@ -79,7 +79,7 @@ public class FiqlParser<T> extends AbstractSearchConditionParser<T> {
         OPERATORS_MAP.put(EQ, ConditionType.EQUALS);
         OPERATORS_MAP.put(NEQ, ConditionType.NOT_EQUALS);
         
-        CONDITION_MAP = new HashMap<ConditionType, String>();
+        CONDITION_MAP = new HashMap<>();
         CONDITION_MAP.put(ConditionType.GREATER_THAN, GT);
         CONDITION_MAP.put(ConditionType.GREATER_OR_EQUALS, GE);
         CONDITION_MAP.put(ConditionType.LESS_THAN, LT);
@@ -97,8 +97,8 @@ public class FiqlParser<T> extends AbstractSearchConditionParser<T> {
         COMPARATORS_PATTERN_SINGLE_EQUALS = Pattern.compile(s2);
     }
 
-    private Map<String, ConditionType> operatorsMap = OPERATORS_MAP;
-    private Pattern comparatorsPattern = COMPARATORS_PATTERN;
+    protected Map<String, ConditionType> operatorsMap = OPERATORS_MAP;
+    protected Pattern comparatorsPattern = COMPARATORS_PATTERN;
     /**
      * Creates FIQL parser.
      * 
@@ -125,7 +125,8 @@ public class FiqlParser<T> extends AbstractSearchConditionParser<T> {
      * 
      * @param tclass - class of T used to create condition objects in built syntax tree. Class T must have
      *            accessible no-arg constructor and complementary setters to these used in FIQL expressions.
-     * @param contextProperties            
+     * @param contextProperties
+     * @param beanProperties 
      */
     public FiqlParser(Class<T> tclass, 
                       Map<String, String> contextProperties,
@@ -133,7 +134,7 @@ public class FiqlParser<T> extends AbstractSearchConditionParser<T> {
         super(tclass, contextProperties, beanProperties);
         
         if (MessageUtils.isTrue(this.contextProperties.get(SUPPORT_SINGLE_EQUALS))) {
-            operatorsMap = new HashMap<String, ConditionType>(operatorsMap);
+            operatorsMap = new HashMap<>(operatorsMap);
             operatorsMap.put("=", ConditionType.EQUALS);
             comparatorsPattern = COMPARATORS_PATTERN_SINGLE_EQUALS;
         }
@@ -161,18 +162,18 @@ public class FiqlParser<T> extends AbstractSearchConditionParser<T> {
      * @return tree of {@link SearchCondition} objects representing runtime search structure.
      * @throws SearchParseException when expression does not follow FIQL grammar
      */
+    @Override
     public SearchCondition<T> parse(String fiqlExpression) throws SearchParseException {
         ASTNode<T> ast = parseAndsOrsBrackets(fiqlExpression);
         return ast.build();
     }
 
     private ASTNode<T> parseAndsOrsBrackets(String expr) throws SearchParseException {
-        List<String> subexpressions = new ArrayList<String>();
-        List<String> operators = new ArrayList<String>();
+        List<String> subexpressions = new ArrayList<>();
+        List<String> operators = new ArrayList<>();
         int level = 0;
         int lastIdx = 0;
-        int idx = 0;
-        for (idx = 0; idx < expr.length(); idx++) {
+        for (int idx = 0; idx < expr.length(); idx++) {
             char c = expr.charAt(idx);
             if (c == '(') {
                 level++;
@@ -222,7 +223,7 @@ public class FiqlParser<T> extends AbstractSearchConditionParser<T> {
             SubExpression ands = new SubExpression(AND);
             for (; from <= to; from++) {
                 String subex = subexpressions.get(from);
-                ASTNode<T> node = null;
+                ASTNode<T> node;
                 if (subex.startsWith("(")) {
                     node = parseAndsOrsBrackets(subex.substring(1, subex.length() - 1));
                 } else {
@@ -246,7 +247,7 @@ public class FiqlParser<T> extends AbstractSearchConditionParser<T> {
         }
     }
 
-    private Comparison parseComparison(String expr) throws SearchParseException {
+    protected ASTNode<T> parseComparison(String expr) throws SearchParseException {
         Matcher m = comparatorsPattern.matcher(expr);
         if (m.find()) {
             String propertyName = expr.substring(0, m.start(1));
@@ -271,7 +272,7 @@ public class FiqlParser<T> extends AbstractSearchConditionParser<T> {
     }
 
     
-    private TypeInfoObject parseType(String originalName, String setter, String value) throws SearchParseException {
+    protected TypeInfoObject parseType(String originalName, String setter, String value) throws SearchParseException {
         TypeInfo typeInfo = getTypeInfo(setter, value);
         if (isDecodeQueryValues()) {
             value = UrlUtils.urlDecode(value);
@@ -280,12 +281,13 @@ public class FiqlParser<T> extends AbstractSearchConditionParser<T> {
         return new TypeInfoObject(object, typeInfo);
     }
     
+    @Override
     protected boolean isCount(String propName) {
         return propName.startsWith(EXTENSION_COUNT_OPEN);
     }
     
     
-    private String unwrapSetter(String setter) {
+    protected String unwrapSetter(String setter) {
         if (setter.startsWith(EXTENSION_COUNT_OPEN) && setter.endsWith(")")) {
             return setter.substring(EXTENSION_COUNT_OPEN.length(), setter.length() - 1);        
         } else {
@@ -294,13 +296,13 @@ public class FiqlParser<T> extends AbstractSearchConditionParser<T> {
     }
     
     // node of abstract syntax tree
-    private interface ASTNode<T> {
+    protected interface ASTNode<T> {
         SearchCondition<T> build() throws SearchParseException;
     }
 
     private class SubExpression implements ASTNode<T> {
-        private String operator;
-        private List<ASTNode<T>> subnodes = new ArrayList<ASTNode<T>>();
+        private final String operator;
+        private final List<ASTNode<T>> subnodes = new ArrayList<>();
 
         SubExpression(String operator) {
             this.operator = operator;
@@ -329,24 +331,25 @@ public class FiqlParser<T> extends AbstractSearchConditionParser<T> {
             return builder.toString();
         }
 
+        @Override
         public SearchCondition<T> build() throws SearchParseException {
-            List<SearchCondition<T>> scNodes = new ArrayList<SearchCondition<T>>();
+            List<SearchCondition<T>> scNodes = new ArrayList<>();
             for (ASTNode<T> node : subnodes) {
                 scNodes.add(node.build());
             }
             if (OR.equals(operator)) {
-                return new OrSearchCondition<T>(scNodes);
+                return new OrSearchCondition<>(scNodes);
             } else {
-                return new AndSearchCondition<T>(scNodes);
+                return new AndSearchCondition<>(scNodes);
             }
             
         }
     }
 
     private class Comparison implements ASTNode<T> {
-        private String name;
-        private String operator;
-        private TypeInfoObject tvalue;
+        private final String name;
+        private final String operator;
+        private final TypeInfoObject tvalue;
 
         Comparison(String name, String operator, TypeInfoObject value) {
             this.name = name;
@@ -360,16 +363,17 @@ public class FiqlParser<T> extends AbstractSearchConditionParser<T> {
                 + " (" + tvalue.getObject().getClass().getSimpleName() + ")";
         }
 
+        @Override
         public SearchCondition<T> build() throws SearchParseException {
             String templateName = getSetter(name);
             T cond = createTemplate(templateName);
             ConditionType ct = operatorsMap.get(operator);
             
             if (isPrimitive(cond)) {
-                return new SimpleSearchCondition<T>(ct, cond); 
+                return new SimpleSearchCondition<>(ct, cond); 
             } else {
                 String templateNameLCase = templateName.toLowerCase();
-                return new SimpleSearchCondition<T>(Collections.singletonMap(templateNameLCase, ct),
+                return new SimpleSearchCondition<>(Collections.singletonMap(templateNameLCase, ct),
                                                     Collections.singletonMap(templateNameLCase, name),
                                                     Collections.singletonMap(templateNameLCase, tvalue.getTypeInfo()),
                                                     cond);
@@ -397,9 +401,9 @@ public class FiqlParser<T> extends AbstractSearchConditionParser<T> {
         }
     }
     
-    static class TypeInfoObject {
-        private Object object;
-        private TypeInfo typeInfo;
+    protected static class TypeInfoObject {
+        private final Object object;
+        private final TypeInfo typeInfo;
         
         TypeInfoObject(Object object, TypeInfo typeInfo) {
             this.object = object;
