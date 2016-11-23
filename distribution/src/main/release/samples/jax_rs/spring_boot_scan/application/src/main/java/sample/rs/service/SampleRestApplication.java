@@ -19,6 +19,8 @@
 package sample.rs.service;
 import java.util.Collections;
 
+import com.codahale.metrics.MetricRegistry;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.actuate.endpoint.MetricReaderPublicMetrics;
 import org.springframework.boot.actuate.endpoint.MetricsEndpoint;
@@ -27,13 +29,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.context.annotation.Bean;
 
-import com.codahale.metrics.MetricRegistry;
 
 @SpringBootApplication
 @EnableEurekaClient
 public class SampleRestApplication {
     @Bean
-    public MetricRegistry metricRegistry(){
+    public MetricRegistry metricRegistry() {
         return new MetricRegistry();
     }
     
