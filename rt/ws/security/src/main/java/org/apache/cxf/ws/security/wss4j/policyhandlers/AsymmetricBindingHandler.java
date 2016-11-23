@@ -826,8 +826,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                         tempTok.setTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
                     }
                     
-                    getTokenStore().add(tempTok);
-                    message.put(SecurityConstants.TOKEN_ID, tempTok.getId());
+                    message.put(SecurityConstants.TOKEN, tempTok);
                     
                     return id;
                 }
