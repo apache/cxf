@@ -30,6 +30,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
+import javax.xml.stream.XMLStreamReader;
 
 import org.apache.abdera.Abdera;
 import org.apache.abdera.model.Document;
@@ -39,6 +40,7 @@ import org.apache.abdera.parser.ParserOptions;
 import org.apache.abdera.writer.Writer;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
+import org.apache.cxf.staxutils.StaxUtils;
 
 public abstract class AbstractAtomProvider<T extends Element> 
     implements MessageBodyWriter<T>, MessageBodyReader<T> {
@@ -89,10 +91,10 @@ public abstract class AbstractAtomProvider<T extends Element>
             ParserOptions options = parser.getDefaultParserOptions();
             if (options != null) {
                 options.setAutodetectCharset(autodetectCharset);
-                options.setResolveEntities(false);
             }
         }
-        Document<T> doc = parser.parse(is);
+        XMLStreamReader reader = StaxUtils.createXMLStreamReader(is);
+        Document<T> doc = parser.parse(reader);
         return doc.getRoot();
     }
 
