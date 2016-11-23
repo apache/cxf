@@ -155,13 +155,13 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                     if (isRequestor()) {
                         tokenId = setupEncryptedKey(encryptionWrapper, encryptionToken);
                     } else {
-                        tokenId = getEncryptedKey();
+                        tok = getEncryptedKey();
                     }
                 } else if (encryptionToken instanceof UsernameToken) {
                     if (isRequestor()) {
                         tokenId = setupUTDerivedKey((UsernameToken)encryptionToken);
                     } else {
-                        tokenId = getUTDerivedKey();
+                        tok = getUTDerivedKey();
                     }
                 }
                 if (tok == null) {
@@ -285,13 +285,13 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                     if (isRequestor()) {
                         sigTokId = setupEncryptedKey(sigAbstractTokenWrapper, sigToken);
                     } else {
-                        sigTokId = getEncryptedKey();
+                        sigTok = getEncryptedKey();
                     }
                 } else if (sigToken instanceof UsernameToken) {
                     if (isRequestor()) {
                         sigTokId = setupUTDerivedKey((UsernameToken)sigToken);
                     } else {
-                        sigTokId = getUTDerivedKey();
+                        sigTok = getUTDerivedKey();
                     }
                 }
             } else {
@@ -928,6 +928,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
         return id;
     }
     
+<<<<<<< HEAD
     private String getEncryptedKey() {
         
         List<WSHandlerResult> results = CastUtils.cast((List<?>)message.getExchange().getInMessage()
@@ -954,11 +955,28 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                     return encryptedKeyID;
                 }
             }
+=======
+    private SecurityToken getEncryptedKey() {
+        WSSecurityEngineResult encryptedKeyResult = getEncryptedKeyResult();
+        if (encryptedKeyResult != null) {
+            // Store it in the cache
+            Date created = new Date();
+            Date expires = new Date();
+            expires.setTime(created.getTime() + WSS4JUtils.getSecurityTokenLifetime(message));
+            
+            String encryptedKeyID = (String)encryptedKeyResult.get(WSSecurityEngineResult.TAG_ID);
+            SecurityToken securityToken = new SecurityToken(encryptedKeyID, created, expires);
+            securityToken.setSecret((byte[])encryptedKeyResult.get(WSSecurityEngineResult.TAG_SECRET));
+            securityToken.setSHA1(getSHA1((byte[])encryptedKeyResult
+                                    .get(WSSecurityEngineResult.TAG_ENCRYPTED_EPHEMERAL_KEY)));
+            
+            return securityToken;
+>>>>>>> 0769de2... CXF-7148 - Race Condition while handling symmetric key in SymmetricBindingHandler
         }
         return null;
     }
     
-    private String getUTDerivedKey() throws WSSecurityException {
+    private SecurityToken getUTDerivedKey() throws WSSecurityException {
         
         List<WSHandlerResult> results = CastUtils.cast((List<?>)message.getExchange().getInMessage()
             .get(WSHandlerConstants.RECV_RESULTS));
@@ -975,14 +993,19 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                     }
                     Date created = new Date();
                     Date expires = new Date();
+<<<<<<< HEAD
                     expires.setTime(created.getTime() + 300000);
                     SecurityToken tempTok = new SecurityToken(utID, created, expires);
                     
-                    byte[] secret = (byte[])wser.get(WSSecurityEngineResult.TAG_SECRET);
-                    tempTok.setSecret(secret);
-                    tokenStore.add(tempTok);
+=======
+                    expires.setTime(created.getTime() + WSS4JUtils.getSecurityTokenLifetime(message));
+                    SecurityToken securityToken = new SecurityToken(utID, created, expires);
 
-                    return utID;
+>>>>>>> 0769de2... CXF-7148 - Race Condition while handling symmetric key in SymmetricBindingHandler
+                    byte[] secret = (byte[])wser.get(WSSecurityEngineResult.TAG_SECRET);
+                    securityToken.setSecret(secret);
+
+                    return securityToken;
                 }
             }
         }
