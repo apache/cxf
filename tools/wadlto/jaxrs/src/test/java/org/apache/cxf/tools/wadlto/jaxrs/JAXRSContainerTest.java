@@ -435,6 +435,11 @@ public class JAXRSContainerTest extends ProcessorTestBase {
             Method[] test1Methods = test1.getDeclaredMethods();
             assertEquals(2, test1Methods.length);
             assertEquals(2, test1Methods[0].getAnnotations().length);
+            if ("getGetaddmethod2".equals(test1Methods[0].getName())) {
+                Method tmp = test1Methods[0];
+                test1Methods[0] = test1Methods[1];
+                test1Methods[1] = tmp;
+            }
             checkComplexPathMethod(test1Methods[0], "");
             checkComplexPathMethod(test1Methods[1], "2");
         } catch (Exception e) {
