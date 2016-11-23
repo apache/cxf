@@ -928,8 +928,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
         return id;
     }
     
-<<<<<<< HEAD
-    private String getEncryptedKey() {
+    private SecurityToken getEncryptedKey() {
         
         List<WSHandlerResult> results = CastUtils.cast((List<?>)message.getExchange().getInMessage()
             .get(WSHandlerConstants.RECV_RESULTS));
@@ -946,32 +945,14 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                     Date created = new Date();
                     Date expires = new Date();
                     expires.setTime(created.getTime() + 300000);
-                    SecurityToken tempTok = new SecurityToken(encryptedKeyID, created, expires);
-                    tempTok.setSecret((byte[])wser.get(WSSecurityEngineResult.TAG_SECRET));
-                    tempTok.setSHA1(getSHA1((byte[])wser
+                    SecurityToken securityToken = new SecurityToken(encryptedKeyID, created, expires);
+                    securityToken.setSecret((byte[])wser.get(WSSecurityEngineResult.TAG_SECRET));
+                    securityToken.setSHA1(getSHA1((byte[])wser
                                             .get(WSSecurityEngineResult.TAG_ENCRYPTED_EPHEMERAL_KEY)));
-                    tokenStore.add(tempTok);
                     
-                    return encryptedKeyID;
+                    return securityToken;
                 }
             }
-=======
-    private SecurityToken getEncryptedKey() {
-        WSSecurityEngineResult encryptedKeyResult = getEncryptedKeyResult();
-        if (encryptedKeyResult != null) {
-            // Store it in the cache
-            Date created = new Date();
-            Date expires = new Date();
-            expires.setTime(created.getTime() + WSS4JUtils.getSecurityTokenLifetime(message));
-            
-            String encryptedKeyID = (String)encryptedKeyResult.get(WSSecurityEngineResult.TAG_ID);
-            SecurityToken securityToken = new SecurityToken(encryptedKeyID, created, expires);
-            securityToken.setSecret((byte[])encryptedKeyResult.get(WSSecurityEngineResult.TAG_SECRET));
-            securityToken.setSHA1(getSHA1((byte[])encryptedKeyResult
-                                    .get(WSSecurityEngineResult.TAG_ENCRYPTED_EPHEMERAL_KEY)));
-            
-            return securityToken;
->>>>>>> 0769de2... CXF-7148 - Race Condition while handling symmetric key in SymmetricBindingHandler
         }
         return null;
     }
@@ -993,15 +974,9 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                     }
                     Date created = new Date();
                     Date expires = new Date();
-<<<<<<< HEAD
                     expires.setTime(created.getTime() + 300000);
-                    SecurityToken tempTok = new SecurityToken(utID, created, expires);
-                    
-=======
-                    expires.setTime(created.getTime() + WSS4JUtils.getSecurityTokenLifetime(message));
                     SecurityToken securityToken = new SecurityToken(utID, created, expires);
-
->>>>>>> 0769de2... CXF-7148 - Race Condition while handling symmetric key in SymmetricBindingHandler
+                    
                     byte[] secret = (byte[])wser.get(WSSecurityEngineResult.TAG_SECRET);
                     securityToken.setSecret(secret);
 
