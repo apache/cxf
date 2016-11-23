@@ -24,8 +24,8 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 
+//CHECKSTYLE:OFF
 public class SampleWsApplicationClient {
-
  
     public static void main(String[] args) {
         String address = "http://localhost:8080/Service/Hello";
@@ -44,3 +44,5 @@ public class SampleWsApplicationClient {
     }
 
 }
+//CHECKSTYLE:ON
+

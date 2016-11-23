@@ -124,13 +124,13 @@ public class StreamingService {
             
             JavaDStream<String> receiverStream = null;
             if ("queue".equals(receiverType)) {
-               Queue<JavaRDD<String>> rddQueue = new LinkedList<>();
-               for (int i = 0; i < 30; i++) {
-                   rddQueue.add(jssc.sparkContext().parallelize(inputStrings));
-               }
-               receiverStream = jssc.queueStream(rddQueue);
+                Queue<JavaRDD<String>> rddQueue = new LinkedList<>();
+                for (int i = 0; i < 30; i++) {
+                    rddQueue.add(jssc.sparkContext().parallelize(inputStrings));
+                }
+                receiverStream = jssc.queueStream(rddQueue);
             } else {
-               receiverStream = jssc.receiverStream(new StringListReceiver(inputStrings));
+                receiverStream = jssc.receiverStream(new StringListReceiver(inputStrings));
             }
             
             JavaPairDStream<String, Integer> wordCounts = SparkUtils.createOutputDStream(receiverStream, false);
@@ -156,13 +156,13 @@ public class StreamingService {
             
             JavaDStream<String> receiverStream = null;
             if ("queue".equals(receiverType)) {
-               Queue<JavaRDD<String>> rddQueue = new LinkedList<>();
-               for (int i = 0; i < 30; i++) {
-                   rddQueue.add(jssc.sparkContext().parallelize(inputStrings));
-               }
-               receiverStream = jssc.queueStream(rddQueue);
+                Queue<JavaRDD<String>> rddQueue = new LinkedList<>();
+                for (int i = 0; i < 30; i++) {
+                    rddQueue.add(jssc.sparkContext().parallelize(inputStrings));
+                }
+                receiverStream = jssc.queueStream(rddQueue);
             } else {
-               receiverStream = jssc.receiverStream(new StringListReceiver(inputStrings));
+                receiverStream = jssc.receiverStream(new StringListReceiver(inputStrings));
             }
             
             JavaPairDStream<String, Integer> wordCounts = SparkUtils.createOutputDStream(receiverStream, false);

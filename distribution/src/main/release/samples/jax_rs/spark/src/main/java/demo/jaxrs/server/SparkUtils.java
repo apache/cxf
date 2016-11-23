@@ -47,14 +47,14 @@ public final class SparkUtils {
     public static JavaPairDStream<String, Integer> createOutputDStream(
         JavaDStream<String> receiverStream, boolean withId) {
         final JavaDStream<String> words = 
-            receiverStream.flatMap(x -> (withId ? splitInputStringWithId(x) : splitInputString(x)));
+            receiverStream.flatMap(x -> withId ? splitInputStringWithId(x) : splitInputString(x));
             
         final JavaPairDStream<String, Integer> pairs = words.mapToPair(s -> {
-                    return new Tuple2<String, Integer>(s, 1);
-                });
+            return new Tuple2<String, Integer>(s, 1);
+        });
         return pairs.reduceByKey((i1, i2) -> {
-                    return i1 + i2;
-                });
+            return i1 + i2;
+        });
     }
     public static Iterator<String> splitInputString(String x) {
         List<String> list = new LinkedList<String>();

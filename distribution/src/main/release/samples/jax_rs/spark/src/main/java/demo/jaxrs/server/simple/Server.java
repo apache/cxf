@@ -29,8 +29,8 @@ public class Server {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setResourceClasses(StreamingService.class);
         
-        String receiverType = args.length == 1 && args[0].equals("-receiverType=queue") ?
-            "queue" : "string";
+        String receiverType = args.length == 1 && args[0].equals("-receiverType=queue")
+            ? "queue" : "string";
         sf.setResourceProvider(StreamingService.class, 
             new SingletonResourceProvider(new StreamingService(receiverType)));
         sf.setAddress("http://localhost:9000/spark");
