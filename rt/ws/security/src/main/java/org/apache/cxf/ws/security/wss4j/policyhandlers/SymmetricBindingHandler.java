@@ -160,13 +160,13 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                     if (isRequestor()) {
                         tokenId = setupEncryptedKey(encryptionWrapper, encryptionToken);
                     } else {
-                        tokenId = getEncryptedKey();
+                        tok = getEncryptedKey();
                     }
                 } else if (encryptionToken instanceof UsernameToken) {
                     if (isRequestor()) {
                         tokenId = setupUTDerivedKey((UsernameToken)encryptionToken);
                     } else {
-                        tokenId = getUTDerivedKey();
+                        tok = getUTDerivedKey();
                     }
                 }
                 if (tok == null) {
@@ -290,13 +290,13 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                     if (isRequestor()) {
                         sigTokId = setupEncryptedKey(sigAbstractTokenWrapper, sigToken);
                     } else {
-                        sigTokId = getEncryptedKey();
+                        sigTok = getEncryptedKey();
                     }
                 } else if (sigToken instanceof UsernameToken) {
                     if (isRequestor()) {
                         sigTokId = setupUTDerivedKey((UsernameToken)sigToken);
                     } else {
-                        sigTokId = getUTDerivedKey();
+                        sigTok = getUTDerivedKey();
                     }
                 }
             } else {
@@ -970,7 +970,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
         return id;
     }
     
-    private String getEncryptedKey() {
+    private SecurityToken getEncryptedKey() {
         WSSecurityEngineResult encryptedKeyResult = getEncryptedKeyResult();
         if (encryptedKeyResult != null) {
             // Store it in the cache
@@ -979,19 +979,18 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             expires.setTime(created.getTime() + WSS4JUtils.getSecurityTokenLifetime(message));
             
             String encryptedKeyID = (String)encryptedKeyResult.get(WSSecurityEngineResult.TAG_ID);
-            SecurityToken tempTok = new SecurityToken(encryptedKeyID, created, expires);
-            tempTok.setSecret((byte[])encryptedKeyResult.get(WSSecurityEngineResult.TAG_SECRET));
-            tempTok.setSHA1(getSHA1((byte[])encryptedKeyResult
+            SecurityToken securityToken = new SecurityToken(encryptedKeyID, created, expires);
+            securityToken.setSecret((byte[])encryptedKeyResult.get(WSSecurityEngineResult.TAG_SECRET));
+            securityToken.setSHA1(getSHA1((byte[])encryptedKeyResult
                                     .get(WSSecurityEngineResult.TAG_ENCRYPTED_EPHEMERAL_KEY)));
-            tokenStore.add(tempTok);
             
-            return encryptedKeyID;
+            return securityToken;
         }
         
         return null;
     }
     
-    private String getUTDerivedKey() throws WSSecurityException {
+    private SecurityToken getUTDerivedKey() throws WSSecurityException {
         
         List<WSHandlerResult> results = CastUtils.cast((List<?>)message.getExchange().getInMessage()
             .get(WSHandlerConstants.RECV_RESULTS));
@@ -1009,13 +1008,12 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                     Date created = new Date();
                     Date expires = new Date();
                     expires.setTime(created.getTime() + WSS4JUtils.getSecurityTokenLifetime(message));
-                    SecurityToken tempTok = new SecurityToken(utID, created, expires);
+                    SecurityToken securityToken = new SecurityToken(utID, created, expires);
 
                     byte[] secret = (byte[])wser.get(WSSecurityEngineResult.TAG_SECRET);
-                    tempTok.setSecret(secret);
-                    tokenStore.add(tempTok);
+                    securityToken.setSecret(secret);
 
-                    return utID;
+                    return securityToken;
                 }
             }
         }
