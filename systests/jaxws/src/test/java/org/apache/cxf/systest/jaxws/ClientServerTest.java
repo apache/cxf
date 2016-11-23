@@ -40,6 +40,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 
+import javax.xml.bind.JAXBContext;
 import javax.xml.namespace.QName;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.ws.AsyncHandler;
@@ -916,7 +917,11 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
         // that would actually notice the difference. At least it ensures that 
         // specifying the property does not explode.
         Map<String, Object> jaxbContextProperties = new HashMap<String, Object>();
-        jaxbContextProperties.put("com.sun.xml.bind.defaultNamespaceRemap", "uri:ultima:thule");
+        if (JAXBContext.newInstance(String.class).getClass().getName().contains("internal")) {
+            jaxbContextProperties.put("com.sun.xml.internal.bind.defaultNamespaceRemap", "uri:ultima:thule");
+        } else {
+            jaxbContextProperties.put("com.sun.xml.bind.defaultNamespaceRemap", "uri:ultima:thule");
+        }
         dcf.setJaxbContextProperties(jaxbContextProperties);
         client = dcf.createClient(wsdlUrl, serviceName, portName);
         updateAddressPort(client, PORT);

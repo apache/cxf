@@ -277,10 +277,6 @@ public class JAXBDataBindingTest extends Assert {
     public void testDeclaredNamespaceMappingInternal() throws Exception {
         doNamespaceMappingTest(true, true);
     }
-    @Test
-    public void testDeclaredNamespaceMappingRINoAsm() throws Exception {
-        doNamespaceMappingTest(false, false);
-    }
     
     @Test
     public void testDeclaredNamespaceMappingInternalNoAsm() throws Exception {
