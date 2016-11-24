@@ -780,7 +780,7 @@ public abstract class AbstractClient implements Client {
     }
     
     protected static void reportMessageHandlerProblem(String name, Class<?> cls, MediaType ct, Throwable ex) {
-        String errorMessage = JAXRSUtils.logMessageHandlerProblem("NO_MSG_WRITER", cls, ct);
+        String errorMessage = JAXRSUtils.logMessageHandlerProblem(name, cls, ct);
         Throwable actualEx = ex instanceof Fault ? ((Fault)ex).getCause() : ex;
         throw new ProcessingException(errorMessage, actualEx);
     }
