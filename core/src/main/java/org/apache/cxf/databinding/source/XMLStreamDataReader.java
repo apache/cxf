@@ -316,7 +316,7 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
         }
     }
     
-    class NUllOutputStream extends OutputStream {
+    static class NUllOutputStream extends OutputStream {
         public void write(byte[] b, int off, int len) {
         }
         public void write(int b) {

@@ -240,7 +240,7 @@ public class PrettyPrintXMLStreamWriter implements XMLStreamWriter {
     }
 
 
-    class CurrentElement {
+    static class CurrentElement {
         private QName name;
         private boolean hasChildElements;
 

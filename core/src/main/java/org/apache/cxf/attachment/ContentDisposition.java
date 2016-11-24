@@ -103,7 +103,7 @@ public class ContentDisposition {
                 while (matcher.find()) {
                     String matched = matcher.group();
                     if (matched.startsWith("&#")) {
-                        int codePoint = Integer.valueOf(matched.substring(2, 6));
+                        int codePoint = Integer.parseInt(matched.substring(2, 6));
                         sb.append(Character.toChars(codePoint));
                     } else {
                         sb.append(matched.charAt(0));
