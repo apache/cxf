@@ -82,7 +82,7 @@ public class SimpleGroup extends SimplePrincipal implements Group {
             return false;
         }
         SimpleGroup other = (SimpleGroup)obj;
-        return getName().equals(other.getName()) && members.equals(other.members);
+        return members.equals(other.members) && super.equals(obj);
     }
     
     public int hashCode() {
