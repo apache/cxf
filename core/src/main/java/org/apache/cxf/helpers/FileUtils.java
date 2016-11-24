@@ -377,16 +377,19 @@ public final class FileUtils {
                                               Pattern pattern,
                                               File exclude, boolean rec,
                                               List<File> fileList) {
-        for (File file : dir.listFiles()) {
-            if (file.equals(exclude)) {
-                continue;
-            }
-            if (file.isDirectory() && rec) {
-                getFilesRecurse(file, pattern, exclude, rec, fileList);
-            } else {
-                Matcher m = pattern.matcher(file.getName());
-                if (m.matches()) {
-                    fileList.add(file);                                
+        File[] files = dir.listFiles();
+        if (files != null) {
+            for (File file : dir.listFiles()) {
+                if (file.equals(exclude)) {
+                    continue;
+                }
+                if (file.isDirectory() && rec) {
+                    getFilesRecurse(file, pattern, exclude, rec, fileList);
+                } else {
+                    Matcher m = pattern.matcher(file.getName());
+                    if (m.matches()) {
+                        fileList.add(file);                                
+                    }
                 }
             }
         }

@@ -814,7 +814,7 @@ public final class StaxUtils {
                 && StringUtils.isEmpty(writer.getNamespaceContext().getNamespaceURI(""))) {
                 writeElementNS = false;
             }
-            while (it != null && it.hasNext()) {
+            while (it.hasNext()) {
                 String s = it.next();
                 if (s == null) {
                     s = "";
@@ -1182,7 +1182,7 @@ public final class StaxUtils {
         Document doc = DOMUtils.createDocument();
         if (reader.getLocation().getSystemId() != null) {
             try {
-                doc.setDocumentURI(new String(reader.getLocation().getSystemId()));
+                doc.setDocumentURI(reader.getLocation().getSystemId());
             } catch (Exception e) {
                 //ignore - probably not DOM level 3
             }
@@ -1197,7 +1197,7 @@ public final class StaxUtils {
         Document doc = builder == null ? DOMUtils.createDocument() : builder.newDocument();
         if (reader.getLocation().getSystemId() != null) {
             try {
-                doc.setDocumentURI(new String(reader.getLocation().getSystemId()));
+                doc.setDocumentURI(reader.getLocation().getSystemId());
             } catch (Exception e) {
                 //ignore - probably not DOM level 3
             }
@@ -1687,8 +1687,8 @@ public final class StaxUtils {
         node.setAttributeNodeNS(attr);
     }
     public static XMLStreamReader createXMLStreamReader(InputSource src) {
-        String sysId = src.getSystemId() == null ? null : new String(src.getSystemId());
-        String pubId = src.getPublicId() == null ? null : new String(src.getPublicId());
+        String sysId = src.getSystemId() == null ? null : src.getSystemId();
+        String pubId = src.getPublicId() == null ? null : src.getPublicId();
         if (src.getByteStream() != null) {
             if (src.getEncoding() == null) {
                 StreamSource ss = new StreamSource(src.getByteStream(), sysId);

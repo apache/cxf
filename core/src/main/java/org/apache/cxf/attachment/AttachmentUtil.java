@@ -176,7 +176,7 @@ public final class AttachmentUtil {
             if (threshold instanceof Long) {
                 bos.setThreshold((Long)threshold);
             } else {
-                bos.setThreshold(Long.valueOf((String)threshold));
+                bos.setThreshold(Long.parseLong((String)threshold));
             }
         } else {
             bos.setThreshold(AttachmentDeserializer.THRESHOLD);
@@ -187,7 +187,7 @@ public final class AttachmentUtil {
             if (maxSize instanceof Long) {
                 bos.setMaxSize((Long) maxSize);
             } else {
-                bos.setMaxSize(Long.valueOf((String)maxSize));
+                bos.setMaxSize(Long.parseLong((String)maxSize));
             }
         }
     }
