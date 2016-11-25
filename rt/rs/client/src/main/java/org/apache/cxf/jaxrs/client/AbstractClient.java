@@ -121,6 +121,7 @@ public abstract class AbstractClient implements Client {
     private AtomicBoolean closed = new AtomicBoolean(); 
     protected AbstractClient(ClientState initialState) {
         this.state = initialState;
+        cfg.getInInterceptors().add(new InChainCompleteResponseInterceptor());
     }
     
     /**
@@ -555,6 +556,18 @@ public abstract class AbstractClient implements Client {
         Exchange exchange = message.getExchange(); 
       
         Exception ex = message.getContent(Exception.class);
+        if (ex == null) {
+            ex = message.getExchange().get(Exception.class);
+        }
+        if (ex == null && !exchange.isOneWay()) {
+            synchronized (exchange) {
+                while (exchange.get("IN_CHAIN_COMPLETE") == null) {
+                    exchange.wait(cfg.getSynchronousTimeout());
+                }
+            }
+        }
+        ex = message.getContent(Exception.class);
+        
         if (ex != null
             || PropertyUtils.isTrue(exchange.get(SERVICE_NOT_AVAIL_PROPERTY))
                 && PropertyUtils.isTrue(exchange.get(COMPLETE_IF_SERVICE_NOT_AVAIL_PROPERTY))) {
@@ -1134,5 +1147,27 @@ public abstract class AbstractClient implements Client {
             
             
         }
+    }
+    protected static class InChainCompleteResponseInterceptor extends AbstractPhaseInterceptor<Message> {
+        InChainCompleteResponseInterceptor() {
+            super(Phase.UNMARSHAL);
+        }
+
+        @Override
+        public void handleMessage(Message message) throws Fault {
+            synchronized (message.getExchange()) {
+                message.getExchange().put("IN_CHAIN_COMPLETE", Boolean.TRUE);
+                message.getExchange().notifyAll();
+            }
+        }
+
+        @Override
+        public void handleFault(Message message) {
+            synchronized (message.getExchange()) {
+                message.getExchange().put("IN_CHAIN_COMPLETE", Boolean.TRUE);
+                message.getExchange().notifyAll();
+            }
+        }
+
     }
 }
