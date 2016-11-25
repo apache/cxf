@@ -73,6 +73,7 @@ import org.apache.cxf.jaxrs.provider.XSLTJaxbProvider;
 import org.apache.cxf.systest.jaxrs.BookStore.BookInfo;
 import org.apache.cxf.systest.jaxrs.BookStore.BookInfoInterface;
 import org.apache.cxf.systest.jaxrs.BookStore.BookNotReturnedException;
+import org.apache.cxf.systest.jaxrs.CustomFaultInInterceptor.CustomRuntimeException;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.junit.BeforeClass;
@@ -2633,11 +2634,11 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     public void testNonExistentWithGetCustomEx() throws Exception {
         String address = "http://localhostt/bookstore";
         BookStore c = JAXRSClientFactory.create(address, BookStore.class);
-        WebClient.getConfig(c).getInFaultInterceptors().add(new CustomFaultInInterceptor());
+        WebClient.getConfig(c).getInFaultInterceptors().add(new CustomFaultInInterceptor(false));
         try {
             c.getBook("123");
             fail("Exception expected");
-        } catch (ProcessingException ex) {
+        } catch (CustomRuntimeException ex) {
             assertEquals("UnknownHostException: Microservice at http://localhostt/bookstore/bookstore/books/123/"
                           + " is not available", ex.getMessage());
         }
