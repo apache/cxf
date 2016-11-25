@@ -67,6 +67,8 @@ public final class PackageUtils {
             }
             if (j == lParts.size()) {
                 currentParts.add(lParts.get(j - 1).get(i));
+            } else {
+                break;
             }
         }
         StringBuilder sb = new StringBuilder();
