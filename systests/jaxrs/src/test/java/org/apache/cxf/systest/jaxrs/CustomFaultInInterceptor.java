@@ -26,16 +26,28 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 
 public class CustomFaultInInterceptor extends AbstractPhaseInterceptor<Message> {
-    public CustomFaultInInterceptor() {
+    private boolean useProcEx;
+    public CustomFaultInInterceptor(boolean useProcEx) {
         super(Phase.PRE_STREAM);
+        this.useProcEx = useProcEx;
     } 
 
     public void handleMessage(Message message) throws Fault {
         Exception ex = message.getContent(Exception.class);
-        throw new ProcessingException(ex.getCause().getClass().getSimpleName() 
+        String errorMessage = ex.getCause().getClass().getSimpleName() 
             + ": Microservice at "
             + message.get(Message.REQUEST_URI)
-            + " is not available");
+            + " is not available";
+        message.getExchange().put("wrap.in.processing.exception", useProcEx);
+        throw useProcEx ? new ProcessingException(new CustomRuntimeException(errorMessage))
+            : new CustomRuntimeException(errorMessage);
+    }
+    public static class CustomRuntimeException extends RuntimeException {
+        private static final long serialVersionUID = -4664563239685175537L;
+
+        public CustomRuntimeException(String errorMessage) {
+            super(errorMessage);
+        }
     }
       
 }
