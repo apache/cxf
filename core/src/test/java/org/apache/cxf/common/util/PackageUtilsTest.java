@@ -92,4 +92,11 @@ public class PackageUtilsTest extends Assert {
                     org.apache.cxf.common.jaxb.JAXBContextCache.class));       
         assertEquals("", packageName);
     }
+    @Test
+    public void testSharedPackageNameManyClassesCommonRoot6() {
+        String packageName = PackageUtils.getSharedPackageName(
+            Arrays.asList(org.apache.cxf.bus.spring.BusApplicationContext.class,
+                    org.apache.cxf.configuration.spring.JAXBBeanFactory.class));
+        assertEquals("org.apache.cxf", packageName);
+    }
 }
