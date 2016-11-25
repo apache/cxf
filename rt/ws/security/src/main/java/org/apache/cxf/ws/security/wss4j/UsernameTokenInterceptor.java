@@ -29,6 +29,7 @@ import java.util.Set;
 
 import javax.security.auth.Subject;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.util.StringUtils;
@@ -369,8 +370,11 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
         UsernameToken tok = assertTokens(message);
 
         Header h = findSecurityHeader(message, true);
+        Element el = (Element)h.getObject();
+        Document doc = el.getOwnerDocument();
+        
         WSSecUsernameToken utBuilder = 
-            addUsernameToken(message, tok);
+            addUsernameToken(message, doc, tok);
         if (utBuilder == null) {
             AssertionInfoMap aim = message.get(AssertionInfoMap.class);
             Collection<AssertionInfo> ais = 
@@ -382,13 +386,12 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
             }
             return;
         }
-        Element el = (Element)h.getObject();
-        utBuilder.prepare(el.getOwnerDocument());
+        utBuilder.prepare();
         el.appendChild(utBuilder.getUsernameTokenElement());
     }
 
 
-    protected WSSecUsernameToken addUsernameToken(SoapMessage message, UsernameToken token) {
+    protected WSSecUsernameToken addUsernameToken(SoapMessage message, Document doc, UsernameToken token) {
         String userName = 
             (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.USERNAME, message);
         WSSConfig wssConfig = (WSSConfig)message.getContextualProperty(WSSConfig.class.getName());
@@ -399,7 +402,7 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
         if (!StringUtils.isEmpty(userName)) {
             // If NoPassword property is set we don't need to set the password
             if (token.getPasswordType() == UsernameToken.PasswordType.NoPassword) {
-                WSSecUsernameToken utBuilder = new WSSecUsernameToken();
+                WSSecUsernameToken utBuilder = new WSSecUsernameToken(doc);
                 utBuilder.setIdAllocator(wssConfig.getIdAllocator());
                 utBuilder.setWsTimeSource(wssConfig.getCurrentTime());
                 utBuilder.setUserInfo(userName, null);
@@ -415,7 +418,7 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
             
             if (!StringUtils.isEmpty(password)) {
                 //If the password is available then build the token
-                WSSecUsernameToken utBuilder = new WSSecUsernameToken();
+                WSSecUsernameToken utBuilder = new WSSecUsernameToken(doc);
                 utBuilder.setIdAllocator(wssConfig.getIdAllocator());
                 utBuilder.setWsTimeSource(wssConfig.getCurrentTime());
                 if (token.getPasswordType() == UsernameToken.PasswordType.HashPassword) {

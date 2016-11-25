@@ -149,7 +149,10 @@ public final class TokenProviderUtils {
             }
         }
         
-        WSSecEncrypt builder = new WSSecEncrypt();
+        Document doc = element.getOwnerDocument();
+        doc.appendChild(element);
+        
+        WSSecEncrypt builder = new WSSecEncrypt(doc);
         if (WSHandlerConstants.USE_REQ_SIG_CERT.equals(name)) {
             X509Certificate cert = getReqSigCert(messageContext);
             builder.setUseThisCert(cert);
@@ -164,10 +167,7 @@ public final class TokenProviderUtils {
         WSEncryptionPart encryptionPart = new WSEncryptionPart(id, "Element");
         encryptionPart.setElement(element);
         
-        Document doc = element.getOwnerDocument();
-        doc.appendChild(element);
-                                 
-        builder.prepare(element.getOwnerDocument(), stsProperties.getEncryptionCrypto());
+        builder.prepare(stsProperties.getEncryptionCrypto());
         builder.encryptForRef(null, Collections.singletonList(encryptionPart));
         
         return doc.getDocumentElement();

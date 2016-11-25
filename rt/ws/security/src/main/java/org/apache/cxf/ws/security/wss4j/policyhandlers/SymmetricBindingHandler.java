@@ -251,10 +251,10 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                     if (encryptionToken.getDerivedKeys() == DerivedKeys.RequireDerivedKeys 
                         && !secondEncrParts.isEmpty()) {
                         secondRefList = ((WSSecDKEncrypt)encr).encryptForExternalRef(null, 
-                                secondEncrParts, secHeader);
+                                secondEncrParts);
                     } else if (!secondEncrParts.isEmpty()) {
                         //Encrypt, get hold of the ref list and add it
-                        secondRefList = ((WSSecEncrypt)encr).encryptForRef(null, secondEncrParts, secHeader);
+                        secondRefList = ((WSSecEncrypt)encr).encryptForRef(null, secondEncrParts);
                     }
                     if (secondRefList != null) {
                         this.addDerivedKeyElement(secondRefList);
@@ -402,7 +402,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                                           List<WSEncryptionPart> encrParts,
                                           boolean atEnd) {
         try {
-            WSSecDKEncrypt dkEncr = new WSSecDKEncrypt();
+            WSSecDKEncrypt dkEncr = new WSSecDKEncrypt(secHeader);
             dkEncr.setEncryptionSerializer(new StaxSerializer());
             dkEncr.setIdAllocator(wssConfig.getIdAllocator());
             dkEncr.setCallbackLookup(callbackLookup);
@@ -486,12 +486,12 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             AlgorithmSuiteType algType = sbinding.getAlgorithmSuite().getAlgorithmSuiteType();
             dkEncr.setSymmetricEncAlgorithm(algType.getEncryption());
             dkEncr.setDerivedKeyLength(algType.getEncryptionDerivedKeyLength() / 8);
-            dkEncr.prepare(saaj.getSOAPPart());
+            dkEncr.prepare();
             Element encrDKTokenElem = null;
             encrDKTokenElem = dkEncr.getdktElement();
             addDerivedKeyElement(encrDKTokenElem);
             
-            Element refList = dkEncr.encryptForExternalRef(null, encrParts, secHeader);
+            Element refList = dkEncr.encryptForExternalRef(null, encrParts);
             List<Element> attachments = dkEncr.getAttachmentEncryptedDataElements();
             addAttachmentsForEncryption(atEnd, refList, attachments);
 
@@ -519,7 +519,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                                            attached, encrParts, atEnd);
             } else {
                 try {
-                    WSSecEncrypt encr = new WSSecEncrypt();
+                    WSSecEncrypt encr = new WSSecEncrypt(secHeader);
                     encr.setEncryptionSerializer(new StaxSerializer());
                     encr.setIdAllocator(wssConfig.getIdAllocator());
                     encr.setCallbackLookup(callbackLookup);
@@ -552,7 +552,6 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                         setEncryptionUser(encr, encrToken, false, crypto);
                     }
                     
-                    encr.setDocument(saaj.getSOAPPart());
                     encr.setEncryptSymmKey(false);
                     encr.setSymmetricEncAlgorithm(algorithmSuite.getAlgorithmSuiteType().getEncryption());
                     encr.setMGFAlgorithm(algorithmSuite.getAlgorithmSuiteType().getMGFAlgo());
@@ -595,13 +594,13 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                         encr.setKeyIdentifierType(WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER);
                     }
 
-                    encr.prepare(saaj.getSOAPPart(), crypto);
+                    encr.prepare(crypto);
                    
                     if (encr.getBSTTokenId() != null) {
-                        encr.prependBSTElementToHeader(secHeader);
+                        encr.prependBSTElementToHeader();
                     }
                    
-                    Element refList = encr.encryptForRef(null, encrParts, secHeader);
+                    Element refList = encr.encryptForRef(null, encrParts);
                     List<Element> attachments = encr.getAttachmentEncryptedDataElements();
                     addAttachmentsForEncryption(atEnd, refList, attachments);
                     
@@ -643,7 +642,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                                SecurityToken tok,
                                boolean included) throws WSSecurityException {
         Document doc = saaj.getSOAPPart();
-        WSSecDKSign dkSign = new WSSecDKSign();
+        WSSecDKSign dkSign = new WSSecDKSign(secHeader);
         dkSign.setIdAllocator(wssConfig.getIdAllocator());
         dkSign.setCallbackLookup(callbackLookup);
         dkSign.setAttachmentCallbackHandler(new AttachmentCallbackHandler(message));
@@ -735,7 +734,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             }
         }
         
-        dkSign.prepare(doc, secHeader);
+        dkSign.prepare();
         
         if (sbinding.isProtectTokens()) {
             String sigTokId = tok.getId();
@@ -754,7 +753,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
         }
         
         dkSign.getParts().addAll(sigs);
-        List<Reference> referenceList = dkSign.addReferencesToSign(sigs, secHeader);
+        List<Reference> referenceList = dkSign.addReferencesToSign(sigs);
         if (!referenceList.isEmpty()) {
             //Add elements to header
             Element el = dkSign.getdktElement();
@@ -783,7 +782,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
         if (policyToken.getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
             return doSignatureDK(sigs, policyAbstractTokenWrapper, policyToken, tok, included);
         } else {
-            WSSecSignature sig = new WSSecSignature();
+            WSSecSignature sig = new WSSecSignature(secHeader);
             sig.setIdAllocator(wssConfig.getIdAllocator());
             sig.setCallbackLookup(callbackLookup);
             sig.setAttachmentCallbackHandler(new AttachmentCallbackHandler(message));
@@ -888,9 +887,9 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                 crypto = getSignatureCrypto();
             }
             this.message.getExchange().put(SecurityConstants.SIGNATURE_CRYPTO, crypto);
-            sig.prepare(saaj.getSOAPPart(), crypto, secHeader);
+            sig.prepare(crypto);
             sig.getParts().addAll(sigs);
-            List<Reference> referenceList = sig.addReferencesToSign(sigs, secHeader);
+            List<Reference> referenceList = sig.addReferencesToSign(sigs);
             if (!referenceList.isEmpty()) {
                 //Do signature
                 if (bottomUpElement == null) {
@@ -937,7 +936,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
         //If direct ref is used to refer to the cert
         //then add the cert to the sec header now
         if (bstTokenId != null && bstTokenId.length() > 0) {
-            encrKey.prependBSTElementToHeader(secHeader);
+            encrKey.prependBSTElementToHeader();
         }
         return id;
     }

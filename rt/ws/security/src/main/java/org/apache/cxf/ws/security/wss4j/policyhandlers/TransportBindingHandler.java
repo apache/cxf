@@ -29,7 +29,6 @@ import javax.xml.crypto.dsig.Reference;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.interceptor.Fault;
@@ -105,8 +104,8 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             if (token instanceof UsernameToken) {
                 WSSecUsernameToken utBuilder = addUsernameToken((UsernameToken)token);
                 if (utBuilder != null) {
-                    utBuilder.prepare(saaj.getSOAPPart());
-                    utBuilder.appendToHeader(secHeader);
+                    utBuilder.prepare();
+                    utBuilder.appendToHeader();
                 }
             } else if (token instanceof IssuedToken || token instanceof KerberosToken
                 || token instanceof SpnegoContextToken) {
@@ -345,8 +344,6 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
     private byte[] doX509TokenSignature(AbstractToken token, SupportingTokens wrapper) 
         throws Exception {
         
-        Document doc = saaj.getSOAPPart();
-        
         List<WSEncryptionPart> sigParts = 
             signPartsAndElements(wrapper.getSignedParts(), wrapper.getSignedElements());
         
@@ -358,9 +355,9 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             if (bstElem != null) {
                 addTopDownElement(bstElem);
             }
-            encrKey.appendToHeader(secHeader);
+            encrKey.appendToHeader();
             
-            WSSecDKSign dkSig = new WSSecDKSign();
+            WSSecDKSign dkSig = new WSSecDKSign(secHeader);
             dkSig.setIdAllocator(wssConfig.getIdAllocator());
             dkSig.setCallbackLookup(callbackLookup);
             if (token.getVersion() == SPConstants.SPVersion.SP11) {
@@ -374,13 +371,13 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             
             dkSig.setExternalKey(encrKey.getEphemeralKey(), encrKey.getId());
             
-            dkSig.prepare(doc, secHeader);
+            dkSig.prepare();
             
             dkSig.getParts().addAll(sigParts);
-            List<Reference> referenceList = dkSig.addReferencesToSign(sigParts, secHeader);
+            List<Reference> referenceList = dkSig.addReferencesToSign(sigParts);
             
             //Do signature
-            dkSig.appendDKElementToHeader(secHeader);
+            dkSig.appendDKElementToHeader();
             dkSig.computeSignature(referenceList, false, null);
             
             return dkSig.getSignatureValue();
@@ -388,9 +385,9 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             WSSecSignature sig = getSignatureBuilder(token, false, false);
             assertPolicy(wrapper);
             if (sig != null) {
-                sig.prependBSTElementToHeader(secHeader);
+                sig.prependBSTElementToHeader();
             
-                List<Reference> referenceList = sig.addReferencesToSign(sigParts, secHeader);
+                List<Reference> referenceList = sig.addReferencesToSign(sigParts);
                 
                 if (bottomUpElement == null) {
                     sig.computeSignature(referenceList, false, null);
@@ -451,7 +448,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
         List<WSEncryptionPart> sigParts
     ) throws Exception {
         //Do Signature with derived keys
-        WSSecDKSign dkSign = new WSSecDKSign();
+        WSSecDKSign dkSign = new WSSecDKSign(secHeader);
         dkSign.setIdAllocator(wssConfig.getIdAllocator());
         dkSign.setCallbackLookup(callbackLookup);
         AlgorithmSuite algorithmSuite = tbinding.getAlgorithmSuite();
@@ -481,13 +478,12 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
         if (token.getVersion() == SPConstants.SPVersion.SP11) {
             dkSign.setWscVersion(ConversationConstants.VERSION_05_02);
         }
-        Document doc = saaj.getSOAPPart();
-        dkSign.prepare(doc, secHeader);
+        dkSign.prepare();
 
         addDerivedKeyElement(dkSign.getdktElement());
 
         dkSign.getParts().addAll(sigParts);
-        List<Reference> referenceList = dkSign.addReferencesToSign(sigParts, secHeader);
+        List<Reference> referenceList = dkSign.addReferencesToSign(sigParts);
 
         //Do signature
         dkSign.computeSignature(referenceList, false, null);
@@ -502,7 +498,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
         SupportingTokens wrapper,
         List<WSEncryptionPart> sigParts
     ) throws Exception {
-        WSSecSignature sig = new WSSecSignature();
+        WSSecSignature sig = new WSSecSignature(secHeader);
         sig.setIdAllocator(wssConfig.getIdAllocator());
         sig.setCallbackLookup(callbackLookup);
         
@@ -583,11 +579,10 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
         AlgorithmSuiteType algType = binding.getAlgorithmSuite().getAlgorithmSuiteType();
         sig.setDigestAlgo(algType.getDigest());
 
-        Document doc = saaj.getSOAPPart();
-        sig.prepare(doc, crypto, secHeader);
+        sig.prepare(crypto);
 
         sig.getParts().addAll(sigParts);
-        List<Reference> referenceList = sig.addReferencesToSign(sigParts, secHeader);
+        List<Reference> referenceList = sig.addReferencesToSign(sigParts);
 
         //Do signature
         if (bottomUpElement == null) {

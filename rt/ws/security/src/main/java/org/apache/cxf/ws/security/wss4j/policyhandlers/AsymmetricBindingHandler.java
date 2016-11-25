@@ -404,9 +404,9 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             && encrBase instanceof WSSecDKEncrypt) {
             try {
                 Element secondRefList = 
-                    ((WSSecDKEncrypt)encrBase).encryptForExternalRef(null, secondEncrParts, secHeader);
+                    ((WSSecDKEncrypt)encrBase).encryptForExternalRef(null, secondEncrParts);
                 if (secondRefList != null) {
-                    ((WSSecDKEncrypt)encrBase).addExternalRefElement(secondRefList, secHeader);
+                    ((WSSecDKEncrypt)encrBase).addExternalRefElement(secondRefList);
                 }
 
             } catch (WSSecurityException ex) {
@@ -424,7 +424,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                 } else {
                     this.insertBeforeBottomUp(secondRefList);
                 }
-                ((WSSecEncrypt)encrBase).encryptForRef(secondRefList, secondEncrParts, secHeader);
+                ((WSSecEncrypt)encrBase).encryptForRef(secondRefList, secondEncrParts);
 
             } catch (WSSecurityException ex) {
                 LOG.log(Level.FINE, ex.getMessage(), ex);
@@ -446,14 +446,13 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                 return doEncryptionDerived(recToken, encrToken, encrParts, algorithmSuite);
             } else {
                 try {
-                    WSSecEncrypt encr = new WSSecEncrypt();
+                    WSSecEncrypt encr = new WSSecEncrypt(secHeader);
                     encr.setEncryptionSerializer(new StaxSerializer());
                     encr.setIdAllocator(wssConfig.getIdAllocator());
                     encr.setCallbackLookup(callbackLookup);
                     encr.setAttachmentCallbackHandler(new AttachmentCallbackHandler(message));
                     encr.setStoreBytesInAttachment(storeBytesInAttachment);
                     
-                    encr.setDocument(saaj.getSOAPPart());
                     Crypto crypto = getEncryptionCrypto();
                     
                     SecurityToken securityToken = getSecurityToken();
@@ -499,13 +498,13 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                     encr.setKeyEncAlgo(algType.getAsymmetricKeyWrap());
                     encr.setMGFAlgorithm(algType.getMGFAlgo());
                     encr.setDigestAlgorithm(algType.getEncryptionDigest());
-                    encr.prepare(saaj.getSOAPPart(), crypto);
+                    encr.prepare(crypto);
                     
                     Element encryptedKeyElement = encr.getEncryptedKeyElement();
                     List<Element> attachments = encr.getAttachmentEncryptedDataElements();
                     //Encrypt, get hold of the ref list and add it
                     if (externalRef) {
-                        Element refList = encr.encryptForRef(null, encrParts, secHeader);
+                        Element refList = encr.encryptForRef(null, encrParts);
                         if (refList != null) {
                             insertBeforeBottomUp(refList);
                         }
@@ -518,7 +517,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                             this.addEncryptedKeyElement(encryptedKeyElement);
                         }
                     } else {
-                        Element refList = encr.encryptForRef(null, encrParts, secHeader);
+                        Element refList = encr.encryptForRef(null, encrParts);
                         if (refList != null || (attachments != null && !attachments.isEmpty())) {
                             this.addEncryptedKeyElement(encryptedKeyElement);
                         }
@@ -536,7 +535,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
 
                     // Put BST before EncryptedKey element
                     if (encr.getBSTTokenId() != null) {
-                        encr.prependBSTElementToHeader(secHeader);
+                        encr.prependBSTElementToHeader();
                     }
 
                     return encr;
@@ -554,7 +553,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                                      List<WSEncryptionPart> encrParts,
                                      AlgorithmSuite algorithmSuite) {
         try {
-            WSSecDKEncrypt dkEncr = new WSSecDKEncrypt();
+            WSSecDKEncrypt dkEncr = new WSSecDKEncrypt(secHeader);
             dkEncr.setEncryptionSerializer(new StaxSerializer());
             dkEncr.setIdAllocator(wssConfig.getIdAllocator());
             dkEncr.setCallbackLookup(callbackLookup);
@@ -575,10 +574,10 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             AlgorithmSuiteType algType = algorithmSuite.getAlgorithmSuiteType();
             dkEncr.setSymmetricEncAlgorithm(algType.getEncryption());
             dkEncr.setDerivedKeyLength(algType.getEncryptionDerivedKeyLength() / 8);
-            dkEncr.prepare(saaj.getSOAPPart());
+            dkEncr.prepare();
 
             addDerivedKeyElement(dkEncr.getdktElement());
-            Element refList = dkEncr.encryptForExternalRef(null, encrParts, secHeader);
+            Element refList = dkEncr.encryptForExternalRef(null, encrParts);
             if (refList != null) {
                 insertBeforeBottomUp(refList);
             }
@@ -631,7 +630,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             // Add the BST to the security header if required
             if (!attached && isTokenRequired(sigToken.getIncludeTokenType())) {
                 WSSecSignature sig = getSignatureBuilder(sigToken, attached, false);
-                sig.appendBSTElementToHeader(secHeader);
+                sig.appendBSTElementToHeader();
             } 
             return;
         }
@@ -639,7 +638,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             // Set up the encrypted key to use
             setupEncryptedKey(wrapper, sigToken);
             
-            WSSecDKSign dkSign = new WSSecDKSign();
+            WSSecDKSign dkSign = new WSSecDKSign(secHeader);
             dkSign.setIdAllocator(wssConfig.getIdAllocator());
             dkSign.setCallbackLookup(callbackLookup);
             dkSign.setAttachmentCallbackHandler(new AttachmentCallbackHandler(message));
@@ -666,7 +665,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             dkSign.setAddInclusivePrefixes(includePrefixes);
             
             try {
-                dkSign.prepare(saaj.getSOAPPart(), secHeader);
+                dkSign.prepare();
 
                 if (abinding.isProtectTokens()) {
                     assertPolicy(
@@ -686,7 +685,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
 
                 dkSign.getParts().addAll(sigParts);
 
-                List<Reference> referenceList = dkSign.addReferencesToSign(sigParts, secHeader);
+                List<Reference> referenceList = dkSign.addReferencesToSign(sigParts);
                 if (!referenceList.isEmpty()) {
                     // Add elements to header
                     addDerivedKeyElement(dkSign.getdktElement());
@@ -719,10 +718,10 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                     bstPart.setElement(sig.getBinarySecurityTokenElement());
                     sigParts.add(bstPart);
                 }
-                sig.prependBSTElementToHeader(secHeader);
+                sig.prependBSTElementToHeader();
             }
 
-            List<Reference> referenceList = sig.addReferencesToSign(sigParts, secHeader);
+            List<Reference> referenceList = sig.addReferencesToSign(sigParts);
             if (!referenceList.isEmpty()) {
                 //Do signature
                 if (bottomUpElement == null) {
@@ -735,7 +734,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                 if (!abinding.isProtectTokens()) {
                     Element bstElement = sig.getBinarySecurityTokenElement();
                     if (bstElement != null) {
-                        secHeader.getSecurityHeader().insertBefore(bstElement, bottomUpElement);
+                        secHeader.getSecurityHeaderElement().insertBefore(bstElement, bottomUpElement);
                     }
                 }
                 
@@ -787,7 +786,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
         Element bstElem = encrKey.getBinarySecurityTokenElement();
         if (bstElem != null) {
             // If a BST is available then use it
-            encrKey.prependBSTElementToHeader(secHeader);
+            encrKey.prependBSTElementToHeader();
         }
         
         // Add the EncryptedKey

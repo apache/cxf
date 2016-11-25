@@ -341,15 +341,15 @@ public abstract class AbstractOperation {
             }
         }
         
-        WSSecEncryptedKey builder = new WSSecEncryptedKey();
+        Document doc = DOMUtils.createDocument();
+        
+        WSSecEncryptedKey builder = new WSSecEncryptedKey(doc);
         builder.setUserInfo(name);
         builder.setKeyIdentifierType(encryptionProperties.getKeyIdentifierType());
         builder.setEphemeralKey(secret);
         builder.setKeyEncAlgo(keyWrapAlgorithm);
         
-        Document doc = DOMUtils.createDocument();
-                                 
-        builder.prepare(doc, stsProperties.getEncryptionCrypto());
+        builder.prepare(stsProperties.getEncryptionCrypto());
         
         return builder.getEncryptedKeyElement();
     }

@@ -224,12 +224,12 @@ public class WSS4JOutInterceptorTest extends AbstractSecurityTest {
         private int executions;
         
         @Override
-        public void execute(WSHandler handler, SecurityActionToken actionToken, Document doc,
+        public void execute(WSHandler handler, SecurityActionToken actionToken,
                 RequestData reqData) throws WSSecurityException {
             
             this.executions++;
             reqData.setPwType(WSConstants.PW_TEXT);
-            super.execute(handler, actionToken, doc, reqData);
+            super.execute(handler, actionToken, reqData);
         }
 
         public int getExecutions() {

@@ -334,13 +334,13 @@ public class DefaultSubjectProvider implements SubjectProvider {
         KeyInfoBean keyInfo = new KeyInfoBean();
 
         // Create an EncryptedKey
-        WSSecEncryptedKey encrKey = new WSSecEncryptedKey();
+        WSSecEncryptedKey encrKey = new WSSecEncryptedKey(doc);
         encrKey.setKeyIdentifierType(encryptionProperties.getKeyIdentifierType());
         encrKey.setEphemeralKey(secret);
         encrKey.setSymmetricEncAlgorithm(encryptionProperties.getEncryptionAlgorithm());
         encrKey.setUseThisCert(certificate);
         encrKey.setKeyEncAlgo(encryptionProperties.getKeyWrapAlgorithm());
-        encrKey.prepare(doc, encryptionCrypto);
+        encrKey.prepare(encryptionCrypto);
         Element encryptedKeyElement = encrKey.getEncryptedKeyElement();
 
         // Append the EncryptedKey to a KeyInfo element

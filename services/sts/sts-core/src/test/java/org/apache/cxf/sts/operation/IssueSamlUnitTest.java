@@ -825,13 +825,13 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         );
         
         // Now add Entropy
-        WSSecEncryptedKey builder = new WSSecEncryptedKey();
+        Document doc = DOMUtils.createDocument();
+        WSSecEncryptedKey builder = new WSSecEncryptedKey(doc);
         builder.setUserInfo("mystskey");
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         builder.setKeyEncAlgo(WSConstants.KEYTRANSPORT_RSAOAEP);
         
-        Document doc = DOMUtils.createDocument();
-        builder.prepare(doc, stsProperties.getSignatureCrypto());
+        builder.prepare(stsProperties.getSignatureCrypto());
         Element encryptedKeyElement = builder.getEncryptedKeyElement();
         byte[] secret = builder.getEphemeralKey();
         
