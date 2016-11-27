@@ -256,6 +256,10 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
                 checkCachedStream(message, outOriginal, enabled);
             } finally {
                 if (enabled) {
+                    OutputStream os = message.getContent(OutputStream.class);
+                    if (os != outOriginal && os instanceof CachedOutputStream) {
+                        os.close();
+                    }
                     message.setContent(OutputStream.class, outOriginal);
                     message.put(XMLStreamWriter.class.getName(), null);
                 }
