@@ -151,6 +151,12 @@ public class Java2WSMojo extends AbstractMojo {
     private Boolean genWrapperbean;
 
     /**
+     * @parameter
+     */
+    private String portName;
+
+
+    /**
      * Attach the generated wsdl file to the list of files to be deployed
      * on install. This means the wsdl file will be copied to the repository
      * with groupId, artifactId and version of the project and type "wsdl".
@@ -340,6 +346,12 @@ public class Java2WSMojo extends AbstractMojo {
         if (address != null) {
             args.add("-address");
             args.add(address);
+        }
+
+        // portname arg
+        if (portName != null) {
+            args.add("-portname");
+            args.add(portName);
         }
 
         if (argline != null) {
