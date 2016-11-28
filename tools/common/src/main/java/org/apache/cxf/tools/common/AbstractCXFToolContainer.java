@@ -160,7 +160,7 @@ public abstract class AbstractCXFToolContainer extends AbstractToolContainer {
             fileBase = tok.nextToken();
         }
         if (fileBase.endsWith(".wsdl")) {
-            fileBase = new String(fileBase.substring(0, fileBase.length() - 5));
+            fileBase = fileBase.substring(0, fileBase.length() - 5);
         }
         return fileBase;
     }

@@ -265,7 +265,7 @@ public final class IdlPreprocessorReader extends Reader {
         String symbol = line.substring("#if".length()).trim();
         boolean notSkip = true;
         try {
-            int value = Integer.valueOf(symbol);
+            int value = Integer.parseInt(symbol);
             if (value == 0) {
                 notSkip = false;
             }

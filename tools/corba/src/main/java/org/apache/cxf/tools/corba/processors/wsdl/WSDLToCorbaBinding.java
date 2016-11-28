@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -145,11 +146,11 @@ public class WSDLToCorbaBinding {
 
                 Map<QName, PortType> portTypes = CastUtils.cast(def.getAllPortTypes());
                 if (portTypes != null) {
-                    for (QName existPortQName : portTypes.keySet()) {
-                        if (!existPortQName.getLocalPart().equals(interfaceName)) {
+                    for (Entry<QName, PortType> entry : portTypes.entrySet()) {
+                        if (!entry.getKey().getLocalPart().equals(interfaceName)) {
                             portType = null;
                         } else {
-                            portType = portTypes.get(existPortQName);
+                            portType = entry.getValue();
                             break;
                         }
                     }
@@ -689,7 +690,7 @@ public class WSDLToCorbaBinding {
 
 
     public void setWsdlFile(String file) {
-        wsdlFileName = new String(file);
+        wsdlFileName = file;
     }
 
     public String getWsdlFileName() {
@@ -817,7 +818,7 @@ public class WSDLToCorbaBinding {
     }
 
     public void setOutputFile(String file) {
-        outputFile = new String(file);
+        outputFile = file;
     }
 
     public void setNamespace(String nameSpaceName) {
