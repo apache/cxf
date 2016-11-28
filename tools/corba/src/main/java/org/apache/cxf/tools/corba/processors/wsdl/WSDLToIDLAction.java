@@ -785,7 +785,7 @@ public class WSDLToIDLAction {
         String result[] = new String[strtok.countTokens()];
 
         for (int i = 0; strtok.hasMoreTokens(); ++i) {
-            result[i] = new String(strtok.nextToken());
+            result[i] = strtok.nextToken();
         }
 
         return result;
@@ -800,7 +800,7 @@ public class WSDLToIDLAction {
     }
  
     public void setWsdlFile(String file) {
-        wsdlFileName = new String(file);
+        wsdlFileName = file;
     }
 
     public void setVerboseOn(boolean verbose) {
@@ -811,7 +811,7 @@ public class WSDLToIDLAction {
     }
 
     public void setBindingName(String bindName) {
-        bindingName = new String(bindName);
+        bindingName = bindName;
     }
     
     public String getBindingName() {
@@ -819,7 +819,7 @@ public class WSDLToIDLAction {
     }
 
     public void setNamespace(String namespaceName) {
-        namespace = new String(namespaceName);
+        namespace = namespaceName;
     }
     
     public String getNamespace() {

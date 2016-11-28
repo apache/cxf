@@ -29,7 +29,7 @@ public abstract class IdlStructBase extends IdlScopeBase implements IdlType {
 
     protected IdlStructBase(IdlScopeBase parent, String name, String type) {
         super(parent, name);   
-        this.kind = new String(type);
+        this.kind = type;
     }
 
     void addField(IdlField f) {

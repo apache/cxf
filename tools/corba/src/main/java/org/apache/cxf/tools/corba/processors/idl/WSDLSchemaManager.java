@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.wsdl.Definition;
 import javax.wsdl.Import;
@@ -60,7 +61,7 @@ public class WSDLSchemaManager {
 
     boolean ignoreImports;
 
-    class DeferredSchemaAttachment {
+    static class DeferredSchemaAttachment {
         Definition defn;
         XmlSchema schema;
         boolean isGenerated;
@@ -319,22 +320,18 @@ public class WSDLSchemaManager {
     }
 
     public File getImportedWSDLDefinitionFile(String ns) {
-        for (Iterator<File> it = importedDefns.keySet().iterator(); it.hasNext();) {
-            File file = it.next();
-            Definition defn = importedDefns.get(file);
-            if (defn.getTargetNamespace().equals(ns)) {
-                return file;
+        for (Entry<File, Definition> entry : importedDefns.entrySet()) {
+            if (entry.getValue().getTargetNamespace().equals(ns)) {
+                return entry.getKey();
             }
         }
         return null;
     }
 
     public File getImportedXmlSchemaFile(String ns) {
-        for (Iterator<File> it = importedSchemas.keySet().iterator(); it.hasNext();) {
-            File file = it.next();
-            XmlSchema schema = importedSchemas.get(file);
-            if (schema.getTargetNamespace().equals(ns)) {
-                return file;
+        for (Entry<File, XmlSchema> entry : importedSchemas.entrySet()) {
+            if (entry.getValue().getTargetNamespace().equals(ns)) {
+                return entry.getKey();
             }
         }
         return null;

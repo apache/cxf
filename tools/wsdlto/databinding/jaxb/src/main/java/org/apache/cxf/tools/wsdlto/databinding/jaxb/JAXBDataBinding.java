@@ -167,7 +167,7 @@ public class JAXBDataBinding implements DataBindingProfile {
             }
         }
     }
-    public class LocationFilterReader extends StreamReaderDelegate {
+    public static class LocationFilterReader extends StreamReaderDelegate {
         boolean isImport;
         boolean isInclude;
         int locIdx = -1;

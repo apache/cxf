@@ -57,7 +57,7 @@ public abstract class AbstractToolContainer implements ToolContainer {
     private OutputStream outOutputStream;
     private OutputStream errOutputStream;
  
-    public class GenericOutputStream extends OutputStream {
+    public static class GenericOutputStream extends OutputStream {
         public void write(int b) throws IOException {
 
         }
