@@ -323,6 +323,7 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
             ClassLoader theLoader = proxyLoader == null ? cri.getServiceClass().getClassLoader() : proxyLoader;
             Class<?>[] ifaces = new Class[]{Client.class, InvocationHandlerAware.class, cri.getServiceClass()};
             Client actualClient = (Client)ProxyHelper.getProxy(theLoader, ifaces, proxyImpl);
+            proxyImpl.setProxyClient(actualClient);
             notifyLifecycleManager(actualClient);
             this.getServiceFactory().sendEvent(FactoryBeanListener.Event.CLIENT_CREATED, actualClient, ep);
             return actualClient;

@@ -18,6 +18,9 @@
  */
 package org.apache.cxf.systest.jaxrs.validation.spring;
 
+import java.util.Arrays;
+
+import javax.validation.ConstraintViolationException;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.Response;
@@ -28,6 +31,8 @@ import javax.xml.ws.soap.SOAPBinding;
 import javax.xml.ws.soap.SOAPFaultException;
 
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
+import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
+import org.apache.cxf.jaxrs.client.validation.JAXRSClientBeanValidationFeature;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.systest.jaxrs.AbstractSpringServer;
 import org.apache.cxf.systest.jaxrs.validation.AbstractJAXRSValidationTest;
@@ -91,6 +96,25 @@ public class JAXRSClientServerValidationSpringTest extends AbstractJAXRSValidati
             service.echoBook(new BookWithValidation(null, "123"));
             fail("Validation failure expected");
         } catch (BadRequestException ex) {
+            // complete
+        }
+        
+    }
+    
+    @Test
+    public void testHelloRestValidationFailsIfNameIsNullClient() throws Exception {
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setAddress("http://localhost:" + PORT + "/bwrest");
+        bean.setServiceClass(BookWorld.class);
+        bean.setFeatures(Arrays.asList(new JAXRSClientBeanValidationFeature()));
+        BookWorld service = bean.create(BookWorld.class);
+        BookWithValidation bw = service.echoBook(new BookWithValidation("RS", "123"));
+        assertEquals("123", bw.getId());
+        
+        try {
+            service.echoBook(new BookWithValidation(null, "123"));
+            fail("Validation failure expected");
+        } catch (ConstraintViolationException ex) {
             // complete
         }
         
