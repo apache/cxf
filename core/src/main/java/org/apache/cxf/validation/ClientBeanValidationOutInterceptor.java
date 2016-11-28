@@ -20,11 +20,11 @@ package org.apache.cxf.validation;
 
 import org.apache.cxf.phase.Phase;
 
-public class BeanValidationInInterceptor extends AbstractBeanValidationInterceptor {
-    public BeanValidationInInterceptor() {
-        super(Phase.PRE_INVOKE);
+public class ClientBeanValidationOutInterceptor extends AbstractBeanValidationInterceptor {
+    public ClientBeanValidationOutInterceptor() {
+        super(Phase.PRE_LOGICAL);
     }
-    public BeanValidationInInterceptor(String phase) {
+    public ClientBeanValidationOutInterceptor(String phase) {
         super(phase);
     }
 }
