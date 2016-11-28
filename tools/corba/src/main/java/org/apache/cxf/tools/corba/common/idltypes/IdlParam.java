@@ -35,7 +35,7 @@ public final class IdlParam extends IdlDefnImplBase {
     private IdlParam(IdlOperation parent, String name, IdlType typeType, String modeValue) {
         super(parent, name);
         this.type = typeType;
-        this.mode = new String(modeValue);        
+        this.mode = modeValue;        
     }
     
     public static IdlParam create(IdlOperation parent, String name, IdlType type, String mode) {

@@ -82,7 +82,7 @@ public class ClassUtils {
 
                 dirSet.add(path);
                 File file = new File(path);
-                if (file.isDirectory()) {
+                if (file.isDirectory() && file.list() != null) {
                     for (String str : file.list()) {
                         if (str.endsWith("java")) {
                             fileList.add(path + str);

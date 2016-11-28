@@ -71,10 +71,10 @@ public class WSDLToCorbaProcessor extends WSDLToProcessor {
             setOutputFile();
             String filename = getFileBase(env.get("wsdlurl").toString());
             if ((wsdlOutput == null) && (wsdlToCorbaBinding != null)) {
-                wsdlOutput = new String(filename + "-corba.wsdl");
+                wsdlOutput = filename + "-corba.wsdl";
             }
             if ((idlOutput == null) && (idlAction != null)) {
-                idlOutput = new String(filename + ".idl");
+                idlOutput = filename + ".idl";
             }
 
             if (wsdlToCorbaBinding != null) {
@@ -222,7 +222,7 @@ public class WSDLToCorbaProcessor extends WSDLToProcessor {
             fileBase = tok.nextToken();
         }
         if (fileBase.endsWith(".wsdl")) {
-            fileBase = new String(fileBase.substring(0, fileBase.length() - 5));
+            fileBase = fileBase.substring(0, fileBase.length() - 5);
         }
         return fileBase;
     }

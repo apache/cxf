@@ -31,7 +31,7 @@ import org.apache.cxf.common.logging.LogUtils;
 public class ToolErrorListener {
     private static final Logger LOG = LogUtils.getL7dLogger(ToolErrorListener.class);
     
-    class ErrorInfo {
+    static class ErrorInfo {
         String file;
         int line;
         int col;

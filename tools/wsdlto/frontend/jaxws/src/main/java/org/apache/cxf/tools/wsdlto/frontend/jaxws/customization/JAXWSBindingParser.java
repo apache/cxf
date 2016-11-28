@@ -232,7 +232,7 @@ public class JAXWSBindingParser {
         return rnode;
     }
 
-    class ContextImpl implements NamespaceContext {
+    static class ContextImpl implements NamespaceContext {
         private Node targetNode;
 
         ContextImpl(Node node) {

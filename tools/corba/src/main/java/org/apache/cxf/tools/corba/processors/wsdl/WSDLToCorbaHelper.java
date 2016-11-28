@@ -754,7 +754,6 @@ public class WSDLToCorbaHelper {
                                                              corbaTypeImpl, anonymous);
                 } else if ((corbaTypeImpl.getType().equals(W3CConstants.NT_SCHEMA_BASE64))
                     || (baseName.equals(W3CConstants.NT_SCHEMA_BASE64))
-                    || (corbaTypeImpl.getType().equals(W3CConstants.NT_SCHEMA_HBIN))
                     || (corbaTypeImpl.getType().equals(W3CConstants.NT_SCHEMA_HBIN))) {
                     corbaTypeImpl = WSDLTypes.processBase64Type(corbaTypeImpl,
                                                                 name, maxLength, length);
