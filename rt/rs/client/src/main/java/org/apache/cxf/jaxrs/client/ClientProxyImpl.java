@@ -96,8 +96,7 @@ public class ClientProxyImpl extends AbstractClient implements
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(ClientProxyImpl.class);
     private static final String SLASH = "/";
     private static final String BUFFER_PROXY_RESPONSE = "buffer.proxy.response";
-    private static final String METHOD_PARAM_BODY_INDEX = "method.parameter.body.index";
-    private static final String METHOD_PARAMS = "method.parameters";
+    private static final String PROXY_METHOD_PARAM_BODY_INDEX = "proxy.method.parameter.body.index";
     
     private ClassResourceInfo cri;
     private ClassLoader proxyLoader;
@@ -105,6 +104,7 @@ public class ClientProxyImpl extends AbstractClient implements
     private boolean isRoot;
     private Map<String, Object> valuesMap = Collections.emptyMap();
     private BodyWriter bodyWriter = new BodyWriter();
+    private Client proxy; 
     public ClientProxyImpl(URI baseURI,
                            ClassLoader loader,
                            ClassResourceInfo cri, 
@@ -128,7 +128,9 @@ public class ClientProxyImpl extends AbstractClient implements
         initValuesMap(varValues);
         cfg.getInInterceptors().add(new ClientAsyncResponseInterceptor());
     }
-    
+    void setProxyClient(Client client) {
+        this.proxy = client;
+    }
     private void initValuesMap(Object... varValues) {
         if (isRoot) {
             List<String> vars = cri.getURITemplate().getVariables();
@@ -732,15 +734,18 @@ public class ClientProxyImpl extends AbstractClient implements
             outMessage.put(Annotation.class.getName(), 
                            getMethodAnnotations(ori.getAnnotatedMethod(), bodyIndex));
             
-            outMessage.put(METHOD_PARAMS, methodParams);
+            outMessage.getExchange().put(Message.SERVICE_OBJECT, proxy);
+            if (methodParams != null) {
+                outMessage.put(List.class, Arrays.asList(methodParams));
+            }
             if (body != null) {
-                outMessage.put(METHOD_PARAM_BODY_INDEX, bodyIndex);
+                outMessage.put(PROXY_METHOD_PARAM_BODY_INDEX, bodyIndex);
             }
             outMessage.getInterceptorChain().add(bodyWriter);
             
             Map<String, Object> reqContext = getRequestContext(outMessage);
             reqContext.put(OperationResourceInfo.class.getName(), ori);
-            reqContext.put(METHOD_PARAM_BODY_INDEX, bodyIndex);
+            reqContext.put(PROXY_METHOD_PARAM_BODY_INDEX, bodyIndex);
             
             // execute chain
             InvocationCallback<Object> asyncCallback = checkAsyncCallback(ori, reqContext);
@@ -828,7 +833,7 @@ public class ClientProxyImpl extends AbstractClient implements
                                  Map<String, Object> invContext) throws Throwable {
         
         Map<String, Object> reqContext = CastUtils.cast((Map<?, ?>)invContext.get(REQUEST_CONTEXT));
-        int bodyIndex = body != null ? (Integer)reqContext.get(METHOD_PARAM_BODY_INDEX) : -1;
+        int bodyIndex = body != null ? (Integer)reqContext.get(PROXY_METHOD_PARAM_BODY_INDEX) : -1;
         OperationResourceInfo ori = 
             (OperationResourceInfo)reqContext.get(OperationResourceInfo.class.getName());
         return doChainedInvocation(newRequestURI, headers, ori, null,
@@ -906,7 +911,7 @@ public class ClientProxyImpl extends AbstractClient implements
             }
             
             Method method = ori.getMethodToInvoke();
-            int bodyIndex = (Integer)outMessage.get(METHOD_PARAM_BODY_INDEX);
+            int bodyIndex = (Integer)outMessage.get(PROXY_METHOD_PARAM_BODY_INDEX);
             
             Annotation[] anns = customAnns != null ? customAnns
                 : getMethodAnnotations(ori.getAnnotatedMethod(), bodyIndex);

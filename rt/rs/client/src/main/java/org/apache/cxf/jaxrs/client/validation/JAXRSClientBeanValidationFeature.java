@@ -16,33 +16,25 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.validation;
+package org.apache.cxf.jaxrs.client.validation;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.annotations.Provider;
 import org.apache.cxf.annotations.Provider.Scope;
 import org.apache.cxf.annotations.Provider.Type;
-import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.interceptor.InterceptorProvider;
+import org.apache.cxf.validation.ClientBeanValidationFeature;
 
-@Provider(value = Type.Feature, scope = Scope.Server)
-public class BeanValidationFeature extends AbstractFeature {
-
-    private BeanValidationProvider validationProvider;
-    
+@Provider(value = Type.Feature, scope = Scope.Client)
+public class JAXRSClientBeanValidationFeature extends ClientBeanValidationFeature {
+    private boolean wrapInProcessingException;
     @Override
     protected void initializeProvider(InterceptorProvider interceptorProvider, Bus bus) {
-        BeanValidationInInterceptor in = new BeanValidationInInterceptor();
-        BeanValidationOutInterceptor out = new BeanValidationOutInterceptor();
-        if (validationProvider != null) {
-            in.setProvider(validationProvider);
-            out.setProvider(validationProvider);
-        }
-        interceptorProvider.getInInterceptors().add(in);
-        interceptorProvider.getOutInterceptors().add(out);
+        JAXRSClientBeanValidationOutInterceptor out = new JAXRSClientBeanValidationOutInterceptor();
+        out.setWrapInProcessingException(wrapInProcessingException);
+        super.addInterceptor(interceptorProvider, out);
     }
-
-    public void setProvider(BeanValidationProvider provider) {
-        this.validationProvider = provider;
+    public void setWrapInProcessingException(boolean wrapInProcessingException) {
+        this.wrapInProcessingException = wrapInProcessingException;
     }
 }
