@@ -208,13 +208,8 @@ public class CommandLineParser {
     public String getUsage() throws TransformerException {
         // REVISIT: style usage document into a form more readily output as a
         // usage message
-<<<<<<< HEAD
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         InputStream in = getClass().getResourceAsStream("usage.xsl");
-=======
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            InputStream in = getClass().getResourceAsStream("usage.xsl")) {
->>>>>>> 0398758... Some improvements in the tooling code
 
         toolspec.transform(in, baos);
         return baos.toString();
@@ -223,7 +218,6 @@ public class CommandLineParser {
     public String getDetailedUsage() throws TransformerException {
         // REVISIT: style usage document into a form more readily output as a
         // usage message
-<<<<<<< HEAD
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         toolspec.transform(getClass().getResourceAsStream("detailedUsage.xsl"), baos);
         return baos.toString();
@@ -233,22 +227,6 @@ public class CommandLineParser {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         toolspec.transform(getClass().getResourceAsStream("detailedUsage.xsl"), baos);
         String usage = baos.toString();
-=======
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            InputStream is = getClass().getResourceAsStream("detailedUsage.xsl")) {
-            toolspec.transform(is, baos);
-            return baos.toString();
-        }
-    }
-
-    public String getFormattedDetailedUsage() throws TransformerException, IOException {
-        String usage = null;
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            InputStream is = getClass().getResourceAsStream("detailedUsage.xsl")) {
-            toolspec.transform(is, baos);
-            usage = baos.toString();
-        }
->>>>>>> 0398758... Some improvements in the tooling code
         // we use the following pattern to format usage
         // |-------|-options|------|description-----------------|
         // before option white space size is 7
