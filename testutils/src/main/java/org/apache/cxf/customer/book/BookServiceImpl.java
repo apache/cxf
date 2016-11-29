@@ -51,7 +51,7 @@ public class BookServiceImpl implements BookService {
                                + me.getValue().getName() + ", " + me.getValue().getId());
         }
         System.out.println("Book de id " + getBook.getId());
-        Book b = books.get(((Long)getBook.getId()).longValue());
+        Book b = books.get(getBook.getId());
 
         if (b == null) {
             BookNotFoundDetails details = new BookNotFoundDetails();
@@ -67,7 +67,7 @@ public class BookServiceImpl implements BookService {
                                + me.getValue().getName() + ", " + me.getValue().getId());
         }
         System.out.println("Book de id " + getAnotherBook.getId());
-        Book b = books.get(((Long)getAnotherBook.getId()).longValue());
+        Book b = books.get(getAnotherBook.getId());
 
         if (b == null) {
             BookNotFoundDetails details = new BookNotFoundDetails();
