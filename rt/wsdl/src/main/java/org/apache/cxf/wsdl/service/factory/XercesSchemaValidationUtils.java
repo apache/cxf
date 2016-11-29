@@ -49,7 +49,6 @@ import org.apache.xerces.xs.XSLoader;
  */
 class XercesSchemaValidationUtils {
 
-<<<<<<< HEAD
     @SuppressWarnings("rawtypes")
     private static final class ListLSInput extends ArrayList implements LSInputList {
         private static final long serialVersionUID = 1L;
@@ -68,11 +67,7 @@ class XercesSchemaValidationUtils {
         }
     }
     
-    class DOMLSInput implements LSInput {
-=======
-   
     static class DOMLSInput implements LSInput {
->>>>>>> 01fdc40... More FindBugs work
         private String systemId;
         private String data;
         
@@ -162,19 +157,6 @@ class XercesSchemaValidationUtils {
         impl = (XSImplementation)source.getDOMImplementation("XS-Loader");
     }
 
-<<<<<<< HEAD
-=======
-    
-    Method findMethod(Object o, String name) {
-        for (Method m : o.getClass().getMethods()) {
-            if (m.getName() != null && m.getName().equals(name)) {
-                m.setAccessible(true);
-                return m;
-            }
-        }
-        return null;
-    }
->>>>>>> 01fdc40... More FindBugs work
     void tryToParseSchemas(XmlSchemaCollection collection, DOMErrorHandler handler)
         throws XmlSchemaSerializerException, TransformerException {
 
