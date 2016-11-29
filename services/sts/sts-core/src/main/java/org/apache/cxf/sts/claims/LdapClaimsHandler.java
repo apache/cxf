@@ -37,7 +37,6 @@ import javax.security.auth.kerberos.KerberosPrincipal;
 import javax.security.auth.x500.X500Principal;
 
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.rt.security.claims.Claim;
 import org.apache.cxf.rt.security.claims.ClaimCollection;
 import org.apache.cxf.sts.token.realm.RealmSupport;
@@ -171,9 +170,9 @@ public class LdapClaimsHandler implements ClaimsHandler, RealmSupport {
         
         Map<String, Attribute> ldapAttributes = null;
         if (useLdapLookup) {
-            AttributesMapper mapper = 
-                new AttributesMapper() {
-                    public Object mapFromAttributes(Attributes attrs) throws NamingException {
+            AttributesMapper<Map<String, Attribute>> mapper = 
+                new AttributesMapper<Map<String, Attribute>>() {
+                    public Map<String, Attribute> mapFromAttributes(Attributes attrs) throws NamingException {
                         Map<String, Attribute> map = new HashMap<>();
                         NamingEnumeration<? extends Attribute> attrEnum = attrs.getAll();
                         while (attrEnum.hasMore()) {
@@ -184,25 +183,25 @@ public class LdapClaimsHandler implements ClaimsHandler, RealmSupport {
                     }
                 };
                 
-            Object result = ldap.lookup(user, mapper);
-            ldapAttributes = CastUtils.cast((Map<?, ?>)result);
+            ldapAttributes = ldap.lookup(user, mapper);
         } else {
             List<String> searchAttributeList = new ArrayList<>();
             for (Claim claim : claims) {
-                if (getClaimsLdapAttributeMapping().keySet().contains(claim.getClaimType().toString())) {
+                String claimType = claim.getClaimType().toString();
+                if (getClaimsLdapAttributeMapping().keySet().contains(claimType)) {
                     searchAttributeList.add(
-                        getClaimsLdapAttributeMapping().get(claim.getClaimType().toString())
+                        getClaimsLdapAttributeMapping().get(claimType)
                     );
                 } else {
                     if (LOG.isLoggable(Level.FINER)) {
-                        LOG.finer("Unsupported claim: " + claim.getClaimType());
+                        LOG.finer("Unsupported claim: " + claimType);
                     }
                 }
             }
 
             String[] searchAttributes = searchAttributeList.toArray(new String[searchAttributeList.size()]);
             
-            if (this.userBaseDNs == null || this.userBaseDn != null) {
+            if (this.userBaseDn != null) {
                 ldapAttributes = LdapUtils.getAttributesOfEntry(ldap, this.userBaseDn, this.getObjectClass(), this
                     .getUserNameAttribute(), user, searchAttributes);
             }
@@ -226,7 +225,6 @@ public class LdapClaimsHandler implements ClaimsHandler, RealmSupport {
         }
         
         ProcessedClaimCollection claimsColl = new ProcessedClaimCollection();
-
         for (Claim claim : claims) {
             ProcessedClaim c = processClaim(claim, ldapAttributes, principal);
             if (c != null) {

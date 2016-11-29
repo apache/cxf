@@ -64,9 +64,9 @@ public final class LdapUtils {
         
         Map<String, Attribute> ldapAttributes = null;
         
-        AttributesMapper mapper = 
-            new AttributesMapper() {
-                public Object mapFromAttributes(Attributes attrs) throws NamingException {
+        AttributesMapper<Map<String, Attribute>> mapper = 
+            new AttributesMapper<Map<String, Attribute>>() {
+                public Map<String, Attribute> mapFromAttributes(Attributes attrs) throws NamingException {
                     Map<String, Attribute> map = new HashMap<>();
                     NamingEnumeration<? extends Attribute> attrEnum = attrs.getAll();
                     while (attrEnum.hasMore()) {
@@ -143,9 +143,9 @@ public final class LdapUtils {
     public static Name getDnOfEntry(LdapTemplate ldapTemplate, String baseDN, 
         String objectClass, String filterAttributeName, String filterAttributeValue) {
 
-        ContextMapper mapper = 
-            new AbstractContextMapper() {
-                public Object doMapFromContext(DirContextOperations ctx) {
+        ContextMapper<Name> mapper = 
+            new AbstractContextMapper<Name>() {
+                public Name doMapFromContext(DirContextOperations ctx) {
                     return ctx.getDn();
                 }
             };
@@ -155,12 +155,12 @@ public final class LdapUtils {
             new EqualsFilter("objectclass", objectClass)).and(
                 new EqualsFilter(filterAttributeName, filterAttributeValue));
 
-        List<?> result = ldapTemplate.search((baseDN == null) ? "" : baseDN, filter.toString(),
+        List<Name> result = ldapTemplate.search((baseDN == null) ? "" : baseDN, filter.toString(),
             SearchControls.SUBTREE_SCOPE, mapper);
         
         if (result != null && result.size() > 0) {
             //not only the first one....
-            return (Name)result.get(0);
+            return result.get(0);
         }
         return null;
     }
