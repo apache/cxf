@@ -21,6 +21,7 @@ package org.apache.cxf.wsdl11;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.wsdl.Binding;
 import javax.wsdl.BindingFault;
@@ -68,10 +69,10 @@ public final class PartialWSDLProcessor  {
         String existPortTypeName = null;
         PortType portType = null;
         try {
-            for (QName existPortTypeQName : portTypes.keySet()) {
-                existPortTypeName = existPortTypeQName.getLocalPart();
+            for (Entry<QName, PortType> entry : portTypes.entrySet()) {
+                existPortTypeName = entry.getKey().getLocalPart();
                 if (name.getLocalPart().contains(existPortTypeName)) {
-                    portType = portTypes.get(existPortTypeQName);
+                    portType = entry.getValue();
                     break;
                 }
             }  
@@ -88,9 +89,9 @@ public final class PartialWSDLProcessor  {
             return false;
         }
         try {
-            for (QName existBindingQName : bindings.keySet()) {
-                if (existBindingQName.getLocalPart().contains(name.getLocalPart())) {
-                    binding = bindings.get(existBindingQName);
+            for (Entry<QName, Binding> entry : bindings.entrySet()) {
+                if (entry.getKey().getLocalPart().contains(name.getLocalPart())) {
+                    binding = entry.getValue();
                     break;
                 }
             }

@@ -116,7 +116,7 @@ public class ModelMBeanAssembler {
         return result;
     }
     
-    class ManagedAttributeInfo {
+    static class ManagedAttributeInfo {
         String fname;
         String ftype;
         String description;
