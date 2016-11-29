@@ -160,6 +160,37 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
             }
         }
     }
+    
+    @org.junit.Test
+    public void testRetrieveClaimsUsingLDAPLookup() throws Exception {
+        LdapClaimsHandler claimsHandler = (LdapClaimsHandler)appContext.getBean("testClaimsHandler");
+
+        ClaimCollection requestedClaims = createRequestClaimCollection();
+
+        List<URI> expectedClaims = new ArrayList<URI>();
+        expectedClaims.add(ClaimTypes.FIRSTNAME);
+        expectedClaims.add(ClaimTypes.LASTNAME);
+        expectedClaims.add(ClaimTypes.EMAILADDRESS);
+       
+        ClaimsParameters params = new ClaimsParameters();
+        params.setPrincipal(new CustomTokenPrincipal("cn=alice,ou=users,dc=example,dc=com"));
+        ProcessedClaimCollection retrievedClaims = 
+            claimsHandler.retrieveClaimValues(requestedClaims, params);
+
+        Assert.isTrue(
+                      retrievedClaims.size() == expectedClaims.size(), 
+                      "Retrieved number of claims [" + retrievedClaims.size() 
+                      + "] doesn't match with expected [" + expectedClaims.size() + "]"
+        );
+
+        for (ProcessedClaim c : retrievedClaims) {
+            if (expectedClaims.contains(c.getClaimType())) {
+                expectedClaims.remove(c.getClaimType());
+            } else {
+                Assert.isTrue(false, "Claim '" + c.getClaimType() + "' not requested");
+            }
+        }
+    }
 
     @org.junit.Test
     public void testMultiUserBaseDNs() throws Exception {
@@ -382,6 +413,27 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
 
         ClaimsParameters params = new ClaimsParameters();
         params.setPrincipal(new CustomTokenPrincipal(user));
+        ProcessedClaimCollection retrievedClaims = 
+            claimsHandler.retrieveClaimValues(requestedClaims, params);
+
+        Assert.isTrue(retrievedClaims.size() == 1);
+        Assert.isTrue(retrievedClaims.get(0).getClaimType().equals(roleURI));
+        Assert.isTrue(retrievedClaims.get(0).getValues().size() == 2);
+    }
+    
+    @org.junit.Test
+    public void testRetrieveRolesForAliceUsingLDAPLookup() throws Exception {
+        LdapGroupClaimsHandler claimsHandler = 
+            (LdapGroupClaimsHandler)appContext.getBean("testGroupClaimsHandler");
+
+        ClaimCollection requestedClaims = new ClaimCollection();
+        Claim claim = new Claim();
+        URI roleURI = URI.create("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role");
+        claim.setClaimType(roleURI);
+        requestedClaims.add(claim);
+
+        ClaimsParameters params = new ClaimsParameters();
+        params.setPrincipal(new CustomTokenPrincipal("cn=alice,ou=users,dc=example,dc=com"));
         ProcessedClaimCollection retrievedClaims = 
             claimsHandler.retrieveClaimValues(requestedClaims, params);
 
