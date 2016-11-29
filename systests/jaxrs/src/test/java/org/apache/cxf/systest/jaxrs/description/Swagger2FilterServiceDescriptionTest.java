@@ -19,6 +19,7 @@
 package org.apache.cxf.systest.jaxrs.description;
 
 import org.junit.BeforeClass;
+import org.junit.Test;
 
 public class Swagger2FilterServiceDescriptionTest extends AbstractSwagger2ServiceDescriptionTest {
     private static final String PORT = allocatePort(Swagger2FilterServiceDescriptionTest.class);
@@ -44,12 +45,12 @@ public class Swagger2FilterServiceDescriptionTest extends AbstractSwagger2Servic
     }
 
     @Override
-    protected String getExpectedFileJson() {
-        return "swagger2-json.txt";
-    }
-
-    @Override
     protected String getExpectedFileYaml() {
         return "swagger2-yaml.txt";
+    }
+    
+    @Test
+    public void testApiListingIsProperlyReturnedJSON() throws Exception {
+        doTestApiListingIsProperlyReturnedJSON();
     }
 }

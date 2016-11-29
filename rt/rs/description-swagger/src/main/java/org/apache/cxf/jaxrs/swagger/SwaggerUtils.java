@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.jaxrs.swagger;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -69,11 +70,14 @@ public final class SwaggerUtils {
             if (is == null) {
                 return null;
             }
-            return getUserResourceFromJson(IOUtils.readStringFromStream(is));
+            return getUserResourceFromStream(is);
         } catch (Exception ex) {
             LOG.warning("Problem with processing a user model at " + loc);
         }
         return null;
+    }
+    public static UserResource getUserResourceFromStream(InputStream is) throws IOException {
+        return getUserResourceFromJson(IOUtils.readStringFromStream(is));
     }
     public static List<UserResource> getUserResourcesFromResourceObjects(List<String> jsonObjects) {
         List<UserResource> resources = new ArrayList<UserResource>();
@@ -137,7 +141,6 @@ public final class SwaggerUtils {
                     Parameter userParam = new Parameter(pType, name);
                     
                     setJavaType(userParam, (String)param.get("type"));
-                    
                     userOpParams.add(userParam);
                 }   
                 if (!userOpParams.isEmpty()) {
