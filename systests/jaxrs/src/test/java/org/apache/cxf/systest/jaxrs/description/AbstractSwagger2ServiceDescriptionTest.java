@@ -21,7 +21,10 @@ package org.apache.cxf.systest.jaxrs.description;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
+import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -35,16 +38,19 @@ import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
+import org.apache.cxf.jaxrs.model.Parameter;
+import org.apache.cxf.jaxrs.model.ParameterType;
+import org.apache.cxf.jaxrs.model.UserOperation;
+import org.apache.cxf.jaxrs.model.UserResource;
 import org.apache.cxf.jaxrs.swagger.Swagger2Feature;
+import org.apache.cxf.jaxrs.swagger.SwaggerUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 import org.junit.Ignore;
 import org.junit.Test;
 
-import org.skyscreamer.jsonassert.JSONAssert;
 import org.yaml.snakeyaml.Yaml;
-
 
 public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBusClientServerTestBase {
     
@@ -93,21 +99,36 @@ public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBus
 
     protected abstract String getPort();
 
-    protected abstract String getExpectedFileJson();
-
     protected abstract String getExpectedFileYaml();
     
-    @Test
-    @Ignore
-    public void testApiListingIsProperlyReturnedJSON() throws Exception {
+    protected void doTestApiListingIsProperlyReturnedJSON() throws Exception {
         final WebClient client = createWebClient("/swagger.json");
         try {
-            final Response r = client.get();
-            assertEquals(Status.OK.getStatusCode(), r.getStatus());
-            JSONAssert.assertEquals(
-                getExpectedValue(getExpectedFileJson(), getPort()),
-                IOUtils.readStringFromStream((InputStream)r.getEntity()),
-                false);
+            String swaggerJson = client.get(String.class);
+            UserResource r = SwaggerUtils.getUserResourceFromJson(swaggerJson);
+            Map<String, UserOperation> map = r.getOperationsAsMap();
+            assertEquals(3, map.size());
+            UserOperation getBooksOp = map.get("getBooks");
+            assertEquals(HttpMethod.GET, getBooksOp.getVerb());
+            assertEquals("/bookstore", getBooksOp.getPath());
+            assertEquals(MediaType.APPLICATION_JSON, getBooksOp.getProduces());
+            List<Parameter> getBooksOpParams = getBooksOp.getParameters();
+            assertEquals(1, getBooksOpParams.size());
+            assertEquals(ParameterType.QUERY, getBooksOpParams.get(0).getType());
+            UserOperation getBookOp = map.get("getBook");
+            assertEquals(HttpMethod.GET, getBookOp.getVerb());
+            assertEquals("/bookstore/{id}", getBookOp.getPath());
+            assertEquals(MediaType.APPLICATION_JSON, getBookOp.getProduces());
+            List<Parameter> getBookOpParams = getBookOp.getParameters();
+            assertEquals(1, getBookOpParams.size());
+            assertEquals(ParameterType.PATH, getBookOpParams.get(0).getType());
+            UserOperation deleteOp = map.get("delete");
+            assertEquals(HttpMethod.DELETE, deleteOp.getVerb());
+            assertEquals("/bookstore/{id}", deleteOp.getPath());
+            List<Parameter> delOpParams = deleteOp.getParameters();
+            assertEquals(1, delOpParams.size());
+            assertEquals(ParameterType.PATH, delOpParams.get(0).getType());
+            
         } finally {
             client.close();
         }
@@ -134,7 +155,7 @@ public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBus
         }
     }
 
-    private WebClient createWebClient(final String url) {
+    protected WebClient createWebClient(final String url) {
         return WebClient
             .create("http://localhost:" + getPort() + url, 
                 Arrays.< Object >asList(new JacksonJsonProvider()),
