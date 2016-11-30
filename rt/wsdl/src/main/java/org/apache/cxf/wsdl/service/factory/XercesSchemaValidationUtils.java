@@ -50,7 +50,7 @@ import org.apache.ws.commons.schema.XmlSchemaSerializer;
 class XercesSchemaValidationUtils {
 
    
-    class DOMLSInput implements LSInput {
+    static class DOMLSInput implements LSInput {
         private String systemId;
         private String data;
         
@@ -144,8 +144,8 @@ class XercesSchemaValidationUtils {
 
     
     Method findMethod(Object o, String name) {
-        for (Method m: o.getClass().getMethods()) {
-            if (m.getName() == name) {
+        for (Method m : o.getClass().getMethods()) {
+            if (m.getName() != null && m.getName().equals(name)) {
                 m.setAccessible(true);
                 return m;
             }

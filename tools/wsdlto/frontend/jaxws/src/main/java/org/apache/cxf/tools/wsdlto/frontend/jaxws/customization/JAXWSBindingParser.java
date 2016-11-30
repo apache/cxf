@@ -35,6 +35,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
@@ -93,14 +94,14 @@ public class JAXWSBindingParser {
                     jaxwsBinding.setPackage(getPackageName(child));
                     Node docChild = DOMUtils.getChild(child, Element.ELEMENT_NODE);
                     if (docChild != null && this.isJAXWSClassDoc(docChild)) {
-                        jaxwsBinding.setPackageJavaDoc(DOMUtils.getContent(docChild));
+                        jaxwsBinding.setPackageJavaDoc(StringEscapeUtils.escapeHtml(DOMUtils.getContent(docChild)));
                     }
                 } else if (isJAXWSMethodElement(child)) {
                     jaxwsBinding.setMethodName(getMethodName(child));
                     Node docChild = DOMUtils.getChild(child, Element.ELEMENT_NODE);
 
                     if (docChild != null && this.isJAXWSClassDoc(docChild)) {
-                        jaxwsBinding.setMethodJavaDoc(DOMUtils.getContent(docChild));
+                        jaxwsBinding.setMethodJavaDoc(StringEscapeUtils.escapeHtml(DOMUtils.getContent(docChild)));
                     }
                 } else if (isJAXWSParameterElement(child)) {
                     Element childElement = (Element)child;
@@ -139,7 +140,7 @@ public class JAXWSBindingParser {
                     Node docChild = DOMUtils.getChild(child, Element.ELEMENT_NODE);
 
                     if (docChild != null && this.isJAXWSClassDoc(docChild)) {
-                        javadoc  = DOMUtils.getContent(docChild);
+                        javadoc = StringEscapeUtils.escapeHtml(DOMUtils.getContent(docChild));
                     }
 
                     JAXWSClass jaxwsClass = new JAXWSClass(clzName, javadoc);
@@ -232,7 +233,7 @@ public class JAXWSBindingParser {
         return rnode;
     }
 
-    class ContextImpl implements NamespaceContext {
+    static class ContextImpl implements NamespaceContext {
         private Node targetNode;
 
         ContextImpl(Node node) {

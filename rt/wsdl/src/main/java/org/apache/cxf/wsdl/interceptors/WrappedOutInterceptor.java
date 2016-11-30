@@ -90,7 +90,7 @@ public class WrappedOutInterceptor extends AbstractOutDatabindingInterceptor {
         }
     }
     
-    public class WrappedOutEndingInterceptor extends AbstractOutDatabindingInterceptor {
+    public static class WrappedOutEndingInterceptor extends AbstractOutDatabindingInterceptor {
         public WrappedOutEndingInterceptor(String phase) {
             super(phase);
         }

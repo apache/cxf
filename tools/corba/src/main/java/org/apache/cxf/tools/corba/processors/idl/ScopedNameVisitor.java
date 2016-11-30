@@ -601,8 +601,7 @@ public class ScopedNameVisitor extends VisitorBase {
                     populateAliasSchemaType(corbaType, wsdlVisitor, holder);
                 }
             } else if (((corbaType instanceof Sequence) || (corbaType instanceof Anonsequence))
-                       && ((corbaType.getType().equals(Constants.XSD_BASE64))
-                           || (corbaType.getType().equals(Constants.XSD_BASE64)))) {
+                       && ((corbaType.getType().equals(Constants.XSD_BASE64)))) {
                 //special case of sequence of octets
                 result = true;
                 if (holder != null) {

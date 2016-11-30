@@ -612,7 +612,7 @@ public class ReadOnlyFileStorage implements ReadableLogStorage {
         private int getLogIndex(String name) {
             int index = name.lastIndexOf('.');
             try {
-                return Integer.valueOf(name.substring(index + 1));
+                return Integer.parseInt(name.substring(index + 1));
             } catch (Exception ex) {
                 return 0;
             }    

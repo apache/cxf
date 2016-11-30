@@ -44,7 +44,7 @@ public final class IdlPrimitive extends IdlDefnImplBase implements IdlType {
 
     private IdlPrimitive(IdlScopeBase parent, String name, String wsdlFileName, short typeValue) {
         super(parent, name);
-        this.wsdlName = new String(wsdlFileName);
+        this.wsdlName = wsdlFileName;
         this.type = typeValue;
     }    
     

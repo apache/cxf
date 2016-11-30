@@ -28,6 +28,7 @@ import org.apache.cxf.jaxrs.swagger.Swagger2Feature;
 import org.apache.cxf.systest.jaxrs.description.group1.BookStore;
 
 import org.junit.BeforeClass;
+import org.junit.Test;
 
 public class Swagger2NonAnnotatedServiceDescriptionTest extends AbstractSwagger2ServiceDescriptionTest {
     private static final String PORT = allocatePort(Swagger2NonAnnotatedServiceDescriptionTest.class);
@@ -70,11 +71,11 @@ public class Swagger2NonAnnotatedServiceDescriptionTest extends AbstractSwagger2
         return PORT;
     }
 
-    @Override
-    protected String getExpectedFileJson() {
-        return "swagger2-noano-json.txt";
+    @Test
+    public void testApiListingIsProperlyReturnedJSON() throws Exception {
+        doTestApiListingIsProperlyReturnedJSON();
     }
-
+    
     @Override
     protected String getExpectedFileYaml() {
         return "swagger2-noano-yaml.txt";

@@ -359,9 +359,8 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
                 reader = new MappingReaderDelegate(reader);
                 o = u.unmarshal(reader, extensionClass);
             }
-            if (o instanceof JAXBElement<?>) {
-                JAXBElement<?> el = (JAXBElement<?>)o;
-                o = el.getValue();
+            if (o != null) {
+                o = ((JAXBElement<?>)o).getValue();
             }
             
             ExtensibilityElement el = o instanceof ExtensibilityElement ? (ExtensibilityElement)o 

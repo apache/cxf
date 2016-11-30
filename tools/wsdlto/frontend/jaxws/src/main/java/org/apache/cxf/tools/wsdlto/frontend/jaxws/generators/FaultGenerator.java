@@ -21,6 +21,7 @@ package org.apache.cxf.tools.wsdlto.frontend.jaxws.generators;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.xml.namespace.QName;
 
@@ -68,9 +69,8 @@ public class FaultGenerator extends AbstractJAXWSGenerator {
 
             Map<String, JavaExceptionClass> exceptionClasses = javaModel
                     .getExceptionClasses();
-            for (String expClassName : exceptionClasses.keySet()) {
-                JavaExceptionClass expClz =
-                    exceptionClasses.get(expClassName);
+            for (Entry<String, JavaExceptionClass> entry : exceptionClasses.entrySet()) {
+                JavaExceptionClass expClz = entry.getValue();
     
                 clearAttributes();
                 

@@ -69,6 +69,8 @@ import io.swagger.jaxrs.config.DefaultReaderConfig;
 import io.swagger.jaxrs.config.ReaderConfig;
 import io.swagger.jaxrs.config.SwaggerContextService;
 import io.swagger.jaxrs.listing.ApiListingResource;
+import io.swagger.models.Swagger;
+import io.swagger.models.auth.SecuritySchemeDefinition;
 
 @Provider(value = Type.Feature, scope = Scope.Server)
 public class Swagger2Feature extends AbstractSwaggerFeature {
@@ -93,6 +95,8 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
     private boolean usePathBasedConfig;
     
     private boolean dynamicBasePath;
+    
+    private Map<String, SecuritySchemeDefinition> securityDefinitions;
     
     @Override
     protected void calculateDefaultBasePath(Server server) {
@@ -191,6 +195,11 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         beanConfig.setPrettyPrint(isPrettyPrint());
         beanConfig.setFilterClass(getFilterClass());
         
+        Swagger swagger = beanConfig.getSwagger();
+        if (swagger != null && securityDefinitions != null) {
+            swagger.setSecurityDefinitions(securityDefinitions);
+        }
+        
         swagger2Serializers.setBeanConfig(beanConfig);
     }
 
@@ -268,6 +277,10 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
 
     public void setSwaggerUiMediaTypes(Map<String, String> swaggerUiMediaTypes) {
         this.swaggerUiMediaTypes = swaggerUiMediaTypes;
+    }
+
+    public void setSecurityDefinitions(Map<String, SecuritySchemeDefinition> securityDefinitions) {
+        this.securityDefinitions = securityDefinitions;
     }
 
     private class ServletConfigProvider implements ContextProvider<ServletConfig> {
