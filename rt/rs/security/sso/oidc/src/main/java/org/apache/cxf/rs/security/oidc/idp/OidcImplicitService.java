@@ -33,6 +33,7 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
+import org.apache.cxf.rs.security.oauth2.common.AbstractFormImplicitResponse;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthError;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
@@ -114,7 +115,7 @@ public class OidcImplicitService extends ImplicitGrantService {
     }
     
     @Override
-    protected StringBuilder prepareGrant(OAuthRedirectionState state,
+    protected StringBuilder prepareRedirectResponse(OAuthRedirectionState state,
                                    Client client,
                                    List<String> requestedScope,
                                    List<String> approvedScope,
@@ -122,7 +123,8 @@ public class OidcImplicitService extends ImplicitGrantService {
                                    ServerAccessToken preAuthorizedToken) {
         
         if (canAccessTokenBeReturned(state.getResponseType())) {
-            return super.prepareGrant(state, client, requestedScope, approvedScope, userSubject, preAuthorizedToken);
+            return super.prepareRedirectResponse(state, client, requestedScope, approvedScope, 
+                                                 userSubject, preAuthorizedToken);
         }
         // id_token response type processing
         
@@ -135,6 +137,28 @@ public class OidcImplicitService extends ImplicitGrantService {
         }
         finalizeResponse(sb, state);
         return sb;
+    }
+    
+    @Override
+    protected AbstractFormImplicitResponse prepareFormResponse(OAuthRedirectionState state,
+                                                Client client,
+                                                List<String> requestedScope,
+                                                List<String> approvedScope,
+                                                UserSubject userSubject,
+                                                ServerAccessToken preAuthorizedToken) {
+        if (canAccessTokenBeReturned(state.getResponseType())) {
+            return super.prepareFormResponse(state, client, requestedScope, approvedScope, 
+                                                  userSubject, preAuthorizedToken);
+        }
+        // id_token response type processing
+        String idToken = getProcessedIdToken(state, userSubject, 
+                                             getApprovedScope(requestedScope, approvedScope));
+        FormIdTokenResponse response = new FormIdTokenResponse();
+        response.setIdToken(idToken);
+        response.setResponseType(state.getResponseType());
+        response.setRedirectUri(state.getRedirectUri());
+        response.setState(state.getState());
+        return response;
     }
     
     private String getProcessedIdToken(OAuthRedirectionState state, 

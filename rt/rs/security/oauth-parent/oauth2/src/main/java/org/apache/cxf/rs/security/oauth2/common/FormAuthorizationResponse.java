@@ -19,34 +19,22 @@
 package org.apache.cxf.rs.security.oauth2.common;
 
 
-public class OOBAuthorizationResponse extends AbstractAuthorizationResponse {
-    private String clientId;
-    private String clientDescription;
-    private String userId;
-    public String getClientId() {
-        return clientId;
+public class FormAuthorizationResponse extends AbstractAuthorizationResponse {
+    private String redirectUri;
+    private String state;
+    public String getRedirectUri() {
+        return redirectUri;
     }
 
-    public void setClientId(String clientId) {
-        this.clientId = clientId;
+    public void setRedirectUri(String redirectUri) {
+        this.redirectUri = redirectUri;
     }
 
-    public String getUserId() {
-        return userId;
+    public String getState() {
+        return state;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setState(String state) {
+        this.state = state;
     }
-
-    
-    public String getClientDescription() {
-        return clientDescription;
-    }
-
-    public void setClientDescription(String clientDescription) {
-        this.clientDescription = clientDescription;
-    }
-
-    
 }

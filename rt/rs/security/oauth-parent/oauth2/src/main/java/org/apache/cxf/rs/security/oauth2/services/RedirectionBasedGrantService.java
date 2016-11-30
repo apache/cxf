@@ -31,6 +31,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
@@ -527,6 +528,13 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         }
         return client;
         
+    }
+    protected Response createHtmlResponse(Object response) {
+        return Response.ok(response).type(MediaType.TEXT_HTML).build();
+    }
+    protected boolean isFormResponse(OAuthRedirectionState state) {
+        return OAuthConstants.FORM_RESPONSE_MODE.equals(
+                    state.getExtraProperties().get(OAuthConstants.RESPONSE_MODE));
     }
     protected String getSupportedGrantType() {
         return this.supportedGrantType;

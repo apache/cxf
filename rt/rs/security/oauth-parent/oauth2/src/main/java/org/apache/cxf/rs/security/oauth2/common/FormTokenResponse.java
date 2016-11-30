@@ -19,34 +19,32 @@
 package org.apache.cxf.rs.security.oauth2.common;
 
 
-public class OOBAuthorizationResponse extends AbstractAuthorizationResponse {
-    private String clientId;
-    private String clientDescription;
-    private String userId;
-    public String getClientId() {
-        return clientId;
+public class FormTokenResponse extends AbstractFormImplicitResponse {
+    private String accessToken;
+    private String accessTokenType;
+    private long accessTokenExpiresIn;
+
+    public String getAccessToken() {
+        return accessToken;
     }
 
-    public void setClientId(String clientId) {
-        this.clientId = clientId;
+    public void setAccessToken(String accessToken) {
+        this.accessToken = accessToken;
     }
 
-    public String getUserId() {
-        return userId;
+    public String getAccessTokenType() {
+        return accessTokenType;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setAccessTokenType(String accessTokenType) {
+        this.accessTokenType = accessTokenType;
     }
 
-    
-    public String getClientDescription() {
-        return clientDescription;
+    public long getAccessTokenExpiresIn() {
+        return accessTokenExpiresIn;
     }
 
-    public void setClientDescription(String clientDescription) {
-        this.clientDescription = clientDescription;
+    public void setAccessTokenExpiresIn(long accessTokenExpiresIn) {
+        this.accessTokenExpiresIn = accessTokenExpiresIn;
     }
-
-    
 }

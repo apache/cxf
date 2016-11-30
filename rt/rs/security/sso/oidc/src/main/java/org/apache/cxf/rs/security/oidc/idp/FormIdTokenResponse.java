@@ -16,37 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.oauth2.common;
+package org.apache.cxf.rs.security.oidc.idp;
 
+import org.apache.cxf.rs.security.oauth2.common.AbstractFormImplicitResponse;
 
-public class OOBAuthorizationResponse extends AbstractAuthorizationResponse {
-    private String clientId;
-    private String clientDescription;
-    private String userId;
-    public String getClientId() {
-        return clientId;
+public class FormIdTokenResponse extends AbstractFormImplicitResponse {
+    private String idToken;
+
+    public String getIdToken() {
+        return idToken;
     }
 
-    public void setClientId(String clientId) {
-        this.clientId = clientId;
+    public void setIdToken(String idToken) {
+        this.idToken = idToken;
     }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    
-    public String getClientDescription() {
-        return clientDescription;
-    }
-
-    public void setClientDescription(String clientDescription) {
-        this.clientDescription = clientDescription;
-    }
-
-    
 }
