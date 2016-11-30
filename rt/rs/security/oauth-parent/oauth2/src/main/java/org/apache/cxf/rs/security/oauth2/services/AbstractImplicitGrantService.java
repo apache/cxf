@@ -127,6 +127,7 @@ public abstract class AbstractImplicitGrantService extends RedirectionBasedGrant
         bean.setAccessToken(clientToken.getTokenKey());
         bean.setAccessTokenType(clientToken.getTokenType());
         bean.setAccessTokenExpiresIn(clientToken.getExpiresIn());
+        bean.getParameters().putAll(clientToken.getParameters());
         return bean;
     }
     
