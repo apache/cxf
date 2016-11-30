@@ -294,7 +294,9 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
             throw new WebApplicationException(400);
         }
         
-        LOG.fine("Received response: " + DOM2Writer.nodeToString(responseDoc.getDocumentElement()));
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("Received response: " + DOM2Writer.nodeToString(responseDoc.getDocumentElement()));
+        }
         
         XMLObject responseObject = null;
         try {
