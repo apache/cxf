@@ -18,11 +18,14 @@
  */
 package org.apache.cxf.rs.security.oauth2.common;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public abstract class AbstractFormImplicitResponse {
     private String responseType;
     private String redirectUri;
     private String state;
+    private Map<String, String> parameters = new LinkedHashMap<String, String>();
     public String getRedirectUri() {
         return redirectUri;
     }
@@ -44,5 +47,13 @@ public abstract class AbstractFormImplicitResponse {
 
     public void setState(String state) {
         this.state = state;
+    }
+
+    public Map<String, String> getParameters() {
+        return parameters;
+    }
+
+    public void setParameters(Map<String, String> parameters) {
+        this.parameters = parameters;
     }
 }
