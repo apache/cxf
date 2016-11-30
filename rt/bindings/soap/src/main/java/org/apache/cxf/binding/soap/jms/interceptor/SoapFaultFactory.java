@@ -86,8 +86,7 @@ public class SoapFaultFactory  {
     }
     
     public String toString(Fault f) {
-        SoapFault sf = (SoapFault)f;
-        return sf.toString();
+        return f.toString();
     }
         
 
