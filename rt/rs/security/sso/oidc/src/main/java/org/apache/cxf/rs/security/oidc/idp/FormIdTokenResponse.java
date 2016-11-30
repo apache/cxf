@@ -19,15 +19,14 @@
 package org.apache.cxf.rs.security.oidc.idp;
 
 import org.apache.cxf.rs.security.oauth2.common.AbstractFormImplicitResponse;
+import org.apache.cxf.rs.security.oidc.utils.OidcUtils;
 
 public class FormIdTokenResponse extends AbstractFormImplicitResponse {
-    private String idToken;
-
     public String getIdToken() {
-        return idToken;
+        return (String)getParameters().get(OidcUtils.ID_TOKEN);
     }
 
     public void setIdToken(String idToken) {
-        this.idToken = idToken;
+        getParameters().put(OidcUtils.ID_TOKEN, idToken);
     }
 }
