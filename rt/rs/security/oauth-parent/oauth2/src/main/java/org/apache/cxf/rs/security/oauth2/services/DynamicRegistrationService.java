@@ -160,6 +160,9 @@ public class DynamicRegistrationService {
         if (c.getApplicationLogoUri() != null) {
             reg.setLogoUri(c.getApplicationLogoUri());
         }
+        if (!c.getRegisteredAudiences().isEmpty()) {
+            reg.setResourceUris(c.getRegisteredAudiences());
+        }
         //etc
         return reg;
     }
@@ -228,6 +231,12 @@ public class DynamicRegistrationService {
                 validateRequestUri(uri, appType, grantTypes);
             }
             newClient.setRedirectUris(redirectUris);
+        }
+        
+        // Client Resource Audience URIs
+        List<String> resourceUris = request.getResourceUris();
+        if (resourceUris != null) {
+            newClient.setRegisteredAudiences(resourceUris);
         }
         
         // Client Scopes
