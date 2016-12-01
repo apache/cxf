@@ -183,7 +183,7 @@ public class TypeClassInitializer extends ServiceModelVisitor {
     }
 
     
-    private class ExceptionCreator extends ASMHelper {
+    private static class ExceptionCreator extends ASMHelper {
         public Class<?> createExceptionClass(Class<?> bean) {
             String newClassName = bean.getName() + "_Exception";
             newClassName = newClassName.replaceAll("\\$", ".");

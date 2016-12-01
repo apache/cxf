@@ -224,7 +224,7 @@ class HttpServletResponseAdapter implements HttpServletResponse {
         this.setStatus(sc);
     }
 
-    private class ServletOutputStreamAdapter extends ServletOutputStream {
+    private static class ServletOutputStreamAdapter extends ServletOutputStream {
 
         private OutputStream delegate;
 

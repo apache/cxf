@@ -713,7 +713,7 @@ public class DynamicClientFactory {
         }
     }
 
-    class InnerErrorListener {
+    static class InnerErrorListener {
 
         private String url;
         private StringBuilder errors = new StringBuilder();
@@ -998,7 +998,7 @@ public class DynamicClientFactory {
         }
         return clone;
     }
-    public class LocationFilterReader extends StreamReaderDelegate {
+    public static class LocationFilterReader extends StreamReaderDelegate {
         boolean isImport;
         boolean isInclude;
         int locIdx = -1;

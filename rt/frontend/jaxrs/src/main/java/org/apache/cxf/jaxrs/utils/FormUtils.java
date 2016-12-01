@@ -264,7 +264,7 @@ public final class FormUtils {
             return;
         }
         try {
-            int maxPartsCount = Integer.valueOf(maxPartsCountProp);
+            int maxPartsCount = Integer.parseInt(maxPartsCountProp);
             if (maxPartsCount != -1 && numberOfParts >= maxPartsCount) {
                 throw new WebApplicationException(413);
             }
