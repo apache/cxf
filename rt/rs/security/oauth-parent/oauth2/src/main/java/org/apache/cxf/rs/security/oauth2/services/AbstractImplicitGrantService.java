@@ -31,9 +31,11 @@ import javax.ws.rs.core.Response;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.rs.security.oauth2.common.AbstractFormImplicitResponse;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenRegistration;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
+import org.apache.cxf.rs.security.oauth2.common.FormTokenResponse;
 import org.apache.cxf.rs.security.oauth2.common.OAuthRedirectionState;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
@@ -57,41 +59,30 @@ public abstract class AbstractImplicitGrantService extends RedirectionBasedGrant
     }
     
     protected Response createGrant(OAuthRedirectionState state,
-                                          Client client,
-                                          List<String> requestedScope,
-                                          List<String> approvedScope,
-                                          UserSubject userSubject,
-                                          ServerAccessToken preAuthorizedToken) {
-        StringBuilder sb =
-            prepareGrant(state, client, requestedScope, approvedScope, userSubject, preAuthorizedToken);
-        return Response.seeOther(URI.create(sb.toString())).build();
-        
-    }
-    protected StringBuilder prepareGrant(OAuthRedirectionState state,
                                    Client client,
                                    List<String> requestedScope,
                                    List<String> approvedScope,
                                    UserSubject userSubject,
                                    ServerAccessToken preAuthorizedToken) {
-        
-        ServerAccessToken token = null;
-        if (preAuthorizedToken == null) {
-            AccessTokenRegistration reg = createTokenRegistration(state,
-                                                                  client,
-                                                                  requestedScope,
-                                                                  approvedScope,
-                                                                  userSubject);
-            token = getDataProvider().createAccessToken(reg);
+        if (isFormResponse(state)) {
+            return createHtmlResponse(prepareFormResponse(state, client, requestedScope, 
+                                            approvedScope, userSubject, preAuthorizedToken));
         } else {
-            token = preAuthorizedToken;
-            if (state.getNonce() != null) {
-                JAXRSUtils.getCurrentMessage().getExchange().put(OAuthConstants.NONCE, state.getNonce());
-            }
+            StringBuilder sb = 
+                prepareRedirectResponse(state, client, requestedScope, approvedScope, userSubject, preAuthorizedToken);
+            return Response.seeOther(URI.create(sb.toString())).build();
         }
+    }
+    
+    protected StringBuilder prepareRedirectResponse(OAuthRedirectionState state,
+                                          Client client,
+                                          List<String> requestedScope,
+                                          List<String> approvedScope,
+                                          UserSubject userSubject,
+                                          ServerAccessToken preAuthorizedToken) {
         
-        ClientAccessToken clientToken = OAuthUtils.toClientAccessToken(token, isWriteOptionalParameters());
-        processClientAccessToken(clientToken, token);
-        
+        ClientAccessToken clientToken = 
+            getClientAccessToken(state, client, requestedScope, approvedScope, userSubject, preAuthorizedToken);
         // return the token by appending it as a fragment parameter to the redirect URI
         
         StringBuilder sb = getUriWithFragment(state.getRedirectUri());
@@ -111,12 +102,60 @@ public abstract class AbstractImplicitGrantService extends RedirectionBasedGrant
                 sb.append("&").append(entry.getKey()).append("=").append(HttpUtils.queryEncode(entry.getValue()));
             }
         }
-        if (token.getRefreshToken() != null) {
-            processRefreshToken(sb, token.getRefreshToken());
+        if (clientToken.getRefreshToken() != null) {
+            processRefreshToken(sb, clientToken.getRefreshToken());
         }
-        
+            
         finalizeResponse(sb, state);
         return sb;
+    }
+    
+    protected AbstractFormImplicitResponse prepareFormResponse(OAuthRedirectionState state,
+                                           Client client,
+                                           List<String> requestedScope,
+                                           List<String> approvedScope,
+                                           UserSubject userSubject,
+                                           ServerAccessToken preAuthorizedToken) {
+       
+        ClientAccessToken clientToken = 
+            getClientAccessToken(state, client, requestedScope, approvedScope, userSubject, preAuthorizedToken);
+        
+        FormTokenResponse bean = new FormTokenResponse();
+        bean.setResponseType(OAuthConstants.TOKEN_RESPONSE_TYPE);
+        bean.setRedirectUri(state.getRedirectUri());
+        bean.setState(state.getState());
+        bean.setAccessToken(clientToken.getTokenKey());
+        bean.setAccessTokenType(clientToken.getTokenType());
+        bean.setAccessTokenExpiresIn(clientToken.getExpiresIn());
+        bean.getParameters().putAll(clientToken.getParameters());
+        return bean;
+    }
+    
+    protected ClientAccessToken getClientAccessToken(OAuthRedirectionState state,
+                                                     Client client,
+                                                     List<String> requestedScope,
+                                                     List<String> approvedScope,
+                                                     UserSubject userSubject,
+                                                     ServerAccessToken preAuthorizedToken) {
+       
+        ServerAccessToken token = null;
+        if (preAuthorizedToken == null) {
+            AccessTokenRegistration reg = createTokenRegistration(state,
+                                                                  client,
+                                                                  requestedScope,
+                                                                  approvedScope,
+                                                                  userSubject);
+            token = getDataProvider().createAccessToken(reg);
+        } else {
+            token = preAuthorizedToken;
+            if (state.getNonce() != null) {
+                JAXRSUtils.getCurrentMessage().getExchange().put(OAuthConstants.NONCE, state.getNonce());
+            }
+        }
+       
+        ClientAccessToken clientToken = OAuthUtils.toClientAccessToken(token, isWriteOptionalParameters());
+        processClientAccessToken(clientToken, token);
+        return clientToken;
     }
     
     protected AccessTokenRegistration createTokenRegistration(OAuthRedirectionState state, 

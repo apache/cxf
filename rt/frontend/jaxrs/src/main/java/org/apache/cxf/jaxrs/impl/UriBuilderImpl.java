@@ -913,7 +913,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
                 if (index != -1) {
                     String[] schemePair = uri.substring(0, index).split(":");
                     this.host = schemePair[0];
-                    this.port = schemePair.length == 2 ? Integer.valueOf(schemePair[1]) : -1;
+                    this.port = schemePair.length == 2 ? Integer.parseInt(schemePair[1]) : -1;
                     
                 }
                 uri = uri.substring(index);
@@ -1016,7 +1016,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
         return map;
     }
     
-    private class UriParts {
+    private static class UriParts {
         String path;
         String query;
         String fragment;

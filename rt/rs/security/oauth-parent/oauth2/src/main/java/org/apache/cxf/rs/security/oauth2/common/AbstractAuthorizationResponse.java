@@ -19,34 +19,23 @@
 package org.apache.cxf.rs.security.oauth2.common;
 
 
-public class OOBAuthorizationResponse extends AbstractAuthorizationResponse {
-    private String clientId;
-    private String clientDescription;
-    private String userId;
-    public String getClientId() {
-        return clientId;
+public abstract class AbstractAuthorizationResponse {
+    private String authorizationCode;
+    private long expiresIn;
+    public String getAuthorizationCode() {
+        return authorizationCode;
     }
 
-    public void setClientId(String clientId) {
-        this.clientId = clientId;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setAuthorizationCode(String authorizationCode) {
+        this.authorizationCode = authorizationCode;
     }
 
     
-    public String getClientDescription() {
-        return clientDescription;
+    public long getExpiresIn() {
+        return expiresIn;
     }
 
-    public void setClientDescription(String clientDescription) {
-        this.clientDescription = clientDescription;
+    public void setExpiresIn(long lifetime) {
+        this.expiresIn = lifetime;
     }
-
-    
 }

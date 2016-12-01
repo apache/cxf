@@ -179,7 +179,7 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
         if (0 == len) {
             return true;
         }
-        if ('"' == value.charAt(0) & '"' == value.charAt(len - 1)) {
+        if ('"' == value.charAt(0) && '"' == value.charAt(len - 1)) {
             // already wrapped with quotes
             return false;         
         } 

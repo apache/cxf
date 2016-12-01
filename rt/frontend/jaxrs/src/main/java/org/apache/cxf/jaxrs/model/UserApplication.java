@@ -25,6 +25,7 @@ import java.util.Map;
 public class UserApplication {
 
     private String name;
+    private String basePath;
     private List<UserResource> resources; 
     
     public UserApplication() {
@@ -61,5 +62,13 @@ public class UserApplication {
             }
         }
         return map;
+    }
+
+    public String getBasePath() {
+        return basePath;
+    }
+
+    public void setBasePath(String basePath) {
+        this.basePath = basePath;
     }
 }

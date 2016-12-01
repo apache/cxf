@@ -22,12 +22,12 @@ package org.apache.cxf.rs.security.oauth2.services;
 import java.util.List;
 
 import javax.ws.rs.Path;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
 import org.apache.cxf.rs.security.oauth2.common.Client;
+import org.apache.cxf.rs.security.oauth2.common.FormAuthorizationResponse;
 import org.apache.cxf.rs.security.oauth2.common.OAuthAuthorizationData;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
 import org.apache.cxf.rs.security.oauth2.common.OAuthRedirectionState;
@@ -104,17 +104,21 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
             return createErrorResponse(state.getState(), state.getRedirectUri(), OAuthConstants.ACCESS_DENIED);
         }
         String grantCode = processCodeGrant(client, grant.getCode(), grant.getSubject());
-        if (state.getRedirectUri() == null
-            || OAuthConstants.FORM_RESPONSE_MODE.equals(
-                   state.getExtraProperties().get(OAuthConstants.RESPONSE_MODE))) {
-            OOBAuthorizationResponse oobResponse = new OOBAuthorizationResponse();
-            oobResponse.setClientId(client.getClientId());
-            oobResponse.setClientDescription(client.getApplicationDescription());
-            oobResponse.setAuthorizationCode(grantCode);
-            oobResponse.setUserId(userSubject.getLogin());
-            oobResponse.setExpiresIn(grant.getExpiresIn());
-            oobResponse.setRedirectUri(state.getRedirectUri());
-            return deliverOOBResponse(oobResponse);
+        if (state.getRedirectUri() == null) {
+            OOBAuthorizationResponse bean = new OOBAuthorizationResponse();
+            bean.setClientId(client.getClientId());
+            bean.setClientDescription(client.getApplicationDescription());
+            bean.setAuthorizationCode(grantCode);
+            bean.setUserId(userSubject.getLogin());
+            bean.setExpiresIn(grant.getExpiresIn());
+            return deliverOOBResponse((OOBAuthorizationResponse)bean);    
+        } else if (isFormResponse(state)) {
+            FormAuthorizationResponse bean = new FormAuthorizationResponse();
+            bean.setAuthorizationCode(grantCode);
+            bean.setExpiresIn(grant.getExpiresIn());
+            bean.setState(state.getState());
+            bean.setRedirectUri(state.getRedirectUri());
+            return createHtmlResponse(bean);
         } else {
             // return the code by appending it as a query parameter to the redirect URI
             UriBuilder ub = getRedirectUriBuilder(state.getState(), state.getRedirectUri());
@@ -174,7 +178,7 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
         if (oobDeliverer != null) {    
             return oobDeliverer.deliver(response);
         } else {
-            return Response.ok(response).type(MediaType.TEXT_HTML).build();
+            return createHtmlResponse(response);
         }
     }
     

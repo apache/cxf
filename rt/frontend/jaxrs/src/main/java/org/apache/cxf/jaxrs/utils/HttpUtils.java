@@ -305,7 +305,7 @@ public final class HttpUtils {
             return -1;
         }
         try {
-            int len = Integer.valueOf(value);
+            int len = Integer.parseInt(value);
             return len >= 0 ? len : -1;
         } catch (Exception ex) {
             return -1;
