@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -194,9 +195,9 @@ public class ConfigurationImpl implements Configuration {
             metadata = new HashMap<Class<?>, Integer>();
             providers.put(provider, metadata);
         }
-        for (Class<?> contract : contracts.keySet()) {
-            if (contract.isAssignableFrom(provider.getClass())) {
-                metadata.put(contract, contracts.get(contract));
+        for (Entry<Class<?>, Integer> entry : contracts.entrySet()) {
+            if (entry.getKey().isAssignableFrom(provider.getClass())) {
+                metadata.put(entry.getKey(), entry.getValue());
             }
         }
         return true;

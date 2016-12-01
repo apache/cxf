@@ -427,7 +427,6 @@ public class WrappedMessageContext implements MessageContext {
         }
         Object ret = null;
         if ((MessageContext.HTTP_RESPONSE_HEADERS.equals(key)
-            || MessageContext.HTTP_RESPONSE_CODE.equals(key)
             || MessageContext.HTTP_RESPONSE_CODE.equals(key))
             && !isResponse() && !isRequestor()) { 
             Message tmp = createResponseMessage();

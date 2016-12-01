@@ -100,7 +100,7 @@ public class LogicalHandlerOutInterceptor
         }
     }
     
-    private class LogicalHandlerOutEndingInterceptor 
+    private static class LogicalHandlerOutEndingInterceptor 
         extends AbstractJAXWSHandlerInterceptor<Message> {
     
         LogicalHandlerOutEndingInterceptor(Binding binding) {
