@@ -203,7 +203,7 @@ public class KerberosAuthenticationFilter implements ContainerRequestFilter {
         this.callbackHandler = callbackHandler;
     }
 
-    private final class ValidateServiceTicketAction implements PrivilegedExceptionAction<byte[]> {
+    private static final class ValidateServiceTicketAction implements PrivilegedExceptionAction<byte[]> {
         private final GSSContext context;
         private final byte[] token;
 

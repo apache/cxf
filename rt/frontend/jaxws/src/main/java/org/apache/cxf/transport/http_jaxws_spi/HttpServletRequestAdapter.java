@@ -272,7 +272,7 @@ class HttpServletRequestAdapter implements HttpServletRequest {
 
     public long getDateHeader(String name) {
         String s = this.getHeader(name);
-        return s != null ? Long.valueOf(s) : 0;
+        return s != null ? Long.parseLong(s) : 0;
     }
 
     public String getHeader(String name) {
@@ -290,7 +290,7 @@ class HttpServletRequestAdapter implements HttpServletRequest {
 
     public int getIntHeader(String name) {
         String s = this.getHeader(name);
-        return s != null ? Integer.valueOf(s) : 0;
+        return s != null ? Integer.parseInt(s) : 0;
     }
 
     public String getMethod() {
@@ -398,7 +398,7 @@ class HttpServletRequestAdapter implements HttpServletRequest {
         throw new UnsupportedOperationException();
     }
     
-    private class ServletInputStreamAdapter extends ServletInputStream {
+    private static class ServletInputStreamAdapter extends ServletInputStream {
         
         private InputStream delegate;
         

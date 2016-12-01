@@ -521,7 +521,7 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
         Collection<Attachment> attachments = getAttachments(true);
         if (attachments != null) {
             Object value = getContext().getContextualProperty(Message.MTOM_THRESHOLD);
-            Integer threshold = value != null ? Integer.valueOf(value.toString()) : 0;
+            Integer threshold = value != null ? Integer.valueOf(value.toString()) : Integer.valueOf(0);
             ms.setAttachmentMarshaller(new JAXBAttachmentMarshaller(
                 attachments, threshold));
         }

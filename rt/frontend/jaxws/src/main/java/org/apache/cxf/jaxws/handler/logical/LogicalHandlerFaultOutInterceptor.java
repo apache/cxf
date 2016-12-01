@@ -83,7 +83,7 @@ public class LogicalHandlerFaultOutInterceptor
     }
     
     
-    private class LogicalHandlerFaultOutEndingInterceptor 
+    private static class LogicalHandlerFaultOutEndingInterceptor 
         extends AbstractJAXWSHandlerInterceptor<Message> {
     
         LogicalHandlerFaultOutEndingInterceptor(Binding binding) {
