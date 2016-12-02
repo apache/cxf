@@ -356,11 +356,7 @@ public class DefaultProtocolInterceptor extends AtmosphereInterceptorAdapter {
     }
 
     // a workaround to flush the header data upon close when no write operation occurs  
-<<<<<<< HEAD
-    private class WrappedAtmosphereResponse extends AtmosphereResponse {
-=======
-    private static class WrappedAtmosphereResponse extends AtmosphereResponseImpl {
->>>>>>> a644c5d... Findbugs work on the transports
+    private static class WrappedAtmosphereResponse extends AtmosphereResponse {
         final AtmosphereResponse response;
         ServletOutputStream sout;
         WrappedAtmosphereResponse(AtmosphereResponse resp, AtmosphereRequest req) throws IOException {
