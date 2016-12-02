@@ -119,11 +119,12 @@ public final class HttpAuthHeader {
                     if (value.indexOf(".") > 0) {
                         value = value.substring(0, value.indexOf("."));
                     }
-                    String pad = "";
+                    StringBuilder pad = new StringBuilder();
+                    pad.append("");
                     for (int i = 0; i < 8 - value.length(); i++) {
-                        pad = pad + "0";
+                        pad.append("0");
                     }
-                    value = pad + value;
+                    value = pad.toString() + value;
                 } else {
                     value = tok.sval;
                 }

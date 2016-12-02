@@ -196,7 +196,7 @@ public abstract class AbstractSpnegoAuthSupplier {
         this.realm = realm;
     }
     
-    private final class CreateServiceTicketAction implements PrivilegedExceptionAction<byte[]> {
+    private static final class CreateServiceTicketAction implements PrivilegedExceptionAction<byte[]> {
         private final GSSContext context;
         private final byte[] token;
 
