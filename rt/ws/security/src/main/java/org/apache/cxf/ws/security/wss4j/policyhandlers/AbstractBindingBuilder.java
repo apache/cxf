@@ -613,11 +613,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
     }
     
     protected Element cloneElement(Element el) {
-<<<<<<< HEAD
-        if (!secHeader.getSecurityHeader().getOwnerDocument().equals(el.getOwnerDocument())) {
-            return (Element)secHeader.getSecurityHeader().getOwnerDocument().importNode(el, true);
-=======
-        Document doc = secHeader.getSecurityHeaderElement().getOwnerDocument();
+        Document doc = secHeader.getSecurityHeader().getOwnerDocument();
         if (!doc.equals(el.getOwnerDocument())) {
             
             XMLStreamReader reader = StaxUtils.createXMLStreamReader(el);
@@ -629,7 +625,6 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             } catch (XMLStreamException ex) {
                 LOG.log(Level.FINE, "Error cloning security element", ex);
             }
->>>>>>> 66e97c7... CXF-6604 - Sporadic ClassCastException in AsymmetricBindingHandler#doSignBeforeEncrypt
         }
         return el;
     }
