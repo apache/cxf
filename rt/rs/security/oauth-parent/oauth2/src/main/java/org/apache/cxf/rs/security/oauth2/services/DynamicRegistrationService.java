@@ -125,10 +125,12 @@ public class DynamicRegistrationService {
     protected ClientRegistrationResponse fromClientToRegistrationResponse(Client client) {
         ClientRegistrationResponse response = new ClientRegistrationResponse();
         response.setClientId(client.getClientId());
-        response.setClientSecret(client.getClientSecret());
+        if (client.getClientSecret() != null) {
+            response.setClientSecret(client.getClientSecret());
+            // TODO: consider making Client secret time limited
+            response.setClientSecretExpiresAt(Long.valueOf(0));
+        }
         response.setClientIdIssuedAt(client.getRegisteredAt());
-        // TODO: consider making Client secret time limited
-        response.setClientSecretExpiresAt(Long.valueOf(0));
         UriBuilder ub = getMessageContext().getUriInfo().getAbsolutePathBuilder();
         
         if (supportRegistrationAccessTokens) {
