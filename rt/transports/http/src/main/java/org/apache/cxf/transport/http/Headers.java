@@ -487,7 +487,7 @@ public class Headers {
             return true;
         }
         try {
-            if (Integer.valueOf(ctLen.get(0)) == 0) {
+            if (Integer.parseInt(ctLen.get(0)) == 0) {
                 return false;
             }
         } catch (NumberFormatException ex) {

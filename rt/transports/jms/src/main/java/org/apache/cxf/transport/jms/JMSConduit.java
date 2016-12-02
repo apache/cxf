@@ -232,7 +232,7 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
                     } catch (InterruptedException e) {
                         throw new JMSException("Interrupted while correlating " +  e.getMessage());
                     }
-                    if (exchange.get(CORRELATED) != Boolean.TRUE) {
+                    if (!Boolean.TRUE.equals(exchange.get(CORRELATED))) {
                         throw new JMSException("Timeout receiving message with correlationId "
                                                    + correlationId);
                     }

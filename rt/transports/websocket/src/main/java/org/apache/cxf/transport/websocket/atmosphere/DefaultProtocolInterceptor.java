@@ -359,7 +359,7 @@ public class DefaultProtocolInterceptor extends AtmosphereInterceptorAdapter {
     }
 
     // a workaround to flush the header data upon close when no write operation occurs  
-    private class WrappedAtmosphereResponse extends AtmosphereResponseImpl {
+    private static class WrappedAtmosphereResponse extends AtmosphereResponseImpl {
         final AtmosphereResponse response;
         ServletOutputStream sout;
         WrappedAtmosphereResponse(AtmosphereResponse resp, AtmosphereRequest req) throws IOException {

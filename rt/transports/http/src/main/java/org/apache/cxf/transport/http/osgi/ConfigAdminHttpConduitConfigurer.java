@@ -121,7 +121,7 @@ class ConfigAdminHttpConduitConfigurer implements ManagedServiceFactory, HTTPCon
         String p = (String)properties.get("order");
         int order = 50; 
         if (p != null) {
-            order = Integer.valueOf(p);
+            order = Integer.parseInt(p);
         }
         
         PidInfo info = new PidInfo(properties, matcher, order);

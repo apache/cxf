@@ -461,11 +461,11 @@ public class UndertowHTTPServerEngine implements ServerEngine {
             ? SSLContext.getInstance(proto)
                 : SSLContext.getInstance(proto, tlsServerParameters.getJsseProvider());
             
-        KeyManager keyManagers[] = tlsServerParameters.getKeyManagers();
+        KeyManager[] keyManagers = tlsServerParameters.getKeyManagers();
         if (tlsServerParameters.getCertAlias() != null) {
             keyManagers = getKeyManagersWithCertAlias(keyManagers);
         }
-        context.init(tlsServerParameters.getKeyManagers(), 
+        context.init(keyManagers, 
                      tlsServerParameters.getTrustManagers(),
                      tlsServerParameters.getSecureRandom());
 
