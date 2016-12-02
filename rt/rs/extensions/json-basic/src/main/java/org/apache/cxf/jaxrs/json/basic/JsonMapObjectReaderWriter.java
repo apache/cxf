@@ -305,6 +305,9 @@ public class JsonMapObjectReaderWriter {
         @Override
         public Output append(String str) {
             try {
+                if (str == null) {
+                    str = "null";
+                }
                 os.write(StringUtils.toBytesUTF8(str));
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
