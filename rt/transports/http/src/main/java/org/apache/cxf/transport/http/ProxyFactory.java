@@ -79,7 +79,7 @@ public class ProxyFactory {
                 proxyPort = "8080";
             }
             
-            systemProxyConfiguration.setProxyServerPort(Integer.valueOf(proxyPort));
+            systemProxyConfiguration.setProxyServerPort(Integer.parseInt(proxyPort));
 
             // Load non proxy hosts
             String nonProxyHosts = SystemPropertyAction.getPropertyOrNull(HTTP_NON_PROXY_HOSTS);
