@@ -41,6 +41,8 @@ import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPHeader;
 import javax.xml.soap.SOAPMessage;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -48,6 +50,7 @@ import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
+import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -63,6 +66,8 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.cxf.service.model.EndpointInfo;
+import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.PolicyConstants;
@@ -608,8 +613,18 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
     }
     
     protected Element cloneElement(Element el) {
-        if (!secHeader.getSecurityHeaderElement().getOwnerDocument().equals(el.getOwnerDocument())) {
-            return (Element)secHeader.getSecurityHeaderElement().getOwnerDocument().importNode(el, true);
+        Document doc = secHeader.getSecurityHeaderElement().getOwnerDocument();
+        if (!doc.equals(el.getOwnerDocument())) {
+            
+            XMLStreamReader reader = StaxUtils.createXMLStreamReader(el);
+            DocumentFragment fragment = doc.createDocumentFragment();
+            W3CDOMStreamWriter writer = new W3CDOMStreamWriter(fragment);
+            try {
+                StaxUtils.copy(reader, writer);
+                return (Element)fragment.getFirstChild();
+            } catch (XMLStreamException ex) {
+                LOG.log(Level.FINE, "Error cloning security element", ex);
+            }
         }
         return el;
     }

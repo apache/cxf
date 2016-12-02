@@ -95,7 +95,7 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.message.Message;
 
 public final class StaxUtils {
-    // System properies for defaults, but also contextual properties usable
+    // System properties for defaults, but also contextual properties usable
     // for StaxInInterceptor
     public static final String MAX_CHILD_ELEMENTS = 
         "org.apache.cxf.stax.maxChildElements";
