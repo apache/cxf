@@ -769,6 +769,7 @@ public final class StaxUtils {
                 }
                 break;
             case XMLStreamConstants.CHARACTERS:
+            case XMLStreamConstants.SPACE:
                 String s = reader.getText();
                 if (s != null) {
                     writer.writeCharacters(s);
