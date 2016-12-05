@@ -83,7 +83,7 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
         Map<String, List<String>> headers =
             CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));        
         if (null == headers) {
-            Collections.emptyMap();
+            return Collections.emptyMap();
         }
         return headers;
     }
