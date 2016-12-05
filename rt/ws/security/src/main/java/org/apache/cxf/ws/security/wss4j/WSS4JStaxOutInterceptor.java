@@ -119,7 +119,7 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
         //must turn off mtom when using WS-Sec so binary is inlined so it can
         //be properly signed/encrypted/etc...
         String mtomKey = org.apache.cxf.message.Message.MTOM_ENABLED;
-        if (mc.get(mtomKey) == Boolean.TRUE) {
+        if (Boolean.TRUE.equals(mc.get(mtomKey))) {
             LOG.warning("MTOM will be disabled as the WSS4JOutInterceptor.mtomEnabled property"
                     + " is set to false");
         }

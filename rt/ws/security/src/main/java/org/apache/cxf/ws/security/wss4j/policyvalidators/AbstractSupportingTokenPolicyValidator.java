@@ -716,11 +716,9 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSec
             final XPathFactory factory = XPathFactory.newInstance();
             final XPath xpath = factory.newXPath();
             
-            List<String> expressions = new ArrayList<>();
             MapNamespaceContext namespaceContext = new MapNamespaceContext();
             
             for (org.apache.wss4j.policy.model.XPath xPath : xpaths) {
-                expressions.add(xPath.getXPath());
                 Map<String, String> namespaceMap = xPath.getPrefixNamespaceMap();
                 if (namespaceMap != null) {
                     namespaceContext.addNamespaces(namespaceMap);
