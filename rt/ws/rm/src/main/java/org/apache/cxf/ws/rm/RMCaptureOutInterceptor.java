@@ -228,7 +228,7 @@ public class RMCaptureOutInterceptor extends AbstractRMInterceptor<Message>  {
         message.getInterceptorChain().add(new CaptureEnd());
     }    
     
-    private class CaptureStart extends AbstractPhaseInterceptor<Message> {
+    private static class CaptureStart extends AbstractPhaseInterceptor<Message> {
         CaptureStart() {
             super(Phase.PRE_PROTOCOL);
         }
@@ -319,7 +319,7 @@ public class RMCaptureOutInterceptor extends AbstractRMInterceptor<Message>  {
     private String getAddressingNamespace(AddressingProperties maps) {
         String wsaNamespace = maps.getNamespaceURI();
         if (wsaNamespace == null) {
-            getManager().getConfiguration().getAddressingNamespace();
+            return getManager().getConfiguration().getAddressingNamespace();
         }
         return wsaNamespace;
     }

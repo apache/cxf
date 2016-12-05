@@ -318,7 +318,7 @@ public class Wsdl11AttachmentPolicyProvider extends AbstractPolicyProvider {
         return null;
     }
      
-    private class ExtensibleInfo implements Extensible {
+    private static class ExtensibleInfo implements Extensible {
         private List<ExtensibilityElement> extensors;
         ExtensibleInfo(List<ExtensibilityElement> e) {
             extensors = e;

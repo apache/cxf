@@ -490,7 +490,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         // advance just past body
         int evt = reader.next();
         
-        if (reader.hasNext() && (evt != XMLStreamConstants.END_ELEMENT || evt != XMLStreamConstants.START_ELEMENT)) {
+        if (reader.hasNext() && evt != XMLStreamConstants.END_ELEMENT) {
             reader.next();
         }
 

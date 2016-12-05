@@ -172,7 +172,7 @@ public class STSTokenOutInterceptor extends AbstractPhaseInterceptor<Message> {
             props.put(SecurityConstants.USERNAME, authParams.getUserName());
         }
         props.put(SecurityConstants.CALLBACK_HANDLER, authParams.getCallbackHandler());
-        if ((authParams.getKeystoreProperties() != null) && (authParams.getKeystoreProperties() != null)) {
+        if (authParams.getKeystoreProperties() != null) {
             props.put(SecurityConstants.ENCRYPT_USERNAME, authParams.getAlias());
             props.put(SecurityConstants.ENCRYPT_PROPERTIES, authParams.getKeystoreProperties());
             props.put(SecurityConstants.SIGNATURE_PROPERTIES, authParams.getKeystoreProperties());
