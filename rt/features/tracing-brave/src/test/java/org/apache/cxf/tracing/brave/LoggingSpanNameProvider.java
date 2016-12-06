@@ -16,34 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.tracing.brave.soap;
+package org.apache.cxf.tracing.brave;
 
-import java.net.URI;
+import com.github.kristofa.brave.http.HttpRequest;
+import com.github.kristofa.brave.http.SpanNameProvider;
 
-import com.github.kristofa.brave.http.HttpClientRequest;
-import org.apache.cxf.message.Message;
-
-public class CxfHttpClientRequest implements HttpClientRequest {
-
-    private ParsedMessage message;
-
-    public CxfHttpClientRequest(Message message) {
-        this.message = new ParsedMessage(message);
-    }
+public class LoggingSpanNameProvider implements SpanNameProvider {
 
     @Override
-    public URI getUri() {
-        return message.getUri();
+    public String spanName(HttpRequest request) {
+        return (request instanceof SpanNameProvider) ? ((SpanNameProvider)request).spanName(request) : ""; 
     }
 
-    @Override
-    public String getHttpMethod() {
-        return message.getHttpMethod();
-    }
-
-    @Override
-    public void addHeader(String header, String value) {
-        message.addHeader(header, value);
-    }
-    
 }

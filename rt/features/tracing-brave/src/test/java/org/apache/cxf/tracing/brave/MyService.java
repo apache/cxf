@@ -16,13 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.tracing.brave.soap;
+package org.apache.cxf.tracing.brave;
 
-public class MyServiceImpl implements MyService {
+import javax.jws.WebService;
 
-    @Override
-    public String echo(String msg) {
-        return msg;
-    }
-
+@WebService
+public interface MyService {
+    String echo(String msg);
 }
