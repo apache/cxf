@@ -141,9 +141,9 @@ public class EJBEndpoint {
             return DEFAULT_HTTP_PORT;
         }
         if (end < index) {
-            return Integer.valueOf(address.substring(index + 1)).intValue();
+            return Integer.parseInt(address.substring(index + 1));
         } 
-        return Integer.valueOf(address.substring(index + 1, end)).intValue();
+        return Integer.parseInt(address.substring(index + 1, end));
     }
     
     private static boolean isJaxWsServiceInterface(Class<?> cls) {
