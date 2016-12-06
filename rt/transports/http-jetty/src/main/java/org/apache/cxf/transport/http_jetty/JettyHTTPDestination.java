@@ -368,8 +368,11 @@ public class JettyHTTPDestination extends ServletDestination {
                       final HttpServletRequest req, 
                       final HttpServletResponse resp) {
         if (engine != null && engine.getContinuationsEnabled()) {
-            inMessage.put(ContinuationProvider.class.getName(), 
-                      new JettyContinuationProvider(req, resp, inMessage));
+            super.setupContinuation(inMessage, req, resp);
+            if (!inMessage.containsKey(ContinuationProvider.class.getName())) {
+                inMessage.put(ContinuationProvider.class.getName(), 
+                    new JettyContinuationProvider(req, resp, inMessage));
+            }
         }
     }
     
