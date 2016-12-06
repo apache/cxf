@@ -22,7 +22,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import org.apache.abdera.model.Element;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 
 /**
  * Wrapper on other deliverer retrying delivery in case of failure. Delivery attempts repeat in loop with some

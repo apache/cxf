@@ -55,7 +55,6 @@
         <cxf.osgi.dynamic.import />
         <cxf.osgi.spring.version>[3.1,5)</cxf.osgi.spring.version>
         <cxf.osgi.spring.osgi.version>[1.2.0,2)</cxf.osgi.spring.osgi.version>
-        <cxf.osgi.commons.lang.version>[2.4,3)</cxf.osgi.commons.lang.version>
         <cxf.osgi.slf4j.version>[1.5,2)</cxf.osgi.slf4j.version>
         <cxf.osgi.javax.annotation.version>[0.0,2)</cxf.osgi.javax.annotation.version>
         <cxf.osgi.javax.bind.version>[0.0,3)</cxf.osgi.javax.bind.version>
@@ -78,8 +77,7 @@
         <cxf.classmate.version>1.1.0</cxf.classmate.version>
         <cxf.commons-codec.version>1.10</cxf.commons-codec.version>
         <cxf.commons-collections.version>3.2.2</cxf.commons-collections.version>
-        <cxf.commons-lang.version>2.6</cxf.commons-lang.version>
-        <cxf.commons-lang3.version>3.4</cxf.commons-lang3.version>
+        <cxf.commons-lang3.version>3.5</cxf.commons-lang3.version>
         <cxf.derby.version>10.12.1.1</cxf.derby.version>
         <cxf.dropwizard.version>3.1.2</cxf.dropwizard.version>
         <cxf.ehcache.version>2.10.3</cxf.ehcache.version>
@@ -1648,9 +1646,9 @@
                 <version>1.2</version>
             </dependency>
             <dependency>
-                <groupId>commons-lang</groupId>
-                <artifactId>commons-lang</artifactId>
-                <version>${cxf.commons-lang.version}</version>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${cxf.commons-lang3.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.bouncycastle</groupId>

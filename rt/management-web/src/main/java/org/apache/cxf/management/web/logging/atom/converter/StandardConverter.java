@@ -40,7 +40,7 @@ import org.apache.abdera.model.Element;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.ExtensibleElement;
 import org.apache.abdera.model.Feed;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.apache.cxf.jaxrs.provider.atom.AbstractEntryBuilder;
 import org.apache.cxf.jaxrs.provider.atom.AbstractFeedBuilder;
 import org.apache.cxf.management.web.logging.LogRecord;

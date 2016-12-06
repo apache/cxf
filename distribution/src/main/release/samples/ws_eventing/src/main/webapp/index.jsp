@@ -2,7 +2,7 @@
 <%@ page import="demo.wseventing.eventapi.CatastrophicEventSinkImpl" %>
 <%@ page import="org.apache.cxf.ws.eventing.backend.database.SubscriptionTicket" %>
 <%@ page import="demo.wseventing.SingletonSubscriptionManagerContainer" %>
-<%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
+<%@ page import="org.apache.commons.lang3.StringEscapeUtils" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
@@ -38,7 +38,7 @@
         <tr>
             <td><%=ticket.getUuid()%></td>
             <td><a href="<%=ticket.getTargetURL()%>"><%=ticket.getTargetURL()%></a></td>
-            <td><%=StringEscapeUtils.escapeHtml(ticket.getFilterString())%></td>
+            <td><%=StringEscapeUtils.escapeHtml4(ticket.getFilterString())%></td>
             <td><%=ticket.isNonExpiring() ? "never" : ticket.getExpires().toXMLFormat()%></td>
         </tr>
         <%

@@ -28,7 +28,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.abdera.model.Element;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.apache.cxf.management.web.logging.LogRecord;
 import org.apache.cxf.management.web.logging.atom.converter.Converter;
 import org.apache.cxf.management.web.logging.atom.deliverer.Deliverer;

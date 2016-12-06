@@ -208,7 +208,7 @@
                             net.sf.cglib*;resolution:=optional;version="${cxf.cglib.osgi.version}",
                             org.apache.abdera*;resolution:=optional;version="[1.0,2)",
                             org.apache.aries*;resolution:=optional;version="${cxf.aries.version.range}",
-                            org.apache.commons.lang*;resolution:=optional;version="[2.4,3)",
+                            org.apache.commons.lang3*;resolution:=optional;version="[3,4)",
                             org.apache.commons.codec*;resolution:=optional,
                             org.apache.commons.pool*;resolution:=optional,
                             org.apache.log4j*;resolution:=optional,

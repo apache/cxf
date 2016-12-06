@@ -33,7 +33,7 @@ import javax.ws.rs.Produces;
 
 import org.apache.abdera.model.Element;
 import org.apache.abdera.model.Feed;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.apache.cxf.jaxrs.ext.StreamingResponse;
 import org.apache.cxf.management.web.logging.atom.converter.Converter;
 import org.apache.cxf.management.web.logging.atom.deliverer.Deliverer;

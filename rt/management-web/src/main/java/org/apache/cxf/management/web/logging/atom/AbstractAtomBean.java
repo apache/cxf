@@ -24,7 +24,7 @@ import java.util.StringTokenizer;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
 
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.management.web.logging.LogLevel;

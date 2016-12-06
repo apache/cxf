@@ -25,7 +25,7 @@ import javax.ws.rs.core.Response;
 
 import org.apache.abdera.model.Element;
 import org.apache.abdera.model.Feed;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.provider.atom.AtomEntryProvider;
 import org.apache.cxf.jaxrs.provider.atom.AtomFeedProvider;

@@ -31,7 +31,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.datatype.DatatypeConfigurationException;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
@@ -121,7 +121,7 @@ public class CreateSubscriptionServlet extends HttpServlet {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         m.marshal(o, baos);
         String unescaped = baos.toString();
-        return StringEscapeUtils.escapeHtml(unescaped);
+        return StringEscapeUtils.escapeHtml4(unescaped);
     }
 
 }

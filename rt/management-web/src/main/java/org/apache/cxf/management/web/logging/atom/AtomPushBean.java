@@ -20,7 +20,7 @@ package org.apache.cxf.management.web.logging.atom;
 
 import java.util.logging.Handler;
 
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.apache.cxf.management.web.logging.atom.converter.Converter;
 import org.apache.cxf.management.web.logging.atom.deliverer.Deliverer;
 

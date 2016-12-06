@@ -61,8 +61,8 @@ public class Sample {
     @Produces({ MediaType.APPLICATION_JSON })
     @GET
     @ApiOperation(
-        value = "Get operation with Response and @Default value", 
-        notes = "Get operation with Response and @Default value", 
+        value = "Get operation with Response and @Default value <script>alert(\"TEST\");</script>", 
+        notes = "Get operation with Response and @Default value <script>alert(\"TEST\");</script>", 
         response = Item.class, 
         responseContainer = "List"
     )
