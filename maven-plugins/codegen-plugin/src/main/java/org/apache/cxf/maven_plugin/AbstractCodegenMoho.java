@@ -467,9 +467,11 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
      */
     protected boolean deleteDir(File f) {
         if (f.isDirectory()) {
-            File files[] = f.listFiles();
-            for (int idx = 0; idx < files.length; ++idx) {
-                deleteDir(files[idx]);
+            File[] files = f.listFiles();
+            if (files != null) {
+                for (int idx = 0; idx < files.length; ++idx) {
+                    deleteDir(files[idx]);
+                }
             }
         }
 

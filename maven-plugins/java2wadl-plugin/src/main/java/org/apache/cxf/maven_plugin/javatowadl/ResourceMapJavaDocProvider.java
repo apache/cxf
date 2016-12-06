@@ -37,11 +37,9 @@ public class ResourceMapJavaDocProvider implements DocumentationProvider {
     private Properties dumpedDocFile;
     
     public ResourceMapJavaDocProvider(String targetFolder) {
-        try {
-            dumpedDocFile = new Properties();
-            FileInputStream fis = new FileInputStream(targetFolder + "/site/apidocs/dumpFile.properties");
+        dumpedDocFile = new Properties();
+        try (FileInputStream fis = new FileInputStream(targetFolder + "/site/apidocs/dumpFile.properties")) {
             dumpedDocFile.load(fis);
-            fis.close();
         } catch (Exception e) {
             LOG.warning("can't load dumped Docomentation file" + e.getMessage());
         }
