@@ -64,6 +64,7 @@ import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.FilterProviderInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
+import org.apache.cxf.jaxrs.nio.NioMessageBodyWriter;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
@@ -119,7 +120,9 @@ public final class ServerProviderFactory extends ProviderFactory {
         }
         ServerProviderFactory factory = new ServerProviderFactory(bus);
         ProviderFactory.initFactory(factory);
-        factory.setProviders(false, false, new WebApplicationExceptionMapper());
+        factory.setProviders(false, false, 
+                             new WebApplicationExceptionMapper(),
+                             new NioMessageBodyWriter());
         factory.setBusProviders();
         return factory;
     }

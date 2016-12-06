@@ -138,5 +138,10 @@ public class JettyContinuationWrapper implements Continuation, ContinuationListe
         pendingTimeout = 0;
         isResumed = true;
     }
+
+    @Override
+    public boolean isReadyForWrite() {
+        return true;
+    }
     
 }

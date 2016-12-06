@@ -32,6 +32,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.continuations.SuspendedInvocationException;
 import org.apache.cxf.interceptor.Fault;
@@ -312,8 +313,16 @@ public class PhaseInterceptorChain implements InterceptorChain {
                     }
                     
                 } catch (SuspendedInvocationException ex) {
-                    // we need to resume from the same interceptor the exception got originated from
-                    if (iterator.hasPrevious()) {
+                    
+                    // Moving the chain iterator to the previous interceptor is needed 
+                    // for the invocation to be resumed from the same interceptor which
+                    // suspended the invocation.  
+                    // If "suspend.chain.on.current.interceptor" is set to true then 
+                    // the chain will be resumed from the interceptor which follows 
+                    // the interceptor which suspended the invocation. 
+                    Object suspendProp = message.remove("suspend.chain.on.current.interceptor");
+                    if ((suspendProp == null || PropertyUtils.isFalse(suspendProp)) 
+                        && iterator.hasPrevious()) {
                         iterator.previous();
                     }
                     pause();

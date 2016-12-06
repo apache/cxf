@@ -79,8 +79,12 @@ public class OutgoingChainInterceptor extends AbstractPhaseInterceptor<Message> 
             if (outChain == null) {
                 outChain = OutgoingChainInterceptor.getChain(ex, chainCache);
                 out.setInterceptorChain(outChain);
+            } else if (outChain.getState() == InterceptorChain.State.PAUSED) {
+                outChain.resume();
+                return;
             }
             outChain.doIntercept(out);
+            
         }
     }
     

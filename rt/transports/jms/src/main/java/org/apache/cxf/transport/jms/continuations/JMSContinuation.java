@@ -157,5 +157,10 @@ public class JMSContinuation implements Continuation {
         isCanceled = true;
     }
 
+    @Override
+    public boolean isReadyForWrite() {
+        return true;
+    }
+
 
 }

@@ -124,8 +124,8 @@ public class ProviderFactoryTest extends Assert {
         
         // writers
         List<ProviderInfo<MessageBodyWriter<?>>> writers = pf.getMessageWriters();
-        assertEquals(9, writers.size());
-        Object lastWriter = writers.get(8).getProvider();
+        assertEquals(10, writers.size());
+        Object lastWriter = writers.get(9).getProvider();
         assertTrue(lastWriter instanceof StringTextProvider);
         //readers
         List<ProviderInfo<MessageBodyReader<?>>> readers = pf.getMessageReaders();
@@ -154,8 +154,8 @@ public class ProviderFactoryTest extends Assert {
         
         // writers
         List<ProviderInfo<MessageBodyWriter<?>>> writers = pf.getMessageWriters();
-        assertEquals(9, writers.size());
-        Object lastWriter = writers.get(8).getProvider();
+        assertEquals(10, writers.size());
+        Object lastWriter = writers.get(9).getProvider();
         assertTrue(lastWriter instanceof StringTextProvider);
         //readers
         List<ProviderInfo<MessageBodyReader<?>>> readers = pf.getMessageReaders();
@@ -188,7 +188,7 @@ public class ProviderFactoryTest extends Assert {
         
         // writers
         List<ProviderInfo<MessageBodyWriter<?>>> writers = pf.getMessageWriters();
-        assertEquals(9, writers.size());
+        assertEquals(10, writers.size());
         Object lastWriter = writers.get(8).getProvider();
         assertFalse(lastWriter instanceof StringTextProvider);
         //readers
@@ -221,8 +221,8 @@ public class ProviderFactoryTest extends Assert {
         
         // writers
         List<ProviderInfo<MessageBodyWriter<?>>> writers = pf.getMessageWriters();
-        assertEquals(9, writers.size());
-        Object lastWriter = writers.get(8).getProvider();
+        assertEquals(10, writers.size());
+        Object lastWriter = writers.get(9).getProvider();
         assertTrue(lastWriter instanceof StringTextProvider);
         //readers
         List<ProviderInfo<MessageBodyReader<?>>> readers = pf.getMessageReaders();
