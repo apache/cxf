@@ -43,14 +43,14 @@ public class NioMessageBodyWriter implements MessageBodyWriter<NioWriteEntity> {
 
     @Override
     public boolean isWriteable(Class<?> cls, Type type, Annotation[] anns, MediaType mt) {
-        return NioWriteEntity.class.isAssignableFrom(cls);
+        return NioWriteEntity.class.isAssignableFrom(cls) && getContinuationProvider() != null;
     }
     
     @Override
     public void writeTo(NioWriteEntity entity, Class<?> cls, Type t, Annotation[] anns,
             MediaType mt, MultivaluedMap<String, Object> headers, OutputStream os) 
                 throws IOException, WebApplicationException {
-        Continuation cont = getContinuation();
+        Continuation cont = getContinuationProvider().getContinuation();
         NioWriteListenerImpl listener = new NioWriteListenerImpl(cont, entity, os);
         Message m = JAXRSUtils.getCurrentMessage();
         m.put(WriteListener.class, listener);
@@ -65,10 +65,8 @@ public class NioMessageBodyWriter implements MessageBodyWriter<NioWriteEntity> {
             MediaType mediaType) {
         return -1;
     }
-    private Continuation getContinuation() {
-        ContinuationProvider provider = 
-            (ContinuationProvider)JAXRSUtils.getCurrentMessage().getExchange()
+    private ContinuationProvider getContinuationProvider() {
+        return (ContinuationProvider)JAXRSUtils.getCurrentMessage().getExchange()
             .getInMessage().get(ContinuationProvider.class.getName());
-        return provider.getContinuation();
     }
 }
