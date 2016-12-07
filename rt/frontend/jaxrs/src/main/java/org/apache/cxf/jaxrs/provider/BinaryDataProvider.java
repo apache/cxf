@@ -38,19 +38,31 @@ import java.security.DigestInputStream;
 import java.util.UUID;
 import java.util.logging.Logger;
 
+import javax.servlet.WriteListener;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.NioOutputStream;
+import javax.ws.rs.core.NioWriterHandler;
 import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 
+import org.apache.cxf.annotations.UseNioWrite;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.MessageDigestInputStream;
+import org.apache.cxf.continuations.Continuation;
+import org.apache.cxf.continuations.ContinuationProvider;
 import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
+import org.apache.cxf.jaxrs.nio.DelegatingNioOutputStream;
+import org.apache.cxf.jaxrs.nio.NioWriteEntity;
+import org.apache.cxf.jaxrs.nio.NioWriteListenerImpl;
+import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
@@ -151,12 +163,12 @@ public class BinaryDataProvider<T> extends AbstractConfigurableProvider
         throws IOException {
         
         if (InputStream.class.isAssignableFrom(o.getClass())) {
-            copyInputToOutput((InputStream)o, os, headers);
+            copyInputToOutput((InputStream)o, os, annotations, headers);
         } else if (File.class.isAssignableFrom(o.getClass())) {
             copyInputToOutput(new BufferedInputStream(
-                    new FileInputStream((File)o)), os, headers);
+                    new FileInputStream((File)o)), os, annotations, headers);
         } else if (byte[].class.isAssignableFrom(o.getClass())) {
-            copyInputToOutput(new ByteArrayInputStream((byte[])o), os, headers);
+            copyInputToOutput(new ByteArrayInputStream((byte[])o), os, annotations, headers);
         } else if (Reader.class.isAssignableFrom(o.getClass())) {
             try {
                 Writer writer = new OutputStreamWriter(os, getEncoding(type));
@@ -185,19 +197,48 @@ public class BinaryDataProvider<T> extends AbstractConfigurableProvider
     }
     
     protected void copyInputToOutput(InputStream is, OutputStream os,
-            MultivaluedMap<String, Object> outHeaders) throws IOException {
+            Annotation[] anns, MultivaluedMap<String, Object> outHeaders) throws IOException {
         if (isRangeSupported()) {
             Message inMessage = PhaseInterceptorChain.getCurrentMessage().getExchange().getInMessage();
             handleRangeRequest(is, os, new HttpHeadersImpl(inMessage), outHeaders);
         } else {
+            boolean nioWrite = AnnotationUtils.getAnnotation(anns, UseNioWrite.class) != null;
+            if (nioWrite) {
+                ContinuationProvider provider = getContinuationProvider();
+                if (provider != null) {
+                    copyUsingNio(is, os, provider.getContinuation());
+                }
+                return;
+            } 
             if (closeResponseInputStream) {
                 IOUtils.copyAndCloseInput(is, os, bufferSize);
             } else {
                 IOUtils.copy(is, os, bufferSize);
             }
+            
         }
     }
     
+    protected void copyUsingNio(InputStream is, OutputStream os, Continuation cont) {
+        NioWriteListenerImpl listener = 
+            new NioWriteListenerImpl(cont, 
+                                     new NioWriteEntity(getNioHandler(is), null), 
+                                     new DelegatingNioOutputStream(os));
+        Message m = JAXRSUtils.getCurrentMessage();
+        m.put(WriteListener.class, listener);
+        // After this MBW registers the listener, JAXRSOutInterceptor is done, and the
+        // out chain will need to be resumed from the interceptor which follows it 
+        m.put("suspend.chain.on.current.interceptor", Boolean.TRUE);
+        cont.suspend(0);
+    }
+    
+    private ContinuationProvider getContinuationProvider() {
+        return (ContinuationProvider)JAXRSUtils.getCurrentMessage().getExchange()
+            .getInMessage().get(ContinuationProvider.class.getName());
+    }
+
+
+
     protected void handleRangeRequest(InputStream is, 
                                       OutputStream os,
                                       HttpHeaders inHeaders, 
@@ -230,5 +271,37 @@ public class BinaryDataProvider<T> extends AbstractConfigurableProvider
 
     public void setBufferSize(int bufferSize) {
         this.bufferSize = bufferSize;
+    }
+    
+    protected NioWriterHandler getNioHandler(final InputStream in) {
+        
+        return new NioWriterHandler() {
+            final byte[] buffer = new byte[bufferSize];
+            @Override
+            public boolean write(NioOutputStream out) {
+                try {
+                    final int n = in.read(buffer);
+    
+                    if (n >= 0) {
+                        out.write(buffer, 0, n);
+                        return true;
+                    }
+                    if (closeResponseInputStream) {    
+                        try { 
+                            in.close(); 
+                        } catch (IOException ex) { 
+                            /* do nothing */ 
+                        }
+                    }
+                    
+                    return false;
+                } catch (IOException ex) {
+                    throw new WebApplicationException(ex);    
+                }
+                
+            } 
+        };
+            
+        
     }
 }

@@ -20,22 +20,23 @@ package org.apache.cxf.systest.jaxrs.nio;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.cxf.annotations.UseNioWrite;
 import org.apache.cxf.helpers.IOUtils;
 
 @Path("/bookstore")
 public class NioBookStore {
     @GET
     @Produces(MediaType.TEXT_PLAIN)
-    public Response readBooks(@QueryParam("path") String path) throws IOException {
+    public Response readBooks() throws IOException {
         final ByteArrayInputStream in = new ByteArrayInputStream(
             IOUtils.readBytesFromStream(getClass().getResourceAsStream("/files/books.txt")));
         final byte[] buffer = new byte[4096];
@@ -65,5 +66,13 @@ public class NioBookStore {
                 throw throwable;
             }
         ).build();
+    }
+    
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    @Path("/is")
+    @UseNioWrite
+    public InputStream readBooksFromInputStream() throws IOException {
+        return getClass().getResourceAsStream("/files/books.txt");
     }
 }

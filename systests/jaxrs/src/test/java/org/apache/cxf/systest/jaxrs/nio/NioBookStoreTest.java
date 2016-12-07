@@ -58,6 +58,20 @@ public class NioBookStoreTest extends AbstractBusClientServerTestBase {
         }
     }
     
+    @Test
+    public void testGetAllBooksIs() throws Exception {
+        final Response response = createWebClient("/bookstore/is", MediaType.TEXT_PLAIN).get();
+        
+        try {
+            assertEquals(200, response.getStatus());
+            
+            assertThat(response.readEntity(String.class), equalTo(IOUtils.readStringFromStream(
+                getClass().getResourceAsStream("/files/books.txt"))));
+        } finally {
+            response.close();
+        }
+    }
+    
     protected WebClient createWebClient(final String url, final String mediaType) {
         final List< ? > providers = Arrays.asList(new JacksonJsonProvider());
         
