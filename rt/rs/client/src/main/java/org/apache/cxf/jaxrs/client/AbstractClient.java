@@ -525,7 +525,7 @@ public abstract class AbstractClient implements Client {
     }
     
     protected boolean responseStreamCanBeClosed(Message outMessage, Class<?> cls) {
-        return cls != InputStream.class
+        return !JAXRSUtils.isStreamingOutType(cls)
             && MessageUtils.isTrue(outMessage.getContextualProperty("response.stream.auto.close"));
     }
     
