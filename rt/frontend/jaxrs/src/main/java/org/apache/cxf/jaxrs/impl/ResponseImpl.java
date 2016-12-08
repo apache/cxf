@@ -440,7 +440,7 @@ public final class ResponseImpl extends Response {
     }
     
     protected void autoClose(Class<?> cls, boolean exception) {
-        if (!entityBufferred && cls != InputStream.class
+        if (!entityBufferred && !JAXRSUtils.isStreamingOutType(cls)
             && (exception || MessageUtils.isTrue(outMessage.getContextualProperty("response.stream.auto.close")))) {
             close();
         }
