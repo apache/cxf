@@ -18,10 +18,7 @@
  */
 package org.apache.cxf.jaxrs.client;
 
-import java.io.Closeable;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.ParameterizedType;
@@ -46,15 +43,8 @@ import java.util.logging.Logger;
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.InvocationCallback;
-import javax.ws.rs.core.Cookie;
-import javax.ws.rs.core.EntityTag;
-import javax.ws.rs.core.Form;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.core.*;
 import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.ext.ParamConverter;
 import javax.ws.rs.ext.WriterInterceptor;
 import javax.xml.stream.XMLStreamWriter;
@@ -525,7 +515,11 @@ public abstract class AbstractClient implements Client {
     }
     
     protected boolean responseStreamCanBeClosed(Message outMessage, Class<?> cls) {
-        return cls != InputStream.class
+        boolean isNotStreamingOutputType = (cls != InputStream.class)
+                && (cls != StreamingOutput.class)
+                && (cls != Reader.class);
+
+        return isNotStreamingOutputType
             && MessageUtils.isTrue(outMessage.getContextualProperty("response.stream.auto.close"));
     }
     
