@@ -22,6 +22,7 @@ package org.apache.cxf.jaxrs.utils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Reader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -70,6 +71,7 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.SecurityContext;
+import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.MessageBodyReader;
@@ -165,8 +167,14 @@ public final class JAXRSUtils {
     private static final String NO_CONTENT_EXCEPTION = "javax.ws.rs.core.NoContentException";
     private static final String HTTP_CHARSET_PARAM = "charset";
     private static final Annotation[] EMPTY_ANNOTATIONS = new Annotation[0]; 
+    private static final Set<Class<?>> STREAMING_OUT_TYPES = new HashSet<Class<?>>(
+        Arrays.asList(InputStream.class, Reader.class, StreamingOutput.class));
     
     private JAXRSUtils() {        
+    }
+    
+    public static boolean isStreamingOutType(Class<?> type) {
+        return STREAMING_OUT_TYPES.contains(type);
     }
     
     public static List<PathSegment> getPathSegments(String thePath, boolean decode) {
