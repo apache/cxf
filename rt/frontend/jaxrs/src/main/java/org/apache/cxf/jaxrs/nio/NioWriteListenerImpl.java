@@ -44,12 +44,7 @@ public final class NioWriteListenerImpl implements WriteListener {
     public void onWritePossible() throws IOException {
         while (cont.isReadyForWrite()) {
             if (!entity.getWriter().write(out)) {
-                // REVISIT:
-                // Immediately closing the async context with cont.resume() works better
-                // at the moment - with cont.resume() Jetty throws NPE in its internal code
-                // which is quite possibly a Jetty bug.
-                // Do we really need to complete the out chain after the response has been written out ?
-                cont.resume();
+                cont.reset();
                 return;
             }
         }

@@ -29,7 +29,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.apache.cxf.annotations.UseNioWrite;
+import org.apache.cxf.annotations.UseNio;
 import org.apache.cxf.helpers.IOUtils;
 
 @Path("/bookstore")
@@ -71,7 +71,7 @@ public class NioBookStore {
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     @Path("/is")
-    @UseNioWrite
+    @UseNio
     public InputStream readBooksFromInputStream() throws IOException {
         return getClass().getResourceAsStream("/files/books.txt");
     }

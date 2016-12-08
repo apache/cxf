@@ -49,7 +49,7 @@ import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 
-import org.apache.cxf.annotations.UseNioWrite;
+import org.apache.cxf.annotations.UseNio;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.MessageDigestInputStream;
 import org.apache.cxf.continuations.Continuation;
@@ -202,7 +202,7 @@ public class BinaryDataProvider<T> extends AbstractConfigurableProvider
             Message inMessage = PhaseInterceptorChain.getCurrentMessage().getExchange().getInMessage();
             handleRangeRequest(is, os, new HttpHeadersImpl(inMessage), outHeaders);
         } else {
-            boolean nioWrite = AnnotationUtils.getAnnotation(anns, UseNioWrite.class) != null;
+            boolean nioWrite = AnnotationUtils.getAnnotation(anns, UseNio.class) != null;
             if (nioWrite) {
                 ContinuationProvider provider = getContinuationProvider();
                 if (provider != null) {
@@ -226,9 +226,6 @@ public class BinaryDataProvider<T> extends AbstractConfigurableProvider
                                      new DelegatingNioOutputStream(os));
         Message m = JAXRSUtils.getCurrentMessage();
         m.put(WriteListener.class, listener);
-        // After this MBW registers the listener, JAXRSOutInterceptor is done, and the
-        // out chain will need to be resumed from the interceptor which follows it 
-        m.put("suspend.chain.on.current.interceptor", Boolean.TRUE);
         cont.suspend(0);
     }
     

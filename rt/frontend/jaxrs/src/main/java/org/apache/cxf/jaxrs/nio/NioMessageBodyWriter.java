@@ -54,9 +54,7 @@ public class NioMessageBodyWriter implements MessageBodyWriter<NioWriteEntity> {
         NioWriteListenerImpl listener = new NioWriteListenerImpl(cont, entity, os);
         Message m = JAXRSUtils.getCurrentMessage();
         m.put(WriteListener.class, listener);
-        // After this MBW registers the listener, JAXRSOutInterceptor is done, and the
-        // out chain will need to be resumed from the interceptor which follows it 
-        m.put("suspend.chain.on.current.interceptor", Boolean.TRUE);
+        // return the current thread to the pool
         cont.suspend(0);
     }
     
