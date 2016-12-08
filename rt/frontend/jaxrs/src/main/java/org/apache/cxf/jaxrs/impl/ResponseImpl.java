@@ -19,6 +19,21 @@
 
 package org.apache.cxf.jaxrs.impl;
 
+import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.jaxrs.provider.ProviderFactory;
+import org.apache.cxf.jaxrs.utils.HttpUtils;
+import org.apache.cxf.jaxrs.utils.InjectionUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
+
+import javax.ws.rs.ProcessingException;
+import javax.ws.rs.client.ResponseProcessingException;
+import javax.ws.rs.core.*;
+import javax.ws.rs.core.Response.Status.Family;
+import javax.ws.rs.ext.ReaderInterceptor;
+import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
+import javax.xml.stream.XMLStreamReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,39 +42,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-
-import javax.ws.rs.ProcessingException;
-import javax.ws.rs.client.ResponseProcessingException;
-import javax.ws.rs.core.EntityTag;
-import javax.ws.rs.core.GenericType;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Link;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.NewCookie;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status.Family;
-import javax.ws.rs.ext.ReaderInterceptor;
-import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
-import javax.xml.stream.XMLStreamReader;
-
-import org.apache.cxf.helpers.IOUtils;
-import org.apache.cxf.jaxrs.provider.ProviderFactory;
-import org.apache.cxf.jaxrs.utils.HttpUtils;
-import org.apache.cxf.jaxrs.utils.InjectionUtils;
-import org.apache.cxf.jaxrs.utils.JAXRSUtils;
-import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageUtils;
+import java.util.*;
 
 public final class ResponseImpl extends Response {
     
@@ -440,7 +423,11 @@ public final class ResponseImpl extends Response {
     }
     
     protected void autoClose(Class<?> cls, boolean exception) {
-        if (!entityBufferred && cls != InputStream.class
+        boolean isStreamingOutputType = (cls != InputStream.class)
+                && (cls != StreamingOutput.class)
+                && (cls != Reader.class);
+
+        if (!entityBufferred && isStreamingOutputType
             && (exception || MessageUtils.isTrue(outMessage.getContextualProperty("response.stream.auto.close")))) {
             close();
         }
