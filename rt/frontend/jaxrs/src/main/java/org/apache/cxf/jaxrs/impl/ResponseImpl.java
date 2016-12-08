@@ -423,11 +423,11 @@ public final class ResponseImpl extends Response {
     }
     
     protected void autoClose(Class<?> cls, boolean exception) {
-        boolean isStreamingOutputType = (cls != InputStream.class)
+        boolean isNotStreamingOutputType = (cls != InputStream.class)
                 && (cls != StreamingOutput.class)
                 && (cls != Reader.class);
 
-        if (!entityBufferred && isStreamingOutputType
+        if (!entityBufferred && isNotStreamingOutputType
             && (exception || MessageUtils.isTrue(outMessage.getContextualProperty("response.stream.auto.close")))) {
             close();
         }
