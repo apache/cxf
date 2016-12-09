@@ -24,6 +24,7 @@ import com.codahale.metrics.MetricRegistry;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.actuate.endpoint.MetricReaderPublicMetrics;
 import org.springframework.boot.actuate.endpoint.MetricsEndpoint;
+import org.springframework.boot.actuate.endpoint.PublicMetrics;
 import org.springframework.boot.actuate.metrics.reader.MetricRegistryMetricReader;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
@@ -40,8 +41,8 @@ public class SampleRestApplication {
     
     @Bean
     public MetricsEndpoint metricsEndpoint(final MetricRegistry registry) {
-        return new MetricsEndpoint(Collections.singleton(new MetricReaderPublicMetrics(
-            new MetricRegistryMetricReader(registry))));
+        PublicMetrics pm = new MetricReaderPublicMetrics(new MetricRegistryMetricReader(registry));
+        return new MetricsEndpoint(Collections.singleton(pm));
     }
 
     public static void main(String[] args) {
