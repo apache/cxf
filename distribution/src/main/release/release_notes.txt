@@ -1,8 +1,8 @@
-Apache CXF 3.1.8 Release Notes
+Apache CXF 3.1.9 Release Notes
 
 1. Overview
 
-The 3.1.8 version of Apache CXF is a significant new version of CXF 
+The 3.1.9 version of Apache CXF is a significant new version of CXF 
 that provides several new features and enhancements.  
 
 New features include: 
@@ -25,8 +25,7 @@ http://cxf.apache.org/docs/31-migration-guide.html
 for further information and requirements for upgrading from earlier
 versions of CXF.
 
-3.1.8 fixes over 55 JIRA issues reported by users and the community.
-
+3.1.9 fixes over 45 JIRA issues reported by users and the community.
 
 
 2. Installation Prerequisites 
@@ -73,63 +72,59 @@ to 3.1.
 
 
 ** Bug
-    * [CXF-6740] - Collision by Swagger2Feature in two OSGI bundles 
-    * [CXF-6917] - SuperClass and Interface's Annotations are ignored when the Method contains ParameterAnnotation
-    * [CXF-6981] - Getting "java.io.IOException: stream is closed" for > 64K messages
-    * [CXF-6984] - OAuthJSonProvider mixes expirytime and issuer in writeTokenIntrospection.
-    * [CXF-6985] - parameter state may contain spaces, it must be urlencoded in response.
-    * [CXF-6989] - Content Disposition does not handle "=" in filename
-    * [CXF-6990] - Swagger tags not sorted if using Swagger2Feature
-    * [CXF-6991] - WS-RM - Request context properties are lost when sending subsequent protocol message
-    * [CXF-6992] - ParamConverterProvider invoked with wrong types
-    * [CXF-6994] - RMCaptureInInterceptor running on GET requests
-    * [CXF-6996] - "n" in JWK for RSA should be unsigned, but is signed in JwkUtils.prepareRSAJwk
-    * [CXF-7003] - Allow STS Tokens to have an optional ID
-    * [CXF-7004] - Custom DateTime property is not serialized to JSON properly
-    * [CXF-7005] - NullPointerException when using JwkUtils.toRSAPrivateKey
-    * [CXF-7008] - Regression: CXF-5788 - JMS replyToDestination doesn't work
-    * [CXF-7010] - Swagger2Feature can not auto-link to SwaggerUi in OSGI
-    * [CXF-7017] - @BeanParam not working in subresource
-    * [CXF-7021] - The WS-SecurityPolicy TransportBinding does not respect the digest method of the algorithm suite
-    * [CXF-7026] - o.a.c.transport.http.osgi.HttpServiceTrackerCust service leak
-    * [CXF-7028] - AsyncResponse Suspended annotation can not be inherited
-    * [CXF-7029] - HttpAuthenticationFaultHandler cause java.lang.IllegalStateException: WRITER
-    * [CXF-7033] - LoggingInterceptors do not handle messages with non-UTF-8 encoding properly
-    * [CXF-7034] - should close HttpServiceTracker  in HTTPTransportActivator
-    * [CXF-7037] - @Suspended can be broken on tomcat
-    * [CXF-7038] - ensure the JMS Connection get refreshed so that the jms retry can get a useful Connection
-    * [CXF-7039] - JAX-RS Security SAML web SSO consumer service can not validate SAML response behind reverse proxy
-    * [CXF-7040] - Swagger UI Feature's resource root is incorrect for executable JAR/WAR
-    * [CXF-7043] - JAX-RS endpoints cannot handle encoded URL when used with continuation and servlet transport
-    * [CXF-7044] - LoggingInInterceptor sometimes crashes if truncates response with Unicode simbols
-    * [CXF-7045] - Update sample description_swagger2_osgi README.txt
-    * [CXF-7048] - Response does not include SequenceAcknowledgement
-    * [CXF-7059] - ClientImpl.getBooleanValue() will return null for String values
-    * [CXF-7069] - Finish JPACodeDataProvider implementation
-    * [CXF-7070] - HTTP headers logged in debug
-    * [CXF-7071] - HttpServletRequest.getParameter only get String from query not both posted form data
-    * [CXF-7080] - XmlSecOutInterceptor doesn't recognise KeyName as a KeyIdentifier
-    * [CXF-7087] - Getting the wsdl from a cxf webservice with custom XMLOuputFactory throws an exception
-    * [CXF-7088] - SignedEncryptedSupportingTokens in WS-Policy and SAML not encrypted being accepted
-    * [CXF-7090] - WSS4J not in <dependencyManagement> section
+    * [CXF-6216] - No output sanitizing in FormattedServiceListWriter 
+    * [CXF-6604] - Sporadic ClassCastException in AsymmetricBindingHandler#doSignBeforeEncrypt
+    * [CXF-6836] - Swagger2 tests need to be updated to do a more robust JSON or YAML comparison
+    * [CXF-6896] - CDI integration: duplicate service / feature / provider beans are registered when Application class has singletons
+    * [CXF-7015] - Invalid URL encoding causes error 500
+    * [CXF-7091] - JAXRSBeanValidationOutInterceptor fails to validate Response entity on the 2nd try
+    * [CXF-7092] - Swagger2Feature tries to resolve swagger-ui resources with api-docs
+    * [CXF-7095] - CDI integration doesn't use the right bus to create the server factory
+    * [CXF-7097] - [CDI] application leaks a creational context
+    * [CXF-7099] - Technical user should be the SAML Subject for the ActAs use-case
+    * [CXF-7105] - Don't register default application if no services discovered
+    * [CXF-7109] - ClientCallback may be invoked twice when Async HTTP Transport is used
+    * [CXF-7112] - AsyncHTTPConduit ignore the ReceiveTimeout when use Async JAXWS api
+    * [CXF-7114] - Disable HTTP TRACE method on CXF http-jetty transport
+    * [CXF-7115] - Issuer in TokenIntrospection should be quoted in JSON
+    * [CXF-7116] - AsyncResponse.resume() infinitely hangs up after first call
+    * [CXF-7117] - Swagger2Feature not working in OSGi container when jaxrs server address not attached to CXF servlet
+    * [CXF-7121] - Need to log a warning when async method returns a non-void type
+    * [CXF-7122] - Infinite loop due to AsyncHTTPConduit read timeout with exhausted connection pool
+    * [CXF-7123] - JAXRS Clients will hang if they do not set a oneway exchange status before the call and 202 is returned
+    * [CXF-7124] - PackageUtils.getSharedPackageName(List<Class<?>>) has bug
+    * [CXF-7133] - Don't rely on disabled scanning in CDI
+    * [CXF-7134] - Fix how non-normal scoped beans are used in CDI extension
+    * [CXF-7139] - BufferOverflowException when decoding a parameter values with a trailing %
+    * [CXF-7140] - Multiple calls to AsyncResponse.cancel() returns different values
+    * [CXF-7142] - Blueprint mandatory in OSGi
+    * [CXF-7145] - synchronized store and getMessages of JmsPullPoint would cause deadlock
+    * [CXF-7147] - Unable to register a generic _InvocationCallback<Object>_ when using the async proxy client API in JAX-RS
+    * [CXF-7148] - Race Condition while handling symmetric key in SymmetricBindingHandler
+    * [CXF-7154] - WSDL2JAVA Allows Unsafe Characters in to Generated Javadocs
+    * [CXF-7155] - JAXRSOutInterceptor do not close CachedOutputStream when out buffering is enabled
+    * [CXF-7161] - OIDC Dynamic Registration : NPE for implicit grant_types
+    * [CXF-7162] - Inconsistent reading of formatted xml when validating schema
 
 ** Improvement
-    * [CXF-6692] - Update AbstractOAuthDataProvider to support JWT access tokens
-    * [CXF-6941] - Send Comma Separated Array in url request
-    * [CXF-6950] - Support the per-request scope resouce bean via Spring configuration
-    * [CXF-6983] - org.apache.cxf.jaxrs.provider.AbstractJAXBProvider#handleJAXBException doubles the error text for unmarshalling errors
-    * [CXF-7000] - Allow logging to be enabled on-the-fly
-    * [CXF-7002] - Add isExpired method in JettyContinuationWrapper 
-    * [CXF-7006] - add an util method in AuthorizationUtils which can take AuthorizationFailure cause
-    * [CXF-7020] - explicity create woodstox event factory as fallback if XMLEventFactory.newInstance fail
-    * [CXF-7022] - Allow customization of Swagger JSON generation
-    * [CXF-7024] - Support original WADL namespace prefix without incrementing it
-    * [CXF-7027] - WADLGenerator should support AsyncResponse if ElementClass annotation is used
-    * [CXF-7032] - Update WadlToJava to support javax.validation.Valid 
-    * [CXF-7035] - Default Swagger2Serializers dynamicBasePath code needs to sync BeanConfig with Swagger
-    * [CXF-7075] - Remove unnecessary string.length() and map.containsKey(...) calls to improve performance
-    * [CXF-7089] - Let ParamConverters handle null proxy path parameters
+    * [CXF-6986] - Don't require an application class if using CDI
+    * [CXF-7072] - Make it easier to auto-discover MetricsFeature
+    * [CXF-7106] - Support inserting claims into tokens issued by the STS in conjunction with ActAs
+    * [CXF-7107] - Support inserting claims into tokens issued by the STS in conjunction with ActAs
+    * [CXF-7110] - Inflexible jwt audience restriction validation
+    * [CXF-7111] - Make the security token lifetime configurable
+    * [CXF-7125] - Automatically expose logging feature as intent for DOSGi
+    * [CXF-7137] - Allow OAuth2 customization via Swagger2Feature
+    * [CXF-7144] - support to specify pullpoint queue name of WS-N
+    * [CXF-7156] - java2ws-plugin - add portName as configuration option
 
-** Wish
-    * [CXF-7057] - CXF JAXRSClientFactoryBean proxy async support
+** New Feature
+    * [CXF-7119] - Introduce a JAX-RS client provider for catching technical exceptions (e.g. IOException)
+    * [CXF-7157] - Support the client side bean validation for CXF client proxies  
+
+** Task
+    * [CXF-7093] - Investigate how SpringBoot demos can be included in the distribution
+    * [CXF-7152] - OIDC FormResponse mode needs to be supported for Implicit Flow too
+
+
 
