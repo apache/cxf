@@ -1,4 +1,4 @@
-Apache CXF 3.0.11 Release Notes
+Apache CXF 3.0.12 Release Notes
 
 1. Overview
 
@@ -22,7 +22,7 @@ Users are encourage to review the migration guide at:
 http://cxf.apache.org/docs/30-migration-guide.html
 for further information and requirements for upgrading from 2.7.x.
 
-3.0.11 fixes over 30 JIRA issues reported by users and the community.
+3.0.12 fixes over 17 JIRA issues reported by users and the community.
 
 
 
@@ -68,39 +68,26 @@ for caveats when upgrading from CXF 2.7.x to 3.0.0
 
 
 ** Bug
-    * [CXF-6981] - Getting "java.io.IOException: stream is closed" for > 64K messages
-    * [CXF-6989] - Content Disposition does not handle "=" in filename
-    * [CXF-6990] - Swagger tags not sorted if using Swagger2Feature
-    * [CXF-6991] - WS-RM - Request context properties are lost when sending subsequent protocol message
-    * [CXF-6992] - ParamConverterProvider invoked with wrong types
-    * [CXF-7008] - Regression: CXF-5788 - JMS replyToDestination doesn't work
-    * [CXF-7017] - @BeanParam not working in subresource
-    * [CXF-7021] - The WS-SecurityPolicy TransportBinding does not respect the digest method of the algorithm suite
-    * [CXF-7028] - AsyncResponse Suspended annotation can not be inherited
-    * [CXF-7029] - HttpAuthenticationFaultHandler cause java.lang.IllegalStateException: WRITER
-    * [CXF-7033] - LoggingInterceptors do not handle messages with non-UTF-8 encoding properly
-    * [CXF-7037] - @Suspended can be broken on tomcat
-    * [CXF-7038] - ensure the JMS Connection get refreshed so that the jms retry can get a useful Connection
-    * [CXF-7039] - JAX-RS Security SAML web SSO consumer service can not validate SAML response behind reverse proxy
-    * [CXF-7043] - JAX-RS endpoints cannot handle encoded URL when used with continuation and servlet transport
-    * [CXF-7044] - LoggingInInterceptor sometimes crashes if truncates response with Unicode simbols
-    * [CXF-7059] - ClientImpl.getBooleanValue() will return null for String values
-    * [CXF-7070] - HTTP headers logged in debug
-    * [CXF-7071] - HttpServletRequest.getParameter only get String from query not both posted form data
-    * [CXF-7080] - XmlSecOutInterceptor doesn't recognise KeyName as a KeyIdentifier
-    * [CXF-7087] - Getting the wsdl from a cxf webservice with custom XMLOuputFactory throws an exception
-    * [CXF-7088] - SignedEncryptedSupportingTokens in WS-Policy and SAML not encrypted being accepted
+    * [CXF-6216] - No output sanitizing in FormattedServiceListWriter 
+    * [CXF-6604] - Sporadic ClassCastException in AsymmetricBindingHandler#doSignBeforeEncrypt
+    * [CXF-7015] - Invalid URL encoding causes error 500
+    * [CXF-7091] - JAXRSBeanValidationOutInterceptor fails to validate Response entity on the 2nd try
+    * [CXF-7099] - Technical user should be the SAML Subject for the ActAs use-case
+    * [CXF-7114] - Disable HTTP TRACE method on CXF http-jetty transport
+    * [CXF-7116] - AsyncResponse.resume() infinitely hangs up after first call
+    * [CXF-7121] - Need to log a warning when async method returns a non-void type
+    * [CXF-7123] - JAXRS Clients will hang if they do not set a oneway exchange status before the call and 202 is returned
+    * [CXF-7124] - PackageUtils.getSharedPackageName(List<Class<?>>) has bug
+    * [CXF-7135] - ConcurrentModificationException in MessageImpl.calcContextCache() when using JMS Transport and JAXRS Client
+    * [CXF-7139] - BufferOverflowException when decoding a parameter values with a trailing %
+    * [CXF-7140] - Multiple calls to AsyncResponse.cancel() returns different values
+    * [CXF-7148] - Race Condition while handling symmetric key in SymmetricBindingHandler
+    * [CXF-7154] - WSDL2JAVA Allows Unsafe Characters in to Generated Javadocs
+    * [CXF-7155] - JAXRSOutInterceptor do not close CachedOutputStream when out buffering is enabled
+    * [CXF-7162] - Inconsistent reading of formatted xml when validating schema
 
 
-** Improvement
-    * [CXF-7002] - Add isExpired method in JettyContinuationWrapper 
-    * [CXF-7006] - add an util method in AuthorizationUtils which can take AuthorizationFailure cause
-    * [CXF-7022] - Allow customization of Swagger JSON generation
-    * [CXF-7027] - WADLGenerator should support AsyncResponse if ElementClass annotation is used
-    * [CXF-7032] - Update WadlToJava to support javax.validation.Valid 
-    * [CXF-7035] - Default Swagger2Serializers dynamicBasePath code needs to sync BeanConfig with Swagger
-    * [CXF-7075] - Remove unnecessary string.length() and map.containsKey(...) calls to improve performance
-    * [CXF-7089] - Let ParamConverters handle null proxy path parameters
+
 
 
 
