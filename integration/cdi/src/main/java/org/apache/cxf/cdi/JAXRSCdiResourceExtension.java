@@ -120,7 +120,7 @@ public class JAXRSCdiResourceExtension implements Extension {
         
         bus = (Bus)beanManager.getReference(
                 busBean, 
-                Bus.class,
+                busBean.getBeanClass(),
                 beanManager.createCreationalContext(busBean));
 
         for (final Bean< ? > application: applicationBeans) {

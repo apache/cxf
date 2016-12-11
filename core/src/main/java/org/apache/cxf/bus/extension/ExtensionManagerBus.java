@@ -192,7 +192,7 @@ public class ExtensionManagerBus extends AbstractBasicInterceptorProvider implem
     }
     
     
-    protected final void setState(BusState state) {
+    protected void setState(BusState state) {
         this.state = state;
     }
     
@@ -200,7 +200,7 @@ public class ExtensionManagerBus extends AbstractBasicInterceptorProvider implem
         id = i;
     }
 
-    public final <T> T getExtension(Class<T> extensionType) {
+    public <T> T getExtension(Class<T> extensionType) {
         Object obj = extensions.get(extensionType);
         if (obj == null) {
             if (missingExtensions.contains(extensionType)) {
@@ -250,7 +250,7 @@ public class ExtensionManagerBus extends AbstractBasicInterceptorProvider implem
         return false;
     }
     
-    protected final synchronized ConfiguredBeanLocator createConfiguredBeanLocator() {
+    protected synchronized ConfiguredBeanLocator createConfiguredBeanLocator() {
         ConfiguredBeanLocator loc = (ConfiguredBeanLocator)extensions.get(ConfiguredBeanLocator.class);
         if (loc == null) {
             loc = extensionManager; 
@@ -259,7 +259,7 @@ public class ExtensionManagerBus extends AbstractBasicInterceptorProvider implem
         return loc;
     }
 
-    public final <T> void setExtension(T extension, Class<T> extensionType) {
+    public <T> void setExtension(T extension, Class<T> extensionType) {
         if (extension == null) {
             extensions.remove(extensionType);
             missingExtensions.add(extensionType);
