@@ -69,11 +69,6 @@ public final class JAXBContextCache {
             this.classes = classes;
             ccas = new WeakReference<CachedContextAndSchemasInternal>(i);
         }
-        private CachedContextAndSchemas(CachedContextAndSchemasInternal i) {
-            this.context = i.getContext();
-            this.classes = i.getClasses();
-            ccas = new WeakReference<CachedContextAndSchemasInternal>(i);
-        }
         public JAXBContext getContext() {
             return context;
         }
@@ -237,7 +232,8 @@ public final class JAXBContextCache {
                         JAXBCONTEXT_CACHE.remove(cachedContextAndSchemasInternal.getClasses());
                         cachedContextAndSchemasInternal = null;
                     } else {
-                        return new CachedContextAndSchemas(cachedContextAndSchemasInternal);
+                        return new CachedContextAndSchemas(context, cachedContextAndSchemasInternal.getClasses(),
+                            cachedContextAndSchemasInternal);
                     }
                 }
             }
