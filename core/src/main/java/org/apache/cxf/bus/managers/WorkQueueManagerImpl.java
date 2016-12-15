@@ -48,6 +48,9 @@ public class WorkQueueManagerImpl implements WorkQueueManager {
     private static final Logger LOG =
         LogUtils.getL7dLogger(WorkQueueManagerImpl.class);
 
+    public static final String DEFAULT_QUEUE_NAME = "default";
+    public static final String DEFAULT_WORKQUEUE_BEAN_NAME = "cxf.default.workqueue";
+
     Map<String, AutomaticWorkQueue> namedQueues 
         = new ConcurrentHashMap<String, AutomaticWorkQueue>(4, 0.75f, 2);
     
