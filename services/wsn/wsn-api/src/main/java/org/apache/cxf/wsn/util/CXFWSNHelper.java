@@ -30,6 +30,7 @@ import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.ws.Endpoint;
+import javax.xml.ws.soap.SOAPBinding;
 
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.wsn.wsdl.WSNWSDLLocator;
@@ -72,7 +73,7 @@ public class CXFWSNHelper extends WSNHelper {
         }
     }
     public Endpoint publish(String address, Object o, Class<?> ... extraClasses) {
-        Endpoint endpoint = Endpoint.create(o);
+        Endpoint endpoint = Endpoint.create(SOAPBinding.SOAP12HTTP_BINDING, o);
         if (extraClasses != null && extraClasses.length > 0) {
             Map<String, Object> props = new HashMap<String, Object>();
             props.put("jaxb.additionalContextClasses", extraClasses);
