@@ -25,13 +25,13 @@ import java.util.Set;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import org.apache.aries.blueprint.NamespaceHandler;
 import org.apache.aries.blueprint.Namespaces;
 import org.apache.aries.blueprint.ParserContext;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.frontend.blueprint.ClientProxyFactoryBeanDefinitionParser;
 import org.apache.cxf.frontend.blueprint.ServerFactoryBeanDefinitionParser;
+import org.apache.cxf.helpers.BaseNamespaceHandler;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.jaxws.support.JaxWsServiceFactoryBean;
@@ -40,14 +40,17 @@ import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.osgi.service.blueprint.reflect.Metadata;
 
 @Namespaces("http://cxf.apache.org/blueprint/jaxws")
-public class JAXWSBPNamespaceHandler implements NamespaceHandler {
+public class JAXWSBPNamespaceHandler extends BaseNamespaceHandler {
     private BlueprintContainer blueprintContainer;
     
     public JAXWSBPNamespaceHandler() {
     }
     
     public URL getSchemaLocation(String namespace) {
-        return getClass().getClassLoader().getResource("schemas/blueprint/jaxws.xsd");
+        if ("http://cxf.apache.org/blueprint/jaxws".equals(namespace)) {
+            return getClass().getClassLoader().getResource("schemas/blueprint/jaxws.xsd");
+        }
+        return super.findCoreSchemaLocation(namespace);
     }
 
 
