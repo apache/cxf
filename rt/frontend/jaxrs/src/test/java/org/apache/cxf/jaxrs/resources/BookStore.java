@@ -20,6 +20,7 @@
 
 package org.apache.cxf.jaxrs.resources;
 
+import javax.ws.rs.BeanParam;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -36,13 +37,12 @@ public class BookStore extends BookSuperClass implements BookInterface {
     public Book getBook(String id) {
         return null;
     }
-    
+
     @Override
     public Book getNewBook(String id, Boolean isNew) {
         return null;
     }
-    
-    
+
 
     @POST
     @Path("/books")
@@ -71,6 +71,22 @@ public class BookStore extends BookSuperClass implements BookInterface {
     public String getAuthor() {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    @Override
+    public void getBookDescriptor(BookDescriptor descriptor) {
+    }
+
+    @Override
+    public void getBookDescriptor(BookDescriptor2 descriptor) {
+    }
+
+    @Override
+    public void getBookDescriptor(BookDescriptor3 descriptor) {
+    }
+
+    @Override
+    public void getBookDescriptor(BookDescriptor4 descriptor) {
     }
 }
 

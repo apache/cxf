@@ -19,6 +19,7 @@
 
 package org.apache.cxf.jaxrs.resources;
 
+import javax.ws.rs.BeanParam;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -35,4 +36,20 @@ public interface BookInterface {
     
     @Path("/books/{bookId}")
     Book getBook(@PathParam("bookId") String id);
+
+    @GET
+    @Path("/descriptor/${year}/${isbn}")
+    void getBookDescriptor(@BeanParam BookDescriptor descriptor);
+
+    @GET
+    @Path("/descriptor2/${year}/${isbn}")
+    void getBookDescriptor(@BeanParam BookDescriptor2 descriptor);
+
+    @GET
+    @Path("/descriptor3/${year}/${isbn}")
+    void getBookDescriptor(@BeanParam BookDescriptor3 descriptor);
+
+    @GET
+    @Path("/descriptor4/${year}/${isbn}")
+    void getBookDescriptor(@BeanParam BookDescriptor4 descriptor);
 }
