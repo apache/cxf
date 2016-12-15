@@ -1,0 +1,9 @@
+<handler-chains xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://www.oracle.com/webfolder/technetwork/jsc/xml/ns/javaee/javaee_web_services_metadata_handler_2_0.xsd">
+    <handler-chain>
+        <handler>
+            <handler-name>ContextHandler</handler-name>
+            <handler-class>org.apache.cxf.systest.cxf6319.EmptyHandler</handler-class>
+        </handler>
+    </handler-chain>
+</handler-chains>
