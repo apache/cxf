@@ -21,15 +21,16 @@ package org.apache.cxf.ws.policy.blueprint;
 
 import java.net.URL;
 import java.util.Set;
+
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import org.apache.aries.blueprint.NamespaceHandler;
 import org.apache.aries.blueprint.ParserContext;
+import org.apache.cxf.helpers.BaseNamespaceHandler;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.osgi.service.blueprint.reflect.Metadata;
 
-public class PolicyBPHandler implements NamespaceHandler {
+public class PolicyBPHandler extends BaseNamespaceHandler {
 
     public URL getSchemaLocation(String s) {
         //Say yes to various schemas.
@@ -54,7 +55,7 @@ public class PolicyBPHandler implements NamespaceHandler {
         if (location != null) {
             return getClass().getClassLoader().getResource(location);
         }
-        return null;
+        return super.findCoreSchemaLocation(s);
     }
 
     @SuppressWarnings("rawtypes")
