@@ -20,6 +20,7 @@ package org.apache.cxf.binding.object.blueprint;
 
 import java.net.URL;
 import java.util.Set;
+
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -33,7 +34,11 @@ import org.osgi.service.blueprint.reflect.Metadata;
 public class ObjectBindingBPHandler implements NamespaceHandler {
 
     public URL getSchemaLocation(String s) {
-        return getClass().getClassLoader().getResource("schemas/bindings/blueprint/object.xsd");
+        if ("http://cxf.apache.org/blueprint/binding/object".equals(s)) {
+            return getClass().getClassLoader().getResource("schemas/bindings/blueprint/object.xsd");
+        }
+        // no imported XSDs, so we don't have to delegate to cxf-core namespace handler
+        return null;
     }
 
     @SuppressWarnings("rawtypes")
