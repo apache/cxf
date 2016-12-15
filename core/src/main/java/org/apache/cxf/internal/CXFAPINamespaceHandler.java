@@ -49,15 +49,24 @@ public class CXFAPINamespaceHandler implements NamespaceHandler {
     public URL getSchemaLocation(String namespace) {
         String location = null;
 
-        if ("http://cxf.apache.org/configuration/beans".equals(namespace)) {
+        // when schema is being resolved for custom namespace elements, "namespace" is real namespace
+        // (from xmlns:prefix="<namespace>"
+        // but when namespace is <xsd:import>ed, aries/xerces uses systemID (schemaLocation)
+
+        if ("http://cxf.apache.org/configuration/beans".equals(namespace)
+                || "http://cxf.apache.org/schemas/configuration/cxf-beans.xsd".equals(namespace)) {
             location = "schemas/configuration/cxf-beans.xsd";           
-        } else if ("http://cxf.apache.org/configuration/parameterized-types".equals(namespace)) {
+        } else if ("http://cxf.apache.org/configuration/parameterized-types".equals(namespace)
+                || "http://cxf.apache.org/schemas/configuration/parameterized-types.xsd".equals(namespace)) {
             location = "schemas/configuration/parameterized-types.xsd";
-        } else if ("http://cxf.apache.org/configuration/security".equals(namespace)) {
+        } else if ("http://cxf.apache.org/configuration/security".equals(namespace)
+                || "http://cxf.apache.org/schemas/configuration/security.xsd".equals(namespace)) {
             location = "schemas/configuration/security.xsd";
-        } else if ("http://schemas.xmlsoap.org/wsdl/".equals(namespace)) {
+        } else if ("http://schemas.xmlsoap.org/wsdl/".equals(namespace)
+                || "http://schemas.xmlsoap.org/wsdl/2003-02-11.xsd".equals(namespace)) {
             location = "schemas/wsdl/wsdl.xsd";
-        } else if ("http://www.w3.org/2005/08/addressing".equals(namespace)) {
+        } else if ("http://www.w3.org/2005/08/addressing".equals(namespace)
+                || "http://www.w3.org/2006/03/addressing/ws-addr.xsd".equals(namespace)) {
             location = "schemas/wsdl/ws-addr.xsd";
         } else if ("http://schemas.xmlsoap.org/ws/2004/08/addressing".equals(namespace)) {
             location = "schemas/wsdl/addressing.xsd";

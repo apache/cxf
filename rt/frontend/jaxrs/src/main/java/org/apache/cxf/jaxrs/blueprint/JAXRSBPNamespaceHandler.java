@@ -47,8 +47,11 @@ public class JAXRSBPNamespaceHandler extends BaseNamespaceHandler {
     }
     
     public URL getSchemaLocation(String namespace) {
-        if ("http://cxf.apache.org/blueprint/jaxrs".equals(namespace)) {
+        if ("http://cxf.apache.org/blueprint/jaxrs".equals(namespace)
+                || "http://cxf.apache.org/schemas/jaxrs.xsd".equals(namespace)) {
             return getClass().getClassLoader().getResource("schemas/blueprint/jaxrs.xsd");
+        } else if ("http://cxf.apache.org/schemas/jaxrs-common.xsd".equals(namespace)) {
+            return getClass().getClassLoader().getResource("schemas/blueprint/jaxrs-common.xsd");
         }
         return super.findCoreSchemaLocation(namespace);
     }
