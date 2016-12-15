@@ -20,17 +20,18 @@ package org.apache.cxf.ws.rm.blueprint;
 
 import java.net.URL;
 import java.util.Set;
+
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import org.apache.aries.blueprint.NamespaceHandler;
 import org.apache.aries.blueprint.ParserContext;
+import org.apache.cxf.helpers.BaseNamespaceHandler;
 import org.apache.cxf.ws.rm.RMManager;
 import org.apache.cxf.ws.rm.feature.RMFeature;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.osgi.service.blueprint.reflect.Metadata;
 
-public class RMBPHandler implements NamespaceHandler {
+public class RMBPHandler extends BaseNamespaceHandler {
 
     public URL getSchemaLocation(String s) {
         if ("http://cxf.apache.org/ws/rm/manager".equals(s)) {
@@ -43,7 +44,7 @@ public class RMBPHandler implements NamespaceHandler {
             return getClass().getClassLoader().
                 getResource("schemas/configuration/wsrmp-1.1-schema-200702.xsd");
         }
-        return null;
+        return super.findCoreSchemaLocation(s);
     }
 
     @SuppressWarnings("rawtypes")

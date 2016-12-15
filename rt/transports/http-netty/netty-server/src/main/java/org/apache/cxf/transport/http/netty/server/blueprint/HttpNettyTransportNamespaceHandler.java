@@ -26,15 +26,15 @@ import java.util.logging.Logger;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import org.apache.aries.blueprint.NamespaceHandler;
 import org.apache.aries.blueprint.Namespaces;
 import org.apache.aries.blueprint.ParserContext;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.BaseNamespaceHandler;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.osgi.service.blueprint.reflect.Metadata;
 
 @Namespaces("http://cxf.apache.org/transports/http-netty-server/configuration")
-public class HttpNettyTransportNamespaceHandler implements NamespaceHandler {
+public class HttpNettyTransportNamespaceHandler extends BaseNamespaceHandler {
 
     public static final String NETTY_SERVER_TRANSPORT = 
         "http://cxf.apache.org/transports/http-netty-server/configuration";
@@ -48,7 +48,7 @@ public class HttpNettyTransportNamespaceHandler implements NamespaceHandler {
             return getClass().getClassLoader().
                 getResource("schemas/configuration/http-netty-server.xsd");
         } else {
-            return null;
+            return super.findCoreSchemaLocation(s);
         }
     }
 
