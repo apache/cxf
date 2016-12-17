@@ -19,6 +19,7 @@
 package org.apache.cxf.aegis.type.java5;
 
 import java.beans.PropertyDescriptor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 import javax.xml.namespace.QName;
@@ -93,13 +94,45 @@ public class AnnotatedTypeInfo extends BeanTypeInfo {
     }
 
     protected QName createQName(PropertyDescriptor desc) {
+        String name = getName(desc);
+        String namespace = getNamespace(desc);
+        return new QName(namespace, name);
+    }
+
+    /**
+     * XML Name of a field is derived from the following sources in this order of priorities:
+     * <ul>
+     *   <li> getter method annotation
+     *   <li> field annotation
+     *   <li> field name
+     * </ul>
+     */
+    private String getName(PropertyDescriptor desc) {
         String name = annotationReader.getName(desc.getReadMethod());
+        if (name == null) {
+            name = annotationReader.getName(getField(desc));
+        }
         if (name == null) {
             name = desc.getName();
         }
+        return name;
+    }
 
-        // namespace: method, class, package, generated
+    /**
+     * XML Namespace of a field is derived from the following sources in this order of priorities:
+     * <ol>
+     *  <li> getter method annotation
+     *  <li> field annotation
+     *  <li> class annotation
+     *  <li> package annotation
+     *  <li> fully qualified package name
+     * </ol>
+     */
+    private String getNamespace(PropertyDescriptor desc) {
         String namespace = annotationReader.getNamespace(desc.getReadMethod());
+        if (namespace == null) {
+            namespace = annotationReader.getNamespace(getField(desc));
+        }
         if (namespace == null) {
             namespace = annotationReader.getNamespace(getTypeClass());
         }
@@ -109,8 +142,15 @@ public class AnnotatedTypeInfo extends BeanTypeInfo {
         if (namespace == null) {
             namespace = NamespaceHelper.makeNamespaceFromClassName(getTypeClass().getName(), "http");
         }
+        return namespace;
+    }
 
-        return new QName(namespace, name);
+    private Field getField(PropertyDescriptor desc) {
+        try {
+            return getTypeClass().getDeclaredField(desc.getName());
+        } catch (NoSuchFieldException e) {
+            return null;
+        }
     }
 
     public boolean isNillable(QName name) {

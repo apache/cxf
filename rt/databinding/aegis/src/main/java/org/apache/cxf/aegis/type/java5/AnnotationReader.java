@@ -289,7 +289,7 @@ public class AnnotationReader {
             Class<? extends Annotation>... annotations) {
 
         for (Class<?> annotation : annotations) {
-            if (annotation != null) {
+            if (annotation != null && element != null) {
                 try {
                     Annotation ann = element.getAnnotation(annotation.asSubclass(Annotation.class));
                     if (ann != null) {

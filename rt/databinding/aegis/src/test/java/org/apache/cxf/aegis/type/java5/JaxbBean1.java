@@ -25,6 +25,8 @@ public class JaxbBean1 {
     private String elementProperty;
     private String attributeProperty;
     private String bogusProperty;
+    @XmlElement(name = "Annotated")
+    private String annotatedProperty;
 
     @XmlAttribute
     public String getAttributeProperty() {
@@ -50,5 +52,13 @@ public class JaxbBean1 {
 
     public void setElementProperty(String elementProperty) {
         this.elementProperty = elementProperty;
+    }
+
+    public String getAnnotatedProperty() {
+        return annotatedProperty;
+    }
+
+    public void setAnnotatedProperty(String annotatedProperty) {
+        this.annotatedProperty = annotatedProperty;
     }
 }
