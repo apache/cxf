@@ -78,7 +78,7 @@ public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBus
             sf.setFeatures(Arrays.asList(feature));
             sf.setAddress("http://localhost:" + port + "/");
             sf.setExtensionMappings(
-                 Collections.singletonMap("json", "application/json;charset=UTF-8"));
+                 Collections.<Object, Object>singletonMap("json", "application/json;charset=UTF-8"));
             sf.create();
         }
         
