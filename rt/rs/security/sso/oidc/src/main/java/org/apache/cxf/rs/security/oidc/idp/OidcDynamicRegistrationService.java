@@ -18,30 +18,30 @@
  */
 package org.apache.cxf.rs.security.oidc.idp;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Response;
-
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.services.ClientRegistration;
+import org.apache.cxf.rs.security.oauth2.services.ClientRegistrationResponse;
 import org.apache.cxf.rs.security.oauth2.services.DynamicRegistrationService;
 
 public class OidcDynamicRegistrationService extends DynamicRegistrationService {
     private boolean protectIdTokenWithClientSecret;
     
-    @POST
-    @Consumes("application/json")
-    @Produces("application/json")
-    public Response register(OidcClientRegistration request) {
-        return super.register(request);
+    @Override
+    protected Client createNewClient(ClientRegistration request) {
+        //TODO: set OIDC specific properties as Client extra properties 
+        return super.createNewClient(request);
     }
     
     @Override
-    protected Client createNewClient(ClientRegistration request) {
-        // TODO: cast to OidcClientRegistrationRequest, 
-        // set OIDC specific properties as Client extra properties 
-        return super.createNewClient(request);
+    protected ClientRegistrationResponse fromClientToRegistrationResponse(Client client) {
+        //TODO: check OIDC specific properties in Client extra properties
+        return super.fromClientToRegistrationResponse(client);
+    }
+    
+    @Override
+    protected ClientRegistration fromClientToClientRegistration(Client client) {
+        //TODO: check OIDC specific properties in Client extra properties
+        return super.fromClientToClientRegistration(client);
     }
     
     protected int getClientSecretSizeInBytes(ClientRegistration request) {
