@@ -21,6 +21,7 @@ package org.apache.cxf.systest.jaxrs.description;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -76,6 +77,8 @@ public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBus
             feature.setRunAsFilter(runAsFilter);
             sf.setFeatures(Arrays.asList(feature));
             sf.setAddress("http://localhost:" + port + "/");
+            sf.setExtensionMappings(
+                 Collections.singletonMap("json", "application/json;charset=UTF-8"));
             sf.create();
         }
         
