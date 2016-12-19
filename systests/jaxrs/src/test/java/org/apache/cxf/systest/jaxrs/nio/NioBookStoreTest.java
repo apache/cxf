@@ -19,6 +19,7 @@
 
 package org.apache.cxf.systest.jaxrs.nio;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -67,6 +68,20 @@ public class NioBookStoreTest extends AbstractBusClientServerTestBase {
             
             assertThat(response.readEntity(String.class), equalTo(IOUtils.readStringFromStream(
                 getClass().getResourceAsStream("/files/books.txt"))));
+        } finally {
+            response.close();
+        }
+    }
+    
+    @Test
+    public void testPostBookStore() throws IOException {
+        final Response response = createWebClient("/bookstore", MediaType.TEXT_PLAIN)
+            .type(MediaType.APPLICATION_OCTET_STREAM)
+            .post(IOUtils.readBytesFromStream(getClass().getResourceAsStream("/files/books.txt")));
+        
+        try {
+            assertEquals(200, response.getStatus());
+            assertThat(response.readEntity(String.class), equalTo("Book Store uploaded: 10355 bytes"));
         } finally {
             response.close();
         }

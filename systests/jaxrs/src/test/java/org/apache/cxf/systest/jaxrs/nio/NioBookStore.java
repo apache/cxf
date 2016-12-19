@@ -19,14 +19,22 @@
 package org.apache.cxf.systest.jaxrs.nio;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.concurrent.atomic.LongAdder;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.container.Suspended;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 
 import org.apache.cxf.annotations.UseNio;
@@ -74,5 +82,44 @@ public class NioBookStore {
     @UseNio
     public InputStream readBooksFromInputStream() throws IOException {
         return getClass().getResourceAsStream("/files/books.txt");
+    }
+    
+    @POST
+    @Consumes(MediaType.APPLICATION_OCTET_STREAM)
+    @Produces(MediaType.TEXT_PLAIN)
+    public void uploadBooks(@Context Request request, @Suspended AsyncResponse response) {
+        final ByteArrayOutputStream out = new ByteArrayOutputStream();
+        final byte[] buffer = new byte[4096];
+        final LongAdder adder = new LongAdder();
+
+        request.entity(
+            in -> {
+                try {
+                    final int n = in.read(buffer);
+                    if (n > 0) {
+                        adder.add(n);
+                        out.write(buffer, 0, n);
+                    }
+                } catch (IOException e) {
+                    throw new WebApplicationException(e);
+                }
+            },
+            in -> {
+                try {
+                    if (!in.isFinished()) {
+                        throw new IllegalStateException("Reader did not finish yet");
+                    }
+                    
+                    out.close();
+                    response.resume("Book Store uploaded: " + adder.longValue() + " bytes");
+                } catch (IOException e) {
+                    throw new WebApplicationException(e);
+                }
+            },
+            throwable -> {              // error handler
+                System.out.println("Problem found: " + throwable.getMessage());
+                throw throwable;
+            }
+        );
     }
 }

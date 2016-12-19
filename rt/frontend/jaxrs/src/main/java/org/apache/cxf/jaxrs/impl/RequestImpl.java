@@ -19,6 +19,7 @@
 
 package org.apache.cxf.jaxrs.impl;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
@@ -28,6 +29,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.HttpHeaders;
@@ -41,10 +43,13 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Variant;
 
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.jaxrs.nio.NioReadEntity;
+import org.apache.cxf.jaxrs.nio.NioReadListenerImpl;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
+import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 /**
  * TODO : deal with InvalidStateExceptions
@@ -387,22 +392,30 @@ public class RequestImpl implements Request {
     }
 
     @Override
-    public void entity(NioReaderHandler arg0) {
-        // TODO: Implementation required (JAX-RS 2.1)
+    public void entity(NioReaderHandler reader) {
+        entity(reader, in -> { }, throwable -> { });
     }
 
     @Override
-    public void entity(NioReaderHandler arg0, NioCompletionHandler arg1) {
-        // TODO: Implementation required (JAX-RS 2.1)
+    public void entity(NioReaderHandler reader, NioCompletionHandler completion) {
+        entity(reader, completion, throwable -> { });
     }
 
     @Override
-    public void entity(NioReaderHandler arg0, NioErrorHandler arg1) {
-        // TODO: Implementation required (JAX-RS 2.1)
+    public void entity(NioReaderHandler reader, NioErrorHandler error) {
+        entity(reader, in -> { }, error);
     }
 
     @Override
-    public void entity(NioReaderHandler arg0, NioCompletionHandler arg1, NioErrorHandler arg2) {
-        // TODO: Implementation required (JAX-RS 2.1)
+    public void entity(NioReaderHandler reader, NioCompletionHandler completion, NioErrorHandler error) {
+        try {
+            final HttpServletRequest request = (HttpServletRequest)m.get(AbstractHTTPDestination.HTTP_REQUEST);
+            if (request != null) {
+                final NioReadEntity entity = new NioReadEntity(reader, completion, error);
+                request.getInputStream().setReadListener(new NioReadListenerImpl(entity, request.getInputStream()));
+            }
+        } catch (final IOException ex) {
+            throw new RuntimeException("Unable to initialize NIO entity", ex);
+        }
     }
 }
