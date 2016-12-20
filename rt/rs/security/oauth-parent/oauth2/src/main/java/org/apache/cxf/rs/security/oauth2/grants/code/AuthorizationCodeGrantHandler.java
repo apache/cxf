@@ -123,7 +123,12 @@ public class AuthorizationCodeGrantHandler extends AbstractGrantHandler {
                 throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
             }
         }
+        // Make sure the client supports the authorization code in cases where 
+        // the implicit/hybrid service was initiating the code grant processing flow
         
+        if (!client.getAllowedGrantTypes().isEmpty() && !client.getAllowedGrantTypes().contains(requestedGrant)) {
+            throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
+        }
         // Delegate to the data provider to create the one
         AccessTokenRegistration reg = new AccessTokenRegistration();
         reg.setGrantCode(grant.getCode());
