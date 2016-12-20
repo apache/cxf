@@ -46,7 +46,7 @@ public class IdTokenResponseFilter extends OAuthServerJoseJwtProducer implements
     public void process(ClientAccessToken ct, ServerAccessToken st) {
         if (st.getResponseType() != null
             && OidcUtils.CODE_AT_RESPONSE_TYPE.equals(st.getResponseType())
-            && OidcUtils.HYBRID_FLOW.equals(st.getGrantType())) {
+            && OAuthConstants.IMPLICIT_GRANT.equals(st.getGrantType())) {
             // token post-processing as part of the current hybrid (implicit) flow
             // so no id_token is returned now - however when the code gets exchanged later on
             // this filter will add id_token to the returned access token
