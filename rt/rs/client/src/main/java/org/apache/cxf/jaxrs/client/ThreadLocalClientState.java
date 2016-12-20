@@ -123,7 +123,9 @@ public class ThreadLocalClientState implements ClientState {
                 prepareCheckpointMap();
                 long currentTime = System.currentTimeMillis();
                 checkpointMap.put(Thread.currentThread(), currentTime);
-                new CleanupThread(Thread.currentThread(), currentTime).start();
+                Thread clThread = new CleanupThread(Thread.currentThread(), currentTime);
+                clThread.setName("Client state cleanup thread " + clThread.hashCode());
+                clThread.start();
             }
         }
         return cs;
