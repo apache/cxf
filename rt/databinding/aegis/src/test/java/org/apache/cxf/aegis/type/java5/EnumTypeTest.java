@@ -30,10 +30,10 @@ import org.apache.cxf.aegis.type.DefaultTypeMapping;
 import org.apache.cxf.aegis.type.TypeCreationOptions;
 import org.apache.cxf.aegis.type.java5.CurrencyService.Currency;
 import org.apache.cxf.aegis.xml.stax.ElementReader;
-import org.apache.cxf.common.util.SOAPConstants;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaSerializer;
+import org.apache.ws.commons.schema.constants.Constants;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -41,7 +41,7 @@ import org.junit.Test;
 public class EnumTypeTest extends AbstractAegisTest {
     private DefaultTypeMapping tm;
 
-    private enum smallEnum {
+    private enum SmallEnum {
         VALUE1, VALUE2;
 
         @Override
@@ -64,12 +64,12 @@ public class EnumTypeTest extends AbstractAegisTest {
     @Test
     public void testType() throws Exception {
         EnumType type = new EnumType();
-        type.setTypeClass(smallEnum.class);
+        type.setTypeClass(SmallEnum.class);
         type.setSchemaType(new QName("urn:test", "test"));
 
         tm.register(type);
 
-        Element element = writeObjectToElement(type, smallEnum.VALUE1, getContext());
+        Element element = writeObjectToElement(type, SmallEnum.VALUE1, getContext());
 
         assertEquals("VALUE1", element.getTextContent());
         
@@ -77,12 +77,12 @@ public class EnumTypeTest extends AbstractAegisTest {
         ElementReader reader = new ElementReader(xreader);
         Object value = type.readObject(reader, getContext());
 
-        assertEquals(smallEnum.VALUE1, value);
+        assertEquals(SmallEnum.VALUE1, value);
     }
 
     @Test
     public void testAutoCreation() throws Exception {
-        AegisType type = tm.getTypeCreator().createType(smallEnum.class);
+        AegisType type = tm.getTypeCreator().createType(SmallEnum.class);
 
         assertTrue(type instanceof EnumType);
     }
@@ -114,19 +114,55 @@ public class EnumTypeTest extends AbstractAegisTest {
         assertTrue(type instanceof EnumType);
     }
 
+    /**
+     * {@link https://issues.apache.org/jira/browse/CXF-7188}
+     */
+    @Test
+    public void testTypeWithJaxbAnnotations() throws Exception {
+        AegisType type = tm.getTypeCreator().createType(JaxbTestEnum.class);
+
+        Element element = writeObjectToElement(type, JaxbTestEnum.VALUE1, getContext());
+
+        assertEquals("Value1", element.getTextContent());
+
+        XMLStreamReader xreader = StaxUtils.createXMLStreamReader(element);
+        ElementReader reader = new ElementReader(xreader);
+        Object value = type.readObject(reader, getContext());
+
+        assertEquals(JaxbTestEnum.VALUE1, value);
+    }
+
     @Test
     public void testWSDL() throws Exception {
         EnumType type = new EnumType();
-        type.setTypeClass(smallEnum.class);
+        type.setTypeClass(SmallEnum.class);
         type.setSchemaType(new QName("urn:test", "test"));
         XmlSchema schema = newXmlSchema("urn:test");
         type.writeSchema(schema);
 
         XmlSchemaSerializer ser = new XmlSchemaSerializer();
         Document doc = ser.serializeSchema(schema, false)[0];
-        addNamespace("xsd", SOAPConstants.XSD);
+        addNamespace("xsd", Constants.URI_2001_SCHEMA_XSD);
         assertValid("//xsd:simpleType[@name='test']/xsd:restriction[@base='xsd:string']", doc);
         assertValid("//xsd:restriction[@base='xsd:string']/xsd:enumeration[@value='VALUE1']", doc);
+        assertValid("//xsd:restriction[@base='xsd:string']/xsd:enumeration[@value='VALUE2']", doc);
+    }
+
+    /**
+     * {@link https://issues.apache.org/jira/browse/CXF-7188}
+     */
+    @Test
+    public void testWsdlFromJaxbAnnotations() throws Exception {
+        AegisType type = tm.getTypeCreator().createType(JaxbTestEnum.class);
+
+        XmlSchema schema = newXmlSchema("urn:test");
+        type.writeSchema(schema);
+
+        XmlSchemaSerializer ser = new XmlSchemaSerializer();
+        Document doc = ser.serializeSchema(schema, false)[0];
+        addNamespace("xsd", Constants.URI_2001_SCHEMA_XSD);
+        assertValid("//xsd:simpleType[@name='bar']/xsd:restriction[@base='xsd:string']", doc);
+        assertValid("//xsd:restriction[@base='xsd:string']/xsd:enumeration[@value='Value1']", doc);
         assertValid("//xsd:restriction[@base='xsd:string']/xsd:enumeration[@value='VALUE2']", doc);
     }
 

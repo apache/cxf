@@ -26,27 +26,24 @@ import org.apache.cxf.aegis.DatabindingException;
 import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
-import org.apache.cxf.common.xmlschema.XmlSchemaConstants;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaEnumerationFacet;
 import org.apache.ws.commons.schema.XmlSchemaFacet;
 import org.apache.ws.commons.schema.XmlSchemaSimpleType;
 import org.apache.ws.commons.schema.XmlSchemaSimpleTypeRestriction;
+import org.apache.ws.commons.schema.constants.Constants;
 
 public class EnumType extends AegisType {
-    @SuppressWarnings("unchecked")
     @Override
     public Object readObject(MessageReader reader, Context context) {
         String value = reader.getValue();
-        @SuppressWarnings("rawtypes")
-        Class<? extends Enum> cls = (Class<? extends Enum>)getTypeClass();
-        return Enum.valueOf(cls, value.trim());
+        return matchValue(value);
     }
 
     @Override
     public void writeObject(Object object, MessageWriter writer, Context context) {
         // match the reader.
-        writer.writeValue(((Enum<?>)object).name());
+        writer.writeValue(getValue((Enum<?>)object));
     }
 
     @Override
@@ -69,7 +66,7 @@ public class EnumType extends AegisType {
         XmlSchemaSimpleType simple = new XmlSchemaSimpleType(root, true);
         simple.setName(getSchemaType().getLocalPart());
         XmlSchemaSimpleTypeRestriction restriction = new XmlSchemaSimpleTypeRestriction();
-        restriction.setBaseTypeName(XmlSchemaConstants.STRING_QNAME);
+        restriction.setBaseTypeName(Constants.XSD_STRING);
         simple.setContent(restriction);
 
         Object[] constants = getTypeClass().getEnumConstants();
@@ -77,9 +74,37 @@ public class EnumType extends AegisType {
         List<XmlSchemaFacet> facets = restriction.getFacets();
         for (Object constant : constants) {
             XmlSchemaEnumerationFacet f = new XmlSchemaEnumerationFacet();
-            f.setValue(((Enum<?>)constant).name());
+            f.setValue(getValue(constant));
             facets.add(f);
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private Enum<?> matchValue(String value) {
+        if (value == null) {
+            return null;
+        }
+        @SuppressWarnings("rawtypes")
+        Class<? extends Enum> enumClass = (Class<? extends Enum>)getTypeClass();
+        for (Enum<?> enumConstant : enumClass.getEnumConstants()) {
+            if (value.equals(AnnotationReader.getEnumValue(enumConstant))) {
+                return enumConstant;
+            }
+        }
+        return Enum.valueOf(enumClass, value.trim());
+    }
+
+
+    private Object getValue(Object constant) {
+        if (!(constant instanceof Enum<?>)) {
+            return null;
+        }
+        Enum<?> enumConstant = (Enum<?>)constant;
+        String annotatedValue = AnnotationReader.getEnumValue(enumConstant);
+        if (annotatedValue != null) {
+            return annotatedValue;
+        }
+        return enumConstant.name();
     }
 
     @Override
