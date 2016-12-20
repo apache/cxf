@@ -173,20 +173,7 @@ public class ClientImpl
             } else {
                 getConduit().close();
             }
-        }
-        
-        bus = null;
-        conduitSelector = null;
-        outFaultObserver = null;
-        outboundChainCache = null;
-        inboundChainCache = null;
-
-        currentRequestContext = null;
-        requestContext.clear();
-        requestContext = null;
-        responseContext.clear();
-        responseContext = null;
-        executor = null;            
+        }       
     }
 
     private void notifyLifecycleManager() {
