@@ -64,7 +64,6 @@ import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.message.MessageUtils;
 
 public class MessageContextImpl implements MessageContext {
-
     private Message m;
     public MessageContextImpl(Message m) {
         this.m = m;
@@ -289,7 +288,7 @@ public class MessageContextImpl implements MessageContext {
                                      new ProvidersImpl(inMessage));
             newAttachments.add(first);
         } catch (IOException ex) {
-            ExceptionUtils.toInternalServerErrorException(ex, null);
+            throw ExceptionUtils.toInternalServerErrorException(ex, null);
         }
         
     
