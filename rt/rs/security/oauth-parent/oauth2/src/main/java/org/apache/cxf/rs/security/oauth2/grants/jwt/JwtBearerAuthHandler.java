@@ -36,12 +36,12 @@ import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rs.security.jose.jwt.JwtUtils;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.provider.ClientRegistrationProvider;
-import org.apache.cxf.rs.security.oauth2.provider.OAuthJoseJwtConsumer;
+import org.apache.cxf.rs.security.oauth2.provider.OAuthServerJoseJwtConsumer;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.security.SecurityContext;
 
-public class JwtBearerAuthHandler extends OAuthJoseJwtConsumer implements ContainerRequestFilter {
+public class JwtBearerAuthHandler extends OAuthServerJoseJwtConsumer implements ContainerRequestFilter {
     private ClientRegistrationProvider clientProvider;
     private FormEncodingProvider<Form> provider = new FormEncodingProvider<Form>(true);
     private boolean validateAudience = true;
@@ -76,7 +76,7 @@ public class JwtBearerAuthHandler extends OAuthJoseJwtConsumer implements Contai
                 message.put(Client.class, client);
             }
         }
-        JwtToken token = super.getJwtToken(assertion, client == null ? null : client.getClientSecret());
+        JwtToken token = super.getJwtToken(assertion, client);
         
         String subjectName = (String)token.getClaim(JwtConstants.CLAIM_SUBJECT);
         if (clientId != null && !clientId.equals(subjectName)) {
