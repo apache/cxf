@@ -30,6 +30,9 @@ public class JoseJwtConsumer extends AbstractJoseConsumer {
     private boolean jwsRequired = true;
     private boolean jweRequired;
     
+    private int clockOffset;
+    private int ttl;
+    
     public JwtToken getJwtToken(String wrappedJwtToken) {
         return getJwtToken(wrappedJwtToken, null, null);
     }
@@ -104,4 +107,19 @@ public class JoseJwtConsumer extends AbstractJoseConsumer {
         this.jweRequired = jweRequired;
     }
     
+    public int getClockOffset() {
+        return clockOffset;
+    }
+
+    public void setClockOffset(int clockOffset) {
+        this.clockOffset = clockOffset;
+    }
+    
+    public int getTtl() {
+        return ttl;
+    }
+
+    public void setTtl(int ttl) {
+        this.ttl = ttl;
+    }
 }
