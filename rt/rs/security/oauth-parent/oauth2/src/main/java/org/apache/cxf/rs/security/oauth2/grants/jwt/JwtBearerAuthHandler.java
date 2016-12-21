@@ -20,6 +20,7 @@
 package org.apache.cxf.rs.security.oauth2.grants.jwt;
 
 import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -29,15 +30,21 @@ import org.apache.cxf.jaxrs.utils.FormUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.rs.security.jose.jaxrs.JwtAuthenticationFilter;
+import org.apache.cxf.rs.security.jose.jaxrs.JwtTokenSecurityContext;
 import org.apache.cxf.rs.security.jose.jwt.JwtConstants;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
+import org.apache.cxf.rs.security.jose.jwt.JwtUtils;
+import org.apache.cxf.rs.security.oauth2.common.Client;
+import org.apache.cxf.rs.security.oauth2.provider.ClientRegistrationProvider;
+import org.apache.cxf.rs.security.oauth2.provider.OAuthJoseJwtConsumer;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.security.SecurityContext;
 
-public class JwtBearerAuthHandler extends JwtAuthenticationFilter {
+public class JwtBearerAuthHandler extends OAuthJoseJwtConsumer implements ContainerRequestFilter {
+    private ClientRegistrationProvider clientProvider;
     private FormEncodingProvider<Form> provider = new FormEncodingProvider<Form>(true);
+    private boolean validateAudience = true;
     
     public JwtBearerAuthHandler() {
     }
@@ -54,9 +61,23 @@ public class JwtBearerAuthHandler extends JwtAuthenticationFilter {
         }
         
         String assertion = formData.getFirst(Constants.CLIENT_AUTH_ASSERTION_PARAM);
-        JwtToken token = super.getJwtToken(assertion);
+        if (assertion == null) {
+            throw ExceptionUtils.toNotAuthorizedException(null, null);
+        }
         
         String clientId = formData.getFirst(OAuthConstants.CLIENT_ID);
+        
+        Client client = null;
+        if (clientId != null && clientProvider != null) {
+            client = clientProvider.getClient(clientId);
+            if (client == null) {
+                throw ExceptionUtils.toNotAuthorizedException(null, null);
+            } else {
+                message.put(Client.class, client);
+            }
+        }
+        JwtToken token = super.getJwtToken(assertion, client == null ? null : client.getClientSecret());
+        
         String subjectName = (String)token.getClaim(JwtConstants.CLAIM_SUBJECT);
         if (clientId != null && !clientId.equals(subjectName)) {
             throw ExceptionUtils.toNotAuthorizedException(null, null);
@@ -80,6 +101,10 @@ public class JwtBearerAuthHandler extends JwtAuthenticationFilter {
         }
     }
     
+    protected SecurityContext configureSecurityContext(JwtToken token) {
+        return new JwtTokenSecurityContext(token, null);
+    }
+
     private Form readFormData(Message message) {
         try {
             return FormUtils.readForm(provider, message);
@@ -106,6 +131,19 @@ public class JwtBearerAuthHandler extends JwtAuthenticationFilter {
         if (jwt.getClaim(JwtConstants.CLAIM_EXPIRY) == null) {
             throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
         }
+        
+        JwtUtils.validateTokenClaims(jwt.getClaims(), getTtl(), getClockOffset(), isValidateAudience());
+    }
+
+    public void setClientProvider(ClientRegistrationProvider clientProvider) {
+        this.clientProvider = clientProvider;
     }
     
+    public boolean isValidateAudience() {
+        return validateAudience;
+    }
+
+    public void setValidateAudience(boolean validateAudience) {
+        this.validateAudience = validateAudience;
+    }
 }

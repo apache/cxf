@@ -39,8 +39,6 @@ import org.apache.cxf.rs.security.oidc.common.IdToken;
 public class OidcClaimsValidator extends OAuthJoseJwtConsumer {
     private static final String SELF_ISSUED_ISSUER = "https://self-issued.me";
     private String issuerId;
-    private int clockOffset;
-    private int ttl;
     private WebClient jwkSetClient;
     private boolean supportSelfIssuedProvider;
     private boolean strictTimeValidation;
@@ -88,7 +86,7 @@ public class OidcClaimsValidator extends OAuthJoseJwtConsumer {
             boolean expiredRequired = 
                 validateClaimsAlways || strictTimeValidation && claims.getIssuedAt() == null;
             try {
-                JwtUtils.validateJwtExpiry(claims, clockOffset, expiredRequired);
+                JwtUtils.validateJwtExpiry(claims, getClockOffset(), expiredRequired);
             } catch (JwtException ex) {
                 throw new OAuthServiceException("ID Token has expired", ex);
             }
@@ -98,13 +96,13 @@ public class OidcClaimsValidator extends OAuthJoseJwtConsumer {
             boolean issuedAtRequired = 
                 validateClaimsAlways || strictTimeValidation && claims.getExpiryTime() == null;
             try {
-                JwtUtils.validateJwtIssuedAt(claims, ttl, clockOffset, issuedAtRequired);
+                JwtUtils.validateJwtIssuedAt(claims, getTtl(), getClockOffset(), issuedAtRequired);
             } catch (JwtException ex) {
                 throw new OAuthServiceException("Invalid issuedAt claim", ex);
             }
             if (strictTimeValidation) {
                 try {
-                    JwtUtils.validateJwtNotBefore(claims, clockOffset, strictTimeValidation);
+                    JwtUtils.validateJwtNotBefore(claims, getClockOffset(), strictTimeValidation);
                 } catch (JwtException ex) {
                     throw new OAuthServiceException("ID Token can not be used yet", ex);
                 }    
@@ -170,23 +168,7 @@ public class OidcClaimsValidator extends OAuthJoseJwtConsumer {
         this.supportSelfIssuedProvider = supportSelfIssuedProvider;
     }
 
-    public int getClockOffset() {
-        return clockOffset;
-    }
-
-    public void setClockOffset(int clockOffset) {
-        this.clockOffset = clockOffset;
-    }
-
     public void setStrictTimeValidation(boolean strictTimeValidation) {
         this.strictTimeValidation = strictTimeValidation;
-    }
-
-    public int getTtl() {
-        return ttl;
-    }
-
-    public void setTtl(int ttl) {
-        this.ttl = ttl;
     }
 }
