@@ -47,7 +47,7 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
  * way to create attachments for use with {@link org.apache.cxf.jaxrs.client.WebClient}.
  */
 public class Attachment implements Transferable {
-
+    
     private DataHandler handler;
     private MultivaluedMap<String, String> headers = 
         new MetadataMap<String, String>(false, true);
@@ -142,7 +142,7 @@ public class Attachment implements Transferable {
                     return mbr.readFrom(cls, cls, new Annotation[]{}, getContentType(), 
                                         headers, getDataHandler().getInputStream());
                 } catch (Exception ex) {
-                    ExceptionUtils.toInternalServerErrorException(ex, null);
+                    throw ExceptionUtils.toInternalServerErrorException(ex, null);
                 }
             }
         }
