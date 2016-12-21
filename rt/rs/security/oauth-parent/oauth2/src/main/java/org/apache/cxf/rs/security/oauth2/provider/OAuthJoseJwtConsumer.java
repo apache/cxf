@@ -51,10 +51,21 @@ public class OAuthJoseJwtConsumer extends JoseJwtConsumer {
         }
     }
 
-    public void setDecryptWithClientSecret(boolean decryptWithClientSecret) {
-        this.decryptWithClientSecret = verifyWithClientSecret;
+    public boolean isDecryptWithClientSecret() {
+        return decryptWithClientSecret;
     }
+
+    public void setDecryptWithClientSecret(boolean decryptWithClientSecret) {
+        this.decryptWithClientSecret = decryptWithClientSecret;
+    }
+
+    public boolean isVerifyWithClientSecret() {
+        return verifyWithClientSecret;
+    }
+
     public void setVerifyWithClientSecret(boolean verifyWithClientSecret) {
         this.verifyWithClientSecret = verifyWithClientSecret;
     }
+
+    
 }
