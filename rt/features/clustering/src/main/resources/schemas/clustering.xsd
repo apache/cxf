@@ -55,7 +55,7 @@
   
   <xsd:element name="loadDistributor">
     <xsd:annotation>
-      <xsd:documentation>Configures the loadDistributor feature. This element is associated with the org.apache.cxf.clustering.FailoverFeature object.</xsd:documentation>
+      <xsd:documentation>Configures the loadDistributor feature. This element is associated with the org.apache.cxf.clustering.LoadDistributorFeature object.</xsd:documentation>
     </xsd:annotation>
     <xsd:complexType>
       <xsd:complexContent>
@@ -79,7 +79,7 @@
   
   <xsd:element name="circuit-breaker-failover">
     <xsd:annotation>
-      <xsd:documentation>Configures the circuit breaker feature. This element is associated with the org.apache.cxf.clustering.FailoverFeature object.</xsd:documentation>
+      <xsd:documentation>Configures the circuit breaker feature. This element is associated with the org.apache.cxf.clustering.CircuitBreakerFailoverFeature object.</xsd:documentation>
     </xsd:annotation>
     <xsd:complexType>
       <xsd:complexContent>
