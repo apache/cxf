@@ -92,7 +92,7 @@
             </xsd:element>
             <xsd:element name="targetSelector" type="xsd:anyType" minOccurs="0">
               <xsd:annotation>
-                <xsd:documentation>Configures the targetSelector which will be used in the loadDistributor feature.</xsd:documentation>
+                <xsd:documentation>Configures the targetSelector which will be used in the circuit breaker feature.</xsd:documentation>
               </xsd:annotation>
             </xsd:element>
           </xsd:all>   
