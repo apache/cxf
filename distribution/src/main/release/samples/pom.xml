@@ -106,8 +106,6 @@
         <module>jax_rs/spring_boot_scan/client</module>
         <module>jax_rs/spring_boot_scan/eureka-registry</module>
         <module>jaxws_spring_boot</module>
-        <module>logbrowser</module>
-        <module>logbrowser-blueprint</module>
         <module>ws_notification</module>
         <module>sts</module>
         <module>corba/bank</module>

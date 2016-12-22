@@ -39,7 +39,6 @@
         <module>ws</module>
         <module>rs</module>
         <module>management</module>
-        <module>management-web</module>
         <module>javascript</module>
         <module>security</module>
         <module>security-saml</module>
