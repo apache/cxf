@@ -433,8 +433,6 @@
         -->
         <!-- need msv
         <bundle>mvn:org.apache.cxf/cxf-wstx-msv-validation/${project.version}</bundle-->
-        <!-- need sdo deps
-        <bundle>mvn:org.apache.cxf/cxf-rt-databinding-sdo/${project.version}</bundle-->
     </feature>
     <feature name="cxf-sts" version="${project.version}">
         <bundle start-level="40" dependency="true">mvn:com.hazelcast/hazelcast/${cxf.hazelcast.version}</bundle>

@@ -33,6 +33,5 @@
         <module>jaxb</module>
         <module>xmlbeans</module>
         <module>aegis</module>
-        <module>sdo</module>
     </modules>
 </project>
