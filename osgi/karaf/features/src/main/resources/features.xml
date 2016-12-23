@@ -298,11 +298,6 @@
         <feature version="${project.version}">cxf-wsdl</feature>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-databinding-jaxb/${project.version}</bundle>
     </feature>
-    <feature name="cxf-databinding-xmlbeans" version="${project.version}">
-        <feature version="${project.version}">cxf-core</feature>
-        <bundle start-level="30" dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xmlbeans/${cxf.xmlbeans.bundle.version}</bundle>
-        <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-databinding-xmlbeans/${project.version}</bundle>
-    </feature>
     <feature name="cxf-features-clustering" version="${project.version}">
         <feature version="${project.version}">cxf-core</feature>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-features-clustering/${project.version}</bundle>

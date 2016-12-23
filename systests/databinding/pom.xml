@@ -83,16 +83,6 @@
                             </defaultOptions>
                             <wsdlOptions>
                                 <wsdlOption>
-                                    <wsdl>${basedir}/src/test/resources/wsdl_systest_databinding/xmlbeans/hello_world.wsdl</wsdl>
-                                    <frontEnd>cxf</frontEnd>
-                                    <dataBinding>xmlbeans</dataBinding>
-                                </wsdlOption>
-                                <wsdlOption>
-                                    <wsdl>${basedir}/src/test/resources/wsdl_systest_databinding/xmlbeans/doc_lit_bare.wsdl</wsdl>
-                                    <frontEnd>cxf</frontEnd>
-                                    <dataBinding>xmlbeans</dataBinding>
-                                </wsdlOption>
-                                <wsdlOption>
                                     <wsdl>${basedir}/src/test/resources/wsdl_systest_databinding/source/hello_world.wsdl</wsdl>
                                     <frontEnd>cxf</frontEnd>
                                     <dataBinding>domsource</dataBinding>
@@ -264,11 +254,6 @@
         <dependency>
             <groupId>com.sun.xml.fastinfoset</groupId>
             <artifactId>FastInfoset</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-databinding-xmlbeans</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>rhino</groupId>
