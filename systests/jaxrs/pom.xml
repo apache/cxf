@@ -101,6 +101,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.apache.olingo</groupId>
             <artifactId>olingo-odata2-core</artifactId>
         </dependency>
