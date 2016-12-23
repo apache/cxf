@@ -32,7 +32,6 @@
     <modules>
         <module>soap</module>
         <module>xml</module>
-        <module>object</module>
         <module>coloc</module>
         <module>corba</module>
     </modules>
