@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.tracing.htrace.jaxrs;
+package org.apache.cxf.tracing.brave.jaxrs;
 
 import java.io.IOException;
 
@@ -26,22 +26,23 @@ import javax.ws.rs.client.ClientResponseContext;
 import javax.ws.rs.client.ClientResponseFilter;
 import javax.ws.rs.ext.Provider;
 
-import org.apache.cxf.tracing.htrace.AbstractHTraceClientProvider;
-import org.apache.htrace.core.TraceScope;
-import org.apache.htrace.core.Tracer;
+import com.github.kristofa.brave.Brave;
+import com.twitter.zipkin.gen.Span;
+
+import org.apache.cxf.tracing.brave.AbstractBraveClientProvider;
 
 @Provider
-public class HTraceClientProvider extends AbstractHTraceClientProvider 
+public class BraveClientProvider extends AbstractBraveClientProvider 
         implements ClientRequestFilter, ClientResponseFilter {
-
-    public HTraceClientProvider(final Tracer tracer) {
-        super(tracer);
+    
+    public BraveClientProvider(final Brave brave) {
+        super(brave);
     }
 
     @Override
     public void filter(final ClientRequestContext requestContext) throws IOException {
-        final TraceScopeHolder<TraceScope> holder = super.startTraceSpan(requestContext.getStringHeaders(), 
-            requestContext.getUri().toString(), requestContext.getMethod());
+        final TraceScopeHolder<Span> holder = super.startTraceSpan(requestContext.getStringHeaders(), 
+            requestContext.getUri(), requestContext.getMethod());
 
         if (holder != null) {
             requestContext.setProperty(TRACE_SPAN, holder);
@@ -52,8 +53,8 @@ public class HTraceClientProvider extends AbstractHTraceClientProvider
     @Override
     public void filter(final ClientRequestContext requestContext,
             final ClientResponseContext responseContext) throws IOException {
-        final TraceScopeHolder<TraceScope> holder = 
-            (TraceScopeHolder<TraceScope>)requestContext.getProperty(TRACE_SPAN);
-        super.stopTraceSpan(holder);
+        final TraceScopeHolder<Span> holder = 
+            (TraceScopeHolder<Span>)requestContext.getProperty(TRACE_SPAN);
+        super.stopTraceSpan(holder, responseContext.getStatus());
     }
 }

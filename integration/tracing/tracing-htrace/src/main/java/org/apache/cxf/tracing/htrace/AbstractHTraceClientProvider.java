@@ -32,7 +32,7 @@ import org.apache.htrace.core.Tracer;
 
 public abstract class AbstractHTraceClientProvider extends AbstractTracingProvider { 
     protected static final Logger LOG = LogUtils.getL7dLogger(AbstractHTraceClientProvider.class);
-    protected static final String TRACE_SPAN = "org.apache.cxf.tracing.htrace.span";
+    protected static final String TRACE_SPAN = "org.apache.cxf.tracing.client.htrace.span";
         
     private final Tracer tracer;
         

@@ -210,6 +210,7 @@
         <cxf.jexl.version>2.1.1</cxf.jexl.version>
         <cxf.htrace.version>4.0.1-incubating</cxf.htrace.version>
         <cxf.zest.version>2.1</cxf.zest.version>
+        <cxf.brave.version>3.16.0</cxf.brave.version>
         <cxf.checkstyle.extension />
         <cxf.jaxb.context.class />
         <cxf.jaxb.context.class.property>none</cxf.jaxb.context.class.property>
@@ -1917,6 +1918,11 @@
                 <groupId>org.apache.htrace</groupId>
                 <artifactId>htrace-core4</artifactId>
                 <version>${cxf.htrace.version}</version>
+            </dependency>
+            <dependency>
+                 <groupId>io.zipkin.brave</groupId>
+                 <artifactId>brave-http</artifactId>
+                 <version>${cxf.brave.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.qi4j.library</groupId>

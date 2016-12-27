@@ -123,6 +123,7 @@
         <module>jax_rs/sse_cdi</module>
         <module>jax_rs/sse_tomcat</module>
         <module>jax_rs/sse_spring</module>
+        <module>jax_rs/tracing_brave</module>
     </modules>
     <dependencyManagement>
         <dependencies>

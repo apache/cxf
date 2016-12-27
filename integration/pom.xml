@@ -33,6 +33,7 @@
         <module>jca</module>
         <module>cdi</module>
         <module>tracing/tracing-htrace</module>
+        <module>tracing/tracing-brave</module>
         <module>spring-boot</module>
     </modules>
 </project>
