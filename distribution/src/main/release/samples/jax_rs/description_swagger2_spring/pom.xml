@@ -90,6 +90,10 @@
             <groupId>javax.ws.rs</groupId>
             <artifactId>javax.ws.rs-api</artifactId>
         </dependency>
+        <dependency>
+          <groupId>com.fasterxml.jackson.jaxrs</groupId>
+          <artifactId>jackson-jaxrs-json-provider</artifactId>
+        </dependency>
         <!-- spring -->
         <dependency>
             <groupId>org.springframework</groupId>
