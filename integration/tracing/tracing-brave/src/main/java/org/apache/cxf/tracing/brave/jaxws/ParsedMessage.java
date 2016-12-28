@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.tracing.brave;
+package org.apache.cxf.tracing.brave.jaxws;
 
 import java.net.URI;
 import java.net.URISyntaxException;

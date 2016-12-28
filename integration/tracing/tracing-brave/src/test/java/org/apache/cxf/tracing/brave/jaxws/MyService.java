@@ -16,34 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.tracing.brave;
+package org.apache.cxf.tracing.brave.jaxws;
 
-import java.net.URI;
+import javax.jws.WebService;
 
-import com.github.kristofa.brave.http.HttpClientRequest;
-import org.apache.cxf.message.Message;
-
-public class CxfClientRequest implements HttpClientRequest {
-
-    private ParsedMessage message;
-
-    public CxfClientRequest(Message message) {
-        this.message = new ParsedMessage(message);
-    }
-
-    @Override
-    public URI getUri() {
-        return message.getUri();
-    }
-
-    @Override
-    public String getHttpMethod() {
-        return message.getHttpMethod();
-    }
-
-    @Override
-    public void addHeader(String header, String value) {
-        message.addHeader(header, value);
-    }
-    
+@WebService
+public interface MyService {
+    String echo(String msg);
 }

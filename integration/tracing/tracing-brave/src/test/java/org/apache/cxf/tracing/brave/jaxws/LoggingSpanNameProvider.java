@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.tracing.brave;
+package org.apache.cxf.tracing.brave.jaxws;
 
 import com.github.kristofa.brave.http.HttpRequest;
 import com.github.kristofa.brave.http.SpanNameProvider;

@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.tracing.brave;
+package org.apache.cxf.tracing.brave.jaxws;
 
 import com.github.kristofa.brave.Brave;
 import com.github.kristofa.brave.http.HttpClientResponseAdapter;
@@ -33,12 +33,12 @@ import org.apache.cxf.phase.Phase;
  * 
  */
 @NoJSR250Annotations
-public class TraceInInterceptor extends AbstractPhaseInterceptor<Message> {
+public class BraveInInterceptor extends AbstractPhaseInterceptor<Message> {
 
     private Brave brave;
     private SpanNameProvider spanNameProvider;
 
-    public TraceInInterceptor(Brave brave, SpanNameProvider spanNameProvider) {
+    public BraveInInterceptor(Brave brave, SpanNameProvider spanNameProvider) {
         super(Phase.PRE_INVOKE);
         this.brave = brave;
         this.spanNameProvider = spanNameProvider;

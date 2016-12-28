@@ -16,11 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.tracing.brave;
+package org.apache.cxf.tracing.brave.jaxws;
 
-import javax.jws.WebService;
+import com.github.kristofa.brave.http.HttpResponse;
 
-@WebService
-public interface MyService {
-    String echo(String msg);
+final class HttpResponse200 implements HttpResponse {
+    @Override
+    public int getHttpStatusCode() {
+        return 200;
+    }
 }

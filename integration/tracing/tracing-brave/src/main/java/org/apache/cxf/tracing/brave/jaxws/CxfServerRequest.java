@@ -16,13 +16,33 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.tracing.brave;
+package org.apache.cxf.tracing.brave.jaxws;
 
-import com.github.kristofa.brave.http.HttpResponse;
+import java.net.URI;
 
-final class HttpResponse200 implements HttpResponse {
-    @Override
-    public int getHttpStatusCode() {
-        return 200;
+import com.github.kristofa.brave.http.HttpServerRequest;
+
+public class CxfServerRequest implements HttpServerRequest {
+
+    private ParsedMessage message;
+
+    public CxfServerRequest(ParsedMessage message) {
+        this.message = message;
     }
+
+    @Override
+    public URI getUri() {
+        return message.getUri();
+    }
+
+    @Override
+    public String getHttpMethod() {
+        return message.getHttpMethod();
+    }
+
+    @Override
+    public String getHttpHeaderValue(String headerName) {
+        return message.getHeaders().get(headerName);
+    }
+
 }

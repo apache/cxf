@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.tracing.brave;
+package org.apache.cxf.tracing.brave.jaxws;
 
 import com.github.kristofa.brave.Brave;
 import com.github.kristofa.brave.http.DefaultSpanNameProvider;
@@ -29,14 +29,14 @@ import org.apache.cxf.interceptor.InterceptorProvider;
 
 @NoJSR250Annotations
 @Provider(value = Type.Feature)
-public class TraceFeature extends AbstractFeature {
-    private TraceInInterceptor in;
-    private TraceOutInterceptor out;
+public class BraveFeature extends AbstractFeature {
+    private BraveInInterceptor in;
+    private BraveOutInterceptor out;
 
-    public TraceFeature(Brave brave) {
+    public BraveFeature(Brave brave) {
         DefaultSpanNameProvider nameProvider = new DefaultSpanNameProvider();
-        in = new TraceInInterceptor(brave, nameProvider);
-        out = new TraceOutInterceptor(brave, nameProvider);
+        in = new BraveInInterceptor(brave, nameProvider);
+        out = new BraveOutInterceptor(brave, nameProvider);
     }
 
     @Override
