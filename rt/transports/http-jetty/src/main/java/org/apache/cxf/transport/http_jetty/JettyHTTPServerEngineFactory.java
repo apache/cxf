@@ -38,7 +38,6 @@ import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.management.InstrumentationManager;
-import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.util.component.Container;
 
 
@@ -127,11 +126,7 @@ public class JettyHTTPServerEngineFactory {
         return ref;
     }
     
-    public boolean isJetty8() {
-        return Server.getVersion().startsWith("8");
-    }
-
-    
+        
     /**
      * This call is used to set the bus. It should only be called once.
      * @param bus

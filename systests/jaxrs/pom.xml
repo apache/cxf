@@ -598,26 +598,6 @@
             </dependencies>
         </profile>
         <profile>
-            <id>jetty8</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <dependencies>
-              <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-plus</artifactId>
-                <version>${cxf.jetty8.version}</version>
-                <scope>test</scope>
-              </dependency>
-              <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-websocket</artifactId>
-                <version>${cxf.jetty8.version}</version>
-                <scope>test</scope>
-              </dependency>
-            </dependencies>
-        </profile>
-        <profile>
             <id>jetty9</id>
             <activation>
                 <activeByDefault>true</activeByDefault>

@@ -23,7 +23,6 @@ import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.GeneralSecurityException;
@@ -51,6 +50,8 @@ import org.apache.cxf.transport.http_jetty.continuations.JettyContinuationProvid
 import org.apache.cxf.transport.https.CertConstraintsJaxBUtils;
 import org.apache.cxf.transport.servlet.ServletDestination;
 import org.apache.cxf.transports.http.configuration.HTTPServerPolicy;
+import org.eclipse.jetty.server.HttpChannel;
+import org.eclipse.jetty.server.HttpConnection;
 import org.eclipse.jetty.server.HttpOutput;
 import org.eclipse.jetty.server.Request;
 
@@ -282,12 +283,7 @@ public class JettyHTTPDestination extends ServletDestination {
 
         private boolean sendContent(Class<?> type, InputStream c) throws IOException {
             try {
-                out.getClass().getMethod("sendContent", type).invoke(out, c);
-            } catch (InvocationTargetException ioe) {
-                if (ioe.getTargetException() instanceof IOException) {
-                    throw (IOException)ioe.getTargetException();
-                }
-                return false;
+                out.sendContent(c);
             } catch (Exception e) {
                 return false;
             }
@@ -378,19 +374,10 @@ public class JettyHTTPDestination extends ServletDestination {
     
     private Request getCurrentRequest() {
         try {
-            //Jetty 8
-            Object con = ClassLoaderUtils.loadClass("org.eclipse.jetty.server.AbstractHttpConnection",
-                                                    getClass()).getMethod("getCurrentConnection").invoke(null);
-            return (Request)con.getClass().getMethod("getRequest").invoke(con);
-        } catch (Throwable t) {
-            //
-        }
-        try {
-            //Jetty 9
-            Object con = ClassLoaderUtils.loadClass("org.eclipse.jetty.server.HttpConnection",
-                                                    getClass()).getMethod("getCurrentConnection").invoke(null);
-            Object channel = con.getClass().getMethod("getHttpChannel").invoke(con);
-            return (Request)channel.getClass().getMethod("getRequest").invoke(channel);
+            HttpConnection con = HttpConnection.getCurrentConnection();
+            
+            HttpChannel channel = con.getHttpChannel();
+            return channel.getRequest();
         } catch (Throwable t) {
             //
         }

@@ -38,8 +38,6 @@ import org.apache.cxf.transport.websocket.atmosphere.AtmosphereWebSocketServletD
 @NoJSR250Annotations()
 public class WebSocketDestinationFactory implements HttpDestinationFactory {
     private static final boolean ATMOSPHERE_AVAILABLE = probeClass("org.atmosphere.cpr.ApplicationConfig");
-    private static final Constructor<?> JETTY_WEBSOCKET_DESTINATION_CTR =
-        probeConstructor("org.apache.cxf.transport.websocket.jetty.JettyWebSocketDestination");
     private static final Constructor<?> JETTY9_WEBSOCKET_DESTINATION_CTR =
         probeConstructor("org.apache.cxf.transport.websocket.jetty9.Jetty9WebSocketDestination");
     private static final Constructor<?> ATMOSPHERE_WEBSOCKET_JETTY_DESTINATION_CTR =
@@ -78,13 +76,8 @@ public class WebSocketDestinationFactory implements HttpDestinationFactory {
                 return createJettyHTTPDestination(ATMOSPHERE_WEBSOCKET_JETTY_DESTINATION_CTR,
                                                   bus, registry, endpointInfo, serverEngineFactory);
             } else {
-                if (serverEngineFactory.isJetty8()) {
-                    return createJettyHTTPDestination(JETTY_WEBSOCKET_DESTINATION_CTR,
+                return createJettyHTTPDestination(JETTY9_WEBSOCKET_DESTINATION_CTR,
                                                       bus, registry, endpointInfo, serverEngineFactory);
-                } else {
-                    return createJettyHTTPDestination(JETTY9_WEBSOCKET_DESTINATION_CTR,
-                                                      bus, registry, endpointInfo, serverEngineFactory);
-                }
             }
         } else {
             //REVISIT other way of getting the registry of http so that the plain cxf servlet finds the destination?
@@ -96,16 +89,9 @@ public class WebSocketDestinationFactory implements HttpDestinationFactory {
                 return new AtmosphereWebSocketServletDestination(bus, registry,
                                                                  endpointInfo, endpointInfo.getAddress());
             } else {
-                JettyHTTPServerEngineFactory serverEngineFactory = bus
-                    .getExtension(JettyHTTPServerEngineFactory.class);
                 // use jetty-websocket
-                if (serverEngineFactory.isJetty8()) { 
-                    return createJettyHTTPDestination(JETTY_WEBSOCKET_DESTINATION_CTR,
+                return createJettyHTTPDestination(JETTY9_WEBSOCKET_DESTINATION_CTR,
                                                       bus, registry, endpointInfo, null);
-                } else {
-                    return createJettyHTTPDestination(JETTY9_WEBSOCKET_DESTINATION_CTR,
-                                                      bus, registry, endpointInfo, null);
-                }
             }
         }
     }

@@ -114,7 +114,6 @@
         <cxf.joda.time.version>2.9.4</cxf.joda.time.version>
         <cxf.jdom.version>1.0</cxf.jdom.version>
         <cxf.jettison.version>1.3.8</cxf.jettison.version>
-        <cxf.jetty8.version>8.1.19.v20160209</cxf.jetty8.version>
         <cxf.jetty9.version>9.3.5.v20151012</cxf.jetty9.version>
         <cxf.jetty.version>${cxf.jetty9.version}</cxf.jetty.version>
         <cxf.jetty.osgi.version>[8.1,10)</cxf.jetty.osgi.version>
@@ -1970,12 +1969,6 @@
             <id>jetty9</id>
             <properties>
                 <cxf.jetty.version>${cxf.jetty9.version}</cxf.jetty.version>
-            </properties>
-        </profile>
-        <profile>
-            <id>jetty8</id>
-            <properties>
-                <cxf.jetty.version>${cxf.jetty8.version}</cxf.jetty.version>
             </properties>
         </profile>
         <profile>

@@ -30,6 +30,7 @@ import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transport.http.HTTPTransportFactory;
 import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngine;
 import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngineFactory;
+import org.apache.cxf.transport.websocket.jetty9.Jetty9WebSocketDestination;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 
@@ -73,7 +74,7 @@ public class JettyWebSocketDestinationTest extends Assert {
         assertNull(registry.getDestinationForPath(ENDPOINT_ADDRESS));
     }
     
-    private static class TestJettyWebSocketDestination extends JettyWebSocketDestination {
+    private static class TestJettyWebSocketDestination extends Jetty9WebSocketDestination {
         TestJettyWebSocketDestination(Bus bus, DestinationRegistry registry, EndpointInfo ei,
                                       JettyHTTPServerEngineFactory serverEngineFactory, 
                                       JettyHTTPServerEngine engine) throws IOException {
