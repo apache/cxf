@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.tracing.brave.jaxws;
+package org.apache.cxf.tracing.brave;
 
 import com.github.kristofa.brave.Brave;
 import com.github.kristofa.brave.http.DefaultSpanNameProvider;
@@ -27,8 +27,6 @@ import org.apache.cxf.annotations.Provider.Type;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.interceptor.InterceptorProvider;
-import org.apache.cxf.tracing.brave.BraveStartInterceptor;
-import org.apache.cxf.tracing.brave.BraveStopInterceptor;
 
 @NoJSR250Annotations
 @Provider(value = Type.Feature)

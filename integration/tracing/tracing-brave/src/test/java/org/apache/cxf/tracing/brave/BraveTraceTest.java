@@ -27,7 +27,7 @@ import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
-import org.apache.cxf.tracing.brave.jaxws.BraveFeature;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
