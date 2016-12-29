@@ -16,11 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.tracing.brave.jaxws;
+package org.apache.cxf.tracing.brave;
 
-import javax.jws.WebService;
+import com.github.kristofa.brave.http.HttpRequest;
+import com.github.kristofa.brave.http.SpanNameProvider;
 
-@WebService
-public interface MyService {
-    String echo(String msg);
+public class LoggingSpanNameProvider implements SpanNameProvider {
+
+    @Override
+    public String spanName(HttpRequest request) {
+        return (request instanceof SpanNameProvider) ? ((SpanNameProvider)request).spanName(request) : ""; 
+    }
+
 }
