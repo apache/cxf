@@ -323,11 +323,6 @@
         <feature version="${project.version}">cxf-core</feature>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-bindings-coloc/${project.version}</bundle>
     </feature>
-    <feature name="cxf-bindings-object" version="${project.version}">
-        <feature version="${project.version}">cxf-core</feature>
-        <feature version="${project.version}">cxf-transports-local</feature>
-        <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-bindings-object/${project.version}</bundle>
-    </feature>
     <feature name="cxf-transports-local" version="${project.version}">
         <feature version="${project.version}">cxf-core</feature>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-transports-local/${project.version}</bundle>
@@ -404,10 +399,8 @@
         <feature version="${project.version}">cxf-jaxrs</feature>
         <feature version="${project.version}">cxf-databinding-jaxb</feature>
         <feature version="${project.version}">cxf-databinding-aegis</feature>
-        <feature version="${project.version}">cxf-databinding-xmlbeans</feature>
         <feature version="${project.version}">cxf-bindings-corba</feature>
         <feature version="${project.version}">cxf-bindings-coloc</feature>
-        <feature version="${project.version}">cxf-bindings-object</feature>
         <feature version="${project.version}">cxf-http-provider</feature>
         <feature version="${project.version}">cxf-transports-local</feature>
         <feature version="${project.version}">cxf-transports-jms</feature>
