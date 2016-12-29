@@ -24,10 +24,10 @@ import java.util.List;
 
 import com.github.kristofa.brave.Brave;
 import org.apache.cxf.endpoint.Server;
-import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
+import org.apache.cxf.tracing.brave.jaxws.BraveFeature;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -39,7 +39,7 @@ public class BraveTraceTest {
     
     private static final String ADDRESS = "http://localhost:8182";
     private Server server;
-    private TraceFeature logging;
+    private BraveFeature logging;
     private Localreporter localReporter;
 
     @Before
@@ -77,13 +77,13 @@ public class BraveTraceTest {
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
         factory.setServiceClass(MyService.class);
         factory.setAddress(ADDRESS);
-        factory.setFeatures(Arrays.asList(trace, new LoggingFeature()));
+        factory.setFeatures(Arrays.asList(trace));
         return (MyService)factory.create();
     }
 
-    private static TraceFeature createLoggingFeature(Reporter<Span> reporter) {
+    private static BraveFeature createLoggingFeature(Reporter<Span> reporter) {
         Brave brave = new Brave.Builder("myservice").reporter(reporter).build();
-        return new TraceFeature(brave);
+        return new BraveFeature(brave);
     }
     
     static final class Localreporter implements Reporter<Span> {

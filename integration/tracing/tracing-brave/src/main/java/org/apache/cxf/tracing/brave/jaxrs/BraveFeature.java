@@ -31,7 +31,11 @@ public class BraveFeature extends AbstractFeature {
     private final Brave brave;
     
     public BraveFeature() {
-        this(new Brave.Builder().build());
+        this("");
+    }
+    
+    public BraveFeature(final String name) {
+        this(new Brave.Builder(name).build());
     }
 
     public BraveFeature(final Brave brave) {

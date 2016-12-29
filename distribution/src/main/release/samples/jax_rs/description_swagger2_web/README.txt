@@ -14,7 +14,7 @@ located), the Maven pom.xml file can be used to build and run the demo.
 Using either UNIX or Windows:
 
   mvn install
-  mvn package tomcat7:run
+  mvn jetty:run-war
 
 
 Two JAX-RS endpoints are availbale after the service has started. 

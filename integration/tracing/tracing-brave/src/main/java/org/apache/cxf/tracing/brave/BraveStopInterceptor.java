@@ -19,7 +19,6 @@
 package org.apache.cxf.tracing.brave;
 
 import com.github.kristofa.brave.Brave;
-import com.github.kristofa.brave.http.HttpClientRequest;
 import com.github.kristofa.brave.http.HttpClientRequestAdapter;
 import com.github.kristofa.brave.http.HttpServerResponseAdapter;
 import com.github.kristofa.brave.http.SpanNameProvider;
@@ -27,31 +26,23 @@ import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
-import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 
 /**
  * 
  */
 @NoJSR250Annotations
-public class TraceOutInterceptor extends AbstractPhaseInterceptor<Message> {
-
-    private Brave brave;
-    private SpanNameProvider spanNameProvider;
-
-    public TraceOutInterceptor(Brave brave, SpanNameProvider spanNameProvider) {
-        super(Phase.PRE_PROTOCOL);
-        this.brave = brave;
-        this.spanNameProvider = spanNameProvider;
+public class BraveStopInterceptor extends AbstractBraveInterceptor {
+    public BraveStopInterceptor(Brave brave, SpanNameProvider spanNameProvider) {
+        super(Phase.PRE_PROTOCOL, brave, spanNameProvider);
     }
 
     public void handleMessage(Message message) throws Fault {
         if (MessageUtils.isRequestor(message)) {
-            final HttpClientRequest req = new CxfClientRequest(message);
-            brave.clientRequestInterceptor().handle(new HttpClientRequestAdapter(req, spanNameProvider));
+            brave.clientRequestInterceptor().handle(
+                new HttpClientRequestAdapter(getClientRequest(message), spanNameProvider));
         } else {
-            brave.serverResponseInterceptor().handle(new HttpServerResponseAdapter(new HttpResponse200()));
+            brave.serverResponseInterceptor().handle(new HttpServerResponseAdapter(() -> 200));
         }
     }
-
 }

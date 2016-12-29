@@ -34,6 +34,5 @@
         <module>logging</module>
         <module>metrics</module>
         <module>throttling</module>
-        <module>tracing-brave</module>
     </modules>
 </project>
