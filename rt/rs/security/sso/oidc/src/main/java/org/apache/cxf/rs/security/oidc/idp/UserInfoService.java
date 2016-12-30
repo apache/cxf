@@ -29,6 +29,7 @@ import javax.ws.rs.core.Response;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
+import org.apache.cxf.rs.security.jose.jwt.JwtUtils;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthContext;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthDataProvider;
@@ -66,14 +67,17 @@ public class UserInfoService extends OAuthServerJoseJwtProducer {
             return Response.serverError().build();
         }
         
-        Object responseEntity = userInfo;
+        Object responseEntity;
+        JwtToken jwtToken = new JwtToken(userInfo);
         // UserInfo may be returned in a clear form as JSON
         if (super.isJwsRequired() || super.isJweRequired()) {
             Client client = null;
             if (oauthDataProvider != null) {
                 client = oauthDataProvider.getClient(oauth.getClientId());
             }
-            responseEntity = super.processJwt(new JwtToken(userInfo), client);
+            responseEntity = super.processJwt(jwtToken, client);
+        } else {
+            responseEntity = JwtUtils.claimsToJson(jwtToken.getClaims(), null);
         }
         return Response.ok(responseEntity).build();
         
