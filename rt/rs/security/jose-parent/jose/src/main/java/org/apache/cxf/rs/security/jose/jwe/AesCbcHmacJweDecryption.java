@@ -18,8 +18,8 @@
  */
 package org.apache.cxf.rs.security.jose.jwe;
 
+import java.security.MessageDigest;
 import java.security.spec.AlgorithmParameterSpec;
-import java.util.Arrays;
 
 import javax.crypto.spec.IvParameterSpec;
 
@@ -56,7 +56,7 @@ public class AesCbcHmacJweDecryption extends JweDecryption {
                                                            jweDecryptionInput.getDecodedJsonHeaders());
         macState.mac.update(jweDecryptionInput.getEncryptedContent());
         byte[] expectedAuthTag = AesCbcHmacJweEncryption.signAndGetTag(macState);
-        if (!Arrays.equals(actualAuthTag, expectedAuthTag)) {
+        if (!MessageDigest.isEqual(actualAuthTag, expectedAuthTag)) {
             LOG.warning("Invalid authentication tag");
             throw new JweException(JweException.Error.CONTENT_DECRYPTION_FAILURE);
         }

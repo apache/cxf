@@ -19,7 +19,7 @@
 package org.apache.cxf.rs.security.oauth2.tokens.hawk;
 
 import java.net.URI;
-import java.util.Arrays;
+import java.security.MessageDigest;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -78,7 +78,7 @@ public abstract class AbstractHawkAccessTokenValidator implements AccessTokenVal
                                                          
             String clientMacString = schemeParams.get(OAuthConstants.HAWK_TOKEN_SIGNATURE);
             byte[] clientMacData = Base64Utility.decode(clientMacString);
-            boolean validMac = Arrays.equals(serverMacData, clientMacData);
+            boolean validMac = MessageDigest.isEqual(serverMacData, clientMacData);
             if (!validMac) {
                 AuthorizationUtils.throwAuthorizationFailure(Collections
                     .singleton(OAuthConstants.HAWK_AUTHORIZATION_SCHEME));
