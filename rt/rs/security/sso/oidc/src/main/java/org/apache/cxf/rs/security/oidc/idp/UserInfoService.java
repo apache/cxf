@@ -29,6 +29,7 @@ import javax.ws.rs.core.Response;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
+import org.apache.cxf.rs.security.jose.jwt.JwtUtils;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthContext;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthDataProvider;
@@ -43,7 +44,7 @@ public class UserInfoService extends OAuthServerJoseJwtProducer {
     private UserInfoProvider userInfoProvider;
     private OAuthDataProvider oauthDataProvider;
     private List<String> additionalClaims = Collections.emptyList();
-    
+    private boolean convertClearUserInfoToString;
     @Context
     private MessageContext mc;
     @GET
@@ -83,9 +84,7 @@ public class UserInfoService extends OAuthServerJoseJwtProducer {
     
     protected Object convertUserInfoToResponseEntity(UserInfo userInfo) {
         // By default a JAX-RS MessageBodyWriter is expected to serialize UserInfo.
-        // Custom implementations of this method may further augment UserInfo or
-        // convert it to String: JwtUtils.claimsToJson(userInfo);
-        return userInfo;
+        return convertClearUserInfoToString ? JwtUtils.claimsToJson(userInfo) : userInfo;
     }
 
     protected UserInfo createFromIdToken(IdToken idToken) {
@@ -140,5 +139,9 @@ public class UserInfoService extends OAuthServerJoseJwtProducer {
      */
     public void setAdditionalClaims(List<String> additionalClaims) {
         this.additionalClaims = additionalClaims;
+    }
+
+    public void setConvertClearUserInfoToString(boolean convertClearUserInfoToString) {
+        this.convertClearUserInfoToString = convertClearUserInfoToString;
     }
 }
