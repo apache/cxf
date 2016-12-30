@@ -66,7 +66,7 @@ public class UserInfoService extends OAuthServerJoseJwtProducer {
             return Response.serverError().build();
         }
         
-        Object responseEntity = userInfo;
+        Object responseEntity = null;
         // UserInfo may be returned in a clear form as JSON
         if (super.isJwsRequired() || super.isJweRequired()) {
             Client client = null;
@@ -74,11 +74,20 @@ public class UserInfoService extends OAuthServerJoseJwtProducer {
                 client = oauthDataProvider.getClient(oauth.getClientId());
             }
             responseEntity = super.processJwt(new JwtToken(userInfo), client);
+        } else {
+            responseEntity = convertUserInfoToResponseEntity(userInfo);
         }
         return Response.ok(responseEntity).build();
         
     }
     
+    protected Object convertUserInfoToResponseEntity(UserInfo userInfo) {
+        // By default a JAX-RS MessageBodyWriter is expected to serialize UserInfo.
+        // Custom implementations of this method may further augment UserInfo or
+        // convert it to String: JwtUtils.claimsToJson(userInfo);
+        return userInfo;
+    }
+
     protected UserInfo createFromIdToken(IdToken idToken) {
         UserInfo userInfo = new UserInfo();
         userInfo.setSubject(idToken.getSubject());
