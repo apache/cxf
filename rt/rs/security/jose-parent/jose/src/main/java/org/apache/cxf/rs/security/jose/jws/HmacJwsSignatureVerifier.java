@@ -18,8 +18,8 @@
  */
 package org.apache.cxf.rs.security.jose.jws;
 
+import java.security.MessageDigest;
 import java.security.spec.AlgorithmParameterSpec;
-import java.util.Arrays;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
@@ -53,7 +53,7 @@ public class HmacJwsSignatureVerifier implements JwsSignatureVerifier {
     @Override
     public boolean verify(JwsHeaders headers, String unsignedText, byte[] signature) {
         byte[] expected = computeMac(headers, unsignedText);
-        return Arrays.equals(expected, signature);
+        return MessageDigest.isEqual(expected, signature);
     }
     
     private byte[] computeMac(JwsHeaders headers, String text) {
