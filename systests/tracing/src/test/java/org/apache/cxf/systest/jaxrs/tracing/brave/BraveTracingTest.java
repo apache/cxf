@@ -73,7 +73,7 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
             sf.setResourceProvider(BookStore.class, new SingletonResourceProvider(new BookStore<TraceScope>()));
             sf.setAddress("http://localhost:" + PORT);
             sf.setProvider(new JacksonJsonProvider());
-            sf.setFeatures(Arrays.asList(new BraveFeature(brave)));
+            sf.setProvider(new BraveFeature(brave));
             sf.create();
         }
     }

@@ -18,16 +18,12 @@
  */
 package org.apache.cxf.tracing.brave.jaxrs;
 
-import java.util.Arrays;
+import javax.ws.rs.core.Feature;
+import javax.ws.rs.core.FeatureContext;
 
 import com.github.kristofa.brave.Brave;
 
-import org.apache.cxf.Bus;
-import org.apache.cxf.endpoint.Server;
-import org.apache.cxf.feature.AbstractFeature;
-import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
-
-public class BraveFeature extends AbstractFeature {
+public class BraveFeature implements Feature {
     private final Brave brave;
     
     public BraveFeature() {
@@ -41,16 +37,11 @@ public class BraveFeature extends AbstractFeature {
     public BraveFeature(final Brave brave) {
         this.brave = brave;
     }
-
+    
     @Override
-    public void initialize(final Server server, final Bus bus) {
-        final ServerProviderFactory providerFactory = (ServerProviderFactory)server
-            .getEndpoint()
-            .get(ServerProviderFactory.class.getName());
-        
-        if (providerFactory != null) {
-            providerFactory.setUserProviders(Arrays.asList(new BraveProvider(brave), 
-                new BraveContextProvider(brave)));
-        }
+    public boolean configure(FeatureContext context) {
+        context.register(new BraveProvider(brave));
+        context.register(new BraveContextProvider(brave));
+        return true;
     }
 }
