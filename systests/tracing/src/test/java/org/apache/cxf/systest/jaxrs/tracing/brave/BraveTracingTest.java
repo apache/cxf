@@ -49,6 +49,7 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import static org.apache.cxf.systest.jaxrs.tracing.brave.HasSpan.hasSpan;
 import static org.apache.cxf.systest.jaxrs.tracing.brave.IsAnnotationContaining.hasItem;
 import static org.apache.cxf.systest.jaxrs.tracing.brave.IsBinaryAnnotationContaining.hasItem;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -146,9 +147,8 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
         
         assertThat(TestSpanReporter.getAllSpans().size(), equalTo(2));
-        assertThat(TestSpanReporter.getAllSpans().get(0).name, equalTo("processing books"));
-        assertThat(TestSpanReporter.getAllSpans().get(0).annotations, hasItem("Processing started"));
-        assertThat(TestSpanReporter.getAllSpans().get(1).name, equalTo("put /bookstore/process"));
+        assertThat(TestSpanReporter.getAllSpans(), hasSpan("processing books", hasItem("Processing started")));
+        assertThat(TestSpanReporter.getAllSpans(), hasSpan("put /bookstore/process"));
         
         assertThatTraceIsPresent(r, spanId);
     }

@@ -29,7 +29,9 @@ public class IsAnnotationContaining extends IsCollectionContaining<Annotation> {
         super(new TypeSafeMatcher<Annotation>() {
             @Override
             public void describeTo(Description description) {
-                description.appendValue(value);
+                description
+                    .appendText("annotation with name")
+                    .appendValue(value);
             }
 
             @Override
