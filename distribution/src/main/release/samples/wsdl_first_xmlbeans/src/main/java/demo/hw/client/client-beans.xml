@@ -18,7 +18,7 @@
         under the License.
 -->
 <!-- START SNIPPET: beans -->
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxws="http://cxf.apache.org/jaxws" xsi:schemaLocation=" http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxws="http://cxf.apache.org/jaxws" xsi:schemaLocation=" http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
     <jaxws:client xmlns:s="http://apache.org/hello_world_soap_http" id="client" serviceClass="org.apache.hello_world_soap_http.Greeter" serviceName="s:SOAPService" endpointName="s:SoapPort" wsdlLocation="wsdl/hello_world.wsdl" address="http://localhost:9000/SoapContext/SoapPort">
         <jaxws:properties>
             <entry key="schema-validation-enabled" value="true"/>
