@@ -161,7 +161,7 @@ public final class STSTokenRetriever {
                     // Check to see whether the delegated token needs to be renewed
                     secToken = renewToken(message, secToken, params);
                 } else {
-                    secToken = getTokenFromSTS(message, client, maps, appliesTo, params);
+                    secToken = getTokenFromSTS(client, maps, appliesTo, params);
                 }
                 storeDelegationTokens(
                                       message, secToken, onBehalfOfToken, actAsToken, appliesTo,
@@ -409,7 +409,7 @@ public final class STSTokenRetriever {
         }
     }
 
-    private static SecurityToken getTokenFromSTS(Message message, STSClient client,
+    private static SecurityToken getTokenFromSTS(STSClient client,
                                           AddressingProperties maps, String appliesTo,
                                           TokenRequestParams params) throws Exception {
         client.setTrust(params.getTrust10());
