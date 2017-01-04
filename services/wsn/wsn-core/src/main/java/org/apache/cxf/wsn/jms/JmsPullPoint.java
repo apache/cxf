@@ -55,7 +55,9 @@ public class JmsPullPoint extends AbstractPullPoint {
 
     private Connection connection;
 
-    private Session session;
+    private Session producerSession;
+    
+    private Session consumerSession;
 
     private Queue queue;
 
@@ -73,22 +75,33 @@ public class JmsPullPoint extends AbstractPullPoint {
     }
 
     protected synchronized void initSession() throws JMSException {
-        if (session == null) {
-            session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-            queue = session.createQueue(getName());
-            producer = session.createProducer(queue);
-            consumer = session.createConsumer(queue);
+        if (producerSession == null || consumerSession == null) {
+            producerSession = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            consumerSession = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            queue = producerSession.createQueue(getName());
+            producer = producerSession.createProducer(queue);
+            consumer = consumerSession.createConsumer(queue);
         }
     }
     
     protected synchronized void closeSession() {
-        if (session != null) {
+        if (producerSession != null) {
             try {
-                session.close();
+                producerSession.close();
             } catch (JMSException inner) {
-                LOGGER.log(Level.FINE, "Error closing session", inner);
+                LOGGER.log(Level.FINE, "Error closing ProducerSession", inner);
             } finally {
-                session = null;
+                producerSession = null;
+            }
+        }
+        
+        if (consumerSession != null) {
+            try {
+                consumerSession.close();
+            } catch (JMSException inner) {
+                LOGGER.log(Level.FINE, "Error closing ConsumerSession", inner);
+            } finally {
+                consumerSession = null;
             }
         }
     }
@@ -101,8 +114,10 @@ public class JmsPullPoint extends AbstractPullPoint {
             notify.getNotificationMessage().add(messageHolder);
             StringWriter writer = new StringWriter();
             jaxbContext.createMarshaller().marshal(notify, writer);
-            Message message = session.createTextMessage(writer.toString());
-            producer.send(message);
+            synchronized (producerSession) {
+                Message message = producerSession.createTextMessage(writer.toString());
+                producer.send(message);
+            }
         } catch (JMSException e) {
             LOGGER.log(Level.WARNING, "Error storing message", e);
             closeSession();
@@ -122,7 +137,10 @@ public class JmsPullPoint extends AbstractPullPoint {
             initSession();
             List<NotificationMessageHolderType> messages = new ArrayList<NotificationMessageHolderType>();
             for (int i = 0; i < max; i++) {
-                Message msg = consumer.receiveNoWait();
+                Message msg = null;
+                synchronized (consumerSession) {
+                    msg = consumer.receiveNoWait();
+                }
                 if (msg == null) {
                     break;
                 }
