@@ -40,18 +40,20 @@ public class BraveTraceTest {
     private static final String ADDRESS = "http://localhost:8182";
     private Server server;
     private BraveFeature logging;
+    private BraveClientFeature clientLogging;
     private Localreporter localReporter;
 
     @Before
     public void startServer() {
         localReporter = new Localreporter();
         logging = createLoggingFeature(localReporter);
+        clientLogging = createClientLoggingFeature(localReporter);
         server = createServer(logging);
     }
 
     @Test
     public void testMyService() {
-        MyService myService = createProxy(logging);
+        MyService myService = createProxy(clientLogging);
         myService.echo("test");
         for (Span span : localReporter.spans) {
             System.out.println(span);
@@ -84,6 +86,11 @@ public class BraveTraceTest {
     private static BraveFeature createLoggingFeature(Reporter<Span> reporter) {
         Brave brave = new Brave.Builder("myservice").reporter(reporter).build();
         return new BraveFeature(brave);
+    }
+    
+    private static BraveClientFeature createClientLoggingFeature(Reporter<Span> reporter) {
+        Brave brave = new Brave.Builder("myservice").reporter(reporter).build();
+        return new BraveClientFeature(brave);
     }
     
     static final class Localreporter implements Reporter<Span> {

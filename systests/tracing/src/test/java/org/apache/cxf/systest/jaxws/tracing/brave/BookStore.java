@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.jaxws.tracing;
+package org.apache.cxf.systest.jaxws.tracing.brave;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -25,19 +25,44 @@ import java.util.UUID;
 import javax.jws.WebMethod;
 import javax.jws.WebService;
 
+import com.github.kristofa.brave.Brave;
+
 import org.apache.cxf.systest.Book;
-import org.apache.htrace.core.TraceScope;
-import org.apache.htrace.core.Tracer;
+import org.apache.cxf.systest.TestSpanReporter;
+import org.apache.cxf.systest.jaxws.tracing.BookStoreService;
+
+import zipkin.Constants;
 
 @WebService(endpointInterface = "org.apache.cxf.systest.jaxws.tracing.BookStoreService", serviceName = "BookStore")
 public class BookStore implements BookStoreService {
+    private final Brave brave;
+    
+    public BookStore() {
+        brave = new Brave.Builder("book-store")
+            .reporter(new TestSpanReporter())
+            .build();
+    }
+    
     @WebMethod
     public Collection< Book > getBooks() {
-        try (TraceScope span = Tracer.curThreadTracer().newScope("Get Books")) {
+        try {
+            brave
+                .localTracer()
+                .startNewSpan(Constants.LOCAL_COMPONENT, "Get Books");
+            
             return Arrays.asList(
-                new Book("Apache CXF in Action", UUID.randomUUID().toString()),
-                new Book("Mastering Apache CXF", UUID.randomUUID().toString())
-            );
+                    new Book("Apache CXF in Action", UUID.randomUUID().toString()),
+                    new Book("Mastering Apache CXF", UUID.randomUUID().toString())
+                );
+        } finally {
+            brave
+                .localTracer()
+                .finishSpan();
         }
+    }
+    
+    @WebMethod
+    public int removeBooks() {
+        throw new RuntimeException("Unable to remove books");
     }
 }

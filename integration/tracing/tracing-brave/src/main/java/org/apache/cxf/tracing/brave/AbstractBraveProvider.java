@@ -41,10 +41,14 @@ public abstract class AbstractBraveProvider extends AbstractTracingProvider {
     protected static final Logger LOG = LogUtils.getL7dLogger(AbstractBraveProvider.class);
     protected static final String TRACE_SPAN = "org.apache.cxf.tracing.brave.span";
         
-    private final Brave brave;
-    private final SpanNameProvider spanNameProvider;
+    protected final Brave brave;
+    protected final SpanNameProvider spanNameProvider;
             
-    public AbstractBraveProvider(final Brave brave) {
+    protected AbstractBraveProvider(final Brave brave) {
+        this(brave, new ServerSpanNameProvider());
+    }
+    
+    protected AbstractBraveProvider(final Brave brave, final SpanNameProvider spanNameProvider) {
         this.brave = brave;
         this.spanNameProvider = new ServerSpanNameProvider();
     }

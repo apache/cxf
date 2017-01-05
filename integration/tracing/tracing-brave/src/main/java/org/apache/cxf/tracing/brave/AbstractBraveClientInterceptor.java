@@ -18,29 +18,46 @@
  */
 package org.apache.cxf.tracing.brave;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Set;
+
 import com.github.kristofa.brave.Brave;
-import com.github.kristofa.brave.ServerSpan;
 
-import org.apache.cxf.common.injection.NoJSR250Annotations;
-import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.phase.Phase;
+import org.apache.cxf.phase.PhaseInterceptor;
 
-@NoJSR250Annotations
-public class BraveStartInterceptor extends AbstractBraveInterceptor {
-    public BraveStartInterceptor(Brave brave) {
-        super(Phase.PRE_INVOKE, brave, new ServerSpanNameProvider());
+public abstract class AbstractBraveClientInterceptor extends AbstractBraveClientProvider 
+        implements PhaseInterceptor<Message> {
+    
+    private String phase;
+
+    protected AbstractBraveClientInterceptor(final String phase, final Brave brave) {
+        super(brave);
+        this.phase = phase;
+    }
+    
+    public Collection<PhaseInterceptor<? extends Message>> getAdditionalInterceptors() {
+        return null;
     }
 
-    @Override
-    public void handleMessage(Message message) throws Fault {       
-        final ParsedMessage parsed = new ParsedMessage(message);
-        
-        final TraceScopeHolder<ServerSpan> holder = super.startTraceSpan(parsed.getHeaders(), 
-            parsed.getUri(), parsed.getHttpMethod());
-        
-        if (holder != null) {
-            message.getExchange().put(TRACE_SPAN, holder);
-        }
+    public Set<String> getAfter() {
+        return Collections.emptySet();
     }
+
+    public Set<String> getBefore() {
+        return Collections.emptySet();
+    }
+
+    public String getId() {
+        return getClass().getName();
+    }
+
+    public String getPhase() {
+        return phase;
+    }
+    
+    public void handleFault(Message message) {
+    }
+
 }

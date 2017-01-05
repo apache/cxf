@@ -29,14 +29,14 @@ import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.interceptor.InterceptorProvider;
 
 @NoJSR250Annotations
-@Provider(value = Type.Feature, scope = Scope.Server)
-public class BraveFeature extends AbstractFeature {
-    private BraveStartInterceptor in;
-    private BraveStopInterceptor out;
+@Provider(value = Type.Feature, scope = Scope.Client)
+public class BraveClientFeature extends AbstractFeature {
+    private BraveClientStartInterceptor out;
+    private BraveClientStopInterceptor in;
 
-    public BraveFeature(Brave brave) {
-        in = new BraveStartInterceptor(brave);
-        out = new BraveStopInterceptor(brave);
+    public BraveClientFeature(Brave brave) {
+        out = new BraveClientStartInterceptor(brave);
+        in = new BraveClientStopInterceptor(brave);
     }
 
     @Override

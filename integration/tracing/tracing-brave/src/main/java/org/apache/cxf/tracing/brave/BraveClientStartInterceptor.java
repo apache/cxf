@@ -19,28 +19,32 @@
 package org.apache.cxf.tracing.brave;
 
 import com.github.kristofa.brave.Brave;
-import com.github.kristofa.brave.ServerSpan;
+import com.twitter.zipkin.gen.Span;
 
-import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.tracing.brave.AbstractBraveInterceptor.ParsedMessage;
 
-@NoJSR250Annotations
-public class BraveStartInterceptor extends AbstractBraveInterceptor {
-    public BraveStartInterceptor(Brave brave) {
-        super(Phase.PRE_INVOKE, brave, new ServerSpanNameProvider());
+public class BraveClientStartInterceptor extends AbstractBraveClientInterceptor {
+    public BraveClientStartInterceptor(final Brave brave) {
+        this(Phase.PRE_STREAM, brave);
+    }
+
+    public BraveClientStartInterceptor(final String phase, final Brave brave) {
+        super(phase, brave);
     }
 
     @Override
-    public void handleMessage(Message message) throws Fault {       
+    public void handleMessage(Message message) throws Fault {
         final ParsedMessage parsed = new ParsedMessage(message);
         
-        final TraceScopeHolder<ServerSpan> holder = super.startTraceSpan(parsed.getHeaders(), 
+        final TraceScopeHolder<Span> holder = super.startTraceSpan(parsed.getHeaders(), 
             parsed.getUri(), parsed.getHttpMethod());
         
         if (holder != null) {
             message.getExchange().put(TRACE_SPAN, holder);
         }
     }
+    
 }

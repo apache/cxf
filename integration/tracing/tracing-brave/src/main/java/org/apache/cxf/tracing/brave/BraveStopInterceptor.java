@@ -18,11 +18,15 @@
  */
 package org.apache.cxf.tracing.brave;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import com.github.kristofa.brave.Brave;
-import com.github.kristofa.brave.http.HttpClientRequestAdapter;
-import com.github.kristofa.brave.http.HttpServerResponseAdapter;
-import com.github.kristofa.brave.http.SpanNameProvider;
+import com.github.kristofa.brave.ServerSpan;
+
 import org.apache.cxf.common.injection.NoJSR250Annotations;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
@@ -33,16 +37,34 @@ import org.apache.cxf.phase.Phase;
  */
 @NoJSR250Annotations
 public class BraveStopInterceptor extends AbstractBraveInterceptor {
-    public BraveStopInterceptor(Brave brave, SpanNameProvider spanNameProvider) {
-        super(Phase.PRE_PROTOCOL, brave, spanNameProvider);
+    public BraveStopInterceptor(final Brave brave) {
+        super(Phase.PRE_MARSHAL, brave, new ServerSpanNameProvider());
     }
 
+    @Override
     public void handleMessage(Message message) throws Fault {
-        if (MessageUtils.isRequestor(message)) {
-            brave.clientRequestInterceptor().handle(
-                new HttpClientRequestAdapter(getClientRequest(message), spanNameProvider));
-        } else {
-            brave.serverResponseInterceptor().handle(new HttpServerResponseAdapter(() -> 200));
+        Map<String, List<Object>> responseHeaders = CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
+        
+        if (responseHeaders == null) {
+            responseHeaders = new HashMap<String, List<Object>>();
+            message.put(Message.PROTOCOL_HEADERS, responseHeaders);
         }
+        
+        boolean isRequestor = MessageUtils.isRequestor(message);
+        Message requestMessage = isRequestor ? message.getExchange().getOutMessage() 
+            : message.getExchange().getInMessage();
+        Map<String, List<String>> requestHeaders =  
+            CastUtils.cast((Map<?, ?>)requestMessage.get(Message.PROTOCOL_HEADERS));
+        
+        @SuppressWarnings("unchecked")
+        final TraceScopeHolder<ServerSpan> holder = 
+            (TraceScopeHolder<ServerSpan>)message.getExchange().get(TRACE_SPAN);
+        
+        Integer responseCode = (Integer)message.get(Message.RESPONSE_CODE);
+        if (responseCode == null) {
+            responseCode = 200; 
+        }
+        
+        super.stopTraceSpan(requestHeaders, responseHeaders, responseCode, holder);
     }
 }

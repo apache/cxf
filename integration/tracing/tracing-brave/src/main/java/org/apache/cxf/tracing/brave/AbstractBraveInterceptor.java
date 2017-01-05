@@ -21,25 +21,25 @@ package org.apache.cxf.tracing.brave;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.github.kristofa.brave.Brave;
-import com.github.kristofa.brave.http.HttpClientRequest;
-import com.github.kristofa.brave.http.HttpServerRequest;
 import com.github.kristofa.brave.http.SpanNameProvider;
 
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
-import org.apache.cxf.phase.AbstractPhaseInterceptor;
+import org.apache.cxf.phase.PhaseInterceptor;
 
-public abstract class AbstractBraveInterceptor extends AbstractPhaseInterceptor<Message> {
-    protected final Brave brave;
-    protected final SpanNameProvider spanNameProvider;
+public abstract class AbstractBraveInterceptor extends AbstractBraveProvider implements PhaseInterceptor<Message> {
+    private final String phase;
     
-    private static class ParsedMessage {
+    protected static class ParsedMessage {
         private Message message;
 
         ParsedMessage(Message message) {
@@ -54,7 +54,7 @@ public abstract class AbstractBraveInterceptor extends AbstractPhaseInterceptor<
             return (value instanceof String) ? value.toString() : null;
         }
         
-        public String getUriSt() {
+        private String getUriSt() {
             String uri = safeGet(Message.REQUEST_URL);
             if (uri == null) {
                 String address = safeGet(Message.ENDPOINT_ADDRESS);
@@ -78,7 +78,7 @@ public abstract class AbstractBraveInterceptor extends AbstractPhaseInterceptor<
             }
         }
         
-        public URI getUri() {
+        URI getUri() {
             try {
                 String uriSt = getUriSt();
                 return uriSt != null ? new URI(uriSt) : new URI("");
@@ -97,21 +97,14 @@ public abstract class AbstractBraveInterceptor extends AbstractPhaseInterceptor<
             }
         }
         
-        Map<String, String> getHeaders() {
+        Map<String, List<String>> getHeaders() {
             Map<String, List<String>> headers = CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
-            Map<String, String> result = new HashMap<>();
+
             if (headers == null) {
-                return result;
+                return Collections.emptyMap();
             }
-            for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
-                if (entry.getValue().size() == 1) {
-                    result.put(entry.getKey(), entry.getValue().get(0));
-                } else {
-                    String[] valueAr = entry.getValue().toArray(new String[] {});
-                    result.put(entry.getKey(), valueAr.toString());
-                }
-            }
-            return result;
+
+            return headers;
         }
         
         void addHeader(String key, String value) {
@@ -123,57 +116,43 @@ public abstract class AbstractBraveInterceptor extends AbstractPhaseInterceptor<
             headers.put(key, Arrays.asList(value));
         }
 
-        public String getHttpMethod() {
+        String getHttpMethod() {
             ParsedMessage eMessage = new ParsedMessage(getEffectiveMessage());
             return eMessage.safeGet(Message.HTTP_REQUEST_METHOD);
         }
     }
 
     protected AbstractBraveInterceptor(String phase, Brave brave, SpanNameProvider spanNameProvider) {
-        super(phase);
-        this.brave = brave;
-        this.spanNameProvider = spanNameProvider;
+        super(brave, spanNameProvider);
+        this.phase = phase;
     }
     
-    protected HttpClientRequest getClientRequest(final Message message) {
-        final ParsedMessage parsedMessage = new ParsedMessage(message);
-        
-        return new HttpClientRequest() {
-            @Override
-            public URI getUri() {
-                return parsedMessage.getUri();
-            }
+    @Override
+    public Set<String> getAfter() {
+        return Collections.emptySet();
+    }
 
-            @Override
-            public String getHttpMethod() {
-                return parsedMessage.getHttpMethod();
-            }
+    @Override
+    public Set<String> getBefore() {
+        return Collections.emptySet();
+    }
 
-            @Override
-            public void addHeader(String header, String value) {
-                parsedMessage.addHeader(header, value);
-            }
-        };
+    @Override
+    public String getId() {
+        return getClass().getName();
+    }
+
+    @Override
+    public String getPhase() {
+        return phase;
     }
     
-    protected HttpServerRequest getServerRequest(final Message message) {
-        final ParsedMessage parsedMessage = new ParsedMessage(message);
-        
-        return new HttpServerRequest() {
-            @Override
-            public URI getUri() {
-                return parsedMessage.getUri();
-            }
-
-            @Override
-            public String getHttpMethod() {
-                return parsedMessage.getHttpMethod();
-            }
-
-            @Override
-            public String getHttpHeaderValue(String headerName) {
-                return parsedMessage.getHeaders().get(headerName);
-            }
-        };
+    @Override
+    public Collection<PhaseInterceptor<? extends Message>> getAdditionalInterceptors() {
+        return null;
+    }
+    
+    @Override
+    public void handleFault(Message message) {
     }
 }
