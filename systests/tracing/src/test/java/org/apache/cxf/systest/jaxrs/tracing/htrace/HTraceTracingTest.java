@@ -53,6 +53,9 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import static org.apache.cxf.systest.jaxrs.tracing.htrace.HasSpan.hasSpan;
+import static org.apache.cxf.systest.jaxrs.tracing.htrace.IsTimelineContaining.hasItem;
+import static org.apache.cxf.systest.jaxrs.tracing.htrace.IsTimelineEmpty.empty;
 import static org.hamcrest.CoreMatchers.equalTo;
 
 public class HTraceTracingTest extends AbstractBusClientServerTestBase {
@@ -155,10 +158,8 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
         
         assertThat(TestSpanReceiver.getAllSpans().size(), equalTo(2));
-        assertThat(TestSpanReceiver.getAllSpans().get(0).getDescription(), equalTo("PUT bookstore/process"));
-        assertThat(TestSpanReceiver.getAllSpans().get(0).getTimelineAnnotations().size(), equalTo(0));
-        assertThat(TestSpanReceiver.getAllSpans().get(1).getDescription(), equalTo("Processing books"));
-        assertThat(TestSpanReceiver.getAllSpans().get(1).getTimelineAnnotations().size(), equalTo(1));
+        assertThat(TestSpanReceiver.getAllSpans(), hasSpan("Processing books", hasItem("Processing started")));
+        assertThat(TestSpanReceiver.getAllSpans(), hasSpan("PUT bookstore/process", empty()));
         
         assertThat((String)r.getHeaders().getFirst(TracerHeaders.DEFAULT_HEADER_SPAN_ID), equalTo(spanId.toString()));
     }

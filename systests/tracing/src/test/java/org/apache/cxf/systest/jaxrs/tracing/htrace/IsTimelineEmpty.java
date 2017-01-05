@@ -16,32 +16,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.jaxrs.tracing.brave;
+package org.apache.cxf.systest.jaxrs.tracing.htrace;
 
+import org.apache.htrace.core.TimelineAnnotation;
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
-import org.hamcrest.core.IsCollectionContaining;
 
-import zipkin.Annotation;
+public class IsTimelineEmpty extends TypeSafeMatcher<Iterable<? super TimelineAnnotation>> {
+    @Override
+    public void describeTo(Description description) {
+        description.appendText("timeline is empty");
+    }
 
-public class IsAnnotationContaining extends IsCollectionContaining<Annotation> {
-    public IsAnnotationContaining(final String value) {
-        super(new TypeSafeMatcher<Annotation>() {
-            @Override
-            public void describeTo(Description description) {
-                description
-                    .appendText("annotation with name ")
-                    .appendValue(value);
-            }
-
-            @Override
-            protected boolean matchesSafely(Annotation item) {
-                return value.equals(item.value);
-            }
-        });
+    @Override
+    protected boolean matchesSafely(Iterable<? super TimelineAnnotation> annotations) {
+        return annotations == null|| !annotations.iterator().hasNext();
     }
     
-    public static IsAnnotationContaining hasItem(final String value) {
-        return new IsAnnotationContaining(value);
+    public static IsTimelineEmpty empty() {
+        return new IsTimelineEmpty();
     }
 }
