@@ -30,7 +30,7 @@ public class IsTimelineEmpty extends TypeSafeMatcher<Iterable<? super TimelineAn
 
     @Override
     protected boolean matchesSafely(Iterable<? super TimelineAnnotation> annotations) {
-        return annotations == null|| !annotations.iterator().hasNext();
+        return annotations == null || !annotations.iterator().hasNext();
     }
     
     public static IsTimelineEmpty empty() {
