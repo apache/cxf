@@ -227,6 +227,24 @@
                             </execution>
                         </executions>
                     </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <includes>
+                                <include>**/*Test.java</include>
+                                <include>**/*TestCase.java</include>
+                                <include>**/*TestCases.java</include>
+                            </includes>
+                            <excludes>
+                                <exclude>**/*$*</exclude>
+                                <!--ignore the test caused by CXF-7206-->
+                                <exclude>/org/apache/cxf/systest/ws/addressing/DecoupledJMSTest.java</exclude>
+                                <exclude>/org/apache/cxf/systest/ws/addressing/NonDecoupledJMSTest.java</exclude>
+                                <exclude>/org/apache/cxf/systest/ws/addressing/NonDecoupledTest.java</exclude>
+                            </excludes>
+                        </configuration>
+                    </plugin>
                 </plugins>
             </build>
         </profile>
