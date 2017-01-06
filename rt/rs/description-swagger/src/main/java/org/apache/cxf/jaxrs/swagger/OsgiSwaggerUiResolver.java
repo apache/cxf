@@ -40,11 +40,11 @@ public class OsgiSwaggerUiResolver extends SwaggerUiResolver {
             for (Bundle b : bundle.getBundleContext().getBundles()) {
                 String location = b.getLocation();
                 if (swaggerUiVersion != null) {
-                    if (location.equals(LOCATION + swaggerUiVersion)) {
+                    if (location.endsWith(LOCATION + swaggerUiVersion)) {
                         return getSwaggerUiRoot(b, swaggerUiVersion);
                     }
-                } else if (location.startsWith(LOCATION)) {
-                    swaggerUiVersion = location.substring(LOCATION.length());
+                } else if (location.contains(LOCATION)) {
+                    swaggerUiVersion = location.substring(location.indexOf(LOCATION) + LOCATION.length());
                     return getSwaggerUiRoot(b, swaggerUiVersion);
                 }
             }
