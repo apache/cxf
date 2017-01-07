@@ -26,7 +26,11 @@ import org.osgi.framework.FrameworkUtil;
 import io.swagger.annotations.Api;
 
 public class OsgiSwaggerUiResolver extends SwaggerUiResolver {
-    private static final String LOCATION = "mvn:org.webjars/swagger-ui/";
+    private static final String LOCATIONS[] = {
+        "mvn:org.webjars/swagger-ui/",
+        "wrap:mvn:org.webjars/swagger-ui/"
+    };
+    
     OsgiSwaggerUiResolver() throws Exception {
         Class.forName("org.osgi.framework.FrameworkUtil");
     }
@@ -39,13 +43,16 @@ public class OsgiSwaggerUiResolver extends SwaggerUiResolver {
             }
             for (Bundle b : bundle.getBundleContext().getBundles()) {
                 String location = b.getLocation();
-                if (swaggerUiVersion != null) {
-                    if (location.equals(LOCATION + swaggerUiVersion)) {
+                
+                for (String pattern: LOCATIONS) {
+                    if (swaggerUiVersion != null) {
+                        if (location.equals(pattern + swaggerUiVersion)) {
+                            return getSwaggerUiRoot(b, swaggerUiVersion);
+                        }
+                    } else  if (location.startsWith(pattern)) {
+                        swaggerUiVersion = location.substring(pattern.length());
                         return getSwaggerUiRoot(b, swaggerUiVersion);
                     }
-                } else if (location.startsWith(LOCATION)) {
-                    swaggerUiVersion = location.substring(LOCATION.length());
-                    return getSwaggerUiRoot(b, swaggerUiVersion);
                 }
             }
         } catch (Throwable ex) {
