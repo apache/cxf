@@ -267,6 +267,8 @@
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-rs-security-oauth2/${project.version}</bundle>
     </feature>
     <feature name="cxf-jackson" version="${project.version}">
+        <!-- Required by jackson-dataformat-yaml -->
+        <bundle start-level="35">mvn:org.yaml/snakeyaml/1.15</bundle>
         <bundle start-level="35">mvn:com.fasterxml.jackson.core/jackson-core/${cxf.jackson.version}</bundle>
         <bundle start-level="35">mvn:com.fasterxml.jackson.core/jackson-annotations/${cxf.jackson.version}</bundle>
         <bundle start-level="35">mvn:com.fasterxml.jackson.core/jackson-databind/${cxf.jackson.version}</bundle>
