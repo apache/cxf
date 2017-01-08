@@ -60,9 +60,9 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.interceptors.STSTokenOutInterceptor;
-import org.apache.cxf.ws.security.policy.interceptors.STSTokenOutInterceptor.AuthMode;
-import org.apache.cxf.ws.security.policy.interceptors.STSTokenOutInterceptor.AuthParams;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
+import org.apache.cxf.ws.security.trust.STSAuthParams;
+import org.apache.cxf.ws.security.trust.STSAuthParams.AuthMode;
 import org.apache.cxf.ws.security.trust.STSClient;
 
 import org.junit.AfterClass;
@@ -119,8 +119,8 @@ public class STSTokenOutInterceptorTest extends AbstractBusClientServerTestBase 
     public void testBasicAsymmetricBinding() throws Exception {
         Bus bus = BusFactory.getThreadDefaultBus();        
         
-        AuthParams authParams = new AuthParams(
-                 AuthMode.X509, 
+        STSAuthParams authParams = new STSAuthParams(
+                 AuthMode.X509_ASSYMETRIC, 
                  null,
                  "org.apache.cxf.systest.sts.common.CommonCallbackHandler",
                  "mystskey",
@@ -145,8 +145,8 @@ public class STSTokenOutInterceptorTest extends AbstractBusClientServerTestBase 
         configureDefaultHttpsConnection();
         
         Bus bus = BusFactory.getThreadDefaultBus();  
-        AuthParams authParams = new AuthParams(
-                   AuthMode.TRANSPORT, 
+        STSAuthParams authParams = new STSAuthParams(
+                   AuthMode.UT_TRANSPORT, 
                    "alice",
                    "org.apache.cxf.systest.sts.common.CommonCallbackHandler",
                    null,

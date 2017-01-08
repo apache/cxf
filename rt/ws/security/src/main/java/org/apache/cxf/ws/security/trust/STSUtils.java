@@ -19,6 +19,9 @@
 
 package org.apache.cxf.ws.security.trust;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 
@@ -76,6 +79,10 @@ public final class STSUtils {
     
     public static final String TOKEN_TYPE_SCT_05_02 = SCT_NS_05_02 + "/sct";
     public static final String TOKEN_TYPE_SCT_05_12 = SCT_NS_05_12 + "/sct";
+
+    private static final String TOKEN_TYPE_SAML_2_0 = 
+            "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLV2.0";
+    private static final QName STS_SERVICE_NAME = new QName(WST_NS_05_12 + "/", "SecurityTokenService");
 
     private STSUtils() {
         //utility class
@@ -181,6 +188,38 @@ public final class STSUtils {
         return client;
     }
     
+    public static STSClient createSTSClient(STSAuthParams authParams, String stsWsdlLocation, Bus bus) {
+        STSClient basicStsClient = new STSClient(bus);
+        basicStsClient.setWsdlLocation(stsWsdlLocation);
+        basicStsClient.setServiceName(STS_SERVICE_NAME.toString());
+        basicStsClient.setEndpointName(authParams.getAuthMode().getEndpointName().toString());
+        if (authParams.getAuthMode().getKeyType() != null) {
+            basicStsClient.setKeyType(authParams.getAuthMode().getKeyType());
+        } else {
+            basicStsClient.setSendKeyType(false);
+        }
+        basicStsClient.setTokenType(TOKEN_TYPE_SAML_2_0);
+        basicStsClient.setAllowRenewingAfterExpiry(true);
+        basicStsClient.setEnableLifetime(true);
+
+        Map<String, Object> props = new HashMap<String, Object>();
+        if (authParams.getUserName() != null) {
+            props.put(SecurityConstants.USERNAME, authParams.getUserName());
+        }
+        props.put(SecurityConstants.CALLBACK_HANDLER, authParams.getCallbackHandler());
+        if (authParams.getKeystoreProperties() != null) {
+            props.put(SecurityConstants.ENCRYPT_USERNAME, authParams.getAlias());
+            props.put(SecurityConstants.ENCRYPT_PROPERTIES, authParams.getKeystoreProperties());
+            props.put(SecurityConstants.SIGNATURE_PROPERTIES, authParams.getKeystoreProperties());
+            props.put(SecurityConstants.STS_TOKEN_USERNAME, authParams.getAlias());
+            props.put(SecurityConstants.STS_TOKEN_PROPERTIES, authParams.getKeystoreProperties());
+            props.put(SecurityConstants.STS_TOKEN_USE_CERT_FOR_KEYINFO, "true");
+        }
+        basicStsClient.setProperties(props);
+        
+        return basicStsClient;
+    }
+    
     public static String findMEXLocation(EndpointReferenceType ref) {
         if (ref.getMetadata() != null && ref.getMetadata().getAny() != null) {
             for (Object any : ref.getMetadata().getAny()) {
@@ -230,7 +269,6 @@ public final class STSUtils {
                                              Policy policy) throws BusException, EndpointException {
         return createSTSEndpoint(bus, namespace, transportId, location, soapVersion, policy, null, true);
     }     
-    
     
     //CHECKSTYLE:OFF
     private static Endpoint createSTSEndpoint(Bus bus, 
