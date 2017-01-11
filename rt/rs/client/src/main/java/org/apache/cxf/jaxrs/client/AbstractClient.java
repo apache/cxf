@@ -647,8 +647,10 @@ public abstract class AbstractClient implements Client {
         String reqURIPath = requestURI.getRawPath();
         
         UriBuilder builder = new UriBuilderImpl().uri(newBaseURI);
-        String basePath = reqURIPath.startsWith(baseURIPath) ? baseURIPath : getBaseURI().getRawPath(); 
-        builder.path(reqURIPath.equals(basePath) ? "" : reqURIPath.substring(basePath.length()));
+        String basePath = reqURIPath.startsWith(baseURIPath) ? baseURIPath : getBaseURI().getRawPath();
+        String relativePath = reqURIPath.equals(basePath) ? ""
+                : reqURIPath.startsWith(basePath) ? reqURIPath.substring(basePath.length()) : reqURIPath;
+        builder.path(relativePath);
         
         String newQuery = newBaseURI.getRawQuery();
         if (newQuery == null) {
