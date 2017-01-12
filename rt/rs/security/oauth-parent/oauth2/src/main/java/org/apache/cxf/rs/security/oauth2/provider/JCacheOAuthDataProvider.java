@@ -183,6 +183,14 @@ public class JCacheOAuthDataProvider extends AbstractOAuthDataProvider {
 
     @Override
     public void close() {
+        
+        clientCache.close();
+        refreshTokenCache.close();
+        if (accessTokenCache != null) {
+            accessTokenCache.close();
+        } else {
+            jwtAccessTokenCache.close();
+        }
         cacheManager.close();
     }
 
