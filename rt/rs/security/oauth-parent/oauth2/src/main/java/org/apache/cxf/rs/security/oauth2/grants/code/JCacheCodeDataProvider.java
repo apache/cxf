@@ -123,4 +123,10 @@ public class JCacheCodeDataProvider extends JCacheOAuthDataProvider
     protected static boolean isExpired(ServerAuthorizationCodeGrant grant) {
         return System.currentTimeMillis() < (grant.getIssuedAt() + grant.getExpiresIn());
     }
+    
+    @Override
+    public void close() {
+        grantCache.close();
+        super.close();
+    }
 }
