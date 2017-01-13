@@ -114,7 +114,7 @@ public abstract class AbstractOAuthService {
      */
     protected void checkTransportSecurity() {  
         if (!mc.getSecurityContext().isSecure()) {
-            LOG.warning("Unsecure HTTP, Transport Layer Security is recommended");
+            LOG.warning("Unsecure HTTP, HTTPS is recommended");
             if (blockUnsecureRequests) {
                 throw ExceptionUtils.toBadRequestException(null, null);    
             }
