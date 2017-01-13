@@ -74,7 +74,7 @@ public class WadlGeneratorJsonTest extends Assert {
         m.put(Message.PROTOCOL_HEADERS, headers);
         
         WadlGenerator wg = new WadlGenerator() {
-            public void filter(ContainerRequestContext context) {
+            @Override public void filter(ContainerRequestContext context) {
                 super.doFilter(context, m);
             }
         };

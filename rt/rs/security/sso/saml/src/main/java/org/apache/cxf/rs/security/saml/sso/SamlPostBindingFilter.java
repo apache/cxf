@@ -56,6 +56,7 @@ public class SamlPostBindingFilter extends AbstractServiceProviderFilter {
         this.useDeflateEncoding = useDeflateEncoding;
     }
     
+    @Override
     public void filter(ContainerRequestContext context) {
         Message m = JAXRSUtils.getCurrentMessage();
         if (checkSecurityContext(m)) {

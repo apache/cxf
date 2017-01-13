@@ -78,6 +78,8 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
     private boolean allPermissionsMatch;
     private boolean blockPublicClients;
     private AuthenticationMethod am;
+
+    @Override
     public void filter(ContainerRequestContext context) {
         validateRequest(JAXRSUtils.getCurrentMessage());
     }    
