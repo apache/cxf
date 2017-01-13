@@ -295,7 +295,7 @@ public class BookStore {
     public Response patchBook(Book book) {
         if (book.getName().equals("Timeout")) {
             try {
-                Thread.sleep(25000);
+                Thread.sleep(4000);
             } catch (InterruptedException e) {
             }
             return Response.ok(book).build();
