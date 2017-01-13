@@ -973,9 +973,10 @@ public abstract class AbstractClient implements Client {
             m.put(Message.REQUEST_URI, requestURIProperty.toString());
         }
         
-        m.put(Message.CONTENT_TYPE, headers.getFirst(HttpHeaders.CONTENT_TYPE));
+        String ct = headers.getFirst(HttpHeaders.CONTENT_TYPE);
+        m.put(Message.CONTENT_TYPE, ct);
         
-        body = checkIfBodyEmpty(body);
+        body = checkIfBodyEmpty(body, ct);
         setEmptyRequestPropertyIfNeeded(m, body);    
         
         m.setContent(List.class, getContentsList(body));
@@ -1020,12 +1021,13 @@ public abstract class AbstractClient implements Client {
     }
 
     
-    protected Object checkIfBodyEmpty(Object body) {
+    protected Object checkIfBodyEmpty(Object body, String contentType) {
         //CHECKSTYLE:OFF
         if (body != null 
             && (body.getClass() == String.class && ((String)body).length() == 0 
             || body.getClass() == Form.class && ((Form)body).asMap().isEmpty()
-            || Map.class.isAssignableFrom(body.getClass()) && ((Map<?, ?>)body).isEmpty() 
+            || Map.class.isAssignableFrom(body.getClass()) && ((Map<?, ?>)body).isEmpty()
+                && !MediaType.APPLICATION_JSON.equals(contentType)
             || body instanceof byte[] && ((byte[])body).length == 0)) {
             body = null;
         }
