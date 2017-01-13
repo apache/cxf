@@ -293,7 +293,15 @@ public class BookStore {
     @Produces("application/xml")
     @Consumes("application/xml")
     public Response patchBook(Book book) {
-        return Response.ok(book).build();
+        if (book.getName().equals("Timeout")) {
+            try {
+                Thread.sleep(25000);
+            } catch (InterruptedException e) {
+            }
+            return Response.ok(book).build();
+        } else {
+            return Response.ok(book).build();
+        }
     }
     
     @DELETE
