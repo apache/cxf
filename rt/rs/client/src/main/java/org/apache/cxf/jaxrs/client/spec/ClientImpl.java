@@ -46,6 +46,7 @@ import org.apache.cxf.jaxrs.client.ClientProviderFactory;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.model.FilterProviderInfo;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.https.SSLUtils;
 
 public class ClientImpl implements Client {
@@ -54,6 +55,7 @@ public class ClientImpl implements Client {
     private static final String HTTP_PROXY_SERVER_PROP = "http.proxy.server.uri";
     private static final String HTTP_PROXY_SERVER_PORT_PROP = "http.proxy.server.port";
     private static final String HTTP_AUTOREDIRECT_PROP = "http.autoredirect";
+    private static final String HTTP_MAINTAIN_SESSION_PROP = "http.maintain.session";
     private static final String HTTP_RESPONSE_AUTOCLOSE_PROP = "http.response.stream.auto.close";
     private static final String THREAD_SAFE_CLIENT_PROP = "thread.safe.client";
     private static final String THREAD_SAFE_CLIENT_STATE_CLEANUP_PROP = "thread.safe.client.state.cleanup.period";
@@ -326,6 +328,10 @@ public class ClientImpl implements Client {
             Boolean autoRedirectValue = getBooleanValue(configProps.get(HTTP_AUTOREDIRECT_PROP));
             if (autoRedirectValue != null) {
                 clientCfg.getHttpConduit().getClient().setAutoRedirect(autoRedirectValue);
+            }
+            Boolean mantainSessionValue = getBooleanValue(configProps.get(HTTP_MAINTAIN_SESSION_PROP));
+            if (mantainSessionValue != null) {
+                clientCfg.getRequestContext().put(Message.MAINTAIN_SESSION, mantainSessionValue);
             }
         }
 
