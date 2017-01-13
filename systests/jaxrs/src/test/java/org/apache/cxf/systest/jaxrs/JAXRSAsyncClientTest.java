@@ -52,10 +52,12 @@ import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.xml.ws.Holder;
 
+import org.apache.cxf.jaxrs.client.ClientConfiguration;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -101,6 +103,24 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         Book book = wc.invoke("PATCH", new Book("Patch", 123L), Book.class);
         assertEquals("Patch", book.getName());
         wc.close();
+    }
+    
+    @Test
+    public void testPatchBookTimeout() throws Exception {
+        String address = "http://localhost:" + PORT + "/bookstore/patch";
+        WebClient wc = WebClient.create(address);
+        wc.type("application/xml");
+        ClientConfiguration clientConfig = WebClient.getConfig(wc);
+        clientConfig.getRequestContext().put("use.async.http.conduit", true);
+        HTTPClientPolicy clientPolicy = clientConfig.getHttpConduit().getClient();
+        clientPolicy.setReceiveTimeout(15000);
+        clientPolicy.setConnectionTimeout(15000);
+        try {
+            Book book = wc.invoke("PATCH", new Book("Timeout", 123L), Book.class);
+            fail("should throw an exception due to timeout");
+        } catch (javax.ws.rs.ProcessingException e) {
+            //expected!!!
+        }
     }
     
     @Test
