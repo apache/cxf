@@ -114,8 +114,8 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         ClientConfiguration clientConfig = WebClient.getConfig(wc);
         clientConfig.getRequestContext().put("use.async.http.conduit", true);
         HTTPClientPolicy clientPolicy = clientConfig.getHttpConduit().getClient();
-        clientPolicy.setReceiveTimeout(2000);
-        clientPolicy.setConnectionTimeout(2000);
+        clientPolicy.setReceiveTimeout(500);
+        clientPolicy.setConnectionTimeout(500);
         try {
             Book book = wc.invoke("PATCH", new Book("Timeout", 123L), Book.class);
             fail("should throw an exception due to timeout");
