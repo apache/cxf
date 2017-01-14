@@ -276,6 +276,17 @@
         <bundle start-level="35">mvn:com.fasterxml.jackson.jaxrs/jackson-jaxrs-base/${cxf.jackson.version}</bundle>
         <bundle start-level="35">mvn:com.fasterxml.jackson.jaxrs/jackson-jaxrs-json-provider/${cxf.jackson.version}</bundle>
     </feature>
+    <feature name="cxf-jsr-json" version="${project.version}">
+        <bundle start-level="35">mvn:javax.json/javax.json-api/${cxf.json.api.version}</bundle>
+        <bundle start-level="35">mvn:org.glassfish/javax.json/${cxf.glassfish.json.version}</bundle>
+    </feature>
+    <feature name="cxf-tracing-brave" version="${project.version}">
+        <bundle start-level="35">mvn:io.zipkin.java/zipkin/1.16.2</bundle>
+        <bundle start-level="35">mvn:io.zipkin.reporter/zipkin-reporter/0.6.9</bundle>
+        <bundle start-level="35">mvn:io.zipkin.brave/brave-core/${cxf.brave.version}</bundle>
+        <bundle start-level="35">mvn:io.zipkin.brave/brave-http/${cxf.brave.version}</bundle>
+        <bundle start-level="40">mvn:org.apache.cxf/cxf-integration-tracing-brave/${project.version}</bundle>
+    </feature>
     <feature name="cxf-rs-description-swagger2" version="${project.version}">
         <feature version="${project.version}">cxf-jaxrs</feature>
         <feature version="${project.version}">cxf-jackson</feature>

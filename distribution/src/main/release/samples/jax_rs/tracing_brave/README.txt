@@ -1,7 +1,7 @@
-JAX-RS HTrace Demo 
+JAX-RS Brave/OpenZipkin Tracing Demo 
 =================
 
-The demo shows a basic usage of HTrace distributed tracer with REST based 
+The demo shows a basic usage of Brave/OpenZipkin distributed tracer with REST based 
 Web Services using  JAX-RS 2.0 (JSR-339). The REST server provides the 
 following services: 
 

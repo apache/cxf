@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.tracing.brave.jaxrs;
 
+import java.util.UUID;
+
 import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.FeatureContext;
 
@@ -27,7 +29,7 @@ public class BraveFeature implements Feature {
     private final Brave brave;
     
     public BraveFeature() {
-        this("");
+        this("cxf-svc-" + UUID.randomUUID().toString());
     }
     
     public BraveFeature(final String name) {

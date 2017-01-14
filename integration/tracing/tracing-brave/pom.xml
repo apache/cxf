@@ -20,7 +20,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cxf-integration-tracing-brave</artifactId>
-    <packaging>jar</packaging>
+    <packaging>bundle</packaging>
     <name>Apache CXF Distributed Tracing using OpenZipkin Brave</name>
     <description>Apache CXF Distributed using OpenZipkin Brave</description>
     <url>http://cxf.apache.org</url>
@@ -33,7 +33,9 @@
     
     <properties>
         <cxf.osgi.export>
-            org.apache.cxf.tracing
+            org.apache.cxf.tracing,
+            org.apache.cxf.tracing.brave,
+            org.apache.cxf.tracing.brave.jaxrs
         </cxf.osgi.export>
     </properties>
     
