@@ -278,7 +278,7 @@
     </feature>
     <feature name="cxf-jsr-json" version="${project.version}">
         <bundle start-level="35">mvn:javax.json/javax.json-api/${cxf.json.api.version}</bundle>
-        <bundle start-level="35">mvn:org.glassfish/javax.json/${cxf.glassfish.json.version}</bundle>
+        <bundle start-level="35">mvn:org.apache.johnzon/johnzon-core/${cxf.johnzon.version}</bundle>
     </feature>
     <feature name="cxf-tracing-brave" version="${project.version}">
         <bundle start-level="35">mvn:io.zipkin.java/zipkin/1.16.2</bundle>

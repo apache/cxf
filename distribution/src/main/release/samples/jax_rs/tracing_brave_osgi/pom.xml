@@ -70,8 +70,8 @@
             <artifactId>javax.json-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.glassfish</groupId>
-            <artifactId>javax.json</artifactId>
+            <groupId>org.apache.johnzon</groupId>
+            <artifactId>johnzon-core</artifactId>
         </dependency>
         <dependency>
             <groupId>commons-httpclient</groupId>
@@ -104,6 +104,7 @@
                             org.apache.cxf.tracing.brave.jaxrs,
                             org.osgi.service.blueprint,
                             javax.annotation;version="[1.2,2)",
+                            org.apache.johnzon.core,
                             *
                         </Import-Package>
                         <Export-Package>

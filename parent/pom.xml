@@ -172,6 +172,7 @@
         <cxf.osgi.validation.api.version>1.1.0</cxf.osgi.validation.api.version>
         <cxf.hibernate.validator.version>5.2.2.Final</cxf.hibernate.validator.version>
         <cxf.glassfish.json.version>1.0.4</cxf.glassfish.json.version>
+        <cxf.johnzon.version>1.0.0</cxf.johnzon.version>
         <cxf.javax.el.version>3.0.0</cxf.javax.el.version>
         <!-- various OSGi related versions -->
         <cxf.aries.version>1.0.0</cxf.aries.version>
@@ -945,6 +946,12 @@
                 <groupId>org.glassfish</groupId>
                 <artifactId>javax.json</artifactId>
                 <version>${cxf.glassfish.json.version}</version>
+                <optional>true</optional>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.johnzon</groupId>
+                <artifactId>johnzon-core</artifactId>
+                <version>${cxf.johnzon.version}</version>
                 <optional>true</optional>
             </dependency>
             <dependency>
