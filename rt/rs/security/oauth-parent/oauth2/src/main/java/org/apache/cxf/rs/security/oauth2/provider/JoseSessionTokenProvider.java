@@ -124,7 +124,7 @@ public class JoseSessionTokenProvider implements SessionAuthenticityTokenProvide
         String stateString = jwe.decrypt(sessionToken).getContentText();
         JwsSignatureVerifier jws = getInitializedSigVerifier();
         if (jws != null) {
-            stateString = JwsUtils.verify(jws, stateString).getUnsignedEncodedSequence();
+            stateString = JwsUtils.verify(jws, stateString).getDecodedJwsPayload();
         }
         return stateString;
     }
