@@ -116,7 +116,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         clientPolicy.setReceiveTimeout(2000);
         clientPolicy.setConnectionTimeout(2000);
         try {
-            Book book = wc.invoke("PATCH", new Book("Timeout", 123L), Book.class);
+            wc.invoke("PATCH", new Book("Timeout", 123L), Book.class);
             fail("should throw an exception due to timeout");
         } catch (javax.ws.rs.ProcessingException e) {
             //expected!!!
