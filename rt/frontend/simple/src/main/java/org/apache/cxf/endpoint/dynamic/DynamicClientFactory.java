@@ -606,7 +606,11 @@ public class DynamicClientFactory {
         
         javaCompiler.setClassPath(classPath);
         javaCompiler.setOutputDir(dest);
-        javaCompiler.setTarget("1.6");
+        if (System.getProperty("java.version").startsWith("9")) {
+            javaCompiler.setTarget("9");
+        } else {
+            javaCompiler.setTarget("1.6");
+        }
         
         return javaCompiler.compileFiles(srcList); 
     }

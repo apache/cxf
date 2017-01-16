@@ -130,7 +130,7 @@ public class CryptoUtilsTest extends Assert {
         // compare tokens
         compareAccessTokens(token, token2);
     }
-    
+   
     @Test
     public void testBearerTokenJSONCertificate() throws Exception {
         if ("IBM Corporation".equals(System.getProperty("java.vendor"))) {
@@ -188,6 +188,7 @@ public class CryptoUtilsTest extends Assert {
         assertEquals("id", c2.getSubject().getId());
     }
     
+        
     @Test
     public void testCodeGrantJSON() throws Exception {
         Client c = new Client("client", "secret", true);

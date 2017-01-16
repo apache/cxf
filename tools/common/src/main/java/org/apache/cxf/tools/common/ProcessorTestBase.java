@@ -49,6 +49,7 @@ import org.apache.cxf.tools.util.ToolsStaxUtils;
 import org.apache.ws.commons.schema.constants.Constants;
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.ComparisonFailure;
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
@@ -88,6 +89,13 @@ public class ProcessorTestBase extends Assert {
             a = qnameAtts.get(element);
         }
         a.add(local);
+    }
+    
+    @Before
+    public void setUp() throws Exception {
+        if (System.getProperty("java.version").startsWith("9")) {
+            System.setProperty("org.apache.cxf.common.util.Compiler-fork", "true");
+        }
     }
 
     @After

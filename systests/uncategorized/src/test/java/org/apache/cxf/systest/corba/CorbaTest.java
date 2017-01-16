@@ -88,6 +88,9 @@ public class CorbaTest extends AbstractBusClientServerTestBase {
             port.pingMe("USER");
         } catch (PingMeFault pe) {
             return;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
         }
         fail("Didn't catch an exception");
     }

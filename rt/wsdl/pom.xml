@@ -85,6 +85,8 @@
                             <goal>xsdtojava-tests</goal>
                         </goals>
                         <configuration>
+                            <fork>${cxf.xjcplugin.forkmode}</fork>
+                            <additionalJvmArgs>${cxf.xjc.jvmArgs}</additionalJvmArgs>
                             <testSourceRoot>${basedir}/target/generated/src/test/java</testSourceRoot>
                             <xsdOptions>
                                 <xsdOption>

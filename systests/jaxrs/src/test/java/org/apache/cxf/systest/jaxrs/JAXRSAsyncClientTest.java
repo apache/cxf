@@ -185,7 +185,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testNonExistent() throws Exception {
-        String address = "http://localhostt/bookstore";
+        String address = "http://168.168.168.168/bookstore";
         List<Object> providers = new ArrayList<Object>();
         providers.add(new TestResponseFilter());
         WebClient wc =  WebClient.create(address, providers);
@@ -203,7 +203,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
     }
     @Test
     public void testNonExistentJaxrs20WithGet() throws Exception {
-        String address = "http://localhostt/bookstore";
+        String address = "http://168.168.168.168/bookstore";
         Client c = ClientBuilder.newClient();
         c.register(new TestResponseFilter());
         WebTarget t1 = c.target(address);
@@ -223,7 +223,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
     @Test
     public void testNonExistentJaxrs20WithPost() throws Exception {
         Client client = ClientBuilder.newClient();
-        WebTarget target = client.target("http://test.test/");
+        WebTarget target = client.target("http://168.168.168.168/");
         Invocation.Builder builder = target.request();
         Entity<String> entity = Entity.entity("entity", MediaType.WILDCARD_TYPE);
         Invocation invocation = builder.buildPost(entity);

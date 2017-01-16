@@ -207,7 +207,7 @@ public abstract class AbstractJMSTester extends Assert {
 
     protected void waitForReceiveInMessage() {
         int waitTime = 0;
-        while (inMessage == null && waitTime < MAX_RECEIVE_TIME) {
+        while (inMessage == null && waitTime < MAX_RECEIVE_TIME * 10) {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {

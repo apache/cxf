@@ -88,6 +88,7 @@ public class CorbaTimeoutTest extends AbstractBusClientServerTestBase {
         } finally {
             System.getProperties().remove("org.omg.CORBA.ORBClass");
             System.getProperties().remove("org.omg.CORBA.ORBSingletonClass");
+            System.setProperty("org.omg.CORBA.ORBClass", "com.sun.corba.se.impl.orb.ORBImpl");
         }
     }
 

@@ -259,6 +259,9 @@ public class AegisClientServerTest extends AbstractBusClientServerTestBase {
           
     @Test
     public void testDynamicClient() throws Exception {
+        if (System.getProperty("java.version").startsWith("9")) {
+            System.setProperty("org.apache.cxf.common.util.Compiler-fork", "true");
+        }
         DynamicClientFactory dcf = DynamicClientFactory.newInstance();
         Client client = dcf.createClient("http://localhost:" + PORT + "/jaxwsAndAegisSports?wsdl&dynamic");
 

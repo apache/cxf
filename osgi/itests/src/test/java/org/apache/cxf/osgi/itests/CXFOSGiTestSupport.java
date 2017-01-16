@@ -28,6 +28,7 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.net.DatagramSocket;
 import java.net.ServerSocket;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -93,6 +94,14 @@ public class CXFOSGiTestSupport {
     public TestProbeBuilder probeConfiguration(TestProbeBuilder probe) {
         probe.setHeader(Constants.DYNAMICIMPORT_PACKAGE, "*,org.apache.felix.service.*;status=provisional");
         return probe;
+    }
+
+    public File getConfigFile(String path) {
+        URL res = this.getClass().getResource(path);
+        if (res == null) {
+            throw new RuntimeException("Config resource " + path + " not found");
+        }
+        return new File(res.getFile());
     }
 
     private static String getKarafVersion() {

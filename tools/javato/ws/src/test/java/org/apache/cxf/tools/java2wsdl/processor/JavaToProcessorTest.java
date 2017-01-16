@@ -75,6 +75,10 @@ public class JavaToProcessorTest extends ProcessorTestBase {
 
         classPath = System.getProperty("java.class.path");
         System.setProperty("java.class.path", getClassPath());
+        if (System.getProperty("java.version").startsWith("9")) {
+            System.setProperty("org.apache.cxf.common.util.Compiler-fork", "true");
+        }
+
     }
     @After
     public void tearDown() {

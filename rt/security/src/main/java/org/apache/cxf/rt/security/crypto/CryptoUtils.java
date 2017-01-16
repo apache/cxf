@@ -520,7 +520,12 @@ public final class CryptoUtils {
                 result = c.doFinal(bytes);
             } else {
                 if (blockSize == -1) {
-                    blockSize = secretKey instanceof PublicKey ? 117 : 128;
+                    if (System.getProperty("java.version").startsWith("9")) {
+                        //the default block size is 256 when use private key under java9
+                        blockSize = secretKey instanceof PublicKey ? 117 : 256;
+                    } else {
+                        blockSize = secretKey instanceof PublicKey ? 117 : 128;
+                    }
                 }
                 boolean updateRequired = keyProps != null && keyProps.getAdditionalData() != null;
                 int offset = 0;
