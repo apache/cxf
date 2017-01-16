@@ -41,7 +41,8 @@ public class SamlFormInHandler extends AbstractSamlBase64InHandler {
     
     public SamlFormInHandler() {
     }
-    
+
+    @Override
     public void filter(ContainerRequestContext context) {
         Message message = JAXRSUtils.getCurrentMessage();
         

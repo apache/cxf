@@ -90,6 +90,7 @@ public class ServerProviderFactoryTest extends Assert {
     @PreMatching
     private static class TestHandler implements ContainerRequestFilter {
 
+        @Override
         public void filter(ContainerRequestContext context) {
             // complete
         }

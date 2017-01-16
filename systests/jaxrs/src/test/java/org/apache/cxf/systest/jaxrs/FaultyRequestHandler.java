@@ -31,6 +31,7 @@ public class FaultyRequestHandler implements ContainerRequestFilter {
     @Context
     private UriInfo uriInfo;
     
+    @Override
     public void filter(ContainerRequestContext context) {
         if (uriInfo.getPath().endsWith("/propogateExceptionVar/1")) {
             MultivaluedMap<String, String> vars = uriInfo.getPathParameters();
