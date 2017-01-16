@@ -29,6 +29,7 @@ import org.apache.cxf.message.Message;
 @PreMatching
 public class XmlSigInHandler extends AbstractXmlSigInHandler implements ContainerRequestFilter {
     
+    @Override
     public void filter(ContainerRequestContext context) {
         Message message = JAXRSUtils.getCurrentMessage();
         

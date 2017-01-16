@@ -54,7 +54,8 @@ public class Saml2BearerAuthHandler extends AbstractSamlInHandler {
     public void setSamlOAuthValidator(SamlOAuthValidator validator) {
         samlOAuthValidator = validator;
     }
-    
+
+    @Override
     public void filter(ContainerRequestContext context) {
         Message message = JAXRSUtils.getCurrentMessage();
         Form form = readFormData(message);

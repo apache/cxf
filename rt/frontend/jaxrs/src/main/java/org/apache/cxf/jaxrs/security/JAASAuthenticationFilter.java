@@ -104,7 +104,8 @@ public class JAASAuthenticationFilter implements ContainerRequestFilter {
     protected CallbackHandler getCallbackHandler(String name, String password) {
         return new NamePasswordCallbackHandler(name, password);
     }
-    
+
+    @Override
     public void filter(ContainerRequestContext context) {
         Message m = JAXRSUtils.getCurrentMessage();
         try {

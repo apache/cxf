@@ -40,6 +40,7 @@ import org.apache.cxf.security.SecurityContext;
 @PreMatching
 public class OAuthRequestFilter extends AbstractAuthFilter implements ContainerRequestFilter {
     
+    @Override
     public void filter(ContainerRequestContext context) {
         try {
             Message m = JAXRSUtils.getCurrentMessage();
