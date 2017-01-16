@@ -35,6 +35,7 @@ public class ClaimsAuthorizingFilter implements ContainerRequestFilter {
 
     private ClaimsAuthorizingInterceptor interceptor = new ClaimsAuthorizingInterceptor();
     
+    @Override
     public void filter(ContainerRequestContext context) {
         Message message = JAXRSUtils.getCurrentMessage();
         try {

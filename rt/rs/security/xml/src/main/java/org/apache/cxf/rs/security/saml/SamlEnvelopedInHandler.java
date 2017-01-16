@@ -48,6 +48,7 @@ public class SamlEnvelopedInHandler extends AbstractSamlInHandler {
     public SamlEnvelopedInHandler() {
     }
     
+    @Override
     public void filter(ContainerRequestContext context) {
         Message message = JAXRSUtils.getCurrentMessage();
         String method = (String)message.get(Message.HTTP_REQUEST_METHOD);

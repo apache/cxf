@@ -69,6 +69,7 @@ public class KerberosAuthenticationFilter implements ContainerRequestFilter {
     private String servicePrincipalName;
     private String realm;
     
+    @Override
     public void filter(ContainerRequestContext context) {
         
         List<String> authHeaders = messageContext.getHttpHeaders()
