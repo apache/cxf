@@ -737,7 +737,7 @@ public class ClientImpl
         if (endpoint.getService().getDataBinding() instanceof InterceptorProvider) {
             InterceptorProvider p = (InterceptorProvider)endpoint.getService().getDataBinding();
             if (LOG.isLoggable(Level.FINE)) {
-                LOG.fine("Interceptors contributed by databinging: " + p.getInInterceptors());
+                LOG.fine("Interceptors contributed by databinding: " + p.getInInterceptors());
             }
             chain = inboundChainCache.get(pm.getInPhases(), i1, i2, i3, i4,
                                           p.getInInterceptors());
