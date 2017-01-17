@@ -268,4 +268,16 @@
             </exclusions>
         </dependency>
     </dependencies>
+    <profiles>
+        <profile>
+            <id>java9</id>
+            <properties>
+                <cxf.surefire.fork.vmargs>-Djdk.http.auth.tunneling.disabledSchemes="" -ea --patch-module java.annotations.common=${project.basedir}/target/java9/javax.annotation-api-1.2.jar --patch-module java.transaction=${project.basedir}/target/java9 --add-exports=java.xml.bind/com.sun.xml.internal.bind.v2.runtime=ALL-UNNAMED --add-exports=java.base/java.io=ALL-UNNAMED --add-opens java.xml.bind/com.sun.xml.internal.bind.api=ALL-UNNAMED --add-opens jdk.xml.bind/com.sun.tools.internal.xjc.reader.internalizer=ALL-UNNAMED --add-opens jdk.xml.bind/com.sun.tools.internal.xjc.api.impl.s2j=ALL-UNNAMED --add-opens java.xml.ws/javax.xml.ws=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED --add-opens java.xml.ws/javax.xml.ws.wsaddressing=ALL-UNNAMED --add-opens jdk.xml.bind/com.sun.codemodel.internal=ALL-UNNAMED --add-opens java.base/java.security=ALL-UNNAMED --add-opens java.base/java.net=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.util.concurrent=ALL-UNNAMED --add-exports=java.base/sun.security.util=ALL-UNNAMED --add-exports=java.xml/com.sun.org.apache.xerces.internal.impl.xs=ALL-UNNAMED --add-exports=java.base/sun.reflect.generics.reflectiveObjects=ALL-UNNAMED --add-exports=java.xml/com.sun.org.apache.xerces.internal.impl.xs.util=ALL-UNNAMED --add-exports=java.xml/com.sun.org.apache.xerces.internal.jaxp=ALL-UNNAMED --add-exports=java.xml/com.sun.org.apache.xerces.internal.dom=ALL-UNNAMED --add-exports=java.xml.bind/com.sun.xml.internal.bind.marshaller=ALL-UNNAMED --add-exports=java.xml/com.sun.org.apache.xml.internal.resolver=ALL-UNNAMED --add-exports=java.xml/com.sun.org.apache.xml.internal.resolver.tools=ALL-UNNAMED --add-exports=java.xml.ws/com.sun.xml.internal.messaging.saaj.soap=ALL-UNNAMED --add-exports=jdk.xml.bind/com.sun.tools.internal.xjc.api.impl.s2j=ALL-UNNAMED --add-exports=jdk.xml.bind/com.sun.tools.internal.xjc=ALL-UNNAMED --add-exports=jdk.xml.bind/com.sun.tools.internal.xjc.api=ALL-UNNAMED --add-exports=jdk.xml.bind/com.sun.codemodel.internal=ALL-UNNAMED --add-exports=jdk.xml.bind/com.sun.codemodel.internal.writer=ALL-UNNAMED --add-exports=java.corba/com.sun.corba.se.impl.corba=ALL-UNNAMED --add-modules java.corba,java.activation,java.xml.bind,java.xml.ws,jdk.xml.bind</cxf.surefire.fork.vmargs>
+            </properties>
+            <activation>
+                <jdk>9</jdk>
+            </activation>
+        </profile>
+    </profiles>
+
 </project>

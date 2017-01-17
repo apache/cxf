@@ -34,6 +34,7 @@
   <properties>
     <hibernate.em.version>4.1.0.Final</hibernate.em.version>
     <hsqldb.version>1.8.0.10</hsqldb.version>
+    <compilerArguments>-Aopenjpa.source=7 -Aopenjpa.metamodel=true</compilerArguments>
   </properties>
   <dependencies>
     <dependency>
@@ -130,6 +131,14 @@
       <version>${cxf.slf4j.version}</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-jta_1.1_spec</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
+        </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -143,9 +152,9 @@
             <goals>
               <goal>process</goal>
             </goals>
-            <phase>generate-sources</phase>
+            <phase>generate-resources</phase>
             <configuration>
-              <compilerArguments>-Aopenjpa.source=7 -Aopenjpa.metamodel=true</compilerArguments>
+              <compilerArguments>${compilerArguments}</compilerArguments>
               <processors>
                 <processor>org.apache.openjpa.persistence.meta.AnnotationProcessor6</processor>
               </processors>
@@ -200,7 +209,7 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-          <argLine>-javaagent:${project.basedir}/target/openjpa-${cxf.openjpa.version}.jar</argLine>
+          <argLine>-javaagent:${project.basedir}/target/openjpa-${cxf.openjpa.version}.jar ${cxf.surefire.fork.vmargs}</argLine>
           <workingDirectory>${project.basedir}/target</workingDirectory>
         </configuration>
       </plugin>
@@ -258,9 +267,16 @@
                                         <artifactItem>
                                             <groupId>javax.annotation</groupId>
                                             <artifactId>javax.annotation-api</artifactId>
+                                            <version>${cxf.javax.annotation-api.version}</version> 
                                             <type>jar</type>
                                             <overWrite>false</overWrite>
                                             <outputDirectory>${project.basedir}/target/java9</outputDirectory>
+                                        </artifactItem>
+                                        <artifactItem>
+                                            <groupId>org.apache.openjpa</groupId>
+                                            <artifactId>openjpa</artifactId>
+                                            <version>${cxf.openjpa.version}</version>
+                                            <outputDirectory>${project.build.directory}</outputDirectory>
                                         </artifactItem>
                                     </artifactItems>
                                     <overWriteReleases>false</overWriteReleases>
