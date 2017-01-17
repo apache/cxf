@@ -104,8 +104,12 @@ public class StaxInInterceptor extends AbstractPhaseInterceptor<Message> {
                     .getHeader(m, HttpHeaderHelper.CONTENT_LENGTH);
                 List<String> contentTE = HttpHeaderHelper
                     .getHeader(m, HttpHeaderHelper.CONTENT_TRANSFER_ENCODING);
+                List<String> transferEncoding = HttpHeaderHelper
+                    .getHeader(m, HttpHeaderHelper.TRANSFER_ENCODING);
                 if ((StringUtils.isEmpty(contentLen) || "0".equals(contentLen.get(0)))
-                    && StringUtils.isEmpty(contentTE)) {
+                    && StringUtils.isEmpty(contentTE)
+                    && (StringUtils.isEmpty(transferEncoding) 
+                    || !"chunked".equalsIgnoreCase(transferEncoding.get(0)))) {
                     return;
                 }
             }
