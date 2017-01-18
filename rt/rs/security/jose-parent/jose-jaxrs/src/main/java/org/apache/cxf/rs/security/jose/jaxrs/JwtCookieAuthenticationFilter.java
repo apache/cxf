@@ -19,26 +19,23 @@
 package org.apache.cxf.rs.security.jose.jaxrs;
 
 import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.Cookie;
 
 import org.apache.cxf.rs.security.jose.common.JoseException;
 
-public class JwtAuthenticationFilter extends AbstractJwtAuthenticationFilter {
-    private static final String DEFAULT_AUTH_SCHEME = "JWT";
-    private String expectedAuthScheme = DEFAULT_AUTH_SCHEME;
+public class JwtCookieAuthenticationFilter extends AbstractJwtAuthenticationFilter {
+    private static final String DEFAULT_COOKIE_NAME = "access_token";
+    private String cookieName = DEFAULT_COOKIE_NAME;
     
     protected String getEncodedJwtToken(ContainerRequestContext requestContext) {
-        String auth = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
-        String[] parts = auth == null ? null : auth.split(" ");
-        if (parts == null || !expectedAuthScheme.equals(parts[0]) || parts.length != 2) {
-            throw new JoseException(expectedAuthScheme + " scheme is expected");
+        Cookie cookie = requestContext.getCookies().get(cookieName);
+        if (cookie == null || cookie.getValue() == null) {
+            throw new JoseException("JWT cookie is not available");
         }
-        return parts[1];
-    }
-
-    public void setExpectedAuthScheme(String expectedAuthScheme) {
-        this.expectedAuthScheme = expectedAuthScheme;
+        return cookie.getValue();
     }
     
-
+    public void setCookieName(String cookieName) {
+        this.cookieName = cookieName;
+    }
 }
