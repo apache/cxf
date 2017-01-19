@@ -20,7 +20,6 @@ package org.apache.cxf.jaxrs.client;
 
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.Arrays;
@@ -41,6 +40,7 @@ import javax.ws.rs.client.CompletionStageRxInvoker;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.InvocationCallback;
 import javax.ws.rs.client.RxInvoker;
+import javax.ws.rs.client.RxInvokerProvider;
 import javax.ws.rs.client.SyncInvoker;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.EntityTag;
@@ -1277,26 +1277,13 @@ public class WebClient extends AbstractClient implements AsyncClient {
     }
     // Link to JAX-RS 2.1 RxInvoker extensions
     @SuppressWarnings("rawtypes")
-    public <T extends RxInvoker> T rx(Class<T> clazz) {
-        return rx(clazz, (ExecutorService)null);
+    public <T extends RxInvoker> T rx(RxInvokerProvider<T> p) {
+        return rx(p, (ExecutorService)null);
     }
-    @SuppressWarnings({
-     "rawtypes", "unchecked"
-    })
-    public <T extends RxInvoker> T rx(Class<T> clazz, ExecutorService executorService) {
-        if (clazz == CompletionStageRxInvoker.class) {
-            return (T)rx(executorService);
-        } else {
-            String implClassName = clazz.getName() + "Impl";
-            try {
-                Constructor c = ClassLoaderUtils.loadClass(implClassName, WebClient.class)
-                    .getConstructor(AsyncClient.class, ExecutorService.class);
-                return (T)c.newInstance(this, executorService);
-            } catch (Throwable t) {
-                throw new ProcessingException(t);
-            }
-        }
-        
+
+    @SuppressWarnings("rawtypes")
+    public <T extends RxInvoker> T rx(RxInvokerProvider<T> p, ExecutorService execService) {
+        return p.getRxInvoker(new InvocationBuilderImpl(this), execService);
     }
     
     private void setEntityHeaders(Entity<?> entity) {

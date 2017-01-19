@@ -26,6 +26,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
 import javax.ws.rs.HttpMethod;
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.AsyncInvoker;
 import javax.ws.rs.client.CompletionStageRxInvoker;
 import javax.ws.rs.client.Entity;
@@ -34,6 +35,7 @@ import javax.ws.rs.client.Invocation.Builder;
 import javax.ws.rs.client.InvocationCallback;
 import javax.ws.rs.client.NioInvoker;
 import javax.ws.rs.client.RxInvoker;
+import javax.ws.rs.client.RxInvokerProvider;
 import javax.ws.rs.client.SyncInvoker;
 import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Cookie;
@@ -385,18 +387,38 @@ public class InvocationBuilderImpl implements Invocation.Builder {
         return webClient.rx(executorService);
     }
 
+    
     @SuppressWarnings("rawtypes")
     @Override
-    public <T extends RxInvoker> T rx(Class<T> clazz) {
-        return rx(clazz, (ExecutorService)null);
+    public <T extends RxInvoker> T rx(Class<? extends RxInvokerProvider<T>> pClass) {
+        return rx(pClass, (ExecutorService)null);
     }
 
     @SuppressWarnings("rawtypes")
     @Override
-    public <T extends RxInvoker> T rx(Class<T> clazz, ExecutorService executorService) {
-        return webClient.rx(clazz, executorService);
+    public <T extends RxInvoker> T rx(Class<? extends RxInvokerProvider<T>> pClass, ExecutorService execService) {
+        RxInvokerProvider<T> p = null;
+        try {
+            p = pClass.newInstance();
+        } catch (Throwable t) {
+            throw new ProcessingException(t);
+        }
+        return rx(p, execService);
+    }
+    
+    @SuppressWarnings("rawtypes")
+    @Override
+    public <T extends RxInvoker> T rx(RxInvokerProvider<T> p) {
+        return rx(p, (ExecutorService)null);
     }
 
+    @SuppressWarnings("rawtypes")
+    @Override
+    public <T extends RxInvoker> T rx(RxInvokerProvider<T> p, ExecutorService execService) {
+        return p.getRxInvoker(this, execService);
+    }
+    
+    
     @Override
     public NioInvoker nio() {
         // TODO: Implementation required (JAX-RS 2.1)
