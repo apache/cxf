@@ -16,24 +16,26 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
-package org.apache.cxf.rs.security.xml;
+package org.apache.cxf.rs.security.jose.jaxrs;
 
 import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.container.PreMatching;
+import javax.ws.rs.core.Cookie;
 
-import org.apache.cxf.jaxrs.utils.JAXRSUtils;
-import org.apache.cxf.message.Message;
+import org.apache.cxf.rs.security.jose.common.JoseException;
 
-@PreMatching
-public class XmlSigInHandler extends AbstractXmlSigInHandler implements ContainerRequestFilter {
+public class JwtCookieAuthenticationFilter extends AbstractJwtAuthenticationFilter {
+    private static final String DEFAULT_COOKIE_NAME = "access_token";
+    private String cookieName = DEFAULT_COOKIE_NAME;
     
-    @Override
-    public void filter(ContainerRequestContext context) {
-        Message message = JAXRSUtils.getCurrentMessage();
-        
-        checkSignature(message);
-        
+    protected String getEncodedJwtToken(ContainerRequestContext requestContext) {
+        Cookie cookie = requestContext.getCookies().get(cookieName);
+        if (cookie == null || cookie.getValue() == null) {
+            throw new JoseException("JWT cookie is not available");
+        }
+        return cookie.getValue();
+    }
+    
+    public void setCookieName(String cookieName) {
+        this.cookieName = cookieName;
     }
 }

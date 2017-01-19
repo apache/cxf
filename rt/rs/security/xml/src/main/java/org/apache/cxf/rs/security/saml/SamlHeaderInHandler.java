@@ -36,6 +36,7 @@ public class SamlHeaderInHandler extends AbstractSamlBase64InHandler {
     @Context
     private HttpHeaders headers;
     
+    @Override
     public void filter(ContainerRequestContext context) {
         Message message = JAXRSUtils.getCurrentMessage();
         

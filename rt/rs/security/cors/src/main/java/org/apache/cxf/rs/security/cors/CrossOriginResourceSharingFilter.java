@@ -110,6 +110,7 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
         return ReflectionUtil.getAnnotationForMethodOrContainingClass(m,  annClass);
     }
 
+    @Override
     public void filter(ContainerRequestContext context) {
         Message m = JAXRSUtils.getCurrentMessage();
         
@@ -338,6 +339,7 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
         
     }
 
+    @Override
     public void filter(ContainerRequestContext requestContext,
                        ContainerResponseContext responseContext) {
         
