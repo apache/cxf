@@ -31,9 +31,13 @@ import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.jaxws.DispatchImpl;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.systest.ws.common.TestParam;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.transport.http.HTTPConduit;
+import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
@@ -49,6 +53,12 @@ public class SignatureWhitespaceTest extends AbstractBusClientServerTestBase {
 
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
+
+    final TestParam test;
+
+    public SignatureWhitespaceTest(TestParam type) {
+        this.test = type;
+    }
     
     @BeforeClass
     public static void startServers() throws Exception {
@@ -64,12 +74,6 @@ public class SignatureWhitespaceTest extends AbstractBusClientServerTestBase {
                    // set this to false to fork
                    launchServer(SignatureStaxServer.class, true)
         );
-    }
-    
-    final TestParam test;
-    
-    public SignatureWhitespaceTest(TestParam type) {
-        this.test = type;
     }
     
     @org.junit.AfterClass
@@ -111,10 +115,7 @@ public class SignatureWhitespaceTest extends AbstractBusClientServerTestBase {
     
     @org.junit.Test
     public void testTrailingWhitespaceInSOAPBody() throws Exception {
-        // TODO Bug
-        if (STAX_PORT.equals(test.getPort())) {
-            return;
-        }
+
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = SignatureWhitespaceTest.class.getResource("client.xml");
 
@@ -128,6 +129,16 @@ public class SignatureWhitespaceTest extends AbstractBusClientServerTestBase {
 
         Dispatch<StreamSource> dispatch = 
             service.createDispatch(portQName, StreamSource.class, Service.Mode.MESSAGE);
+        
+        Client client = ((DispatchImpl<StreamSource>) dispatch).getClient();
+
+        HTTPConduit http = (HTTPConduit) client.getConduit();
+
+        HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
+        httpClientPolicy.setConnectionTimeout(0);
+        httpClientPolicy.setReceiveTimeout(0);
+        http.setClient(httpClientPolicy);
+
         
         // Creating a DOMSource Object for the request
         
@@ -145,10 +156,7 @@ public class SignatureWhitespaceTest extends AbstractBusClientServerTestBase {
     
     @org.junit.Test
     public void testAddedCommentsInSOAPBody() throws Exception {
-        // TODO Bug
-        if (STAX_PORT.equals(test.getPort())) {
-            return;
-        }
+
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = SignatureWhitespaceTest.class.getResource("client.xml");
 
@@ -176,4 +184,5 @@ public class SignatureWhitespaceTest extends AbstractBusClientServerTestBase {
         StreamSource response = dispatch.invoke(request);
         assertNotNull(response);
     }
+    
 }
