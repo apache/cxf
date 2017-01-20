@@ -35,7 +35,7 @@ public class CatalogStore {
     }
     
     public boolean remove(final String key) throws IOException {
-        return (books.remove(key) != null);
+        return books.remove(key) != null;
     }
     
     public JsonObject get(final String key) throws IOException {

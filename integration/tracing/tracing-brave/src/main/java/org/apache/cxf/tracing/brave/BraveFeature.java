@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.tracing.brave;
 
+import java.util.UUID;
+
 import com.github.kristofa.brave.Brave;
 
 import org.apache.cxf.Bus;
@@ -33,6 +35,14 @@ import org.apache.cxf.interceptor.InterceptorProvider;
 public class BraveFeature extends AbstractFeature {
     private BraveStartInterceptor in;
     private BraveStopInterceptor out;
+
+    public BraveFeature() {
+        this("cxf-svc-" + UUID.randomUUID().toString());
+    }
+    
+    public BraveFeature(final String name) {
+        this(new Brave.Builder(name).build());
+    }
 
     public BraveFeature(Brave brave) {
         in = new BraveStartInterceptor(brave);
