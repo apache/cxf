@@ -32,6 +32,8 @@ import javax.xml.stream.util.StreamReaderDelegate;
 
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
+import org.apache.cxf.binding.soap.interceptor.StartBodyInterceptor;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
@@ -96,6 +98,8 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
         if (soapMessage.containsKey(SECURITY_PROCESSED) || isGET(soapMessage)) {
             return;
         }
+        
+        soapMessage.getInterceptorChain().add(new StaxStartBodyInterceptor());
 
         XMLStreamReader originalXmlStreamReader = soapMessage.getContent(XMLStreamReader.class);
         XMLStreamReader newXmlStreamReader;
@@ -403,5 +407,45 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
         }
     }
+    
+    /**
+     * This interceptor runs after the StartBodyInterceptor. It skips any white space after the SOAP:Body start tag, 
+     * to make sure that the WSS4J OperationInputProcessor is triggered by the first SOAP Body child (if it is not, 
+     * then WS-Security processing does not happen correctly).
+     */
+    private class StaxStartBodyInterceptor extends AbstractSoapInterceptor {
+        
+        StaxStartBodyInterceptor() {
+            super(Phase.READ);
+            super.addAfter(StartBodyInterceptor.class.getName());
+        }
+        
+        StaxStartBodyInterceptor(String phase) {
+            super(phase);
+        }
+
+        /** {@inheritDoc}*/
+        public void handleMessage(SoapMessage message) throws Fault {
+            if (isGET(message)) {
+                LOG.fine("StartBodyInterceptor skipped in HTTP GET method");
+                return;
+            }
+            XMLStreamReader xmlReader = message.getContent(XMLStreamReader.class);
+            try {
+                int i = xmlReader.getEventType();
+                while (i == XMLStreamReader.NAMESPACE
+                    || i == XMLStreamReader.ATTRIBUTE
+                    || i == XMLStreamReader.CHARACTERS) {
+                    i = xmlReader.next();
+                }
+            } catch (XMLStreamException e) {
+                throw new SoapFault(new Message("XML_STREAM_EXC", LOG, e.getMessage()), e, 
+                                    message.getVersion().getSender());
+            }
+
+        }
+
+    }
+
 
 }
