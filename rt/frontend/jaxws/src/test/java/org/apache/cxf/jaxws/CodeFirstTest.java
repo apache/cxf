@@ -464,10 +464,6 @@ public class CodeFirstTest extends AbstractJaxWsTest {
     
     @Test
     public void testCXF1510() throws Exception {
-        if (System.getProperty("java.version").startsWith("9")) {
-            //can't pass with java9 so far
-            return;
-        }
         JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean(); 
         factory.setServiceClass(NoRootBare.class); 
         factory.setServiceBean(new NoRootBareImpl()); 

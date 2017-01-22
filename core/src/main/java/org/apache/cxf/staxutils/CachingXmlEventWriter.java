@@ -182,7 +182,8 @@ public class CachingXmlEventWriter implements XMLStreamWriter {
 
 
     public void writeEndElement() throws XMLStreamException {
-        addEvent(factory.createEndElement(lastStart, Collections.emptyList().iterator()));
+        addEvent(factory.createEndElement(lastStart, 
+                                          Collections.<javax.xml.stream.events.Namespace>emptyList().iterator()));
         curContext = contexts.pop();
         lastStart = elNames.pop();
     }
