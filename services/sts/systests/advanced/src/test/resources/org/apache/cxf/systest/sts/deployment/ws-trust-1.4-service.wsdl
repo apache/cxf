@@ -195,6 +195,28 @@
             </wsdl:output>
         </wsdl:operation>
     </wsdl:binding>
+     <wsdl:binding name="UT_Binding" type="wstrust:STS">
+        <wsp:PolicyReference URI="#UT_policy"/>
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="Issue">
+            <soap:operation soapAction="http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/Issue"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="Validate">
+            <soap:operation soapAction="http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/Validate"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
     <wsdl:service name="SecurityTokenService">
         <wsdl:port name="Transport_Port" binding="tns:Transport_Binding">
             <soap:address location="https://localhost:8084/SecurityTokenService/Transport"/>
@@ -204,6 +226,9 @@
         </wsdl:port>
         <wsdl:port name="Transport_Kerberos_Port" binding="tns:Transport_Kerberos_Binding">
             <soap:address location="https://localhost:8084/SecurityTokenService/Kerberos"/>
+        </wsdl:port>
+        <wsdl:port name="UT_Port" binding="tns:UT_Binding">
+            <soap:address location="https://localhost:8084/SecurityTokenService/UT"/>
         </wsdl:port>
     </wsdl:service>
     <wsp:Policy wsu:Id="Transport_policy">
@@ -304,6 +329,22 @@
                         <sp:RequireServerEntropy/>
                     </wsp:Policy>
                 </sp:Trust13>
+            </wsp:All>
+        </wsp:ExactlyOne>
+    </wsp:Policy>
+    <wsp:Policy wsu:Id="UT_policy">
+        <wsp:ExactlyOne>
+            <wsp:All>
+                <wsap10:UsingAddressing/>
+                <sp:SupportingTokens xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                    <wsp:Policy>
+                        <sp:UsernameToken sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
+                            <wsp:Policy>
+                                <sp:WssUsernameToken10/>
+                            </wsp:Policy>
+                        </sp:UsernameToken>
+                    </wsp:Policy>
+                </sp:SupportingTokens>
             </wsp:All>
         </wsp:ExactlyOne>
     </wsp:Policy>
