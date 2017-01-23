@@ -78,7 +78,7 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
     
     public void handleMessage(Message message) throws Fault {
         Logger logger = getMessageLogger(message);
-        if (writer != null || logger.isLoggable(Level.INFO)) {
+        if (logger != null && (writer != null || logger.isLoggable(Level.INFO))) {
             logging(logger, message);
         }
     }

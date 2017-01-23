@@ -69,7 +69,7 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
             return;
         }
         Logger logger = getMessageLogger(message);
-        if (logger.isLoggable(Level.INFO) || writer != null) {
+        if (logger != null && (logger.isLoggable(Level.INFO) || writer != null)) {
             // Write the output while caching it for the log message
             boolean hasLogged = message.containsKey(LOG_SETUP);
             if (!hasLogged) {
