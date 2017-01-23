@@ -165,6 +165,8 @@ public class ClaimsTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(transportClaimsPort);
         }
         
+        doubleIt(transportClaimsPort, 25);
+        
         ((java.io.Closeable)transportClaimsPort).close();
         bus.shutdown(true);
     }
