@@ -156,16 +156,4 @@
             </plugin>
         </plugins>
     </build>
-    <profiles>
-        <profile>
-            <id>java9</id>
-            <activation>
-                <jdk>9</jdk>
-            </activation>
-            <modules>
-                <module>base</module>
-                <module>cdi-weld</module>
-            </modules>
-        </profile>
-    </profiles>
 </project>
