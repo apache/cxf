@@ -74,7 +74,7 @@ public class WebApplicationExceptionMapper
         
         if (doAddMessage) {
             r = JAXRSUtils.copyResponseIfNeeded(r);
-            r = JAXRSUtils.fromResponse(r).entity(errorMessage).type(MediaType.TEXT_PLAIN).build();
+            r = buildResponse(r, errorMessage);
         }
         return r;
     }
@@ -92,6 +92,14 @@ public class WebApplicationExceptionMapper
             sb.append(", message: ").append(message);
         }
         return sb.toString();
+    }
+
+    protected Response buildResponse(Response response, String responseText) {
+        Response.ResponseBuilder rb = JAXRSUtils.fromResponse(response);
+        if (responseText != null) {
+            rb.type(MediaType.TEXT_PLAIN).entity(responseText);
+        }
+        return rb.build();
     }
     
     /**
