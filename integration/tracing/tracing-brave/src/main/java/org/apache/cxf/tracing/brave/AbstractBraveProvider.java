@@ -50,7 +50,7 @@ public abstract class AbstractBraveProvider extends AbstractTracingProvider {
     
     protected AbstractBraveProvider(final Brave brave, final SpanNameProvider spanNameProvider) {
         this.brave = brave;
-        this.spanNameProvider = new ServerSpanNameProvider();
+        this.spanNameProvider = spanNameProvider;
     }
 
     protected TraceScopeHolder<ServerSpan> startTraceSpan(final Map<String, List<String>> requestHeaders,
