@@ -254,6 +254,7 @@ public class JettyHTTPServerEngine implements ServerEngine {
         return server;
     }
     
+        
     /**
      * Set the jetty server instance 
      * @param s 
@@ -332,9 +333,16 @@ public class JettyHTTPServerEngine implements ServerEngine {
     
     private Server createServer() {
         Server s = null;
+        if (connector != null && connector.getServer() != null) {
+            s = connector.getServer();
+        }
         if (threadPool != null) {
             try {
-                s = new Server(threadPool);
+                if (s == null) {
+                    s = new Server(threadPool);
+                } else {
+                    s.addBean(threadPool);
+                }
             } catch (Exception e) {
                 //ignore
             }

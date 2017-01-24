@@ -28,6 +28,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -44,8 +45,13 @@ import org.apache.cxf.management.InstrumentationManager;
 import org.apache.cxf.testutil.common.TestUtil;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
+import org.eclipse.jetty.server.ConnectionFactory;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.HttpConnectionFactory;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.util.thread.ThreadPool;
@@ -60,6 +66,8 @@ public class JettyHTTPServerEngineTest extends Assert {
         = Integer.valueOf(TestUtil.getPortNumber(JettyHTTPServerEngineTest.class, 2));
     private static final int PORT3 
         = Integer.valueOf(TestUtil.getPortNumber(JettyHTTPServerEngineTest.class, 3));
+    private static final int PORT4 
+        = Integer.valueOf(TestUtil.getPortNumber(JettyHTTPServerEngineTest.class, 4));
     
 
     private Bus bus;
@@ -406,6 +414,41 @@ public class JettyHTTPServerEngineTest extends Assert {
         assertEquals("the jetty http handler did not take effect", response, "test2");
 
         JettyHTTPServerEngineFactory.destroyForPort(PORT3);
+    }
+    
+    @Test
+    public void testSetConnector() throws Exception {
+        URL url = new URL("http://localhost:" + PORT4 + "/hello/test");
+        JettyHTTPTestHandler handler1 = new JettyHTTPTestHandler("string1", true);
+        JettyHTTPTestHandler handler2 = new JettyHTTPTestHandler("string2", true);
+
+        JettyHTTPServerEngine engine = new JettyHTTPServerEngine();
+        engine.setPort(PORT4);
+        Server server = new Server();
+        ServerConnector connector = new ServerConnector(server); 
+        connector.setPort(PORT4);
+        HttpConfiguration httpConfig = new HttpConfiguration();
+        httpConfig.addCustomizer(new org.eclipse.jetty.server.ForwardedRequestCustomizer());
+        HttpConnectionFactory httpFactory = new HttpConnectionFactory(httpConfig);
+        Collection<ConnectionFactory> connectionFactories = new ArrayList<ConnectionFactory>();
+        connectionFactories.add(httpFactory);
+        connector.setConnectionFactories(connectionFactories);
+        engine.setConnector(connector);
+        List<Handler> handlers = new ArrayList<Handler>();
+        handlers.add(handler1);
+        engine.setHandlers(handlers);
+        engine.finalizeConfig();
+
+        engine.addServant(url, handler2);
+        String response = null;
+        try {
+            response = getResponse(url.toString());
+            assertEquals("the jetty http handler1 did not take effect", response, "string1string2");
+        } catch (Exception ex) {
+            fail("Can't get the reponse from the server " + ex);
+        }
+        engine.stop();
+        JettyHTTPServerEngineFactory.destroyForPort(PORT4);
     }
 
     private String getResponse(String target) throws Exception {
