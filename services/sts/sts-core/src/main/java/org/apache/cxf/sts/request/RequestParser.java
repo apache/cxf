@@ -95,6 +95,8 @@ public class RequestParser {
     
     private static final Logger LOG = LogUtils.getL7dLogger(RequestParser.class);
     
+    private boolean allowCustomContent;
+    
     public RequestRequirements parseRequest(
         RequestSecurityTokenType request, Map<String, Object> messageContext, STSPropertiesMBean stsProperties, 
         List<ClaimsParser> claimsParsers
@@ -144,6 +146,8 @@ public class RequestParser {
                         || STSConstants.WSP_NS_04.equals(element.getNamespaceURI()))) {
                     tokenRequirements.setAppliesTo(element);
                     LOG.fine("Found AppliesTo element");
+                } else if (allowCustomContent) {
+                    tokenRequirements.addCustomContent((Element)requestObject);
                 } else {
                     LOG.log(
                         Level.WARNING, 
@@ -753,6 +757,14 @@ public class RequestParser {
             }
         }
         throw new STSException("Cannot retreive token from reference", STSException.REQUEST_FAILED);
+    }
+
+    public boolean isAllowCustomContent() {
+        return allowCustomContent;
+    }
+
+    public void setAllowCustomContent(boolean allowCustomContent) {
+        this.allowCustomContent = allowCustomContent;
     }
 
 }
