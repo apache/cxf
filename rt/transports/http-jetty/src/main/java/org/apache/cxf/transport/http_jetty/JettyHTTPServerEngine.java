@@ -250,6 +250,7 @@ public class JettyHTTPServerEngine implements ServerEngine {
         return server;
     }
     
+        
     /**
      * Set the jetty server instance 
      * @param s 
@@ -328,13 +329,20 @@ public class JettyHTTPServerEngine implements ServerEngine {
     
     private Server createServer() {
         Server s = null;
+        if (connector != null && connector.getServer() != null) {
+            s = connector.getServer();
+        }
         if (threadPool != null) {
             try {
-                if (!Server.getVersion().startsWith("8")) {
-                    s = Server.class.getConstructor(ThreadPool.class).newInstance(threadPool);
+                if (s == null) {
+                    if (!Server.getVersion().startsWith("8")) {
+                        s = Server.class.getConstructor(ThreadPool.class).newInstance(threadPool);
+                    } else {
+                        s = new Server();
+                        Server.class.getMethod("setThreadPool", ThreadPool.class).invoke(s, threadPool);
+                    }
                 } else {
-                    s = new Server();
-                    Server.class.getMethod("setThreadPool", ThreadPool.class).invoke(s, threadPool);
+                    s.addBean(threadPool);
                 }
             } catch (Exception e) {
                 //ignore
