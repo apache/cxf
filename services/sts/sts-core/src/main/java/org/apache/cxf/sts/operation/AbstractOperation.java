@@ -103,7 +103,16 @@ public abstract class AbstractOperation {
     protected STSEventListener eventPublisher;
     protected List<TokenDelegationHandler> delegationHandlers = new ArrayList<>();
     protected TokenWrapper tokenWrapper = new DefaultTokenWrapper();
+    protected boolean allowCustomContent;
     
+    public boolean isAllowCustomContent() {
+        return allowCustomContent;
+    }
+
+    public void setAllowCustomContent(boolean allowCustomContent) {
+        this.allowCustomContent = allowCustomContent;
+    }
+
     public TokenWrapper getTokenWrapper() {
         return tokenWrapper;
     }
@@ -189,6 +198,7 @@ public abstract class AbstractOperation {
         stsProperties.configureProperties();
         
         RequestParser requestParser = new RequestParser();
+        requestParser.setAllowCustomContent(allowCustomContent);
         return requestParser.parseRequest(request, messageContext, stsProperties, 
                                           claimsManager.getClaimParsers());
     }

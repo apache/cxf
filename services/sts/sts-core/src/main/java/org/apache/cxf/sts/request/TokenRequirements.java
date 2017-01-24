@@ -18,7 +18,12 @@
  */
 package org.apache.cxf.sts.request;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.w3c.dom.Element;
+
 import org.apache.cxf.rt.security.claims.ClaimCollection;
 
 /**
@@ -40,6 +45,7 @@ public class TokenRequirements {
     private ClaimCollection secondaryClaims;
     private Renewing renewing;
     private Participants participants;
+    private final List<Element> customContent = new ArrayList<>();
     
     public Renewing getRenewing() {
         return renewing;
@@ -143,6 +149,16 @@ public class TokenRequirements {
 
     public void setParticipants(Participants participants) {
         this.participants = participants;
+    }
+
+    public List<Element> getCustomContent() {
+        return Collections.unmodifiableList(customContent);
+    }
+    
+    public void addCustomContent(Element customElement) {
+        if (customElement != null) {
+            this.customContent.add(customElement);
+        }
     }
 
 }
