@@ -111,6 +111,28 @@ public class JAXRSHttpsBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    @Ignore
+    public void testCustomVerbProxyFromSpringWildcard() throws Exception {
+        ClassPathXmlApplicationContext ctx =
+            new ClassPathXmlApplicationContext(new String[] {CLIENT_CONFIG_FILE4});
+        Object bean = ctx.getBean("bookService.proxyFactory");
+        assertNotNull(bean);
+        JAXRSClientFactoryBean cfb = (JAXRSClientFactoryBean) bean;
+        
+        BookStore bs = cfb.create(BookStore.class);
+        WebClient.getConfig(bs).getRequestContext().put("use.httpurlconnection.method.reflection", true);
+        // CXF RS Client code will set this property to true if the http verb is unknown
+        // and this property is not already set. The async conduit is loaded in the tests module
+        // but we do want to test HTTPUrlConnection reflection hence we set this property to false
+        WebClient.getConfig(bs).getRequestContext().put("use.async.http.conduit", false);
+        
+        Book book = bs.retrieveBook(new Book("Retrieve", 123L));
+        assertEquals("Retrieve", book.getName());
+        
+        ctx.close();
+    }
+    
+    @Test
     public void testGetBook123WebClientFromSpringWildcard() throws Exception {
         ClassPathXmlApplicationContext ctx =
             new ClassPathXmlApplicationContext(new String[] {CLIENT_CONFIG_FILE5});
