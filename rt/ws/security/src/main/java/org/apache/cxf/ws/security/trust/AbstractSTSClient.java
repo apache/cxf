@@ -166,6 +166,7 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
     protected int keySize = 256;
     protected boolean requiresEntropy = true;
     protected Element template;
+    protected Object customContent;
     protected Object claims;
     protected CallbackHandler claimsCallbackHandler;
     protected AlgorithmSuite algorithmSuite;
@@ -393,6 +394,10 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
     
     public void setActAs(Object actAs) {
         this.actAs = actAs;
+    }
+    
+    public void setCustomContent(Object customContent) {
+        this.customContent = customContent;
     }
     
     public void setKeySize(int i) {
@@ -846,6 +851,11 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
         // Write out renewal semantics
         writeRenewalSemantics(writer);
         
+        Element customElement = getCustomContent();
+        if (customElement != null) {
+            StaxUtils.copy(customElement, writer);
+        }
+        
         writer.writeEndElement();
 
         Object obj[] = client.invoke(boi, new DOMSource(writer.getDocument().getDocumentElement()));
@@ -867,23 +877,40 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
         return getDelegationSecurityToken(this.actAs);
     }
     
+    /**
+     * Get some custom Element to be inserted into the RequestSecurityToken
+     */
+    public Element getCustomContent() throws Exception {
+        if (customContent != null) {
+            // We can also support a CallbackHandler her as per getDelegationSecurityToken if required
+            final boolean isString = customContent instanceof String;
+            final boolean isElement = customContent instanceof Element; 
+            if (isString) {
+                final Document doc =
+                    StaxUtils.read(new StringReader((String) customContent));
+                return doc.getDocumentElement();
+            } else if (isElement) {
+                return (Element) customContent;
+            }
+        }
+        return null;
+    }
+    
     protected Element getDelegationSecurityToken(Object delegationObject) throws Exception {
         if (delegationObject != null) {
             final boolean isString = delegationObject instanceof String;
             final boolean isElement = delegationObject instanceof Element; 
             final boolean isCallbackHandler = delegationObject instanceof CallbackHandler;
-            if (isString || isElement || isCallbackHandler) {
-                if (isString) {
-                    final Document doc =
-                        StaxUtils.read(new StringReader((String) delegationObject));
-                    return doc.getDocumentElement();
-                } else if (isElement) {
-                    return (Element) delegationObject;
-                } else {
-                    DelegationCallback callback = new DelegationCallback(message);
-                    ((CallbackHandler)delegationObject).handle(new Callback[]{callback});
-                    return callback.getToken();
-                }
+            if (isString) {
+                final Document doc =
+                    StaxUtils.read(new StringReader((String) delegationObject));
+                return doc.getDocumentElement();
+            } else if (isElement) {
+                return (Element) delegationObject;
+            } else if (isCallbackHandler) {
+                DelegationCallback callback = new DelegationCallback(message);
+                ((CallbackHandler)delegationObject).handle(new Callback[]{callback});
+                return callback.getToken();
             }
         }
         return null;
