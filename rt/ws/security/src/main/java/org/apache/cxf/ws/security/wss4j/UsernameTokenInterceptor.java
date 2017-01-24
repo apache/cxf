@@ -137,7 +137,7 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
                     }
                     
                     if (principal instanceof UsernameTokenPrincipal) {
-                        storeResults((UsernameTokenPrincipal)principal, message);
+                        storeResults((UsernameTokenPrincipal)principal, subject, message);
                     }
                 } catch (WSSecurityException ex) {
                     throw new Fault(ex);
@@ -169,13 +169,18 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
         return context;
     }
     
-    private void storeResults(UsernameTokenPrincipal principal, SoapMessage message) {
+    private void storeResults(UsernameTokenPrincipal principal, Subject subject, SoapMessage message) {
         List<WSSecurityEngineResult> v = new ArrayList<>();
         int action = WSConstants.UT;
         if (principal.getPassword() == null) {
             action = WSConstants.UT_NOPASSWORD;
         }
-        v.add(0, new WSSecurityEngineResult(action, principal, null, null, null));
+        
+        WSSecurityEngineResult result = new WSSecurityEngineResult(action, principal, null, null, null);
+        if (subject != null) {
+            result.put(WSSecurityEngineResult.TAG_SUBJECT, subject);
+        }
+        v.add(0, result);
         List<WSHandlerResult> results = CastUtils.cast((List<?>)message
                                                   .get(WSHandlerConstants.RECV_RESULTS));
         if (results == null) {
