@@ -111,10 +111,9 @@ public class JAXRSHttpsBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
-    @Ignore
     public void testCustomVerbProxyFromSpringWildcard() throws Exception {
         ClassPathXmlApplicationContext ctx =
-            new ClassPathXmlApplicationContext(new String[] {CLIENT_CONFIG_FILE4});
+            new ClassPathXmlApplicationContext(new String[] {CLIENT_CONFIG_FILE3});
         Object bean = ctx.getBean("bookService.proxyFactory");
         assertNotNull(bean);
         JAXRSClientFactoryBean cfb = (JAXRSClientFactoryBean) bean;
