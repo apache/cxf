@@ -35,6 +35,8 @@ import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.logging.Level;
 
+import javax.net.ssl.HttpsURLConnection;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.common.util.SystemPropertyAction;
@@ -149,7 +151,27 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
             }
             if (b) {
                 try {
+                    boolean set = false;
                     java.lang.reflect.Field f = ReflectionUtil.getDeclaredField(HttpURLConnection.class, "method");
+                    if (connection instanceof HttpsURLConnection) {
+                        try {
+                            java.lang.reflect.Field f2 = ReflectionUtil.getDeclaredField(connection.getClass(),
+                                                                                         "delegate");
+                            Object c = ReflectionUtil.setAccessible(f2).get(connection);
+                            if (c instanceof HttpURLConnection) {
+                                ReflectionUtil.setAccessible(f).set(c, httpRequestMethod);
+                            }
+
+                            f2 = ReflectionUtil.getDeclaredField(c.getClass(), "httpsURLConnection");
+                            HttpsURLConnection c2 = (HttpsURLConnection)ReflectionUtil.setAccessible(f2)
+                                    .get(c);
+
+                            ReflectionUtil.setAccessible(f).set(c2, httpRequestMethod);
+                        } catch (Throwable t) {
+                            //ignore
+                            t.printStackTrace();
+                        }
+                    }
                     ReflectionUtil.setAccessible(f).set(connection, httpRequestMethod);
                     message.put(HTTPURL_CONNECTION_METHOD_REFLECTION, true);
                 } catch (Throwable t) {
