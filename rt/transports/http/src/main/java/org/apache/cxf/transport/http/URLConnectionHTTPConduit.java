@@ -151,7 +151,6 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
             }
             if (b) {
                 try {
-                    boolean set = false;
                     java.lang.reflect.Field f = ReflectionUtil.getDeclaredField(HttpURLConnection.class, "method");
                     if (connection instanceof HttpsURLConnection) {
                         try {
