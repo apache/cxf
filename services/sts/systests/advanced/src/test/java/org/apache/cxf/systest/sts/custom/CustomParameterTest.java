@@ -19,6 +19,8 @@
 package org.apache.cxf.systest.sts.custom;
 
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
@@ -26,9 +28,11 @@ import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.rt.security.SecurityConstants;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.systest.sts.common.TokenTestUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.ws.security.trust.STSClient;
 import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.BeforeClass;
 
@@ -69,7 +73,8 @@ public class CustomParameterTest extends AbstractBusClientServerTestBase {
     }
 
     @org.junit.Test
-    public void testCustomParameter() throws Exception {
+    @org.junit.Ignore
+    public void testCustomParameterInRST() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = CustomParameterTest.class.getResource("cxf-client.xml");
@@ -86,6 +91,23 @@ public class CustomParameterTest extends AbstractBusClientServerTestBase {
         updateAddressPort(transportClaimsPort, PORT);
         
         TokenTestUtils.updateSTSPort((BindingProvider)transportClaimsPort, STSPORT);
+        
+        STSClient stsClient = new STSClient(bus);
+        stsClient.setWsdlLocation("https://localhost:" + STSPORT + "/SecurityTokenService/UT?wsdl");
+        stsClient.setServiceName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService");
+        stsClient.setEndpointName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}UT_Port");
+        // Add custom content to the RST
+        stsClient.setCustomContent("<realm xmlns=\"http://cxf.apache.org/custom\">custom-realm</realm>");
+        
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("security.username", "alice");
+        properties.put("security.callback-handler", "org.apache.cxf.systest.sts.common.CommonCallbackHandler");
+        properties.put("security.sts.token.username", "myclientkey");
+        properties.put("security.sts.token.properties", "clientKeystore.properties");
+        properties.put("security.sts.token.usecert", "true");
+        stsClient.setProperties(properties);
+        
+        ((BindingProvider)transportClaimsPort).getRequestContext().put(SecurityConstants.STS_CLIENT, stsClient);
         
         doubleIt(transportClaimsPort, 25);
         
