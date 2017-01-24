@@ -19,7 +19,7 @@
 package org.apache.cxf.transport.http_jetty;
 
 import java.net.URL;
-
+import java.util.Collection;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -27,6 +27,10 @@ import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.transport.DestinationFactory;
 import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.transport.http.HTTPTransportFactory;
+import org.eclipse.jetty.server.ConnectionFactory;
+import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.HttpConnectionFactory;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -124,6 +128,36 @@ public class JettyHTTPServerEngineFactoryTest
         } catch (Exception e) {
             // expect the exception
         }
+    }
+    
+    @Test
+    public void testMakeSureJetty9ConnectorConfigured() throws Exception {
+        
+               
+        URL config = getClass().getResource("server-engine-factory-jetty9-connector.xml");
+        
+        bus = new SpringBusFactory().createBus(config, true);
+        
+        JettyHTTPServerEngineFactory factory =
+            bus.getExtension(JettyHTTPServerEngineFactory.class);
+        
+        assertNotNull("EngineFactory is not configured.", factory);
+        
+        JettyHTTPServerEngine engine = null;
+        engine = factory.createJettyHTTPServerEngine(1234, "http");
+        
+        assertNotNull("Engine is not available.", engine);
+        assertEquals(1234, engine.getPort());
+        assertEquals("Not http", "http", engine.getProtocol());
+        Connector connector = engine.getConnector();
+        Collection<ConnectionFactory> connectionFactories = connector.getConnectionFactories(); 
+        assertEquals("Has one HttpConnectionFactory", 1, connectionFactories.size());
+        ConnectionFactory connectionFactory = connectionFactories.iterator().next();
+        assertTrue(connectionFactory instanceof HttpConnectionFactory);
+        HttpConfiguration httpConfiguration = ((HttpConnectionFactory)connectionFactory).getHttpConfiguration();
+        assertEquals("Has one ForwardedRequestCustomizer", 1, httpConfiguration.getCustomizers().size());
+        assertTrue(httpConfiguration.getCustomizers().iterator().next() 
+                   instanceof org.eclipse.jetty.server.ForwardedRequestCustomizer);
     }
     
     @Test
