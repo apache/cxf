@@ -37,7 +37,7 @@ import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.BeforeClass;
 
 /**
- * This test sends a custom WS-Trust parameter indicating the "realm" of the user, which is interpreted by the
+ * This test sends a custom parameter indicating the "realm" of the user, which is interpreted by the
  * STS's CustomUTValidator.
  */
 public class CustomParameterTest extends AbstractBusClientServerTestBase {
@@ -72,8 +72,8 @@ public class CustomParameterTest extends AbstractBusClientServerTestBase {
         stopAllServers();
     }
 
+    
     @org.junit.Test
-    @org.junit.Ignore
     public void testCustomParameterInRST() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
@@ -96,8 +96,6 @@ public class CustomParameterTest extends AbstractBusClientServerTestBase {
         stsClient.setWsdlLocation("https://localhost:" + STSPORT + "/SecurityTokenService/UT?wsdl");
         stsClient.setServiceName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService");
         stsClient.setEndpointName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}UT_Port");
-        // Add custom content to the RST
-        stsClient.setCustomContent("<realm xmlns=\"http://cxf.apache.org/custom\">custom-realm</realm>");
         
         Map<String, Object> properties = new HashMap<>();
         properties.put("security.username", "alice");
@@ -109,7 +107,60 @@ public class CustomParameterTest extends AbstractBusClientServerTestBase {
         
         ((BindingProvider)transportClaimsPort).getRequestContext().put(SecurityConstants.STS_CLIENT, stsClient);
         
+        // Successful test
+        
+        // Add custom content to the RST
+        stsClient.setCustomContent("<realm xmlns=\"http://cxf.apache.org/custom\">custom-realm</realm>");
         doubleIt(transportClaimsPort, 25);
+        
+        ((java.io.Closeable)transportClaimsPort).close();
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testCustomParameterInRST2() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = CustomParameterTest.class.getResource("cxf-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = CustomParameterTest.class.getResource("DoubleIt.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItTransportCustomParameterPort");
+        DoubleItPortType transportClaimsPort = 
+            service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(transportClaimsPort, PORT);
+        
+        TokenTestUtils.updateSTSPort((BindingProvider)transportClaimsPort, STSPORT);
+        
+        STSClient stsClient = new STSClient(bus);
+        stsClient.setWsdlLocation("https://localhost:" + STSPORT + "/SecurityTokenService/UT?wsdl");
+        stsClient.setServiceName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService");
+        stsClient.setEndpointName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}UT_Port");
+        
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("security.username", "alice");
+        properties.put("security.callback-handler", "org.apache.cxf.systest.sts.common.CommonCallbackHandler");
+        properties.put("security.sts.token.username", "myclientkey");
+        properties.put("security.sts.token.properties", "clientKeystore.properties");
+        properties.put("security.sts.token.usecert", "true");
+        stsClient.setProperties(properties);
+        
+        ((BindingProvider)transportClaimsPort).getRequestContext().put(SecurityConstants.STS_CLIENT, stsClient);
+        
+        // Failing test
+        
+        // Add custom content to the RST
+        stsClient.setCustomContent("<realm xmlns=\"http://cxf.apache.org/custom\">custom-unknown-realm</realm>");
+        try {
+            doubleIt(transportClaimsPort, 25);
+            fail("Failure expected on the wrong realm");
+        } catch (Exception ex) {
+            // expected
+        }
         
         ((java.io.Closeable)transportClaimsPort).close();
         bus.shutdown(true);
