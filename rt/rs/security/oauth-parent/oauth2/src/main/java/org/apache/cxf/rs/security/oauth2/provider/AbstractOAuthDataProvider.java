@@ -69,7 +69,7 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
     }
     
     protected ServerAccessToken doCreateAccessToken(AccessTokenRegistration atReg) {
-        ServerAccessToken at = createNewAccessToken(atReg.getClient());
+        ServerAccessToken at = createNewAccessToken(atReg.getClient(), atReg.getSubject());
         at.setAudiences(atReg.getAudiences());
         at.setGrantType(atReg.getGrantType());
         List<String> theScopes = atReg.getApprovedScope();
@@ -151,13 +151,13 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         if (at.getClientCodeVerifier() != null) {
             claims.setClaim(OAuthConstants.AUTHORIZATION_CODE_VERIFIER, at.getClientCodeVerifier());
         }
-        // ServerAccessToken 'nonce' property, if available, can be ignored for the purpose for persisting it
-        // further as a JWT claim - as it is only used once by (OIDC) IdTokenResponseFilter
-        // to set IdToken nonce property with the filter having an access to the current ServerAccessToken instance
+        if (at.getNonce() != null) {
+            claims.setClaim(OAuthConstants.NONCE, at.getNonce());
+        }
         return claims;
     }
     
-    protected ServerAccessToken createNewAccessToken(Client client) {
+    protected ServerAccessToken createNewAccessToken(Client client, UserSubject userSub) {
         return new BearerAccessToken(client, accessTokenLifetime);
     }
     
@@ -329,6 +329,8 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
             scopes.addAll(at.getScopes());
             rt.setScopes(scopes);
         }
+        rt.setGrantCode(at.getGrantCode());
+        rt.setNonce(at.getNonce());
         rt.setSubject(at.getSubject());
         rt.setClientCodeVerifier(at.getClientCodeVerifier());
         return rt;
@@ -344,10 +346,13 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
     protected ServerAccessToken doRefreshAccessToken(Client client, 
                                                      RefreshToken oldRefreshToken, 
                                                      List<String> restrictedScopes) {
-        ServerAccessToken at = createNewAccessToken(client);
+        ServerAccessToken at = createNewAccessToken(client, oldRefreshToken.getSubject());
         at.setAudiences(oldRefreshToken.getAudiences());
         at.setGrantType(oldRefreshToken.getGrantType());
+        at.setGrantCode(oldRefreshToken.getGrantCode());
         at.setSubject(oldRefreshToken.getSubject());
+        at.setNonce(oldRefreshToken.getNonce());
+        at.setClientCodeVerifier(oldRefreshToken.getClientCodeVerifier());
         if (restrictedScopes.isEmpty()) {
             at.setScopes(oldRefreshToken.getScopes());
         } else {

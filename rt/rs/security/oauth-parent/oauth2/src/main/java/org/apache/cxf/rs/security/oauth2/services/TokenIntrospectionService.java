@@ -46,6 +46,7 @@ public class TokenIntrospectionService {
     private static final Logger LOG = LogUtils.getL7dLogger(TokenIntrospectionService.class);
     private boolean blockUnsecureRequests;
     private boolean blockUnauthorizedRequests = true;
+    private boolean reportExtraTokenProperties = true;
     private MessageContext mc;
     private OAuthDataProvider dataProvider;
     @POST
@@ -83,6 +84,11 @@ public class TokenIntrospectionService {
         }
         
         response.setTokenType(at.getTokenType());
+        
+        if (reportExtraTokenProperties) {
+            response.getExtensions().putAll(at.getExtraProperties());
+        }
+        
         return response;
     }
 
@@ -114,5 +120,9 @@ public class TokenIntrospectionService {
     @Context
     public void setMessageContext(MessageContext context) {
         this.mc = context;
+    }
+
+    public void setReportExtraTokenProperties(boolean reportExtraTokenProperties) {
+        this.reportExtraTokenProperties = reportExtraTokenProperties;
     }
 }

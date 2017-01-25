@@ -112,7 +112,10 @@ public final class JwtTokenUtils {
         if (codeVerifier != null) {
             at.setClientCodeVerifier(codeVerifier);
         }
-        
+        String nonce = claims.getStringProperty(OAuthConstants.NONCE);
+        if (nonce != null) {
+            at.setNonce(nonce);
+        }
         Map<String, String> extraProperties = CastUtils.cast((Map<?, ?>)claims.getClaim("extra_propertirs"));
         if (extraProperties != null) {
             at.getExtraProperties().putAll(extraProperties);
