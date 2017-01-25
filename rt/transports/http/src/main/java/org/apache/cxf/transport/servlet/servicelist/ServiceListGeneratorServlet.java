@@ -32,6 +32,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.message.Message;
@@ -51,6 +52,10 @@ public class ServiceListGeneratorServlet extends HttpServlet {
     public ServiceListGeneratorServlet(DestinationRegistry destinationRegistry, Bus bus) {
         this.destinationRegistry = destinationRegistry;
         this.bus = bus;
+        if (this.bus == null) {
+            this.bus = BusFactory.getDefaultBus(false);
+        }
+        
         this.title = "CXF - Service list";
     }
 
