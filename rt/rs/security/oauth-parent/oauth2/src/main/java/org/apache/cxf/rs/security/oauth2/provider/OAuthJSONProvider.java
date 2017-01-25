@@ -123,6 +123,12 @@ public class OAuthJSONProvider implements MessageBodyWriter<Object>,
                 sb.append(",");
                 appendJsonPair(sb, "exp", obj.getExp(), false);
             }
+            if (!obj.getExtensions().isEmpty()) {
+                for (Map.Entry<String, String> entry : obj.getExtensions().entrySet()) {
+                    sb.append(",");
+                    appendJsonPair(sb, entry.getKey(), entry.getValue());
+                }
+            }
         }
         sb.append("}");
         String result = sb.toString();

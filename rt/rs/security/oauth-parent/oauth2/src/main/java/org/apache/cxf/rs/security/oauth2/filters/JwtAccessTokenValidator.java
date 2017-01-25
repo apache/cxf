@@ -110,6 +110,11 @@ public class JwtAccessTokenValidator extends JoseJwtConsumer implements AccessTo
         } else if (claims.getSubject() != null) {
             atv.setTokenSubject(new UserSubject(claims.getSubject()));
         }
+        Map<String, String> extraProperties = CastUtils.cast((Map<?, ?>)claims.getClaim("extra_propertirs"));
+        if (extraProperties != null) {
+            atv.getExtraProps().putAll(extraProperties);
+        }
+        
         return atv;
     }
 
