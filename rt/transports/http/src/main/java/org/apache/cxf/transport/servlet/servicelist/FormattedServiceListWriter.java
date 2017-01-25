@@ -24,7 +24,6 @@ import java.net.URI;
 import java.util.Map;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.service.model.OperationInfo;
@@ -45,9 +44,6 @@ public class FormattedServiceListWriter implements ServiceListWriter {
         this.title = title;
         this.showForeignContexts = showForeignContexts;
         this.bus = bus;
-        if (this.bus == null) {
-            this.bus = BusFactory.getDefaultBus(false);
-        }
         if (this.bus != null) {
             this.atomMap = 
                 CastUtils.cast((Map<?, ?>)this.bus.getProperty("org.apache.cxf.extensions.logging.atom.pull"));
