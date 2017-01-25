@@ -19,13 +19,17 @@
 
 package org.apache.cxf.systest.sts.custom;
 
-import org.w3c.dom.Document;
+import javax.xml.soap.SOAPException;
+import javax.xml.soap.SOAPMessage;
+
 import org.w3c.dom.Element;
 
+import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor;
+import org.apache.cxf.binding.soap.saaj.SAAJUtils;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.validate.Credential;
 import org.apache.wss4j.dom.validate.UsernameTokenValidator;
 import org.apache.wss4j.dom.validate.Validator;
@@ -41,20 +45,32 @@ public class CustomUTValidator implements Validator {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noCredential");
         }
         
-        // Find custom Element in the SOAP Body
-        Document doc = credential.getUsernametoken().getElement().getOwnerDocument();
-        Element soapBody = WSSecurityUtil.findBodyElement(doc);
-        Element realm = XMLUtils.findElement(soapBody, "realm", "http://cxf.apache.org/custom");
-        if (realm != null) {
-            String realmStr = realm.getTextContent();
-            if ("custom-realm".equals(realmStr)) {
-
-                UsernameTokenValidator validator = new UsernameTokenValidator();
-                return validator.validate(credential, data);
+        // Need to use SAAJ to get the SOAP Body as we are just using the UsernameTokenInterceptor
+        SOAPMessage soapMessage = getSOAPMessage((SoapMessage)data.getMsgContext());
+        try {
+            Element soapBody = SAAJUtils.getBody(soapMessage);
+        
+            if (soapBody != null) {
+                // Find custom Element in the SOAP Body
+                Element realm = XMLUtils.findElement(soapBody, "realm", "http://cxf.apache.org/custom");
+                if (realm != null) {
+                    String realmStr = realm.getTextContent();
+                    if ("custom-realm".equals(realmStr)) {
+        
+                        UsernameTokenValidator validator = new UsernameTokenValidator();
+                        return validator.validate(credential, data);
+                    }
+                }
             }
+        } catch (SOAPException ex) {
+            // ignore
         }
         
         throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noCredential");
     }
 
+    private SOAPMessage getSOAPMessage(SoapMessage msg) {
+        SAAJInInterceptor.INSTANCE.handleMessage(msg);
+        return msg.getContent(SOAPMessage.class);
+    }
 }
