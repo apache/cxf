@@ -28,6 +28,10 @@
         <jaxws:properties>
         </jaxws:properties>
     </jaxws:client>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportCustomParameterClaimsPort" createdFromAPI="true">
+        <jaxws:properties>
+        </jaxws:properties>
+    </jaxws:client>
     <http:conduit name="https://localhost:.*">
         <http:tlsClientParameters disableCNCheck="true">
             <sec:trustManagers>

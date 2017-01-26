@@ -41,6 +41,7 @@
         <property name="tokenStore" ref="defaultTokenStore"/>
         <property name="delegationHandlers" ref="utDelegationHandler"/>
         <property name="tokenValidators" ref="transportTokenValidators"/>
+        <property name="allowCustomContent" value="true" />
     </bean>
     <bean id="transportValidateDelegate" class="org.apache.cxf.sts.operation.TokenValidateOperation">
         <property name="tokenProviders" ref="transportTokenProviders"/>
@@ -99,7 +100,7 @@
     <util:list id="claimHandlerList">
         <ref bean="customClaimsHandler"/>
     </util:list>
-    <bean id="customClaimsHandler" class="org.apache.cxf.systest.sts.deployment.CustomClaimsHandler">
+    <bean id="customClaimsHandler" class="org.apache.cxf.systest.sts.custom.CustomClaimsHandler">
         </bean>
     <bean id="transportCustomBSTTokenValidator" class="org.apache.cxf.systest.sts.deployment.CustomBSTTokenValidator">
         </bean>
