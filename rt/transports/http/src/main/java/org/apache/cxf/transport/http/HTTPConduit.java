@@ -24,6 +24,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.HttpRetryException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -1046,9 +1048,15 @@ public abstract class HTTPConduit
                 }
                 incomingObserver.onMessage(inMessage);
             } catch (IOException e) {
-                e.printStackTrace();
+                logStackTrace(e);
             }
         }
+    }
+    
+    protected void logStackTrace(Throwable ex) { 
+        StringWriter sw = new StringWriter();
+        ex.printStackTrace(new PrintWriter(sw));
+        LOG.warning(sw.toString());
     }
     
     public void assertMessage(Message message) {

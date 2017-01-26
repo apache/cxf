@@ -165,13 +165,13 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
                             ReflectionUtil.setAccessible(f).set(c2, httpRequestMethod);
                         } catch (Throwable t) {
                             //ignore
-                            t.printStackTrace();
+                            logStackTrace(t);
                         }
                     }
                     ReflectionUtil.setAccessible(f).set(connection, httpRequestMethod);
                     message.put(HTTPURL_CONNECTION_METHOD_REFLECTION, true);
                 } catch (Throwable t) {
-                    t.printStackTrace();
+                    logStackTrace(t);
                     throw ex;
                 }
             } else {
@@ -240,7 +240,7 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
                     cout = connection.getOutputStream();
                     ReflectionUtil.setAccessible(f).set(connection, method);                        
                 } catch (Throwable t) {
-                    t.printStackTrace();
+                    logStackTrace(t);
                 }
                 
             } else {
