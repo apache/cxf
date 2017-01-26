@@ -1224,7 +1224,8 @@ public abstract class ProviderFactory {
             names = ((FilterProviderInfo<?>)p).getNameBinding();
         }
         if (names == null) {
-            names = AnnotationUtils.getNameBindings(p.getProvider().getClass().getAnnotations());
+            Class<?> pClass = ClassHelper.getRealClass(p.getBus(), p.getProvider());
+            names = AnnotationUtils.getNameBindings(pClass.getAnnotations());
         }
         if (names.isEmpty()) {
             names = Collections.singleton(DEFAULT_FILTER_NAME_BINDING);
