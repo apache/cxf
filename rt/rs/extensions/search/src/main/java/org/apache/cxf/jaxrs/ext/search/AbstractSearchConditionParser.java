@@ -42,6 +42,7 @@ import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
+import org.apache.olingo.odata2.api.servicedocument.Collection;
 
 public abstract class AbstractSearchConditionParser<T> implements SearchConditionParser<T> {
     
@@ -210,8 +211,13 @@ public abstract class AbstractSearchConditionParser<T> implements SearchConditio
                     nextObject = actualReturnType.newInstance();
                 }
                 Method setterM = actualType.getMethod("set" + nextPart, new Class[]{returnType});
-                Object valueObjectValue = lastTry || !returnCollection 
-                    ? nextObject : getCollectionSingleton(valueType, nextObject); 
+                Object valueObjectValue = null;
+                if (lastTry || !returnCollection) {
+                    valueObjectValue = nextObject;
+                } else {
+                    Class<?> collCls = Collection.class.isAssignableFrom(valueType) ? valueType : returnType;
+                    valueObjectValue = getCollectionSingleton(collCls, nextObject);
+                }
                 setterM.invoke(valueObject, new Object[]{valueObjectValue});
                 
                 if (lastTry) {
