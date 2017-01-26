@@ -560,8 +560,9 @@ public final class ServerProviderFactory extends ProviderFactory {
         }
         private boolean isRegistered(Collection<?> list, Class<?> cls) {
             Collection<ProviderInfo<?>> list2 = CastUtils.cast(list);
-            for (ProviderInfo<?> pi : list2) {
-                if (cls.isAssignableFrom(pi.getProvider().getClass())) {
+            for (ProviderInfo<?> p : list2) {
+                Class<?> pClass = ClassHelper.getRealClass(p.getBus(), p.getProvider());
+                if (cls.isAssignableFrom(pClass)) {
                     return true;
                 }
             }
@@ -569,9 +570,12 @@ public final class ServerProviderFactory extends ProviderFactory {
         }
         private Integer getPriority(Collection<?> list, Class<?> cls, Class<?> filterClass) {
             Collection<ProviderInfo<?>> list2 = CastUtils.cast(list);
-            for (ProviderInfo<?> pi : list2) {
-                if (pi instanceof FilterProviderInfo && pi.getProvider().getClass().isAssignableFrom(cls)) {
-                    return ((FilterProviderInfo<?>)pi).getPriority(filterClass);
+            for (ProviderInfo<?> p : list2) {
+                if (p instanceof FilterProviderInfo) {
+                    Class<?> pClass = ClassHelper.getRealClass(p.getBus(), p.getProvider());
+                    if (cls.isAssignableFrom(pClass)) {
+                        return ((FilterProviderInfo<?>)p).getPriority(filterClass);
+                    }
                 }
             }
             return Priorities.USER;
