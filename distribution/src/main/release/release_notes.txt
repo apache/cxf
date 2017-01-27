@@ -1,8 +1,8 @@
-Apache CXF 3.1.9 Release Notes
+Apache CXF 3.1.10 Release Notes
 
 1. Overview
 
-The 3.1.9 version of Apache CXF is a significant new version of CXF 
+The 3.1.10 version of Apache CXF is a significant new version of CXF 
 that provides several new features and enhancements.  
 
 New features include: 
@@ -25,7 +25,7 @@ http://cxf.apache.org/docs/31-migration-guide.html
 for further information and requirements for upgrading from earlier
 versions of CXF.
 
-3.1.9 fixes over 45 JIRA issues reported by users and the community.
+3.1.10 fixes over 25 JIRA issues reported by users and the community.
 
 
 2. Installation Prerequisites 
@@ -72,59 +72,53 @@ to 3.1.
 
 
 ** Bug
-    * [CXF-6216] - No output sanitizing in FormattedServiceListWriter 
-    * [CXF-6604] - Sporadic ClassCastException in AsymmetricBindingHandler#doSignBeforeEncrypt
-    * [CXF-6836] - Swagger2 tests need to be updated to do a more robust JSON or YAML comparison
-    * [CXF-6896] - CDI integration: duplicate service / feature / provider beans are registered when Application class has singletons
-    * [CXF-7015] - Invalid URL encoding causes error 500
-    * [CXF-7091] - JAXRSBeanValidationOutInterceptor fails to validate Response entity on the 2nd try
-    * [CXF-7092] - Swagger2Feature tries to resolve swagger-ui resources with api-docs
-    * [CXF-7095] - CDI integration doesn't use the right bus to create the server factory
-    * [CXF-7097] - [CDI] application leaks a creational context
-    * [CXF-7099] - Technical user should be the SAML Subject for the ActAs use-case
-    * [CXF-7105] - Don't register default application if no services discovered
-    * [CXF-7109] - ClientCallback may be invoked twice when Async HTTP Transport is used
-    * [CXF-7112] - AsyncHTTPConduit ignore the ReceiveTimeout when use Async JAXWS api
-    * [CXF-7114] - Disable HTTP TRACE method on CXF http-jetty transport
-    * [CXF-7115] - Issuer in TokenIntrospection should be quoted in JSON
-    * [CXF-7116] - AsyncResponse.resume() infinitely hangs up after first call
-    * [CXF-7117] - Swagger2Feature not working in OSGi container when jaxrs server address not attached to CXF servlet
-    * [CXF-7121] - Need to log a warning when async method returns a non-void type
-    * [CXF-7122] - Infinite loop due to AsyncHTTPConduit read timeout with exhausted connection pool
-    * [CXF-7123] - JAXRS Clients will hang if they do not set a oneway exchange status before the call and 202 is returned
-    * [CXF-7124] - PackageUtils.getSharedPackageName(List<Class<?>>) has bug
-    * [CXF-7133] - Don't rely on disabled scanning in CDI
-    * [CXF-7134] - Fix how non-normal scoped beans are used in CDI extension
-    * [CXF-7139] - BufferOverflowException when decoding a parameter values with a trailing %
-    * [CXF-7140] - Multiple calls to AsyncResponse.cancel() returns different values
-    * [CXF-7142] - Blueprint mandatory in OSGi
-    * [CXF-7145] - synchronized store and getMessages of JmsPullPoint would cause deadlock
-    * [CXF-7147] - Unable to register a generic _InvocationCallback<Object>_ when using the async proxy client API in JAX-RS
-    * [CXF-7148] - Race Condition while handling symmetric key in SymmetricBindingHandler
-    * [CXF-7154] - WSDL2JAVA Allows Unsafe Characters in to Generated Javadocs
-    * [CXF-7155] - JAXRSOutInterceptor do not close CachedOutputStream when out buffering is enabled
-    * [CXF-7161] - OIDC Dynamic Registration : NPE for implicit grant_types
-    * [CXF-7162] - Inconsistent reading of formatted xml when validating schema
+    * [CXF-5436] - Poorly crafted response caused NullPointerException when processing incoming message
+    * [CXF-6962] - Basic auth uses UTF-8 for the encoded password when it should use ISO-8859-1
+    * [CXF-7166] - NullPointerException at org.apache.cxf.common.jaxb.JAXBUtils.createJAXBContextProxy with IBM-JDK 8
+    * [CXF-7174] - NullPointerException when Content-Type is not specified in the http request
+    * [CXF-7179] - Unable to set ServerConnector in JettyHTTPServerEngine using jetty 9
+    * [CXF-7183] - CXF Blueprint namespace don't work well with blueprint-core 1.7.x
+    * [CXF-7185] - Xml validation with Mtom enabled is not working with french locale
+    * [CXF-7189] - org.apache.cxf.jaxrs.ext.multipart.Attachment.getObject do not rethrow exception
+    * [CXF-7204] - CXF 3.1.9 does not support Spring 3.2, enforces Spring 4.1
+    * [CXF-7205] - In JmsPullPoint create session for producer and consumer separately and synchronized the session but not the whole method to avoid deadlock
+    * [CXF-7207] - JCacheOAuthDataProvider can leak jcache component(s)
+    * [CXF-7210] - StringIndexOutOfBoundsException during construction of failover request
+    * [CXF-7213] - FIQL Parser: Crashes when parsing a collection (java.util.Set) inside an object
+    * [CXF-7220] - WS-Security StaX processing fails on whitespace after the SOAP Body opening tag
+    * [CXF-7221] - NullPointerException when using org.apache.cxf.logging.enable and logging interceptors
+    * [CXF-7228] - ProviderInfo rarely supports proxies
+    * [CXF-7230] - Unable to disable access to default wadl genearated by cxf
+    * [CXF-7231] - Java HttpUrlConnection Reflection Fix to support custom verbs does not work with HTTPS
+
 
 ** Improvement
-    * [CXF-6986] - Don't require an application class if using CDI
-    * [CXF-7072] - Make it easier to auto-discover MetricsFeature
-    * [CXF-7106] - Support inserting claims into tokens issued by the STS in conjunction with ActAs
-    * [CXF-7107] - Support inserting claims into tokens issued by the STS in conjunction with ActAs
-    * [CXF-7110] - Inflexible jwt audience restriction validation
-    * [CXF-7111] - Make the security token lifetime configurable
-    * [CXF-7125] - Automatically expose logging feature as intent for DOSGi
-    * [CXF-7137] - Allow OAuth2 customization via Swagger2Feature
-    * [CXF-7144] - support to specify pullpoint queue name of WS-N
-    * [CXF-7156] - java2ws-plugin - add portName as configuration option
+    * [CXF-7168] - CXF WSN Publisher SOAP 1.2 Binding
+    * [CXF-7190] - org.apache.cxf.jaxrs.ext.MessageContextImpl.createAttachments lost inner exception
+    * [CXF-7201] - Incorrect JSON return in openId connect UserInfo when no signature or encryption
+    * [CXF-7222] - Improve extensibility of JAX-RS ExceptionMappers
+    * [CXF-7233] - Create workaround for JDK HostnameVerifier issue
+    * [CXF-7234] - JavaDocProvider should not require a ref to the JavaDoc lib
 
-** New Feature
-    * [CXF-7119] - Introduce a JAX-RS client provider for catching technical exceptions (e.g. IOException)
-    * [CXF-7157] - Support the client side bean validation for CXF client proxies  
 
-** Task
-    * [CXF-7093] - Investigate how SpringBoot demos can be included in the distribution
-    * [CXF-7152] - OIDC FormResponse mode needs to be supported for Implicit Flow too
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
