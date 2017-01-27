@@ -50,7 +50,9 @@ public class OsgiSwaggerUiResolver extends SwaggerUiResolver {
                             return getSwaggerUiRoot(b, swaggerUiVersion);
                         }
                     } else  if (location.startsWith(pattern)) {
-                        swaggerUiVersion = location.substring(pattern.length());
+                        int dollarIndex = location.indexOf("$");
+                        swaggerUiVersion = location.substring(pattern.length(),
+                                dollarIndex > pattern.length() ? dollarIndex : location.length());
                         return getSwaggerUiRoot(b, swaggerUiVersion);
                     }
                 }
