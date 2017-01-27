@@ -25,6 +25,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.ServerSocket;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.Arrays;
 import java.util.Collection;
@@ -45,6 +46,7 @@ import org.apache.cxf.attachment.AttachmentDataSource;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.common.util.Base64Utility;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.Configurable;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
@@ -105,6 +107,8 @@ public abstract class AbstractHTTPDestination
     private static final String SSL_CIPHER_SUITE_ATTRIBUTE = "javax.servlet.request.cipher_suite";
     private static final String SSL_PEER_CERT_CHAIN_ATTRIBUTE = "javax.servlet.request.X509Certificate";
 
+    private static final String DECODE_BASIC_AUTH_WITH_ISO8859 = "decode.basicauth.with.iso8859";
+    
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractHTTPDestination.class);
     
     protected final Bus bus;
@@ -118,6 +122,7 @@ public abstract class AbstractHTTPDestination
     protected boolean multiplexWithAddress;
     protected CertConstraints certConstraints;
     protected boolean isServlet3;
+    protected boolean decodeBasicAuthWithIso8859;
     protected ContinuationProviderFactory cproviderFactory;
     protected boolean enableWebSocket;
 
@@ -148,6 +153,7 @@ public abstract class AbstractHTTPDestination
         } catch (Throwable t) {
             //servlet 2.5 or earlier, no async support
         }
+        decodeBasicAuthWithIso8859 = PropertyUtils.isTrue(bus.getProperty(DECODE_BASIC_AUTH_WITH_ISO8859));
         
         initConfig();
     }
@@ -165,7 +171,11 @@ public abstract class AbstractHTTPDestination
         if ("Basic".equals(authType) && creds.size() == 2) {
             String authEncoded = creds.get(1);
             try {
-                String authDecoded = new String(Base64Utility.decode(authEncoded));
+                byte[] authBytes = Base64Utility.decode(authEncoded);
+                
+                String authDecoded = decodeBasicAuthWithIso8859 
+                    ? new String(authBytes, StandardCharsets.ISO_8859_1) : new String(authBytes);
+                
                 int idx = authDecoded.indexOf(':');
                 String username = null;
                 String password = null;
