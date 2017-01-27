@@ -18,8 +18,8 @@
  */
 package org.apache.cxf.transport.http.auth;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
 
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.common.util.PropertyUtils;
@@ -42,7 +42,16 @@ public final class DefaultBasicAuthSupplier implements HttpAuthSupplier {
     
     public static String getBasicAuthHeader(String userName, String passwd, boolean useIso8859) {
         String userAndPass = userName + ":" + passwd;
-        byte[] authBytes = useIso8859 ? userAndPass.getBytes(StandardCharsets.ISO_8859_1) : userAndPass.getBytes();
+        byte[] authBytes = null;
+        if (useIso8859) {
+            try {
+                authBytes = userAndPass.getBytes("ISO-8859-1");
+            } catch (UnsupportedEncodingException ex) {
+                authBytes = userAndPass.getBytes();
+            }
+        } else {
+            authBytes = userAndPass.getBytes();
+        }
         return "Basic " + Base64Utility.encode(authBytes);
     }
 

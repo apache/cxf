@@ -22,10 +22,10 @@ package org.apache.cxf.transport.http;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.ServerSocket;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.Arrays;
 import java.util.Collection;
@@ -173,8 +173,16 @@ public abstract class AbstractHTTPDestination
             try {
                 byte[] authBytes = Base64Utility.decode(authEncoded);
                 
-                String authDecoded = decodeBasicAuthWithIso8859 
-                    ? new String(authBytes, StandardCharsets.ISO_8859_1) : new String(authBytes);
+                String authDecoded = null;
+                if (decodeBasicAuthWithIso8859) {
+                    try {
+                        authDecoded = new String(authBytes, "ISO-8859-1");
+                    } catch (UnsupportedEncodingException ex) {
+                        authDecoded = new String(authBytes);
+                    }  
+                } else {
+                    authDecoded = new String(authBytes);
+                } 
                 
                 int idx = authDecoded.indexOf(':');
                 String username = null;
