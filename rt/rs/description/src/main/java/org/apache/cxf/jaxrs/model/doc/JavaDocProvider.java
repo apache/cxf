@@ -47,12 +47,13 @@ public class JavaDocProvider implements DocumentationProvider {
     private final ConcurrentHashMap<String, ClassDocs> docs = new ConcurrentHashMap<String, ClassDocs>();
     private double javaDocsBuiltByVersion = JAVA_VERSION;
     
+    public JavaDocProvider() {
+    }
+    
     public JavaDocProvider(URL... javaDocUrls) {
-        if (javaDocUrls == null) {
-            throw new IllegalArgumentException("URL are null");
+        if (javaDocUrls != null) {
+            javaDocLoader = new URLClassLoader(javaDocUrls);
         }
-        
-        javaDocLoader = new URLClassLoader(javaDocUrls);
     }
     
     public JavaDocProvider(String path) throws Exception {
@@ -64,15 +65,13 @@ public class JavaDocProvider implements DocumentationProvider {
     }
     
     public JavaDocProvider(Bus bus, String... paths) throws Exception {
-        if (paths == null) {
-            throw new IllegalArgumentException("paths are null");
+        if (paths != null) {
+            URL[] javaDocUrls = new URL[paths.length];
+            for (int i = 0; i < paths.length; i++) {
+                javaDocUrls[i] = ResourceUtils.getResourceURL(paths[i], bus);
+            }
+            javaDocLoader = new URLClassLoader(javaDocUrls);
         }
-
-        URL[] javaDocUrls = new URL[paths.length];
-        for (int i = 0; i < paths.length; i++) {
-            javaDocUrls[i] = ResourceUtils.getResourceURL(paths[i], bus);
-        }
-        javaDocLoader = new URLClassLoader(javaDocUrls);
     }
     
     private static double getVersion() {
@@ -165,7 +164,8 @@ public class JavaDocProvider implements DocumentationProvider {
         String resource = annotatedClass.getName().replace(".", "/") + ".html";
         ClassDocs classDocs = docs.get(resource);
         if (classDocs == null) {
-            InputStream resourceStream = javaDocLoader.getResourceAsStream(resource);
+            ClassLoader loader = javaDocLoader != null ? javaDocLoader : annotatedClass.getClassLoader();  
+            InputStream resourceStream = loader.getResourceAsStream(resource);
             if (resourceStream != null) {
                 String doc = IOUtils.readStringFromStream(resourceStream);
                 
