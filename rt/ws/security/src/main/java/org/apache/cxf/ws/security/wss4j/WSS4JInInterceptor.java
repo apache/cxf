@@ -39,7 +39,7 @@ import javax.xml.transform.dom.DOMSource;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-
+import org.apache.cxf.attachment.AttachmentUtil;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.SoapVersion;
@@ -241,12 +241,19 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                 Certificate[] tlsCerts = tlsInfo.getPeerCertificates();
                 reqData.setTlsCerts(tlsCerts);
             }
-
+            
             /*
              * Get and check the Signature specific parameters first because
              * they may be used for encryption too.
              */
             doReceiverAction(actions, reqData);
+            
+            // Only search for and expand (Signed) XOP Elements if MTOM is enabled (and not
+            // explicitly specified by the user)
+            String expandXOP = getString(WSHandlerConstants.EXPAND_XOP_INCLUDE_FOR_SIGNATURE, msg);
+            if (expandXOP == null) {
+                reqData.setExpandXopIncludeForSignature(AttachmentUtil.isMtomEnabled(msg));
+            }
             
             /*get chance to check msg context enableRevocation setting
              *when use policy based ws-security where the WSHandler configuration
