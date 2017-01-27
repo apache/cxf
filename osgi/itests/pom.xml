@@ -164,6 +164,46 @@
             </exclusions>
         </dependency>
     </dependencies>
+
+    <profiles>
+        <profile>
+            <id>jdk16</id>
+            <activation>
+                <jdk>1.6</jdk>
+            </activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-surefire-plugin</artifactId>
+                            <configuration>
+                                <skipTests>true</skipTests>
+                            </configuration>
+                         </plugin>
+                     </plugins>
+                 </pluginManagement>
+             </build>
+         </profile>
+         <profile>
+            <id>alt-jdks</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-surefire-plugin</artifactId>
+                         </plugin>
+                     </plugins>
+                 </pluginManagement>
+             </build>
+         </profile>
+
+    </profiles>
+
     <build>
         <plugins>
             <!-- generate dependencies versions -->

@@ -65,6 +65,8 @@ import org.apache.cxf.tools.common.ToolException;
 public class SchemaValidator extends AbstractDefinitionValidator {
     protected static final Logger LOG = LogUtils.getL7dLogger(SchemaValidator.class);
 
+    private static final String ACCESS_EXTERNAL_SCHEMA = "http://javax.xml.XMLConstants/property/accessExternalSchema";
+
     protected String[] defaultSchemas;
 
     protected String schemaLocation = "./";
@@ -126,7 +128,11 @@ public class SchemaValidator extends AbstractDefinitionValidator {
 
         SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         sf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
-        sf.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "file");
+        try {
+            sf.setProperty(ACCESS_EXTERNAL_SCHEMA, "file");
+        } catch (SAXException ex) {
+            LOG.fine("Error setting the ACCESS_EXTERNAL_SCHEMA property");
+        }
         SchemaResourceResolver resourceResolver = new SchemaResourceResolver();
 
         sf.setResourceResolver(resourceResolver);

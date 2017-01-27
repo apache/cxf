@@ -180,7 +180,7 @@ public class HeadersTest extends Assert {
         // second check - null specified in request, valid content-type specified in message
         // expect that determineContentType returns the content-type specified in the message
         HttpServletRequest req = control.createMock(HttpServletRequest.class);
-        EasyMock.expect(req.getHeaderNames()).andReturn(Collections.<String>emptyEnumeration());
+        EasyMock.expect(req.getHeaderNames()).andReturn(Collections.enumeration(Collections.<String>emptyList()));
         EasyMock.expect(req.getContentType()).andReturn(null).anyTimes();
         control.replay();
         message = new MessageImpl();
@@ -196,7 +196,7 @@ public class HeadersTest extends Assert {
         // expect that determineContentType returns the default value of text/xml
         control = EasyMock.createNiceControl();
         req = control.createMock(HttpServletRequest.class);
-        EasyMock.expect(req.getHeaderNames()).andReturn(Collections.<String>emptyEnumeration());
+        EasyMock.expect(req.getHeaderNames()).andReturn(Collections.enumeration(Collections.<String>emptyList()));
         EasyMock.expect(req.getContentType()).andReturn(null).anyTimes();
         control.replay();
         message = new MessageImpl();
