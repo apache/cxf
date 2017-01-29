@@ -452,12 +452,12 @@ public class JMSEndpoint {
         this.jndiTransactionManagerName = jndiTransactionManagerName;
     }
     
-    public String getMessageSelector(){
-    	return this.messageSelector;
+    public String getMessageSelector() {
+        return this.messageSelector;
     }
     
-    public void setMessageSelector(final String messageSelector){
-    	this.messageSelector = messageSelector;
+    public void setMessageSelector(final String messageSelector) {
+        this.messageSelector = messageSelector;
     }
 
     public enum DeliveryModeType { PERSISTENT, NON_PERSISTENT };
