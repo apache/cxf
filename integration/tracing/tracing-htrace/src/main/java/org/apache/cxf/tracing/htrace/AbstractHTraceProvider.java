@@ -25,7 +25,7 @@ import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
-import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.tracing.AbstractTracingProvider;
 import org.apache.htrace.core.SpanId;
 import org.apache.htrace.core.TraceScope;
@@ -95,11 +95,11 @@ public abstract class AbstractHTraceProvider extends AbstractTracingProvider {
     }
     
     private void propagateContinuationSpan(final TraceScope continuationScope) {
-        JAXRSUtils.getCurrentMessage().put(TraceScope.class, continuationScope);
+        PhaseInterceptorChain.getCurrentMessage().put(TraceScope.class, continuationScope);
     }
     
     protected boolean isAsyncResponse() {
-        return !JAXRSUtils.getCurrentMessage().getExchange().isSynchronous();
+        return !PhaseInterceptorChain.getCurrentMessage().getExchange().isSynchronous();
     }
     
     private static SpanId getFirstValueOrDefault(final Map<String, List<String>> headers, 

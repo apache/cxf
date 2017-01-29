@@ -34,7 +34,7 @@ import com.github.kristofa.brave.http.SpanNameProvider;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
-import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.tracing.AbstractTracingProvider;
 
 public abstract class AbstractBraveProvider extends AbstractTracingProvider { 
@@ -131,10 +131,10 @@ public abstract class AbstractBraveProvider extends AbstractTracingProvider {
     }
     
     private void propagateContinuationSpan(final ServerSpan continuationScope) {
-        JAXRSUtils.getCurrentMessage().put(ServerSpan.class, continuationScope);
+        PhaseInterceptorChain.getCurrentMessage().put(ServerSpan.class, continuationScope);
     }
     
     protected boolean isAsyncResponse() {
-        return !JAXRSUtils.getCurrentMessage().getExchange().isSynchronous();
+        return !PhaseInterceptorChain.getCurrentMessage().getExchange().isSynchronous();
     }
 }
