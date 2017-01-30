@@ -133,7 +133,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         // Accept
         String acceptTypes = null;
         List<String> acceptHeaderValues = protocolHeaders.get(Message.ACCEPT_CONTENT_TYPE);
-        if (acceptHeaderValues != null) {
+        if (acceptHeaderValues != null && !acceptHeaderValues.isEmpty()) {
             acceptTypes = acceptHeaderValues.get(0);
             message.put(Message.ACCEPT_CONTENT_TYPE, acceptTypes);
         }
