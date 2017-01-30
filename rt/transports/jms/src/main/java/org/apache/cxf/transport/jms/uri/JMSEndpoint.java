@@ -86,7 +86,8 @@ public class JMSEndpoint {
     private boolean useConduitIdSelector = true;
     private String username;
     private int concurrentConsumers = 1;
-
+    private String messageSelector;
+    
     /**
      * @param uri
      * @param subject
@@ -449,6 +450,14 @@ public class JMSEndpoint {
 
     public void setJndiTransactionManagerName(String jndiTransactionManagerName) {
         this.jndiTransactionManagerName = jndiTransactionManagerName;
+    }
+    
+    public String getMessageSelector() {
+        return this.messageSelector;
+    }
+    
+    public void setMessageSelector(final String messageSelector) {
+        this.messageSelector = messageSelector;
     }
 
     public enum DeliveryModeType { PERSISTENT, NON_PERSISTENT };
