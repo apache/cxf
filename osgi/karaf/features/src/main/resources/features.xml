@@ -268,19 +268,25 @@
     </feature>
     <feature name="cxf-jackson" version="${project.version}">
         <!-- Required by jackson-dataformat-yaml -->
-        <bundle start-level="35">mvn:org.yaml/snakeyaml/1.15</bundle>
+        <bundle start-level="10" dependency="true">mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jsr370-api-m1/${cxf.servicemix.specs.version}</bundle>
+        <bundle start-level="10" dependency="true">mvn:javax.annotation/javax.annotation-api/${cxf.javax.annotation-api.version}</bundle>
+        <bundle start-level="35">mvn:org.yaml/snakeyaml/1.17</bundle>
         <bundle start-level="35">mvn:com.fasterxml.jackson.core/jackson-core/${cxf.jackson.version}</bundle>
         <bundle start-level="35">mvn:com.fasterxml.jackson.core/jackson-annotations/${cxf.jackson.version}</bundle>
         <bundle start-level="35">mvn:com.fasterxml.jackson.core/jackson-databind/${cxf.jackson.version}</bundle>
         <bundle start-level="35">mvn:com.fasterxml.jackson.dataformat/jackson-dataformat-yaml/${cxf.jackson.version}</bundle>
-        <bundle start-level="35">mvn:com.fasterxml.jackson.jaxrs/jackson-jaxrs-base/${cxf.jackson.version}</bundle>
-        <bundle start-level="35">mvn:com.fasterxml.jackson.jaxrs/jackson-jaxrs-json-provider/${cxf.jackson.version}</bundle>
+        <!-- <bundle start-level="35">mvn:com.fasterxml.jackson.jaxrs/jackson-jaxrs-base/${cxf.jackson.version}</bundle> -->
+        <!-- <bundle start-level="35">mvn:com.fasterxml.jackson.jaxrs/jackson-jaxrs-json-provider/${cxf.jackson.version}</bundle> -->
+		<feature prerequisite="true">wrap</feature>
+		<bundle>wrap:mvn:com.fasterxml.jackson.jaxrs/jackson-jaxrs-base/${cxf.jackson.version}$overwrite=merge&amp;Import-Package=javax.ws.rs*;version="[2.0,3)",com.fasterxml.jackson*;version="[2.8,3)"</bundle>
+		<bundle>wrap:mvn:com.fasterxml.jackson.jaxrs/jackson-jaxrs-json-provider/${cxf.jackson.version}$overwrite=merge&amp;Import-Package=javax.ws.rs*;version="[2.0,3)",com.fasterxml.jackson.module.jaxb;resolution:=optional;version="[2.8,3)",com.fasterxml.jackson*;version="[2.8,3)"</bundle>
     </feature>
     <feature name="cxf-jsr-json" version="${project.version}">
         <bundle start-level="35">mvn:javax.json/javax.json-api/${cxf.json.api.version}</bundle>
         <bundle start-level="35">mvn:org.apache.johnzon/johnzon-core/${cxf.johnzon.version}</bundle>
     </feature>
     <feature name="cxf-tracing-brave" version="${project.version}">
+        <feature version="${project.version}">cxf-core</feature>
         <bundle start-level="35">mvn:io.zipkin.java/zipkin/1.16.2</bundle>
         <bundle start-level="35">mvn:io.zipkin.reporter/zipkin-reporter/0.6.9</bundle>
         <bundle start-level="35">mvn:io.zipkin.brave/brave-core/${cxf.brave.version}</bundle>
@@ -391,9 +397,9 @@
         <feature version="${project.version}">cxf-jaxrs</feature>
         <feature version="${project.version}">cxf-jaxws</feature>
         <feature version="${project.version}">cxf-javascript</feature>
-        <bundle start-level="35">mvn:org.apache.commons/commons-lang3/${cxf.commons-lang3.version}</bundle>
-        <bundle>mvn:org.apache.velocity/velocity/${cxf.velocity.version}</bundle>
-        <bundle>mvn:commons-collections/commons-collections/${cxf.commons-collections.version}</bundle>
+        <bundle start-level="35" dependency="true">mvn:commons-lang/commons-lang/2.4</bundle>
+        <bundle dependency="true">mvn:org.apache.velocity/velocity/${cxf.velocity.version}</bundle>
+        <bundle dependency="true">mvn:commons-collections/commons-collections/${cxf.commons-collections.version}</bundle>
         <bundle>mvn:org.apache.cxf/cxf-tools-common/${project.version}</bundle>
         <bundle>mvn:org.apache.cxf/cxf-tools-java2ws/${project.version}</bundle>
         <bundle>mvn:org.apache.cxf/cxf-tools-misctools/${project.version}</bundle>
