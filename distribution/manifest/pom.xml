@@ -216,12 +216,6 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>cxf-rt-databinding-sdo</artifactId>
-            <version>${project.version}</version>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
             <artifactId>cxf-rt-rs-extension-providers</artifactId>
             <version>${project.version}</version>
         </dependency>
