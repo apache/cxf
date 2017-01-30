@@ -80,10 +80,6 @@ For Aegis support:
 - jdom.jar (optional, if you want to map xsd:anyType to JDOM)
 - cxf-rt-databinding-aegis.jar
 
-For XmlBeans databinding support:
-- xmlbeans.jar
-- cxf-rt-databinding-xmlbeans.jar
-
 For WS-Security support:
 - wss4j-*.jar
 - xmlsec.jar

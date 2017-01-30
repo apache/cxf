@@ -210,11 +210,6 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>cxf-rt-databinding-xmlbeans</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
             <artifactId>cxf-rt-databinding-jibx</artifactId>
             <version>${project.version}</version>
             <optional>true</optional>
