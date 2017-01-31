@@ -38,16 +38,13 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMResult;
-import javax.xml.transform.dom.DOMSource;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
-
 
 import org.apache.cxf.binding.soap.saaj.SAAJStreamWriter;
 import org.apache.cxf.helpers.LoadingByteArrayOutputStream;
@@ -207,18 +204,6 @@ public class StaxSerializer extends AbstractSerializer {
         }
     }
     
-    @Override
-    public byte[] serializeToByteArray(NodeList content) throws Exception {
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-            XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(baos);
-            for (int i = 0; i < content.getLength(); i++) {
-                StaxUtils.copy(new DOMSource(content.item(i)), writer);
-            }
-            writer.close();
-            return baos.toByteArray();
-        }
-    }
-
     /**
      * @param ctx
      * @param inputSource
