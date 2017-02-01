@@ -32,6 +32,7 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
+import org.apache.cxf.jaxrs.rx.client.ObservableRxInvoker;
 import org.apache.cxf.jaxrs.rx.client.ObservableRxInvokerProvider;
 import org.apache.cxf.jaxrs.rx.provider.ObservableReader;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -127,9 +128,10 @@ public class JAXRSReactiveTest extends AbstractBusClientServerTestBase {
     @Test
     public void testGetHelloWorldAsyncObservable() throws Exception {
         String address = "http://localhost:" + PORT + "/reactive/textAsync";
-        WebClient wc = WebClient.create(address);
+        WebClient wc = WebClient.create(address,
+                                        Collections.singletonList(new ObservableRxInvokerProvider()));
         Observable<String> obs = wc.accept("text/plain")
-            .rx(new ObservableRxInvokerProvider())
+            .rx(ObservableRxInvoker.class)
             .get(String.class);
         obs.map(s -> { 
             return s + s; 
@@ -142,8 +144,9 @@ public class JAXRSReactiveTest extends AbstractBusClientServerTestBase {
     @Test
     public void testGetHelloWorldAsyncObservable404() throws Exception {
         String address = "http://localhost:" + PORT + "/reactive/textAsync404";
-        Invocation.Builder b = ClientBuilder.newClient().target(address).request();
-        b.rx(ObservableRxInvokerProvider.class).get(String.class).subscribe(
+        Invocation.Builder b = ClientBuilder.newClient().register(new ObservableRxInvokerProvider())
+            .target(address).request();
+        b.rx(ObservableRxInvoker.class).get(String.class).subscribe(
             s -> {
                 fail("Exception expected");
             },

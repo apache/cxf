@@ -20,7 +20,7 @@ package org.apache.cxf.jaxrs.client;
 
 import java.lang.reflect.Type;
 
-//Work in progress
+//Work in progress. May be removed once the Rx client work is finalized
 public interface AsyncClient {
     void prepareAsyncClient(String httpMethod, 
                             Object body,

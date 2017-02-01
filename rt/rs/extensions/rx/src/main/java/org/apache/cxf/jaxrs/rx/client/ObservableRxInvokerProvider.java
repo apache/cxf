@@ -20,16 +20,24 @@ package org.apache.cxf.jaxrs.rx.client;
 
 import java.util.concurrent.ExecutorService;
 
-import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.RxInvokerProvider;
+import javax.ws.rs.client.SyncInvoker;
 
-import org.apache.cxf.jaxrs.client.spec.InvocationBuilderImpl;
+import org.apache.cxf.jaxrs.client.SyncInvokerImpl;
 
 public class ObservableRxInvokerProvider implements RxInvokerProvider<ObservableRxInvoker> {
 
     @Override
-    public ObservableRxInvoker getRxInvoker(Invocation.Builder builder, ExecutorService execService) {
-        return new ObservableRxInvokerImpl(((InvocationBuilderImpl)builder).getWebClient(), execService);
+    public ObservableRxInvoker getRxInvoker(SyncInvoker syncInvoker, ExecutorService executorService) {
+        // TODO: At the moment we still delegate if possible to the async HTTP conduit.
+        // Investigate if letting the RxJava thread pool deal with the sync invocation
+        // is indeed more effective 
+        return new ObservableRxInvokerImpl(((SyncInvokerImpl)syncInvoker).getWebClient(), executorService);
+    }
+
+    @Override
+    public boolean isProviderFor(Class<?> rxCls) {
+        return ObservableRxInvoker.class == rxCls;
     }
 
 }

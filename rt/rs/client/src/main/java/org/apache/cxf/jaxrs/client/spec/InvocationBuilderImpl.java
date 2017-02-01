@@ -26,7 +26,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
 import javax.ws.rs.HttpMethod;
-import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.AsyncInvoker;
 import javax.ws.rs.client.CompletionStageRxInvoker;
 import javax.ws.rs.client.Entity;
@@ -35,7 +34,6 @@ import javax.ws.rs.client.Invocation.Builder;
 import javax.ws.rs.client.InvocationCallback;
 import javax.ws.rs.client.NioInvoker;
 import javax.ws.rs.client.RxInvoker;
-import javax.ws.rs.client.RxInvokerProvider;
 import javax.ws.rs.client.SyncInvoker;
 import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Cookie;
@@ -384,40 +382,25 @@ public class InvocationBuilderImpl implements Invocation.Builder {
 
     @Override
     public CompletionStageRxInvoker rx(ExecutorService executorService) {
+        // TODO: At the moment we still delegate if possible to the async HTTP conduit.
+        // Investigate if letting the CompletableFuture thread pool deal with the sync invocation
+        // is indeed more effective
+        
         return webClient.rx(executorService);
     }
 
     
     @SuppressWarnings("rawtypes")
     @Override
-    public <T extends RxInvoker> T rx(Class<? extends RxInvokerProvider<T>> pClass) {
-        return rx(pClass, (ExecutorService)null);
+    public <T extends RxInvoker> T rx(Class<T> rxCls) {
+        return rx(rxCls, (ExecutorService)null);
     }
 
     @SuppressWarnings("rawtypes")
     @Override
-    public <T extends RxInvoker> T rx(Class<? extends RxInvokerProvider<T>> pClass, ExecutorService execService) {
-        RxInvokerProvider<T> p = null;
-        try {
-            p = pClass.newInstance();
-        } catch (Throwable t) {
-            throw new ProcessingException(t);
-        }
-        return rx(p, execService);
+    public <T extends RxInvoker> T rx(Class<T> rxCls, ExecutorService executorService) {
+        return webClient.rx(rxCls, executorService);
     }
-    
-    @SuppressWarnings("rawtypes")
-    @Override
-    public <T extends RxInvoker> T rx(RxInvokerProvider<T> p) {
-        return rx(p, (ExecutorService)null);
-    }
-
-    @SuppressWarnings("rawtypes")
-    @Override
-    public <T extends RxInvoker> T rx(RxInvokerProvider<T> p, ExecutorService execService) {
-        return p.getRxInvoker(this, execService);
-    }
-    
     
     @Override
     public NioInvoker nio() {

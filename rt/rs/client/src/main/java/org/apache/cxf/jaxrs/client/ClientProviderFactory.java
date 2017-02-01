@@ -25,6 +25,7 @@ import java.util.List;
 
 import javax.ws.rs.client.ClientRequestFilter;
 import javax.ws.rs.client.ClientResponseFilter;
+import javax.ws.rs.client.RxInvokerProvider;
 import javax.ws.rs.core.Configuration;
 
 import org.apache.cxf.Bus;
@@ -42,7 +43,7 @@ public final class ClientProviderFactory extends ProviderFactory {
         new ArrayList<ProviderInfo<ClientResponseFilter>>(1);
     private List<ProviderInfo<ResponseExceptionMapper<?>>> responseExceptionMappers = 
         new ArrayList<ProviderInfo<ResponseExceptionMapper<?>>>(1);
-    
+    private RxInvokerProvider<?> rxInvokerProvider;
     private ClientProviderFactory(Bus bus) {
         super(bus);
     }
@@ -84,6 +85,10 @@ public final class ClientProviderFactory extends ProviderFactory {
             
             if (ResponseExceptionMapper.class.isAssignableFrom(providerCls)) {
                 addProviderToList(responseExceptionMappers, provider);
+            }
+            
+            if (RxInvokerProvider.class.isAssignableFrom(providerCls)) {
+                this.rxInvokerProvider = RxInvokerProvider.class.cast(provider.getProvider());
             }
         }
         Collections.sort(clientRequestFilters, 
@@ -133,5 +138,8 @@ public final class ClientProviderFactory extends ProviderFactory {
         return (Configuration)m.getExchange().getOutMessage()
             .getContextualProperty(Configuration.class.getName());
     }
-    
+
+    public RxInvokerProvider<?> getRxInvokerProvider() {
+        return rxInvokerProvider;
+    }
 }
