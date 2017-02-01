@@ -24,6 +24,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.transfer.Create;
 import org.apache.cxf.ws.transfer.Get;
@@ -38,16 +39,19 @@ import org.junit.Test;
 
 public class GetTest {
     
+    static final String PORT = TestUtil.getPortNumber(CreateStudentTest.class);
+    static final String PORT2 = TestUtil.getPortNumber(CreateStudentTest.class, 2);
+    
     private static EndpointReferenceType studentRef;
     
     private static EndpointReferenceType teacherRef;
     
     @BeforeClass
     public static void beforeClass() throws XMLStreamException {
-        TestUtils.createStudentsServers();
-        TestUtils.createTeachersServers();
+        TestUtils.createStudentsServers(PORT, PORT2);
+        TestUtils.createTeachersServers(PORT2);
 
-        ResourceFactory rf = TestUtils.createResourceFactoryClient();
+        ResourceFactory rf = TestUtils.createResourceFactoryClient(PORT);
         
         Document createStudentXML = StaxUtils.read(
                 GetTest.class.getResourceAsStream("/xml/createStudent.xml"));
