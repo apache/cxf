@@ -102,7 +102,7 @@ public class AssertionInfoMap extends HashMap<QName, Collection<AssertionInfo>> 
             Collection<AssertionInfo> ail = getAssertionInfo(ass.getName());
             boolean found = false;
             for (AssertionInfo ai : ail) {
-                if (ai.getAssertion().equal(ass)) {
+                if (ai.getAssertion().equal(ass) || ai.getAssertion().equals(ass)) {
                     found = true;
                     if (!ai.isAsserted() && !ass.isOptional()) {
                         errors.add(ass.getName());
