@@ -1572,7 +1572,6 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.Test
-    @org.junit.Ignore
     public void testSymmetricWithOptionalAddressing() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
