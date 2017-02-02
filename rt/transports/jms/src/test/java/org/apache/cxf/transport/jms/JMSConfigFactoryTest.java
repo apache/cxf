@@ -87,4 +87,11 @@ public class JMSConfigFactoryTest extends AbstractJMSTester {
         Assert.assertEquals(4, jmsConfig.getConcurrentConsumers());
 
     }
+    
+    @Test
+    public void testMessageSelectorIsSet() {
+        EndpointInfo ei = setupServiceInfo("HelloWorldSelectorService", "HelloWorldPort");
+        JMSConfiguration config = JMSConfigFactory.createFromEndpointInfo(bus, ei, target);
+        Assert.assertEquals("customJMSAttribute=helloWorld", config.getMessageSelector());        
+    }
 }
