@@ -33,15 +33,39 @@ import javax.transaction.Status;
 import javax.transaction.Transaction;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.transport.jms.JMSConfiguration;
+import org.apache.cxf.transport.jms.JMSFactory;
 
 public class PollingMessageListenerContainer extends AbstractMessageListenerContainer {
     private static final Logger LOG = LogUtils.getL7dLogger(PollingMessageListenerContainer.class);
+
+    private JMSConfiguration jmsConfig;
+    private boolean reply;
+
+    public PollingMessageListenerContainer(JMSConfiguration jmsConfig, boolean isReply,
+                                           MessageListener listenerHandler) {
+        this.jmsConfig = jmsConfig;
+        this.reply = isReply;
+        this.listenerHandler = listenerHandler;
+    }
 
     public PollingMessageListenerContainer(Connection connection, Destination destination,
                                            MessageListener listenerHandler) {
         this.connection = connection;
         this.destination = destination;
         this.listenerHandler = listenerHandler;
+    }
+
+    private boolean isReply() {
+        return reply;
+    }
+
+    private Connection createConnection() {
+        try {
+            return JMSFactory.createConnection(jmsConfig);
+        } catch (JMSException e) {
+            throw JMSUtil.convertJmsException(e);
+        }
     }
 
     private class Poller implements Runnable {
@@ -51,9 +75,28 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
             while (running) {
                 try (ResourceCloser closer = new ResourceCloser()) {
                     closer.register(createInitialContext());
+                    Connection connection;
+                    if (jmsConfig != null && jmsConfig.isOneSessionPerConnection()) {
+                        connection = closer.register(createConnection());
+                    } else {
+                        connection = PollingMessageListenerContainer.this.connection;
+                    }
                     // Create session early to optimize performance
                     Session session = closer.register(connection.createSession(transacted, acknowledgeMode));
-                    MessageConsumer consumer = closer.register(createConsumer(session));
+                    MessageConsumer consumer;
+                    if (jmsConfig != null && jmsConfig.isOneSessionPerConnection()) {
+                        Destination destination;
+                        if (!isReply()) {
+                            destination = jmsConfig.getTargetDestination(session);
+                        } else {
+                            destination = jmsConfig.getReplyDestination(session);
+                        }
+                        consumer = closer.register(createConsumer(destination, session));
+                        connection.start();
+                    } else {
+                        consumer = closer.register(createConsumer(session));
+                    }
+
                     while (running) {
                         Message message = consumer.receive(1000);
                         try {
@@ -100,21 +143,43 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
                         throw new IllegalStateException("External transactions are not supported in XAPoller");
                     }
                     transactionManager.begin();
-                    /*
-                     * Create session inside transaction to give it the 
-                     * chance to enlist itself as a resource
-                     */
-                    Session session = closer.register(connection.createSession(transacted, acknowledgeMode));
-                    MessageConsumer consumer = closer.register(createConsumer(session));
-                    Message message = consumer.receive(1000);
+
                     try {
+                        Connection connection;
+                        if (jmsConfig != null && jmsConfig.isOneSessionPerConnection()) {
+                            connection = closer.register(createConnection());
+                        } else {
+                            connection = PollingMessageListenerContainer.this.connection;
+                        }
+
+                        /*
+                         * Create session inside transaction to give it the
+                         * chance to enlist itself as a resource
+                         */
+                        Session session = closer.register(connection.createSession(transacted, acknowledgeMode));
+                        MessageConsumer consumer;
+                        if (jmsConfig != null && jmsConfig.isOneSessionPerConnection()) {
+                            Destination destination;
+                            if (!isReply()) {
+                                destination = jmsConfig.getTargetDestination(session);
+                            } else {
+                                destination = jmsConfig.getReplyDestination(session);
+                            }
+                            consumer = closer.register(createConsumer(destination, session));
+                            connection.start();
+                        } else {
+                            consumer = closer.register(createConsumer(session));
+                        }
+
+                        Message message = consumer.receive(1000);
+
                         if (message != null) {
                             listenerHandler.onMessage(message);
                         }
                         transactionManager.commit();
                     } catch (Throwable e) {
                         LOG.log(Level.WARNING, "Exception while processing jms message in cxf. Rolling back", e);
-                        safeRollBack(session);
+                        safeRollBack();
                     }
                 } catch (Exception e) {
                     LOG.log(Level.WARNING, "Unexpected exception. Restarting session and consumer", e);
@@ -124,7 +189,7 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
 
         }
         
-        private void safeRollBack(Session session) {
+        private void safeRollBack() {
             try {
                 transactionManager.rollback();
             } catch (Exception e) {
@@ -135,6 +200,10 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
     }
     
     private MessageConsumer createConsumer(Session session) throws JMSException {
+        return createConsumer(this.destination, session);
+    }
+
+    private MessageConsumer createConsumer(Destination destination, Session session) throws JMSException {
         if (durableSubscriptionName != null && destination instanceof Topic) {
             return session.createDurableSubscriber((Topic)destination, durableSubscriptionName,
                                                    messageSelector, pubSubNoLocal);

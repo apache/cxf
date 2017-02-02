@@ -90,6 +90,7 @@ public class JMSConfiguration {
     private boolean useConduitIdSelector = true;
     private String conduitSelectorPrefix;
     private boolean jmsProviderTibcoEms;
+    private boolean oneSessionPerConnection;
 
     private TransactionManager transactionManager;
 
@@ -433,6 +434,14 @@ public class JMSConfiguration {
         this.jmsProviderTibcoEms = jmsProviderTibcoEms;
     }
 
+    public boolean isOneSessionPerConnection() {
+        return oneSessionPerConnection;
+    }
+
+    public void setOneSessionPerConnection(boolean oneSessionPerConnection) {
+        this.oneSessionPerConnection = oneSessionPerConnection;
+    }
+    
     public static Destination resolveOrCreateDestination(final Session session,
                                                          final DestinationResolver resolver,
                                                          final String replyToDestinationName,
