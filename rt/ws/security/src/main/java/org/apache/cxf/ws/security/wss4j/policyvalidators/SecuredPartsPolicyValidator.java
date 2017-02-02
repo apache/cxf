@@ -35,9 +35,9 @@ import org.apache.wss4j.dom.WSDataRef;
 import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SPConstants;
+import org.apache.wss4j.policy.model.AbstractSecuredParts;
 import org.apache.wss4j.policy.model.Attachments;
 import org.apache.wss4j.policy.model.Header;
-import org.apache.wss4j.policy.model.SignedParts;
 
 /**
  * Validate either a SignedParts or EncryptedParts policy
@@ -86,7 +86,7 @@ public class SecuredPartsPolicyValidator implements SecurityPolicyValidator {
                 // they are a child of a SupportingToken
                 continue;
             }
-            SignedParts p = (SignedParts)ai.getAssertion();
+            AbstractSecuredParts p = (AbstractSecuredParts)ai.getAssertion();
             ai.setAsserted(true);
             
             if (p.isBody()) {

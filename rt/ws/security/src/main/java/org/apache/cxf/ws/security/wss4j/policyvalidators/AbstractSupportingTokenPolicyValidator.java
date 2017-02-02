@@ -58,6 +58,7 @@ import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.token.KerberosSecurity;
 import org.apache.wss4j.policy.SPConstants;
+import org.apache.wss4j.policy.model.AbstractSecuredParts;
 import org.apache.wss4j.policy.model.AbstractSecurityAssertion;
 import org.apache.wss4j.policy.model.EncryptedElements;
 import org.apache.wss4j.policy.model.EncryptedParts;
@@ -611,7 +612,7 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSec
      * Validate the SignedParts or EncryptedParts policies
      */
     private boolean validateSignedEncryptedParts(
-        SignedParts parts,
+        AbstractSecuredParts parts,
         boolean content,
         List<WSSecurityEngineResult> protResults,
         List<WSSecurityEngineResult> tokenResults,
