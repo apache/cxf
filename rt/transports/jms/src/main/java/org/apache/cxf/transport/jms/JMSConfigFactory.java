@@ -129,6 +129,7 @@ public final class JMSConfigFactory {
         
         String targetService = endpoint.getTargetService();
         jmsConfig.setTargetService(targetService);
+        jmsConfig.setMessageSelector(endpoint.getMessageSelector());
         return jmsConfig;
     }
 
