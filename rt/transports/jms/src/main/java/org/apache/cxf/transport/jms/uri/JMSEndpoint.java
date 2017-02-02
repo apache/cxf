@@ -86,6 +86,7 @@ public class JMSEndpoint {
     private boolean useConduitIdSelector = true;
     private String username;
     private int concurrentConsumers = 1;
+    private String messageSelector;
 
     /**
      * @param uri
@@ -476,5 +477,15 @@ public class JMSEndpoint {
             throw new IllegalArgumentException(v);
         }
     }
+
+	public String getMessageSelector() {
+		return messageSelector;
+	}
+
+	public void setMessageSelector(String messageSelector) {
+		this.messageSelector = messageSelector;
+	}
+    
+    
     
 }
