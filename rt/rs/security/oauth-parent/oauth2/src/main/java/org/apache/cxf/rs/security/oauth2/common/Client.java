@@ -50,6 +50,7 @@ public class Client implements Serializable {
     private String applicationDescription;
     private String applicationWebUri;
     private String applicationLogoUri;
+    private String applicationLogoutUri;
     private List<String> applicationCertificates = new LinkedList<String>();
     private List<String> redirectUris = new LinkedList<String>();
 
@@ -392,5 +393,13 @@ public class Client implements Serializable {
 
     public void setRegisteredDynamically(boolean registeredDynamically) {
         this.registeredDynamically = registeredDynamically;
+    }
+
+    public String getApplicationLogoutUri() {
+        return applicationLogoutUri;
+    }
+
+    public void setApplicationLogoutUri(String applicationLogoutUri) {
+        this.applicationLogoutUri = applicationLogoutUri;
     }
 }
