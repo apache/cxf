@@ -31,7 +31,8 @@ import javax.xml.ws.Holder;
 import javax.xml.ws.Service;
 import javax.xml.ws.soap.MTOMFeature;
 
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
+import org.apache.cxf.ext.logging.event.PrintWriterEventSender;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.local.LocalConduit;
 
@@ -135,7 +136,7 @@ public class MtomFeatureClientServerTest extends AbstractBusClientServerTestBase
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         PrintWriter writer = new PrintWriter(bos, true);
 
-        LoggingOutInterceptor out = new LoggingOutInterceptor(writer);
+        LoggingOutInterceptor out = new LoggingOutInterceptor(new PrintWriterEventSender(writer));
         this.bus.getOutInterceptors().add(out);
 
         return bos;

@@ -28,10 +28,10 @@ import javax.xml.ws.BindingProvider;
 import org.w3c.dom.Node;
 
 import org.apache.cxf.binding.soap.SoapHeader;
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.headers.Header;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.intfault.BadRecordLitFault;
 import org.apache.intfault.Greeter;

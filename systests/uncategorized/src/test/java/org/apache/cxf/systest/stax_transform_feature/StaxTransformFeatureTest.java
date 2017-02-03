@@ -30,14 +30,14 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
+import org.apache.cxf.ext.logging.event.LogEvent;
+import org.apache.cxf.ext.logging.event.LogEventSender;
 import org.apache.cxf.greeter_control.Greeter;
 import org.apache.cxf.greeter_control.GreeterService;
-import org.apache.cxf.interceptor.Fault;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.interceptor.transform.TransformInInterceptor;
 import org.apache.cxf.interceptor.transform.TransformOutInterceptor;
-import org.apache.cxf.message.Message;
 import org.apache.cxf.systest.interceptor.GreeterImpl;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
@@ -57,8 +57,8 @@ public class StaxTransformFeatureTest extends AbstractBusClientServerTestBase {
     private static final Logger LOG = LogUtils.getLogger(StaxTransformFeatureTest.class);
     private static final String GREETER_PORT_ADDRESS = "http://localhost:" + PORT + "/SoapContext/GreeterPort";
     
-    private static TestLoggingInInterceptor serverlogIn = new TestLoggingInInterceptor();
-    private static TestLoggingOutInterceptor serverlogOut = new TestLoggingOutInterceptor();
+    private static TestLoggingEventSender serverlogIn = new TestLoggingEventSender();
+    private static TestLoggingEventSender serverlogOut = new TestLoggingEventSender();
     private static TransformInInterceptor servertransIn = new TransformInInterceptor();
     private static TransformOutInterceptor servertransOut = new TransformOutInterceptor();
     
@@ -74,9 +74,9 @@ public class StaxTransformFeatureTest extends AbstractBusClientServerTestBase {
             BusFactory.setDefaultBus(bus);
             setBus(bus);
 
-            bus.getInInterceptors().add(serverlogIn);
-            bus.getOutInterceptors().add(serverlogOut);
-            bus.getOutFaultInterceptors().add(serverlogOut);
+            bus.getInInterceptors().add(new LoggingInInterceptor(serverlogIn));
+            bus.getOutInterceptors().add(new LoggingOutInterceptor(serverlogOut));
+            bus.getOutFaultInterceptors().add(new LoggingOutInterceptor(serverlogOut));
 
 
             Map<String, String> inElements = new HashMap<String, String>();
@@ -149,11 +149,12 @@ public class StaxTransformFeatureTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus();
         BusFactory.setDefaultBus(bus);
 
-        TestLoggingInInterceptor logIn = new TestLoggingInInterceptor();
-        bus.getInInterceptors().add(logIn);
-        TestLoggingOutInterceptor logOut = new TestLoggingOutInterceptor();
-        bus.getOutInterceptors().add(logOut);
-        bus.getOutFaultInterceptors().add(logOut);
+        TestLoggingEventSender logIn = new TestLoggingEventSender();
+        bus.getInInterceptors().add(new LoggingInInterceptor(logIn));
+        bus.getInFaultInterceptors().add(new LoggingInInterceptor(logIn));
+        TestLoggingEventSender logOut = new TestLoggingEventSender();
+        bus.getOutInterceptors().add(new LoggingOutInterceptor(logOut));
+        bus.getOutFaultInterceptors().add(new LoggingOutInterceptor(logOut));
 
         TransformInInterceptor transIn = new TransformInInterceptor();
         Map<String, String> inElements = new HashMap<String, String>();
@@ -175,7 +176,7 @@ public class StaxTransformFeatureTest extends AbstractBusClientServerTestBase {
         
         updateAddressPort(greeter, PORT);
         LOG.fine("Created greeter client.");
-        
+
         // ping 1: request-response transformation
         greeter.pingMe();
         verifyPayload(logOut.getMessage(), "dontPingMe");
@@ -187,10 +188,11 @@ public class StaxTransformFeatureTest extends AbstractBusClientServerTestBase {
         serverlogIn.cleaerMessage();
         logOut.cleaerMessage();
         logIn.cleaerMessage();
-        
+
         // ping 2: request-fault transformation
         try {
             greeter.pingMe();
+            fail("Ping should have failed");
         } catch (Exception e) {
             assertEquals("Pings succeed only every other time.", e.getMessage());
         }
@@ -212,6 +214,7 @@ public class StaxTransformFeatureTest extends AbstractBusClientServerTestBase {
         servertransOut.setSkipOnFault(true);
         try {
             greeter.pingMe();
+            fail("Ping should have failed");
         } catch (Exception e) {
             assertEquals("Pings succeed only every other time.", e.getMessage());
         }
@@ -226,49 +229,25 @@ public class StaxTransformFeatureTest extends AbstractBusClientServerTestBase {
     private void verifyPayload(String m, String value) {
         assertNotNull("message not logged", m);
         // the entire soap envelope is logged
-        assertTrue(m.indexOf("Payload: <soap:Envelope") > 0 && m.indexOf("</soap:Envelope>") > 0);
+        assertTrue(m, m.indexOf("<soap:Envelope") >= 0 && m.indexOf("</soap:Envelope>") > 0);
         // the transformed body is logged
-        assertTrue(value + " must be found in payload", m.indexOf(value) > 0);
+        assertTrue(value + " must be found in payload: " + m, m.indexOf(value) > 0);
     }
 
-    static class TestLoggingInInterceptor extends LoggingInInterceptor {
+    static class TestLoggingEventSender implements LogEventSender {
         private String logMessage;
         
-        @Override
-        public void handleMessage(Message msg) throws Fault {
-            msg.getExchange().getEndpoint().getEndpointInfo().setProperty("MessageLogger", LOG);            
-            super.handleMessage(msg);
-        }
-        @Override
-        protected void log(Logger logger, String msg) {
-            logMessage = msg;
-        }
         public String getMessage() {
             return logMessage;
         }
         public void cleaerMessage() {
             logMessage = null;
         }
-    }
-    
-    static class TestLoggingOutInterceptor extends LoggingOutInterceptor {
-        private String message;
-        
         @Override
-        public void handleMessage(Message msg) throws Fault {
-            msg.getExchange().getEndpoint().getEndpointInfo().setProperty("MessageLogger", LOG);            
-            super.handleMessage(msg);
-        }
-        @Override
-        protected void log(Logger logger, String msg) {
-            message = msg;
-        }
-        public String getMessage() {
-            return message;
-        }
-        public void cleaerMessage() {
-            message = null;
+        public void send(LogEvent event) {
+            logMessage = event.getPayload();
         }
     }
+
 
 }

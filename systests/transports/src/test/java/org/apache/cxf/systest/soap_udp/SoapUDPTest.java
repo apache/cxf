@@ -23,7 +23,7 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.feature.LoggingFeature;
+import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.hello_world_soap_http.Greeter;
 

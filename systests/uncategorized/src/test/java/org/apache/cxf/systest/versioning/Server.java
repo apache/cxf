@@ -22,7 +22,7 @@ package org.apache.cxf.systest.versioning;
 import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.transport.MultipleEndpointObserver;

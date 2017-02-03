@@ -28,9 +28,9 @@ import javax.xml.transform.Source;
 import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.factory_pattern.NumberFactory;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;

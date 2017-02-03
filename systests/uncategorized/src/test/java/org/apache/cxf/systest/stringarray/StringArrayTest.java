@@ -23,8 +23,9 @@ import java.io.StringWriter;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
+import org.apache.cxf.ext.logging.event.PrintWriterEventSender;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.stringarray.SOAPServiceRPCLit;
 import org.apache.stringarray.StringListTest;
@@ -53,11 +54,11 @@ public class StringArrayTest extends AbstractBusClientServerTestBase {
         setBus(bus);
         StringWriter swin = new java.io.StringWriter();
         java.io.PrintWriter pwin = new java.io.PrintWriter(swin);
-        LoggingInInterceptor logIn = new LoggingInInterceptor(pwin);
+        LoggingInInterceptor logIn = new LoggingInInterceptor(new PrintWriterEventSender(pwin));
         
         StringWriter swout = new java.io.StringWriter();
         java.io.PrintWriter pwout = new java.io.PrintWriter(swout);
-        LoggingOutInterceptor logOut = new LoggingOutInterceptor(pwout);
+        LoggingOutInterceptor logOut = new LoggingOutInterceptor(new PrintWriterEventSender(pwout));
         
         
         getBus().getInInterceptors().add(logIn);
@@ -69,10 +70,12 @@ public class StringArrayTest extends AbstractBusClientServerTestBase {
         String[] res =  port.stringListTest(strs);
         assertArrayEquals(strs, res);      
 
-        assertTrue("Request message is not marshalled correctly and @XmlList does not take effect",
-                     swout.toString().indexOf("<in>org apache cxf</in>") > -1);
-        assertTrue("Response message is not marshalled correctly and @XmlList does not take effect",
-                     swin.toString().indexOf("<out>org apache cxf</out>") > -1);
+        assertTrue("Request message is not marshalled correctly and @XmlList does not take effect:\n" 
+                   + swout.toString(),
+                   swout.toString().indexOf("<in>org apache cxf</in>") > -1);
+        assertTrue("Response message is not marshalled correctly and @XmlList does not take effect\n" 
+                   + swin.toString(),
+                   swin.toString().indexOf("<out>org apache cxf</out>") > -1);
     }
     
 }

@@ -38,6 +38,8 @@ import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
+import org.apache.cxf.ext.logging.event.PrintWriterEventSender;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.greeter_control.Control;
 import org.apache.cxf.greeter_control.ControlImpl;
@@ -47,7 +49,6 @@ import org.apache.cxf.greeter_control.Greeter;
 import org.apache.cxf.greeter_control.GreeterService;
 import org.apache.cxf.greeter_control.PingMeFault;
 import org.apache.cxf.greeter_control.types.FaultLocation;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseComparator;
@@ -199,8 +200,8 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
             // writer to grab the content of soap fault.
             // robust is not yet used at client's side, but I think it should
             StringWriter writer = new StringWriter();
-            ((Client)greeter).getInInterceptors().add(new LoggingInInterceptor());
-            ((LoggingInInterceptor)greeterBus.getInInterceptors().get(0)).setPrintWriter(new PrintWriter(writer));
+            ((Client)greeter).getInInterceptors()
+                .add(new LoggingInInterceptor(new PrintWriterEventSender(new PrintWriter(writer))));
             // it should tell CXF to convert one-way robust out faults into real SoapFaultException
             ((Client)greeter).getEndpoint().put(Message.ROBUST_ONEWAY, true);
             greeter.greetMeOneWay("oneway");
