@@ -215,7 +215,12 @@ public class BookServer20 extends AbstractBusTestServerBase {
                 replaceStream(context);
             } else if (path.endsWith("books/check2")) {
                 replaceStream(context);
+            } else if (path.endsWith("books/checkNQuery")) {
+                URI requestURI = URI.create(path.replace("NQuery", "2?a=b"));
+                context.setRequestUri(requestURI);
+                replaceStream(context);
             }
+            
         }
         private void replaceStream(ContainerRequestContext context) {
             InputStream is = new ByteArrayInputStream("123".getBytes());
