@@ -115,9 +115,13 @@ public class ContainerRequestContextImpl extends AbstractRequestContextImpl
         doSetRequestUri(requestUri);
     }
     
-    public void doSetRequestUri(URI requestUri) throws IllegalStateException {
+    protected void doSetRequestUri(URI requestUri) throws IllegalStateException {
         checkNotPreMatch();
-        HttpUtils.resetRequestURI(m, requestUri.toString());
+        HttpUtils.resetRequestURI(m, requestUri.getRawPath());
+        String query = requestUri.getRawQuery();
+        if (query != null) {
+            m.put(Message.QUERY_STRING, query);
+        }
     }
 
     @Override
