@@ -715,6 +715,14 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         wc.accept("text/plain").type("text/plain");
         assertTrue(wc.post("s", Boolean.class));
     }
+    @Test
+    public void testBookExistsServerAddressOverwriteWithQuery() throws Exception {
+        String address = "http://localhost:" + PORT + "/bookstore/books/checkNQuery?a=b";
+        WebClient wc = WebClient.create(address);
+        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000);
+        wc.accept("text/plain").type("text/plain");
+        assertTrue(wc.post("s", Boolean.class));
+    }
     
     @Test
     public void testPostBookAsync() throws Exception {
