@@ -281,7 +281,7 @@ public class DefaultLogEventMapper implements LogEventMapper {
      * @param message the message
      * @return the event type
      */
-    private EventType getEventType(Message message) {
+    public EventType getEventType(Message message) {
         boolean isRequestor = MessageUtils.isRequestor(message);
         boolean isFault = MessageUtils.isFault(message);
         if (!isFault) {
@@ -320,7 +320,7 @@ public class DefaultLogEventMapper implements LogEventMapper {
         }
     }
 
-    private void setEpInfo(Message message, final LogEvent event) {
+    public void setEpInfo(Message message, final LogEvent event) {
         EndpointInfo endpoint = getEPInfo(message);
         event.setPortName(endpoint.getName());
         event.setPortTypeName(endpoint.getName());
