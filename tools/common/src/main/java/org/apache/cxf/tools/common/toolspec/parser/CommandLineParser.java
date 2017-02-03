@@ -181,8 +181,7 @@ public class CommandLineParser {
             try {
                 TransformerFactory transformerFactory = TransformerFactory.newInstance();
                 transformerFactory.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
-                Transformer serializer = transformerFactory.newInstance()
-                    .newTransformer(
+                Transformer serializer = transformerFactory.newTransformer(
                                     new StreamSource(Tool.class
                                         .getResourceAsStream("indent-no-xml-declaration.xsl")));
 

@@ -109,8 +109,8 @@ public final class LdapUtils {
 
         List<String> ldapAttributes = null;
 
-        AttributesMapper mapper = 
-            new AttributesMapper() {
+        AttributesMapper<Object> mapper = 
+            new AttributesMapper<Object>() {
             public Object mapFromAttributes(Attributes attrs) throws NamingException {
                 NamingEnumeration<? extends Attribute> attrEnum = attrs.getAll();
                 while (attrEnum.hasMore()) {

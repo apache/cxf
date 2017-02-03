@@ -630,7 +630,7 @@ public class RedeliveryQueueImpl implements RedeliveryQueue {
                 }
                 message.removeContent(XMLStreamReader.class);
             }
-            List olist = message.getContent(List.class);
+            List<?> olist = message.getContent(List.class);
             if (olist != null && olist.size() == 1) {
                 Object o = olist.get(0);
                 if (o instanceof XMLStreamReader) {
