@@ -62,7 +62,7 @@ public class AttachmentCallbackHandler implements CallbackHandler {
                     // Load all attachments
                     attachmentId = null;
                 }
-                loadAttachments(attachmentList, attachmentId);
+                loadAttachments(attachmentList, attachmentId, attachmentRequestCallback.isRemoveAttachments());
             } else if (callback instanceof AttachmentResultCallback) {
                 AttachmentResultCallback attachmentResultCallback = (AttachmentResultCallback) callback;
                 
@@ -96,7 +96,8 @@ public class AttachmentCallbackHandler implements CallbackHandler {
 
     private void loadAttachments(
         List<org.apache.wss4j.common.ext.Attachment> attachmentList,
-        String attachmentId
+        String attachmentId,
+        boolean removeAttachments
     ) throws IOException {
         final Collection<org.apache.cxf.message.Attachment> attachments = soapMessage.getAttachments();
         // Calling LazyAttachmentCollection.size() here to force it to load the attachments
@@ -121,7 +122,9 @@ public class AttachmentCallbackHandler implements CallbackHandler {
                 }
                 attachmentList.add(att);
 
-                iterator.remove();
+                if (removeAttachments) {
+                    iterator.remove();
+                }
             }
         }
     }
