@@ -258,8 +258,9 @@ public class DefaultLogEventMapper implements LogEventMapper {
         String requestUri = safeGet(message, Message.REQUEST_URI);
         if (requestUri != null) {
             String basePath = safeGet(message, Message.BASE_PATH);
-            int baseUriLength = (basePath != null) ? basePath.length() : 0;
-            path = requestUri.substring(baseUriLength);
+            if (basePath != null && requestUri.startsWith(basePath)) {
+                path = requestUri.substring(basePath.length());
+            }
             if (path.isEmpty()) {
                 path = "/";
             }
