@@ -29,7 +29,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import javax.security.auth.Subject;
-import javax.xml.stream.XMLStreamReader;
 
 import org.apache.cxf.binding.Binding;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
@@ -42,7 +41,6 @@ import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.InterfaceInfo;
 import org.apache.cxf.service.model.ServiceInfo;
-import org.apache.cxf.service.model.ServiceModelUtil;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.ContextUtils;
 
@@ -156,7 +154,7 @@ public class DefaultLogEventMapper implements LogEventMapper {
                     }
                     uri = address + uri;
                 }
-            } else {
+            } else if (address != null) {
                 uri = address;
             }
         }
@@ -207,34 +205,12 @@ public class DefaultLogEventMapper implements LogEventMapper {
         BindingOperationInfo boi = null;
 
         boi = message.getExchange().getBindingOperationInfo();
-        if (null == boi) {
-            boi = getOperationFromContent(message);
-        }
-
-        if (null == boi) {
-            Message inMsg = message.getExchange().getInMessage();
-            if (null != inMsg) {
-                Message reqMsg = inMsg.getExchange().getInMessage();
-                if (null != reqMsg) {
-                    boi = getOperationFromContent(reqMsg);
-                }
-            }
-        }
 
         if (null != boi) {
             operationName = boi.getName().toString();
         }
 
         return operationName;
-    }
-
-    private BindingOperationInfo getOperationFromContent(Message message) {
-        XMLStreamReader xmlReader = message.getContent(XMLStreamReader.class);
-        if (xmlReader != null) {
-            return ServiceModelUtil.getOperation(message.getExchange(), xmlReader.getName());
-        } else {
-            return null;
-        }
     }
 
     private Message getEffectiveMessage(Message message) {
@@ -258,7 +234,9 @@ public class DefaultLogEventMapper implements LogEventMapper {
         String requestUri = safeGet(message, Message.REQUEST_URI);
         if (requestUri != null) {
             String basePath = safeGet(message, Message.BASE_PATH);
-            if (basePath != null && requestUri.startsWith(basePath)) {
+            if (basePath == null) {
+                path = requestUri;
+            } else if (requestUri.startsWith(basePath)) {
                 path = requestUri.substring(basePath.length());
             }
             if (path.isEmpty()) {
