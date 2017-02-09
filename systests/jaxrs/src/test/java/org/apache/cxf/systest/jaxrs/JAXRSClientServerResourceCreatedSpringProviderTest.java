@@ -39,10 +39,10 @@ import javax.xml.xpath.XPathConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.helpers.XPathUtils;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.model.wadl.WadlGenerator;

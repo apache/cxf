@@ -32,8 +32,8 @@ public class Book {
     }
     
     public Book(String name, long id) {
-        this.setName(name);
-        this.setId(id);
+        this.name = name;
+        this.id = id;
     }
 
     public String getName() {

@@ -152,8 +152,8 @@ public class WSAFromWSDLTest extends AbstractWSATestBase {
             String expectedOut = "3in";
             String expectedIn = "3fault";
     
-            assertTrue(output.toString().indexOf(expectedOut) != -1);
-            assertTrue(input.toString().indexOf(expectedIn) != -1);
+            assertTrue(output.toString(), output.toString().indexOf(expectedOut) != -1);
+            assertTrue(input.toString(), input.toString().indexOf(expectedIn) != -1);
         }
     }
     

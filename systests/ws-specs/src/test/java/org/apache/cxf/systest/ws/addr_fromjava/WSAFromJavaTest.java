@@ -31,7 +31,7 @@ import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
 import org.apache.cxf.binding.soap.interceptor.ReadHeadersInterceptor;
 import org.apache.cxf.endpoint.Client;
-import org.apache.cxf.feature.LoggingFeature;
+import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.headers.Header;
 import org.apache.cxf.interceptor.Fault;
@@ -152,7 +152,7 @@ public class WSAFromJavaTest extends AbstractWSATestBase {
             //expected
         }
         assertLogContains(output.toString(), "//wsa:Action", "cxf");
-        assertTrue(output.toString().indexOf("SOAPAction=[\"cxf\"]") != -1);
+        assertTrue(output.toString(), output.toString().indexOf("SOAPAction=\"cxf\"") != -1);
     }
 
     private AddNumberImpl getPort() throws Exception {

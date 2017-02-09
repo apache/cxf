@@ -20,7 +20,6 @@
 package org.apache.cxf.systest.ws;
 
 import java.io.ByteArrayOutputStream;
-import java.io.PrintWriter;
 import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,30 +28,46 @@ import javax.xml.stream.XMLStreamException;
 
 import org.w3c.dom.Document;
 
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
+import org.apache.cxf.ext.logging.event.LogEvent;
+import org.apache.cxf.ext.logging.event.LogEventSender;
 import org.apache.cxf.helpers.XPathUtils;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 public class AbstractWSATestBase extends AbstractBusClientServerTestBase {
 
-    protected ByteArrayOutputStream setupInLogging() {
+    static class PayloadLogEventSender implements LogEventSender {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        PrintWriter writer = new PrintWriter(bos, true);
-        LoggingInInterceptor in = new LoggingInInterceptor(writer);
+
+        @Override
+        public void send(LogEvent event) {
+            try {
+                bos.write(("Address: " + event.getAddress()).getBytes("utf8"));
+                bos.write(("Headers: " + event.getHeaders().toString()).getBytes("utf8"));
+                bos.write(("Payload: " + event.getPayload()).getBytes("utf8"));
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    
+    
+    protected ByteArrayOutputStream setupInLogging() {
+        PayloadLogEventSender sender = new PayloadLogEventSender();
+        LoggingInInterceptor in = new LoggingInInterceptor(sender);
         this.bus.getInInterceptors().add(in);
-        return bos;
+        this.bus.getInFaultInterceptors().add(in);
+        return sender.bos;
     }
 
     protected ByteArrayOutputStream setupOutLogging() {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        PrintWriter writer = new PrintWriter(bos, true);
-
-        LoggingOutInterceptor out = new LoggingOutInterceptor(writer);
+        PayloadLogEventSender sender = new PayloadLogEventSender();
+        LoggingOutInterceptor out = new LoggingOutInterceptor(sender);
         this.bus.getOutInterceptors().add(out);
-
-        return bos;
+        this.bus.getOutFaultInterceptors().add(out);
+        return sender.bos;
     }
     
     

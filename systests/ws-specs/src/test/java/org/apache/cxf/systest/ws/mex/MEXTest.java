@@ -19,7 +19,7 @@
 
 package org.apache.cxf.systest.ws.mex;
 
-import org.apache.cxf.feature.LoggingFeature;
+import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.systest.ws.AbstractWSATestBase;
 import org.apache.cxf.ws.mex.MetadataExchange;

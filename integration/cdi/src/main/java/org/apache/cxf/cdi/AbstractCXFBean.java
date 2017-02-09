@@ -34,8 +34,10 @@ abstract class AbstractCXFBean<T> implements Bean<T> {
     public Set<Annotation> getQualifiers() {
         Set<Annotation> qualifiers = new HashSet<>();
         qualifiers.add(new AnnotationLiteral<Default>() {
+            private static final long serialVersionUID = 1L;
         });
         qualifiers.add(new AnnotationLiteral<Any>() {
+            private static final long serialVersionUID = 1L;
         });
         return qualifiers;
     }

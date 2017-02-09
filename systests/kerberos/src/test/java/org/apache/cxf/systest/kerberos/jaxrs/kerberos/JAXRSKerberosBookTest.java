@@ -26,7 +26,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.security.KerberosAuthOutInterceptor;

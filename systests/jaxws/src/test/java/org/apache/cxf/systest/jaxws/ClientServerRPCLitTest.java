@@ -53,9 +53,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import org.apache.cxf.binding.soap.Soap11;
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.helpers.XPathUtils;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CNamespaceContext;

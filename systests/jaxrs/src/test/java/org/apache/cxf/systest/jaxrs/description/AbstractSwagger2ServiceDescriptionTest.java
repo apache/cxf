@@ -32,8 +32,8 @@ import javax.ws.rs.core.Response.Status;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
+import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.feature.Feature;
-import org.apache.cxf.feature.LoggingFeature;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;

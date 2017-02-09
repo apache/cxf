@@ -22,9 +22,9 @@ package org.apache.cxf.systest.dispatch;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.Fault;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
