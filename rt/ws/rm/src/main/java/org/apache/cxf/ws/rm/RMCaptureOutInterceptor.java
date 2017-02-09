@@ -40,7 +40,6 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.interceptor.AttachmentOutInterceptor;
 import org.apache.cxf.interceptor.Fault;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.io.WriteOnCloseOutputStream;
 import org.apache.cxf.message.Exchange;
@@ -76,7 +75,8 @@ public class RMCaptureOutInterceptor extends AbstractRMInterceptor<Message>  {
     public RMCaptureOutInterceptor() {
         super(Phase.PRE_STREAM);
         addBefore(AttachmentOutInterceptor.class.getName());
-        addBefore(LoggingOutInterceptor.class.getName());
+        addBefore("org.apache.cxf.interceptor.LoggingOutInterceptor");
+        addBefore("org.apache.cxf.ext.logging.LoggingOutInterceptor");
     }
     
     protected void handle(Message msg) throws SequenceFault, RMException {  

@@ -231,7 +231,7 @@ public class DefaultCryptoCoverageChecker extends CryptoCoverageChecker {
         return encryptUsernameToken;
     }
 
-    public void setEncryptUsernameToken(boolean encryptUsernameToken) {
+    public final void setEncryptUsernameToken(boolean encryptUsernameToken) {
         this.encryptUsernameToken = encryptUsernameToken;
         
         XPathExpression soap11Expression = 

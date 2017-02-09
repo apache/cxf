@@ -23,8 +23,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
@@ -138,8 +136,6 @@ public class ResourceFactoryImpl implements ResourceFactory {
     
     private CreateResponse createRemotely(Create body, ResourceReference ref) {
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
-        factory.getInInterceptors().add(new LoggingInInterceptor());
-        factory.getOutInterceptors().add(new LoggingOutInterceptor());
         factory.setServiceClass(ResourceFactory.class);
         factory.setAddress(ref.getResourceURL() 
                 + TransferConstants.RESOURCE_REMOTE_SUFFIX);

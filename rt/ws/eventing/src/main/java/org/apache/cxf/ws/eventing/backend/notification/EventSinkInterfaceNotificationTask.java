@@ -31,7 +31,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.ws.eventing.EventType;
 import org.apache.cxf.ws.eventing.backend.database.SubscriptionTicket;

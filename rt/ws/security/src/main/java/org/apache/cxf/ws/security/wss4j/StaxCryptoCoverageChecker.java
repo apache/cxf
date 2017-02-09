@@ -447,7 +447,7 @@ public class StaxCryptoCoverageChecker extends AbstractPhaseInterceptor<SoapMess
         return encryptUsernameToken;
     }
 
-    public void setEncryptUsernameToken(boolean encryptUsernameToken) {
+    public final void setEncryptUsernameToken(boolean encryptUsernameToken) {
         this.encryptUsernameToken = encryptUsernameToken;
     }
 }

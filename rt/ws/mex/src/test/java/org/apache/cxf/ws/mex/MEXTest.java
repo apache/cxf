@@ -23,7 +23,7 @@ import javax.jws.WebMethod;
 import javax.jws.WebService;
 
 import org.apache.cxf.endpoint.Server;
-import org.apache.cxf.feature.LoggingFeature;
+import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.transport.local.LocalTransportFactory;
