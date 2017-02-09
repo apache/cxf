@@ -311,7 +311,7 @@ public class UDPDestination extends AbstractDestination {
             if (e != null && in != null) {
                 in.throwException(e);
             } else {
-                session.close(true);
+                session.closeOnFlush().awaitUninterruptibly();
             }
         }
         public void sessionIdle(IoSession session, IdleStatus status) {

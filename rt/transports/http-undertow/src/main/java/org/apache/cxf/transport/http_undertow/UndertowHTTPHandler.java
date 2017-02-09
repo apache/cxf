@@ -114,7 +114,7 @@ public class UndertowHTTPHandler implements HttpHandler {
         } catch (Throwable t) {
             t.printStackTrace();
             if (undertowExchange.isResponseChannelAvailable()) {
-                undertowExchange.setResponseCode(500);
+                undertowExchange.setStatusCode(500);
                 final String errorPage = "<html><head><title>Error</title>"
                     + "</head><body>Internal Error 500" + t.getMessage()
                     + "</body></html>";

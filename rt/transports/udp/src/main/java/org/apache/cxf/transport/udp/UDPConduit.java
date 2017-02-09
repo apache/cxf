@@ -149,7 +149,7 @@ public class UDPConduit extends AbstractConduit {
                     q = connections.get(s);
                 }
                 if (!q.offer(c)) {
-                    c.getSession().close(false);
+                    c.getSession().closeOnFlush();
                 }
             }
         }
@@ -158,7 +158,7 @@ public class UDPConduit extends AbstractConduit {
         super.close();
         for (Queue<ConnectFuture> f : connections.values()) {
             for (ConnectFuture cf : f) {
-                cf.getSession().close(false);
+                cf.getSession().closeOnFlush();
             }
         }
         connections.clear();

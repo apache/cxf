@@ -31,6 +31,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.transport.servlet.AbstractHTTPServlet;
 
 public class CxfUndertowServlet extends AbstractHTTPServlet {
+    private static final long serialVersionUID = 1L;
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)

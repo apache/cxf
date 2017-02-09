@@ -239,7 +239,7 @@ public class UndertowHTTPDestination extends ServletDestination {
     }
     
       
-    protected String getAddress(EndpointInfo endpointInfo) {
+    protected final String getAddress(EndpointInfo endpointInfo) {
         return endpointInfo.getAddress();
     }
     
