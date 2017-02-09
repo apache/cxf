@@ -38,7 +38,7 @@ import org.junit.Assert;
 @WebService(targetNamespace = "http://www.example.org/contract/DoubleIt", 
             serviceName = "DoubleItService", 
             endpointInterface = "org.example.contract.doubleit.DoubleItPortType")
-@Features(classes = org.apache.cxf.feature.LoggingFeature.class)              
+@Features(classes = org.apache.cxf.ext.logging.LoggingFeature.class)              
 public class DoubleItPortTypeImpl implements DoubleItPortType {
     
     @Resource

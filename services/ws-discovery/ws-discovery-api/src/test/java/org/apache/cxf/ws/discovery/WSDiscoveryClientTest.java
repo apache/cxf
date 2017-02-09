@@ -38,7 +38,6 @@ import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.feature.LoggingFeature;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.cxf.ws.discovery.internal.WSDiscoveryServiceImpl;
@@ -144,7 +143,6 @@ public final class WSDiscoveryClientTest {
         
         
         Bus bus  = BusFactory.newInstance().createBus();
-        new LoggingFeature().initialize(bus);
         WSDiscoveryClient c = new WSDiscoveryClient(bus);
         c.setVersion10();
         c.setAddress("soap.udp://239.255.255.250:" + PORT);
@@ -179,7 +177,6 @@ public final class WSDiscoveryClientTest {
             HelloType h = service.register(ep.getEndpointReference());
             
             bus  = BusFactory.newInstance().createBus();
-            new LoggingFeature().initialize(bus);
             WSDiscoveryClient c = new WSDiscoveryClient(bus);
             c.setVersion10();
             
