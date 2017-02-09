@@ -269,7 +269,7 @@ public class DefaultLogEventMapper implements LogEventMapper {
     }
     
     private static String safeGet(Message message, String key) {
-        if (!message.containsKey(key)) {
+        if (message == null || !message.containsKey(key)) {
             return null;
         }
         Object value = message.get(key);
