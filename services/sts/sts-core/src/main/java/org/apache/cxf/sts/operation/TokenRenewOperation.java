@@ -61,7 +61,7 @@ public class TokenRenewOperation extends AbstractOperation implements RenewOpera
 
     private static final Logger LOG = LogUtils.getL7dLogger(TokenRenewOperation.class);
 
-    private List<TokenRenewer> tokenRenewers = new ArrayList<TokenRenewer>();
+    private List<TokenRenewer> tokenRenewers = new ArrayList<>();
 
     public void setTokenRenewers(List<TokenRenewer> tokenRenewerList) {
         this.tokenRenewers = tokenRenewerList;

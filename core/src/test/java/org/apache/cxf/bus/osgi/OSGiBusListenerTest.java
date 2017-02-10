@@ -85,7 +85,7 @@ public class OSGiBusListenerTest extends Assert {
     public void testRegistratioWithServices() throws Exception {
         setUpClientLifeCycleListeners(SERVICE_BUNDLE_NAMES, new String[]{null, null}, null);
         setUpServerLifeCycleListeners(SERVICE_BUNDLE_NAMES, new String[]{null, null}, null);
-        Collection<Feature> lst = new ArrayList<Feature>();
+        Collection<Feature> lst = new ArrayList<>();
         setFeatures(SERVICE_BUNDLE_NAMES, new String[]{null, null}, lst);
         
         control.replay();
@@ -100,7 +100,7 @@ public class OSGiBusListenerTest extends Assert {
     public void testRegistratioWithServicesExcludes() throws Exception {
         setUpClientLifeCycleListeners(SERVICE_BUNDLE_NAMES, new String[]{null, null}, EXCLUDES);
         setUpServerLifeCycleListeners(SERVICE_BUNDLE_NAMES, new String[]{null, null}, EXCLUDES);
-        Collection<Feature> lst = new ArrayList<Feature>();
+        Collection<Feature> lst = new ArrayList<>();
         setFeatures(SERVICE_BUNDLE_NAMES, new String[]{null, null}, lst);
         EasyMock.expect(bus.getProperty("bus.extension.bundles.excludes")).andReturn(EXCLUDES);
         control.replay();
@@ -115,7 +115,7 @@ public class OSGiBusListenerTest extends Assert {
     public void testRegistratioWithServicesExcludesAndRestricted() throws Exception {
         setUpClientLifeCycleListeners(SERVICE_BUNDLE_NAMES, new String[]{RESTRICTED, null}, EXCLUDES);
         setUpServerLifeCycleListeners(SERVICE_BUNDLE_NAMES, new String[]{RESTRICTED, null}, EXCLUDES);
-        Collection<Feature> lst = new ArrayList<Feature>();
+        Collection<Feature> lst = new ArrayList<>();
         setFeatures(SERVICE_BUNDLE_NAMES, new String[]{RESTRICTED, null}, lst);
         EasyMock.expect(bus.getProperty("bus.extension.bundles.excludes")).andReturn(EXCLUDES);
         control.replay();

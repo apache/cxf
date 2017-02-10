@@ -46,7 +46,7 @@ public class XSDToWSDL extends AbstractCXFToolContainer {
     }
 
     private Set<String> getArrayKeys() {
-        return new HashSet<String>();
+        return new HashSet<>();
     }
 
     public void execute(boolean exitOnFinish) {

@@ -167,7 +167,7 @@ public class WSDLToCorbaHelper {
                                              QName defaultName,
                                              QName schemaTypeName)
         throws Exception {
-        List<MemberType> members = new ArrayList<MemberType>();
+        List<MemberType> members = new ArrayList<>();
 
         Iterator<? extends XmlSchemaObjectBase> iterL = null;
         if (particle instanceof XmlSchemaSequence) {
@@ -526,7 +526,7 @@ public class WSDLToCorbaHelper {
     protected List<MemberType> processAttributesAsMembers(List<XmlSchemaAttributeOrGroupRef> list,
                                                           String uri) throws Exception {
         QName memName = null;
-        List <MemberType>members = new ArrayList<MemberType>();
+        List <MemberType>members = new ArrayList<>();
 
         for (XmlSchemaAttributeOrGroupRef aog : list) {
             if (!(aog instanceof XmlSchemaAttribute)) {
@@ -1409,7 +1409,7 @@ public class WSDLToCorbaHelper {
 
         List<MemberType> fields = processContainerAsMembers(choice, defaultName, schematypeName);
 
-        List<String> caselist = new ArrayList<String>();
+        List<String> caselist = new ArrayList<>();
 
         if (disctype instanceof Enum) {
             Enum corbaenum = (Enum)disctype;
@@ -1496,7 +1496,7 @@ public class WSDLToCorbaHelper {
         List<MemberType> fields = processContainerAsMembers(choice, defaultName, schematypeName);
 
         //Choose an Integer as a Discriminator
-        List<String> caselist = new ArrayList<String>();
+        List<String> caselist = new ArrayList<>();
 
         for (int i = 0; i < fields.size(); i++) {
             caselist.add(Integer.toString(i));

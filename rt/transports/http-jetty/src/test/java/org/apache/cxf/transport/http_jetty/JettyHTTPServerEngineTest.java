@@ -180,7 +180,7 @@ public class JettyHTTPServerEngineTest extends Assert {
         engine.setTlsServerParameters(new TLSServerParameters());
         engine.finalizeConfig();
 
-        List<JettyHTTPServerEngine> list = new ArrayList<JettyHTTPServerEngine>();
+        List<JettyHTTPServerEngine> list = new ArrayList<>();
         list.add(engine);
         factory.setEnginesList(list);
         engine = factory.createJettyHTTPServerEngine(PORT2, "https");
@@ -330,7 +330,7 @@ public class JettyHTTPServerEngineTest extends Assert {
         JettyHTTPServerEngine engine = new JettyHTTPServerEngine();
         engine.setPort(PORT2);
 
-        List<Handler> handlers = new ArrayList<Handler>();
+        List<Handler> handlers = new ArrayList<>();
         handlers.add(handler1);
         engine.setHandlers(handlers);
         engine.finalizeConfig();
@@ -430,11 +430,11 @@ public class JettyHTTPServerEngineTest extends Assert {
         HttpConfiguration httpConfig = new HttpConfiguration();
         httpConfig.addCustomizer(new org.eclipse.jetty.server.ForwardedRequestCustomizer());
         HttpConnectionFactory httpFactory = new HttpConnectionFactory(httpConfig);
-        Collection<ConnectionFactory> connectionFactories = new ArrayList<ConnectionFactory>();
+        Collection<ConnectionFactory> connectionFactories = new ArrayList<>();
         connectionFactories.add(httpFactory);
         connector.setConnectionFactories(connectionFactories);
         engine.setConnector(connector);
-        List<Handler> handlers = new ArrayList<Handler>();
+        List<Handler> handlers = new ArrayList<>();
         handlers.add(handler1);
         engine.setHandlers(handlers);
         engine.finalizeConfig();

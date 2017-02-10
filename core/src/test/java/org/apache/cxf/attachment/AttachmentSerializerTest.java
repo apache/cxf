@@ -66,7 +66,7 @@ public class AttachmentSerializerTest extends Assert {
     private void doTestMessageWrite(boolean xop, String soapContentType) throws Exception {
         MessageImpl msg = new MessageImpl();
         
-        Collection<Attachment> atts = new ArrayList<Attachment>();
+        Collection<Attachment> atts = new ArrayList<>();
         AttachmentImpl a = new AttachmentImpl("test.xml");
         
         InputStream is = getClass().getResourceAsStream("my.wav");
@@ -174,7 +174,7 @@ public class AttachmentSerializerTest extends Assert {
     public void testMessageMTOM() throws Exception {
         MessageImpl msg = new MessageImpl();
         
-        Collection<Attachment> atts = new ArrayList<Attachment>();
+        Collection<Attachment> atts = new ArrayList<>();
         AttachmentImpl a = new AttachmentImpl("test.xml");
         
         InputStream is = getClass().getResourceAsStream("my.wav");

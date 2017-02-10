@@ -91,7 +91,7 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
     }
     public Set<K> keySet() {
         reap();
-        Set<K> ret = new HashSet<K>();
+        Set<K> ret = new HashSet<>();
         for (IdentityWeakReference ref : backingStore.keySet()) {
             ret.add(ref.get());
         }

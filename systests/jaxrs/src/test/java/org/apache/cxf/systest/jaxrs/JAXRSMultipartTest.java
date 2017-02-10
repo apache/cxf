@@ -445,7 +445,7 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
             WebClient.client(client).header("Content-Type", "multipart/mixed;type=application/xml");
         }
         
-        List<Book> books = new ArrayList<Book>();
+        List<Book> books = new ArrayList<>();
         books.add(new Book("CXF 1", 1L));
         books.add(new Book("CXF 2", 2L));
         List<Book> books2 = addHeader ? client.addBooks(books) : client.addBooksWithoutHeader(books);
@@ -598,7 +598,7 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         objects.put(MediaType.APPLICATION_OCTET_STREAM, attIs);
         
         Collection<? extends Attachment> coll = client.postAndGetCollection(objects, Attachment.class);
-        List<Attachment> result = new ArrayList<Attachment>(coll);
+        List<Attachment> result = new ArrayList<>(coll);
         Book jaxb2 = readBookFromInputStream(result.get(0).getDataHandler().getInputStream());
         assertEquals("jaxb", jaxb2.getName());
         assertEquals(1L, jaxb2.getId());
@@ -643,7 +643,7 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         objects.put(MediaType.APPLICATION_OCTET_STREAM, attIs);
         
         Collection<? extends Attachment> coll = client.postAndGetCollection(objects, Attachment.class);
-        List<Attachment> result = new ArrayList<Attachment>(coll);
+        List<Attachment> result = new ArrayList<>(coll);
         assertEquals(2, result.size());
         Book json2 = readJSONBookFromInputStream(result.get(0).getDataHandler().getInputStream());
         assertEquals("json", json2.getName());
@@ -670,7 +670,7 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         objects.put(MediaType.APPLICATION_JSON, json);
         objects.put(MediaType.APPLICATION_OCTET_STREAM, is1);
         Collection<? extends Attachment> coll = client.postAndGetCollection(objects, Attachment.class);
-        List<Attachment> result = new ArrayList<Attachment>(coll);
+        List<Attachment> result = new ArrayList<>(coll);
         Book jaxb2 = readBookFromInputStream(result.get(0).getDataHandler().getInputStream());
         assertEquals("jaxb", jaxb2.getName());
         assertEquals(1L, jaxb2.getId());
@@ -695,7 +695,7 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         MultipartStore client = JAXRSClientFactory.create(address, MultipartStore.class);
         
         Map<String, Book> map = client.getBookJaxbJson();
-        List<Book> result = new ArrayList<Book>(map.values());
+        List<Book> result = new ArrayList<>(map.values());
         Book jaxb = result.get(0);
         assertEquals("jaxb", jaxb.getName());
         assertEquals(1L, jaxb.getId());
@@ -716,7 +716,7 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         MultipartStore client = JAXRSClientFactory.create(address, MultipartStore.class);
         
         Map<String, Book> map = client.getBookJson();
-        List<Book> result = new ArrayList<Book>(map.values());
+        List<Book> result = new ArrayList<>(map.values());
         assertEquals(1, result.size());
         Book json = result.get(0);
         assertEquals("json", json.getName());
@@ -735,7 +735,7 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         MultipartStore client = JAXRSClientFactory.create(address, MultipartStore.class);
         
         Map<String, Object> map = client.getBookJaxbJsonObject();
-        List<Object> result = new ArrayList<Object>(map.values());
+        List<Object> result = new ArrayList<>(map.values());
         assertEquals(2, result.size());
         assertTrue(((Attachment)result.get(0)).getContentType().toString().contains("application/xml"));
         assertTrue(((Attachment)result.get(1)).getContentType().toString().contains("application/json"));
@@ -751,12 +751,12 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         Book json = new Book("json", 2L);
         InputStream is1 = 
             getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/java.jpg");
-        List<Attachment> objects = new ArrayList<Attachment>();
+        List<Attachment> objects = new ArrayList<>();
         objects.add(new Attachment("<theroot>", MediaType.APPLICATION_XML, jaxb));
         objects.add(new Attachment("thejson", MediaType.APPLICATION_JSON, json));
         objects.add(new Attachment("theimage", MediaType.APPLICATION_OCTET_STREAM, is1));
         Collection<? extends Attachment> coll = client.postAndGetCollection(objects, Attachment.class);
-        List<Attachment> result = new ArrayList<Attachment>(coll);
+        List<Attachment> result = new ArrayList<>(coll);
         Book jaxb2 = readBookFromInputStream(result.get(0).getDataHandler().getInputStream());
         assertEquals("jaxb", jaxb2.getName());
         assertEquals(1L, jaxb2.getId());
@@ -779,11 +779,11 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         
         Book b = new Book("jaxb", 1L);
         Book b2 = new Book("jaxb2", 2L);
-        List<Book> books = new ArrayList<Book>();
+        List<Book> books = new ArrayList<>();
         books.add(b);
         books.add(b2);
         Collection<? extends Book> coll = client.postAndGetCollection(books, Book.class);
-        List<Book> result = new ArrayList<Book>(coll);
+        List<Book> result = new ArrayList<>(coll);
         Book jaxb = result.get(0);
         assertEquals("jaxb", jaxb.getName());
         assertEquals(1L, jaxb.getId());

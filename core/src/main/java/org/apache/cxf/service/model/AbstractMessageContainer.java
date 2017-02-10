@@ -199,7 +199,7 @@ public abstract class AbstractMessageContainer extends AbstractPropertiesHolder 
 
         MessagePartInfo part = new MessagePartInfo(name, this);
         if (outOfBandParts == null) {
-            outOfBandParts = new ArrayList<MessagePartInfo>(1);
+            outOfBandParts = new ArrayList<>(1);
         }
         part.setIndex(messageParts.size() + outOfBandParts.size());
         outOfBandParts.add(part);
@@ -215,9 +215,9 @@ public abstract class AbstractMessageContainer extends AbstractPropertiesHolder 
      */
     public List<MessagePartInfo> getMessageParts() {
         if (outOfBandParts == null) {
-            return new ArrayList<MessagePartInfo>(messageParts.values());
+            return new ArrayList<>(messageParts.values());
         }
-        List<MessagePartInfo> parts = new ArrayList<MessagePartInfo>(messageParts.values());
+        List<MessagePartInfo> parts = new ArrayList<>(messageParts.values());
         parts.addAll(outOfBandParts);
         return parts;
     }

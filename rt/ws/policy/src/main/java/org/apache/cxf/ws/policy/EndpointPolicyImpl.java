@@ -176,7 +176,7 @@ public class EndpointPolicyImpl implements EndpointPolicy {
     }
     
     protected Collection<Assertion> getSupportedAlternatives(Message msg) {
-        Collection<Assertion> alternatives = new ArrayList<Assertion>();
+        Collection<Assertion> alternatives = new ArrayList<>();
 
         for (Iterator<List<Assertion>> it = policy.getAlternatives(); it.hasNext();) {
             List<Assertion> alternative = it.next();
@@ -200,10 +200,10 @@ public class EndpointPolicyImpl implements EndpointPolicy {
             return;
         }
 
-        List<Assertion> v = new ArrayList<Assertion>();
+        List<Assertion> v = new ArrayList<>();
         List<Assertion> fv = null;
         if (requestor) {
-            fv = new ArrayList<Assertion>();
+            fv = new ArrayList<>();
         }
        
         // vocabulary of alternative chosen for endpoint
@@ -256,7 +256,7 @@ public class EndpointPolicyImpl implements EndpointPolicy {
     }
 
     Collection<Assertion> getSupportedAlternatives(Policy p, Message msg) {
-        Collection<Assertion> alternatives = new ArrayList<Assertion>();
+        Collection<Assertion> alternatives = new ArrayList<>();
         for (Iterator<List<Assertion>> it = p.getAlternatives(); it.hasNext();) {
             List<Assertion> alternative = it.next();
             if (engine.supportsAlternative(alternative, null, msg)) {

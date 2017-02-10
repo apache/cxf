@@ -33,7 +33,7 @@ public class NSStack {
     private int nsPrefixCount = 1;
 
     public synchronized void push() {
-        top = new ArrayList<NSDecl>();
+        top = new ArrayList<>();
         stack.add(top);
         size++;
     }

@@ -29,7 +29,7 @@ public class JavaPort {
     private String name;
     private String portType;
     private String bindingName;
-    private final List<JavaMethod> operations = new ArrayList<JavaMethod>();
+    private final List<JavaMethod> operations = new ArrayList<>();
     private String address;
     private String soapVersion;
     private SOAPBinding.Style style;

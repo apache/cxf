@@ -227,7 +227,7 @@ public class EffectivePolicyImpl implements EffectivePolicy {
     protected Collection<Assertion> getSupportedAlternatives(PolicyEngine engine,
                                                              Policy p, 
                                                              Message m) {
-        Collection<Assertion> alternatives = new ArrayList<Assertion>();
+        Collection<Assertion> alternatives = new ArrayList<>();
 
         for (Iterator<List<Assertion>> it = p.getAlternatives(); it.hasNext();) {
             List<Assertion> alternative = it.next();

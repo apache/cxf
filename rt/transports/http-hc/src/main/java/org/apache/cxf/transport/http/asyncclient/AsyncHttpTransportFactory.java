@@ -44,7 +44,7 @@ public class AsyncHttpTransportFactory extends AbstractTransportFactory implemen
     /**
      * This constant holds the prefixes served by this factory.
      */
-    private static final Set<String> URI_PREFIXES = new HashSet<String>();
+    private static final Set<String> URI_PREFIXES = new HashSet<>();
     
     static {
         URI_PREFIXES.add("hc://");
@@ -61,7 +61,7 @@ public class AsyncHttpTransportFactory extends AbstractTransportFactory implemen
      * @param ans The transport ids.
      */
     public void setActivationNamespaces(Collection<String> ans) {
-        setTransportIds(new ArrayList<String>(ans));
+        setTransportIds(new ArrayList<>(ans));
     }
     
     public Set<String> getUriPrefixes() {

@@ -129,7 +129,7 @@ public class JaxWsEndpointImpl extends EndpointImpl {
     
     public JaxWsEndpointImpl(Bus bus, Service s, EndpointInfo ei, 
                              List<WebServiceFeature> wf) throws EndpointException {
-        this(bus, s, ei, null, wf, new ArrayList<Feature>(), true);
+        this(bus, s, ei, null, wf, new ArrayList<>(), true);
     }    
 
     public JaxWsEndpointImpl(Bus bus, Service s, EndpointInfo ei, JaxWsImplementorInfo implementorInfo, 
@@ -137,11 +137,11 @@ public class JaxWsEndpointImpl extends EndpointImpl {
         throws EndpointException {
         super(bus, s, ei);
         this.implInfo = implementorInfo;
-        this.wsFeatures = new ArrayList<WebServiceFeature>();
+        this.wsFeatures = new ArrayList<>();
         if (af != null) {
             features = CastUtils.cast(af);
         } else {
-            features = new ArrayList<Feature>();
+            features = new ArrayList<>();
         }
         if (wf != null) {
             for (WebServiceFeature f : wf) {

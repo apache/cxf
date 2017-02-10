@@ -85,7 +85,7 @@ public class ProcessorTestBase extends Assert {
     protected final void addQNameAttribute(QName element, String local) {
         Set<String> a = qnameAtts.get(element);
         if (a == null) {
-            qnameAtts.put(element, new HashSet<String>());
+            qnameAtts.put(element, new HashSet<>());
             a = qnameAtts.get(element);
         }
         a.add(local);
@@ -179,7 +179,7 @@ public class ProcessorTestBase extends Assert {
         // So, when we encounter a mismatch, put the unmatched token in a
         // list and check this list when matching subsequent tokens.
         // It would be much better to do a proper xml comparison.
-        List<String> unmatched = new ArrayList<String>();
+        List<String> unmatched = new ArrayList<>();
         while (st1.hasMoreTokens()) {
             String tok1 = st1.nextToken();
             String tok2 = null;

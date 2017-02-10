@@ -109,7 +109,7 @@ public class XACMLAuthorizingInterceptorTest extends org.junit.Assert {
 
             @Override
             public Set<Principal> getUserRoles() {
-                Set<Principal> principals = new HashSet<Principal>();
+                Set<Principal> principals = new HashSet<>();
                 principals.add(new Principal() {
                     public String getName() {
                         return role;

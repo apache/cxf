@@ -105,7 +105,7 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
     
     @Before
     public void setUp() {
-        targets = new ArrayList<String>();
+        targets = new ArrayList<>();
         SpringBusFactory bf = new SpringBusFactory();    
         bus = bf.createBus(getConfig());
         BusFactory.setDefaultBus(bus);

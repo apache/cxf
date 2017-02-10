@@ -635,7 +635,7 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
             Method m = cls.getMethod(methodName, new Class[]{List.class});
             Class<Object> realCls 
                 = (Class<Object>)InjectionUtils.getActualType(m.getGenericParameterTypes()[0]);
-            List<Object> objects = new ArrayList<Object>();
+            List<Object> objects = new ArrayList<>();
             for (Entry e : feed.getEntries()) {
                 objects.add(readFromEntry(e, realCls));
             }

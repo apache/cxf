@@ -361,7 +361,7 @@ public class CorbaStreamWriter implements XMLStreamWriter {
         }
 
         public Iterator<String> getPrefixes(String namespaceURI) {
-            Set<String> set = new HashSet<String>();
+            Set<String> set = new HashSet<>();
             for (Map.Entry<String, String> entry : map.entrySet()) {
                 if (namespaceURI.equals(entry.getValue())) {
                     set.add(entry.getKey());

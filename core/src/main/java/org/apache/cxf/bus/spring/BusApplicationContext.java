@@ -145,7 +145,7 @@ public class BusApplicationContext extends ClassPathXmlApplicationContext {
     
     @Override
     protected Resource[] getConfigResources() {
-        List<Resource> resources = new ArrayList<Resource>();
+        List<Resource> resources = new ArrayList<>();
        
         if (includeDefaults) {
             try {

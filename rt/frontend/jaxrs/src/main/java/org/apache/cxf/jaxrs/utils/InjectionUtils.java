@@ -949,7 +949,7 @@ public final class InjectionUtils {
         if (pathParam != ParameterType.PATH || !PathSegment.class.isAssignableFrom(type)) {
             return values;
         }
-        List<String> newValues = new ArrayList<String>();
+        List<String> newValues = new ArrayList<>();
         for (String v : values) {
             String[] segments = StringUtils.split(v, "/");
             for (String s : segments) {
@@ -1253,7 +1253,7 @@ public final class InjectionUtils {
                     if (value.getClass().isArray()) {
                         theValues = Arrays.asList((Object[])value);
                     } else if (value instanceof Set) {
-                        theValues = new ArrayList<Object>((Set<?>)value);
+                        theValues = new ArrayList<>((Set<?>)value);
                     } else {
                         theValues = CastUtils.cast((List<?>)value);
                     }

@@ -54,7 +54,7 @@ public class ResourceInjectorTest extends Assert {
     public void setUpResourceManager(String pfx) { 
 
         ResourceManager resMgr = EasyMock.createMock(ResourceManager.class);
-        List<ResourceResolver> resolvers = new ArrayList<ResourceResolver>();
+        List<ResourceResolver> resolvers = new ArrayList<>();
         
         resMgr.getResourceResolvers();
         EasyMock.expectLastCall().andReturn(resolvers);

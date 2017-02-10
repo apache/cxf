@@ -26,7 +26,7 @@ import org.apache.cxf.tools.common.Processor;
 import org.apache.cxf.tools.common.toolspec.ToolContainer;
 
 public class FrontEndProfile {
-    List<FrontEndGenerator> generators = new ArrayList<FrontEndGenerator>();
+    List<FrontEndGenerator> generators = new ArrayList<>();
     Processor processor;
     Class<? extends ToolContainer> containerClz;
     String toolspec;

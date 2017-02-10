@@ -71,7 +71,7 @@ public class NettyHttpServletHandler extends ChannelInboundHandlerAdapter {
             NettyInterceptor interceptor) {
 
         if (this.interceptors == null) {
-            this.interceptors = new ArrayList<NettyInterceptor>();
+            this.interceptors = new ArrayList<>();
         }
         this.interceptors.add(interceptor);
         return this;

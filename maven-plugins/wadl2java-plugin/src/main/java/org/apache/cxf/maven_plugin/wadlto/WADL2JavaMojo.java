@@ -136,7 +136,7 @@ public class WADL2JavaMojo extends AbstractCodeGeneratorMojo {
      */
     private List<WadlOption> createWadlOptionsFromScansAndExplicitWadlOptions(File classesDir) 
         throws MojoExecutionException {
-        List<WadlOption> effectiveOptions = new ArrayList<WadlOption>();
+        List<WadlOption> effectiveOptions = new ArrayList<>();
         mergeOptions(effectiveOptions);
         downloadRemoteDocs(effectiveOptions);
         if (effectiveOptions.isEmpty()) {

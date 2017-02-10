@@ -83,7 +83,7 @@ public class IssueJWTRealmUnitTest extends org.junit.Assert {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
         
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         JWTTokenProvider provider = new JWTTokenProvider();
         provider.setRealmMap(createRealms());
         providerList.add(provider);
@@ -156,7 +156,7 @@ public class IssueJWTRealmUnitTest extends org.junit.Assert {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
         
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         JWTTokenProvider provider = new JWTTokenProvider();
         provider.setRealmMap(createRealms());
         providerList.add(provider);
@@ -229,7 +229,7 @@ public class IssueJWTRealmUnitTest extends org.junit.Assert {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
         
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         JWTTokenProvider provider = new JWTTokenProvider();
         provider.setRealmMap(createRealms());
         providerList.add(provider);
@@ -304,7 +304,7 @@ public class IssueJWTRealmUnitTest extends org.junit.Assert {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
         
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         JWTTokenProvider provider = new JWTTokenProvider();
         provider.setRealmMap(createRealms());
         providerList.add(provider);

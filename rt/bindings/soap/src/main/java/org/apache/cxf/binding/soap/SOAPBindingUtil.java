@@ -207,7 +207,7 @@ public final class SOAPBindingUtil {
     }
 
     public static List<SoapHeader> getSoapHeaders(List<ExtensibilityElement> exts) {
-        List<SoapHeader> headers = new ArrayList<SoapHeader>();
+        List<SoapHeader> headers = new ArrayList<>();
         if (exts != null) {
             for (ExtensibilityElement ext : exts) {
                 if (isSOAPHeader(ext)) {
@@ -250,7 +250,7 @@ public final class SOAPBindingUtil {
     }
 
     public static List<SoapHeader> getBindingInputSOAPHeaders(BindingOperation bop) {
-        List<SoapHeader> headers = new ArrayList<SoapHeader>();
+        List<SoapHeader> headers = new ArrayList<>();
         BindingInput bindingInput = bop.getBindingInput();
         if (bindingInput != null) {
             for (Object obj : bindingInput.getExtensibilityElements()) {
@@ -276,7 +276,7 @@ public final class SOAPBindingUtil {
     }
 
     public static List<SoapHeader> getBindingOutputSOAPHeaders(BindingOperation bop) {
-        List<SoapHeader> headers = new ArrayList<SoapHeader>();
+        List<SoapHeader> headers = new ArrayList<>();
         BindingOutput bindingOutput = bop.getBindingOutput();
         if (bindingOutput != null) {
             for (Object obj : bindingOutput.getExtensibilityElements()) {
@@ -309,7 +309,7 @@ public final class SOAPBindingUtil {
     }
 
     public static List<SoapFault> getBindingOperationSoapFaults(BindingOperation bop) {
-        List<SoapFault> faults = new ArrayList<SoapFault>();
+        List<SoapFault> faults = new ArrayList<>();
         for (Object obj : bop.getBindingFaults().values()) {
             if (!(obj instanceof BindingFault)) {
                 continue;

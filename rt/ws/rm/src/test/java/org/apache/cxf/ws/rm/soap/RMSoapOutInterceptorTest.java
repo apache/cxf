@@ -102,7 +102,7 @@ public class RMSoapOutInterceptorTest extends Assert {
 
         message = setupOutboundMessage(); 
         rmps = RMContextUtils.retrieveRMProperties(message, true);          
-        Collection<SequenceAcknowledgement> acks = new ArrayList<SequenceAcknowledgement>();
+        Collection<SequenceAcknowledgement> acks = new ArrayList<>();
         acks.add(ack1);
         rmps.setAcks(acks);        
         codec.encode(message);
@@ -122,7 +122,7 @@ public class RMSoapOutInterceptorTest extends Assert {
 
         message = setupOutboundMessage();
         rmps = RMContextUtils.retrieveRMProperties(message, true);        
-        Collection<AckRequestedType> requested = new ArrayList<AckRequestedType>();
+        Collection<AckRequestedType> requested = new ArrayList<>();
         requested.add(ar1);
         rmps.setAcksRequested(requested);
         codec.encode(message);

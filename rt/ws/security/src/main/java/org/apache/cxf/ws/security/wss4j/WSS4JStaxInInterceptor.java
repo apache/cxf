@@ -287,7 +287,7 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
             enableAudienceRestriction = Boolean.parseBoolean(audRestrStr);
         }
         if (enableAudienceRestriction) {
-            List<String> audiences = new ArrayList<String>();
+            List<String> audiences = new ArrayList<>();
             if (msg.getContextualProperty(org.apache.cxf.message.Message.REQUEST_URL) != null) {
                 audiences.add((String)msg.getContextualProperty(org.apache.cxf.message.Message.REQUEST_URL));
             }

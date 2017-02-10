@@ -101,7 +101,7 @@ public abstract class AbstractJPATypedQueryVisitor<T, T1, E>
         this.em = em;
         this.tClass = tClass;
         this.queryClass = toQueryClass(queryClass, tClass);
-        this.joinProperties = joinProps == null ? null : new HashSet<String>(joinProps);
+        this.joinProperties = joinProps == null ? null : new HashSet<>(joinProps);
     }
     
     @SuppressWarnings("unchecked")
@@ -118,12 +118,12 @@ public abstract class AbstractJPATypedQueryVisitor<T, T1, E>
             builder = em.getCriteriaBuilder();
             cq = builder.createQuery(queryClass);
             root = cq.from(tClass);
-            predStack.push(new ArrayList<Predicate>());
+            predStack.push(new ArrayList<>());
         }
         if (sc.getStatement() != null) {
             predStack.peek().add(buildPredicate(sc.getStatement()));
         } else {
-            predStack.push(new ArrayList<Predicate>());
+            predStack.push(new ArrayList<>());
             for (SearchCondition<T> condition : sc.getSearchConditions()) {
                 condition.accept(this);
             }

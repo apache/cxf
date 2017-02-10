@@ -45,8 +45,8 @@ public class BeanTypeInfo {
     private Map<QName, String> mappedName2pdName = new HashMap<QName, String>();
     private Map<QName, AegisType> mappedName2type = new HashMap<QName, AegisType>();
     private Class<?> beanClass;
-    private List<QName> attributes = new ArrayList<QName>();
-    private List<QName> elements = new ArrayList<QName>();
+    private List<QName> attributes = new ArrayList<>();
+    private List<QName> elements = new ArrayList<>();
     private PropertyDescriptor[] descriptors;
     private TypeMapping typeMapping;
     private volatile boolean initialized;
@@ -306,7 +306,7 @@ public class BeanTypeInfo {
     }
 
     private PropertyDescriptor[] getInterfacePropertyDescriptors(Class<?> clazz) {
-        List<PropertyDescriptor> pds = new ArrayList<PropertyDescriptor>();
+        List<PropertyDescriptor> pds = new ArrayList<>();
 
         getInterfacePropertyDescriptors(clazz, pds, new HashSet<Class<?>>());
 

@@ -122,14 +122,14 @@ public class Compiler {
 
     }
     public boolean compileFiles(File[] files) {
-        List<String> f = new ArrayList<String>(files.length);
+        List<String> f = new ArrayList<>(files.length);
         for (File file : files) {
             f.add(file.getAbsolutePath());
         }
         return compileFiles(f.toArray(new String[files.length]));
     }
     public boolean compileFiles(List<File> files) {
-        List<String> f = new ArrayList<String>(files.size());
+        List<String> f = new ArrayList<>(files.size());
         for (File file : files) {
             f.add(file.getAbsolutePath());
         }
@@ -141,7 +141,7 @@ public class Compiler {
             return useJava6Compiler(files);
         }
         
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
 
         // Start of honoring java.home for used javac
         String fsep = File.separator;
@@ -237,7 +237,7 @@ public class Compiler {
     protected boolean internalJava6Compile(JavaCompiler compiler, JavaFileManager fileManager,
                                            DiagnosticListener<JavaFileObject> listener,
                                            Iterable<? extends JavaFileObject> fileList) {
-        List<String> args = new ArrayList<String>();
+        List<String> args = new ArrayList<>();
         addArgs(args);
         CompilationTask task = compiler.getTask(null, fileManager, listener, args, null, fileList);
         Boolean ret = task.call();

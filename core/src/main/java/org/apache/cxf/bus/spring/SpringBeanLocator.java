@@ -55,7 +55,7 @@ public class SpringBeanLocator implements ConfiguredBeanLocator {
     
     ApplicationContext context;
     ConfiguredBeanLocator orig;
-    Set<String> passThroughs = new HashSet<String>();
+    Set<String> passThroughs = new HashSet<>();
     Object bundleContext;
     boolean osgi = true;
     
@@ -67,7 +67,7 @@ public class SpringBeanLocator implements ConfiguredBeanLocator {
         if (bus != null) {
             orig = bus.getExtension(ConfiguredBeanLocator.class);
             if (orig instanceof ExtensionManagerImpl) {
-                List<String> names = new ArrayList<String>();
+                List<String> names = new ArrayList<>();
                 for (String s : ctx.getBeanDefinitionNames()) {
                     names.add(s);
                     for (String s2 : ctx.getAliases(s)) {
@@ -137,7 +137,7 @@ public class SpringBeanLocator implements ConfiguredBeanLocator {
                                                                                          false)));
         s.removeAll(passThroughs);
         s.addAll(orig.getBeanNamesOfType(type));
-        return new ArrayList<String>(s);
+        return new ArrayList<>(s);
     }
 
     /** {@inheritDoc}*/
@@ -205,7 +205,7 @@ public class SpringBeanLocator implements ConfiguredBeanLocator {
 
     public <T> boolean loadBeansOfType(Class<T> type,
                                        BeanLoaderListener<T> listener) {
-        List<String> list = new ArrayList<String>(Arrays.asList(context.getBeanNamesForType(type,
+        List<String> list = new ArrayList<>(Arrays.asList(context.getBeanNamesForType(type,
                                                                                             false,
                                                                                             false)));
         list.removeAll(passThroughs);
@@ -269,7 +269,7 @@ public class SpringBeanLocator implements ConfiguredBeanLocator {
     }
 
     public <T> List<T> getOSGiServices(Class<T> type) {
-        List<T> lst = new ArrayList<T>();
+        List<T> lst = new ArrayList<>();
         if (!osgi) {
             return lst;
         }

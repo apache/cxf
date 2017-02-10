@@ -222,7 +222,7 @@ public final class ReflectionUtil {
         
         if (springBeanUtilsDescriptorFetcher != null) {
             if (propertyDescriptors != null) {
-                List<PropertyDescriptor> descriptors = new ArrayList<PropertyDescriptor>(propertyDescriptors.length);
+                List<PropertyDescriptor> descriptors = new ArrayList<>(propertyDescriptors.length);
                 for (int i = 0; i < propertyDescriptors.length; i++) {
                     PropertyDescriptor propertyDescriptor = propertyDescriptors[i];
                     try {

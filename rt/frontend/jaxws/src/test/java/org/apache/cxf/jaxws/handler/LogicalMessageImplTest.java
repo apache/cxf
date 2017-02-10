@@ -46,7 +46,7 @@ public class LogicalMessageImplTest extends Assert {
         req = new AddNumbers();        
         req.setArg0(10);
         req.setArg1(20);
-        args = new ArrayList<Object>();
+        args = new ArrayList<>();
         args.add(req);
     }
 

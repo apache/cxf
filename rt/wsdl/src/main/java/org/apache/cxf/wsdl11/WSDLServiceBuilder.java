@@ -171,7 +171,7 @@ public class WSDLServiceBuilder {
         copyExtensors(description, d.getExtensibilityElements());
         copyExtensionAttributes(description, d);
 
-        List<ServiceInfo> serviceList = new ArrayList<ServiceInfo>();
+        List<ServiceInfo> serviceList = new ArrayList<>();
         for (java.util.Iterator<QName> ite = CastUtils.cast(d.getServices().keySet().iterator()); ite
             .hasNext();) {
             QName qn = ite.next();
@@ -210,8 +210,8 @@ public class WSDLServiceBuilder {
     }
 
     public List<ServiceInfo> buildMockServices(Definition d) {
-        List<ServiceInfo> serviceList = new ArrayList<ServiceInfo>();
-        List<Definition> defList = new ArrayList<Definition>();
+        List<ServiceInfo> serviceList = new ArrayList<>();
+        List<Definition> defList = new ArrayList<>();
         defList.add(d);
         parseImports(d, defList);
         for (Definition def : defList) {
@@ -297,7 +297,7 @@ public class WSDLServiceBuilder {
             copyExtensors(description, def.getExtensibilityElements());
             copyExtensionAttributes(description, def);
 
-            Set<Definition> done = new HashSet<Definition>();
+            Set<Definition> done = new HashSet<>();
             done.add(def);
             Collection<List<Import>> values = CastUtils.cast(def.getImports().values());
             for (List<Import> imports : values) {
@@ -362,7 +362,7 @@ public class WSDLServiceBuilder {
             buildEndpoint(service, bi, port);
         }
 
-        return new ArrayList<ServiceInfo>(services.values());
+        return new ArrayList<>(services.values());
     }
 
 
@@ -391,7 +391,7 @@ public class WSDLServiceBuilder {
 
 
     private void parseImports(Definition def, List<Definition> defList) {
-        List<Import> importList = new ArrayList<Import>();
+        List<Import> importList = new ArrayList<>();
 
         Collection<List<Import>> ilist = cast(def.getImports().values());
         for (List<Import> list : ilist) {

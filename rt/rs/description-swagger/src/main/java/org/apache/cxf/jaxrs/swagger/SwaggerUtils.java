@@ -93,7 +93,7 @@ public final class SwaggerUtils {
         
         
         Map<String, List<UserOperation>> userOpsMap = new LinkedHashMap<String, List<UserOperation>>();
-        Set<String> tags = new HashSet<String>();
+        Set<String> tags = new HashSet<>();
         List<Map<String, Object>> tagsProp = CastUtils.cast((List<?>)map.get("tags"));
         if (tagsProp != null) {
             for (Map<String, Object> tagProp : tagsProp) {

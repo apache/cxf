@@ -71,7 +71,7 @@ public class RolePrefixSecurityContextImpl implements LoginSecurityContext {
     
     private static Set<Principal> findRoles(Subject subject, 
         String roleClassifier, String roleClassifierType) {
-        Set<Principal> set = new HashSet<Principal>();
+        Set<Principal> set = new HashSet<>();
         for (Principal p : subject.getPrincipals()) {
             if (isRole(p, roleClassifier, roleClassifierType)) {
                 set.add(p);

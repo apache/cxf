@@ -56,7 +56,7 @@ public class SOAPBindingImpl extends AbstractBindingImpl implements SOAPBinding 
     
     private void addRequiredRoles() {
         if (this.roles == null) {
-            this.roles = new HashSet<String>();
+            this.roles = new HashSet<>();
         }
         if (this.soapBinding instanceof SoapBindingInfo) {
             SoapBindingInfo bindingInfo = (SoapBindingInfo) this.soapBinding;

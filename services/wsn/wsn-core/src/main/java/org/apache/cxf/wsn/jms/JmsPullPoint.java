@@ -135,7 +135,7 @@ public class JmsPullPoint extends AbstractPullPoint {
                 max = 256;
             }
             initSession();
-            List<NotificationMessageHolderType> messages = new ArrayList<NotificationMessageHolderType>();
+            List<NotificationMessageHolderType> messages = new ArrayList<>();
             for (int i = 0; i < max; i++) {
                 Message msg = null;
                 synchronized (consumerSession) {

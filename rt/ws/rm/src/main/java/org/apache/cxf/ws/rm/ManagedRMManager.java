@@ -60,7 +60,7 @@ public class ManagedRMManager implements ManagedComponent {
     
     @ManagedOperation
     public String[] getEndpointIdentifiers() {
-        Set<String> identifiers = new HashSet<String>();
+        Set<String> identifiers = new HashSet<>();
         for (Endpoint ep : manager.getReliableEndpointsMap().keySet()) {
             identifiers.add(RMUtils.getEndpointIdentifier(ep, manager.getBus()));
         }

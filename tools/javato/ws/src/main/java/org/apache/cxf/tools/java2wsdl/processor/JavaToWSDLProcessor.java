@@ -116,7 +116,7 @@ public class JavaToWSDLProcessor implements Processor {
             
         }
         generate(service, outputDir);
-        List<ServiceInfo> serviceList = new ArrayList<ServiceInfo>();
+        List<ServiceInfo> serviceList = new ArrayList<>();
         serviceList.add(service);
         context.put(ToolConstants.SERVICE_LIST, serviceList);
         System.setProperty(JAVA_CLASS_PATH, oldClassPath);
@@ -160,7 +160,7 @@ public class JavaToWSDLProcessor implements Processor {
     @SuppressWarnings("unchecked")
     public ServiceBuilder getServiceBuilder() throws ToolException {
         Object beanFilesParameter = context.get(ToolConstants.CFG_BEAN_CONFIG);
-        List<String> beanDefinitions = new ArrayList<String>();
+        List<String> beanDefinitions = new ArrayList<>();
         if (beanFilesParameter != null) {
             if (beanFilesParameter instanceof String) {
                 beanDefinitions.add((String)beanFilesParameter);

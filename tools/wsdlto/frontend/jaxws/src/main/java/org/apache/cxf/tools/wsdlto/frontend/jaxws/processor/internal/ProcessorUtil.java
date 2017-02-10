@@ -362,7 +362,7 @@ public final class ProcessorUtil {
     }
 
     public static List<QName> getWrappedElementQNames(ToolContext context, QName partElement) {
-        List<QName> qnames = new ArrayList<QName>();
+        List<QName> qnames = new ArrayList<>();
         if (partElement == null) {
             return qnames;
         }
@@ -373,7 +373,7 @@ public final class ProcessorUtil {
     }
 
     public static List<WrapperElement> getWrappedElement(ToolContext context, QName partElement) {
-        List<WrapperElement> qnames = new ArrayList<WrapperElement>();
+        List<WrapperElement> qnames = new ArrayList<>();
 
         ServiceInfo serviceInfo = context.get(ServiceInfo.class);
         SchemaCollection schema = serviceInfo.getXmlSchemaCollection();
@@ -415,7 +415,7 @@ public final class ProcessorUtil {
 
     private static List<WrapperElement> createWrappedElements(XmlSchemaSequence seq) {
        
-        List<WrapperElement> qnames = new ArrayList<WrapperElement>();
+        List<WrapperElement> qnames = new ArrayList<>();
         if (seq != null) {
 
             List<XmlSchemaSequenceMember> items = seq.getItems();

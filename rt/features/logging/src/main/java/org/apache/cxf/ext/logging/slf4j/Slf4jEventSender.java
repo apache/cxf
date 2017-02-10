@@ -45,7 +45,7 @@ public class Slf4jEventSender implements LogEventSender {
         String cat = logCategory != null ? logCategory
             : "org.apache.cxf.services." + event.getPortTypeName().getLocalPart() + "." + event.getType();
         Logger log = LoggerFactory.getLogger(cat);
-        Set<String> keys = new HashSet<String>(); 
+        Set<String> keys = new HashSet<>(); 
         try {
             put(keys, "type", event.getType().toString());
             put(keys, "address", event.getAddress());

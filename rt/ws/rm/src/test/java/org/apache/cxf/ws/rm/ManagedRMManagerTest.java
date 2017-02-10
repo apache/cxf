@@ -379,7 +379,7 @@ public class ManagedRMManagerTest extends Assert {
 
     private List<SourceSequence> createTestSourceSequences(Source source, 
                                                            EndpointReferenceType to) {
-        List<SourceSequence> sss = new ArrayList<SourceSequence>();
+        List<SourceSequence> sss = new ArrayList<>();
         sss.add(createTestSourceSequence(source, "seq1", to, 
                                          ProtocolVariation.RM10WSA200408, new long[]{1L, 1L, 3L, 3L}));
         sss.add(createTestSourceSequence(source, "seq2", to, 
@@ -390,7 +390,7 @@ public class ManagedRMManagerTest extends Assert {
 
     private List<DestinationSequence> createTestDestinationSequences(Destination destination, 
                                                                      EndpointReferenceType to) {
-        List<DestinationSequence> dss = new ArrayList<DestinationSequence>();
+        List<DestinationSequence> dss = new ArrayList<>();
         dss.add(createTestDestinationSequence(destination, "seq3", to, 
                                               ProtocolVariation.RM10WSA200408, new long[]{1L, 1L, 3L, 3L}));
         dss.add(createTestDestinationSequence(destination, "seq4", to, 
@@ -465,13 +465,13 @@ public class ManagedRMManagerTest extends Assert {
     }
     
     private class TestRetransmissionQueue implements RetransmissionQueue {
-        private Set<String> suspended = new HashSet<String>();
+        private Set<String> suspended = new HashSet<>();
         private RetryStatus status = new TestRetransmissionStatus();
         private Map<String, List<Long>> numlists = new HashMap<String, List<Long>>();
         
         TestRetransmissionQueue() {
-            numlists.put("seq1", new ArrayList<Long>());
-            numlists.put("seq2", new ArrayList<Long>());
+            numlists.put("seq1", new ArrayList<>());
+            numlists.put("seq2", new ArrayList<>());
             Collections.addAll(numlists.get("seq1"), 2L, 4L);
             Collections.addAll(numlists.get("seq2"), 3L);
         }
@@ -505,7 +505,7 @@ public class ManagedRMManagerTest extends Assert {
         public List<Long> getUnacknowledgedMessageNumbers(SourceSequence seq) {
             final String key = seq.getIdentifier().getValue(); 
             List<Long> list = numlists.get(key);
-            return list != null ? list : new ArrayList<Long>();
+            return list != null ? list : new ArrayList<>();
         }
 
         public RetryStatus getRetransmissionStatus(SourceSequence seq, long num) {

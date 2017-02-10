@@ -40,7 +40,7 @@ public class SecureAnnotationsInterceptor extends SimpleAuthorizingInterceptor {
     
     private static final Set<String> SKIP_METHODS;
     static {
-        SKIP_METHODS = new HashSet<String>();
+        SKIP_METHODS = new HashSet<>();
         SKIP_METHODS.addAll(Arrays.asList(
             new String[] {"wait", "notify", "notifyAll", 
                           "equals", "toString", "hashCode"}));

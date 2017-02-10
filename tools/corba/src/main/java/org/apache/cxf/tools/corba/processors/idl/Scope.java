@@ -35,7 +35,7 @@ public final class Scope implements Comparable<Object> {
     private String prefix;
     
     public Scope() {
-        scope = new ArrayList<String>();
+        scope = new ArrayList<>();
         parent = this;
     }
     
@@ -54,13 +54,13 @@ public final class Scope implements Comparable<Object> {
     }
     
     public Scope(Scope containingScope) {
-        scope = new ArrayList<String>(containingScope.scope);
+        scope = new ArrayList<>(containingScope.scope);
         parent = containingScope.getParent();
         this.setPrefix(parent.getPrefix());
     }
     
     public Scope(Scope containingScope, String str) {
-        scope = new ArrayList<String>(containingScope.scope);
+        scope = new ArrayList<>(containingScope.scope);
         scope.add(str);
         parent = containingScope;
         this.setPrefix(parent.getPrefix());
@@ -68,7 +68,7 @@ public final class Scope implements Comparable<Object> {
 
     // This is used for interface inheritance
     public Scope(Scope containingScope, Scope prefixScope, String str) {
-        scope = new ArrayList<String>(containingScope.scope);
+        scope = new ArrayList<>(containingScope.scope);
         scope.addAll(prefixScope.scope);
         scope.add(str);
         parent = containingScope;
@@ -76,7 +76,7 @@ public final class Scope implements Comparable<Object> {
     }
     
     public Scope(Scope containingScope, AST node) {
-        scope = new ArrayList<String>(containingScope.scope);
+        scope = new ArrayList<>(containingScope.scope);
         if (node != null) { 
             scope.add(node.toString());
         }

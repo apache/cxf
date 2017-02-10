@@ -46,7 +46,7 @@ public class JMSTransportFactory extends AbstractTransportFactory implements Con
             "http://cxf.apache.org/transports/jms/configuration"
         );
 
-    private static final Set<String> URI_PREFIXES = new HashSet<String>();
+    private static final Set<String> URI_PREFIXES = new HashSet<>();
     static {
         URI_PREFIXES.add("jms://");
         URI_PREFIXES.add("jms:");

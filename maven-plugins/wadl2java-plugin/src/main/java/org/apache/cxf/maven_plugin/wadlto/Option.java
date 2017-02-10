@@ -47,7 +47,7 @@ public class Option {
      * Extra arguments to pass to the command-line code generator. For compatibility as well as to
      * specify any extra flags not addressed by other parameters
      */
-    List<String> extraargs = new ArrayList<String>();
+    List<String> extraargs = new ArrayList<>();
 
     /**
      * Specifies JAXB binding files. Use spaces to separate multiple entries.
@@ -88,7 +88,7 @@ public class Option {
     /**
      * 
      */
-    private List<String> schemaPackagenames = new ArrayList<String>();
+    private List<String> schemaPackagenames = new ArrayList<>();
 
     public Option() {
         super();

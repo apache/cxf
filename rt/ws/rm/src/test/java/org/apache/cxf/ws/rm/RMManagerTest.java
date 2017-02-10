@@ -398,7 +398,7 @@ public class RMManagerTest extends Assert {
         manager = control.createMock(RMManager.class, new Method[] {m});
         Message message = control.createMock(Message.class);
         Exchange exchange = control.createMock(Exchange.class);
-        EasyMock.expect(message.getContextualPropertyKeys()).andReturn(new HashSet<String>()).anyTimes();
+        EasyMock.expect(message.getContextualPropertyKeys()).andReturn(new HashSet<>()).anyTimes();
         EasyMock.expect(message.getExchange()).andReturn(exchange).anyTimes();
         EasyMock.expect(exchange.getOutMessage()).andReturn(message).anyTimes();
         EasyMock.expect(exchange.getInMessage()).andReturn(null).anyTimes();
@@ -595,7 +595,7 @@ public class RMManagerTest extends Assert {
         manager.setRetransmissionQueue(oqueue);
         manager.setRedeliveryQueue(iqueue);
         
-        Collection<SourceSequence> sss = new ArrayList<SourceSequence>();
+        Collection<SourceSequence> sss = new ArrayList<>();
         if (null != ss) {
             sss.add(ss);            
         }
@@ -605,7 +605,7 @@ public class RMManagerTest extends Assert {
             return;
         }         
         
-        Collection<DestinationSequence> dss = new ArrayList<DestinationSequence>();
+        Collection<DestinationSequence> dss = new ArrayList<>();
         if (null != ds) {
             dss.add(ds);            
         }
@@ -615,7 +615,7 @@ public class RMManagerTest extends Assert {
             return;
         }
 
-        Collection<RMMessage> ms = new ArrayList<RMMessage>();
+        Collection<RMMessage> ms = new ArrayList<>();
         if (null != m) {
             ms.add(m);
         }
@@ -684,7 +684,7 @@ public class RMManagerTest extends Assert {
         manager.setRetransmissionQueue(oqueue);
         manager.setRedeliveryQueue(iqueue);
         
-        Collection<SourceSequence> sss = new ArrayList<SourceSequence>();
+        Collection<SourceSequence> sss = new ArrayList<>();
         if (null != ss) {
             sss.add(ss);            
         }
@@ -694,7 +694,7 @@ public class RMManagerTest extends Assert {
             return;
         }         
         
-        Collection<DestinationSequence> dss = new ArrayList<DestinationSequence>();
+        Collection<DestinationSequence> dss = new ArrayList<>();
         if (null != ds) {
             dss.add(ds);            
         }
@@ -703,7 +703,7 @@ public class RMManagerTest extends Assert {
         if (null == ds) {
             return;
         }
-        Collection<RMMessage> ms = new ArrayList<RMMessage>();
+        Collection<RMMessage> ms = new ArrayList<>();
         if (null != m) {
             ms.add(m);
         }
@@ -776,7 +776,7 @@ public class RMManagerTest extends Assert {
         
         MyControl() {
             c = EasyMock.createNiceControl();
-            mocks = new ArrayList<Object>();
+            mocks = new ArrayList<>();
         }
         
         void replay() {

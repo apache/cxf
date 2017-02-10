@@ -236,7 +236,7 @@ public class DoMerges {
         line = reader.readLine();
 
         List<String[]> map = new LinkedList<String[]>();
-        List<String> list = new ArrayList<String>(10);
+        List<String> list = new ArrayList<>(10);
         while (line != null) {
             if (line.length() > 0 && line.startsWith("commit ")) {
                 if (!list.isEmpty()) {
@@ -266,7 +266,7 @@ public class DoMerges {
 
         reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
         line = reader.readLine();
-        List<String> lines = new ArrayList<String>(10);
+        List<String> lines = new ArrayList<>(10);
         while (line != null) {
             if (!line.startsWith("commit ")) {
                 lines.add(line);
@@ -581,7 +581,7 @@ public class DoMerges {
         return false;
     }        
     private static List<String> compareLogs(String[] f, String[] logLines) throws IOException {
-        ArrayList<String> onBranch = new ArrayList<String>(f.length);
+        ArrayList<String> onBranch = new ArrayList<>(f.length);
         for (String s : f) {
             if (s.trim().startsWith("Conflicts:")) {
                 break;
@@ -593,7 +593,7 @@ public class DoMerges {
             }
         }
         
-        List<String> ll = new ArrayList<String>();
+        List<String> ll = new ArrayList<>();
         for (String s : logLines) {
             if (s.trim().length() > 0 
                 && onBranch.remove(s.trim())
@@ -608,7 +608,7 @@ public class DoMerges {
         
 
     private static String[] getCommandLine(String[] args) {
-        List<String> argLine = new ArrayList<String>();
+        List<String> argLine = new ArrayList<>();
         if (isWindows()) {
             argLine.add("cmd.exe");
             argLine.add("/c");

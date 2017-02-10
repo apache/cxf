@@ -88,7 +88,7 @@ public class ConfigurerImpl implements Configurer {
                     Matcher matcher = Pattern.compile(s).matcher("");
                     List<MatcherHolder> m = wildCardBeanDefinitions.get(cls.getName());
                     if (m == null) {
-                        m = new ArrayList<MatcherHolder>();
+                        m = new ArrayList<>();
                         wildCardBeanDefinitions.put(cls.getName(), m);
                     }
                     MatcherHolder holder = new MatcherHolder(orig, matcher);

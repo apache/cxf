@@ -43,7 +43,7 @@ public class ServiceImpl implements Service {
             throw new IllegalArgumentException("key is null");
         }
 
-        Collection<NoDefaultConstructorBean> collection = new ArrayList<NoDefaultConstructorBean>();
+        Collection<NoDefaultConstructorBean> collection = new ArrayList<>();
 
         collection.add(new NoDefaultConstructorBeanImpl("1", "name"));
 
@@ -60,7 +60,7 @@ public class ServiceImpl implements Service {
         Map<NoDefaultConstructorBeanKey, Collection<NoDefaultConstructorBean>> map = 
                 new HashMap<NoDefaultConstructorBeanKey, Collection<NoDefaultConstructorBean>>();
 
-        Collection<NoDefaultConstructorBean> collection = new ArrayList<NoDefaultConstructorBean>();
+        Collection<NoDefaultConstructorBean> collection = new ArrayList<>();
 
         collection.add(new NoDefaultConstructorBeanImpl("1", "name"));
 

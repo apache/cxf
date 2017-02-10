@@ -38,7 +38,7 @@ import org.apache.cxf.tools.wsdlto.core.AbstractGenerator;
 
 public class SimpleFrontEndProcessor implements Processor {
     private ToolContext context;
-    private List<AbstractGenerator> generators = new ArrayList<AbstractGenerator>();
+    private List<AbstractGenerator> generators = new ArrayList<>();
     @SuppressWarnings("unchecked")
     public void process() throws ToolException {       
         List<ServiceInfo> services = (List<ServiceInfo>)context.get(ToolConstants.SERVICE_LIST);

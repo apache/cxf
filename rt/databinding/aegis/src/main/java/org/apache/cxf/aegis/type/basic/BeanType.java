@@ -529,7 +529,7 @@ public class BeanType extends AegisType {
      */
     @Override
     public Set<AegisType> getDependencies() {
-        Set<AegisType> deps = new HashSet<AegisType>();
+        Set<AegisType> deps = new HashSet<>();
 
         BeanTypeInfo inf = getTypeInfo();
 

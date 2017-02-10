@@ -65,7 +65,7 @@ public abstract class AbstractSearchConditionVisitor <T, E> implements SearchCon
     
     protected ClassValue getPrimitiveFieldClass(PrimitiveStatement ps, String name, Class<?> valueCls, 
                                                 Type type, Object value) {
-        return doGetPrimitiveFieldClass(ps, name, valueCls, type, value, new HashSet<String>());
+        return doGetPrimitiveFieldClass(ps, name, valueCls, type, value, new HashSet<>());
     }
     
     @SuppressWarnings("rawtypes")

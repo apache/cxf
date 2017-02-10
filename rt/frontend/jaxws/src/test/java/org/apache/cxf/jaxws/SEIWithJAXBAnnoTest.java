@@ -53,7 +53,7 @@ public class SEIWithJAXBAnnoTest extends AbstractJaxWsTest {
         LoggingOutInterceptor log = new LoggingOutInterceptor(new PrintWriter(strWriter));
         ClientProxy.getClient(proxy).getOutInterceptors().add(log);
         
-        List<String> args = new ArrayList<String>();
+        List<String> args = new ArrayList<>();
         args.add("str1");
         args.add("str2");
         args.add("str3");

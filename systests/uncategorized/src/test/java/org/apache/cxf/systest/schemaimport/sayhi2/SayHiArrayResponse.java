@@ -34,7 +34,7 @@ public class SayHiArrayResponse {
 
     public List<String> getReturn() {
         if (res == null) {
-            res = new ArrayList<String>();
+            res = new ArrayList<>();
         }
         return this.res;
     }

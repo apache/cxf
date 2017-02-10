@@ -166,7 +166,7 @@ public class WSDL2JavaMojo extends AbstractCodegenMoho {
         File outputDirFile = getGeneratedTestRoot() == null 
                              ? getGeneratedSourceRoot() : getGeneratedTestRoot();
 
-        List<GenericWsdlOption> newList = new ArrayList<GenericWsdlOption>();
+        List<GenericWsdlOption> newList = new ArrayList<>();
 
         for (GenericWsdlOption go : effectiveWsdlOptions) {
             WsdlOption o = (WsdlOption) go;
@@ -403,8 +403,8 @@ public class WSDL2JavaMojo extends AbstractCodegenMoho {
             }
             try {
                 ToolContext ctx = new ToolContext();
-                final List<File> files = new ArrayList<File>();                
-                final List<File> errorfiles = new ArrayList<File>();                
+                final List<File> files = new ArrayList<>();                
+                final List<File> errorfiles = new ArrayList<>();                
                 ctx.put(OutputStreamCreator.class, new OutputStreamCreator() {
                     public OutputStream createOutputStream(File file) throws IOException {
                         files.add(file);
@@ -462,7 +462,7 @@ public class WSDL2JavaMojo extends AbstractCodegenMoho {
      */
     protected List<GenericWsdlOption> createWsdlOptionsFromScansAndExplicitWsdlOptions()
         throws MojoExecutionException {
-        List<GenericWsdlOption> effectiveWsdlOptions = new ArrayList<GenericWsdlOption>();
+        List<GenericWsdlOption> effectiveWsdlOptions = new ArrayList<>();
 
         if (wsdlOptions != null) {
             for (WsdlOption wo : wsdlOptions) {

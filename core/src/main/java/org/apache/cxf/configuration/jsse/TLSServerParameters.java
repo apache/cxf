@@ -31,8 +31,8 @@ import org.apache.cxf.configuration.security.ClientAuthentication;
 public class TLSServerParameters extends TLSParameterBase {
 
     ClientAuthentication clientAuthentication;
-    List<String> excludeProtocols = new ArrayList<String>();
-    List<String> includeProtocols = new ArrayList<String>();
+    List<String> excludeProtocols = new ArrayList<>();
+    List<String> includeProtocols = new ArrayList<>();
     
     /**
      * This parameter configures the server side to request and/or
@@ -61,7 +61,7 @@ public class TLSServerParameters extends TLSParameterBase {
      */
     public List<String> getExcludeProtocols() {
         if (excludeProtocols == null) {
-            excludeProtocols = new ArrayList<String>();
+            excludeProtocols = new ArrayList<>();
         }
         return excludeProtocols;
     }
@@ -78,7 +78,7 @@ public class TLSServerParameters extends TLSParameterBase {
      */
     public List<String> getIncludeProtocols() {
         if (includeProtocols == null) {
-            includeProtocols = new ArrayList<String>();
+            includeProtocols = new ArrayList<>();
         }
         return includeProtocols;
     }

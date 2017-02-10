@@ -417,7 +417,7 @@ public final class JAXBUtils {
         
         // split into words 
 
-        List<String> words = new ArrayList<String>();
+        List<String> words = new ArrayList<>();
 
         StringTokenizer st = new StringTokenizer(name, XML_NAME_PUNCTUATION_STRING);
         while (st.hasMoreTokens()) {
@@ -659,7 +659,7 @@ public final class JAXBUtils {
             Object ref = refClass.getConstructor(QName.class, 
                                                  Type.class, 
                                                  anns.getClass()).newInstance(qname, refcls, anns);
-            List<Object> typeRefs = new ArrayList<Object>();
+            List<Object> typeRefs = new ArrayList<>();
             typeRefs.add(ref);
             List<Class<?>> clses = new ArrayList<Class<?>>(ctxClasses);
             clses.add(refClass.getField("type").get(ref).getClass());
@@ -763,7 +763,7 @@ public final class JAXBUtils {
     }
     
     public static List<String> getGeneratedClassNames(JCodeModel codeModel) {
-        List<String> classes = new ArrayList<String>();
+        List<String> classes = new ArrayList<>();
         for (Iterator<JPackage> itr = codeModel.packages(); itr.hasNext();) {
             JPackage package1 = itr.next();
             
@@ -813,7 +813,7 @@ public final class JAXBUtils {
     
     public static List<DOMResult> generateJaxbSchemas(
         JAXBContext context, final Map<String, DOMResult> builtIns) throws IOException {
-        final List<DOMResult> results = new ArrayList<DOMResult>();
+        final List<DOMResult> results = new ArrayList<>();
 
         context.generateSchema(new SchemaOutputResolver() {
             @Override
@@ -962,7 +962,7 @@ public final class JAXBUtils {
         private final Set<String> typesClassNames;
 
         public DefaultClassNameAllocator() {
-            this(new HashSet<String>());
+            this(new HashSet<>());
         }
         
         public DefaultClassNameAllocator(Set<String> set) {
@@ -1140,7 +1140,7 @@ public final class JAXBUtils {
             if (nsctxt == null) {
                 return sup;
             }
-            List<String> s = new ArrayList<String>(Arrays.asList(sup));
+            List<String> s = new ArrayList<>(Arrays.asList(sup));
             for (int x = 1; x < nsctxt.length; x = x + 2) {
                 s.remove(nsctxt[x]);
             }

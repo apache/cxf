@@ -68,7 +68,7 @@ public final class SchemaUtil {
     public void getSchemas(final Definition def, 
                            final SchemaCollection schemaCol,
                            List<SchemaInfo> schemas) {
-        List<Definition> defList = new ArrayList<Definition>();
+        List<Definition> defList = new ArrayList<>();
         parseImports(def, defList);
         extractSchema(def, schemaCol, schemas);
         // added        
@@ -152,7 +152,7 @@ public final class SchemaUtil {
     }
 
     private void parseImports(Definition def, List<Definition> defList) {
-        List<Import> importList = new ArrayList<Import>();
+        List<Import> importList = new ArrayList<>();
 
         Collection<List<Import>> ilist = cast(def.getImports().values());
         for (List<Import> list : ilist) {

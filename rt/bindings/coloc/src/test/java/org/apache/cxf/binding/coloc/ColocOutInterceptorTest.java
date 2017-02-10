@@ -170,7 +170,7 @@ public class ColocOutInterceptorTest extends Assert {
 
         //Funtion Param
         Server s1 = control.createMock(Server.class);
-        List<Server> list = new ArrayList<Server>();
+        List<Server> list = new ArrayList<>();
         list.add(s1);        
         Endpoint sep = control.createMock(Endpoint.class);
         ex.put(Endpoint.class, sep);
@@ -284,7 +284,7 @@ public class ColocOutInterceptorTest extends Assert {
     }
 
     private void verifyIsColocatedWithEmptyList() {
-        List<Server> list = new ArrayList<Server>();
+        List<Server> list = new ArrayList<>();
         //Local var
         Endpoint sep = control.createMock(Endpoint.class);
         Service ses = control.createMock(Service.class);
@@ -304,7 +304,7 @@ public class ColocOutInterceptorTest extends Assert {
     private void verifyIsColocatedWithDifferentService() {
         //Funtion Param
         Server s1 = control.createMock(Server.class);
-        List<Server> list = new ArrayList<Server>();
+        List<Server> list = new ArrayList<>();
         list.add(s1);        
         Endpoint sep = control.createMock(Endpoint.class);
         //Local var
@@ -330,7 +330,7 @@ public class ColocOutInterceptorTest extends Assert {
     private void verifyIsColocatedWithDifferentEndpoint() {
         //Funtion Param
         Server s1 = control.createMock(Server.class);
-        List<Server> list = new ArrayList<Server>();
+        List<Server> list = new ArrayList<>();
         list.add(s1);        
         Endpoint sep = control.createMock(Endpoint.class);
         BindingOperationInfo sboi = control.createMock(BindingOperationInfo.class);
@@ -363,7 +363,7 @@ public class ColocOutInterceptorTest extends Assert {
     private void verifyIsColocatedWithDifferentOperation() {
         //Funtion Param
         Server s1 = control.createMock(Server.class);
-        List<Server> list = new ArrayList<Server>();
+        List<Server> list = new ArrayList<>();
         list.add(s1);        
         Endpoint sep = control.createMock(Endpoint.class);
         BindingOperationInfo sboi = control.createMock(BindingOperationInfo.class);
@@ -405,7 +405,7 @@ public class ColocOutInterceptorTest extends Assert {
         colocOut = new TestColocOutInterceptor1();
         //Funtion Param
         Server s1 = control.createMock(Server.class);
-        List<Server> list = new ArrayList<Server>();
+        List<Server> list = new ArrayList<>();
         list.add(s1);        
         Endpoint sep = control.createMock(Endpoint.class);
         BindingOperationInfo sboi = control.createMock(BindingOperationInfo.class);
@@ -468,7 +468,7 @@ public class ColocOutInterceptorTest extends Assert {
         colocOut = new TestColocOutInterceptor1();
         //Funtion Param
         Server s1 = control.createMock(Server.class);
-        List<Server> list = new ArrayList<Server>();
+        List<Server> list = new ArrayList<>();
         list.add(s1);        
         Endpoint sep = control.createMock(Endpoint.class);
         BindingOperationInfo sboi = control.createMock(BindingOperationInfo.class);

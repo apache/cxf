@@ -114,7 +114,7 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
         // Find the scopes which match the current request
         
         List<OAuthPermission> permissions = accessTokenV.getTokenScopes();
-        List<OAuthPermission> matchingPermissions = new ArrayList<OAuthPermission>();
+        List<OAuthPermission> matchingPermissions = new ArrayList<>();
         
         HttpServletRequest req = getMessageContext().getHttpServletRequest();
         for (OAuthPermission perm : permissions) {

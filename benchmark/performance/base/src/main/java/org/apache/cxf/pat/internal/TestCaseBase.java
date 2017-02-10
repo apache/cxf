@@ -48,7 +48,7 @@ public abstract class TestCaseBase<T> {
 
     protected String wsdlNameSpace;   
 
-    protected List<TestResult> results = new ArrayList<TestResult>();
+    protected List<TestResult> results = new ArrayList<>();
 
     protected int numberOfThreads;
     
@@ -278,7 +278,7 @@ public abstract class TestCaseBase<T> {
         if (numberOfThreads == 0) {
             numberOfThreads = 1; 
 	}
-        List<Thread> threadList = new ArrayList<Thread>();
+        List<Thread> threadList = new ArrayList<>();
         for (int i = 0; i < numberOfThreads; i++) {
             TestRunner<T> runner = new TestRunner<T>("No." + i + " TestRunner", this);
             Thread thread = new Thread(runner, "RunnerThread No." + i);

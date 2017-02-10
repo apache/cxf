@@ -1263,7 +1263,7 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
 
     public class MyHandlerResolver implements HandlerResolver {
         @SuppressWarnings("rawtypes")
-        List<Handler> chain = new ArrayList<Handler>();
+        List<Handler> chain = new ArrayList<>();
         String bindingID;
 
         public MyHandlerResolver(Handler<?>... handlers) {

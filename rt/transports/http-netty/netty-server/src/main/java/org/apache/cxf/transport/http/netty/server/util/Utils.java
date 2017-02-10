@@ -107,7 +107,7 @@ public final class Utils {
                                                       HttpRequest request) {
         String cookieString = request.headers().get(COOKIE);
         if (cookieString != null) {
-            List<Cookie> foundCookie = new ArrayList<Cookie>();
+            List<Cookie> foundCookie = new ArrayList<>();
             Set<Cookie> cookies = CookieDecoder.decode(cookieString);
             for (Cookie cookie : cookies) {
                 if (cookie.getName().equals(name)) {
@@ -124,7 +124,7 @@ public final class Utils {
                                                 HttpResponse response) {
         String cookieString = response.headers().get(COOKIE);
         if (cookieString != null) {
-            List<Cookie> foundCookie = new ArrayList<Cookie>();
+            List<Cookie> foundCookie = new ArrayList<>();
             Set<Cookie> cookies = CookieDecoder.decode(cookieString);
             for (Cookie cookie : cookies) {
                 if (cookie.getName().equals(name)) {
@@ -175,7 +175,7 @@ public final class Utils {
             return null;
         }
 
-        List<Locale> locales = new ArrayList<Locale>();
+        List<Locale> locales = new ArrayList<>();
 
         for (String str : acceptLanguageHeader.split(",")) {
             String[] arr = str.trim().replace("-", "_").split(";");

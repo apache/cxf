@@ -38,7 +38,7 @@ public class PrimitiveTypesVisitor implements Visitor {
 
     private static XmlSchemaPrimitiveMap xmlSchemaPrimitiveMap = new XmlSchemaPrimitiveMap();
     
-    private static final List<Integer> PRIMITIVE_TYPES = new ArrayList<Integer>();
+    private static final List<Integer> PRIMITIVE_TYPES = new ArrayList<>();
 
     static {
         PRIMITIVE_TYPES.add(Integer.valueOf(IDLTokenTypes.LITERAL_float));

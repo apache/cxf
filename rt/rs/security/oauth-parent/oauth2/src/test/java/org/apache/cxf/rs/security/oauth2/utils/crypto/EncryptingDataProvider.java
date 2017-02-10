@@ -43,7 +43,7 @@ public class EncryptingDataProvider implements OAuthDataProvider {
 
     SecretKey key;
     private Map<String, String> clients;
-    private Set<String> tokens = new HashSet<String>();
+    private Set<String> tokens = new HashSet<>();
     private Map<String, String> refreshTokens = new HashMap<String, String>();
     
     public EncryptingDataProvider() throws Exception {

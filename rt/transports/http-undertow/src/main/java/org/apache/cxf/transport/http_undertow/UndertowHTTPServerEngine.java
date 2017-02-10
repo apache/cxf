@@ -536,6 +536,6 @@ public class UndertowHTTPServerEngine implements ServerEngine {
     }
     
     public List<CXFUndertowHttpHandler> getHandlers() {
-        return handlers != null ? handlers : new ArrayList<CXFUndertowHttpHandler>();
+        return handlers != null ? handlers : new ArrayList<>();
     }
 }

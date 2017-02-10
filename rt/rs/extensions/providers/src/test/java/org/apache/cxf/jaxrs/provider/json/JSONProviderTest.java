@@ -769,7 +769,7 @@ public class JSONProviderTest extends Assert {
         p.setNamespaceMap(namespaceMap);
         p.setIgnoreNamespaces(ignoreNamespaces);
         
-        List<TagVO2> tags = new ArrayList<TagVO2>();
+        List<TagVO2> tags = new ArrayList<>();
         tags.add(createTag2("a", "b"));
         tags.add(createTag2("c", "d"));
         ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -799,7 +799,7 @@ public class JSONProviderTest extends Assert {
     @Test
     public void testWriteUnqualifiedCollection() throws Exception {
         JSONProvider<List<Book>> p = new JSONProvider<List<Book>>();
-        List<Book> books = new ArrayList<Book>();
+        List<Book> books = new ArrayList<>();
         books.add(new Book("CXF", 123L));
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         Method m = CollectionsResource.class.getMethod("getBooks", new Class[0]);
@@ -836,7 +836,7 @@ public class JSONProviderTest extends Assert {
             b2 = ((Book[])o)[1];
         } else if (type == Set.class) {
             Set<Book> set = CastUtils.cast((Set<?>)o);
-            List<Book> books = new ArrayList<Book>(new TreeSet<Book>(set));
+            List<Book> books = new ArrayList<>(new TreeSet<Book>(set));
             b1 = books.get(0);
             b2 = books.get(1);
         } else {
@@ -1399,7 +1399,7 @@ public class JSONProviderTest extends Assert {
         TagVO2 tag = new TagVO2("A", "B");
         TagVO2Holder holder = new TagVO2Holder();
         holder.setTag(tag);
-        List<TagVO2Holder> list = new ArrayList<TagVO2Holder>();
+        List<TagVO2Holder> list = new ArrayList<>();
         list.add(holder);
     
         //ParameterizedType required for Lists of Objects
@@ -1446,7 +1446,7 @@ public class JSONProviderTest extends Assert {
     @Test
     public void testDropElementsIgnored() throws Exception {
         JSONProvider<ManyTags> provider = new JSONProvider<ManyTags>();
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         list.add("ManyTags");
         list.add("list");
         list.add("tags");
@@ -1464,7 +1464,7 @@ public class JSONProviderTest extends Assert {
     @Test
     public void testDropElements() throws Exception {
         JSONProvider<ManyTags> provider = new JSONProvider<ManyTags>();
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         list.add("ManyTags");
         list.add("tags");
         provider.setOutDropElements(list);
@@ -1499,7 +1499,7 @@ public class JSONProviderTest extends Assert {
     @Test
     public void testDropQualifiedElements() throws Exception {
         JSONProvider<TagVO2> provider = new JSONProvider<TagVO2>();
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         list.add("{http://tags}thetag");
         provider.setOutDropElements(list);
         Map<String, String> map = new HashMap<String, String>();
@@ -1753,7 +1753,7 @@ public class JSONProviderTest extends Assert {
     @XmlType(name = "", propOrder = {"title", "comments" })
     public static class Post {
         private String title;
-        private List<Comment> comments = new ArrayList<Comment>();
+        private List<Comment> comments = new ArrayList<>();
         public void setTitle(String title) {
             this.title = title;
         }
@@ -1893,7 +1893,7 @@ public class JSONProviderTest extends Assert {
        
         public void addParameterDefinition(ParameterDefinition parameterDefinition) {
             if (parameterList == null) {
-                parameterList = new ArrayList<ParameterDefinition>();
+                parameterList = new ArrayList<>();
             }
             parameterList.add(parameterDefinition);
         }

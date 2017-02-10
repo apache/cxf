@@ -1720,7 +1720,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         Map<Identifier, DestinationSequence> dsmap = new HashMap<Identifier, DestinationSequence>();
         Map<Identifier, Collection<RMMessage>> ommap = new HashMap<Identifier, Collection<RMMessage>>();
         Map<Identifier, Collection<RMMessage>> immap = new HashMap<Identifier, Collection<RMMessage>>();
-        Set<Identifier> ssclosed = new HashSet<Identifier>();
+        Set<Identifier> ssclosed = new HashSet<>();
 
         @Override
         public void createSourceSequence(SourceSequence seq) {

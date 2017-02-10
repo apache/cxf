@@ -657,7 +657,7 @@ public class MAPAggregatorTest extends Assert {
         endpoint.getEndpointInfo();
         EasyMock.expectLastCall().andReturn(endpointInfo).anyTimes();
         List<ExtensibilityElement> endpointExts =
-            new ArrayList<ExtensibilityElement>();
+            new ArrayList<>();
         endpointInfo.getExtensors(EasyMock.eq(ExtensibilityElement.class));
         EasyMock.expectLastCall().andReturn(endpointExts).anyTimes();
         BindingInfo bindingInfo = control.createMock(BindingInfo.class);

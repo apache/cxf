@@ -28,7 +28,7 @@ import org.omg.CORBA.TypeCode;
 
 public class CorbaStructHandler extends CorbaObjectHandler {
 
-    List<CorbaObjectHandler> members = new ArrayList<CorbaObjectHandler>();
+    List<CorbaObjectHandler> members = new ArrayList<>();
     
     public CorbaStructHandler(QName structName, QName structIdlType, TypeCode structTC, Object structType) {
         super(structName, structIdlType, structTC, structType);

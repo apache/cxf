@@ -24,7 +24,7 @@ import java.util.List;
 
 public class JavaServiceClass extends JavaClass {
 
-    private final List<JavaPort> ports = new ArrayList<JavaPort>();
+    private final List<JavaPort> ports = new ArrayList<>();
   
     private String serviceName;
     

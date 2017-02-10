@@ -60,7 +60,7 @@ public final class WSDiscoveryClientTest {
    
     static NetworkInterface findIpv4Interface() throws Exception {
         Enumeration<NetworkInterface> ifcs = NetworkInterface.getNetworkInterfaces();
-        List<NetworkInterface> possibles = new ArrayList<NetworkInterface>();
+        List<NetworkInterface> possibles = new ArrayList<>();
         while (ifcs.hasMoreElements()) {
             NetworkInterface ni = ifcs.nextElement();
             if (ni.supportsMulticast()

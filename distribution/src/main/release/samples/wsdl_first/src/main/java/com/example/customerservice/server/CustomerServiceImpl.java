@@ -50,7 +50,7 @@ public class CustomerServiceImpl implements CustomerService {
                                               noSuchCustomer);
         }
 
-        List<Customer> customers = new ArrayList<Customer>();
+        List<Customer> customers = new ArrayList<>();
         for (int c = 0; c < 2; c++) {
             Customer cust = new Customer();
             cust.setName(name);

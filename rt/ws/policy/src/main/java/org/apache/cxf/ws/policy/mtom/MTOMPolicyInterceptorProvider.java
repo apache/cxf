@@ -35,7 +35,7 @@ public class MTOMPolicyInterceptorProvider extends AbstractPolicyInterceptorProv
     private static final MTOMPolicyInterceptor INTERCEPTOR = new MTOMPolicyInterceptor();
     
     static {
-        Collection<QName> types = new ArrayList<QName>();
+        Collection<QName> types = new ArrayList<>();
         types.add(MetadataConstants.MTOM_ASSERTION_QNAME);
         ASSERTION_TYPES = types;
     }

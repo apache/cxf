@@ -127,7 +127,7 @@ public class HeaderVerifier extends AbstractSoapInterceptor {
 
     private void verify(SoapMessage message, boolean outgoingPartialResponse) {
         try {
-            List<String> wsaHeaders = new ArrayList<String>();
+            List<String> wsaHeaders = new ArrayList<>();
             List<Header> headers = message.getHeaders();
             if (headers != null) {
                 recordWSAHeaders(headers,

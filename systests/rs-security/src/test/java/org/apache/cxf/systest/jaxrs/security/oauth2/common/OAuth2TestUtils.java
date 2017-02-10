@@ -159,7 +159,7 @@ public final class OAuth2TestUtils {
     }
     
     public static List<Object> setupProviders() {
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         JSONProvider<OAuthAuthorizationData> jsonP = new JSONProvider<OAuthAuthorizationData>();
         jsonP.setNamespaceMap(Collections.singletonMap("http://org.apache.cxf.rs.security.oauth",
                                                        "ns2"));

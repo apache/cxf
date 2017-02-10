@@ -59,7 +59,7 @@ public class Java2WADLMojo extends AbstractMojo {
    
     
         
-    private List<ClassResourceInfo> classResourceInfos = new ArrayList<ClassResourceInfo>();
+    private List<ClassResourceInfo> classResourceInfos = new ArrayList<>();
     
         
     /**

@@ -104,7 +104,7 @@ public class BusExtensionLoadingTest extends Assert {
         @Override
         public Enumeration<URL> getResources(final String name) throws IOException {
             if (name.contains("cxf") || name.contains("bus")) {
-                return Collections.enumeration(new ArrayList<URL>());
+                return Collections.enumeration(new ArrayList<>());
             }
             return super.getResources(name);
         }

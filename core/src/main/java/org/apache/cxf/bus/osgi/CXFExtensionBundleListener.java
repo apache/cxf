@@ -85,7 +85,7 @@ public class CXFExtensionBundleListener implements SynchronousBundleListener {
             return false;
         }
         
-        List<String> names = new ArrayList<String>(orig.size());
+        List<String> names = new ArrayList<>(orig.size());
         for (Extension ext : orig) {
             names.add(ext.getName());
         }

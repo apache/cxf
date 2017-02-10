@@ -250,7 +250,7 @@ public final class HttpUtils {
                         values.set(i, value);
                     } catch (UnsupportedOperationException ex) {
                         // this may happen if an unmodifiable List was set via Map put
-                        List<Object> newList = new ArrayList<Object>(values);
+                        List<Object> newList = new ArrayList<>(values);
                         newList.set(i, value);
                         // Won't help if the map is unmodifiable in which case it is a bug anyway 
                         headers.put(entry.getKey(), newList);

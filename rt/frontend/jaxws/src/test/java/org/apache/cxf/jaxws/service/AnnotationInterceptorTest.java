@@ -252,7 +252,7 @@ public class AnnotationInterceptorTest extends AbstractJaxWsTest {
             return strings;
         }
         public List<String> getStringList(List<String> list) {
-            List<String> ret = new ArrayList<String>();
+            List<String> ret = new ArrayList<>();
             ret.add("Hello" + list.get(0));
             ret.add("Bonjour" + list.get(1));
             return ret;
@@ -277,7 +277,7 @@ public class AnnotationInterceptorTest extends AbstractJaxWsTest {
             return strings;
         }
         public List<String> getStringList(List<String> list) {
-            List<String> ret = new ArrayList<String>();
+            List<String> ret = new ArrayList<>();
             ret.add("Hello" + list.get(0));
             ret.add("Bonjour" + list.get(1));
             return ret;

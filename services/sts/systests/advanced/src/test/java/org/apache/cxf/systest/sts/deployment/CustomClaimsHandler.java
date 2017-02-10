@@ -66,7 +66,7 @@ public class CustomClaimsHandler implements ClaimsHandler {
     }
 
     public List<URI> getSupportedClaimTypes() {
-        List<URI> list = new ArrayList<URI>();
+        List<URI> list = new ArrayList<>();
         list.add(ROLE);
         list.add(GIVEN_NAME);
         list.add(LANGUAGE);

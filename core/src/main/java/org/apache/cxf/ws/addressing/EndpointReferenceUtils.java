@@ -99,7 +99,7 @@ public final class EndpointReferenceUtils {
      */
     private static final class SchemaLSResourceResolver implements LSResourceResolver {
         private final Map<String, byte[]> schemas;
-        private final Set<String> done = new HashSet<String>();
+        private final Set<String> done = new HashSet<>();
         private final ExtendedURIResolver resolver = new ExtendedURIResolver();
         private final Bus bus;
         

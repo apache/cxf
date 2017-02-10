@@ -98,7 +98,7 @@ public class SAMLBatchUnitTest extends AbstractBusClientServerTestBase {
         String wsdlLocation = 
             "https://localhost:" + test.getStsPort() + "/SecurityTokenService/Transport?wsdl";
         
-        List<BatchRequest> requestList = new ArrayList<BatchRequest>();
+        List<BatchRequest> requestList = new ArrayList<>();
         BatchRequest request = new BatchRequest();
         request.setAppliesTo("https://localhost:8081/doubleit/services/doubleittransportsaml1");
         request.setTokenType("http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLV1.1");

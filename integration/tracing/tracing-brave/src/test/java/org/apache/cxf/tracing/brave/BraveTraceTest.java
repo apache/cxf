@@ -94,7 +94,7 @@ public class BraveTraceTest {
     }
     
     static final class Localreporter implements Reporter<Span> {
-        List<Span> spans = new ArrayList<Span>();
+        List<Span> spans = new ArrayList<>();
 
         @Override
         public void report(Span span) {

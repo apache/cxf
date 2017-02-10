@@ -45,7 +45,7 @@ public class BookServerThrottled extends AbstractBusTestServerBase {
     protected void run() {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setResourceClasses(BookStore.class);
-        List<Feature> features = new ArrayList<Feature>();
+        List<Feature> features = new ArrayList<>();
         ThrottlingFeature tf = new ThrottlingFeature(new ThrottlingManagerImpl()); 
         features.add(tf);
         sf.setFeatures(features);

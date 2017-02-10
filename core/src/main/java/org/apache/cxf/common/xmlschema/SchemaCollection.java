@@ -276,7 +276,7 @@ public class SchemaCollection {
         if (schemaType != null) {
             Set<XmlSchemaType> xmlTypesCheckedForCrossImports;
             if (!xmlTypesCheckedForCrossImportsPerSchema.containsKey(schema)) {
-                xmlTypesCheckedForCrossImports = new HashSet<XmlSchemaType>();
+                xmlTypesCheckedForCrossImports = new HashSet<>();
                 xmlTypesCheckedForCrossImportsPerSchema.put(schema, xmlTypesCheckedForCrossImports);
             } else {
                 xmlTypesCheckedForCrossImports = xmlTypesCheckedForCrossImportsPerSchema.get(schema);

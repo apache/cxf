@@ -79,7 +79,7 @@ public class JweJsonWriterInterceptor extends AbstractJweJsonWriterProvider impl
             // or per-recipient headers
             protectedHeaders.setKeyEncryptionAlgorithm(keyAlgos.get(0));
         } else {
-            perRecipientUnprotectedHeaders = new ArrayList<JweHeaders>();
+            perRecipientUnprotectedHeaders = new ArrayList<>();
             for (KeyAlgorithm keyAlgo : keyAlgos) {
                 JweHeaders headers = new JweHeaders();
                 headers.setKeyEncryptionAlgorithm(keyAlgo);

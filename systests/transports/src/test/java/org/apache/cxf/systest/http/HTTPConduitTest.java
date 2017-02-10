@@ -62,7 +62,7 @@ import org.junit.Test;
 public class HTTPConduitTest extends AbstractBusClientServerTestBase {
     private static final boolean IN_PROCESS = true;
     
-    private static List<String> servers = new ArrayList<String>();
+    private static List<String> servers = new ArrayList<>();
 
     private static Map<String, String> addrMap = new TreeMap<String, String>();
     

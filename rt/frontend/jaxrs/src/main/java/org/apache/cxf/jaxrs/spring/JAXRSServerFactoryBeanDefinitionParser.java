@@ -66,7 +66,7 @@ public class JAXRSServerFactoryBeanDefinitionParser extends AbstractBeanDefiniti
     protected void mapAttribute(BeanDefinitionBuilder bean, Element e, String name, String val) {
         if ("beanNames".equals(name)) {
             String[] values = StringUtils.split(val, " ");
-            List<SpringResourceFactory> tempFactories = new ArrayList<SpringResourceFactory>(values.length);
+            List<SpringResourceFactory> tempFactories = new ArrayList<>(values.length);
             for (String v : values) {
                 String theValue = v.trim();
                 if (theValue.length() > 0) {
@@ -206,7 +206,7 @@ public class JAXRSServerFactoryBeanDefinitionParser extends AbstractBeanDefiniti
             this.context = ctx;
             
             if (tempFactories != null) {
-                List<ResourceProvider> factories = new ArrayList<ResourceProvider>(
+                List<ResourceProvider> factories = new ArrayList<>(
                     tempFactories.size());
                 for (int i = 0; i < tempFactories.size(); i++) {
                     SpringResourceFactory factory = tempFactories.get(i);

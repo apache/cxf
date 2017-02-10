@@ -31,7 +31,7 @@ import org.apache.cxf.tools.java2wsdl.processor.internal.jaxws.ResponseWrapper;
 
 public final class WrapperBeanGenerator extends BeanGenerator {
     protected Collection<JavaClass> generateBeanClasses(final ServiceInfo serviceInfo) {
-        Collection<JavaClass> wrapperClasses = new HashSet<JavaClass>();
+        Collection<JavaClass> wrapperClasses = new HashSet<>();
         
         for (OperationInfo op : serviceInfo.getInterface().getOperations()) {
             if (op.getUnwrappedOperation() != null) {

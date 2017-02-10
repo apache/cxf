@@ -118,7 +118,7 @@ public final class RM11Constants extends RMConstants {
     
     public static final Set<String> ACTIONS;
     static {
-        Set<String> actions = new HashSet<String>();
+        Set<String> actions = new HashSet<>();
         actions.add(CREATE_SEQUENCE_ACTION);
         actions.add(CREATE_SEQUENCE_RESPONSE_ACTION);
         actions.add(TERMINATE_SEQUENCE_ACTION);
@@ -158,7 +158,7 @@ public final class RM11Constants extends RMConstants {
     
     public static final Set<QName> HEADERS;
     static {
-        Set<QName> headers = new HashSet<QName>();
+        Set<QName> headers = new HashSet<>();
         headers.add(new QName(NAMESPACE_URI, SEQUENCE_NAME));
         headers.add(new QName(NAMESPACE_URI, SEQUENCE_ACK_NAME));
         headers.add(new QName(NAMESPACE_URI, ACK_REQUESTED_NAME));

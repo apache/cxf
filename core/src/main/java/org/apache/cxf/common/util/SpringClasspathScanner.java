@@ -141,7 +141,7 @@ class SpringClasspathScanner extends ClasspathScanner {
                                               String extension,
                                               ClassLoader loader) 
         throws IOException {
-        final List<URL> resourceURLs = new ArrayList<URL>();
+        final List<URL> resourceURLs = new ArrayList<>();
         if (basePackages == null || basePackages.isEmpty()) {
             return resourceURLs;
         }

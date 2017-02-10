@@ -391,7 +391,7 @@ public class ClientProxyImpl extends AbstractClient implements
         if (headers == null || headers.size() == 0) {
             return null;
         }
-        List<MediaType> types = new ArrayList<MediaType>();
+        List<MediaType> types = new ArrayList<>();
         for (String s : headers) {
             types.add(JAXRSUtils.toMediaType(s));
         }

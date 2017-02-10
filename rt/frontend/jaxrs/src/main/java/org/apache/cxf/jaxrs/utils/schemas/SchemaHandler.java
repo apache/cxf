@@ -85,7 +85,7 @@ public class SchemaHandler {
         SchemaFactory factory = SchemaFactory.newInstance(Constants.URI_2001_SCHEMA_XSD);
         Schema s = null;
         try {
-            List<Source> sources = new ArrayList<Source>();
+            List<Source> sources = new ArrayList<>();
             for (String loc : locations) {
                 List<URL> schemaURLs = new LinkedList<URL>();
                 

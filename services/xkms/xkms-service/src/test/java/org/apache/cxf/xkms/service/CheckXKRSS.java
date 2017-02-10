@@ -112,7 +112,7 @@ public class CheckXKRSS {
 
     XKMSService createXKMSService(boolean enableXKRSS) {
         XKMSService xkmsService = new XKMSService();
-        List<Register> keyRegisterHandlers = new ArrayList<Register>();
+        List<Register> keyRegisterHandlers = new ArrayList<>();
         keyRegisterHandlers.add(new Register() {
 
             @Override

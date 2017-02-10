@@ -104,7 +104,7 @@ public class NettyHttpServerEngineFactoryHolder {
             }
             //Engines
 
-            List<NettyHttpServerEngine> engineList = new ArrayList<NettyHttpServerEngine>();
+            List<NettyHttpServerEngine> engineList = new ArrayList<>();
             for (NettyHttpServerEngineConfigType engine : config.getEngine()) {
                 NettyHttpServerEngine eng = new NettyHttpServerEngine();
                

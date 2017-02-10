@@ -42,7 +42,7 @@ import org.opensaml.saml.saml2.core.AttributeValue;
  */
 public class CustomClaimsHandler implements ClaimsHandler {
     
-    private static List<URI> knownURIs = new ArrayList<URI>();
+    private static List<URI> knownURIs = new ArrayList<>();
     private static final URI ROLE_CLAIM = 
             URI.create("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role");
     

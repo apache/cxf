@@ -504,7 +504,7 @@ public class NettyHttpDestinationTest extends Assert {
             }
 
             public Set<String> getUriPrefixes() {
-                return new HashSet<String>(Collections.singletonList("http"));
+                return new HashSet<>(Collections.singletonList("http"));
             }
             
         };
@@ -664,12 +664,12 @@ public class NettyHttpDestinationTest extends Assert {
                 EasyMock.expect(request.getAttribute("org.eclipse.jetty.ajax.Continuation")).andReturn(null);
                 EasyMock.expect(request.getAttribute("http.service.redirection")).andReturn(null).anyTimes();
 
-                List<String> contentType = new ArrayList<String>();
+                List<String> contentType = new ArrayList<>();
                 contentType.add("text/xml");
                 contentType.add("charset=utf8");
-                List<String> authHeader = new ArrayList<String>();
+                List<String> authHeader = new ArrayList<>();
                 authHeader.add(BASIC_AUTH);
-                List<String> headerNames = new ArrayList<String>();
+                List<String> headerNames = new ArrayList<>();
                 headerNames.add("content-type");
                 headerNames.add(AUTH_HEADER);
                 
@@ -738,7 +738,7 @@ public class NettyHttpDestinationTest extends Assert {
         Map<String, List<String>> responseHeaders =
             CastUtils.cast((Map<?, ?>)outMsg.get(Message.PROTOCOL_HEADERS));
         assertNotNull("expected response headers", responseHeaders);
-        List<String> challenges = new ArrayList<String>();
+        List<String> challenges = new ArrayList<>();
         challenges.add(BASIC_CHALLENGE);
         challenges.add(DIGEST_CHALLENGE);
         challenges.add(CUSTOM_CHALLENGE);
@@ -824,7 +824,7 @@ public class NettyHttpDestinationTest extends Assert {
                      3,
                      response.getAddFieldCallCount());
         Enumeration e = response.getFieldValues(CHALLENGE_HEADER);
-        List<String> challenges = new ArrayList<String>();
+        List<String> challenges = new ArrayList<>();
         while (e.hasMoreElements()) {
             challenges.add((String)e.nextElement());
         }

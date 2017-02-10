@@ -738,7 +738,7 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
             for (Header header : headers) {
                 List<String> s = h.headerMap().get(header.getName());
                 if (s == null) {
-                    s = new ArrayList<String>(1);
+                    s = new ArrayList<>(1);
                     h.headerMap().put(header.getName(), s);
                 }
                 s.add(header.getValue());
@@ -921,7 +921,7 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
     }
     
     private String[] findProtocols(String p, String[] options) {
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         for (String s : options) {
             if (s.equals(p)) {
                 return new String[] {p};

@@ -51,7 +51,7 @@ public class JavaToWSContainer extends AbstractCXFToolContainer {
             //checkParams(errors);
             if (!hasInfoOption()) {
                 ToolContext env = new ToolContext();
-                env.setParameters(getParametersMap(new HashSet<String>()));
+                env.setParameters(getParametersMap(new HashSet<>()));
                 if (env.get(ToolConstants.CFG_OUTPUTDIR) == null) {
                     env.put(ToolConstants.CFG_OUTPUTDIR, ".");
                 }

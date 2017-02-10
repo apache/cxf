@@ -126,7 +126,7 @@ public abstract class AbstractWrapperHelper implements WrapperHelper {
     public List<Object> getWrapperParts(Object o) throws Fault {
         try {
             Object wrapperObject = getWrapperObject(o);                          
-            List<Object> ret = new ArrayList<Object>(getMethods.length);
+            List<Object> ret = new ArrayList<>(getMethods.length);
             for (int x = 0; x < getMethods.length; x++) {
                 if (getMethods[x] != null) {
                     ret.add(getValue(getMethods[x], wrapperObject));                        

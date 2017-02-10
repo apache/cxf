@@ -52,7 +52,7 @@ public abstract class AbstractVmJMSTest {
     protected static ConnectionFactoryFeature cff;
     protected static ConnectionFactory cf;
     protected static BrokerService broker;
-    private List<Object> closeableResources = new ArrayList<Object>();
+    private List<Object> closeableResources = new ArrayList<>();
 
     public static void startBusAndJMS(Class<?> testClass) {
         String brokerURI = "vm://" + testClass.getName() + "?broker.persistent=false&broker.useJmx=false";

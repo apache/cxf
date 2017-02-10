@@ -49,8 +49,8 @@ public class JavaMethod implements JavaAnnotatable {
     private boolean wrapperStyle;
     private boolean enableMime;
     private JavaInterface javaInterface;
-    private final List<JavaParameter> parameters = new ArrayList<JavaParameter>();
-    private final List<JavaException> exceptions = new ArrayList<JavaException>();
+    private final List<JavaParameter> parameters = new ArrayList<>();
+    private final List<JavaException> exceptions = new ArrayList<>();
     private final Map<String, JAnnotation> annotations = new HashMap<String, JAnnotation>();
 
     private JavaCodeBlock block;
@@ -314,7 +314,7 @@ public class JavaMethod implements JavaAnnotatable {
     }
 
     public List<String> getParameterList(boolean includeAnnotation) {
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < parameters.size(); i++) {
             JavaParameter parameter = parameters.get(i);

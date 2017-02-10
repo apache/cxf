@@ -27,8 +27,8 @@ import java.util.Set;
 public final class JAnnotation {
 
     private Class<?> type;
-    private List<JAnnotationElement> elements = new ArrayList<JAnnotationElement>();
-    private Set<String> imports = new HashSet<String>();
+    private List<JAnnotationElement> elements = new ArrayList<>();
+    private Set<String> imports = new HashSet<>();
 
     public JAnnotation() {
         // empty

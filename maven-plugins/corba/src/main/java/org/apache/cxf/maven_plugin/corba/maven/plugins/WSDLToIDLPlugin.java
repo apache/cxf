@@ -82,7 +82,7 @@ public class WSDLToIDLPlugin extends AbstractMojo {
 
         outputDir.mkdirs();
         
-        List<URL> urlList = new ArrayList<URL>();
+        List<URL> urlList = new ArrayList<>();
         StringBuilder buf = new StringBuilder();
 
         try {
@@ -139,7 +139,7 @@ public class WSDLToIDLPlugin extends AbstractMojo {
                 }
     
                 if (doWork) {
-                    List<String> list = new ArrayList<String>();
+                    List<String> list = new ArrayList<>();
                     list.add("-d");
                     list.add(outputDir.getAbsolutePath());
                     if (wsdltoidlOptions[x].isCorbaEnabled()) {

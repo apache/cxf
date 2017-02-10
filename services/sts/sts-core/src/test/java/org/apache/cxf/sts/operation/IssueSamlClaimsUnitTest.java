@@ -385,10 +385,10 @@ public class IssueSamlClaimsUnitTest extends org.junit.Assert {
      * @param issueOperation
      */
     private void addTokenProvider(TokenIssueOperation issueOperation) {
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         
         List<AttributeStatementProvider> customProviderList = 
-            new ArrayList<AttributeStatementProvider>();
+            new ArrayList<>();
         customProviderList.add(new CustomAttributeProvider());
         SAMLTokenProvider samlTokenProvider = new SAMLTokenProvider();
         samlTokenProvider.setAttributeStatementProviders(customProviderList);
@@ -478,11 +478,11 @@ public class IssueSamlClaimsUnitTest extends org.junit.Assert {
         Map<String, RealmProperties> realms = createSamlRealms();
         
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         SAMLTokenProvider samlTokenProvider = new SAMLTokenProvider();
         samlTokenProvider.setRealmMap(realms);
         List<AttributeStatementProvider> customProviderList = 
-            new ArrayList<AttributeStatementProvider>();
+            new ArrayList<>();
         customProviderList.add(new ClaimsAttributeStatementProvider());
         samlTokenProvider.setAttributeStatementProviders(customProviderList);
         providerList.add(samlTokenProvider);
@@ -492,7 +492,7 @@ public class IssueSamlClaimsUnitTest extends org.junit.Assert {
         issueOperation.setDelegationHandlers(Collections.singletonList(delegationHandler));
         
         // Add Token Validator
-        List<TokenValidator> validatorList = new ArrayList<TokenValidator>();
+        List<TokenValidator> validatorList = new ArrayList<>();
         SAMLTokenValidator samlTokenValidator = new SAMLTokenValidator();
         samlTokenValidator.setSamlRealmCodec(new IssuerSAMLRealmCodec());
         validatorList.add(samlTokenValidator);
@@ -501,7 +501,7 @@ public class IssueSamlClaimsUnitTest extends org.junit.Assert {
         addService(issueOperation);
         
         // Add Relationship list
-        List<Relationship> relationshipList = new ArrayList<Relationship>();
+        List<Relationship> relationshipList = new ArrayList<>();
         Relationship rs = createRelationship();
         relationshipList.add(rs);
         
@@ -625,11 +625,11 @@ public class IssueSamlClaimsUnitTest extends org.junit.Assert {
         Map<String, RealmProperties> realms = createSamlRealms();
         
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         SAMLTokenProvider samlTokenProvider = new SAMLTokenProvider();
         samlTokenProvider.setRealmMap(realms);
         List<AttributeStatementProvider> customProviderList = 
-            new ArrayList<AttributeStatementProvider>();
+            new ArrayList<>();
         customProviderList.add(new ClaimsAttributeStatementProvider());
         samlTokenProvider.setAttributeStatementProviders(customProviderList);
         providerList.add(samlTokenProvider);
@@ -639,7 +639,7 @@ public class IssueSamlClaimsUnitTest extends org.junit.Assert {
         issueOperation.setDelegationHandlers(Collections.singletonList(delegationHandler));
         
         // Add Token Validator
-        List<TokenValidator> validatorList = new ArrayList<TokenValidator>();
+        List<TokenValidator> validatorList = new ArrayList<>();
         SAMLTokenValidator samlTokenValidator = new SAMLTokenValidator();
         samlTokenValidator.setSamlRealmCodec(new IssuerSAMLRealmCodec());
         validatorList.add(samlTokenValidator);
@@ -648,7 +648,7 @@ public class IssueSamlClaimsUnitTest extends org.junit.Assert {
         addService(issueOperation);
         
         // Add Relationship list
-        List<Relationship> relationshipList = new ArrayList<Relationship>();
+        List<Relationship> relationshipList = new ArrayList<>();
         Relationship rs = createRelationship();
         rs.setType(Relationship.FED_TYPE_IDENTITY);
         rs.setIdentityMapper(new CustomIdentityMapper());
@@ -901,7 +901,7 @@ public class IssueSamlClaimsUnitTest extends org.junit.Assert {
         SAMLTokenProvider samlTokenProvider = new SAMLTokenProvider();
         samlTokenProvider.setRealmMap(realms);
         List<AttributeStatementProvider> customProviderList = 
-            new ArrayList<AttributeStatementProvider>();
+            new ArrayList<>();
         customProviderList.add(new ClaimsAttributeStatementProvider());
         samlTokenProvider.setAttributeStatementProviders(customProviderList);
         

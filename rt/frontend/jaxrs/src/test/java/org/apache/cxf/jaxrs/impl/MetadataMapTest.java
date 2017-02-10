@@ -39,7 +39,7 @@ public class MetadataMapTest extends Assert {
     @Test
     public void testPutSingle() {
         MetadataMap<String, Object> m = new MetadataMap<String, Object>();
-        List<Object> value1 = new ArrayList<Object>();
+        List<Object> value1 = new ArrayList<>();
         value1.add("bar");
         value1.add("foo");
         m.put("baz", value1);
@@ -117,7 +117,7 @@ public class MetadataMapTest extends Assert {
     @Test
     public void testAddAll() {
         MetadataMap<String, Object> m = new MetadataMap<String, Object>();
-        List<Object> values = new ArrayList<Object>();
+        List<Object> values = new ArrayList<>();
         values.add("foo");
         m.addAll("baz", values);
         values = m.get("baz");
@@ -134,7 +134,7 @@ public class MetadataMapTest extends Assert {
     @Test
     public void testPutSingleCaseInsensitive() {
         MetadataMap<String, Object> m = new MetadataMap<String, Object>(false, true);
-        List<Object> value1 = new ArrayList<Object>();
+        List<Object> value1 = new ArrayList<>();
         value1.add("bar");
         value1.add("foo");
         m.put("baz", value1);
@@ -192,7 +192,7 @@ public class MetadataMapTest extends Assert {
     @Test
     public void testPutAllCaseInsensitive() {
         MetadataMap<String, Object> m = new MetadataMap<String, Object>(false, true);
-        List<Object> value1 = new ArrayList<Object>();
+        List<Object> value1 = new ArrayList<>();
         value1.add("bar");
         value1.add("foo");
         m.put("baz", value1);
@@ -203,7 +203,7 @@ public class MetadataMapTest extends Assert {
         assertEquals("foo", values.get(1));
         
         MetadataMap<String, Object> m2 = new MetadataMap<String, Object>(false, true);
-        List<Object> value2 = new ArrayList<Object>();
+        List<Object> value2 = new ArrayList<>();
         value2.add("bar2");
         value2.add("foo2");
         m2.put("BaZ", value2);
@@ -220,7 +220,7 @@ public class MetadataMapTest extends Assert {
     @Test
     public void testRemoveCaseInsensitive() {
         MetadataMap<String, Object> m = new MetadataMap<String, Object>(false, true);
-        List<Object> value1 = new ArrayList<Object>();
+        List<Object> value1 = new ArrayList<>();
         value1.add("bar");
         value1.add("foo");
         m.put("baz", value1);

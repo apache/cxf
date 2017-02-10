@@ -220,7 +220,7 @@ public class Java2WSMojo extends AbstractMojo {
             String cp = classLoaderSwitcher.switchClassLoader(project, false,
                                                               classpath, classpathElements);
             if (fork) {
-                List<String> artifactsPath = new ArrayList<String>(pluginArtifacts.size());
+                List<String> artifactsPath = new ArrayList<>(pluginArtifacts.size());
                 for (Artifact a : pluginArtifacts) {
                     File file = a.getFile();
                     if (file == null) {
@@ -243,7 +243,7 @@ public class Java2WSMojo extends AbstractMojo {
     }
 
     private List<String> initArgs(String cp) {
-        List<String> args = new ArrayList<String>();
+        List<String> args = new ArrayList<>();
 
         if (fork) {
             String[] split = additionalJvmArgs.split("\\s+");

@@ -367,7 +367,7 @@ public class AnnotationsFactoryBeanListener implements FactoryBeanListener {
     }
     
     private void addDocumentation(OperationInfo inf, Placement defPlace, WSDLDocumentation ... values) {
-        List<WSDLDocumentation> later = new ArrayList<WSDLDocumentation>();
+        List<WSDLDocumentation> later = new ArrayList<>();
         for (WSDLDocumentation doc : values) {
             WSDLDocumentation.Placement p = doc.placement();
             if (p == WSDLDocumentation.Placement.DEFAULT) {
@@ -420,7 +420,7 @@ public class AnnotationsFactoryBeanListener implements FactoryBeanListener {
     private void addDocumentation(InterfaceInfo interfaceInfo, 
                                   WSDLDocumentation.Placement defPlace,
                                   WSDLDocumentation ... values) {
-        List<WSDLDocumentation> later = new ArrayList<WSDLDocumentation>();
+        List<WSDLDocumentation> later = new ArrayList<>();
         for (WSDLDocumentation doc : values) {
             WSDLDocumentation.Placement p = doc.placement();
             if (p == WSDLDocumentation.Placement.DEFAULT) {

@@ -210,8 +210,8 @@ public class RMEndpointTest extends Assert {
         control.reset();
         ExtensibilityElement ua = control.createMock(ExtensibilityElement.class);
         ei = control.createMock(EndpointInfo.class);
-        List<ExtensibilityElement> noExts = new ArrayList<ExtensibilityElement>();
-        List<ExtensibilityElement> exts = new ArrayList<ExtensibilityElement>();
+        List<ExtensibilityElement> noExts = new ArrayList<>();
+        List<ExtensibilityElement> exts = new ArrayList<>();
         exts.add(ua);
         EasyMock.expect(ei.getExtensors(ExtensibilityElement.class)).andReturn(noExts);
         BindingInfo bi = control.createMock(BindingInfo.class);
@@ -227,7 +227,7 @@ public class RMEndpointTest extends Assert {
 
     @Test
     public void testGetUsingAddressingFromExtensions() {
-        List<ExtensibilityElement> exts = new ArrayList<ExtensibilityElement>();
+        List<ExtensibilityElement> exts = new ArrayList<>();
         ExtensibilityElement ua = control.createMock(ExtensibilityElement.class);
         exts.add(ua);
         EasyMock.expect(ua.getElementType()).andReturn(Names.WSAW_USING_ADDRESSING_QNAME);

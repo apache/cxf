@@ -70,7 +70,7 @@ public class SwAInInterceptor extends AbstractSoapInterceptor {
             return;
         }
         
-        Set<Integer> foundAtts = new HashSet<Integer>();
+        Set<Integer> foundAtts = new HashSet<>();
         MessageContentsList inObjects = MessageContentsList.getContentsList(message);
 
         for (MessagePartInfo mpi : sbi.getAttachments()) {

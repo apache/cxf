@@ -454,7 +454,7 @@ public class ProviderFactoryTest extends Assert {
     @Test
     public void testMessageBodyHandlerHierarchy() throws Exception {
         ProviderFactory pf = ServerProviderFactory.getInstance();
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         BookReaderWriter bookHandler = new BookReaderWriter();
         providers.add(bookHandler);
         SuperBookReaderWriter superBookHandler = new SuperBookReaderWriter();
@@ -477,7 +477,7 @@ public class ProviderFactoryTest extends Assert {
     @Test
     public void testMessageBodyWriterNoTypes() throws Exception {
         ProviderFactory pf = ServerProviderFactory.getInstance();
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         SuperBookReaderWriter2<SuperBook> superBookHandler = new SuperBookReaderWriter2<SuperBook>();
         providers.add(superBookHandler);
         pf.setUserProviders(providers);
@@ -813,7 +813,7 @@ public class ProviderFactoryTest extends Assert {
         ProviderFactory pf = ServerProviderFactory.getInstance();
         pf.registerUserProvider(provider);
         
-        List<String> locations = new ArrayList<String>();
+        List<String> locations = new ArrayList<>();
         locations.add("classpath:/test.xsd");
         pf.setSchemaLocations(locations);
         Schema s = provider.getSchema();

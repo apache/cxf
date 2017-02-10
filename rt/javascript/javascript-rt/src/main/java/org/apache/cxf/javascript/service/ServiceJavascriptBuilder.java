@@ -94,7 +94,7 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
 
     // Javascript parameter names for the input parameters,
     // derived from the parts.
-    private List<String> inputParameterNames = new ArrayList<String>();
+    private List<String> inputParameterNames = new ArrayList<>();
     // when not wrapped, we use this to keep track of the bits.
     private List<ParticleInfo> unwrappedElementsAndNames;
 
@@ -144,9 +144,9 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
         code.append("\n// Javascript for " + intf.getName() + "\n\n");
 
         currentInterfaceClassName = nameManager.getJavascriptName(intf.getName());
-        operationsWithNameConflicts = new HashSet<OperationInfo>();
-        inputMessagesWithNameConflicts = new HashSet<MessageInfo>();
-        outputMessagesWithNameConflicts = new HashSet<MessageInfo>();
+        operationsWithNameConflicts = new HashSet<>();
+        inputMessagesWithNameConflicts = new HashSet<>();
+        outputMessagesWithNameConflicts = new HashSet<>();
         localOperationsNameMap = new HashMap<String, OperationInfo>();
         localInputMessagesNameMap = new HashMap<String, MessageInfo>();
         localOutputMessagesNameMap = new HashMap<String, MessageInfo>();
@@ -240,7 +240,7 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
 
         StringBuilder parameterList = new StringBuilder();
 
-        inputParameterNames = new ArrayList<String>();
+        inputParameterNames = new ArrayList<>();
 
         if (isWrapped) {
             collectWrapperElementInfo();
@@ -271,7 +271,7 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
      * visit the input message parts and collect relevant data.
      */
     private void collectUnwrappedInputInfo() {
-        unwrappedElementsAndNames = new ArrayList<ParticleInfo>();
+        unwrappedElementsAndNames = new ArrayList<>();
         if (currentOperation.getInput() != null) {
             getElementsForParts(currentOperation.getInput(), unwrappedElementsAndNames);
         }
@@ -511,7 +511,7 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
         if (parts.size() != 1) {
             unsupportedConstruct("MULTIPLE_OUTPUTS", outputMessage.getName().toString());
         }
-        List<ParticleInfo> elements = new ArrayList<ParticleInfo>();
+        List<ParticleInfo> elements = new ArrayList<>();
         String functionName = outputDeserializerFunctionName(outputMessage);
         code.append("function " + functionName + "(cxfjsutils, partElement) {\n");
         getElementsForParts(outputMessage, elements);

@@ -202,7 +202,7 @@ public class WSDL2JavaScriptMojo extends AbstractCodegenMoho {
     @Override
     protected List<GenericWsdlOption> createWsdlOptionsFromScansAndExplicitWsdlOptions()
         throws MojoExecutionException {
-        List<GenericWsdlOption> effectiveWsdlOptions = new ArrayList<GenericWsdlOption>();
+        List<GenericWsdlOption> effectiveWsdlOptions = new ArrayList<>();
         List<GenericWsdlOption> temp;
         
         if (wsdlOptions != null) {
@@ -240,7 +240,7 @@ public class WSDL2JavaScriptMojo extends AbstractCodegenMoho {
         }
 
         List<File> wsdlFiles = WsdlUtilities.getWsdlFiles(wsdlBasedir, includes, excludes);
-        List<GenericWsdlOption> options = new ArrayList<GenericWsdlOption>();
+        List<GenericWsdlOption> options = new ArrayList<>();
         for (File wsdl : wsdlFiles) {
             WsdlOption wsdlOption = new WsdlOption();
             wsdlOption.setOutputDir(defaultOutputDir);
@@ -254,7 +254,7 @@ public class WSDL2JavaScriptMojo extends AbstractCodegenMoho {
                                                                           Option defaultOptions,
                                                                           File outputDir) {
         List<GenericWsdlOption> options 
-            = new ArrayList<GenericWsdlOption>();
+            = new ArrayList<>();
         Set<Artifact> dependencies = CastUtils.cast(project.getDependencyArtifacts());
         for (Artifact artifact : dependencies) {
             WsdlOption option = new WsdlOption();

@@ -152,7 +152,7 @@ public class ClaimUtils {
         if (processedClaim != null) {
             resultClaim = processedClaim.clone();
             List<Object> values = resultClaim.getValues();
-            List<Object> mappedValues = new ArrayList<Object>();
+            List<Object> mappedValues = new ArrayList<>();
 
             if (values == null || mapping == null || mapping.size() == 0) {
                 resultClaim.setValues(mappedValues);

@@ -91,7 +91,7 @@ public final class FrontendFactory {
     }
 
     private List<Method> getWSMethods() {
-        List<Method> methods = new ArrayList<Method>();
+        List<Method> methods = new ArrayList<>();
         for (Method method : serviceClass.getMethods()) {
             if (method.getDeclaringClass().equals(Object.class)
                 || !Modifier.isPublic(method.getModifiers())

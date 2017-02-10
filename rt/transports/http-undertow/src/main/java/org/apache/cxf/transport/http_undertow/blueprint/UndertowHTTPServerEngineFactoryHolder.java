@@ -111,7 +111,7 @@ public class UndertowHTTPServerEngineFactoryHolder {
             }
             //Engines
 
-            List<UndertowHTTPServerEngine> engineList = new ArrayList<UndertowHTTPServerEngine>();
+            List<UndertowHTTPServerEngine> engineList = new ArrayList<>();
             for (UndertowHTTPServerEngineConfigType engine : config.getEngine()) {
                 UndertowHTTPServerEngine eng = new UndertowHTTPServerEngine();
                 

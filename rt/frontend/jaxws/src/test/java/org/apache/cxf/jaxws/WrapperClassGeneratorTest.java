@@ -73,8 +73,8 @@ public class WrapperClassGeneratorTest extends Assert {
         WrapperHelper wh = new JAXBDataBinding().createWrapperHelper(requestClass, null,
                                                              partNames, elTypeNames, partClasses);        
         
-        List<Object> paraList = new ArrayList<Object>();
-        List<String> valueList = new ArrayList<String>();
+        List<Object> paraList = new ArrayList<>();
+        List<String> valueList = new ArrayList<>();
         valueList.add("str1");
         valueList.add("str2");
         valueList.add("str3");
@@ -91,8 +91,8 @@ public class WrapperClassGeneratorTest extends Assert {
         
         wh = new JAXBDataBinding().createWrapperHelper(responseClass, null,
                                                              partNames, elTypeNames, partClasses);        
-        List<Object> resPara = new ArrayList<Object>();
-        List<Integer> intValueList = new ArrayList<Integer>();
+        List<Object> resPara = new ArrayList<>();
+        List<Integer> intValueList = new ArrayList<>();
         intValueList.add(1);
         intValueList.add(2);
         intValueList.add(3);

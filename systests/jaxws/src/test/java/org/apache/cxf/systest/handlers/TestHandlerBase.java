@@ -180,7 +180,7 @@ public abstract class TestHandlerBase {
         if (ctx.containsKey("handler.info")) { 
             handlerInfoList = CastUtils.cast((List<?>)ctx.get("handler.info")); 
         } else {
-            handlerInfoList = new ArrayList<String>();
+            handlerInfoList = new ArrayList<>();
             ctx.put("handler.info", handlerInfoList);
             ctx.setScope("handler.info", MessageContext.Scope.APPLICATION);
         }

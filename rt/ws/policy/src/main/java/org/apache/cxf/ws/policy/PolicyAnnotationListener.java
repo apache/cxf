@@ -125,7 +125,7 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
         Policy p = m.getAnnotation(Policy.class);
         Policies ps = m.getAnnotation(Policies.class);
         if (p != null || ps != null) {
-            List<Policy> list = new ArrayList<Policy>();
+            List<Policy> list = new ArrayList<>();
             if (p != null) {
                 list.add(p);
             }
@@ -245,7 +245,7 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
         Policy p = cls.getAnnotation(Policy.class);
         Policies ps = cls.getAnnotation(Policies.class);
         if (p != null || ps != null) {
-            list = new ArrayList<Policy>();
+            list = new ArrayList<>();
             if (p != null) {
                 list.add(p);
             }
@@ -307,7 +307,7 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
         Policy p = cls.getAnnotation(Policy.class);
         Policies ps = cls.getAnnotation(Policies.class);
         if (p != null || ps != null) {
-            List<Policy> list = new ArrayList<Policy>();
+            List<Policy> list = new ArrayList<>();
             if (p != null) {
                 list.add(p);
             }

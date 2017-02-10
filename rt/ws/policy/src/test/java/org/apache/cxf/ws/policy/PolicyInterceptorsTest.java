@@ -456,7 +456,7 @@ public class PolicyInterceptorsTest extends Assert {
         Assertion assertion = control.createMock(Assertion.class);
         EasyMock.expect(assertion.getName()).andReturn(ASSERTION_QNAME);
         Collection<Assertion> assertions = 
-            new ArrayList<Assertion>();
+            new ArrayList<>();
         assertions.add(assertion);
         
         Policy policyOverride = control.createMock(Policy.class);

@@ -68,7 +68,7 @@ public class AssertionInfoMapTest extends Assert {
                                                                    PolicyAssertion.class));
         AssertionInfo ai1 = new AssertionInfo(a1);
         AssertionInfo ai2 = new AssertionInfo(a2);
-        Collection<AssertionInfo> ais = new ArrayList<AssertionInfo>();
+        Collection<AssertionInfo> ais = new ArrayList<>();
         AssertionInfo bi = new AssertionInfo(b);
         AssertionInfo ci = new AssertionInfo(c);
         ais.add(ai1);
@@ -89,17 +89,17 @@ public class AssertionInfoMapTest extends Assert {
         EasyMock.expect(c.isAsserted(aim)).andReturn(true).anyTimes();
         
         
-        List<Assertion> alt1 = new ArrayList<Assertion>();
+        List<Assertion> alt1 = new ArrayList<>();
         alt1.add(a1);
         alt1.add(b);
         
-        List<Assertion> alt2 = new ArrayList<Assertion>();
+        List<Assertion> alt2 = new ArrayList<>();
         alt2.add(a2);
         alt2.add(c);
                 
         control.replay();
-        assertTrue(!aim.supportsAlternative(alt1, new ArrayList<QName>()));
-        assertTrue(aim.supportsAlternative(alt2, new ArrayList<QName>()));
+        assertTrue(!aim.supportsAlternative(alt1, new ArrayList<>()));
+        assertTrue(aim.supportsAlternative(alt2, new ArrayList<>()));
         control.verify();     
     }  
     
@@ -147,7 +147,7 @@ public class AssertionInfoMapTest extends Assert {
     public void testCheck() throws PolicyException {
         QName aqn = new QName("http://x.y.z", "a");
         Assertion a = new PrimitiveAssertion(aqn);
-        Collection<Assertion> assertions = new ArrayList<Assertion>();
+        Collection<Assertion> assertions = new ArrayList<>();
         assertions.add(a);
         AssertionInfoMap aim = new AssertionInfoMap(assertions);
         try {

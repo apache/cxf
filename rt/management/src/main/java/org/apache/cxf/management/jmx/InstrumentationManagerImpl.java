@@ -68,7 +68,7 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
     private Bus bus;
     private MBServerConnectorFactory mcf;    
     private MBeanServer mbs;
-    private Set<ObjectName> busMBeans = new HashSet<ObjectName>();
+    private Set<ObjectName> busMBeans = new HashSet<>();
     private boolean connectFailed;
     private String persistentBusId;
     

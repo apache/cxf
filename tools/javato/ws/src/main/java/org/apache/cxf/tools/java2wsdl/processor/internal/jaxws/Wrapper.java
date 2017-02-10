@@ -187,7 +187,7 @@ public class Wrapper {
     }
     
     protected List<JavaField> buildFields() {
-        return new ArrayList<JavaField>();
+        return new ArrayList<>();
     }
 
     public Method getMethod() {

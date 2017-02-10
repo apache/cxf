@@ -168,7 +168,7 @@ public abstract class AbstractEndpointFactory extends AbstractBasicInterceptorPr
 
     public List<Feature> getFeatures() {
         if (features == null) {
-            features = new ArrayList<Feature>();
+            features = new ArrayList<>();
         }
         return features;
     }

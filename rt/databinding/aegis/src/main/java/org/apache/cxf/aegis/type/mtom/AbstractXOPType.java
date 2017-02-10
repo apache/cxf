@@ -158,7 +158,7 @@ public abstract class AbstractXOPType extends AegisType {
         
         Collection<Attachment> attachments = context.getAttachments();
         if (attachments == null) {
-            attachments = new ArrayList<Attachment>();
+            attachments = new ArrayList<>();
             context.setAttachments(attachments);
         }
 

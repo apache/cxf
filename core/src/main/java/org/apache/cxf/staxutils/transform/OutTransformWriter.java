@@ -173,9 +173,9 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
         }
         Set<String> s;
         if (writtenUris.isEmpty()) {
-            s = new HashSet<String>();
+            s = new HashSet<>();
         } else {
-            s = new HashSet<String>(writtenUris.get(0));
+            s = new HashSet<>(writtenUris.get(0));
         }
         writtenUris.add(0, s);
         
@@ -231,7 +231,7 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
                 if (appendProp.getText() == null) {
                     // ap-pre-wrap
                     currentDepth++;
-                    pe = new ArrayList<ParsingEvent>();
+                    pe = new ArrayList<>();
                     pe.add(TransformUtils.createEndElementEvent(expected));
                     pe.add(TransformUtils.createEndElementEvent(appendProp.getName()));
                     pushedAheadEvents.add(0, null);
@@ -277,7 +277,7 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
                     this.writeNamespace(theprefix, uri);
                 }
                 currentDepth++;
-                pe = new ArrayList<ParsingEvent>();
+                pe = new ArrayList<>();
                 pe.add(TransformUtils.createEndElementEvent(appendProp.getName()));
                 pe.add(TransformUtils.createEndElementEvent(expected));
                 pushedAheadEvents.add(0, pe);
@@ -285,7 +285,7 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
             } else {
                 // ap-post-incl
                 pushedAheadEvents.remove(0);
-                pe = new ArrayList<ParsingEvent>();
+                pe = new ArrayList<>();
                 pe.add(TransformUtils.createStartElementEvent(appendProp.getName()));
                 pe.add(TransformUtils.createCharactersEvent(appendProp.getText()));
                 pe.add(TransformUtils.createEndElementEvent(appendProp.getName()));

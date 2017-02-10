@@ -96,7 +96,7 @@ public class OOBHeaderTest extends AbstractBusClientServerTestBase {
                         new JAXBDataBinding(ob.getClass()));
                 hdr.setMustUnderstand(mu);
 
-                List<Header> holder = new ArrayList<Header>();
+                List<Header> holder = new ArrayList<>();
                 holder.add(hdr);
                 
                 //Add List of headerHolders to requestContext.

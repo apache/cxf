@@ -150,7 +150,7 @@ public final class NameUtil {
         return toWordList(s, false);
     }
     public static List<String> toWordList(String s, boolean allowUnderscore) {
-        List<String> ss = new ArrayList<String>();
+        List<String> ss = new ArrayList<>();
         int n = s.length();
         for (int i = 0; i < n;) {
             while (i < n) {

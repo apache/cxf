@@ -247,7 +247,7 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         if (requestedScopes.isEmpty()) {
             return Collections.emptyList();
         } else {
-            List<OAuthPermission> list = new ArrayList<OAuthPermission>();
+            List<OAuthPermission> list = new ArrayList<>();
             for (String scope : requestedScopes) {
                 convertSingleScopeToPermission(client, scope, list);
             }

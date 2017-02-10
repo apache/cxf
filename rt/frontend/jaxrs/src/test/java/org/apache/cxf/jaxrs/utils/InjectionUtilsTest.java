@@ -99,18 +99,18 @@ public class InjectionUtilsTest extends Assert {
         CustomerBean1 bean1 = new CustomerBean1();
         bean1.setA("aValue");
         bean1.setB(1L);
-        List<String> values = new ArrayList<String>();
+        List<String> values = new ArrayList<>();
         values.add("lv1");
         values.add("lv2");
         bean1.setC(values);
         CustomerBean2 bean2 = new CustomerBean2();
         bean2.setA("aaValue");
         bean2.setB(2L);
-        values = new ArrayList<String>();
+        values = new ArrayList<>();
         values.add("lv11");
         values.add("lv22");
         bean2.setC(values);
-        Set<String> set = new HashSet<String>();
+        Set<String> set = new HashSet<>();
         set.add("set1");
         set.add("set2");
         bean2.setS(set);
@@ -156,7 +156,7 @@ public class InjectionUtilsTest extends Assert {
         assertEquals(String.class, str);
         ParameterizedType list = (ParameterizedType) InjectionUtils.getGenericResponseType(
             GenericInterface.class.getMethod("list"), TestService.class,
-            new ArrayList<String>(), ArrayList.class, new ExchangeImpl());
+            new ArrayList<>(), ArrayList.class, new ExchangeImpl());
         assertEquals(String.class, list.getActualTypeArguments()[0]);
     }
     

@@ -191,7 +191,7 @@ public class AegisClientServerTest extends AbstractBusClientServerTestBase {
         proxyFactory.getInInterceptors().add(new LoggingInInterceptor());
         proxyFactory.getOutInterceptors().add(new LoggingOutInterceptor());
         SportsService service = (SportsService) proxyFactory.create();
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         list.add("ffang");
         String ret = service.getGeneric(list);
         assertEquals(ret, "ffang");

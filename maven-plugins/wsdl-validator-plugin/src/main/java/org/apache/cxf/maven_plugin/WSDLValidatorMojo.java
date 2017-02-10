@@ -97,7 +97,7 @@ public class WSDLValidatorMojo extends AbstractMojo {
     private List<File> getWsdlFiles(File dir)
         throws MojoExecutionException {
 
-        List<String> exList = new ArrayList<String>();
+        List<String> exList = new ArrayList<>();
         if (excludes != null) {
             exList.addAll(Arrays.asList(excludes));
         }
@@ -129,7 +129,7 @@ public class WSDLValidatorMojo extends AbstractMojo {
         if (doWork) {
             doneFile.delete();
             
-            List<String> list = new ArrayList<String>();
+            List<String> list = new ArrayList<>();
 
             // verbose arg
             if (verbose != null && verbose.booleanValue()) {
@@ -174,7 +174,7 @@ public class WSDLValidatorMojo extends AbstractMojo {
         
         markerDirectory.mkdirs();
         
-        List<File> wsdls = new ArrayList<File>();
+        List<File> wsdls = new ArrayList<>();
         if (wsdlRoot != null && wsdlRoot.exists()) {
             wsdls.addAll(getWsdlFiles(wsdlRoot));
         }

@@ -53,7 +53,7 @@ public class RequestPreprocessor {
         MEDIA_TYPE_SHORTCUTS.put("html", "text/html");
         MEDIA_TYPE_SHORTCUTS.put("wadl", "application/vnd.sun.wadl+xml");
         
-        PATHS_TO_SKIP = new HashSet<String>();
+        PATHS_TO_SKIP = new HashSet<>();
         PATHS_TO_SKIP.add("swagger.json");
         PATHS_TO_SKIP.add("swagger.yaml");
     }
@@ -135,7 +135,7 @@ public class RequestPreprocessor {
         List<String> acceptLanguage =
             ((Map<String, List<String>>)m.get(Message.PROTOCOL_HEADERS)).get(HttpHeaders.ACCEPT_LANGUAGE);
         if (acceptLanguage == null) {
-            acceptLanguage = new ArrayList<String>(); 
+            acceptLanguage = new ArrayList<>(); 
         }
         
         acceptLanguage.add(anotherValue);

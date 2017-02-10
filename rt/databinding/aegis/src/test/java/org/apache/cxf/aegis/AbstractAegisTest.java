@@ -233,7 +233,7 @@ public abstract class AbstractAegisTest extends AbstractCXFTest {
     protected Collection<Document> getWSDLDocuments(String string) throws WSDLException {
         WSDLWriter writer = WSDLFactory.newInstance().newWSDLWriter();
 
-        Collection<Document> docs = new ArrayList<Document>();
+        Collection<Document> docs = new ArrayList<>();
         Definition definition = getWSDLDefinition(string);
         if (definition == null) {
             return null;
@@ -247,7 +247,7 @@ public abstract class AbstractAegisTest extends AbstractCXFTest {
     }
     
     private Collection<Import> getImports(final Definition wsdlDef) {
-        Collection<Import> importList = new ArrayList<Import>();
+        Collection<Import> importList = new ArrayList<>();
         Map<?, ?> imports = wsdlDef.getImports();
         for (Iterator<?> iter = imports.keySet().iterator(); iter.hasNext();) {
             String uri = (String)iter.next();

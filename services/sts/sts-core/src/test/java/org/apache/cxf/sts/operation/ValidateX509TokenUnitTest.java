@@ -67,7 +67,7 @@ public class ValidateX509TokenUnitTest extends org.junit.Assert {
         TokenValidateOperation validateOperation = new TokenValidateOperation();
         
         // Add Token Validator
-        List<TokenValidator> validatorList = new ArrayList<TokenValidator>();
+        List<TokenValidator> validatorList = new ArrayList<>();
         validatorList.add(new X509TokenValidator());
         validateOperation.setTokenValidators(validatorList);
         
@@ -130,7 +130,7 @@ public class ValidateX509TokenUnitTest extends org.junit.Assert {
         TokenValidateOperation validateOperation = new TokenValidateOperation();
         
         // Add Token Validator
-        List<TokenValidator> validatorList = new ArrayList<TokenValidator>();
+        List<TokenValidator> validatorList = new ArrayList<>();
         validatorList.add(new X509TokenValidator());
         validateOperation.setTokenValidators(validatorList);
         

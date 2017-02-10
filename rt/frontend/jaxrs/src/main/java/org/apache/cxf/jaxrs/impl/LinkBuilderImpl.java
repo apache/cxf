@@ -166,7 +166,7 @@ public class LinkBuilderImpl implements Builder {
     
     static class LinkImpl extends Link {
         private static final Set<String> MAIN_PARAMETERS = 
-            new HashSet<String>(Arrays.asList(Link.REL, Link.TITLE, Link.TYPE));
+            new HashSet<>(Arrays.asList(Link.REL, Link.TITLE, Link.TYPE));
         
         private URI uri;
         private Map<String, String> params;
@@ -192,7 +192,7 @@ public class LinkBuilderImpl implements Builder {
                 return Collections.<String>emptyList();
             } else {
                 String[] values = rel.split(" ");
-                List<String> rels = new ArrayList<String>(values.length);
+                List<String> rels = new ArrayList<>(values.length);
                 for (String val : values) {
                     rels.add(val.trim());
                 }

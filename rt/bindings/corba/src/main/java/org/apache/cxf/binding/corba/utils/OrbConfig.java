@@ -47,7 +47,7 @@ public class OrbConfig {
 
     protected String orbClass;
     protected String orbSingletonClass;
-    protected List<String> orbArgs = new ArrayList<String>();
+    protected List<String> orbArgs = new ArrayList<>();
     protected Properties orbProperties = new Properties();
     
     public OrbConfig() {

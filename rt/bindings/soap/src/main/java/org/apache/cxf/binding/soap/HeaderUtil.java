@@ -50,7 +50,7 @@ public final class HeaderUtil {
     }
 
     private static Set<QName> getHeaderQNames(BindingMessageInfo bmi) {
-        Set<QName> set = new HashSet<QName>();
+        Set<QName> set = new HashSet<>();
         List<MessagePartInfo> mps = bmi.getMessageInfo().getMessageParts();
         List<ExtensibilityElement> extList = bmi.getExtensors(ExtensibilityElement.class);
         if (extList != null) {

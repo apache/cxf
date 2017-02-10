@@ -57,7 +57,7 @@ public class DefaultSecurityContextTest extends Assert {
         Principal p = new SimplePrincipal("Barry");
         s.getPrincipals().add(p);
         
-        Set<Principal> roles = new HashSet<Principal>();
+        Set<Principal> roles = new HashSet<>();
         roles.add(new SimpleGroup("friend", p));
         roles.add(new SimpleGroup("admin", p));
         s.getPrincipals().addAll(roles);

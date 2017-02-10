@@ -173,7 +173,7 @@ public class VersionTransformer extends org.apache.cxf.ws.addressing.VersionTran
      * Augment the set of headers understood by the protocol binding with the 2004/08 header QNames.
      */
     static {
-        Set<QName> headers = new HashSet<QName>();
+        Set<QName> headers = new HashSet<>();
         headers.addAll(Names.HEADERS);
         Names200408.addHeaders(headers);
         Names200403.addHeaders(headers);

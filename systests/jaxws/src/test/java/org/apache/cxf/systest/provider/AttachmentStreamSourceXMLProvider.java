@@ -103,7 +103,7 @@ public class AttachmentStreamSourceXMLProvider implements Provider<StreamSource>
             }
 
             
-            List<String> contentTypeValues = new ArrayList<String>();
+            List<String> contentTypeValues = new ArrayList<>();
             contentTypeValues.add("application/xml+custom");
             respHeaders.put(Message.CONTENT_TYPE, contentTypeValues);
 

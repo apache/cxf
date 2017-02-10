@@ -97,7 +97,7 @@ public final class WSActionAnnotator implements Annotator {
             }
         }
         if (operation.hasFaults()) {
-            List<JAnnotation> faultAnnotations = new ArrayList<JAnnotation>();
+            List<JAnnotation> faultAnnotations = new ArrayList<>();
             for (FaultInfo faultInfo : operation.getFaults()) {
                 if (faultInfo.getExtensionAttributes() != null) {
                     String faultAction = getAction(faultInfo);

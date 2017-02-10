@@ -120,7 +120,7 @@ public class AegisJaxWsTest extends AbstractJUnit4SpringContextTests {
     @Test
     public void testBigList() throws Exception {
         int size = 1000;
-        List<String> l = new ArrayList<String>(size);
+        List<String> l = new ArrayList<>(size);
         for (int x = 0; x < size; x++) {
             l.add("Need to create a pretty big soap message to make sure we go over "
                   + "some of the default buffer sizes and such so we can see what really"
@@ -140,7 +140,7 @@ public class AegisJaxWsTest extends AbstractJUnit4SpringContextTests {
     //CXF-3376
     public void testByteArray() throws Exception {
         int size = 50;
-        List<Integer> ints = new ArrayList<Integer>(size);
+        List<Integer> ints = new ArrayList<>(size);
         for (int x = 0; x < size; x++) {
             ints.add(x);
         }        

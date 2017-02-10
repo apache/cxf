@@ -65,7 +65,7 @@ public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
     
     public JAASLoginInterceptor(String phase) {
         super(phase);
-        this.callbackHandlerProviders = new ArrayList<CallbackHandlerProvider>();
+        this.callbackHandlerProviders = new ArrayList<>();
         this.callbackHandlerProviders.add(new CallbackHandlerProviderAuthPol());
         this.callbackHandlerProviders.add(new CallbackHandlerProviderUsernameToken());
     }

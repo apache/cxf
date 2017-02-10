@@ -216,7 +216,7 @@ public interface DocLitWrappedCodeFirstService {
     @XmlType(name = "doFooList", propOrder = { "dbReves" })
     class DoFooListRequest {
         @XmlElement(name = "dbRef", required = true)
-        protected List<Foo> dbReves = new ArrayList<Foo>();
+        protected List<Foo> dbReves = new ArrayList<>();
 
         public List<Foo> getDbReves() {
             return dbReves;

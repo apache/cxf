@@ -85,7 +85,7 @@ public final class AnyClientServerTest extends AbstractBusClientServerTestBase {
         Greeter port = ss.getSoapPort();
         updateAddressPort(port, PORT);
         
-        List<Port> any = new ArrayList<Port>();
+        List<Port> any = new ArrayList<>();
         Port anyPort = new Port();
         Port anyPort1 = new Port();
         JAXBElement<String> ele1 = new JAXBElement<String>(

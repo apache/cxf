@@ -100,7 +100,7 @@ public class PlugInClassLoader extends SecureClassLoader {
     }
 
     private String[] loadUrls(ClassLoader parent) throws IOException {
-        List<String> urlList = new ArrayList<String>();
+        List<String> urlList = new ArrayList<>();
 
         Properties props = getProperties(parent, JARS_PROPS_FILE);
 

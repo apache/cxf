@@ -56,7 +56,7 @@ public final class SpringServiceBuilderFactory extends ServiceBuilderFactory {
 
     public SpringServiceBuilderFactory() {
         super();
-        this.beanDefinitions = new ArrayList<String>(0);
+        this.beanDefinitions = new ArrayList<>(0);
     }
 
     /**

@@ -129,7 +129,7 @@ public class NoSpringServletClientTest extends AbstractBusClientServerTestBase {
         WebConversation client = new WebConversation();
         WebResponse res = client.getResponse(serviceURL + "/services");
         WebLink[] links = res.getLinks();
-        Set<String> s = new HashSet<String>();
+        Set<String> s = new HashSet<>();
         for (WebLink l : links) {
             s.add(l.getURLString());
         }

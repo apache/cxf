@@ -106,7 +106,7 @@ public final class XmlSchemaUtils {
         XmlSchemaSimpleTypeContent content = type.getContent();
         XmlSchemaSimpleTypeRestriction restriction = (XmlSchemaSimpleTypeRestriction) content;
         List<XmlSchemaFacet> facets = restriction.getFacets();
-        List<String> values = new ArrayList<String>();
+        List<String> values = new ArrayList<>();
         for (XmlSchemaFacet facet : facets) {
             XmlSchemaEnumerationFacet enumFacet = (XmlSchemaEnumerationFacet) facet;
             values.add(enumFacet.getValue().toString());
@@ -240,7 +240,7 @@ public final class XmlSchemaUtils {
 
     public static List<XmlSchemaAnnotated> getContentAttributes(XmlSchemaComplexType type, 
                                                                 SchemaCollection collection) {
-        List<XmlSchemaAnnotated> results = new ArrayList<XmlSchemaAnnotated>();
+        List<XmlSchemaAnnotated> results = new ArrayList<>();
         QName baseTypeName = getBaseType(type);
         if (baseTypeName != null) {
             XmlSchemaComplexType baseType = (XmlSchemaComplexType)collection.getTypeByQName(baseTypeName);

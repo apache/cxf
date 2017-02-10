@@ -175,8 +175,8 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
     }
     
     private void purgeCandidates(SourceSequence seq, boolean any) {
-        Collection<Long> purged = new ArrayList<Long>();
-        Collection<ResendCandidate> resends = new ArrayList<ResendCandidate>();
+        Collection<Long> purged = new ArrayList<>();
+        Collection<ResendCandidate> resends = new ArrayList<>();
         Identifier sid = seq.getIdentifier();
         synchronized (this) {
             LOG.fine("Start purging resend candidates.");
@@ -212,7 +212,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
     }
 
     public List<Long> getUnacknowledgedMessageNumbers(SourceSequence seq) {
-        List<Long> unacknowledged = new ArrayList<Long>();
+        List<Long> unacknowledged = new ArrayList<>();
         List<ResendCandidate> sequenceCandidates = getSequenceCandidates(seq);
         if (null != sequenceCandidates) {
             for (int i = 0; i < sequenceCandidates.size(); i++) {
@@ -344,7 +344,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
         synchronized (this) {
             List<ResendCandidate> sequenceCandidates = getSequenceCandidates(key);
             if (null == sequenceCandidates) {
-                sequenceCandidates = new ArrayList<ResendCandidate>();
+                sequenceCandidates = new ArrayList<>();
                 candidates.put(key, sequenceCandidates);
             }
             candidate = new ResendCandidate(message);

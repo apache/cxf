@@ -80,10 +80,10 @@ import org.apache.ws.commons.schema.XmlSchemaType;
 
 public class WSDLRefValidator extends AbstractDefinitionValidator {
     protected static final Logger LOG = LogUtils.getL7dLogger(WSDLRefValidator.class);
-    protected List<XNode> vNodes = new ArrayList<XNode>();
+    protected List<XNode> vNodes = new ArrayList<>();
 
-    private Set<QName> portTypeRefNames = new HashSet<QName>();
-    private Set<QName> messageRefNames = new HashSet<QName>();
+    private Set<QName> portTypeRefNames = new HashSet<>();
+    private Set<QName> messageRefNames = new HashSet<>();
     private Map<QName, Service> services = new HashMap<QName, Service>();
 
     private ValidationResult vResults = new ValidationResult();
@@ -103,14 +103,14 @@ public class WSDLRefValidator extends AbstractDefinitionValidator {
     public WSDLRefValidator(Definition wsdl, Document doc, Bus bus) {
         this.definition = wsdl;
         baseDoc = doc;
-        importedDefinitions = new ArrayList<Definition>();
+        importedDefinitions = new ArrayList<>();
         parseImports(wsdl);
         processSchemas(bus);
     }
     private void getSchemas(Bus bus) {
         Map<String, Element> schemaList = new HashMap<String, Element>();
         SchemaUtil schemaUtil = new SchemaUtil(bus, schemaList);
-        List<SchemaInfo> si = new ArrayList<SchemaInfo>();
+        List<SchemaInfo> si = new ArrayList<>();
         schemaUtil.getSchemas(definition, schemaCollection, si);
         ServiceSchemaInfo ssi = new ServiceSchemaInfo();
         ssi.setSchemaCollection(schemaCollection);
@@ -133,7 +133,7 @@ public class WSDLRefValidator extends AbstractDefinitionValidator {
         }        
     }
     private Collection<Import> getImports(final Definition wsdlDef) {
-        Collection<Import> importList = new ArrayList<Import>();
+        Collection<Import> importList = new ArrayList<>();
         Map<?, ?> imports = wsdlDef.getImports();
         for (Map.Entry<?, ?> entry : imports.entrySet()) {
             List<Import> lst = CastUtils.cast((List<?>)entry.getValue());
@@ -176,7 +176,7 @@ public class WSDLRefValidator extends AbstractDefinitionValidator {
     }
 
     private List<Document> getWSDLDocuments() {
-        List<Document> docs = new ArrayList<Document>();
+        List<Document> docs = new ArrayList<>();
         try {
             docs.add(getWSDLDocument());
 

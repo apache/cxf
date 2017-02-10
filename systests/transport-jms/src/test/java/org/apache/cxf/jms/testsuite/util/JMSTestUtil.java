@@ -66,7 +66,7 @@ public final class JMSTestUtil {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return new ArrayList<TestCaseType>();
+        return new ArrayList<>();
     }
 
     public static TestCaseType getTestCase(String testId) {

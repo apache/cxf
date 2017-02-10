@@ -97,7 +97,7 @@ public class CachedWriter extends Writer {
 
     private List<CachedWriterCallback> callbacks;
     
-    private List<Object> streamList = new ArrayList<Object>();
+    private List<Object> streamList = new ArrayList<>();
 
     
     static class LoadingCharArrayWriter extends CharArrayWriter {
@@ -155,7 +155,7 @@ public class CachedWriter extends Writer {
     
     public void registerCallback(CachedWriterCallback cb) {
         if (null == callbacks) {
-            callbacks = new ArrayList<CachedWriterCallback>();
+            callbacks = new ArrayList<>();
         }
         callbacks.add(cb);
     }

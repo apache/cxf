@@ -68,7 +68,7 @@ public class IssueEncryptedUnitTest extends org.junit.Assert {
         issueOperation.setEncryptIssuedToken(true);
         
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new DummyTokenProvider());
         issueOperation.setTokenProviders(providerList);
         
@@ -120,7 +120,7 @@ public class IssueEncryptedUnitTest extends org.junit.Assert {
         issueOperation.setEncryptIssuedToken(true);
         
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new DummyTokenProvider());
         issueOperation.setTokenProviders(providerList);
         
@@ -180,7 +180,7 @@ public class IssueEncryptedUnitTest extends org.junit.Assert {
         issueOperation.setEncryptIssuedToken(true);
         
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new DummyTokenProvider());
         issueOperation.setTokenProviders(providerList);
         
@@ -238,7 +238,7 @@ public class IssueEncryptedUnitTest extends org.junit.Assert {
         issueOperation.setEncryptIssuedToken(true);
         
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new DummyTokenProvider());
         issueOperation.setTokenProviders(providerList);
         
@@ -317,7 +317,7 @@ public class IssueEncryptedUnitTest extends org.junit.Assert {
         issueOperation.setEncryptIssuedToken(true);
         
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new DummyTokenProvider());
         issueOperation.setTokenProviders(providerList);
         
@@ -386,7 +386,7 @@ public class IssueEncryptedUnitTest extends org.junit.Assert {
         issueOperation.setEncryptIssuedToken(true);
         
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new DummyTokenProvider());
         issueOperation.setTokenProviders(providerList);
         
@@ -460,7 +460,7 @@ public class IssueEncryptedUnitTest extends org.junit.Assert {
         issueOperation.setEncryptIssuedToken(true);
         
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new DummyTokenProvider());
         issueOperation.setTokenProviders(providerList);
         

@@ -45,7 +45,7 @@ public abstract class AbstractAccessTokenValidator {
     private static final String DEFAULT_AUTH_SCHEME = OAuthConstants.BEARER_AUTHORIZATION_SCHEME;
     
 
-    protected Set<String> supportedSchemes = new HashSet<String>();
+    protected Set<String> supportedSchemes = new HashSet<>();
     protected String realm;
     
     private MessageContext mc;

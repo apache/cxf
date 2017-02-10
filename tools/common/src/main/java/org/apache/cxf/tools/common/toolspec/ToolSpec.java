@@ -175,7 +175,7 @@ public class ToolSpec {
     }
 
     public List<String> getInstreamIds() {
-        List<String> res = new ArrayList<String>();
+        List<String> res = new ArrayList<>();
         Element streams = getStreams();
 
         if (streams != null) {
@@ -190,7 +190,7 @@ public class ToolSpec {
     }
 
     public List<String> getOutstreamIds() {
-        List<String> res = new ArrayList<String>();
+        List<String> res = new ArrayList<>();
         Element streams = getStreams();
 
         if (streams != null) {

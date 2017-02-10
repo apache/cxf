@@ -48,7 +48,7 @@ public class Hello {
     
     @WebMethod(action = "myaction")
     public List<String> getGreetings() {
-        List<String> strings = new ArrayList<String>();
+        List<String> strings = new ArrayList<>();
         strings.add("Hello");
         strings.add("Bonjour");
         return strings;
@@ -63,7 +63,7 @@ public class Hello {
     }
     @WebMethod
     public List<String> getStringList(List<String> list) {
-        List<String> ret = new ArrayList<String>();
+        List<String> ret = new ArrayList<>();
         ret.add("Hello" + list.get(0));
         ret.add("Bonjour" + list.get(1));
         return ret;

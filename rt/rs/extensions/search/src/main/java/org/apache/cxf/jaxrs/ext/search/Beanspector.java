@@ -71,7 +71,7 @@ public class Beanspector<T> {
             }
         }
         // check type equality for getter-setter pairs
-        Set<String> pairs = new HashSet<String>(getters.keySet());
+        Set<String> pairs = new HashSet<>(getters.keySet());
         pairs.retainAll(setters.keySet());
         for (String accessor : pairs) {
             Class<?> getterClass = getters.get(accessor).getReturnType();

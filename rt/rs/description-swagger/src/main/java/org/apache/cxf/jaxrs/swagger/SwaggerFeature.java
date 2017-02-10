@@ -48,12 +48,12 @@ public class SwaggerFeature extends AbstractSwaggerFeature {
     protected void addSwaggerResource(Server server, Bus bus) {
         ApiListingResourceJSON apiListingResource = new ApiListingResourceJSON();
         if (!runAsFilter) {
-            List<Object> serviceBeans = new ArrayList<Object>();
+            List<Object> serviceBeans = new ArrayList<>();
             serviceBeans.add(apiListingResource);
             ((JAXRSServiceFactoryBean)server.getEndpoint().get(JAXRSServiceFactoryBean.class.getName())).
                 setResourceClassesFromBeans(serviceBeans);
         }
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         if (runAsFilter) {
             providers.add(new SwaggerContainerRequestFilter(apiListingResource));
         }

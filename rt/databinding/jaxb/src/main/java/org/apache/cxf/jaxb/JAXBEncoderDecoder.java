@@ -376,7 +376,7 @@ public final class JAXBEncoderDecoder {
                     attNs = null;
                 }
             }
-            List<Member> combinedMembers = new ArrayList<Member>();
+            List<Member> combinedMembers = new ArrayList<>();
 
             for (Field f : Utils.getFields(cls, accessType)) {
                 XmlAttribute at = f.getAnnotation(XmlAttribute.class);
@@ -734,13 +734,13 @@ public final class JAXBEncoderDecoder {
         Type genericType = (Type)part.getProperty("generic.type");
         Class<?> tp2 = (Class<?>)((ParameterizedType)genericType).getRawType();
         if (tp2.isInterface()) {
-            return new HashSet<Object>(ret);
+            return new HashSet<>(ret);
         }
         Collection<Object> c;
         try {
             c = CastUtils.cast((Collection<?>)tp2.newInstance());
         } catch (Exception e) {
-            c = new HashSet<Object>();
+            c = new HashSet<>();
         }
         
         c.addAll(ret);
@@ -782,7 +782,7 @@ public final class JAXBEncoderDecoder {
                 }
             }
         }
-        return new ArrayList<Object>();
+        return new ArrayList<>();
     }
 
     private static boolean isList(Type cls) {

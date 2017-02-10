@@ -91,7 +91,7 @@ public class HolderOutInterceptor extends AbstractPhaseInterceptor<Message> {
                 }
             }
         } else {
-            List<Object> holders = new ArrayList<Object>(outObjects);
+            List<Object> holders = new ArrayList<>(outObjects);
             for (int x = 0; x < outObjects.size(); x++) {
                 Object o = outObjects.get(x);
                 if (o instanceof Holder) {

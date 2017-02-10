@@ -125,7 +125,7 @@ public class JavaToJSProcessor implements Processor {
     @SuppressWarnings("unchecked")
     public ServiceBuilder getServiceBuilder() throws ToolException {
         Object beanFilesParameter = context.get(ToolConstants.CFG_BEAN_CONFIG);
-        List<String> beanDefinitions = new ArrayList<String>();
+        List<String> beanDefinitions = new ArrayList<>();
         if (beanFilesParameter != null) {
             if (beanFilesParameter instanceof String) {
                 beanDefinitions.add((String)beanFilesParameter);

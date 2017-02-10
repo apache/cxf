@@ -42,10 +42,10 @@ public class JavaInterface implements JavaAnnotatable {
     private SOAPBinding.Use soapUse;
     private SOAPBinding.ParameterStyle soapParameterStyle;
     
-    private final List<JavaMethod> methods = new ArrayList<JavaMethod>();
-    private final List<JAnnotation> annotations = new ArrayList<JAnnotation>();
+    private final List<JavaMethod> methods = new ArrayList<>();
+    private final List<JAnnotation> annotations = new ArrayList<>();
     private final Set<String> imports = new TreeSet<String>();
-    private final List<String> supers = new ArrayList<String>();
+    private final List<String> supers = new ArrayList<>();
 
     private String webserviceName;
     private Element handlerChains;

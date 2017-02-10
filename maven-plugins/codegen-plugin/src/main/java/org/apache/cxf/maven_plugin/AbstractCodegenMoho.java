@@ -830,7 +830,7 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
     }
 
     private Artifact resolveDependentWsdl(Artifact artifact) {
-        Collection<String> scopes = new ArrayList<String>();
+        Collection<String> scopes = new ArrayList<>();
         scopes.add(Artifact.SCOPE_RUNTIME);
         Set<Artifact> artifactSet = null;
         try {
@@ -843,7 +843,7 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
 
     private Artifact resolveAttachedWsdl(Artifact artifact) {
         List<MavenProject> rProjects = mavenSession.getProjects();
-        List<Artifact> artifactList = new ArrayList<Artifact>();
+        List<Artifact> artifactList = new ArrayList<>();
         for (MavenProject rProject : rProjects) {
             List<Artifact> list = CastUtils.cast(rProject.getAttachedArtifacts());
             if (list != null) {

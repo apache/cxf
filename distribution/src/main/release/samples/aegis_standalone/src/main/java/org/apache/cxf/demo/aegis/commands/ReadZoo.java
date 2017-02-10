@@ -49,7 +49,7 @@ public final class ReadZoo {
         AegisContext context;
 
         context = new AegisContext();
-        Set<Type> rootClasses = new HashSet<Type>();
+        Set<Type> rootClasses = new HashSet<>();
         rootClasses.add(Zoo.class);
         context.setRootClasses(rootClasses);
         context.initialize();

@@ -50,7 +50,7 @@ public class JDOMStreamReader extends AbstractDOMStreamReader<Element, Integer> 
     private FastStack<Map<String, Namespace>> namespaceStack
         = new FastStack<Map<String, Namespace>>();
 
-    private List<Namespace> namespaces = new ArrayList<Namespace>();
+    private List<Namespace> namespaces = new ArrayList<>();
 
     private Map<String, Namespace> prefix2decNs;
 

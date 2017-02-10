@@ -49,7 +49,7 @@ public class SpringOAuthAuthenticationFilter implements Filter {
         HttpServletResponse resp = (HttpServletResponse)response;
 
         List<String> authorities = (List<String>)request.getAttribute(OAUTH_AUTHORITIES);
-        List<GrantedAuthority> grantedAuthorities = new ArrayList<GrantedAuthority>();
+        List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
 
         if (authorities != null) {
             for (String authority : authorities) {

@@ -44,7 +44,7 @@ import org.apache.cxf.service.model.EndpointInfo;
  * 
  */
 public class TransportURIResolver extends ExtendedURIResolver {
-    private static final Set<String> DEFAULT_URI_RESOLVER_HANDLES = new HashSet<String>();
+    private static final Set<String> DEFAULT_URI_RESOLVER_HANDLES = new HashSet<>();
     static {
         //bunch we really don't want to have the conduits checked for
         //as we know the conduits don't handle.  No point

@@ -63,7 +63,7 @@ public class ClassLoaderSwitcher {
     public Set<URI> switchClassLoader(MavenProject project,
                                          boolean useCompileClasspath,
                                          File classesDir) {
-        List<URL> urlList = new ArrayList<URL>();
+        List<URL> urlList = new ArrayList<>();
         StringBuilder buf = new StringBuilder();
         Set<URI> ret = new LinkedHashSet<URI>();
         

@@ -67,7 +67,7 @@ public final class TestUtil {
         soapMessage.setContent(Attachment.class, new AttachmentImpl(cid, new DataHandler(bads)));
 
         // setup the message attachments
-        Collection<Attachment> attachments = new ArrayList<Attachment>();
+        Collection<Attachment> attachments = new ArrayList<>();
         soapMessage.setAttachments(attachments);
 //        String cidAtt1 = "cid:http://cxf.apache.org/me.bmp";
 //        bads = new ByteArrayDataSource(clazz.getResourceAsStream("me.bmp"), "image/bmp");

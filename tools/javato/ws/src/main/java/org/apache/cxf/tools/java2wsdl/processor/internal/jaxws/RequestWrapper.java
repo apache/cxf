@@ -63,7 +63,7 @@ public class RequestWrapper extends Wrapper {
     }    
     
     protected List<JavaField> buildFields(final Method method, final MessageInfo message) {
-        List<JavaField> fields = new ArrayList<JavaField>();
+        List<JavaField> fields = new ArrayList<>();
 
         final Type[] paramClasses = method.getGenericParameterTypes();
         final Annotation[][] paramAnnotations = method.getParameterAnnotations();

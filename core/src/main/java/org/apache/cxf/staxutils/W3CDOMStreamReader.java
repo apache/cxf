@@ -99,9 +99,9 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader<Node, Node> {
     @Override
     protected final void newFrame(ElementFrame<Node, Node> frame) {
         Node element = getCurrentNode();
-        frame.uris = new ArrayList<String>();
-        frame.prefixes = new ArrayList<String>();
-        frame.attributes = new ArrayList<Object>();
+        frame.uris = new ArrayList<>();
+        frame.prefixes = new ArrayList<>();
+        frame.attributes = new ArrayList<>();
 
         if (context == null) {
             context = new W3CNamespaceContext();

@@ -632,7 +632,7 @@ public class PolicyEngineTest extends Assert {
     @Test
     public void testAddAssertions() {
         engine = new PolicyEngineImpl();
-        Collection<Assertion> assertions = new ArrayList<Assertion>();
+        Collection<Assertion> assertions = new ArrayList<>();
         
         Assertion a = control.createMock(Assertion.class);
         EasyMock.expect(a.getType()).andReturn(Constants.TYPE_ASSERTION);
@@ -669,7 +669,7 @@ public class PolicyEngineTest extends Assert {
     }
         
     private Set<String> getInterceptorIds(List<Interceptor<? extends Message>> interceptors) {
-        Set<String> ids = new HashSet<String>();
+        Set<String> ids = new HashSet<>();
         for (Interceptor<? extends Message> i : interceptors) {
             ids.add(((PhaseInterceptor<? extends Message>)i).getId());
         }

@@ -203,8 +203,8 @@ public class GZIPOutInterceptor extends AbstractPhaseInterceptor<Message> {
                     // we split it into its component parts and build two
                     // lists, one with all the "q=0" encodings and the other
                     // with the rest (no q, or q=<non-zero>).
-                    List<String> zeros = new ArrayList<String>(3);
-                    List<String> nonZeros = new ArrayList<String>(3);
+                    List<String> zeros = new ArrayList<>(3);
+                    List<String> nonZeros = new ArrayList<>(3);
 
                     for (String headerLine : acceptEncodingHeader) {
                         String[] encodings = ENCODINGS.split(headerLine.trim());
@@ -325,7 +325,7 @@ public class GZIPOutInterceptor extends AbstractPhaseInterceptor<Message> {
         }
         List<String> header = CastUtils.cast((List<?>)protocolHeaders.get(name));
         if (header == null) {
-            header = new ArrayList<String>();
+            header = new ArrayList<>();
             protocolHeaders.put(name, header);
         }
         if (header.size() == 0) {

@@ -421,7 +421,7 @@ public class DynamicClientFactory {
     
     protected SchemaCompiler createSchemaCompiler() {
         SchemaCompiler compiler = 
-            JAXBUtils.createSchemaCompilerWithDefaultAllocator(new HashSet<String>());
+            JAXBUtils.createSchemaCompilerWithDefaultAllocator(new HashSet<>());
         if (schemaCompilerOptions != null && schemaCompilerOptions.length > 0) {
             compiler.getOptions().parseArguments(schemaCompilerOptions);
         }
@@ -926,7 +926,7 @@ public class DynamicClientFactory {
             return element;
         }
         element = (Element)cloneNode(element.getOwnerDocument(), element, true);
-        List<Node> ns = new ArrayList<Node>();
+        List<Node> ns = new ArrayList<>();
 
         impElemList = DOMUtils.findAllElementsByTagNameNS(element,
                                                           "http://www.w3.org/2001/XMLSchema",

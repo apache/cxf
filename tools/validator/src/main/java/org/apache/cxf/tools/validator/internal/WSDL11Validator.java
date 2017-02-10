@@ -61,7 +61,7 @@ import org.apache.cxf.wsdl.WSDLManager;
 
 public class WSDL11Validator extends AbstractDefinitionValidator {
     protected static final Logger LOG = LogUtils.getL7dLogger(SchemaValidator.class);
-    private final List<AbstractValidator> validators = new ArrayList<AbstractValidator>();
+    private final List<AbstractValidator> validators = new ArrayList<>();
 
     public WSDL11Validator(final Definition definition) {
         this(definition, null);
@@ -175,7 +175,7 @@ public class WSDL11Validator extends AbstractDefinitionValidator {
 
         
     protected List<InputSource> getDefaultSchemas() throws IOException {
-        List<InputSource> xsdList = new ArrayList<InputSource>();
+        List<InputSource> xsdList = new ArrayList<>();
         URL url = ClassLoaderUtils.getResource("/schemas/configuration/parameterized-types.xsd",
                                                this.getClass());
         if (url != null) {

@@ -70,11 +70,11 @@ public class MustUnderstandInterceptor extends AbstractSoapInterceptor {
         }
         
         SoapVersion soapVersion = soapMessage.getVersion();              
-        Set<Header> mustUnderstandHeaders = new HashSet<Header>();
-        Set<URI> serviceRoles = new HashSet<URI>();
-        Set<QName> notUnderstandHeaders = new HashSet<QName>();
-        Set<Header> ultimateReceiverHeaders = new HashSet<Header>();
-        Set<QName> mustUnderstandQNames = new HashSet<QName>();
+        Set<Header> mustUnderstandHeaders = new HashSet<>();
+        Set<URI> serviceRoles = new HashSet<>();
+        Set<QName> notUnderstandHeaders = new HashSet<>();
+        Set<Header> ultimateReceiverHeaders = new HashSet<>();
+        Set<QName> mustUnderstandQNames = new HashSet<>();
 
         initServiceSideInfo(mustUnderstandQNames, soapMessage, serviceRoles, paramHeaders);
         buildMustUnderstandHeaders(mustUnderstandHeaders, soapMessage,
@@ -140,7 +140,7 @@ public class MustUnderstandInterceptor extends AbstractSoapInterceptor {
             }
         }
         if (!ultimateReceiverHeaders.isEmpty()) {
-            Set<QName> notFound = new HashSet<QName>();
+            Set<QName> notFound = new HashSet<>();
             for (Header h : ultimateReceiverHeaders) {
                 if (!mustUnderstandQNames.contains(h.getName())) {
                     notFound.add(h.getName());
@@ -230,7 +230,7 @@ public class MustUnderstandInterceptor extends AbstractSoapInterceptor {
         }
         public void handleMessage(SoapMessage soapMessage) throws Fault {
             SoapVersion soapVersion = soapMessage.getVersion();
-            Set<QName> notFound = new HashSet<QName>();
+            Set<QName> notFound = new HashSet<>();
             List<Header> heads = soapMessage.getHeaders();
             
             for (Header header : heads) {

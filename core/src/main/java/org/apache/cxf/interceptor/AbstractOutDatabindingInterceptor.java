@@ -188,7 +188,7 @@ public abstract class AbstractOutDatabindingInterceptor extends AbstractPhaseInt
         Collection<Attachment> atts = message.getAttachments();
         if (MessageUtils.isTrue(message.getContextualProperty(Message.MTOM_ENABLED))
               && atts == null) {
-            atts = new ArrayList<Attachment>();
+            atts = new ArrayList<>();
             message.setAttachments(atts);
         }
         

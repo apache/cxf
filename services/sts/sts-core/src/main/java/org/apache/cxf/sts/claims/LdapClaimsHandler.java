@@ -125,7 +125,7 @@ public class LdapClaimsHandler implements ClaimsHandler, RealmSupport {
     
     
     public List<URI> getSupportedClaimTypes() {
-        List<URI> uriList = new ArrayList<URI>();
+        List<URI> uriList = new ArrayList<>();
         for (String uri : getClaimsLdapAttributeMapping().keySet()) {
             try {
                 uriList.add(new URI(uri));

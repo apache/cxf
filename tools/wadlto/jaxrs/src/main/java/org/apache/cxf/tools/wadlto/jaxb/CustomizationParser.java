@@ -51,9 +51,9 @@ import org.apache.cxf.tools.wadlto.WadlToolConstants;
 
 public final class CustomizationParser {
     private static final Logger LOG = LogUtils.getL7dLogger(CustomizationParser.class);
-    private final List<InputSource> jaxbBindings = new ArrayList<InputSource>();
-    private final List<InputSource> packageFiles = new ArrayList<InputSource>();
-    private final List<String> compilerArgs = new ArrayList<String>();
+    private final List<InputSource> jaxbBindings = new ArrayList<>();
+    private final List<InputSource> packageFiles = new ArrayList<>();
+    private final List<String> compilerArgs = new ArrayList<>();
     
     private Bus bus;
     private String wadlPath;

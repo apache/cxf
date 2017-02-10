@@ -233,7 +233,7 @@ public class ServiceImpl extends ServiceDelegate {
     }
 
     private List<WebServiceFeature> getAllFeatures(WebServiceFeature features[]) {
-        List<WebServiceFeature> f = new ArrayList<WebServiceFeature>();
+        List<WebServiceFeature> f = new ArrayList<>();
         if (features != null) {
             f.addAll(Arrays.asList(features));
         }

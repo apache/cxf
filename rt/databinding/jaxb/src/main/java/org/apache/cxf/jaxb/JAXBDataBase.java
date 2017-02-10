@@ -106,7 +106,7 @@ public abstract class JAXBDataBase {
                 if (ann instanceof XmlList || ann instanceof XmlAttachmentRef
                     || ann instanceof XmlJavaTypeAdapter) {
                     if (annoList == null) {
-                        annoList = new ArrayList<Annotation>();
+                        annoList = new ArrayList<>();
                     }
                     annoList.add(ann);
                 }

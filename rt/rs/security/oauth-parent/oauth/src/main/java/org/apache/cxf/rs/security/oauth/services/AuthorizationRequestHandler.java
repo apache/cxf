@@ -104,7 +104,7 @@ public class AuthorizationRequestHandler {
                 SecurityContext sc = (SecurityContext)mc.get(SecurityContext.class.getName());
                 List<String> roleNames = Collections.emptyList();
                 if (sc instanceof LoginSecurityContext) {
-                    roleNames = new ArrayList<String>();
+                    roleNames = new ArrayList<>();
                     Set<Principal> roles = ((LoginSecurityContext)sc).getUserRoles();
                     for (Principal p : roles) {
                         roleNames.add(p.getName());
@@ -116,7 +116,7 @@ public class AuthorizationRequestHandler {
                 AuthorizationInput input = new AuthorizationInput();
                 input.setToken(token);
                  
-                Set<OAuthPermission> approvedScopesSet = new HashSet<OAuthPermission>();
+                Set<OAuthPermission> approvedScopesSet = new HashSet<>();
                 
                 List<OAuthPermission> originalScopes = token.getScopes(); 
                 for (OAuthPermission perm : originalScopes) {

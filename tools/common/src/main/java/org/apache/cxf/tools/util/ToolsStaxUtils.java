@@ -42,7 +42,7 @@ public final class ToolsStaxUtils {
     }
 
     public static List<Tag> getTags(final File source) throws Exception {
-        List<Tag> tags = new ArrayList<Tag>();
+        List<Tag> tags = new ArrayList<>();
         List<String> ignoreEmptyTags = Arrays.asList(new String[]{"sequence"});
 
         try (InputStream is = new BufferedInputStream(new FileInputStream(source))) {
@@ -100,7 +100,7 @@ public final class ToolsStaxUtils {
     }
 
     public static Tag getTagTree(final File source) throws Exception {
-        return getTagTree(source, new ArrayList<String>());
+        return getTagTree(source, new ArrayList<>());
     }
 
     public static Tag getTagTree(final File source, final List<String> ignoreAttr) throws Exception {

@@ -1999,7 +1999,7 @@ public abstract class AbstractTypeTestClient
                 assertTrue("testStringList(): Incorrect value for out param", yOrig.equals(z.value));
                 assertTrue("testStringList(): Incorrect return value", x.equals(ret));
             }
-            x = new ArrayList<String>();
+            x = new ArrayList<>();
             y = new Holder<List<String>>(yOrig);
             z = new Holder<List<String>>();
             try {

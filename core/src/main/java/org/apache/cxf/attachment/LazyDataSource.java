@@ -57,7 +57,7 @@ public class LazyDataSource implements DataSource {
         }
         if (dataSource == null) {
             //couldn't find it, build up error message
-            List<String> ids = new ArrayList<String>(10);
+            List<String> ids = new ArrayList<>(10);
             for (Attachment a : attachments) {
                 ids.add(a.getId());
                 if (a.getId().equals(id)) {

@@ -112,7 +112,7 @@ public class UndertowHTTPServerEngineTest extends Assert {
         engine.setTlsServerParameters(new TLSServerParameters());
         engine.finalizeConfig();
 
-        List<UndertowHTTPServerEngine> list = new ArrayList<UndertowHTTPServerEngine>();
+        List<UndertowHTTPServerEngine> list = new ArrayList<>();
         list.add(engine);
         factory.setEnginesList(list);
         engine = factory.createUndertowHTTPServerEngine(PORT2, "https");

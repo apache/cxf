@@ -38,10 +38,10 @@ public class TypesCodeWriter extends CodeWriter {
     private File target;
     private OutputStreamCreator osc;
     
-    private List<String> excludeFileList = new ArrayList<String>();
+    private List<String> excludeFileList = new ArrayList<>();
     private List<String> excludePkgList;
     
-    private List<File> generatedFiles = new ArrayList<File>();
+    private List<File> generatedFiles = new ArrayList<>();
 
     public TypesCodeWriter(File ftarget, List<String> excludePkgs, String e,
                            OutputStreamCreator outputStreamCreator)

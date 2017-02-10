@@ -56,7 +56,7 @@ public class FailoverTest extends AbstractFailoverTest {
     
     private FailoverFeature getCustomFeature(boolean custom, boolean random, String ...address) {
         FailoverFeature feature = new FailoverFeature();
-        List<String> alternateAddresses = new ArrayList<String>();
+        List<String> alternateAddresses = new ArrayList<>();
         for (String s : address) {
             alternateAddresses.add(s);
         }

@@ -43,9 +43,9 @@ public class ToolContext {
     private ToolErrorListener errors;
     private Map<String, String> namespacePackageMap = new HashMap<String, String>();
     private Map<String, String> excludeNamespacePackageMap = new HashMap<String, String>();
-    private List<InputSource> jaxbBindingFiles = new ArrayList<InputSource>();
-    private List<String> excludePkgList = new ArrayList<String>();
-    private List<String> excludeFileList = new ArrayList<String>();
+    private List<InputSource> jaxbBindingFiles = new ArrayList<>();
+    private List<String> excludePkgList = new ArrayList<>();
+    private List<String> excludeFileList = new ArrayList<>();
 
     public ToolContext() {
     }
@@ -312,9 +312,9 @@ public class ToolContext {
         newCopy.packageNameChanged = packageNameChanged;
         newCopy.namespacePackageMap = new HashMap<String, String>(namespacePackageMap);
         newCopy.excludeNamespacePackageMap = new HashMap<String, String>(excludeNamespacePackageMap);
-        newCopy.jaxbBindingFiles = new ArrayList<InputSource>(jaxbBindingFiles);
-        newCopy.excludePkgList = new ArrayList<String>(excludePkgList);
-        newCopy.excludeFileList = new ArrayList<String>(excludeFileList);
+        newCopy.jaxbBindingFiles = new ArrayList<>(jaxbBindingFiles);
+        newCopy.excludePkgList = new ArrayList<>(excludePkgList);
+        newCopy.excludeFileList = new ArrayList<>(excludeFileList);
         newCopy.errors = errors;
         return newCopy;
     }    

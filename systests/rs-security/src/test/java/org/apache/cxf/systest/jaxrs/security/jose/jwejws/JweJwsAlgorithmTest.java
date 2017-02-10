@@ -71,7 +71,7 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
 
         URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
 
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
         providers.add(new JweWriterInterceptor());
 
@@ -98,7 +98,7 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
 
         URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
 
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
         providers.add(new JweWriterInterceptor());
 
@@ -128,7 +128,7 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
 
         URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
 
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
         providers.add(new JweWriterInterceptor());
 
@@ -154,7 +154,7 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
 
         URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
 
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
         providers.add(new JweWriterInterceptor());
 
@@ -184,7 +184,7 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
 
         URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
 
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
         providers.add(new JweWriterInterceptor());
 
@@ -210,7 +210,7 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
 
         URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
 
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
         providers.add(new JweWriterInterceptor());
 
@@ -236,7 +236,7 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
     public void testSmallEncryptionKeySize() throws Exception {
         URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
 
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
         providers.add(new JweWriterInterceptor());
 
@@ -268,7 +268,7 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
 
         URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
 
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
         providers.add(new JwsWriterInterceptor());
 
@@ -295,7 +295,7 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
 
         URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
 
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
         providers.add(new JwsWriterInterceptor());
 
@@ -325,7 +325,7 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
 
         URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
 
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
         providers.add(new JwsWriterInterceptor());
 
@@ -351,7 +351,7 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
 
         URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
 
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
         providers.add(new JwsWriterInterceptor());
 
@@ -378,7 +378,7 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
 
         URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
 
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
         providers.add(new JwsWriterInterceptor());
 
@@ -405,7 +405,7 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
 
         URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
 
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
         providers.add(new JwsWriterInterceptor());
 
@@ -435,7 +435,7 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
 
         URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
 
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
 
         String address = "http://localhost:" + PORT + "/jws/bookstore/books";
@@ -482,7 +482,7 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
 
         URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
 
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
         providers.add(new JwsWriterInterceptor());
 

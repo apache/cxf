@@ -1028,7 +1028,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         
         // Create a SAML Token with an AudienceRestrictionCondition
         ConditionsBean conditions = new ConditionsBean();
-        List<AudienceRestrictionBean> audienceRestrictions = new ArrayList<AudienceRestrictionBean>();
+        List<AudienceRestrictionBean> audienceRestrictions = new ArrayList<>();
         AudienceRestrictionBean audienceRestriction = new AudienceRestrictionBean();
         audienceRestriction.setAudienceURIs(Collections.singletonList(
             "https://localhost:" + portNumber + "/DoubleItSaml2Transport2"));
@@ -1083,7 +1083,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         
         // Create a SAML Token with an AudienceRestrictionCondition
         ConditionsBean conditions = new ConditionsBean();
-        List<AudienceRestrictionBean> audienceRestrictions = new ArrayList<AudienceRestrictionBean>();
+        List<AudienceRestrictionBean> audienceRestrictions = new ArrayList<>();
         AudienceRestrictionBean audienceRestriction = new AudienceRestrictionBean();
         audienceRestriction.setAudienceURIs(Collections.singletonList(
             service.getServiceName().toString()));
@@ -1122,7 +1122,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         
         // Create a SAML Token with an AudienceRestrictionCondition
         ConditionsBean conditions = new ConditionsBean();
-        List<AudienceRestrictionBean> audienceRestrictions = new ArrayList<AudienceRestrictionBean>();
+        List<AudienceRestrictionBean> audienceRestrictions = new ArrayList<>();
         AudienceRestrictionBean audienceRestriction = new AudienceRestrictionBean();
         audienceRestriction.setAudienceURIs(Collections.singletonList(
             service.getServiceName().toString() + ".xyz"));

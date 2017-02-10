@@ -53,7 +53,7 @@ public class JCABusFactory {
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(JCABusFactory.class);
     
     private Bus bus;
-    private List<Server> servantsCache = new ArrayList<Server>();
+    private List<Server> servantsCache = new ArrayList<>();
     private ClassLoader appserverClassLoader;
     private ManagedConnectionFactoryImpl mcf;
     private Object raBootstrapContext;

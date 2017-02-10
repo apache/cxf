@@ -337,7 +337,7 @@ public class Wsdl11AttachmentPolicyProvider extends AbstractPolicyProvider {
                 return null;
             }
             
-            List<T> list = new ArrayList<T>(extensors.size());
+            List<T> list = new ArrayList<>(extensors.size());
             for (ExtensibilityElement e : extensors) {
                 if (cls.isInstance(e)) {
                     list.add(cls.cast(e));

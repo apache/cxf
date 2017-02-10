@@ -27,7 +27,7 @@ import org.omg.CORBA.TypeCode;
 
 public class CorbaSequenceHandler extends CorbaObjectHandler {
 
-    private List<CorbaObjectHandler> elements = new ArrayList<CorbaObjectHandler>();
+    private List<CorbaObjectHandler> elements = new ArrayList<>();
     private CorbaObjectHandler templateElement;
     private boolean hasRecursiveTypeElement;
     

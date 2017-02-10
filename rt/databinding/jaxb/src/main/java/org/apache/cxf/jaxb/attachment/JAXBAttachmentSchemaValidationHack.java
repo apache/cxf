@@ -51,7 +51,7 @@ public final class JAXBAttachmentSchemaValidationHack extends AbstractPhaseInter
         // This assumes that this interceptor is only use in IN / IN Fault chains.
         if (ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.IN, message) 
             && message.getAttachments() != null) {
-            Collection<AttachmentDataSource> dss = new ArrayList<AttachmentDataSource>();
+            Collection<AttachmentDataSource> dss = new ArrayList<>();
             for (Attachment at : message.getAttachments()) {
                 if (at.getDataHandler().getDataSource() instanceof AttachmentDataSource) {
                     AttachmentDataSource ds = (AttachmentDataSource)at.getDataHandler().getDataSource();

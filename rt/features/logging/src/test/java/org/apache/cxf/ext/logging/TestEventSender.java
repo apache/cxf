@@ -25,7 +25,7 @@ import org.apache.cxf.ext.logging.event.LogEvent;
 import org.apache.cxf.ext.logging.event.LogEventSender;
 
 final class TestEventSender implements LogEventSender {
-    private final List<LogEvent> events = new ArrayList<LogEvent>();
+    private final List<LogEvent> events = new ArrayList<>();
 
     @Override
     public void send(LogEvent event) {

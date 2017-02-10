@@ -346,7 +346,7 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
      * @param beans the list of resource instances
      */
     public void setServiceBeans(List<Object> beans) {
-        List<Object> newBeans = new ArrayList<Object>();
+        List<Object> newBeans = new ArrayList<>();
         addToBeans(newBeans, beans);
         serviceFactory.setResourceClassesFromBeans(newBeans);
     }    

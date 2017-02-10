@@ -138,7 +138,7 @@ public class PersistenceUtilsTest extends Assert {
     }
 
     private static void addAttachment(Message msg) throws IOException {
-        Collection<Attachment> attachments = new ArrayList<Attachment>();
+        Collection<Attachment> attachments = new ArrayList<>();
         DataHandler dh = new DataHandler(new ByteArrayDataSource("hello world!", "text/plain"));
         Attachment a = new AttachmentImpl("test.xml", dh);
         attachments.add(a);

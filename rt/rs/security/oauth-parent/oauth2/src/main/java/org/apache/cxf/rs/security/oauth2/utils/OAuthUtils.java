@@ -114,7 +114,7 @@ public final class OAuthUtils {
     public static UserSubject createSubject(SecurityContext securityContext) {
         List<String> roleNames = Collections.emptyList();
         if (securityContext instanceof LoginSecurityContext) {
-            roleNames = new ArrayList<String>();
+            roleNames = new ArrayList<>();
             Set<Principal> roles = ((LoginSecurityContext)securityContext).getUserRoles();
             for (Principal p : roles) {
                 roleNames.add(p.getName());

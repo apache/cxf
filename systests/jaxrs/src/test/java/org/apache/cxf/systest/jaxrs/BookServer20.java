@@ -83,7 +83,7 @@ public class BookServer20 extends AbstractBusTestServerBase {
         sf.setBus(bus);
         sf.setResourceClasses(BookStore.class);
         
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         
         providers.add(new PreMatchContainerRequestFilter2());
         providers.add(new PreMatchContainerRequestFilter());

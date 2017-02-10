@@ -187,7 +187,7 @@ public class JsSimpleDomNode extends ScriptableObject {
     private void establishChildren() {
         if (!childrenWrapped) {
             if (wrappedNode.hasChildNodes()) {
-                children = new ArrayList<JsSimpleDomNode>();
+                children = new ArrayList<>();
                 Node node = wrappedNode.getFirstChild();
                 int x = 0;
                 while (node != null) {
@@ -203,7 +203,7 @@ public class JsSimpleDomNode extends ScriptableObject {
                     x++;
                 }
             } else {
-                children = new ArrayList<JsSimpleDomNode>();
+                children = new ArrayList<>();
             }
             childrenWrapped = true;
         }

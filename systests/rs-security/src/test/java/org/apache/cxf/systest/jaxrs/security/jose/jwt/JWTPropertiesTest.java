@@ -72,7 +72,7 @@ public class JWTPropertiesTest extends AbstractBusClientServerTestBase {
 
         URL busFile = JWTPropertiesTest.class.getResource("client.xml");
 
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
         providers.add(new JwtAuthenticationClientFilter());
 
@@ -109,7 +109,7 @@ public class JWTPropertiesTest extends AbstractBusClientServerTestBase {
 
         URL busFile = JWTPropertiesTest.class.getResource("client.xml");
 
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
         providers.add(new JwtAuthenticationClientFilter());
 
@@ -145,7 +145,7 @@ public class JWTPropertiesTest extends AbstractBusClientServerTestBase {
 
         URL busFile = JWTPropertiesTest.class.getResource("client.xml");
 
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
         providers.add(new JwtAuthenticationClientFilter());
 
@@ -181,7 +181,7 @@ public class JWTPropertiesTest extends AbstractBusClientServerTestBase {
 
         URL busFile = JWTPropertiesTest.class.getResource("client.xml");
 
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
         providers.add(new JwtAuthenticationClientFilter());
 
@@ -217,7 +217,7 @@ public class JWTPropertiesTest extends AbstractBusClientServerTestBase {
 
         URL busFile = JWTPropertiesTest.class.getResource("client.xml");
 
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
         providers.add(new JwtAuthenticationClientFilter());
 
@@ -254,7 +254,7 @@ public class JWTPropertiesTest extends AbstractBusClientServerTestBase {
 
         URL busFile = JWTPropertiesTest.class.getResource("client.xml");
 
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
         providers.add(new JwtAuthenticationClientFilter());
 
@@ -291,7 +291,7 @@ public class JWTPropertiesTest extends AbstractBusClientServerTestBase {
 
         URL busFile = JWTPropertiesTest.class.getResource("client.xml");
 
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
         providers.add(new JwtAuthenticationClientFilter());
 
@@ -321,7 +321,7 @@ public class JWTPropertiesTest extends AbstractBusClientServerTestBase {
 
         URL busFile = JWTPropertiesTest.class.getResource("client.xml");
 
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
         providers.add(new JwtAuthenticationClientFilter());
 
@@ -352,7 +352,7 @@ public class JWTPropertiesTest extends AbstractBusClientServerTestBase {
 
         URL busFile = JWTPropertiesTest.class.getResource("client.xml");
 
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
         providers.add(new JwtAuthenticationClientFilter());
 
@@ -381,7 +381,7 @@ public class JWTPropertiesTest extends AbstractBusClientServerTestBase {
 
         URL busFile = JWTPropertiesTest.class.getResource("client.xml");
 
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
         providers.add(new JwtAuthenticationClientFilter());
 
@@ -397,7 +397,7 @@ public class JWTPropertiesTest extends AbstractBusClientServerTestBase {
         claims.setIssuedAt(new Date().getTime() / 1000L);
         
         String badAddress = "https://localhost:" + PORT + "/badunsignedjwt/bookstore/books";
-        List<String> audiences = new ArrayList<String>();
+        List<String> audiences = new ArrayList<>();
         audiences.add(address);
         audiences.add(badAddress);
         claims.setAudiences(audiences);

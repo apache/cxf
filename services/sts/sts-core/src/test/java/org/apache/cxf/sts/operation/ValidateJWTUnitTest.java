@@ -70,7 +70,7 @@ public class ValidateJWTUnitTest extends org.junit.Assert {
         TokenValidateOperation validateOperation = new TokenValidateOperation();
         
         // Add Token Validator
-        List<TokenValidator> validatorList = new ArrayList<TokenValidator>();
+        List<TokenValidator> validatorList = new ArrayList<>();
         validatorList.add(new JWTTokenValidator());
         validateOperation.setTokenValidators(validatorList);
         

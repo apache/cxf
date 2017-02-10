@@ -101,7 +101,7 @@ public class AegisContext {
     public AegisContext() {
         beanImplementationMap = new HashMap<Class<?>, String>();
         rootClasses = new HashSet<java.lang.reflect.Type>();
-        rootTypeQNames = new HashSet<QName>();
+        rootTypeQNames = new HashSet<>();
     }
 
     public TypeCreator createTypeCreator() {
@@ -233,12 +233,12 @@ public class AegisContext {
      * @param classes list of class names
      */
     private void processRootTypes() {
-        rootTypes = new HashSet<AegisType>();
+        rootTypes = new HashSet<>();
         // app may have already supplied classes.
         if (rootClasses == null) {
             rootClasses = new HashSet<java.lang.reflect.Type>();
         }
-        rootTypeQNames = new HashSet<QName>();
+        rootTypeQNames = new HashSet<>();
         if (this.rootClassNames != null) {
             for (String typeName : rootClassNames) {
                 Class<?> c = null;

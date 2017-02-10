@@ -53,7 +53,7 @@ public class ServiceInvokerInterceptorTest extends Assert {
         Endpoint endpoint = createEndpoint(i);
         exchange.put(Endpoint.class, endpoint);
         Object input = new Object();
-        List<Object> lst = new ArrayList<Object>();
+        List<Object> lst = new ArrayList<>();
         lst.add(input);
         m.setContent(List.class, lst);
         

@@ -179,7 +179,7 @@ public abstract class HTTPConduit
     private static final String HTTP_POST_METHOD = "POST";
     private static final String HTTP_GET_METHOD = "GET";
     private static final Set<String> KNOWN_HTTP_VERBS_WITH_NO_CONTENT = 
-        new HashSet<String>(Arrays.asList(new String[]{"GET", "HEAD", "OPTIONS", "TRACE"}));
+        new HashSet<>(Arrays.asList(new String[]{"GET", "HEAD", "OPTIONS", "TRACE"}));
     /**
      * This constant is the Message(Map) key for a list of visited URLs that
      * is used in redirect loop protection.
@@ -1915,7 +1915,7 @@ public abstract class HTTPConduit
         @SuppressWarnings("unchecked")
         Set<String> authURLs = (Set<String>) message.get(KEY_AUTH_URLS);
         if (authURLs == null) {
-            authURLs = new HashSet<String>();
+            authURLs = new HashSet<>();
             message.put(KEY_AUTH_URLS, authURLs);
         }
         // If we have been here (URL & Realm) before for this particular message

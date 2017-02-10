@@ -80,7 +80,7 @@ public class BasicNameManager implements NameManager {
             }
         }
         
-        Set<String> poorPrefixURIs = new HashSet<String>();
+        Set<String> poorPrefixURIs = new HashSet<>();
         for (SchemaInfo schemaInfo : service.getSchemas()) {
             NamespacePrefixList schemaPrefixList = schemaInfo.getSchema().getNamespaceContext();
             for (String declaredPrefix : schemaPrefixList.getDeclaredPrefixes()) {

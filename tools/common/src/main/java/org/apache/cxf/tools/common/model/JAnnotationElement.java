@@ -29,7 +29,7 @@ public final class JAnnotationElement {
     private Object value;
     private boolean isPrimitive;
 
-    private Set<String> imports = new HashSet<String>();
+    private Set<String> imports = new HashSet<>();
 
     public JAnnotationElement() {
     }

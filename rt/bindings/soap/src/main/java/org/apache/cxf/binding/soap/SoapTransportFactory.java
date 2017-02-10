@@ -74,7 +74,7 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
             "http://www.w3.org/2010/soapjms/",
             "http://www.w3.org/2003/05/soap/bindings/HTTP/");
     public static final Set<String> DEFAULT_PREFIXES 
-        = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
+        = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
             "soap.udp"
         )));
     
@@ -234,7 +234,7 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
     }
     
     public void setActivationNamespaces(Collection<String> ans) {
-        super.setTransportIds(new ArrayList<String>(ans));
+        super.setTransportIds(new ArrayList<>(ans));
     }
 
     private static class SoapEndpointInfo extends EndpointInfo {

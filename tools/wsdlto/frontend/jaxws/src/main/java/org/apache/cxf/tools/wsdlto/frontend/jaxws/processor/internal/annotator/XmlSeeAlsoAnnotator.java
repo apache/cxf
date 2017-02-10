@@ -54,7 +54,7 @@ public final class XmlSeeAlsoAnnotator implements Annotator {
         JAnnotation jaxbAnnotation = new JAnnotation(XmlSeeAlso.class);
         intf.addImports(jaxbAnnotation.getImports());
         
-        List<JavaType> types = new ArrayList<JavaType>();
+        List<JavaType> types = new ArrayList<>();
         for (String pkg : collector.getTypesPackages()) {
             if (pkg.equals(intf.getPackageName())) {
                 types.add(new JavaType(null, "ObjectFactory", null));

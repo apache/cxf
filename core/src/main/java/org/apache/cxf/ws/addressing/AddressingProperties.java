@@ -209,7 +209,7 @@ public class AddressingProperties  {
 
     public List<QName> getMustUnderstand() {
         if (mustUnderstand == null) {
-            mustUnderstand = new ArrayList<QName>();
+            mustUnderstand = new ArrayList<>();
         }
         return mustUnderstand;
     }

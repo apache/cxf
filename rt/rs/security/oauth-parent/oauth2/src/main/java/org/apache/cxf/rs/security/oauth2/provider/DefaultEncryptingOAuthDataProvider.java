@@ -38,8 +38,8 @@ import org.apache.cxf.rt.security.crypto.KeyProperties;
 
 public class DefaultEncryptingOAuthDataProvider extends AbstractOAuthDataProvider {
     protected SecretKey key;
-    private Set<String> tokens = Collections.synchronizedSet(new HashSet<String>());
-    private Set<String> refreshTokens = Collections.synchronizedSet(new HashSet<String>());
+    private Set<String> tokens = Collections.synchronizedSet(new HashSet<>());
+    private Set<String> refreshTokens = Collections.synchronizedSet(new HashSet<>());
     private ConcurrentHashMap<String, String> clientsMap = new ConcurrentHashMap<String, String>();
     public DefaultEncryptingOAuthDataProvider(String algo, int keySize) {
         this(new KeyProperties(algo, keySize));
@@ -67,7 +67,7 @@ public class DefaultEncryptingOAuthDataProvider extends AbstractOAuthDataProvide
     }
     @Override
     public List<Client> getClients(UserSubject resourceOwner) {
-        List<Client> clients = new ArrayList<Client>(clientsMap.size());
+        List<Client> clients = new ArrayList<>(clientsMap.size());
         for (String clientKey : clientsMap.keySet()) {
             Client c = getClient(clientKey);
             if (isClientMatched(c, resourceOwner)) {
@@ -78,7 +78,7 @@ public class DefaultEncryptingOAuthDataProvider extends AbstractOAuthDataProvide
     }
     @Override
     public List<ServerAccessToken> getAccessTokens(Client c, UserSubject sub) {
-        List<ServerAccessToken> list = new ArrayList<ServerAccessToken>(tokens.size());
+        List<ServerAccessToken> list = new ArrayList<>(tokens.size());
         for (String tokenKey : tokens) {
             ServerAccessToken token = getAccessToken(tokenKey);
             if (isTokenMatched(token, c, sub)) {
@@ -89,7 +89,7 @@ public class DefaultEncryptingOAuthDataProvider extends AbstractOAuthDataProvide
     }
     @Override
     public List<RefreshToken> getRefreshTokens(Client c, UserSubject sub) {
-        List<RefreshToken> list = new ArrayList<RefreshToken>(refreshTokens.size());
+        List<RefreshToken> list = new ArrayList<>(refreshTokens.size());
         for (String tokenKey : refreshTokens) {
             RefreshToken token = getRefreshToken(tokenKey);
             if (isTokenMatched(token, c, sub)) {

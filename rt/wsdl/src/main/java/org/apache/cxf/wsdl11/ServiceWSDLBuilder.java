@@ -176,7 +176,7 @@ public class ServiceWSDLBuilder {
             addNamespace(WSDLConstants.CONVENTIONAL_TNS_PREFIX, si.getTargetNamespace(), definition);
             addExtensibilityElements(definition, definition, getWSDL11Extensors(si.getDescription()));
 
-            Collection<PortType> portTypes = new HashSet<PortType>();
+            Collection<PortType> portTypes = new HashSet<>();
             for (ServiceInfo service : services) {
                 Definition portTypeDef = definition;
                 Definition orig = definition;

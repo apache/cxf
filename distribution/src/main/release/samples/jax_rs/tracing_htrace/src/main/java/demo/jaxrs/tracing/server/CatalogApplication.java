@@ -42,7 +42,7 @@ public class CatalogApplication extends Application {
     @Override
     public Set<Object> getSingletons() {
         try {
-            return new HashSet<Object>(
+            return new HashSet<>(
                 Arrays.asList(
                     new Catalog(),
                     new HTraceFeature(HTraceConfiguration.fromMap(getTracingProperties()), "catalog-server"),

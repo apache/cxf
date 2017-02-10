@@ -42,7 +42,7 @@ import org.apache.cxf.tools.wsdlto.frontend.jaxws.customization.JAXWSBinding;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.internal.mapper.InterfaceMapper;
 
 public class PortTypeProcessor extends AbstractProcessor {
-    private List<QName> operationMap = new ArrayList<QName>();
+    private List<QName> operationMap = new ArrayList<>();
 
     public PortTypeProcessor(ToolContext c) {
         super(c);

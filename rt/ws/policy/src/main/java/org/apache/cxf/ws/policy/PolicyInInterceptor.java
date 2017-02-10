@@ -68,7 +68,7 @@ public class PolicyInInterceptor extends AbstractPolicyInterceptor {
         }
 
         List<Interceptor<? extends Message>> interceptors = new ArrayList<Interceptor<? extends Message>>();
-        Collection<Assertion> assertions = new ArrayList<Assertion>();
+        Collection<Assertion> assertions = new ArrayList<>();
         
         // 1. Check overridden policy
         Policy p = (Policy)msg.getContextualProperty(PolicyConstants.POLICY_OVERRIDE);

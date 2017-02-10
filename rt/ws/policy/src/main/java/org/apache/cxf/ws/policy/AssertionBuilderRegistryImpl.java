@@ -51,7 +51,7 @@ public class AssertionBuilderRegistryImpl extends AssertionBuilderFactoryImpl im
     private static final Logger LOG 
         = LogUtils.getL7dLogger(AssertionBuilderRegistryImpl.class);
     private boolean ignoreUnknownAssertions = true; 
-    private Set<QName> ignored = new HashSet<QName>();
+    private Set<QName> ignored = new HashSet<>();
     private Bus bus;
     private boolean dynamicLoaded;
     

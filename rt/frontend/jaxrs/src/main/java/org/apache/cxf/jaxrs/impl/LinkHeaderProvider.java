@@ -37,7 +37,7 @@ public class LinkHeaderProvider implements HeaderDelegate<Link> {
     
     private static final Set<String> KNOWN_PARAMETERS;
     static {
-        KNOWN_PARAMETERS = new HashSet<String>(Arrays.asList(REL, TYPE, TITLE));
+        KNOWN_PARAMETERS = new HashSet<>(Arrays.asList(REL, TYPE, TITLE));
     }
     
     public Link fromString(String value) {

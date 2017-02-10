@@ -80,7 +80,7 @@ public class Headers {
     private static final Set<String> HTTP_HEADERS_SINGLE_VALUE_ONLY;
     private static final String USER_AGENT;
     static {
-        HTTP_HEADERS_SINGLE_VALUE_ONLY = new HashSet<String>();
+        HTTP_HEADERS_SINGLE_VALUE_ONLY = new HashSet<>();
         HTTP_HEADERS_SINGLE_VALUE_ONLY.add(HTTP_HEADERS_SETCOOKIE);
         HTTP_HEADERS_SINGLE_VALUE_ONLY.add(HTTP_HEADERS_LINK);
         USER_AGENT = initUserAgent();
@@ -149,9 +149,9 @@ public class Headers {
             }
         }
         if (cookies == null) {
-            cookies = new ArrayList<String>();
+            cookies = new ArrayList<>();
         } else {
-            cookies = new ArrayList<String>(cookies);
+            cookies = new ArrayList<>(cookies);
         }
         headers.put(HttpHeaderHelper.COOKIE, cookies);
         for (Cookie c : sessionCookies.values()) {
@@ -300,7 +300,7 @@ public class Headers {
     }
 
     private static List<String> createMutableList(String val) {
-        return new ArrayList<String>(Arrays.asList(new String[] {val}));
+        return new ArrayList<>(Arrays.asList(new String[] {val}));
     }
 
     /**
@@ -444,7 +444,7 @@ public class Headers {
             String mappedName = HttpHeaderHelper.getHeaderKey(fname);
             List<String> values = headers.get(mappedName);
             if (values == null) {
-                values = new ArrayList<String>();
+                values = new ArrayList<>();
                 headers.put(mappedName, values);
             }
             for (Enumeration<String> e2 = req.getHeaders(fname); e2.hasMoreElements();) {

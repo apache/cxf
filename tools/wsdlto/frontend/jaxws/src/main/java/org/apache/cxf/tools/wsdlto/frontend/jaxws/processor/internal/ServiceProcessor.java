@@ -466,7 +466,7 @@ public class ServiceProcessor extends AbstractProcessor {
             inbindings = operation.getInput().getExtensors(ExtensibilityElement.class);
         }
         if (inbindings == null) {
-            inbindings = new ArrayList<ExtensibilityElement>();
+            inbindings = new ArrayList<>();
         }
 
         String use = null;
@@ -487,7 +487,7 @@ public class ServiceProcessor extends AbstractProcessor {
             List<ExtensibilityElement> outbindings =
                 operation.getOutput().getExtensors(ExtensibilityElement.class);
             if (outbindings == null) {
-                outbindings = new ArrayList<ExtensibilityElement>();
+                outbindings = new ArrayList<>();
             }
             for (ExtensibilityElement ext : outbindings) {
                 if (SOAPBindingUtil.isSOAPHeader(ext)) {

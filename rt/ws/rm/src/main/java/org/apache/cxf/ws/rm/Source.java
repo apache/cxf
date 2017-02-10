@@ -95,7 +95,7 @@ public class Source extends AbstractEndpoint {
      * @return the collection of unacknowledged sequences.
      */
     public Collection<SourceSequence> getAllUnacknowledgedSequences() {
-        Collection<SourceSequence> seqs = new ArrayList<SourceSequence>();
+        Collection<SourceSequence> seqs = new ArrayList<>();
         for (SourceSequence seq : map.values()) {
             if (!seq.allAcknowledged()) {
                 seqs.add(seq);

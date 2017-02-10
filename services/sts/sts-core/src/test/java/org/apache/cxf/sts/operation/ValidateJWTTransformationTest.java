@@ -96,12 +96,12 @@ public class ValidateJWTTransformationTest extends org.junit.Assert {
         TokenValidateOperation validateOperation = new TokenValidateOperation();
         
         // Add Token Validator
-        List<TokenValidator> validatorList = new ArrayList<TokenValidator>();
+        List<TokenValidator> validatorList = new ArrayList<>();
         validatorList.add(new JWTTokenValidator());
         validateOperation.setTokenValidators(validatorList);
 
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new SAMLTokenProvider());
         validateOperation.setTokenProviders(providerList);
         
@@ -177,14 +177,14 @@ public class ValidateJWTTransformationTest extends org.junit.Assert {
         TokenValidateOperation validateOperation = new TokenValidateOperation();
         
         // Add Token Validator
-        List<TokenValidator> validatorList = new ArrayList<TokenValidator>();
+        List<TokenValidator> validatorList = new ArrayList<>();
         JWTTokenValidator validator = new JWTTokenValidator();
         validator.setRealmCodec(new CustomJWTRealmCodec());
         validatorList.add(validator);
         validateOperation.setTokenValidators(validatorList);
 
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         SAMLTokenProvider samlTokenProvider = new SAMLTokenProvider();
         providerList.add(samlTokenProvider);
         validateOperation.setTokenProviders(providerList);
@@ -271,12 +271,12 @@ public class ValidateJWTTransformationTest extends org.junit.Assert {
         TokenValidateOperation validateOperation = new TokenValidateOperation();
         
         // Add Token Validator
-        List<TokenValidator> validatorList = new ArrayList<TokenValidator>();
+        List<TokenValidator> validatorList = new ArrayList<>();
         validatorList.add(new SAMLTokenValidator());
         validateOperation.setTokenValidators(validatorList);
 
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new JWTTokenProvider());
         validateOperation.setTokenProviders(providerList);
         
@@ -475,7 +475,7 @@ public class ValidateJWTTransformationTest extends org.junit.Assert {
 
         SAMLTokenProvider samlTokenProvider = new SAMLTokenProvider();
         List<AttributeStatementProvider> customProviderList = 
-            new ArrayList<AttributeStatementProvider>();
+            new ArrayList<>();
         customProviderList.add(new ClaimsAttributeStatementProvider());
         samlTokenProvider.setAttributeStatementProviders(customProviderList);
 

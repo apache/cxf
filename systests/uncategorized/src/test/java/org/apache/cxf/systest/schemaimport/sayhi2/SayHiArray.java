@@ -32,7 +32,7 @@ public class SayHiArray {
 
     public List<String> getArg0() {
         if (arg0 == null) {
-            arg0 = new ArrayList<String>();
+            arg0 = new ArrayList<>();
         }
         return this.arg0;
     }

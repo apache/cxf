@@ -35,8 +35,8 @@ public class PolicyFeatureBeanDefinitionParser extends AbstractBeanDefinitionPar
 
     @Override
     protected void parseChildElements(Element e, ParserContext ctx, BeanDefinitionBuilder bean) {
-        List<Element> ps = new ArrayList<Element>();
-        List<Element> prs = new ArrayList<Element>();     
+        List<Element> ps = new ArrayList<>();
+        List<Element> prs = new ArrayList<>();     
         
         Element elem = DOMUtils.getFirstElement(e);
         while (elem != null) {

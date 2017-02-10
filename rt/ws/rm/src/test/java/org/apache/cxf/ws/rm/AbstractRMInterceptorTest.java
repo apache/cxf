@@ -144,7 +144,7 @@ public class AbstractRMInterceptorTest extends Assert {
         Message message = control.createMock(Message.class);
         EasyMock.expect(message.get(AssertionInfoMap.class)).andReturn(null);
         AssertionInfoMap aim = control.createMock(AssertionInfoMap.class);
-        Collection<AssertionInfo> ais = new ArrayList<AssertionInfo>();
+        Collection<AssertionInfo> ais = new ArrayList<>();
         EasyMock.expect(message.get(AssertionInfoMap.class)).andReturn(aim).times(2);
         PolicyAssertion a = control.createMock(PolicyAssertion.class);        
         AssertionInfo ai = new AssertionInfo(a);

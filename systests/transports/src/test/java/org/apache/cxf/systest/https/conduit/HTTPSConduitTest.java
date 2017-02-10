@@ -93,7 +93,7 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
     private static final boolean IN_PROCESS = true;
     
     private static TLSClientParameters tlsClientParameters = new TLSClientParameters();
-    private static List<String> servers = new ArrayList<String>();
+    private static List<String> servers = new ArrayList<>();
 
     private static Map<String, String> addrMap = new TreeMap<String, String>();
     

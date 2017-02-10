@@ -48,7 +48,7 @@ public class HBaseQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Filt
     public HBaseQueryVisitor(String family, Map<String, String> fieldsMap) {
         super(fieldsMap);
         this.family = family;
-        queryStack.push(new ArrayList<Filter>());
+        queryStack.push(new ArrayList<>());
     }
     public HBaseQueryVisitor(Map<String, String> familyMap) {
         this(familyMap, Collections.<String, String>emptyMap());
@@ -57,7 +57,7 @@ public class HBaseQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Filt
                              Map<String, String> fieldsMap) {
         super(fieldsMap);
         this.familyMap = familyMap;
-        queryStack.push(new ArrayList<Filter>());
+        queryStack.push(new ArrayList<>());
     }
     
     public void visit(SearchCondition<T> sc) {
@@ -69,7 +69,7 @@ public class HBaseQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Filt
                                          statement.getValue()));
             }
         } else {
-            queryStack.push(new ArrayList<Filter>());
+            queryStack.push(new ArrayList<>());
             for (SearchCondition<T> condition : sc.getSearchConditions()) {
                 condition.accept(this);
             }

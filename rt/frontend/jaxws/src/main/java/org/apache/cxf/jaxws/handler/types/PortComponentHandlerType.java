@@ -101,7 +101,7 @@ public class PortComponentHandlerType {
      */
     public List<DescriptionType> getDescription() {
         if (description == null) {
-            description = new ArrayList<DescriptionType>();
+            description = new ArrayList<>();
         }
         return this.description;
     }
@@ -123,7 +123,7 @@ public class PortComponentHandlerType {
      */
     public List<DisplayNameType> getDisplayName() {
         if (displayName == null) {
-            displayName = new ArrayList<DisplayNameType>();
+            displayName = new ArrayList<>();
         }
         return this.displayName;
     }
@@ -145,7 +145,7 @@ public class PortComponentHandlerType {
      */
     public List<IconType> getIcon() {
         if (icon == null) {
-            icon = new ArrayList<IconType>();
+            icon = new ArrayList<>();
         }
         return this.icon;
     }
@@ -207,7 +207,7 @@ public class PortComponentHandlerType {
      */
     public List<ParamValueType> getInitParam() {
         if (initParam == null) {
-            initParam = new ArrayList<ParamValueType>();
+            initParam = new ArrayList<>();
         }
         return this.initParam;
     }
@@ -229,7 +229,7 @@ public class PortComponentHandlerType {
      */
     public List<XsdQNameType> getSoapHeader() {
         if (soapHeader == null) {
-            soapHeader = new ArrayList<XsdQNameType>();
+            soapHeader = new ArrayList<>();
         }
         return this.soapHeader;
     }
@@ -251,7 +251,7 @@ public class PortComponentHandlerType {
      */
     public List<CString> getSoapRole() {
         if (soapRole == null) {
-            soapRole = new ArrayList<CString>();
+            soapRole = new ArrayList<>();
         }
         return this.soapRole;
     }

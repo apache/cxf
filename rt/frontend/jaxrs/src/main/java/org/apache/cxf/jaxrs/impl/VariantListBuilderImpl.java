@@ -31,10 +31,10 @@ import javax.ws.rs.core.Variant.VariantListBuilder;
 
 public class VariantListBuilderImpl extends VariantListBuilder {
     
-    private List<String> encodings = new ArrayList<String>();
-    private List<Locale> languages = new ArrayList<Locale>();
-    private List<MediaType> mediaTypes = new ArrayList<MediaType>();
-    private List<Variant> variants = new ArrayList<Variant>();
+    private List<String> encodings = new ArrayList<>();
+    private List<Locale> languages = new ArrayList<>();
+    private List<MediaType> mediaTypes = new ArrayList<>();
+    private List<Variant> variants = new ArrayList<>();
     
     public VariantListBuilderImpl() {
         
@@ -49,7 +49,7 @@ public class VariantListBuilderImpl extends VariantListBuilder {
 
     @Override
     public List<Variant> build() {
-        List<Variant> vs = new ArrayList<Variant>(variants);
+        List<Variant> vs = new ArrayList<>(variants);
         reset();
         return vs;
     }

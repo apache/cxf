@@ -47,7 +47,7 @@ public class MultipartBody {
     }
     
     public MultipartBody(Attachment att) {
-        atts = new ArrayList<Attachment>();
+        atts = new ArrayList<>();
         atts.add(att);
         outbound = true;
         this.mt = MULTIPART_RELATED_TYPE;
@@ -58,7 +58,7 @@ public class MultipartBody {
     }
     
     public MultipartBody(boolean outbound) {
-        this(new ArrayList<Attachment>(), MULTIPART_RELATED_TYPE, outbound);
+        this(new ArrayList<>(), MULTIPART_RELATED_TYPE, outbound);
     }
     
     public MediaType getType() {
@@ -71,7 +71,7 @@ public class MultipartBody {
     }
     
     public List<Attachment> getChildAttachments() {
-        List<Attachment> childAtts = new ArrayList<Attachment>();
+        List<Attachment> childAtts = new ArrayList<>();
         for (int i = 1; i < atts.size(); i++) {
             childAtts.add(atts.get(i));
         }

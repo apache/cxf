@@ -107,7 +107,7 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
     }
 
     public Set<String> getArrayKeys() {
-        Set<String> set = new HashSet<String>();
+        Set<String> set = new HashSet<>();
         set.add(ToolConstants.CFG_PACKAGENAME);
         set.add(ToolConstants.CFG_NEXCLUDE);
         set.add(ToolConstants.CFG_XJC_ARGS);
@@ -187,7 +187,7 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
         @SuppressWarnings("unchecked")
         List<ServiceInfo> serviceList = (List<ServiceInfo>)context.get(ToolConstants.SERVICE_LIST);
         if (serviceList == null) {
-            serviceList = new ArrayList<ServiceInfo>();
+            serviceList = new ArrayList<>();
 
             // Build the ServiceModel from the WSDLModel
             if (version == WSDLConstants.WSDLVersion.WSDL11) {
@@ -429,7 +429,7 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
 
     @SuppressWarnings("unchecked")
     public QName getServiceQName(Definition def) {
-        List<Definition> defs = new ArrayList<Definition>();
+        List<Definition> defs = new ArrayList<>();
         defs.add(def);
         Iterator<?> ite1 = def.getImports().values().iterator();
         while (ite1.hasNext()) {
@@ -742,7 +742,7 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
     }
 
     public List<ServiceValidator> getServiceValidators() {
-        List<ServiceValidator> validators = new ArrayList<ServiceValidator>();
+        List<ServiceValidator> validators = new ArrayList<>();
 
         Properties initialExtensions = null;
         try {

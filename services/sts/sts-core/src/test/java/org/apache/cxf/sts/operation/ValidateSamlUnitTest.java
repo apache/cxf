@@ -75,7 +75,7 @@ public class ValidateSamlUnitTest extends org.junit.Assert {
         TokenValidateOperation validateOperation = new TokenValidateOperation();
         
         // Add Token Validator
-        List<TokenValidator> validatorList = new ArrayList<TokenValidator>();
+        List<TokenValidator> validatorList = new ArrayList<>();
         validatorList.add(new SAMLTokenValidator());
         validateOperation.setTokenValidators(validatorList);
         
@@ -136,7 +136,7 @@ public class ValidateSamlUnitTest extends org.junit.Assert {
         TokenValidateOperation validateOperation = new TokenValidateOperation();
         
         // Add Token Validator
-        List<TokenValidator> validatorList = new ArrayList<TokenValidator>();
+        List<TokenValidator> validatorList = new ArrayList<>();
         validatorList.add(new SAMLTokenValidator());
         validateOperation.setTokenValidators(validatorList);
         

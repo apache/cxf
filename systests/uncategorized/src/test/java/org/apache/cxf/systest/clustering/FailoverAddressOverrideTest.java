@@ -98,7 +98,7 @@ public class FailoverAddressOverrideTest extends AbstractBusClientServerTestBase
         SpringBusFactory bf = new SpringBusFactory();    
         bus = bf.createBus(getConfig());
         BusFactory.setDefaultBus(bus);
-        targets = new ArrayList<String>();
+        targets = new ArrayList<>();
     }
     
     @After

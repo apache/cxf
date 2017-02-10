@@ -91,7 +91,7 @@ public class WrapperBeanAnnotator implements Annotator {
             }
             
         }
-        List<String> props = new ArrayList<String>();
+        List<String> props = new ArrayList<>();
         for (JavaField f : beanClass.getFields()) {
             props.add(f.getParaName());
         }

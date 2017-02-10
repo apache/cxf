@@ -182,7 +182,7 @@ public class EndpointPolicyImplTest extends Assert {
         control.reset();
         EasyMock.expect(engine.isEnabled()).andReturn(true).anyTimes();
         EasyMock.expect(engine.getAlternativeSelector()).andReturn(selector);
-        Collection<Assertion> alternative = new ArrayList<Assertion>();
+        Collection<Assertion> alternative = new ArrayList<>();
         EasyMock.expect(selector.selectAlternative(policy, engine, assertor, null, m)).andReturn(alternative);
         control.replay();
         epi.chooseAlternative(m);
@@ -327,8 +327,8 @@ public class EndpointPolicyImplTest extends Assert {
         PolicyEngineImpl engine = control.createMock(PolicyEngineImpl.class);
 
         EndpointPolicyImpl epi = new EndpointPolicyImpl(ei, engine, requestor, null);
-        Collection<Assertion> v = new ArrayList<Assertion>();
-        Collection<Assertion> fv = new ArrayList<Assertion>();
+        Collection<Assertion> v = new ArrayList<>();
+        Collection<Assertion> fv = new ArrayList<>();
         QName aqn = new QName("http://x.y.z", "a");
         v.add(mockAssertion(aqn, requestor ? 2 : 1, false));
         v.add(mockAssertion(aqn, requestor ? 2 : 1, false));

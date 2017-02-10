@@ -127,7 +127,7 @@ public class JAXRSClientServerNonSpringBookTest extends AbstractBusClientServerT
                                               BookStoreNoAnnotationsInterface.class,
                               "classpath:org/apache/cxf/systest/jaxrs/resources/resources2.xml", null);
         Book book = new Book("From Model", 1L);
-        List<Book> books = new ArrayList<Book>();
+        List<Book> books = new ArrayList<>();
         books.add(book);
         books = proxy.getBooks(books);
         assertEquals(1, books.size());

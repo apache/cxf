@@ -678,7 +678,7 @@ public class BookStore {
     @Produces({"application/xml", "application/json" })
     @Consumes({"application/xml", "application/json" })
     public List<Book> postBookGetCollection(@Nullable Book book) throws Exception {
-        List<Book> list = new ArrayList<Book>();
+        List<Book> list = new ArrayList<>();
         if (book != null) {
             list.add(book);
         }
@@ -735,7 +735,7 @@ public class BookStore {
     @Path("/collections")
     @Produces({"application/xml", "application/json" })
     public List<Book> getBookCollection() throws Exception {
-        return new ArrayList<Book>(books.values());
+        return new ArrayList<>(books.values());
     }
     
     @POST
@@ -1231,7 +1231,7 @@ public class BookStore {
     @GET
     @Path("/books/interface/adapter-list")
     public List<? extends BookInfoInterface> getBookAdapterInterfaceList() throws Exception {
-        List<BookInfoInterface> list = new ArrayList<BookInfoInterface>();
+        List<BookInfoInterface> list = new ArrayList<>();
         list.add(new BookInfo2(doGetBook("123")));
         return list;
     }
@@ -1240,7 +1240,7 @@ public class BookStore {
     @Path("/books/adapter-list")
     @XmlJavaTypeAdapter(BookInfoAdapter.class)
     public List<? extends BookInfo> getBookAdapterList() throws Exception {
-        List<BookInfo> list = new ArrayList<BookInfo>();
+        List<BookInfo> list = new ArrayList<>();
         list.add(new BookInfo(doGetBook("123")));
         return list;
     }

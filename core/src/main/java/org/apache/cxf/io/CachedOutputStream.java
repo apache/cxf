@@ -90,7 +90,7 @@ public class CachedOutputStream extends OutputStream {
 
     private List<CachedOutputStreamCallback> callbacks;
     
-    private List<Object> streamList = new ArrayList<Object>();
+    private List<Object> streamList = new ArrayList<>();
 
     public CachedOutputStream() {
         this(defaultThreshold);
@@ -135,7 +135,7 @@ public class CachedOutputStream extends OutputStream {
     
     public void registerCallback(CachedOutputStreamCallback cb) {
         if (null == callbacks) {
-            callbacks = new ArrayList<CachedOutputStreamCallback>();
+            callbacks = new ArrayList<>();
         }
         callbacks.add(cb);
     }

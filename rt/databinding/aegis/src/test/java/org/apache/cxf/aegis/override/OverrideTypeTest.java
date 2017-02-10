@@ -40,7 +40,7 @@ public class OverrideTypeTest extends AbstractAegisTest {
     @Test
     public void testOverrideBean() throws Exception {
         AegisDatabinding aegisDatabinding = new AegisDatabinding();
-        Set<String> types = new HashSet<String>();
+        Set<String> types = new HashSet<>();
         types.add("org.apache.cxf.aegis.inheritance.Employee");
         aegisDatabinding.setOverrideTypes(types);
         DataReader<XMLStreamReader> dataReader = 

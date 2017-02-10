@@ -58,7 +58,7 @@ public class ReferenceResolverTest extends Assert {
         LocalServiceModelReferenceResolver resolver = 
             new LocalServiceModelReferenceResolver(di, builder);
         
-        List<UnknownExtensibilityElement> extensions = new ArrayList<UnknownExtensibilityElement>();
+        List<UnknownExtensibilityElement> extensions = new ArrayList<>();
         EasyMock.expect(di.getExtensors(UnknownExtensibilityElement.class)).andReturn(extensions);
         
         control.replay();

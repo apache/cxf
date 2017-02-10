@@ -194,7 +194,7 @@ public abstract class AbstractPropertiesHolder implements Extensible {
         if (exts == null) {
             return null;
         }
-        List<T> list = new ArrayList<T>(exts.length);
+        List<T> list = new ArrayList<>(exts.length);
         for (int x = 0; x < exts.length; x++) {
             if (cls.isInstance(exts[x])) {
                 list.add(cls.cast(exts[x]));

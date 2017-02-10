@@ -43,7 +43,7 @@ public class SayHiImpl2 implements SayHi {
                      targetNamespace = "http://apache.org/sayHi2", 
                      className = "org.apache.sayhi2.SayHiArrayResponse")
     public List<String> sayHiArray(@WebParam(name = "arg0", targetNamespace = "") List<String> arg0) {
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         list.add("Hi");
         return list;
     }

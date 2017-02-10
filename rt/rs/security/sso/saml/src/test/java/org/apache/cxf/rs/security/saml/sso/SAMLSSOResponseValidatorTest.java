@@ -435,7 +435,7 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
         subjectConfirmationData.setNotAfter(new DateTime().plusMinutes(5));
         subjectConfirmationData.setRecipient("http://recipient.apache.org");
 
-        List<String> values = new ArrayList<String>();
+        List<String> values = new ArrayList<>();
         values.add("http://unknown-service.apache.org");
         values.add("http://service.apache.org");
         
@@ -467,7 +467,7 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
         subjectConfirmationData.setRecipient("http://recipient.apache.org");
 
         List<AudienceRestrictionBean> audienceRestrictions = 
-            new ArrayList<AudienceRestrictionBean>();
+            new ArrayList<>();
         
         AudienceRestrictionBean audienceRestriction = new AudienceRestrictionBean();
         audienceRestriction.setAudienceURIs(

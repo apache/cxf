@@ -82,7 +82,7 @@ public final class ValidatorUtil {
      */
     public static List<SchemaCollection> getSchemaList(Document document,
             String baseURI) throws IOException, SAXException {
-        List<SchemaCollection> schemaList = new ArrayList<SchemaCollection>();
+        List<SchemaCollection> schemaList = new ArrayList<>();
         if (document == null) {
             return schemaList;
         }

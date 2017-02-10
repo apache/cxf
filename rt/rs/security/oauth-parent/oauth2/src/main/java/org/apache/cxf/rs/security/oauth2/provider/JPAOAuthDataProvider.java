@@ -233,13 +233,13 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
         // this can be the case when using multiple cmt dataProvider operation in a single entityManager
         // lifespan
         if (at.getAudiences() != null) {
-            at.setAudiences(new ArrayList<String>(at.getAudiences()));
+            at.setAudiences(new ArrayList<>(at.getAudiences()));
         }
         if (at.getExtraProperties() != null) {
             at.setExtraProperties(new HashMap<String, String>(at.getExtraProperties()));
         }
         if (at.getScopes() != null) {
-            at.setScopes(new ArrayList<OAuthPermission>(at.getScopes()));
+            at.setScopes(new ArrayList<>(at.getScopes()));
         }
         if (at.getParameters() != null) {
             at.setParameters(new HashMap<String, String>(at.getParameters()));

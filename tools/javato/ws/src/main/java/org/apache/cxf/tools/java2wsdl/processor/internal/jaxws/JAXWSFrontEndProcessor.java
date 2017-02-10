@@ -61,8 +61,8 @@ public class JAXWSFrontEndProcessor implements Processor {
     private static final String SEI_SUFFIX = "_PortType";
     private static final Logger LOG = LogUtils.getL7dLogger(JAXWSFrontEndProcessor.class);
     private ToolContext context;
-    private List<AbstractGenerator> generators = new ArrayList<AbstractGenerator>();
-    private List<String> infList = new ArrayList<String>();
+    private List<AbstractGenerator> generators = new ArrayList<>();
+    private List<String> infList = new ArrayList<>();
     
     @SuppressWarnings("unchecked")
     public void process() throws ToolException {

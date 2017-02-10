@@ -282,13 +282,13 @@ public class EndpointReferenceTest extends AbstractJaxWsTest {
         Element referenceParameter = fetchElementByNameAttribute(doc.getDocumentElement(),
                                                                  "wsa:ReferenceParameters",
                                                                  "");
-        List<Element> referenceParameters = new ArrayList<Element>();
+        List<Element> referenceParameters = new ArrayList<>();
         if (referenceParameter != null) {
             referenceParameters.add(referenceParameter);
         }
 
         Element metadata = fetchElementByNameAttribute(doc.getDocumentElement(), "wsa:metadata", "");
-        List<Element> metadataList = new ArrayList<Element>();
+        List<Element> metadataList = new ArrayList<>();
         if (metadata != null) {
             metadataList.add(metadata);
         }

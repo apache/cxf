@@ -97,7 +97,7 @@ public class BookServer extends AbstractBusTestServerBase {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setBus(bus);
         sf.setResourceClasses(BookStore.class, SimpleBookStore.class, BookStorePerRequest.class);
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         
         //default lifecycle is per-request, change it to singleton
         BinaryDataProvider<Object> p = new BinaryDataProvider<Object>();

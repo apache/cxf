@@ -102,7 +102,7 @@ public class JsonWebKey extends JsonMapObject {
     }
 
     public void setKeyOperation(List<KeyOperation> keyOperation) {
-        List<String> ops = new ArrayList<String>(keyOperation.size());
+        List<String> ops = new ArrayList<>(keyOperation.size());
         for (KeyOperation op : keyOperation) {
             ops.add(op.toString());
         }
@@ -114,7 +114,7 @@ public class JsonWebKey extends JsonMapObject {
         if (ops == null) {
             return null;
         }
-        List<KeyOperation> keyOps = new ArrayList<KeyOperation>(ops.size());
+        List<KeyOperation> keyOps = new ArrayList<>(ops.size());
         for (Object op : ops) {
             keyOps.add(KeyOperation.getKeyOperation(op.toString()));
         }

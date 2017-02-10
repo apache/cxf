@@ -34,7 +34,7 @@ public class JavascriptExampleImpl implements JavascriptExample {
     private List<Beverage> beverages;
     
     public JavascriptExampleImpl() {
-        beverages = new ArrayList<Beverage>();
+        beverages = new ArrayList<>();
         Ingredient calcium = new Ingredient();
         calcium.setName("calcium");
         calcium.setCategory(Category.Mineral);
@@ -80,7 +80,7 @@ public class JavascriptExampleImpl implements JavascriptExample {
     }
 
     public Beverage[] getBeverageWithIngredientCategories(List<Category> c) {
-        List<Beverage> matches = new ArrayList<Beverage>();
+        List<Beverage> matches = new ArrayList<>();
         for (Beverage b : beverages) {
             for (Ingredient i : b.getIngredients()) {
                 if (c.contains(i.getCategory())) {
@@ -93,7 +93,7 @@ public class JavascriptExampleImpl implements JavascriptExample {
     }
 
     public Beverage[] getBeverageWithIngredientCategory(Category c) {
-        List<Beverage> matches = new ArrayList<Beverage>();
+        List<Beverage> matches = new ArrayList<>();
         for (Beverage b : beverages) {
             for (Ingredient i : b.getIngredients()) {
                 if (c == i.getCategory()) {
@@ -106,7 +106,7 @@ public class JavascriptExampleImpl implements JavascriptExample {
     }
 
     public Beverage[] getBeveragesWithIngredient(Ingredient i) {
-        List<Beverage> matches = new ArrayList<Beverage>();
+        List<Beverage> matches = new ArrayList<>();
         for (Beverage b : beverages) {
             for (Ingredient bi : b.getIngredients()) {
                 if (bi == i) {

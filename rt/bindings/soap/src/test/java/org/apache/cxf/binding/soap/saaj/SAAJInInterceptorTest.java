@@ -89,7 +89,7 @@ public class SAAJInInterceptorTest extends TestBase {
         assertEquals("check the first entry of body", "itinerary", xmlReader.getLocalName());
 
         List<Header> eleHeaders = soapMessage.getHeaders();
-        List<Element> headerChilds = new ArrayList<Element>();
+        List<Element> headerChilds = new ArrayList<>();
         Iterator<Header> iter = eleHeaders.iterator();
         
         while (iter.hasNext()) {

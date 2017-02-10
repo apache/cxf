@@ -81,7 +81,7 @@ public class StandaloneReadTest {
         AegisType aegisRegisteredType = context.getTypeMapping().getType(magicTypeQName);
 
         Object something = reader.read(streamReader, aegisRegisteredType);
-        List<String> correctAnswer = new ArrayList<String>();
+        List<String> correctAnswer = new ArrayList<>();
         correctAnswer.add("cat");
         correctAnswer.add("dog");
         correctAnswer.add("hailstorm");
@@ -102,7 +102,7 @@ public class StandaloneReadTest {
         AegisReader<XMLStreamReader> reader = context.createXMLStreamReader();
 
         Object something = reader.read(streamReader);
-        List<String> correctAnswer = new ArrayList<String>();
+        List<String> correctAnswer = new ArrayList<>();
         correctAnswer.add("cat");
         correctAnswer.add("dog");
         correctAnswer.add("hailstorm");

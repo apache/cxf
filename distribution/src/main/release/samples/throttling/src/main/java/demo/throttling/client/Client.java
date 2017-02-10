@@ -119,7 +119,7 @@ public final class Client implements Runnable {
         b.setExtension(registry, MetricRegistry.class);        
 
         SOAPService ss = new SOAPService(wsdlURL, SERVICE_NAME);
-        List<Client> c = new ArrayList<Client>();
+        List<Client> c = new ArrayList<>();
         Client client;
         client = new Client("Tom", ss);
         new Thread(client).start();

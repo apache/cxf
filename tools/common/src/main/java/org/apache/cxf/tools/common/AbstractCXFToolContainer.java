@@ -246,7 +246,7 @@ public abstract class AbstractCXFToolContainer extends AbstractToolContainer {
     }
 
     protected String[] getDefaultExcludedNamespaces(String excludeProps) {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         Properties props = loadProperties(excludeProps);
         java.util.Enumeration<?> nexcludes = props.propertyNames();
 

@@ -30,7 +30,7 @@ import org.apache.cxf.common.i18n.Message;
  */
 public class ToolException extends RuntimeException {
     private static final long serialVersionUID = -4418907917249006910L;
-    List<Throwable> suppressed = new ArrayList<Throwable>(0);
+    List<Throwable> suppressed = new ArrayList<>(0);
     boolean hasSuppressed;
     
     public ToolException() {

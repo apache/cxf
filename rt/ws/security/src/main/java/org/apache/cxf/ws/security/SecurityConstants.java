@@ -402,7 +402,7 @@ public final class SecurityConstants extends org.apache.cxf.rt.security.Security
     public static final Set<String> ALL_PROPERTIES;
     
     static {
-        Set<String> s = new HashSet<String>(Arrays.asList(new String[] {
+        Set<String> s = new HashSet<>(Arrays.asList(new String[] {
             ACTOR, VALIDATE_TOKEN, ALWAYS_ENCRYPT_UT, IS_BSP_COMPLIANT, ENABLE_NONCE_CACHE, 
             ENABLE_TIMESTAMP_CACHE, TIMESTAMP_TTL, TIMESTAMP_FUTURE_TTL, 
             KERBEROS_CLIENT, SPNEGO_CLIENT_ACTION, KERBEROS_JAAS_CONTEXT_NAME, KERBEROS_SPN, 

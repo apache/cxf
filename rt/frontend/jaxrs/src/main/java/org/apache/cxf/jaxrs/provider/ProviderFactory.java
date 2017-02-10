@@ -367,7 +367,7 @@ public abstract class ProviderFactory {
             
             List<ReaderInterceptor> interceptors = null;
             if (size > 0) {
-                interceptors = new ArrayList<ReaderInterceptor>(size + 1);
+                interceptors = new ArrayList<>(size + 1);
                 List<ProviderInfo<ReaderInterceptor>> readers =
                     getBoundFilters(readerInterceptors, names);
                 for (ProviderInfo<ReaderInterceptor> p : readers) {
@@ -406,7 +406,7 @@ public abstract class ProviderFactory {
               
             List<WriterInterceptor> interceptors = null;
             if (size > 0) {
-                interceptors = new ArrayList<WriterInterceptor>(size + 1);
+                interceptors = new ArrayList<>(size + 1);
                 List<ProviderInfo<WriterInterceptor>> writers =
                     getBoundFilters(writerInterceptors, names);
                 for (ProviderInfo<WriterInterceptor> p : writers) {
@@ -968,7 +968,7 @@ public abstract class ProviderFactory {
     }
     
     Set<Object> getReadersWriters() {
-        Set<Object> set = new HashSet<Object>();
+        Set<Object> set = new HashSet<>();
         set.addAll(messageReaders);
         set.addAll(messageWriters);
         return set;

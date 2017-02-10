@@ -131,7 +131,7 @@ public class SchemaValidator extends AbstractDefinitionValidator {
 
         sf.setResourceResolver(resourceResolver);
 
-        List<Source> sources = new ArrayList<Source>();
+        List<Source> sources = new ArrayList<>();
 
         for (InputSource is : xsdsInJar) {
             Message msg = new Message("CREATE_SCHEMA_LOADED_FROM_JAR", LOG, is.getSystemId());
@@ -252,7 +252,7 @@ public class SchemaValidator extends AbstractDefinitionValidator {
             File[] files = f.listFiles(filter);
 
             if (files != null) {
-                List<String> xsdUrls = new ArrayList<String>(files.length);
+                List<String> xsdUrls = new ArrayList<>(files.length);
                 for (File file : files) {
                     try {
                         String s = file.toURI().toURL().toString();
@@ -284,7 +284,7 @@ class NewStackTraceErrorHandler implements ErrorHandler {
         valid = true;
         numErrors = 0;
         buffer = new StringBuilder();
-        errors = new ArrayList<SAXParseException>();
+        errors = new ArrayList<>();
     }
 
     public void error(SAXParseException ex) throws SAXParseException {

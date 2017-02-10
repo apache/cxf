@@ -314,7 +314,7 @@ public class SwAOutInterceptor extends AbstractSoapInterceptor {
         
         Collection<Attachment> atts = message.getAttachments();
         if (atts == null) {
-            atts = new ArrayList<Attachment>();
+            atts = new ArrayList<>();
             message.setAttachments(atts);
         }
         return atts;

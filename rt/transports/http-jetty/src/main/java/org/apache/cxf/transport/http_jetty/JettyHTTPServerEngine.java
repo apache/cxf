@@ -624,7 +624,7 @@ public class JettyHTTPServerEngine implements ServerEngine {
             httpConfig.setSendServerVersion(getSendServerVersion());
             HttpConnectionFactory httpFactory = new HttpConnectionFactory(httpConfig);
             
-            Collection<ConnectionFactory> connectionFactories = new ArrayList<ConnectionFactory>();
+            Collection<ConnectionFactory> connectionFactories = new ArrayList<>();
             
             result = new org.eclipse.jetty.server.ServerConnector(server);
             
@@ -657,7 +657,7 @@ public class JettyHTTPServerEngine implements ServerEngine {
         // remove it from the default excluded protocols
         boolean allowSSLv3 = "SSLv3".equals(proto);
         if (allowSSLv3 || !tlsServerParameters.getIncludeProtocols().isEmpty()) {
-            List<String> excludedProtocols = new ArrayList<String>();
+            List<String> excludedProtocols = new ArrayList<>();
             for (String excludedProtocol : scf.getExcludeProtocols()) {
                 if (!(tlsServerParameters.getIncludeProtocols().contains(excludedProtocol)
                     || (allowSSLv3 && ("SSLv3".equals(excludedProtocol) 

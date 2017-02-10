@@ -325,7 +325,7 @@ public final class KeyManagementUtils {
         return encodeX509CertificateChain(Arrays.asList(chain));
     }
     public static List<String> encodeX509CertificateChain(List<X509Certificate> chain) {
-        List<String> encodedChain = new ArrayList<String>(chain.size());
+        List<String> encodedChain = new ArrayList<>(chain.size());
         for (X509Certificate cert : chain) {
             try {
                 encodedChain.add(CryptoUtils.encodeCertificate(cert));
@@ -338,7 +338,7 @@ public final class KeyManagementUtils {
     }
     public static List<X509Certificate> toX509CertificateChain(List<String> base64EncodedChain) {
         if (base64EncodedChain != null) {
-            List<X509Certificate> certs = new ArrayList<X509Certificate>(base64EncodedChain.size());
+            List<X509Certificate> certs = new ArrayList<>(base64EncodedChain.size());
             for (String encodedCert : base64EncodedChain) {
                 try {
                     certs.add((X509Certificate)CryptoUtils.decodeCertificate(encodedCert));

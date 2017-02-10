@@ -60,7 +60,7 @@ public class ClassResourceInfo extends BeanResourceInfo {
     private String producesTypes;
     private Set<String> nameBindings = Collections.emptySet();
     private ClassResourceInfo parent;
-    private Set<String> injectedSubInstances = new HashSet<String>();
+    private Set<String> injectedSubInstances = new HashSet<>();
     public ClassResourceInfo(ClassResourceInfo cri) {
         super(cri.getBus());       
         if (cri.isCreatedFromModel() && !InjectionUtils.isConcreteClass(cri.getServiceClass())) {
@@ -208,7 +208,7 @@ public class ClassResourceInfo extends BeanResourceInfo {
     }
     
     public Set<String> getAllowedMethods() {
-        Set<String> methods = new HashSet<String>();
+        Set<String> methods = new HashSet<>();
         for (OperationResourceInfo o : methodDispatcher.getOperationResourceInfos()) {
             String method = o.getHttpMethod();
             if (method != null) {

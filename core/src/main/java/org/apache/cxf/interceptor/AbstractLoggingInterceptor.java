@@ -60,7 +60,7 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
     private static final String  LIVE_LOGGING_PROP = "org.apache.cxf.logging.enable";
     private static final List<String> BINARY_CONTENT_MEDIA_TYPES;
     static {
-        BINARY_CONTENT_MEDIA_TYPES = new ArrayList<String>();
+        BINARY_CONTENT_MEDIA_TYPES = new ArrayList<>();
         BINARY_CONTENT_MEDIA_TYPES.add("application/octet-stream");
         BINARY_CONTENT_MEDIA_TYPES.add("image/png");
         BINARY_CONTENT_MEDIA_TYPES.add("image/jpeg");

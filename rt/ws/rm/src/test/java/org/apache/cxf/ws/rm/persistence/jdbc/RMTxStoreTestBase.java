@@ -283,7 +283,7 @@ public abstract class RMTxStoreTestBase extends Assert {
         }
         control.verify();
         
-        Collection<Long> messageNrs = new ArrayList<Long>();
+        Collection<Long> messageNrs = new ArrayList<>();
         messageNrs.add(ZERO);
         messageNrs.add(TEN);
         messageNrs.add(ONE);
@@ -559,7 +559,7 @@ public abstract class RMTxStoreTestBase extends Assert {
             assertEquals(2, in.size());
             checkRecoveredMessages(in);
         } finally {
-            Collection<Long> msgNrs = new ArrayList<Long>();
+            Collection<Long> msgNrs = new ArrayList<>();
             msgNrs.add(ONE);
             msgNrs.add(TEN);
          
@@ -627,7 +627,7 @@ public abstract class RMTxStoreTestBase extends Assert {
             if (null != sid1) {
                 store.removeSourceSequence(sid1);
             }
-            Collection<Long> msgNrs = new ArrayList<Long>();
+            Collection<Long> msgNrs = new ArrayList<>();
             msgNrs.add(ONE);
             store.removeMessages(sid1, msgNrs, true);
         }
@@ -691,7 +691,7 @@ public abstract class RMTxStoreTestBase extends Assert {
             if (null != sid1) {
                 store.removeDestinationSequence(sid1);
             }
-            Collection<Long> msgNrs = new ArrayList<Long>();
+            Collection<Long> msgNrs = new ArrayList<>();
             msgNrs.add(ONE);
             store.removeMessages(sid1, msgNrs, false);
         }

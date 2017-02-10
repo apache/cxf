@@ -51,7 +51,7 @@ public final class CorbaObjectReferenceEventProducer extends AbstractStartEndEve
     static final List<Attribute> IS_NIL_OBJ_REF_ATTRS;
     static {
         XMLEventFactory factory = XMLEventFactory.newInstance();
-        IS_NIL_OBJ_REF_ATTRS = new ArrayList<Attribute>();
+        IS_NIL_OBJ_REF_ATTRS = new ArrayList<>();
         IS_NIL_OBJ_REF_ATTRS.add(factory.createAttribute(new QName(XSI_NAMESPACE_URI, "nil", "xsi"), "true"));
     }
     private static final String INFER_FROM_TYPE_ID = "InferFromTypeId";
@@ -71,7 +71,7 @@ public final class CorbaObjectReferenceEventProducer extends AbstractStartEndEve
             return;
         }
 
-        List<CorbaTypeEventProducer> objRefProducers = new ArrayList<CorbaTypeEventProducer>();
+        List<CorbaTypeEventProducer> objRefProducers = new ArrayList<>();
         
         String address = orb.object_to_string(handler.getReference());
         objRefProducers.add(new CorbaAddressEventProducer(address));
@@ -219,7 +219,7 @@ public final class CorbaObjectReferenceEventProducer extends AbstractStartEndEve
                                           CorbaInterfaceNameEventProducer intf) {
             name = new QName(CorbaObjectReferenceHelper.ADDRESSING_NAMESPACE_URI, "Metadata");
 
-            List<CorbaTypeEventProducer> metaDataProducers = new ArrayList<CorbaTypeEventProducer>();
+            List<CorbaTypeEventProducer> metaDataProducers = new ArrayList<>();
             metaDataProducers.add(svc);
 
             if (intf != null) {
@@ -230,7 +230,7 @@ public final class CorbaObjectReferenceEventProducer extends AbstractStartEndEve
             
             if (location != null) {
                 XMLEventFactory factory = XMLEventFactory.newInstance();
-                metaAttrs = new ArrayList<Attribute>();
+                metaAttrs = new ArrayList<>();
                 metaAttrs.add(factory.createAttribute(
                         new QName(WSDLI_NAMESPACE_URI, "wsdlLocation", "objrefns1"), location));
             }
@@ -267,10 +267,10 @@ public final class CorbaObjectReferenceEventProducer extends AbstractStartEndEve
             
             XMLEventFactory factory = XMLEventFactory.newInstance();
 
-            attributes = new ArrayList<Attribute>();
+            attributes = new ArrayList<>();
             attributes.add(factory.createAttribute("EndpointName", ep));
 
-            namespaces = new ArrayList<Namespace>();
+            namespaces = new ArrayList<>();
             namespaces.add(factory.createNamespace("objrefns2", svc.getNamespaceURI()));
         }
 
@@ -320,7 +320,7 @@ public final class CorbaObjectReferenceEventProducer extends AbstractStartEndEve
                              "InterfaceName");
             
             XMLEventFactory factory = XMLEventFactory.newInstance();
-            namespaces = new ArrayList<Namespace>();
+            namespaces = new ArrayList<>();
             namespaces.add(factory.createNamespace("objrefns2", intf.getNamespaceURI()));
         }
 

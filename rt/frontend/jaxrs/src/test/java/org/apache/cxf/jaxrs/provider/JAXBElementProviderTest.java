@@ -249,7 +249,7 @@ public class JAXBElementProviderTest extends Assert {
     @SuppressWarnings("unchecked")
     private void testXmlList(JAXBElementProvider<?> provider) throws Exception {
         
-        List<XmlObject> list = new ArrayList<XmlObject>();
+        List<XmlObject> list = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             MyObject o = new MyObject();
             o.setName("name #" + i);
@@ -340,12 +340,12 @@ public class JAXBElementProviderTest extends Assert {
         if (setName) {
             provider.setCollectionWrapperName("Books");
         }
-        List<Book> books = new ArrayList<Book>();
+        List<Book> books = new ArrayList<>();
         books.add(new Book("CXF in Action", 123L));
         books.add(new Book("CXF Rocks", 124L));
         @SuppressWarnings("unchecked")
         T o = (T)(type.isArray() ? books.toArray() : type == Set.class 
-            ? new HashSet<Book>(books) : books);
+            ? new HashSet<>(books) : books);
         
         Method m = CollectionsResource.class.getMethod(mName, new Class[0]);
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -729,7 +729,7 @@ public class JAXBElementProviderTest extends Assert {
     public void testWriteQualifiedCollection() throws Exception {
         JAXBElementProvider<List<TagVO2>> provider = new JAXBElementProvider<List<TagVO2>>();
         provider.setCollectionWrapperName("{http://tags}tags");
-        List<TagVO2> tags = new ArrayList<TagVO2>();
+        List<TagVO2> tags = new ArrayList<>();
         tags.add(new TagVO2("A", "B"));
         tags.add(new TagVO2("C", "D"));
         Method m = CollectionsResource.class.getMethod("getTags", new Class[0]);
@@ -1137,7 +1137,7 @@ public class JAXBElementProviderTest extends Assert {
     @Test
     public void testDropElements() throws Exception {
         JAXBElementProvider<ManyTags> provider = new JAXBElementProvider<ManyTags>();
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         list.add("tagVO");
         list.add("ManyTags");
         list.add("list");
@@ -1158,7 +1158,7 @@ public class JAXBElementProviderTest extends Assert {
     @Test
     public void testDropQualifiedElements() throws Exception {
         JAXBElementProvider<TagVO2> provider = new JAXBElementProvider<TagVO2>();
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         list.add("{http://tags}thetag");
         provider.setOutDropElements(list);
         Map<String, String> map = new HashMap<String, String>();
@@ -1212,7 +1212,7 @@ public class JAXBElementProviderTest extends Assert {
             b2 = ((Book[])o)[1];
         } else if (type == Set.class) {
             Set<Book> set = CastUtils.cast((Set<?>)o);
-            List<Book> books = new ArrayList<Book>(new TreeSet<Book>(set));
+            List<Book> books = new ArrayList<>(new TreeSet<Book>(set));
             b1 = books.get(0);
             b2 = books.get(1);
         } else {
@@ -1283,7 +1283,7 @@ public class JAXBElementProviderTest extends Assert {
     @Test
     public void testSetSchemasFromClasspath() {
         JAXBElementProvider<?> provider = new JAXBElementProvider<Object>();
-        List<String> locations = new ArrayList<String>();
+        List<String> locations = new ArrayList<>();
         locations.add("classpath:/test.xsd");
         provider.setSchemaLocations(locations);
         Schema s = provider.getSchema();
@@ -1303,7 +1303,7 @@ public class JAXBElementProviderTest extends Assert {
     @Test
     public void testSetSchemasFromDisk() throws Exception {
         JAXBElementProvider<?> provider = new JAXBElementProvider<Object>();
-        List<String> locations = new ArrayList<String>();
+        List<String> locations = new ArrayList<>();
         String loc = getClass().getClassLoader().getResource("test.xsd").toURI().getPath();
         
         locations.add("file:" + loc);
@@ -1315,7 +1315,7 @@ public class JAXBElementProviderTest extends Assert {
     @Test
     public void testWriteWithValidation() throws Exception {
         JAXBElementProvider<Book2> provider = new JAXBElementProvider<Book2>();
-        List<String> locations = new ArrayList<String>();
+        List<String> locations = new ArrayList<>();
         String loc = getClass().getClassLoader().getResource("book1.xsd").toURI().getPath();
         locations.add(loc);
         provider.setSchemaLocations(locations);
@@ -1337,7 +1337,7 @@ public class JAXBElementProviderTest extends Assert {
     @Test
     public void testWriteWithFailedValidation() throws Exception {
         JAXBElementProvider<Book2> provider = new JAXBElementProvider<Book2>();
-        List<String> locations = new ArrayList<String>();
+        List<String> locations = new ArrayList<>();
         String loc = getClass().getClassLoader().getResource("test.xsd").toURI().getPath();
         locations.add("file:" + loc);
         provider.setSchemaLocations(locations);

@@ -50,7 +50,7 @@ public class CustomAttributeProvider implements AttributeStatementProvider {
      * Get an AttributeStatementBean using the given parameters.
      */
     public AttributeStatementBean getStatement(TokenProviderParameters providerParameters) {
-        List<AttributeBean> attributeList = new ArrayList<AttributeBean>();
+        List<AttributeBean> attributeList = new ArrayList<>();
 
         TokenRequirements tokenRequirements = providerParameters.getTokenRequirements();
         String tokenType = tokenRequirements.getTokenType();

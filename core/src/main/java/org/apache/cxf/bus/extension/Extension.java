@@ -41,7 +41,7 @@ public class Extension {
     protected volatile Class<?> intf;
     protected String interfaceName;
     protected boolean deferred;
-    protected Collection<String> namespaces = new ArrayList<String>();
+    protected Collection<String> namespaces = new ArrayList<>();
     protected Object args[];
     protected volatile Object obj;
     protected boolean optional;
@@ -264,7 +264,7 @@ public class Extension {
             }
         } catch (NoSuchMethodException ex) {
             notFound = true;
-            List<Object> a = new ArrayList<Object>();
+            List<Object> a = new ArrayList<>();
             if (b != null) {
                 a.add(b);
             }

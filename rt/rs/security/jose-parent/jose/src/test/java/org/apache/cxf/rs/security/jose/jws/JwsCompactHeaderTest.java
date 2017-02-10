@@ -166,7 +166,7 @@ public class JwsCompactHeaderTest extends Assert {
         String criticalValue3 = "criticalValue3";
         JwsCompactProducer producer = new JwsCompactProducer(payload);
         producer.getJwsHeaders().setSignatureAlgorithm(SignatureAlgorithm.HS512);
-        List<String> criticalHeader = new ArrayList<String>();
+        List<String> criticalHeader = new ArrayList<>();
         criticalHeader.add(criticalParameter1);
         producer.getJwsHeaders().setCritical(criticalHeader);
         producer.signWith(new HmacJwsSignatureProvider(ENCODED_MAC_KEY, SignatureAlgorithm.HS256));
@@ -187,7 +187,7 @@ public class JwsCompactHeaderTest extends Assert {
         consumer = new JwsCompactConsumer(signedJws);
         assertTrue(consumer.validateCriticalHeaders());
     
-        criticalHeader = new ArrayList<String>();
+        criticalHeader = new ArrayList<>();
         criticalHeader.add(criticalParameter);
         criticalHeader.add(criticalParameter);
         producer = new JwsCompactProducer(payload);

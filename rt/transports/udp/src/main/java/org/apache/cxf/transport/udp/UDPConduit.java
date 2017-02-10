@@ -120,7 +120,7 @@ public class UDPConduit extends AbstractConduit {
                     }
                 }
                 if (mp != null) {
-                    Collection<String> s = new ArrayList<String>(message.getExchange().keySet());
+                    Collection<String> s = new ArrayList<>(message.getExchange().keySet());
                     for (String s2 : s) {
                         message.getExchange().remove(s2);
                     }

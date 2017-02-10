@@ -51,7 +51,7 @@ public class ServiceImpl extends AbstractAttributedInterceptorProvider implement
     }
     
     public ServiceImpl(ServiceInfo si) {
-        serviceInfos = new ArrayList<ServiceInfo>();
+        serviceInfos = new ArrayList<>();
         if (si != null) {
             serviceInfos.add(si);
         }

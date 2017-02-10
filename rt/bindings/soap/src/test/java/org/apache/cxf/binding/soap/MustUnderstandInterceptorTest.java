@@ -164,8 +164,8 @@ public class MustUnderstandInterceptorTest extends TestBase {
         private boolean calledGetRoles;
         private boolean calledGetUnderstood;
 
-        private Set<URI> roles = new HashSet<URI>();
-        private Set<QName> understood = new HashSet<QName>();
+        private Set<URI> roles = new HashSet<>();
+        private Set<QName> understood = new HashSet<>();
 
 
         DummySoapInterceptor(String phase) {

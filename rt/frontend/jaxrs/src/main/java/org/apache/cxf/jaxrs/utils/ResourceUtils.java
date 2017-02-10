@@ -113,7 +113,7 @@ public final class ResourceUtils {
     private static final String NO_VOID_RETURN_ASYNC_MESSAGE_ID = "NO_VOID_RETURN_ASYNC_METHOD";
     private static final Set<String> SERVER_PROVIDER_CLASS_NAMES;
     static {
-        SERVER_PROVIDER_CLASS_NAMES = new HashSet<String>();
+        SERVER_PROVIDER_CLASS_NAMES = new HashSet<>();
         SERVER_PROVIDER_CLASS_NAMES.add("javax.ws.rs.ext.MessageBodyWriter");
         SERVER_PROVIDER_CLASS_NAMES.add("javax.ws.rs.ext.MessageBodyReader");
         SERVER_PROVIDER_CLASS_NAMES.add("javax.ws.rs.ext.ExceptionMapper");
@@ -412,7 +412,7 @@ public final class ResourceUtils {
             return CastUtils.cast(Collections.emptyList(), Parameter.class);
         }
         Class<?>[] types = resourceMethod.getParameterTypes();
-        List<Parameter> params = new ArrayList<Parameter>(paramAnns.length);
+        List<Parameter> params = new ArrayList<>(paramAnns.length);
         for (int i = 0; i < paramAnns.length; i++) {
             Parameter p = getParameter(i, paramAnns[i], types[i]);
             params.add(p);
@@ -581,7 +581,7 @@ public final class ResourceUtils {
     }
     
     public static List<UserResource> getResourcesFromElement(Element modelEl) {
-        List<UserResource> resources = new ArrayList<UserResource>();
+        List<UserResource> resources = new ArrayList<>();
         List<Element> resourceEls = 
             DOMUtils.findAllElementsByTagNameNS(modelEl, 
                                                 "http://cxf.apache.org/jaxrs", "resource");
@@ -730,7 +730,7 @@ public final class ResourceUtils {
         List<Element> operEls = 
             DOMUtils.findAllElementsByTagNameNS(e, 
                  "http://cxf.apache.org/jaxrs", "operation");
-        List<UserOperation> opers = new ArrayList<UserOperation>(operEls.size());
+        List<UserOperation> opers = new ArrayList<>(operEls.size());
         for (Element operEl : operEls) {
             opers.add(getOperationFromElement(operEl));
         }
@@ -749,7 +749,7 @@ public final class ResourceUtils {
         List<Element> paramEls = 
             DOMUtils.findAllElementsByTagNameNS(e, 
                  "http://cxf.apache.org/jaxrs", "param");
-        List<Parameter> params = new ArrayList<Parameter>(paramEls.size());
+        List<Parameter> params = new ArrayList<>(paramEls.size());
         for (int i = 0; i < paramEls.size(); i++) {
             Element paramEl = paramEls.get(i);
             Parameter p = new Parameter(paramEl.getAttribute("type"), i, paramEl.getAttribute("name"));
@@ -825,8 +825,8 @@ public final class ResourceUtils {
         verifySingletons(singletons);
         
         List<Class<?>> resourceClasses = new ArrayList<Class<?>>();
-        List<Object> providers = new ArrayList<Object>();
-        List<Feature> features = new ArrayList<Feature>();
+        List<Object> providers = new ArrayList<>();
+        List<Feature> features = new ArrayList<>();
         Map<Class<?>, ResourceProvider> map = new HashMap<Class<?>, ResourceProvider>();
         
         // Note, app.getClasses() returns a list of per-request classes
@@ -933,7 +933,7 @@ public final class ResourceUtils {
         if (singletons.isEmpty()) {
             return;
         }
-        Set<String> map = new HashSet<String>(); 
+        Set<String> map = new HashSet<>(); 
         for (Object s : singletons) {
             if (map.contains(s.getClass().getName())) {
                 throw new RuntimeException("More than one instance of the same singleton class "

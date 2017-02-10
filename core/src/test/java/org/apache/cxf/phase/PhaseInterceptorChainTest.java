@@ -167,7 +167,7 @@ public class PhaseInterceptorChainTest extends Assert {
     @Test
     public void testAddTwoInterceptorsSamePhase() throws Exception {
         AbstractPhaseInterceptor<? extends Message> p1 = setUpPhaseInterceptor("phase1", "p1");
-        Set<String> after = new HashSet<String>();
+        Set<String> after = new HashSet<>();
         after.add("p1");
         AbstractPhaseInterceptor<? extends Message> p2 = setUpPhaseInterceptor("phase1", "p2", null, after);
         control.replay();
@@ -183,10 +183,10 @@ public class PhaseInterceptorChainTest extends Assert {
     @Test
     public void testThreeInterceptorSamePhaseWithOrder() throws Exception {
         AbstractPhaseInterceptor<? extends Message> p1 = setUpPhaseInterceptor("phase1", "p1");
-        Set<String> before = new HashSet<String>();
+        Set<String> before = new HashSet<>();
         before.add("p1");
         AbstractPhaseInterceptor<? extends Message> p2 = setUpPhaseInterceptor("phase1", "p2", before, null);
-        Set<String> before1 = new HashSet<String>();
+        Set<String> before1 = new HashSet<>();
         before1.add("p2");
         AbstractPhaseInterceptor<? extends Message> p3 = setUpPhaseInterceptor("phase1", "p3", before1, null);
         control.replay();
@@ -333,7 +333,7 @@ public class PhaseInterceptorChainTest extends Assert {
 
         AbstractPhaseInterceptor<Message> p2 = setUpPhaseInterceptor("phase1", "p2");
         setUpPhaseInterceptorInvocations(p2, false, false);
-        Set<String> after3 = new HashSet<String>();
+        Set<String> after3 = new HashSet<>();
         after3.add("p2");
         AbstractPhaseInterceptor<Message> p3 = setUpPhaseInterceptor("phase1", "p3", null, after3);
         setUpPhaseInterceptorInvocations(p3, false, false);

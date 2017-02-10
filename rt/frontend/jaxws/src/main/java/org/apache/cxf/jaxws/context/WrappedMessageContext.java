@@ -367,7 +367,7 @@ public class WrappedMessageContext implements MessageContext {
             dataHandlers = ((WrappedAttachments) attachments).getAttachments();
         } else {
             if (attachments == null) {
-                attachments = new ArrayList<Attachment>();
+                attachments = new ArrayList<>();
                 mc.put(Message.ATTACHMENTS, attachments);
             }
             dataHandlers = AttachmentUtil.getDHMap(attachments);
@@ -384,7 +384,7 @@ public class WrappedMessageContext implements MessageContext {
 
     // map to jaxws
     public final Set<String> keySet() {
-        Set<String> set = new HashSet<String>();
+        Set<String> set = new HashSet<>();
         for (String s : message.keySet()) {
             set.add(s);
             set.add(mapKeyReverse(s));

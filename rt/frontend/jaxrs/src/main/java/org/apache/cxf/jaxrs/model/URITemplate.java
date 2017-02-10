@@ -46,8 +46,8 @@ public final class URITemplate {
     private static final String SLASH_QUOTE = "/;";
     
     private final String template;
-    private final List<String> variables = new ArrayList<String>();
-    private final List<String> customVariables = new ArrayList<String>();
+    private final List<String> variables = new ArrayList<>();
+    private final List<String> customVariables = new ArrayList<>();
     private final Pattern templateRegexPattern;
     private final String literals;
     private final List<UriChunk> uriChunks;
@@ -57,7 +57,7 @@ public final class URITemplate {
         StringBuilder literalChars = new StringBuilder();
         StringBuilder patternBuilder = new StringBuilder();
         CurlyBraceTokenizer tok = new CurlyBraceTokenizer(template);
-        uriChunks = new ArrayList<UriChunk>();
+        uriChunks = new ArrayList<>();
         while (tok.hasNext()) {
             String templatePart = tok.next();
             UriChunk chunk = UriChunk.createUriChunk(templatePart);
@@ -508,7 +508,7 @@ public final class URITemplate {
      */
     static class CurlyBraceTokenizer {
 
-        private List<String> tokens = new ArrayList<String>();
+        private List<String> tokens = new ArrayList<>();
         private int tokenIdx;
 
         CurlyBraceTokenizer(String string) {

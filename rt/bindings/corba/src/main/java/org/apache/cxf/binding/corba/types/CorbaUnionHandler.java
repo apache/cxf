@@ -37,9 +37,9 @@ public class CorbaUnionHandler extends CorbaObjectHandler {
 
     private CorbaObjectHandler discriminator;
     private CorbaObjectHandler value;
-    private List<CorbaObjectHandler> cases = new ArrayList<CorbaObjectHandler>();
+    private List<CorbaObjectHandler> cases = new ArrayList<>();
     private int defaultIndex;
-    private List<String> labels = new ArrayList<String>();
+    private List<String> labels = new ArrayList<>();
 
     public CorbaUnionHandler(QName unionName, QName unionIdlType, TypeCode unionTC, Object unionType) {
         super(unionName, unionIdlType, unionTC, unionType);

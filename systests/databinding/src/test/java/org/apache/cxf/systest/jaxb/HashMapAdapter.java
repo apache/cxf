@@ -62,7 +62,7 @@ public class HashMapAdapter extends XmlAdapter<HashMapAdapter.HashMapType, Map<S
     }
 
     public static class HashMapType {
-        private List<HashMapEntryType> entry = new ArrayList<HashMapEntryType>();
+        private List<HashMapEntryType> entry = new ArrayList<>();
 
         public List<HashMapEntryType> getEntry() {
             return entry;

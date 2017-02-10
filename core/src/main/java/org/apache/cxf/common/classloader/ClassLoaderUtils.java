@@ -140,7 +140,7 @@ public final class ClassLoaderUtils {
      * @param callingClass The Class object of the calling object
      */
     public static List<URL> getResources(String resourceName, Class<?> callingClass) {
-        List<URL> ret = new ArrayList<URL>();
+        List<URL> ret = new ArrayList<>();
         Enumeration<URL> urls = new Enumeration<URL>() {
             public boolean hasMoreElements() {
                 return false;

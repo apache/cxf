@@ -45,7 +45,7 @@ public class CXFController {
     private ConfigurationAdmin configAdmin;
 
     public List<Bus> getBusses() {
-        List<Bus> busses = new ArrayList<Bus>();
+        List<Bus> busses = new ArrayList<>();
         try {
             ServiceReference[] references = bundleContext.getServiceReferences(Bus.class.getName(), null);
             if (references != null) {

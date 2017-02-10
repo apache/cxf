@@ -191,7 +191,7 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
 
     JAXBContext context;
     Set<Class<?>> contextClasses;
-    Collection<Object> typeRefs = new ArrayList<Object>();
+    Collection<Object> typeRefs = new ArrayList<>();
 
     Class<?> cls;
 
@@ -372,7 +372,7 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
                     throw new ServiceConstructionException("SCHEMA_GEN_EXC", LOG, e);
                 }
             }
-            Set<String> ids = new HashSet<String>();
+            Set<String> ids = new HashSet<>();
             for (DOMSource r : schemas) {
                 ids.add(r.getSystemId());
             }
@@ -620,10 +620,10 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
 
     public WrapperHelper createWrapperHelper(Class<?> wrapperType, QName wrapperName, List<String> partNames,
                                              List<String> elTypeNames, List<Class<?>> partClasses) {
-        List<Method> getMethods = new ArrayList<Method>(partNames.size());
-        List<Method> setMethods = new ArrayList<Method>(partNames.size());
-        List<Method> jaxbMethods = new ArrayList<Method>(partNames.size());
-        List<Field> fields = new ArrayList<Field>(partNames.size());
+        List<Method> getMethods = new ArrayList<>(partNames.size());
+        List<Method> setMethods = new ArrayList<>(partNames.size());
+        List<Method> jaxbMethods = new ArrayList<>(partNames.size());
+        List<Field> fields = new ArrayList<>(partNames.size());
 
         Method allMethods[] = wrapperType.getMethods();
         String packageName = PackageUtils.getPackageName(wrapperType);

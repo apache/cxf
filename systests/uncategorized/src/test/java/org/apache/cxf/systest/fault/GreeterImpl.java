@@ -40,7 +40,7 @@ public class GreeterImpl {
     
     public BareDocumentResponse testDocLitFault(String in) throws BadRecordLitFault {
         //System.out.println("Executing testDocLitFault sayHi\n");
-        List<Header> headers = new ArrayList<Header>();
+        List<Header> headers = new ArrayList<>();
         Header header = null;
         try {
             header = new Header(new QName("http://test", "test"), 

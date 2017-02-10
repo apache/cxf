@@ -99,7 +99,7 @@ public class FIStaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
                 = CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
             List<String> accepts = headers.get("Accept");
             if (accepts == null) {
-                accepts = new ArrayList<String>();
+                accepts = new ArrayList<>();
                 headers.put("Accept", accepts);
             }
             String a = "application/fastinfoset";

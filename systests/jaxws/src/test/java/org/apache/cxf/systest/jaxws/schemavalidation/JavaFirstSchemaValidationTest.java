@@ -52,7 +52,7 @@ public class JavaFirstSchemaValidationTest extends Assert {
     static final String PORT2 = TestUtil.getNewPortNumber(JavaFirstSchemaValidationTest.class);
     static final String PORT_UNUSED = TestUtil.getNewPortNumber(JavaFirstSchemaValidationTest.class);
 
-    private static List<Server> serverList = new ArrayList<Server>();
+    private static List<Server> serverList = new ArrayList<>();
     private static PersonServiceAnnotated annotatedClient;
     private static PersonService client;
     private static PersonServiceRPC rpcClient;

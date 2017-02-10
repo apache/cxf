@@ -35,7 +35,7 @@ import org.apache.type_substitution.Porsche;
 public class CarDealerImpl implements CarDealer {
     public List<Car> getSedans(String carType) {
         if (carType.equalsIgnoreCase("Porsche")) {
-            List<Car> cars = new ArrayList<Car>();
+            List<Car> cars = new ArrayList<>();
             cars.add(newPorsche("Boxster", "1998", "white"));
             cars.add(newPorsche("BoxsterS", "1999", "red"));
             return cars;

@@ -41,8 +41,8 @@ public class CORBADocLitClientTypeTest extends AbstractTypeTestClient5 {
     protected static final QName PORT_NAME = new QName("http://apache.org/type_test/doc",
                                                        "TypeTestCORBAPort");
 
-    private static final Set<String> NOT_WORKING_TESTS = new HashSet<String>();
-    private static final Set<String> RUN_TESTS = new HashSet<String>();
+    private static final Set<String> NOT_WORKING_TESTS = new HashSet<>();
+    private static final Set<String> RUN_TESTS = new HashSet<>();
     static {
         
         String notWorking[] = new String[] {

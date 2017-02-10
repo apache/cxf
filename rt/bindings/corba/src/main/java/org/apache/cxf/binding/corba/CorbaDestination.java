@@ -222,7 +222,7 @@ public class CorbaDestination implements MultiplexDestination {
         }
         
         
-        List<String> orbArgs = new ArrayList<String>(orbConfig.getOrbArgs());
+        List<String> orbArgs = new ArrayList<>(orbConfig.getOrbArgs());
 
         String scheme = addressURI.getScheme();
         // A corbaloc address gives us host and port information to use when
@@ -393,7 +393,7 @@ public class CorbaDestination implements MultiplexDestination {
     }
 
     protected POA createPOA(String name, POA parentPOA, POAManager poaManager) {
-        List<Policy> policies = new ArrayList<Policy>();
+        List<Policy> policies = new ArrayList<>();
         policies.add(parentPOA
                 .create_thread_policy(ThreadPolicyValue.ORB_CTRL_MODEL));
 

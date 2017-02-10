@@ -203,7 +203,7 @@ public class MetadataWriter {
             throw new RuntimeException("Unsupported signature method: " + signingCert.getSigAlgName());
         }
 
-        List<Transform> transformList = new ArrayList<Transform>();
+        List<Transform> transformList = new ArrayList<>();
         transformList.add(XML_SIGNATURE_FACTORY.newTransform(Transform.ENVELOPED, (TransformParameterSpec)null));
         transformList.add(XML_SIGNATURE_FACTORY.newCanonicalizationMethod(CanonicalizationMethod.EXCLUSIVE,
                                                                           (C14NMethodParameterSpec)null));
@@ -228,7 +228,7 @@ public class MetadataWriter {
 
         // Create the KeyInfo containing the X509Data.
         KeyInfoFactory kif = XML_SIGNATURE_FACTORY.getKeyInfoFactory();
-        List<Object> x509Content = new ArrayList<Object>();
+        List<Object> x509Content = new ArrayList<>();
         x509Content.add(signingCert.getSubjectX500Principal().getName());
         x509Content.add(signingCert);
         X509Data xd = kif.newX509Data(x509Content);

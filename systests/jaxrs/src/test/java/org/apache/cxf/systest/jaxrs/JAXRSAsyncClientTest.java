@@ -186,7 +186,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
     @Test
     public void testNonExistent() throws Exception {
         String address = "http://168.168.168.168/bookstore";
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new TestResponseFilter());
         WebClient wc =  WebClient.create(address, providers);
         Future<Book> future = wc.async().get(Book.class);
@@ -243,7 +243,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
     @Test
     public void testPostBookProcessingException() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/";
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new FaultyBookWriter());
         WebClient wc = WebClient.create(address, providers);
         
@@ -260,7 +260,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
     @Test
     public void testGetBookResponseProcessingException() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/books/123";
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new FaultyBookReader());
         WebClient wc = WebClient.create(address, providers);
         
@@ -425,7 +425,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         
     }
     private WebClient createWebClient(String address) {
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         return WebClient.create(address, providers);
     }
     

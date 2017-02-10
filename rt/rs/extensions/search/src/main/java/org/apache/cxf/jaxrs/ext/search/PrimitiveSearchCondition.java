@@ -59,7 +59,7 @@ public class PrimitiveSearchCondition<T> implements SearchCondition<T> {
     }
     
     public List<T> findAll(Collection<T> pojos) {
-        List<T> result = new ArrayList<T>();
+        List<T> result = new ArrayList<>();
         for (T pojo : pojos) {
             if (isMet(pojo)) {
                 result.add(pojo);

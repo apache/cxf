@@ -63,7 +63,7 @@ public abstract class BeanResourceInfo extends AbstractResourceInfo {
             for (Annotation a : f.getAnnotations()) {
                 if (AnnotationUtils.isParamAnnotationClass(a.annotationType())) {
                     if (paramFields == null) {
-                        paramFields = new ArrayList<Field>();
+                        paramFields = new ArrayList<>();
                     }
                     paramsAvailable = true;
                     paramFields.add(f);
@@ -95,7 +95,7 @@ public abstract class BeanResourceInfo extends AbstractResourceInfo {
     
     private void addParamMethod(Method m) {
         if (paramMethods == null) {
-            paramMethods = new ArrayList<Method>();
+            paramMethods = new ArrayList<>();
         }
         paramsAvailable = true;
         paramMethods.add(m);

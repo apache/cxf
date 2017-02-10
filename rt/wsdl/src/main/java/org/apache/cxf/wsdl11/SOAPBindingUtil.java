@@ -201,7 +201,7 @@ public final class SOAPBindingUtil {
     }
 
     public static List<SOAPHeader> getSoapHeaders(List<ExtensibilityElement> exts) {
-        List<SOAPHeader> headers = new ArrayList<SOAPHeader>();
+        List<SOAPHeader> headers = new ArrayList<>();
         if (exts != null) {
             for (ExtensibilityElement ext : exts) {
                 if (isSOAPHeader(ext)) {
@@ -277,7 +277,7 @@ public final class SOAPBindingUtil {
     }
 
     public static List<SOAPFault> getBindingOperationSoapFaults(BindingOperation bop) {
-        List<SOAPFault> faults = new ArrayList<SOAPFault>();
+        List<SOAPFault> faults = new ArrayList<>();
         for (Object obj : bop.getBindingFaults().values()) {
             if (!(obj instanceof BindingFault)) {
                 continue;

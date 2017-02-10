@@ -36,7 +36,7 @@ public class LazyAttachmentCollection
     implements Collection<Attachment> {
     
     private AttachmentDeserializer deserializer;
-    private final List<Attachment> attachments = new ArrayList<Attachment>();
+    private final List<Attachment> attachments = new ArrayList<>();
     
     public LazyAttachmentCollection(AttachmentDeserializer deserializer) {
         super();

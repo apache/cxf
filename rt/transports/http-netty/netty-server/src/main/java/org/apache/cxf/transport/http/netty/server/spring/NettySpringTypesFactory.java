@@ -120,7 +120,7 @@ public final class NettySpringTypesFactory {
                                            QName name, 
                                            Class<?> c,
                                            JAXBContext context) throws JAXBException {
-        List<V> list = new ArrayList<V>();
+        List<V> list = new ArrayList<>();
         Node data = null;
            
         Unmarshaller u = context.createUnmarshaller();

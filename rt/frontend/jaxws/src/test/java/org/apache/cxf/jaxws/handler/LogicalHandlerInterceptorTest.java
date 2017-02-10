@@ -111,7 +111,7 @@ public class LogicalHandlerInterceptorTest extends Assert {
     //NOTE: commented out as this has been covered by other tests.
     public void xtestReturnFalseClientSide() throws Exception {
         @SuppressWarnings("rawtypes")
-        List<Handler> list = new ArrayList<Handler>();
+        List<Handler> list = new ArrayList<>();
         list.add(new LogicalHandler<LogicalMessageContext>() {
             public void close(MessageContext arg0) {
             }

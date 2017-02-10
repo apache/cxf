@@ -368,10 +368,10 @@ public final class FileUtils {
     }
 
     public static List<File> getFiles(File dir, final String pattern, File exclude) {
-        return getFilesRecurse(dir, Pattern.compile(pattern), exclude, false, new ArrayList<File>());
+        return getFilesRecurse(dir, Pattern.compile(pattern), exclude, false, new ArrayList<>());
     }
     public static List<File> getFilesRecurse(File dir, final String pattern, File exclude) {
-        return getFilesRecurse(dir, Pattern.compile(pattern), exclude, true, new ArrayList<File>());    
+        return getFilesRecurse(dir, Pattern.compile(pattern), exclude, true, new ArrayList<>());    
     }
     private static List<File> getFilesRecurse(File dir, 
                                               Pattern pattern,
@@ -398,9 +398,9 @@ public final class FileUtils {
 
     public static List<String> readLines(File file) throws Exception {
         if (!file.exists()) {
-            return new ArrayList<String>();
+            return new ArrayList<>();
         }
-        List<String> results = new ArrayList<String>();
+        List<String> results = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line = reader.readLine();
             while (line != null) {

@@ -29,7 +29,7 @@ import java.util.Set;
  */
 public class ProxyClassLoader extends ClassLoader {
     private final Class<?> classes[];
-    private final Set<ClassLoader> loaders = new HashSet<ClassLoader>();
+    private final Set<ClassLoader> loaders = new HashSet<>();
     private boolean checkSystem;
 
     public ProxyClassLoader(ClassLoader parent) {

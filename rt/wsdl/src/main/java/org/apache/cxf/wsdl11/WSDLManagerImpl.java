@@ -304,7 +304,7 @@ public class WSDLManagerImpl implements WSDLManager {
 
     public void removeDefinition(Definition wsdl) {
         synchronized (definitionsMap) {
-            List<Object> keys = new ArrayList<Object>();
+            List<Object> keys = new ArrayList<>();
             for (Map.Entry<Object, Definition> e : definitionsMap.entrySet()) {
                 if (e.getValue() == wsdl) {
                     keys.add(e.getKey());

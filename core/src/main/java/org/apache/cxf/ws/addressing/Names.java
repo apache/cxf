@@ -176,7 +176,7 @@ public final class Names {
      */
     public static final Set<QName> HEADERS;
     static {
-        Set<QName> headers = new HashSet<QName>();
+        Set<QName> headers = new HashSet<>();
         headers.add(WSA_FROM_QNAME);
         headers.add(WSA_TO_QNAME);
         headers.add(WSA_REPLYTO_QNAME);

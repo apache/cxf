@@ -39,7 +39,7 @@ import org.apache.xml.security.utils.ClassLoaderUtils;
  * Extend the DefaultEHCacheCodeDataProvider to allow refreshing of tokens
  */
 public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
-    private Set<String> externalClients = new HashSet<String>();
+    private Set<String> externalClients = new HashSet<>();
     public OAuthDataProviderImpl(String servicePort) throws Exception {
         // filters/grants test client
         Client client = new Client("consumer-id", "this-is-a-secret", true);

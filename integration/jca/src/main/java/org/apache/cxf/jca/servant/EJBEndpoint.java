@@ -111,7 +111,7 @@ public class EJBEndpoint {
         engine.setThreadPool(new WorkManagerThreadPool(getWorkManager()));
         engine.setPort(port);
         
-        List<JettyHTTPServerEngine> engineList = new ArrayList<JettyHTTPServerEngine>();
+        List<JettyHTTPServerEngine> engineList = new ArrayList<>();
         engineList.add(engine);
         engineFactory.setEnginesList(engineList);
     }

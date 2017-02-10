@@ -136,7 +136,7 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
 
         ClaimCollection requestedClaims = createRequestClaimCollection();
 
-        List<URI> expectedClaims = new ArrayList<URI>();
+        List<URI> expectedClaims = new ArrayList<>();
         expectedClaims.add(ClaimTypes.FIRSTNAME);
         expectedClaims.add(ClaimTypes.LASTNAME);
         expectedClaims.add(ClaimTypes.EMAILADDRESS);
@@ -167,7 +167,7 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
 
         ClaimCollection requestedClaims = createRequestClaimCollection();
 
-        List<URI> expectedClaims = new ArrayList<URI>();
+        List<URI> expectedClaims = new ArrayList<>();
         expectedClaims.add(ClaimTypes.FIRSTNAME);
         expectedClaims.add(ClaimTypes.LASTNAME);
         expectedClaims.add(ClaimTypes.EMAILADDRESS);
@@ -203,7 +203,7 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
 
         ClaimCollection requestedClaims = createRequestClaimCollection();
 
-        List<URI> expectedClaims = new ArrayList<URI>();
+        List<URI> expectedClaims = new ArrayList<>();
         expectedClaims.add(ClaimTypes.FIRSTNAME);
         expectedClaims.add(ClaimTypes.LASTNAME);
         expectedClaims.add(ClaimTypes.EMAILADDRESS);
@@ -302,7 +302,7 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
         requestedClaims.add(claim);
 
         // Gender is not expected to be returned because not supported
-        List<URI> expectedClaims = new ArrayList<URI>();
+        List<URI> expectedClaims = new ArrayList<>();
         expectedClaims.add(ClaimTypes.FIRSTNAME);
         expectedClaims.add(ClaimTypes.LASTNAME);
         expectedClaims.add(ClaimTypes.EMAILADDRESS);
@@ -365,7 +365,7 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
         claim.setOptional(true);
         requestedClaims.add(claim);
         
-        List<URI> expectedClaims = new ArrayList<URI>();
+        List<URI> expectedClaims = new ArrayList<>();
         expectedClaims.add(ClaimTypes.FIRSTNAME);
         expectedClaims.add(ClaimTypes.LASTNAME);
         expectedClaims.add(ClaimTypes.EMAILADDRESS);

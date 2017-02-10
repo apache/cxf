@@ -210,7 +210,7 @@ public class JMSSharedQueueTest extends AbstractVmJMSTest {
 
         HelloWorldPortType port = markForClose(service.getPort(portName, HelloWorldPortType.class, cff));
 
-        Collection<ClientRunnable> clients = new ArrayList<ClientRunnable>();
+        Collection<ClientRunnable> clients = new ArrayList<>();
         for (int i = 0; i < 1; ++i) {
             clients.add(new ClientRunnable(port));
         }
@@ -256,7 +256,7 @@ public class JMSSharedQueueTest extends AbstractVmJMSTest {
         HelloWorldPortType portEng = markForClose(service.getPort(portNameEng, HelloWorldPortType.class, cff));
         HelloWorldPortType portSales = markForClose(service.getPort(portNameSales, HelloWorldPortType.class, cff));
 
-        Collection<ClientRunnable> clients = new ArrayList<ClientRunnable>();
+        Collection<ClientRunnable> clients = new ArrayList<>();
         for (int i = 0; i < 10; ++i) {
             clients.add(new ClientRunnable(portEng, "com.mycompany.eng:"));
             clients.add(new ClientRunnable(portSales, "com.mycompany.sales:"));
@@ -274,7 +274,7 @@ public class JMSSharedQueueTest extends AbstractVmJMSTest {
             new HelloWorldServiceRuntimeCorrelationIDDynamicPrefix(wsdl, serviceName);
         HelloWorldPortType port = markForClose(service.getPort(portName, HelloWorldPortType.class, cff));
 
-        Collection<ClientRunnable> clients = new ArrayList<ClientRunnable>();
+        Collection<ClientRunnable> clients = new ArrayList<>();
         for (int i = 0; i < 10; ++i) {
             clients.add(new ClientRunnable(port));
         }

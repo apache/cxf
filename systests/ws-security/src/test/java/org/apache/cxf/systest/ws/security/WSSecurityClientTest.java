@@ -266,7 +266,7 @@ public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
         // with the explicitly configured SAAJOutInterceptor
         //
         @SuppressWarnings("rawtypes")
-        List<Handler> handlerChain = new ArrayList<Handler>();
+        List<Handler> handlerChain = new ArrayList<>();
         Binding binding = ((BindingProvider)greeter).getBinding();
         TestOutHandler handler = new TestOutHandler();
         handlerChain.add(handler);

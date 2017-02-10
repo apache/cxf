@@ -50,7 +50,7 @@ public class OAuthScopesFilter implements ContainerRequestFilter {
     private static final Logger LOG = LogUtils.getL7dLogger(OAuthScopesFilter.class);
     private static final Set<String> SKIP_METHODS;
     static {
-        SKIP_METHODS = new HashSet<String>();
+        SKIP_METHODS = new HashSet<>();
         SKIP_METHODS.addAll(Arrays.asList(
             new String[] {"wait", "notify", "notifyAll", 
                           "equals", "toString", "hashCode"}));
@@ -60,7 +60,7 @@ public class OAuthScopesFilter implements ContainerRequestFilter {
     private MessageContext mc;
     private Map<String, List<String>> scopesMap = new HashMap<String, List<String>>();
     private Map<String, Boolean> scopesMatchAllMap = new HashMap<String, Boolean>();
-    private Set<String> confidentialClientMethods = new HashSet<String>();
+    private Set<String> confidentialClientMethods = new HashSet<>();
    
     public void setSecuredObject(Object object) {
         Class<?> cls = ClassHelper.getRealClass(object);

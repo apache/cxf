@@ -286,7 +286,7 @@ public abstract class AbstractDataBinding implements DataBinding {
     protected static void checkNamespaceMap(Map<String, String> namespaceMap) {
         // make some checks. This is a map from namespace to prefix, but we want unique prefixes.
         if (namespaceMap != null) {
-            Set<String> prefixesSoFar = new HashSet<String>();
+            Set<String> prefixesSoFar = new HashSet<>();
             for (Map.Entry<String, String> mapping : namespaceMap.entrySet()) {
                 if (prefixesSoFar.contains(mapping.getValue())) {
                     throw new IllegalArgumentException("Duplicate prefix " + mapping.getValue());

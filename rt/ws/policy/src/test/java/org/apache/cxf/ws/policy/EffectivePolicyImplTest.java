@@ -99,7 +99,7 @@ public class EffectivePolicyImplTest extends Assert {
         EndpointPolicyImpl endpointPolicy = control.createMock(EndpointPolicyImpl.class);
         Policy p = control.createMock(Policy.class);
         EasyMock.expect(endpointPolicy.getPolicy()).andReturn(p);
-        Collection<Assertion> chosenAlternative = new ArrayList<Assertion>();
+        Collection<Assertion> chosenAlternative = new ArrayList<>();
         EasyMock.expect(endpointPolicy.getChosenAlternative()).andReturn(chosenAlternative);
         PolicyEngineImpl pe = new PolicyEngineImpl();
         effectivePolicy.initialiseInterceptors(pe, false, msg);
@@ -268,7 +268,7 @@ public class EffectivePolicyImplTest extends Assert {
         
         control.reset();        
         EasyMock.expect(engine.getAlternativeSelector()).andReturn(selector);
-        Collection<Assertion> alternative = new ArrayList<Assertion>();
+        Collection<Assertion> alternative = new ArrayList<>();
         EasyMock.expect(selector.selectAlternative(policy, engine, assertor, null, m)).andReturn(alternative);
         control.replay();        
         epi.chooseAlternative(engine, assertor, m);
@@ -300,7 +300,7 @@ public class EffectivePolicyImplTest extends Assert {
     @SuppressWarnings("unchecked")
     private void testInitialiseInterceptors(boolean useIn, boolean fault) {
         EffectivePolicyImpl epi = new EffectivePolicyImpl();        
-        List<Assertion> alternative = new ArrayList<Assertion>();
+        List<Assertion> alternative = new ArrayList<>();
         epi.setChosenAlternative(alternative);
         
         PolicyEngineImpl engine = control.createMock(PolicyEngineImpl.class);

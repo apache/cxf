@@ -44,7 +44,7 @@ import org.apache.cxf.common.util.StringUtils;
 public class CachingXmlEventWriter implements XMLStreamWriter {
     protected XMLEventFactory factory;
     
-    List<XMLEvent> events = new ArrayList<XMLEvent>(1000);
+    List<XMLEvent> events = new ArrayList<>(1000);
     Stack<NSContext> contexts = new Stack<NSContext>();
     Stack<QName> elNames = new Stack<QName>();
     QName lastStart;
@@ -266,7 +266,7 @@ public class CachingXmlEventWriter implements XMLStreamWriter {
         }
 
         public Iterator<String> getPrefixes(String namespaceURI) {
-            List<String> l = new ArrayList<String>();
+            List<String> l = new ArrayList<>();
             for (Map.Entry<String, String> e : map.entrySet()) {
                 if (e.getValue().equals(namespaceURI)) {
                     l.add(e.getKey());

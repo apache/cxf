@@ -31,7 +31,7 @@ import org.apache.cxf.binding.corba.CorbaBindingFactory;
 public class OrbConfigurer  {
 
     private CorbaBindingFactory factory;
-    private List<String> orbArgs = new ArrayList<String>();
+    private List<String> orbArgs = new ArrayList<>();
     private Properties orbProperties = new Properties();
 
     public OrbConfigurer() {

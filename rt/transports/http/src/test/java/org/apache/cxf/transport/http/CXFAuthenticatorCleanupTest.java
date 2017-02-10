@@ -42,7 +42,7 @@ public class CXFAuthenticatorCleanupTest {
     
     @Test
     public void runCleanupTestStrongRef() throws Exception {
-        final List<Integer> traceLengths = new ArrayList<Integer>();
+        final List<Integer> traceLengths = new ArrayList<>();
         
         //create a chain of CXFAuthenticators, strongly referenced to prevent cleanups
         Authenticator.setDefault(new Authenticator() {
@@ -57,7 +57,7 @@ public class CXFAuthenticatorCleanupTest {
         Authenticator.requestPasswordAuthentication("localhost", add,
                                                     8080, "http", "hello", "http");
         
-        List<CXFAuthenticator> list = new ArrayList<CXFAuthenticator>();
+        List<CXFAuthenticator> list = new ArrayList<>();
         for (int x = 0; x < 20; x++) {
             CXFAuthenticator.addAuthenticator();
             list.add(CXFAuthenticator.instance);
@@ -100,7 +100,7 @@ public class CXFAuthenticatorCleanupTest {
     @Test
     public void runCleanupTestWeakRef() throws Exception {
         InetAddress add = InetAddress.getLocalHost();
-        final List<Integer> traceLengths = new ArrayList<Integer>();
+        final List<Integer> traceLengths = new ArrayList<>();
         //create a chain of CXFAuthenticators, strongly referenced to prevent cleanups
         Authenticator.setDefault(new Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {

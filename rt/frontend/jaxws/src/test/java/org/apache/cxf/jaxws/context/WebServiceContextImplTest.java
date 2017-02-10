@@ -85,7 +85,7 @@ public class WebServiceContextImplTest extends Assert {
         MessageImpl msg = new MessageImpl();
         MessageContext context = new WrappedMessageContext(msg);
         Map<String, List<String>> headers = new HashMap<String, List<String>>();
-        List<String> values = new ArrayList<String>();
+        List<String> values = new ArrayList<>();
         values.add("Value1");
         headers.put("Header1", values);
         context.put(MessageContext.HTTP_REQUEST_HEADERS, headers);

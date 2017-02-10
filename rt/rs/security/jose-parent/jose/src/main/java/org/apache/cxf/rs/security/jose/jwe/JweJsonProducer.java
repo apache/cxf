@@ -96,7 +96,7 @@ public class JweJsonProducer {
             unionHeaders.asMap().putAll(unprotectedHeader.asMap());
         }
         
-        List<JweJsonEncryptionEntry> entries = new ArrayList<JweJsonEncryptionEntry>(encryptors.size());
+        List<JweJsonEncryptionEntry> entries = new ArrayList<>(encryptors.size());
         Map<String, Object> jweJsonMap = new LinkedHashMap<String, Object>();
         byte[] cipherText = null;
         byte[] authTag = null;
@@ -179,7 +179,7 @@ public class JweJsonProducer {
         return new JweEncryptionInput(jsonHeaders, content, aad);
     }
     private String checkAndGetContentAlgorithm(List<JweEncryptionProvider> encryptors) {
-        Set<String> set = new HashSet<String>();
+        Set<String> set = new HashSet<>();
         for (JweEncryptionProvider encryptor : encryptors) {
             set.add(encryptor.getContentAlgorithm().getJwaName());
         }

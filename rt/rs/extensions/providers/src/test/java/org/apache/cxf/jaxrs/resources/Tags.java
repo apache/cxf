@@ -28,7 +28,7 @@ import org.apache.cxf.aegis.type.java5.XmlFlattenedArray;
 
 @XmlRootElement(name = "Tags")
 public class Tags {
-    private List<TagVO> list = new ArrayList<TagVO>();
+    private List<TagVO> list = new ArrayList<>();
     
     public Tags() {
         

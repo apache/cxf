@@ -174,7 +174,7 @@ public final class ResponseImpl extends Response {
         if (values == null) {
             return null; 
         } else {
-            List<String> stringValues = new ArrayList<String>(values.size());
+            List<String> stringValues = new ArrayList<>(values.size());
             HeaderDelegate<Object> hd = HttpUtils.getHeaderDelegate(values.get(0));
             for (Object value : values) {
                 String actualValue = hd == null ? value.toString() : hd.toString(value); 
@@ -189,7 +189,7 @@ public final class ResponseImpl extends Response {
         if (methodValues == null) {
             return Collections.emptySet();
         } else {
-            Set<String> methods = new HashSet<String>();
+            Set<String> methods = new HashSet<>();
             for (Object o : methodValues) {
                 methods.add(o.toString());
             }
@@ -285,7 +285,7 @@ public final class ResponseImpl extends Response {
     }
 
     public Set<Link> getLinks() {
-        return new HashSet<Link>(getAllLinks());
+        return new HashSet<>(getAllLinks());
     }
 
     private Set<Link> getAllLinks() {

@@ -52,7 +52,7 @@ public class JMSWSSecurityTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(JMSWSSecurityTest.class);
  
     private static EmbeddedJMSBrokerLauncher broker;
-    private List<String> wsdlStrings = new ArrayList<String>();
+    private List<String> wsdlStrings = new ArrayList<>();
     
     @BeforeClass
     public static void startServers() throws Exception {

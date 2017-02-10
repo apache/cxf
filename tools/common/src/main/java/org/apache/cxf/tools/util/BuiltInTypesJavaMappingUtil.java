@@ -30,7 +30,7 @@ public final class BuiltInTypesJavaMappingUtil {
     private static final String NS_XSD = "http://www.w3.org/2001/XMLSchema";
     private static final String NS_XSI = "http://www.w3.org/2001/XMLSchema-instance";
     
-    private static Set<String> nameSpaces = new HashSet<String>();
+    private static Set<String> nameSpaces = new HashSet<>();
     static {
         nameSpaces.add(XML_SCHEMA_NS.toLowerCase());
         nameSpaces.add(NS_XMLNS.toLowerCase());

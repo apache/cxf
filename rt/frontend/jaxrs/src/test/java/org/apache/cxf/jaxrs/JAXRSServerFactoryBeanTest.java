@@ -40,7 +40,7 @@ public class JAXRSServerFactoryBeanTest extends Assert {
         bean.setAddress("http://localhost:8080/rest");
         bean.setStart(false);
         bean.setResourceClasses(BookStore.class);
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         Object provider1 = new CustomExceptionMapper();
         providers.add(provider1);
         Object provider2 = new RuntimeExceptionMapper();

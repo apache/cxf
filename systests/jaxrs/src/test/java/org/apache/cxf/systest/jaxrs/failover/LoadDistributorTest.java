@@ -83,7 +83,7 @@ public class LoadDistributorTest extends AbstractBusClientServerTestBase {
     @Test    
     public void testSingleAltAddress() throws Exception {
         LoadDistributorFeature feature = new LoadDistributorFeature();
-        List<String> alternateAddresses = new ArrayList<String>();
+        List<String> alternateAddresses = new ArrayList<>();
         alternateAddresses.add(Server.ADDRESS2);
         SequentialStrategy strategy = new SequentialStrategy();
         strategy.setAlternateAddresses(alternateAddresses);
@@ -100,7 +100,7 @@ public class LoadDistributorTest extends AbstractBusClientServerTestBase {
     
     private FailoverFeature getFeature(String ...address) {
         FailoverFeature feature = new FailoverFeature();
-        List<String> alternateAddresses = new ArrayList<String>();
+        List<String> alternateAddresses = new ArrayList<>();
         for (String s : address) {
             alternateAddresses.add(s);
         }
@@ -127,7 +127,7 @@ public class LoadDistributorTest extends AbstractBusClientServerTestBase {
                                                 FailoverFeature feature) {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         bean.setAddress(address);
-        List<AbstractFeature> features = new ArrayList<AbstractFeature>();
+        List<AbstractFeature> features = new ArrayList<>();
         features.add(feature);
         bean.setFeatures(features);
         

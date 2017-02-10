@@ -243,7 +243,7 @@ public class RMInInterceptorTest extends Assert {
         interceptor.setManager(manager);
         SequenceAcknowledgement ack1 = control.createMock(SequenceAcknowledgement.class);
         SequenceAcknowledgement ack2 = control.createMock(SequenceAcknowledgement.class);
-        Collection<SequenceAcknowledgement> acks = new ArrayList<SequenceAcknowledgement>();
+        Collection<SequenceAcknowledgement> acks = new ArrayList<>();
         acks.add(ack1);
         acks.add(ack2);
         EasyMock.expect(rmps.getAcks()).andReturn(acks);

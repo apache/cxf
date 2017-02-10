@@ -130,7 +130,7 @@ public class DelegatingNamespaceContextTest extends Assert {
     }
 
     private void verifyPrefixes(Iterator<String> prefixes, String[] values) {
-        Set<String> tmp = new HashSet<String>();
+        Set<String> tmp = new HashSet<>();
         while (prefixes.hasNext()) {
             tmp.add(prefixes.next());
         }

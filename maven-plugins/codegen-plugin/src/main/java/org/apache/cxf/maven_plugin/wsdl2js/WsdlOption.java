@@ -76,7 +76,7 @@ public class WsdlOption extends Option implements org.apache.cxf.maven_plugin.Ge
     }
 
     public List<String> generateCommandLine(File outputDirFile, URI basedir, URI wsdlURI, boolean debug) {
-        List<String> options = new ArrayList<String>();
+        List<String> options = new ArrayList<>();
         if (wsdlVersion != null && !"".equals(wsdlVersion)) {
             options.add("-wv");
             options.add(wsdlVersion);

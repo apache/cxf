@@ -430,7 +430,7 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
     @ServiceMode(Mode.PAYLOAD)
     public static class GreeterProvider implements Provider<Source> {
         
-        public static final List<String> CALL_ARGS = new ArrayList<String>();
+        public static final List<String> CALL_ARGS = new ArrayList<>();
 
         public Source invoke(Source obj) {
 

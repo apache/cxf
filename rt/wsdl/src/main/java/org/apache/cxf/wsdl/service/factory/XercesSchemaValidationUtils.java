@@ -155,7 +155,7 @@ class XercesSchemaValidationUtils {
     void tryToParseSchemas(XmlSchemaCollection collection, DOMErrorHandler handler)
         throws Exception {
 
-        final List<DOMLSInput> inputs = new ArrayList<DOMLSInput>();
+        final List<DOMLSInput> inputs = new ArrayList<>();
         final Map<String, LSInput> resolverMap = new HashMap<String, LSInput>();
 
         for (XmlSchema schema : collection.getXmlSchemas()) {

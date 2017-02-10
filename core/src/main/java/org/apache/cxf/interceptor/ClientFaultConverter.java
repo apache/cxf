@@ -244,7 +244,7 @@ public class ClientFaultConverter extends AbstractInDatabindingInterceptor {
         ns.put("s", Fault.STACKTRACE_NAMESPACE);
         String ss = (String) xu.getValue("//s:" + Fault.STACKTRACE + "/text()", fault.getDetail(),
                 XPathConstants.STRING);
-        List<StackTraceElement> stackTraceList = new ArrayList<StackTraceElement>();
+        List<StackTraceElement> stackTraceList = new ArrayList<>();
         if (!StringUtils.isEmpty(ss)) {
             Iterator<String> linesIterator = Arrays.asList(CAUSE_SUFFIX_SPLITTER.split(ss)).iterator();
             while (linesIterator.hasNext()) {
@@ -295,7 +295,7 @@ public class ClientFaultConverter extends AbstractInDatabindingInterceptor {
         if (res == null) {
             res = new Throwable(firstLine);
         }
-        List<StackTraceElement> stackTraceList = new ArrayList<StackTraceElement>();
+        List<StackTraceElement> stackTraceList = new ArrayList<>();
         while (linesIterator.hasNext()) {
             String oneLine = linesIterator.next();
             if (oneLine.startsWith("Caused by:")) {

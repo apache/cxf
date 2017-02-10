@@ -333,7 +333,7 @@ public class SAMLTokenValidatorTest extends org.junit.Assert {
         validatorParameters.setToken(validateTarget);
         
         assertTrue(samlTokenValidator.canHandleToken(validateTarget));
-        List<String> certConstraints = new ArrayList<String>();
+        List<String> certConstraints = new ArrayList<>();
         certConstraints.add("XYZ");
         certConstraints.add(".*CN=www.sts.com.*");
         ((SAMLTokenValidator)samlTokenValidator).setSubjectConstraints(certConstraints);

@@ -235,7 +235,7 @@ public class STSLoginModule implements LoginModule {
         }
         String password = new String(tmpPassword);
         
-        roles = new HashSet<Principal>();
+        roles = new HashSet<>();
         userPrincipal = null;
         
         STSTokenValidator validator = new STSTokenValidator(true);

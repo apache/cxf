@@ -55,7 +55,7 @@ public class SoapMessage extends MessageImpl {
     public List<Header> getHeaders() {
         List<Header> heads = CastUtils.cast((List<?>)get(Header.HEADER_LIST));
         if (heads == null) {
-            heads = new ArrayList<Header>();
+            heads = new ArrayList<>();
             put(Header.HEADER_LIST, heads);
         }
         return heads;

@@ -165,7 +165,7 @@ public final class URIParserUtil {
 
     private static List<String> tokenize(String str, String sep) {
         StringTokenizer tokens = new StringTokenizer(str, sep);
-        List<String> r = new ArrayList<String>();
+        List<String> r = new ArrayList<>();
 
         while (tokens.hasMoreTokens()) {
             r.add(tokens.nextToken());
@@ -204,7 +204,7 @@ public final class URIParserUtil {
     }
 
     private static <T> List<T> reverse(List<T> a) {
-        List<T> r = new ArrayList<T>();
+        List<T> r = new ArrayList<>();
 
         for (int i = a.size() - 1; i >= 0; i--) {
             r.add(a.get(i));

@@ -77,7 +77,7 @@ public class IssueSamlRealmUnitTest extends org.junit.Assert {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
         
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         SAMLTokenProvider provider = new SAMLTokenProvider();
         provider.setRealmMap(createRealms());
         providerList.add(provider);
@@ -153,7 +153,7 @@ public class IssueSamlRealmUnitTest extends org.junit.Assert {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
         
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         SAMLTokenProvider provider = new SAMLTokenProvider();
         provider.setRealmMap(createRealms());
         providerList.add(provider);
@@ -229,7 +229,7 @@ public class IssueSamlRealmUnitTest extends org.junit.Assert {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
         
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         SAMLTokenProvider provider = new SAMLTokenProvider();
         provider.setRealmMap(createRealms());
         providerList.add(provider);
@@ -307,7 +307,7 @@ public class IssueSamlRealmUnitTest extends org.junit.Assert {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
         
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         SAMLTokenProvider provider = new SAMLTokenProvider();
         provider.setRealmMap(createRealms());
         providerList.add(provider);
@@ -406,7 +406,7 @@ public class IssueSamlRealmUnitTest extends org.junit.Assert {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
         
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         SAMLTokenProvider provider = new SAMLTokenProvider();
         provider.setRealmMap(createRealms());
         providerList.add(provider);

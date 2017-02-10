@@ -161,7 +161,7 @@ public class SAMLProviderOnBehalfOfTest extends org.junit.Assert {
             // expected on the wrong attribute provider
         }
         
-        List<AttributeStatementProvider> customProviderList = new ArrayList<AttributeStatementProvider>();
+        List<AttributeStatementProvider> customProviderList = new ArrayList<>();
         customProviderList.add(new CustomAttributeProvider());
         ((SAMLTokenProvider)samlTokenProvider).setAttributeStatementProviders(customProviderList);
         

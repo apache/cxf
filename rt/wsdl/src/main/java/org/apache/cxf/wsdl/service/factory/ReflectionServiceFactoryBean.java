@@ -158,12 +158,12 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
     protected final Map<String, String> schemaLocationMapping = new HashMap<String, String>();
 
     private List<AbstractServiceConfiguration> serviceConfigurations =
-        new ArrayList<AbstractServiceConfiguration>();
+        new ArrayList<>();
     private QName serviceName;
     private Invoker invoker;
     private Executor executor;
-    private List<String> ignoredClasses = new ArrayList<String>();
-    private List<Method> ignoredMethods = new ArrayList<Method>();
+    private List<String> ignoredClasses = new ArrayList<>();
+    private List<Method> ignoredMethods = new ArrayList<>();
     private MethodDispatcher methodDispatcher = new SimpleMethodDispatcher();
     private Boolean wrappedStyle;
     private Map<String, Object> properties;
@@ -634,7 +634,7 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
     }
 
     protected void initializeWSDLOperations() {
-        List<OperationInfo> removes = new ArrayList<OperationInfo>();
+        List<OperationInfo> removes = new ArrayList<>();
         Method[] methods = serviceClass.getMethods();
         Arrays.sort(methods, new MethodComparator());
 
@@ -675,7 +675,7 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
         // Update the bindings.
         for (ServiceInfo service : getService().getServiceInfos()) {
             for (BindingInfo bi : service.getBindings()) {
-                List<BindingOperationInfo> biremoves = new ArrayList<BindingOperationInfo>();
+                List<BindingOperationInfo> biremoves = new ArrayList<>();
                 for (BindingOperationInfo binfo : bi.getOperations()) {
                     if (removes.contains(binfo.getOperationInfo())) {
                         biremoves.add(binfo);

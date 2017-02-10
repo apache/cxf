@@ -325,7 +325,7 @@ public final class JwkUtils {
         String kids = KeyManagementUtils.getKeyId(m, props, JoseConstants.RSSEC_KEY_STORE_ALIASES, keyOper);
         if (kids != null) {
             String[] values = kids.split(",");
-            List<JsonWebKey> keys = new ArrayList<JsonWebKey>(values.length);
+            List<JsonWebKey> keys = new ArrayList<>(values.length);
             for (String value : values) {
                 keys.add(jwkSet.getKey(value));
             }

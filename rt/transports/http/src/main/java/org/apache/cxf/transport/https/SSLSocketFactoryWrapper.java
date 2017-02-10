@@ -116,7 +116,7 @@ class SSLSocketFactoryWrapper extends SSLSocketFactory {
         return socket;        
     }
     private String[] findProtocols(String p, String[] options) {
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         for (String s : options) {
             if (s.equals(p)) {
                 return new String[] {p};

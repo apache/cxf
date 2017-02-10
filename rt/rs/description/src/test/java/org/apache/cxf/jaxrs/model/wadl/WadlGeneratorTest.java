@@ -319,7 +319,7 @@ public class WadlGeneratorTest extends Assert {
             ResourceUtils.createClassResourceInfo(BookStore.class, BookStore.class, true, true);
         ClassResourceInfo cri2 = 
             ResourceUtils.createClassResourceInfo(Orders.class, Orders.class, true, true);
-        List<ClassResourceInfo> cris = new ArrayList<ClassResourceInfo>();
+        List<ClassResourceInfo> cris = new ArrayList<>();
         cris.add(cri1);
         cris.add(cri2);
         Message m = mockMessage("http://localhost:8080/baz", "", WadlGenerator.WADL_QUERY, cris);
@@ -551,7 +551,7 @@ public class WadlGeneratorTest extends Assert {
                          new Param("hid", "header", "xs:int"),
                          new Param("provider.bar", "query", "xs:int"),
                          new Param("bookstate", "query", "xs:string",
-                                 new HashSet<String>(Arrays.asList("NEW", "USED", "OLD"))),
+                                 new HashSet<>(Arrays.asList("NEW", "USED", "OLD"))),
                          new Param("a", "query", "xs:string", true));
         
         verifyXmlJsonRepresentations(requestEls.get(0), book2El, "InputBook");
@@ -773,7 +773,7 @@ public class WadlGeneratorTest extends Assert {
         assertEquals(p.getDefaultValue(), paramEl.getAttribute("default"));
         Set<String> options = p.getOptions();
         if (options != null) {
-            Set<String> actualOptions = new HashSet<String>();
+            Set<String> actualOptions = new HashSet<>();
             List<Element> els = DOMUtils.getChildrenWithNamespace(paramEl, WadlGenerator.WADL_NS);
             assertFalse(els.isEmpty());
             assertEquals(options.size(), els.size());

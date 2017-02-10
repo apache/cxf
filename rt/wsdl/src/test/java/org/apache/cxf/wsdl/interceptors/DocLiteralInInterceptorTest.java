@@ -142,7 +142,7 @@ public class DocLiteralInInterceptorTest extends Assert {
         EasyMock.expect(endpointInfo.getName()).andReturn(new QName("http://foo.com", "endpoint")).anyTimes();
         EasyMock.expect(endpointInfo.getProperty("URI", URI.class)).andReturn(new URI("dummy")).anyTimes();
         
-        List<OperationInfo> operations = new ArrayList<OperationInfo>();
+        List<OperationInfo> operations = new ArrayList<>();
         EasyMock.expect(interfaceInfo.getOperations()).andReturn(operations).anyTimes();
         
         m.setExchange(exchange);
@@ -233,7 +233,7 @@ public class DocLiteralInInterceptorTest extends Assert {
         EasyMock.expect(endpointInfo.getName()).andReturn(new QName("http://foo.com", "endpoint")).anyTimes();
         EasyMock.expect(endpointInfo.getProperty("URI", URI.class)).andReturn(new URI("dummy")).anyTimes();
 
-        List<OperationInfo> operations = new ArrayList<OperationInfo>();
+        List<OperationInfo> operations = new ArrayList<>();
         EasyMock.expect(interfaceInfo.getOperations()).andReturn(operations).anyTimes();
 
         m.setExchange(exchange);

@@ -61,7 +61,7 @@ public class WrapperAnnotator implements Annotator {
             method.getInterface().addImports(requestAnnotation.getImports());
         }
         if (wrapperResponse != null) {
-            List<JAnnotationElement> elements = new ArrayList<JAnnotationElement>();
+            List<JAnnotationElement> elements = new ArrayList<>();
             elements.add(new JAnnotationElement("localName", wrapperResponse.getType()));
             elements.add(new JAnnotationElement("targetNamespace", wrapperResponse.getTargetNamespace()));
             elements.add(new JAnnotationElement("className", wrapperResponse.getClassName()));

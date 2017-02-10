@@ -29,7 +29,7 @@ import org.omg.CORBA.TypeCode;
 
 public class CorbaExceptionHandler extends CorbaObjectHandler {
 
-    List<CorbaObjectHandler> members = new ArrayList<CorbaObjectHandler>();
+    List<CorbaObjectHandler> members = new ArrayList<>();
     String id;
     
     public CorbaExceptionHandler(QName exName, QName exIdlType, TypeCode exTC, Object exType) {

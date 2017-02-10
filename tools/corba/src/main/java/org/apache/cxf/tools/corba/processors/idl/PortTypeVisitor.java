@@ -277,7 +277,7 @@ public class PortTypeVisitor extends VisitorBase {
                 
         AST interfaceNameNode = interfaceInheritanceSpecNode.getFirstChild();
         BindingType corbaBinding = findCorbaBinding(binding);
-        List<Scope> inheritedScopes = new ArrayList<Scope>();
+        List<Scope> inheritedScopes = new ArrayList<>();
         
         while (interfaceNameNode != null) {            
             //check for porttypes in current & parent scopes

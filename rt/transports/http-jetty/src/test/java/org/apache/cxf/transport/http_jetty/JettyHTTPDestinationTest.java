@@ -503,7 +503,7 @@ public class JettyHTTPDestinationTest extends Assert {
             }
 
             public Set<String> getUriPrefixes() {
-                return new HashSet<String>(Collections.singletonList("http"));
+                return new HashSet<>(Collections.singletonList("http"));
             }
             
         };
@@ -741,7 +741,7 @@ public class JettyHTTPDestinationTest extends Assert {
         Map<String, List<String>> responseHeaders =
             CastUtils.cast((Map<?, ?>)outMsg.get(Message.PROTOCOL_HEADERS));
         assertNotNull("expected response headers", responseHeaders);
-        List<String> challenges = new ArrayList<String>();
+        List<String> challenges = new ArrayList<>();
         challenges.add(BASIC_CHALLENGE);
         challenges.add(DIGEST_CHALLENGE);
         challenges.add(CUSTOM_CHALLENGE);
@@ -828,7 +828,7 @@ public class JettyHTTPDestinationTest extends Assert {
                      3,
                      response.getAddFieldCallCount());
         Enumeration e = response.getFieldValues(CHALLENGE_HEADER);
-        List<String> challenges = new ArrayList<String>();
+        List<String> challenges = new ArrayList<>();
         while (e.hasMoreElements()) {
             challenges.add((String)e.nextElement());
         }

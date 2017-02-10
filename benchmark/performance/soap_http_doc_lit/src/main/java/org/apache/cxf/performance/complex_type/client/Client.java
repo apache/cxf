@@ -119,7 +119,7 @@ public final class Client extends TestCaseBase<DocPortType> {
             System.arraycopy(args, 0, tmp, 0, servIdx);
             args = tmp;
         }
-        List<String> threadList = new ArrayList<String>();
+        List<String> threadList = new ArrayList<>();
         if (threadIdx != -1) {
             String threads[] = args[threadIdx].split(",");
             for (String s : threads) {

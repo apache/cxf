@@ -150,7 +150,7 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
                 }
     
                 Collection<OperationInfo> operations = null;
-                operations = new ArrayList<OperationInfo>();
+                operations = new ArrayList<>();
                 operations.addAll(si.getInterface().getOperations());
     
                 if (xmlReader == null || !StaxUtils.toNextElement(xmlReader)) {

@@ -62,11 +62,11 @@ public class RetransmissionQueueImplTest extends Assert {
     private Executor executor;
     private RetransmissionQueueImpl queue;
     private TestResender resender;
-    private List<Message> messages = new ArrayList<Message>();
-    private List<RMProperties> properties = new ArrayList<RMProperties>();
-    private List<SequenceType> sequences = new ArrayList<SequenceType>();
-    private List<Identifier> identifiers = new ArrayList<Identifier>();
-    private List<Object> mocks = new ArrayList<Object>();
+    private List<Message> messages = new ArrayList<>();
+    private List<RMProperties> properties = new ArrayList<>();
+    private List<SequenceType> sequences = new ArrayList<>();
+    private List<Identifier> identifiers = new ArrayList<>();
+    private List<Object> mocks = new ArrayList<>();
     
     @Before
     public void setUp() throws RMException {

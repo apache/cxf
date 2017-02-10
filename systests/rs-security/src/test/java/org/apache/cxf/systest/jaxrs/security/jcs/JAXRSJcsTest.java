@@ -67,7 +67,7 @@ public class JAXRSJcsTest extends AbstractBusClientServerTestBase {
     private WebClient createWebClient() {
         URL busFile = JAXRSJcsTest.class.getResource("client.xml");
 
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         
         String address = "https://localhost:" + PORT + "/jcs/bookstore/books";
         WebClient client = 

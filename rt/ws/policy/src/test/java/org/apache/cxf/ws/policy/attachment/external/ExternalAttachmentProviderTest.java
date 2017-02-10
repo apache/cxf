@@ -61,7 +61,7 @@ public class ExternalAttachmentProviderTest extends Assert {
     private Policy policy;
     private Assertion assertion;
     private PolicyAttachment attachment;
-    private Collection<PolicyAttachment> attachments = new ArrayList<PolicyAttachment>();
+    private Collection<PolicyAttachment> attachments = new ArrayList<>();
     
     @Before
     public void setUp() {

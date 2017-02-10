@@ -95,7 +95,7 @@ public final class AttachmentUtil {
         public synchronized CommandInfo[] getAllCommands(String mimeType) {
             CommandInfo[] commands = super.getAllCommands(mimeType);
             CommandInfo[] defaultCommands = DEFAULT_COMMAND_MAP.getAllCommands(mimeType);
-            List<CommandInfo> cmdList = new ArrayList<CommandInfo>(Arrays.asList(commands));
+            List<CommandInfo> cmdList = new ArrayList<>(Arrays.asList(commands));
             
             // Add CommandInfo which does not exist in current command map.
             for (CommandInfo defCmdInfo : defaultCommands) {
@@ -132,7 +132,7 @@ public final class AttachmentUtil {
         public synchronized String[] getMimeTypes() {
             String[] mimeTypes = super.getMimeTypes();
             String[] defMimeTypes = DEFAULT_COMMAND_MAP.getMimeTypes();
-            Set<String> mimeTypeSet = new HashSet<String>();
+            Set<String> mimeTypeSet = new HashSet<>();
             mimeTypeSet.addAll(Arrays.asList(mimeTypes));
             mimeTypeSet.addAll(Arrays.asList(defMimeTypes));
             String[] mimeArray = new String[0];

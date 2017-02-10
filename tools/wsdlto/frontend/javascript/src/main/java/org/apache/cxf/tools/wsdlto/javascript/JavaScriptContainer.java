@@ -67,7 +67,7 @@ public class JavaScriptContainer extends WSDLToJavaContainer {
     }
 
     public Set<String> getArrayKeys() {
-        Set<String> set = new HashSet<String>();
+        Set<String> set = new HashSet<>();
         set.add(ToolConstants.CFG_JSPACKAGEPREFIX);
         set.add(ToolConstants.CFG_BEAN_CONFIG);
         return set;
@@ -91,7 +91,7 @@ public class JavaScriptContainer extends WSDLToJavaContainer {
         String wsdlURL = (String)context.get(ToolConstants.CFG_WSDLURL);
         List<ServiceInfo> serviceList = (List<ServiceInfo>)context.get(ToolConstants.SERVICE_LIST);
         if (serviceList == null) {
-            serviceList = new ArrayList<ServiceInfo>();
+            serviceList = new ArrayList<>();
 
             PluginLoader pluginLoader = PluginLoader.newInstance();
             // for JavaScript generation, we always use JAX-WS.
@@ -284,7 +284,7 @@ public class JavaScriptContainer extends WSDLToJavaContainer {
     }
 
     public List<ServiceValidator> getServiceValidators() {
-        List<ServiceValidator> validators = new ArrayList<ServiceValidator>();
+        List<ServiceValidator> validators = new ArrayList<>();
 
         Properties initialExtensions = null;
         try {

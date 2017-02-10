@@ -602,7 +602,7 @@ public class HandlerChainInvoker {
     }
 
     private <T extends Handler<?>> List<T> reverseHandlerChain(List<T> handlerChain) {
-        List<T> reversedHandlerChain = new ArrayList<T>();
+        List<T> reversedHandlerChain = new ArrayList<>();
         reversedHandlerChain.addAll(handlerChain);
         Collections.reverse(reversedHandlerChain);
         return reversedHandlerChain;

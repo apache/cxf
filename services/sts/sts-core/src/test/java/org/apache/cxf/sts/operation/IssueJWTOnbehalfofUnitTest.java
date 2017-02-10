@@ -95,12 +95,12 @@ public class IssueJWTOnbehalfofUnitTest extends org.junit.Assert {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
 
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new JWTTokenProvider());
         issueOperation.setTokenProviders(providerList);
         
         // Add Token Validator
-        List<TokenValidator> validatorList = new ArrayList<TokenValidator>();
+        List<TokenValidator> validatorList = new ArrayList<>();
         validatorList.add(new SAMLTokenValidator());
         issueOperation.setTokenValidators(validatorList);
 
@@ -185,12 +185,12 @@ public class IssueJWTOnbehalfofUnitTest extends org.junit.Assert {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
 
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new JWTTokenProvider());
         issueOperation.setTokenProviders(providerList);
         
         // Add Token Validator
-        List<TokenValidator> validatorList = new ArrayList<TokenValidator>();
+        List<TokenValidator> validatorList = new ArrayList<>();
         validatorList.add(new UsernameTokenValidator());
         issueOperation.setTokenValidators(validatorList);
 
@@ -283,7 +283,7 @@ public class IssueJWTOnbehalfofUnitTest extends org.junit.Assert {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
         
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         JWTTokenProvider tokenProvider = new JWTTokenProvider();
         providerList.add(tokenProvider);
         issueOperation.setTokenProviders(providerList);
@@ -292,7 +292,7 @@ public class IssueJWTOnbehalfofUnitTest extends org.junit.Assert {
         issueOperation.setDelegationHandlers(Collections.singletonList(delegationHandler));
         
         // Add Token Validator
-        List<TokenValidator> validatorList = new ArrayList<TokenValidator>();
+        List<TokenValidator> validatorList = new ArrayList<>();
         SAMLTokenValidator samlTokenValidator = new SAMLTokenValidator();
         samlTokenValidator.setSamlRealmCodec(new IssuerSAMLRealmCodec());
         validatorList.add(samlTokenValidator);

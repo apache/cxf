@@ -85,7 +85,7 @@ public class DefaultEHCacheCodeDataProvider extends DefaultEHCacheOAuthDataProvi
     public List<ServerAuthorizationCodeGrant> getCodeGrants(Client c, UserSubject sub) {
         List<String> keys = CastUtils.cast(codeGrantCache.getKeys());
         List<ServerAuthorizationCodeGrant> grants = 
-            new ArrayList<ServerAuthorizationCodeGrant>(keys.size());
+            new ArrayList<>(keys.size());
         for (String key : keys) {
             ServerAuthorizationCodeGrant grant = getCodeGrant(key);
             if (AbstractCodeDataProvider.isCodeMatched(grant, c, sub)) {

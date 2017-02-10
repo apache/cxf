@@ -528,7 +528,7 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
                 Metadata metadata = exc.get2004();
                 
                 Definition definition = null;
-                List<Schema> schemas = new ArrayList<Schema>();
+                List<Schema> schemas = new ArrayList<>();
                 // Parse the MetadataSections into WSDL definition + associated schemas
                 for (MetadataSection s : metadata.getMetadataSection()) {
                     if ("http://schemas.xmlsoap.org/wsdl/".equals(s.getDialect())) {
@@ -1275,7 +1275,7 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
                 addrNamespace = "http://www.w3.org/2005/08/addressing";
             }
             
-            List<Header> headers = new ArrayList<Header>();
+            List<Header> headers = new ArrayList<>();
             headers.add(new Header("To", addrNamespace));
             headers.add(new Header("From", addrNamespace));
             headers.add(new Header("FaultTo", addrNamespace));

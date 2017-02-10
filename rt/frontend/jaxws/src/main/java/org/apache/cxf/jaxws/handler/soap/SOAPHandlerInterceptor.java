@@ -87,13 +87,13 @@ public class SOAPHandlerInterceptor extends
     }
 
     public Set<URI> getRoles() {
-        Set<URI> roles = new HashSet<URI>();
+        Set<URI> roles = new HashSet<>();
         //TODO
         return roles;
     }
 
     public Set<QName> getUnderstoodHeaders() {
-        Set<QName> understood = new HashSet<QName>();
+        Set<QName> understood = new HashSet<>();
         for (Handler<?> h : getBinding().getHandlerChain()) {
             if (h instanceof SOAPHandler) {
                 Set<QName> headers = CastUtils.cast(((SOAPHandler<?>) h).getHeaders());
@@ -256,7 +256,7 @@ public class SOAPHandlerInterceptor extends
         setupBindingOperationInfo(exch, sm);
         SOAPMessage msg = sm.getMessage();
         try {            
-            List<SOAPElement> params = new ArrayList<SOAPElement>();
+            List<SOAPElement> params = new ArrayList<>();
             message.put(MessageContext.REFERENCE_PARAMETERS, params);
             SOAPHeader head = SAAJUtils.getHeader(msg);
             if (head != null) {

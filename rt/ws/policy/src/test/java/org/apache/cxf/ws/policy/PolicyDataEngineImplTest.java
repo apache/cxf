@@ -83,7 +83,7 @@ public class PolicyDataEngineImplTest extends Assert {
         AssertionInfo ai = getTestPolicyAssertionInfo(policy);
         AssertionInfoMap aim = new AssertionInfoMap(CastUtils.cast(Collections.EMPTY_LIST,
                                                                    PolicyAssertion.class));
-        Collection<AssertionInfo> ais = new ArrayList<AssertionInfo>();
+        Collection<AssertionInfo> ais = new ArrayList<>();
         ais.add(ai);
         aim.put(TEST_POLICY_NAME, ais);
         checkAssertWithMap(aim);

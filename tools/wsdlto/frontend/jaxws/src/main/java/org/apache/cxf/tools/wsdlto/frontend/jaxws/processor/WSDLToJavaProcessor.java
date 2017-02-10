@@ -75,7 +75,7 @@ public class WSDLToJavaProcessor extends WSDLToProcessor implements ClassNamePro
         }
         context.put(JavaModel.class, javaModel);
         
-        List<JavaInterface> interfaces = new ArrayList<JavaInterface>();
+        List<JavaInterface> interfaces = new ArrayList<>();
         interfaces.addAll(javaModel.getInterfaces().values());
         
         PortTypeProcessor portTypeProcessor = new PortTypeProcessor(context);

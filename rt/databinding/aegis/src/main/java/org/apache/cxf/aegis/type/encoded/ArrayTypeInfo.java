@@ -48,7 +48,7 @@ public class ArrayTypeInfo {
     private AegisType type;
     private QName typeName;
     private int ranks;
-    private final List<Integer> dimensions = new ArrayList<Integer>();
+    private final List<Integer> dimensions = new ArrayList<>();
     private int offset;
 
     public ArrayTypeInfo(QName typeName, int ranks, Integer... dimensions) {

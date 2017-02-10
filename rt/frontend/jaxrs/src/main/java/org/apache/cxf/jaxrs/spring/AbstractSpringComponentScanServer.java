@@ -120,7 +120,7 @@ public abstract class AbstractSpringComponentScanServer extends AbstractSpringCo
     }
     
     private static void warnIfDuplicatesAvailable(List<? extends Object> providers) {
-        Set<String> classNames = new HashSet<String>();
+        Set<String> classNames = new HashSet<>();
         for (Object o : providers) {
             if (!classNames.add(o.getClass().getName())) {
                 LOG.warning("Duplicate Provider " + o.getClass().getName() + " has been detected");

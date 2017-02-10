@@ -110,7 +110,7 @@ public class ConfigurerImpl extends BeanConfigurerSupport
                                 Matcher matcher = Pattern.compile(n).matcher("");
                                 List<MatcherHolder> m = wildCardBeanDefinitions.get(className);
                                 if (m == null) {
-                                    m = new ArrayList<MatcherHolder>();
+                                    m = new ArrayList<>();
                                     wildCardBeanDefinitions.put(className, m);
                                 }
                                 MatcherHolder holder = new MatcherHolder(orig, matcher);
@@ -256,7 +256,7 @@ public class ConfigurerImpl extends BeanConfigurerSupport
     public final void addApplicationContext(ApplicationContext ac) {
         if (!appContexts.contains(ac)) {
             appContexts.add(ac);
-            List<ApplicationContext> inactiveApplicationContexts = new ArrayList<ApplicationContext>();
+            List<ApplicationContext> inactiveApplicationContexts = new ArrayList<>();
             Iterator<ApplicationContext> it = appContexts.iterator();
             while (it.hasNext()) {
                 ApplicationContext c = it.next();

@@ -66,7 +66,7 @@ public class ManagedConnectionImpl implements ManagedConnection {
     private static final Logger LOG = LogUtils.getL7dLogger(ManagedConnectionImpl.class);
     
     private Set<ConnectionEventListener> listeners = 
-        Collections.synchronizedSet(new HashSet<ConnectionEventListener>());
+        Collections.synchronizedSet(new HashSet<>());
     
     private Map<Object, Subject> handles = 
         Collections.synchronizedMap(new HashMap<Object, Subject>());

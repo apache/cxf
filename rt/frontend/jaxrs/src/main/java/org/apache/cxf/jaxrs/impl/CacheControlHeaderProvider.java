@@ -58,9 +58,9 @@ public class CacheControlHeaderProvider implements HeaderDelegate<CacheControl> 
 
     public CacheControl fromString(String c) {
         boolean isPrivate = false;
-        List<String> privateFields = new ArrayList<String>();
+        List<String> privateFields = new ArrayList<>();
         boolean noCache = false;
-        List<String> noCacheFields = new ArrayList<String>();
+        List<String> noCacheFields = new ArrayList<>();
         boolean noStore = false;
         boolean noTransform = false;
         boolean mustRevalidate = false;
@@ -120,7 +120,7 @@ public class CacheControlHeaderProvider implements HeaderDelegate<CacheControl> 
             throw new IllegalArgumentException();
         }
         if (c.contains("\"")) {
-            List<String> values = new ArrayList<String>(4);
+            List<String> values = new ArrayList<>(4);
             Matcher m = COMPLEX_HEADER_PATTERN.matcher(c);
             while (m.find()) {
                 String val = m.group().trim();

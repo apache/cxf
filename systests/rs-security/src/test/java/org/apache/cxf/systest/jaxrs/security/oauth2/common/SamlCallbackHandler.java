@@ -129,12 +129,12 @@ public class SamlCallbackHandler implements CallbackHandler {
                 if (roles == null) {
                     roles = Collections.singletonList("user");
                 }
-                List<AttributeBean> claims = new ArrayList<AttributeBean>();
+                List<AttributeBean> claims = new ArrayList<>();
                 AttributeBean roleClaim = new AttributeBean();
                 roleClaim.setSimpleName("subject-role");
                 roleClaim.setQualifiedName(SAMLClaim.SAML_ROLE_ATTRIBUTENAME_DEFAULT);
                 roleClaim.setNameFormat(SAML2Constants.ATTRNAME_FORMAT_UNSPECIFIED);
-                roleClaim.setAttributeValues(new ArrayList<Object>(roles));
+                roleClaim.setAttributeValues(new ArrayList<>(roles));
                 claims.add(roleClaim);
                 
                 List<String> authMethods = 
@@ -147,7 +147,7 @@ public class SamlCallbackHandler implements CallbackHandler {
                 authClaim.setSimpleName("http://claims/authentication");
                 authClaim.setQualifiedName("http://claims/authentication");
                 authClaim.setNameFormat("http://claims/authentication-format");
-                authClaim.setAttributeValues(new ArrayList<Object>(authMethods));
+                authClaim.setAttributeValues(new ArrayList<>(authMethods));
                 claims.add(authClaim);
                 
                 attrBean.setSamlAttributes(claims);

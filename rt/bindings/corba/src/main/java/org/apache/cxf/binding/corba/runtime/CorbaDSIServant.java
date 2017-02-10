@@ -88,7 +88,7 @@ public class CorbaDSIServant extends DynamicImplementation {
             }
 
             List<String> bases = bindType.getBases();
-            interfaces = new ArrayList<String>();
+            interfaces = new ArrayList<>();
             interfaces.add(bindType.getRepositoryID());
             for (Iterator<String> iter = bases.iterator(); iter.hasNext();) {
                 interfaces.add(iter.next());

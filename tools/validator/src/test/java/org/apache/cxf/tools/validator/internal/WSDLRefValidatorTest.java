@@ -58,7 +58,7 @@ public class WSDLRefValidatorTest extends Assert {
         assertEquals(2, results.getErrors().size());
         String t = results.getErrors().pop();
         String text = "{http://apache.org/hello_world/messages}[portType:GreeterA][operation:sayHi]";
-        Set<String> possibles = new HashSet<String>();
+        Set<String> possibles = new HashSet<>();
         //woodstox
         possibles.add(new Message("FAILED_AT_POINT",
                     WSDLRefValidator.LOG,
@@ -92,7 +92,7 @@ public class WSDLRefValidatorTest extends Assert {
         String expected = "/wsdl:definitions[@targetNamespace='http://schemas.apache.org/yoko/idl/OptionsPT']"
             + "/wsdl:portType[@name='foo.bar']";
 
-        Set<String> xpath = new HashSet<String>();
+        Set<String> xpath = new HashSet<>();
 
         for (XNode node : validator.vNodes) {
             xpath.add(node.toString());
@@ -144,7 +144,7 @@ public class WSDLRefValidatorTest extends Assert {
         
         assertEquals(1, results.getErrors().size());
         String text = "{http://schemas.apache.org/yoko/idl/OptionsPT}[message:getEmployee]";
-        Set<String> possibles = new HashSet<String>();
+        Set<String> possibles = new HashSet<>();
         //woodstox
         possibles.add(new Message("FAILED_AT_POINT",
                     WSDLRefValidator.LOG,

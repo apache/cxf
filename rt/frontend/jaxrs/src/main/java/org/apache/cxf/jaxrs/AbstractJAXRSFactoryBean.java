@@ -285,7 +285,7 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
      * @param entityProviders the entityProviders
      */
     public void setProviders(List<? extends Object> providers) {
-        List<Object> newBeans = new ArrayList<Object>();
+        List<Object> newBeans = new ArrayList<>();
         addToBeans(newBeans, providers);
         this.entityProviders.addAll(newBeans);
     }

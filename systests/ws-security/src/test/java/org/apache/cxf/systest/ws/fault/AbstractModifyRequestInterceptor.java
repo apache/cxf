@@ -45,7 +45,7 @@ public abstract class AbstractModifyRequestInterceptor implements PhaseIntercept
     
     private static final QName SEC_HEADER = 
         new QName(WSConstants.WSSE_NS, WSConstants.WSSE_LN, WSConstants.WSSE_PREFIX);
-    private Set<String> afterInterceptors = new HashSet<String>();
+    private Set<String> afterInterceptors = new HashSet<>();
     
     public AbstractModifyRequestInterceptor() {
         getAfter().add(PolicyBasedWSS4JOutInterceptor.class.getName());

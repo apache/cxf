@@ -89,7 +89,7 @@ public class SoapArrayType extends AegisType {
 
             // if it is a partially transmitted array offset the array values
             if (arrayTypeInfo.getOffset() > 0) {
-                List<Object> list = new ArrayList<Object>(values.size() + arrayTypeInfo.getOffset());
+                List<Object> list = new ArrayList<>(values.size() + arrayTypeInfo.getOffset());
                 list.addAll(Collections.nCopies(arrayTypeInfo.getOffset(), null));
                 list.addAll(values);
                 values = list;
@@ -123,7 +123,7 @@ public class SoapArrayType extends AegisType {
             ArrayTypeInfo arrayTypeInfo,
             int maxSize) throws DatabindingException {
 
-        List<Object> values = new ArrayList<Object>();
+        List<Object> values = new ArrayList<>();
 
         Boolean sparse = null;
         while (reader.hasMoreElementReaders()) {
@@ -372,7 +372,7 @@ public class SoapArrayType extends AegisType {
 
     @Override
     public Set<AegisType> getDependencies() {
-        Set<AegisType> deps = new HashSet<AegisType>();
+        Set<AegisType> deps = new HashSet<>();
 
         deps.add(getComponentType());
 

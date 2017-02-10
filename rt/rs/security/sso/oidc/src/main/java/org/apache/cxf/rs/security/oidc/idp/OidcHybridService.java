@@ -48,7 +48,7 @@ public class OidcHybridService extends OidcImplicitService {
     }
     
     private static Set<String> getResponseTypes(boolean hybridOnly) {
-        List<String> types = new ArrayList<String>(); 
+        List<String> types = new ArrayList<>(); 
         types.addAll(
             Arrays.asList(OidcUtils.CODE_AT_RESPONSE_TYPE, 
                           OidcUtils.CODE_ID_TOKEN_RESPONSE_TYPE, 
@@ -57,7 +57,7 @@ public class OidcHybridService extends OidcImplicitService {
             types.add(OidcUtils.ID_TOKEN_RESPONSE_TYPE);
             types.add(OidcUtils.ID_TOKEN_AT_RESPONSE_TYPE);
         }
-        return new HashSet<String>(types);
+        return new HashSet<>(types);
     }
     
     @Override

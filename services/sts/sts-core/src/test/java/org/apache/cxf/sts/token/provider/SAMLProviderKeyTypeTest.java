@@ -479,7 +479,7 @@ public class SAMLProviderKeyTypeTest extends org.junit.Assert {
         
         STSPropertiesMBean stsProperties = providerParameters.getStsProperties();
         SignatureProperties sigProperties = new SignatureProperties();
-        List<String> acceptedC14nAlgorithms = new ArrayList<String>();
+        List<String> acceptedC14nAlgorithms = new ArrayList<>();
         acceptedC14nAlgorithms.add(WSConstants.C14N_EXCL_OMIT_COMMENTS);
         acceptedC14nAlgorithms.add(WSConstants.C14N_EXCL_WITH_COMMENTS);
         sigProperties.setAcceptedC14nAlgorithms(acceptedC14nAlgorithms);

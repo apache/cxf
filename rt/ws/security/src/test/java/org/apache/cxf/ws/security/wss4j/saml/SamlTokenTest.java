@@ -94,7 +94,7 @@ public class SamlTokenTest extends AbstractSecurityTest {
         customMap.put(WSConstants.SAML2_TOKEN, validator);
         inProperties.put(WSS4JInInterceptor.VALIDATOR_MAP, customMap);
         
-        List<String> xpaths = new ArrayList<String>();
+        List<String> xpaths = new ArrayList<>();
         xpaths.add("//wsse:Security");
         xpaths.add("//wsse:Security/saml1:Assertion");
 
@@ -141,7 +141,7 @@ public class SamlTokenTest extends AbstractSecurityTest {
         customMap.put(WSConstants.SAML2_TOKEN, validator);
         inProperties.put(WSS4JInInterceptor.VALIDATOR_MAP, customMap);
         
-        List<String> xpaths = new ArrayList<String>();
+        List<String> xpaths = new ArrayList<>();
         xpaths.add("//wsse:Security");
         xpaths.add("//wsse:Security/saml1:Assertion");
 
@@ -177,7 +177,7 @@ public class SamlTokenTest extends AbstractSecurityTest {
         customMap.put(WSConstants.SAML2_TOKEN, validator);
         inProperties.put(WSS4JInInterceptor.VALIDATOR_MAP, customMap);
         
-        List<String> xpaths = new ArrayList<String>();
+        List<String> xpaths = new ArrayList<>();
         xpaths.add("//wsse:Security");
         xpaths.add("//wsse:Security/saml2:Assertion");
 
@@ -219,7 +219,7 @@ public class SamlTokenTest extends AbstractSecurityTest {
         customMap.put(WSConstants.SAML2_TOKEN, validator);
         inProperties.put(WSS4JInInterceptor.VALIDATOR_MAP, customMap);
         
-        List<String> xpaths = new ArrayList<String>();
+        List<String> xpaths = new ArrayList<>();
         xpaths.add("//wsse:Security");
         xpaths.add("//wsse:Security/saml2:Assertion");
 
@@ -268,7 +268,7 @@ public class SamlTokenTest extends AbstractSecurityTest {
         customMap.put(WSConstants.SAML2_TOKEN, validator);
         inProperties.put(WSS4JInInterceptor.VALIDATOR_MAP, customMap);
         
-        List<String> xpaths = new ArrayList<String>();
+        List<String> xpaths = new ArrayList<>();
         xpaths.add("//wsse:Security");
         xpaths.add("//wsse:Security/saml1:Assertion");
         
@@ -324,7 +324,7 @@ public class SamlTokenTest extends AbstractSecurityTest {
         customMap.put(WSConstants.SAML2_TOKEN, validator);
         inProperties.put(WSS4JInInterceptor.VALIDATOR_MAP, customMap);
         
-        List<String> xpaths = new ArrayList<String>();
+        List<String> xpaths = new ArrayList<>();
         xpaths.add("//wsse:Security");
         xpaths.add("//wsse:Security/saml2:Assertion");
         
@@ -393,7 +393,7 @@ public class SamlTokenTest extends AbstractSecurityTest {
         customMap.put(WSConstants.SAML2_TOKEN, validator);
         inProperties.put(WSS4JInInterceptor.VALIDATOR_MAP, customMap);
         
-        List<String> xpaths = new ArrayList<String>();
+        List<String> xpaths = new ArrayList<>();
         xpaths.add("//wsse:Security");
         xpaths.add("//wsse:Security/saml2:Assertion");
 
@@ -451,7 +451,7 @@ public class SamlTokenTest extends AbstractSecurityTest {
         customMap.put(WSConstants.SAML2_TOKEN, validator);
         inProperties.put(WSS4JInInterceptor.VALIDATOR_MAP, customMap);
         
-        List<String> xpaths = new ArrayList<String>();
+        List<String> xpaths = new ArrayList<>();
         xpaths.add("//wsse:Security");
         xpaths.add("//wsse:Security/saml2:Assertion");
 
@@ -508,7 +508,7 @@ public class SamlTokenTest extends AbstractSecurityTest {
         customMap.put(WSConstants.SAML2_TOKEN, validator);
         inProperties.put(WSS4JInInterceptor.VALIDATOR_MAP, customMap);
         
-        List<String> xpaths = new ArrayList<String>();
+        List<String> xpaths = new ArrayList<>();
         xpaths.add("//wsse:Security");
         xpaths.add("//wsse:Security/saml1:Assertion");
 

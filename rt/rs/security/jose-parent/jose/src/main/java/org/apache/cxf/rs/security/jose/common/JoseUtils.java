@@ -132,7 +132,7 @@ public final class JoseUtils {
         return headers.asMap().keySet().containsAll(critical);
     }
     private static boolean detectDoubleEntry(List<?> list) {
-        Set<Object> inputSet = new HashSet<Object>(list);
+        Set<Object> inputSet = new HashSet<>(list);
         return list.size() > inputSet.size();
     }
     

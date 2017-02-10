@@ -63,7 +63,7 @@ public class HandlerResolverImpl implements HandlerResolver {
     }
 
     private List<Handler> createHandlerChain(PortInfo portInfo) {
-        List<Handler> chain = new ArrayList<Handler>();
+        List<Handler> chain = new ArrayList<>();
 
         if (annotationClass != null) {
             chain.addAll(getHandlersFromAnnotation(annotationClass, portInfo));         

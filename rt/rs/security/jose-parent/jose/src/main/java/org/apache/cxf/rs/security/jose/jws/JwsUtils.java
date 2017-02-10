@@ -275,7 +275,7 @@ public final class JwsUtils {
         if (JoseConstants.HEADER_JSON_WEB_KEY.equals(props.get(JoseConstants.RSSEC_KEY_STORE_TYPE))) {
             List<JsonWebKey> jwks = JwkUtils.loadJsonWebKeys(m, props, KeyOperation.SIGN);
             if (jwks != null) {
-                theSigProviders = new ArrayList<JwsSignatureProvider>(jwks.size());
+                theSigProviders = new ArrayList<>(jwks.size());
                 for (JsonWebKey jwk : jwks) {
                     theSigProviders.add(JwsUtils.getSignatureProvider(jwk));
                 }
@@ -298,7 +298,7 @@ public final class JwsUtils {
         if (JoseConstants.HEADER_JSON_WEB_KEY.equals(props.get(JoseConstants.RSSEC_KEY_STORE_TYPE))) {
             List<JsonWebKey> jwks = JwkUtils.loadJsonWebKeys(m, props, KeyOperation.VERIFY);
             if (jwks != null) {
-                theVerifiers = new ArrayList<JwsSignatureVerifier>(jwks.size());
+                theVerifiers = new ArrayList<>(jwks.size());
                 for (JsonWebKey jwk : jwks) {
                     theVerifiers.add(JwsUtils.getSignatureVerifier(jwk));
                 }

@@ -54,7 +54,7 @@ public class OidcImplicitService extends ImplicitGrantService {
     private IdTokenProvider idTokenProvider;
     
     public OidcImplicitService() {
-        super(new HashSet<String>(Arrays.asList(OidcUtils.ID_TOKEN_RESPONSE_TYPE,
+        super(new HashSet<>(Arrays.asList(OidcUtils.ID_TOKEN_RESPONSE_TYPE,
                                                 OidcUtils.ID_TOKEN_AT_RESPONSE_TYPE)));
     }
     protected OidcImplicitService(Set<String> supportedResponseTypes,

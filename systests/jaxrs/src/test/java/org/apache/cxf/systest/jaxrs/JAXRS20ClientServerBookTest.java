@@ -488,7 +488,7 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
     private GenericEntity<List<Book>> createGenericEntity() {
         Book b1 = new Book("CXF in Action", 123L);
         Book b2 = new Book("CXF Rocks", 124L);
-        List<Book> books = new ArrayList<Book>();
+        List<Book> books = new ArrayList<>();
         books.add(b1);
         books.add(b2);
         return new GenericEntity<List<Book>>(books) {
@@ -557,14 +557,14 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
     }
     
     private WebClient createWebClient(String address) {
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new ClientHeaderRequestFilter());
         providers.add(new ClientHeaderResponseFilter());
         return WebClient.create(address, providers);
     }
     
     private WebClient createWebClientPost(String address) {
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new ClientHeaderRequestFilter());
         providers.add(new ClientHeaderResponseFilter());
         providers.add(new ClientReaderInterceptor());
@@ -658,7 +658,7 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
     @Test
     public void testClientFiltersLocalResponse() {
         String address = "http://localhost:" + PORT + "/bookstores";
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new ClientCacheRequestFilter());
         providers.add(new ClientHeaderResponseFilter(true));
         WebClient wc = WebClient.create(address, providers);

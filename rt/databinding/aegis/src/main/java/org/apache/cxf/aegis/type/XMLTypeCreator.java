@@ -306,7 +306,7 @@ public class XMLTypeCreator extends AbstractTypeCreator {
 
     protected List<Element> findMappings(Type type) {
         Class<?> clazz = TypeUtil.getTypeClass(type, false);
-        List<Element> mappings = new ArrayList<Element>();
+        List<Element> mappings = new ArrayList<>();
         if (clazz == null) {
             return mappings;
         }
@@ -731,7 +731,7 @@ public class XMLTypeCreator extends AbstractTypeCreator {
 
     private List<Element> getMatches(Node doc, String xpath) {
         NodeList nl = (NodeList)getXPathUtils().getValue(xpath, doc, XPathConstants.NODESET);
-        List<Element> r = new ArrayList<Element>();
+        List<Element> r = new ArrayList<>();
         for (int x = 0; x < nl.getLength(); x++) {
             r.add((Element)nl.item(x));
         }

@@ -84,7 +84,7 @@ public class IssueJWTUnitTest extends org.junit.Assert {
         issueOperation.setTokenStore(tokenStore);
         
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new JWTTokenProvider());
         issueOperation.setTokenProviders(providerList);
         

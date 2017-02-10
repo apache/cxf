@@ -244,7 +244,7 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
                 List<String> bodyParts = null;
                 List<SoapHeaderInfo> headerInfos = b.getInput().getExtensors(SoapHeaderInfo.class);
                 if (headerInfos != null && headerInfos.size() > 0) {
-                    bodyParts = new ArrayList<String>();
+                    bodyParts = new ArrayList<>();
                     for (MessagePartInfo part : b.getInput().getMessageParts()) {
                         bodyParts.add(part.getName().getLocalPart());
                     }
@@ -280,7 +280,7 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
                 List<String> bodyParts = null;
                 List<SoapHeaderInfo> headerInfos = b.getOutput().getExtensors(SoapHeaderInfo.class);
                 if (headerInfos != null && headerInfos.size() > 0) {
-                    bodyParts = new ArrayList<String>();
+                    bodyParts = new ArrayList<>();
                     for (MessagePartInfo part : b.getOutput().getMessageParts()) {
                         bodyParts.add(part.getName().getLocalPart());
                     }
@@ -318,7 +318,7 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
                               BindingMessageInfo unwrappedBMsg,
                               MessageInfo msg,
                               SoapBindingConfiguration config) {
-        List<MessagePartInfo> parts = new ArrayList<MessagePartInfo>();
+        List<MessagePartInfo> parts = new ArrayList<>();
         for (MessagePartInfo part : msg.getMessageParts()) {
             if (config.isHeader(op, part)) {
                 SoapHeaderInfo headerInfo = new SoapHeaderInfo();
@@ -524,7 +524,7 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
     private javax.wsdl.Message findMessage(QName qn, Definition def) {
         javax.wsdl.Message msg = def.getMessage(qn);
         if (msg == null) {
-            msg = findMessage(qn, def, new ArrayList<Definition>());
+            msg = findMessage(qn, def, new ArrayList<>());
         }
         return msg;
     }
@@ -719,7 +719,7 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
     private void initializeMessage(SoapBindingInfo bi, BindingOperationInfo boi, BindingMessageInfo bmsg) {
         MessageInfo msg = bmsg.getMessageInfo();
 
-        List<MessagePartInfo> messageParts = new ArrayList<MessagePartInfo>();
+        List<MessagePartInfo> messageParts = new ArrayList<>();
         messageParts.addAll(msg.getMessageParts());
 
         List<SoapHeader> headers =
@@ -775,7 +775,7 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
         // Initialize the body parts.
         List<MessagePartInfo> attParts = null;
         if (parts != null) {
-            List<MessagePartInfo> bodyParts = new ArrayList<MessagePartInfo>();
+            List<MessagePartInfo> bodyParts = new ArrayList<>();
             for (Iterator<?> itr = parts.iterator(); itr.hasNext();) {
                 Object part = itr.next();
                 if (part instanceof MIMEPart) {

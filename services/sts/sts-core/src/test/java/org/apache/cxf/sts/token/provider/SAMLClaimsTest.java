@@ -254,7 +254,7 @@ public class SAMLClaimsTest extends org.junit.Assert {
         staticClaims.put(APPLICATION_APPLIES_TO, endpointClaimsMap);
         claimsHandler.setEndpointClaims(staticClaims);
         
-        List<URI> supportedClaims = new ArrayList<URI>();
+        List<URI> supportedClaims = new ArrayList<>();
         supportedClaims.add(CLAIM_APPLICATION);
         claimsHandler.setSupportedClaims(supportedClaims);
         
@@ -309,7 +309,7 @@ public class SAMLClaimsTest extends org.junit.Assert {
         staticClaims.put(APPLICATION_APPLIES_TO, endpointClaimsMap);
         claimsHandler.setEndpointClaims(staticClaims);
         
-        List<URI> supportedClaims = new ArrayList<URI>();
+        List<URI> supportedClaims = new ArrayList<>();
         supportedClaims.add(CLAIM_APPLICATION);
         claimsHandler.setSupportedClaims(supportedClaims);
         

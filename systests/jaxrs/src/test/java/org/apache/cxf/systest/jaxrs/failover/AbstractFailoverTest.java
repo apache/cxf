@@ -167,7 +167,7 @@ public abstract class AbstractFailoverTest extends AbstractBusClientServerTestBa
         String address2 = "http://localhost:" + NON_PORT + "/non-existent2";
         
         FailoverFeature feature = new FailoverFeature();
-        List<String> alternateAddresses = new ArrayList<String>();
+        List<String> alternateAddresses = new ArrayList<>();
         alternateAddresses.add(address);
         alternateAddresses.add(address2);
         CustomRetryStrategy strategy = new CustomRetryStrategy();
@@ -208,7 +208,7 @@ public abstract class AbstractFailoverTest extends AbstractBusClientServerTestBa
                                                 FailoverFeature feature) {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         bean.setAddress(address);
-        List<Feature> features = new ArrayList<Feature>();
+        List<Feature> features = new ArrayList<>();
         features.add(feature);
         bean.setFeatures(features);
         

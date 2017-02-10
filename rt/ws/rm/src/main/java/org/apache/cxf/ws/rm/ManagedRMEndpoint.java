@@ -215,7 +215,7 @@ public class ManagedRMEndpoint implements ManagedComponent {
             throw new IllegalArgumentException("no sequence");
         }
         
-        List<Long> list = new ArrayList<Long>();
+        List<Long> list = new ArrayList<>();
         
         for (AcknowledgementRange r : ss.getAcknowledgement().getAcknowledgementRange()) {
             list.add(r.getLower());
@@ -234,7 +234,7 @@ public class ManagedRMEndpoint implements ManagedComponent {
             throw new IllegalArgumentException("no sequence");
         }
         
-        List<Long> list = new ArrayList<Long>();
+        List<Long> list = new ArrayList<>();
         
         for (AcknowledgementRange r : ds.getAcknowledgment().getAcknowledgementRange()) {
             list.add(r.getLower());
@@ -334,7 +334,7 @@ public class ManagedRMEndpoint implements ManagedComponent {
     })
     public String[] getSourceSequenceIds(boolean expired) {
         Source source = endpoint.getSource();
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         for (SourceSequence ss : source.getAllSequences()) {
             if (expired || !ss.isExpired()) {
                 list.add(ss.getIdentifier().getValue());
@@ -347,7 +347,7 @@ public class ManagedRMEndpoint implements ManagedComponent {
     @ManagedOperation(description = "List of Destination Sequence IDs")
     public String[] getDestinationSequenceIds() {
         Destination destination = endpoint.getDestination();
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         for (DestinationSequence ds : destination.getAllSequences()) {
             list.add(ds.getIdentifier().getValue());
         }
@@ -442,7 +442,7 @@ public class ManagedRMEndpoint implements ManagedComponent {
         @ManagedOperationParameter(name = "expired", description = "The expired sequences included") 
     })
     public CompositeData[] getSourceSequences(boolean expired) throws JMException {
-        List<CompositeData> sps = new ArrayList<CompositeData>();
+        List<CompositeData> sps = new ArrayList<>();
         
         Source source = endpoint.getSource();
         for (SourceSequence ss : source.getAllSequences()) {
@@ -466,7 +466,7 @@ public class ManagedRMEndpoint implements ManagedComponent {
     
     @ManagedOperation(description = "Destination Sequences Properties")
     public CompositeData[] getDestinationSequences() throws JMException {
-        List<CompositeData> sps = new ArrayList<CompositeData>();
+        List<CompositeData> sps = new ArrayList<>();
         
         Destination destination = endpoint.getDestination();
         for (DestinationSequence ds : destination.getAllSequences()) {

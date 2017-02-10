@@ -439,8 +439,8 @@ public final class SSLUtils {
                                            String[] supportedCipherSuites,
                                            Logger log, boolean exclude) {
         // We have explicit filters, so use the "include/exclude" cipherSuiteFilter configuration
-        List<String> filteredCipherSuites = new ArrayList<String>();
-        List<String> excludedCipherSuites = new ArrayList<String>();
+        List<String> filteredCipherSuites = new ArrayList<>();
+        List<String> excludedCipherSuites = new ArrayList<>();
         List<Pattern> includes =
             filters != null
                 ? compileRegexPatterns(filters.getInclude(), true, log)
@@ -494,7 +494,7 @@ public final class SSLUtils {
     private static List<Pattern> compileRegexPatterns(List<String> regexes,
                                                       boolean include,
                                                       Logger log) {
-        List<Pattern> patterns = new ArrayList<Pattern>();
+        List<Pattern> patterns = new ArrayList<>();
         if (regexes != null) {
             String msg = include
                          ? "CIPHERSUITE_INCLUDE_FILTER"

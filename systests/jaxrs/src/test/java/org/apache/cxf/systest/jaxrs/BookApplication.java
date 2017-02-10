@@ -70,7 +70,7 @@ public class BookApplication extends Application {
 
     @Override 
     public Set<Object> getSingletons() {
-        Set<Object> classes = new HashSet<Object>();
+        Set<Object> classes = new HashSet<>();
         org.apache.cxf.systest.jaxrs.BookStore store = 
             new org.apache.cxf.systest.jaxrs.BookStore(uriInfo);
         store.setDefaultNameAndId(defaultName, defaultId);

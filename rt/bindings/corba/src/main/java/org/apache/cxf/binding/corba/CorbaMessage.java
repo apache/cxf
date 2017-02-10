@@ -53,7 +53,7 @@ public class CorbaMessage extends AbstractWrappedMessage {
             list = msg.getList();
             corbaTypeMap = msg.getCorbaTypeMap();
         } else {
-            this.arguments = new ArrayList<CorbaStreamable>();    
+            this.arguments = new ArrayList<>();    
         }        
     }
 
@@ -84,7 +84,7 @@ public class CorbaMessage extends AbstractWrappedMessage {
 
     public final void addStreamableArgument(CorbaStreamable arg) {
         if (this.arguments == null) {
-            this.arguments = new ArrayList<CorbaStreamable>(1);
+            this.arguments = new ArrayList<>(1);
         }
 
         this.arguments.add(arg);
@@ -97,7 +97,7 @@ public class CorbaMessage extends AbstractWrappedMessage {
 
     public final void setStreamableArguments(CorbaStreamable[] data) {
         if (this.arguments == null) {
-            this.arguments = new ArrayList<CorbaStreamable>(data.length);
+            this.arguments = new ArrayList<>(data.length);
         }
 
         for (CorbaStreamable streamable : data) {         

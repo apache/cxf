@@ -69,7 +69,7 @@ public class DestinationSequence extends AbstractSequence {
     private long nextInOrder;
     private List<Continuation> continuations = new LinkedList<Continuation>();
     // this map is used for robust and redelivery tracking. for redelivery it holds the beingDeliverd messages
-    private Set<Long> deliveringMessageNumbers = new HashSet<Long>();
+    private Set<Long> deliveringMessageNumbers = new HashSet<>();
     
     public DestinationSequence(Identifier i, EndpointReferenceType a, Destination d, ProtocolVariation pv) {
         this(i, a, 0, false, null, pv);
@@ -484,7 +484,7 @@ public class DestinationSequence extends AbstractSequence {
     synchronized void scheduleDeferredAcknowledgement(long delay) {
         
         if (null == deferredAcknowledgments) {
-            deferredAcknowledgments = new ArrayList<DeferredAcknowledgment>();
+            deferredAcknowledgments = new ArrayList<>();
         }
         long now = System.currentTimeMillis();
         long expectedExecutionTime = now + delay;

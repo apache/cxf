@@ -96,7 +96,7 @@ public class SOAPHandlerInterceptorTest extends Assert {
     @Test
     public void testChangeSOAPBodyOutBound() throws Exception {
         @SuppressWarnings("rawtypes")
-        List<Handler> list = new ArrayList<Handler>();
+        List<Handler> list = new ArrayList<>();
         list.add(new SOAPHandler<SOAPMessageContext>() {
             public boolean handleMessage(SOAPMessageContext smc) {
                 Boolean outboundProperty = (Boolean)smc.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
@@ -191,7 +191,7 @@ public class SOAPHandlerInterceptorTest extends Assert {
     @Test
     public void testChangeSOAPHeaderInBound() throws Exception {
         @SuppressWarnings("rawtypes")
-        List<Handler> list = new ArrayList<Handler>();
+        List<Handler> list = new ArrayList<>();
         list.add(new SOAPHandler<SOAPMessageContext>() {
             public boolean handleMessage(SOAPMessageContext smc) {
                 try {
@@ -289,7 +289,7 @@ public class SOAPHandlerInterceptorTest extends Assert {
     @Test
     public void testChangeSOAPHeaderOutBound() throws Exception {
         @SuppressWarnings("rawtypes")
-        List<Handler> list = new ArrayList<Handler>();
+        List<Handler> list = new ArrayList<>();
         list.add(new SOAPHandler<SOAPMessageContext>() {
             public boolean handleMessage(SOAPMessageContext smc) {
                 try {
@@ -391,7 +391,7 @@ public class SOAPHandlerInterceptorTest extends Assert {
     @Test
     public void testGetSOAPMessageInBound() throws Exception {
         @SuppressWarnings("rawtypes")
-        List<Handler> list = new ArrayList<Handler>();
+        List<Handler> list = new ArrayList<>();
         list.add(new SOAPHandler<SOAPMessageContext>() {
             public boolean handleMessage(SOAPMessageContext smc) {
                 try {
@@ -450,7 +450,7 @@ public class SOAPHandlerInterceptorTest extends Assert {
     @Test
     public void testGetUnderstoodHeadersReturnsNull() {
         @SuppressWarnings("rawtypes")
-        List<Handler> list = new ArrayList<Handler>();
+        List<Handler> list = new ArrayList<>();
         list.add(new SOAPHandler<SOAPMessageContext>() {
             public boolean handleMessage(SOAPMessageContext smc) {
                 return true;
@@ -475,7 +475,7 @@ public class SOAPHandlerInterceptorTest extends Assert {
         SoapMessage message = control.createMock(SoapMessage.class);
         Exchange exchange = control.createMock(Exchange.class);
         expect(message.getExchange()).andReturn(exchange).anyTimes();
-        expect(message.keySet()).andReturn(new HashSet<String>());
+        expect(message.keySet()).andReturn(new HashSet<>());
         expect(exchange.get(HandlerChainInvoker.class)).andReturn(invoker);
         control.replay();
 

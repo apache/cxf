@@ -35,7 +35,7 @@ public class OptionGroup implements TokenConsumer {
     private static final Logger LOG = LogUtils.getL7dLogger(OptionGroup.class);
     private final Element element;
 
-    private final List<Option> options = new ArrayList<Option>();
+    private final List<Option> options = new ArrayList<>();
 
     public OptionGroup(Element el) {
         this.element = el;

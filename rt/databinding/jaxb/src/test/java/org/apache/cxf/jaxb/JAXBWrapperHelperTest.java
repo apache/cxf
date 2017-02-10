@@ -103,7 +103,7 @@ public class JAXBWrapperHelperTest extends Assert {
         @XmlElement(name = "Parameter4")
         protected String parameter4;
         @XmlElement(name = "Parameter5")
-        protected List<String> parameter5 = new ArrayList<String>();
+        protected List<String> parameter5 = new ArrayList<>();
         
         
         /**

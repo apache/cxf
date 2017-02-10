@@ -67,13 +67,13 @@ public class SOAPHandlerFaultOutInterceptor extends
     }
 
     public Set<URI> getRoles() {
-        Set<URI> roles = new HashSet<URI>();
+        Set<URI> roles = new HashSet<>();
         // TODO
         return roles;
     }
 
     public Set<QName> getUnderstoodHeaders() {
-        Set<QName> understood = new HashSet<QName>();
+        Set<QName> understood = new HashSet<>();
         for (Handler<?> h : getBinding().getHandlerChain()) {
             if (h instanceof SOAPHandler) {
                 Set<QName> headers = CastUtils.cast(((SOAPHandler<?>) h).getHeaders());

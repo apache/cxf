@@ -57,7 +57,7 @@ public class RealmSupportTest extends org.junit.Assert {
         realmCHandler.setRealm("B");
         realmCHandler.setSupportedClaimTypes(Collections.singletonList(URI.create("Claim-C")));
         
-        List<ClaimsHandler> claimHandlers = new ArrayList<ClaimsHandler>();
+        List<ClaimsHandler> claimHandlers = new ArrayList<>();
         claimHandlers.add(realmAHandler);
         claimHandlers.add(realmBHandler);
         claimHandlers.add(realmCHandler);
@@ -91,7 +91,7 @@ public class RealmSupportTest extends org.junit.Assert {
         realmCHandler.setRealm("B");
         realmCHandler.setSupportedClaimTypes(Collections.singletonList(URI.create("Claim-C")));
         
-        List<ClaimsHandler> claimHandlers = new ArrayList<ClaimsHandler>();
+        List<ClaimsHandler> claimHandlers = new ArrayList<>();
         claimHandlers.add(realmAHandler);
         claimHandlers.add(realmBHandler);
         claimHandlers.add(realmCHandler);
@@ -126,7 +126,7 @@ public class RealmSupportTest extends org.junit.Assert {
         realmCHandler.setSupportedRealms(Collections.singletonList("A"));
         realmCHandler.setSupportedClaimTypes(Collections.singletonList(URI.create("Claim-C")));
         
-        List<ClaimsHandler> claimHandlers = new ArrayList<ClaimsHandler>();
+        List<ClaimsHandler> claimHandlers = new ArrayList<>();
         claimHandlers.add(realmAHandler);
         claimHandlers.add(realmBHandler);
         claimHandlers.add(realmCHandler);
@@ -165,7 +165,7 @@ public class RealmSupportTest extends org.junit.Assert {
         realmCHandler.setSupportedRealms(Collections.singletonList("A"));
         realmCHandler.setSupportedClaimTypes(Collections.singletonList(URI.create("Claim-C")));
         
-        List<ClaimsHandler> claimHandlers = new ArrayList<ClaimsHandler>();
+        List<ClaimsHandler> claimHandlers = new ArrayList<>();
         claimHandlers.add(realmAHandler);
         claimHandlers.add(realmBHandler);
         claimHandlers.add(realmCHandler);

@@ -278,7 +278,7 @@ public class ServiceImplTest extends AbstractJaxWsTest {
 
         @SuppressWarnings("rawtypes")
         public List<Handler> getHandlerChain(PortInfo portInfo) {
-            List<Handler> handlerList = new ArrayList<Handler>();
+            List<Handler> handlerList = new ArrayList<>();
             this.info = portInfo;
             return handlerList;
         }

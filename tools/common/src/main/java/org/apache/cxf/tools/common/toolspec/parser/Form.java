@@ -37,9 +37,9 @@ public class Form implements TokenConsumer {
     private static final Logger LOG = LogUtils.getL7dLogger(Form.class);
     private final Element element;
 
-    private final List<Object> arguments = new ArrayList<Object>();
-    private final List<Object> optionGroups = new ArrayList<Object>();
-    private final List<Object> options = new ArrayList<Object>();
+    private final List<Object> arguments = new ArrayList<>();
+    private final List<Object> optionGroups = new ArrayList<>();
+    private final List<Object> options = new ArrayList<>();
 
     public Form(Element el) {
         this.element = el;

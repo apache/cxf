@@ -128,13 +128,13 @@ public class JAXWSBinding implements ExtensibilityElement, Serializable {
 
     public void addJaxwsPara(JAXWSParameter para) {
         if (jaxwsPara == null) {
-            jaxwsPara = new ArrayList<JAXWSParameter>();
+            jaxwsPara = new ArrayList<>();
         }
         jaxwsPara.add(para);
     }
 
     public void setJaxwsParas(List<JAXWSParameter> p) {
-        jaxwsPara = new ArrayList<JAXWSParameter>(p);
+        jaxwsPara = new ArrayList<>(p);
     }
     public List<JAXWSParameter> getJaxwsParas() {
         return jaxwsPara;

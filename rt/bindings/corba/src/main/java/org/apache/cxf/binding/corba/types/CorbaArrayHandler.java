@@ -27,7 +27,7 @@ import org.omg.CORBA.TypeCode;
 
 public class CorbaArrayHandler extends CorbaObjectHandler {
 
-    private List<CorbaObjectHandler> elements = new ArrayList<CorbaObjectHandler>();
+    private List<CorbaObjectHandler> elements = new ArrayList<>();
     
     public CorbaArrayHandler(QName arrayName, QName arrayIdlType, TypeCode arrayTC, Object arrayType) {
         super(arrayName, arrayIdlType, arrayTC, arrayType);

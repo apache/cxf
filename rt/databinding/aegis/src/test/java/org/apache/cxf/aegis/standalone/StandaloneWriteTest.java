@@ -104,7 +104,7 @@ public class StandaloneWriteTest {
         context = new AegisContext();
         context.setWriteXsiTypes(true);
         context.initialize();
-        List<String> strings = new ArrayList<String>();
+        List<String> strings = new ArrayList<>();
         strings.add("cat");
         strings.add("dog");
         strings.add("hailstorm");

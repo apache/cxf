@@ -30,7 +30,7 @@ import org.junit.Assert;
 
 
 public abstract class AbstractClientServerTestBase extends Assert {
-    private static List<ServerLauncher> launchers = new ArrayList<ServerLauncher>();  
+    private static List<ServerLauncher> launchers = new ArrayList<>();  
 
 
     @AfterClass

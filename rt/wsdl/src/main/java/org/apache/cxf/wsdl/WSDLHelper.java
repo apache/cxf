@@ -78,7 +78,7 @@ public class WSDLHelper {
     }
 
     public List<PortType> getPortTypes(Definition def) {
-        List<PortType> portTypes = new ArrayList<PortType>();
+        List<PortType> portTypes = new ArrayList<>();
         Collection<PortType> ite = CastUtils.cast(def.getPortTypes().values());
         for (PortType portType : ite) {
             portTypes.add(portType);
@@ -88,7 +88,7 @@ public class WSDLHelper {
 
     public List<Part> getInMessageParts(Operation operation) {
         Input input = operation.getInput();
-        List<Part> partsList = new ArrayList<Part>();
+        List<Part> partsList = new ArrayList<>();
         if (input != null && input.getMessage() != null) {
             Collection<Part> parts = CastUtils.cast(input.getMessage().getParts().values());
             for (Part p : parts) {
@@ -100,7 +100,7 @@ public class WSDLHelper {
 
     public List<Part> getOutMessageParts(Operation operation) {
         Output output = operation.getOutput();
-        List<Part> partsList = new ArrayList<Part>();
+        List<Part> partsList = new ArrayList<>();
         if (output != null && output.getMessage() != null) {
             Collection<Part> parts = CastUtils.cast(output.getMessage().getParts().values());
             for (Part p : parts) {

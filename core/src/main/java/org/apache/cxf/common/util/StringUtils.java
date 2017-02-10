@@ -92,7 +92,7 @@ public final class StringUtils {
     
     public static List<String> getParts(String str, String separator) {
         String[] parts = split(str, separator);
-        List<String> ret = new ArrayList<String>(parts.length);
+        List<String> ret = new ArrayList<>(parts.length);
         for (String part : parts) {
             if (!isEmpty(part)) {
                 ret.add(part);
@@ -127,7 +127,7 @@ public final class StringUtils {
         if (isEmpty(regex) || isEmpty(contents)) {
             return null;
         }
-        List<String> results = new ArrayList<String>();
+        List<String> results = new ArrayList<>();
         Pattern pattern = Pattern.compile(regex, Pattern.UNICODE_CASE);
         Matcher matcher = pattern.matcher(contents);
         

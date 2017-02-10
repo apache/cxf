@@ -235,7 +235,7 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
     ) {
         TokenProviderParameters providerParameters = jwtClaimsProviderParameters.getProviderParameters();
         
-        List<String> audiences = new ArrayList<String>();
+        List<String> audiences = new ArrayList<>();
         String appliesToAddress = providerParameters.getAppliesToAddress();
         if (appliesToAddress != null) {
             audiences.add(appliesToAddress);

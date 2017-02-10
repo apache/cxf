@@ -268,7 +268,7 @@ public final class PluginLoader {
     }
 
     private List<FrontEndGenerator> getFrontEndGenerators(FrontEnd frontend) {
-        List<FrontEndGenerator> generators = new ArrayList<FrontEndGenerator>();
+        List<FrontEndGenerator> generators = new ArrayList<>();
 
         String fullClzName = null;
         try {

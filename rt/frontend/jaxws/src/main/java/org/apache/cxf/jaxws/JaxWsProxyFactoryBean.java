@@ -61,7 +61,7 @@ import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
 @NoJSR250Annotations
 public class JaxWsProxyFactoryBean extends ClientProxyFactoryBean {
     @SuppressWarnings("rawtypes")
-    List<Handler> handlers = new ArrayList<Handler>();
+    List<Handler> handlers = new ArrayList<>();
     boolean loadHandlers = true;
     
     public JaxWsProxyFactoryBean() {
@@ -176,7 +176,7 @@ public class JaxWsProxyFactoryBean extends ClientProxyFactoryBean {
         AnnotationHandlerChainBuilder builder = new AnnotationHandlerChainBuilder();
         JaxWsServiceFactoryBean sf = (JaxWsServiceFactoryBean)getServiceFactory(); 
         @SuppressWarnings("rawtypes")
-        List<Handler> chain = new ArrayList<Handler>(handlers);
+        List<Handler> chain = new ArrayList<>(handlers);
         if (loadHandlers) {
             chain.addAll(builder.buildHandlerChainFromClass(sf.getServiceClass(),
                                                             sf.getEndpointInfo().getName(),

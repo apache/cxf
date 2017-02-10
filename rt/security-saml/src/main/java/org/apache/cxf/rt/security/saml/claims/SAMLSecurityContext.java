@@ -88,7 +88,7 @@ public class SAMLSecurityContext implements ClaimsSecurityContext {
         if (roles == null) {
             return Collections.emptySet();
         }
-        Set<Principal> retRoles = new HashSet<Principal>(roles);
+        Set<Principal> retRoles = new HashSet<>(roles);
         if (principal != null && retRoles.contains(principal)) {
             retRoles.remove(principal);
         }

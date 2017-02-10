@@ -64,7 +64,7 @@ public abstract class AbstractStaticFailoverStrategy implements FailoverStrategy
      */
     public List<String> getAlternateAddresses(Exchange exchange) {
         return alternateAddresses != null
-               ? new ArrayList<String>(alternateAddresses)
+               ? new ArrayList<>(alternateAddresses)
                : null;
     }
 
@@ -134,7 +134,7 @@ public abstract class AbstractStaticFailoverStrategy implements FailoverStrategy
         Endpoint endpoint = exchange.getEndpoint();
         Collection<ServiceInfo> services = endpoint.getService().getServiceInfos();
         QName currentBinding = endpoint.getBinding().getBindingInfo().getName();
-        List<Endpoint> alternates = new ArrayList<Endpoint>();
+        List<Endpoint> alternates = new ArrayList<>();
         for (ServiceInfo service : services) {
             Collection<EndpointInfo> candidates = service.getEndpoints();
             for (EndpointInfo candidate : candidates) {

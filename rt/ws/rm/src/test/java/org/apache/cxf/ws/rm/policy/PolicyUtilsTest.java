@@ -135,7 +135,7 @@ public class PolicyUtilsTest extends Assert {
         control.reset();
         AssertionInfoMap aim = control.createMock(AssertionInfoMap.class);
         EasyMock.expect(message.get(AssertionInfoMap.class)).andReturn(aim);
-        Collection<AssertionInfo> ais = new ArrayList<AssertionInfo>();
+        Collection<AssertionInfo> ais = new ArrayList<>();
         EasyMock.expect(aim.get(RM10Constants.RMASSERTION_QNAME)).andReturn(ais);
         control.replay();
         assertSame(cfg, RMPolicyUtilities.getRMConfiguration(cfg, message));

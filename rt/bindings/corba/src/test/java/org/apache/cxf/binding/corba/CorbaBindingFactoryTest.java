@@ -133,7 +133,7 @@ public class CorbaBindingFactoryTest extends Assert {
                          "SimpleCORBAService", 
                          "SimpleCORBAPort");
         
-        List<String> strs = new ArrayList<String>();
+        List<String> strs = new ArrayList<>();
         strs.add("one");
         strs.add("two");
         factory.setTransportIds(strs);        

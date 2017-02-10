@@ -203,7 +203,7 @@ public class UDPDestination extends AbstractDestination {
         }
         if (ret == null) {
             Enumeration<NetworkInterface> ifcs = NetworkInterface.getNetworkInterfaces();
-            List<NetworkInterface> possibles = new ArrayList<NetworkInterface>();
+            List<NetworkInterface> possibles = new ArrayList<>();
             while (ifcs.hasMoreElements()) {
                 NetworkInterface ni = ifcs.nextElement();
                 if (ni.supportsMulticast()

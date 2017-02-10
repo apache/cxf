@@ -69,7 +69,7 @@ public class HttpHeadersImpl implements HttpHeaders {
     private static final String QUOTE = "\"";
     private static final Set<String> HEADERS_WITH_POSSIBLE_QUOTES;
     static {
-        HEADERS_WITH_POSSIBLE_QUOTES = new HashSet<String>();
+        HEADERS_WITH_POSSIBLE_QUOTES = new HashSet<>();
         HEADERS_WITH_POSSIBLE_QUOTES.add(HttpHeaders.CONTENT_TYPE);
         HEADERS_WITH_POSSIBLE_QUOTES.add(HttpHeaders.CACHE_CONTROL);
         HEADERS_WITH_POSSIBLE_QUOTES.add(HttpHeaders.ETAG);
@@ -188,7 +188,7 @@ public class HttpHeadersImpl implements HttpHeaders {
             return Collections.singletonList(new Locale("*"));
         }
         
-        List<Locale> newLs = new ArrayList<Locale>(); 
+        List<Locale> newLs = new ArrayList<>(); 
         Map<Locale, Float> prefs = new HashMap<Locale, Float>();
         for (String l : ls) {
             String[] pair = StringUtils.split(l, ";");
@@ -264,7 +264,7 @@ public class HttpHeadersImpl implements HttpHeaders {
             if (ls.length == 1) {
                 return Collections.singletonList(ls[0].trim());
             } else {
-                List<String> newValues = new ArrayList<String>();
+                List<String> newValues = new ArrayList<>();
                 for (String v : ls) {
                     newValues.add(v.trim());
                 }
@@ -276,7 +276,7 @@ public class HttpHeadersImpl implements HttpHeaders {
                 : originalValue.substring(1, originalValue.length() - 1);
             return Collections.singletonList(actualValue);
         }
-        List<String> values = new ArrayList<String>(4);
+        List<String> values = new ArrayList<>(4);
         Matcher m = COMPLEX_HEADER_PATTERN.matcher(originalValue);
         while (m.find()) {
             String val = m.group().trim();

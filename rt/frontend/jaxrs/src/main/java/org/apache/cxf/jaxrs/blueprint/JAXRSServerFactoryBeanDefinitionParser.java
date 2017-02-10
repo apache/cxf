@@ -160,7 +160,7 @@ public class JAXRSServerFactoryBeanDefinitionParser extends SimpleBPBeanDefiniti
     }
 
     private static List<String> getResourceClassesFromElement(Element modelEl) {
-        List<String> resources = new ArrayList<String>();
+        List<String> resources = new ArrayList<>();
         List<Element> resourceEls =
             DOMUtils.findAllElementsByTagName(modelEl, "class");
         for (Element e : resourceEls) {

@@ -96,7 +96,7 @@ public class UniqueBodyValidator extends ServiceValidator {
                     uniqueNames.put(mName, op.getName());
                     if (action != null) {
                         if (opActions == null) {
-                            opActions = new HashSet<String>();
+                            opActions = new HashSet<>();
                             actions.put(mName, opActions);
                         }
                         opActions.add(action);

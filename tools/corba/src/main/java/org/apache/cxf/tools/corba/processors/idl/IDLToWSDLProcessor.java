@@ -672,7 +672,7 @@ public class IDLToWSDLProcessor extends IDLProcessor {
                 while (tokens.hasMoreTokens()) {
                     String token = tokens.nextToken();
                     //Revisit, Do we also take in the imports of the wsdl/schema?
-                    exModules.put(token, new ArrayList<String>());
+                    exModules.put(token, new ArrayList<>());
                 }               
             } else if (modules.startsWith(":")) {
                 //TO DO

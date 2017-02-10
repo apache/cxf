@@ -48,12 +48,12 @@ public class UDPTransportFactory extends AbstractTransportFactory
         = Arrays.asList(TRANSPORT_ID);
 
     private static final Logger LOG = LogUtils.getL7dLogger(UDPTransportFactory.class);
-    private static final Set<String> URI_PREFIXES = new HashSet<String>();
+    private static final Set<String> URI_PREFIXES = new HashSet<>();
     static {
         URI_PREFIXES.add("udp://");
     }
     
-    private Set<String> uriPrefixes = new HashSet<String>(URI_PREFIXES);
+    private Set<String> uriPrefixes = new HashSet<>(URI_PREFIXES);
 
     public UDPTransportFactory() {
         super(DEFAULT_NAMESPACES);

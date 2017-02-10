@@ -143,7 +143,7 @@ public class SearchContextImpl implements SearchContext {
     
     private String convertPlainQueriesToFiqlExp(MultivaluedMap<String, String> params) {
         SearchConditionBuilder builder = SearchConditionBuilder.instance();
-        List<CompleteCondition> list = new ArrayList<CompleteCondition>(params.size());
+        List<CompleteCondition> list = new ArrayList<>(params.size());
         
         for (Map.Entry<String, List<String>> entry : params.entrySet()) {
             list.add(getOrCondition(builder, entry));
@@ -169,7 +169,7 @@ public class SearchContextImpl implements SearchContext {
             ct = ConditionType.EQUALS;
         }
         
-        List<CompleteCondition> list = new ArrayList<CompleteCondition>(entry.getValue().size());
+        List<CompleteCondition> list = new ArrayList<>(entry.getValue().size());
         for (String value : entry.getValue()) {
             list.add(builder.is(key).comparesTo(ct, value));
         }

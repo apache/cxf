@@ -142,7 +142,7 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
     }
 
     private void loadWSFeatureAnnotation(Class<?> serviceClass, Class<?> implementorClass) {
-        List<WebServiceFeature> features = new ArrayList<WebServiceFeature>();
+        List<WebServiceFeature> features = new ArrayList<>();
         MTOM mtom = implInfo.getImplementorClass().getAnnotation(MTOM.class);
         if (mtom == null && serviceClass != null) {
             mtom = serviceClass.getAnnotation(MTOM.class);
@@ -302,7 +302,7 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
             //the invoke method, however, this CAN cause other problems
             //such as addresses in the wsdl not getting updated and such
             //so we'll WARN about it.....
-            List<QName> enames = new ArrayList<QName>();
+            List<QName> enames = new ArrayList<>();
             for (ServiceInfo si : getService().getServiceInfos()) {
                 for (EndpointInfo ep : si.getEndpoints()) {
                     enames.add(ep.getName());

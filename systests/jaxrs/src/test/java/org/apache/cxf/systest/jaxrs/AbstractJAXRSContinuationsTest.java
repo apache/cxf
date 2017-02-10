@@ -175,7 +175,7 @@ public abstract class AbstractJAXRSContinuationsTest extends AbstractBusClientSe
                                                              new ArrayBlockingQueue<Runnable>(10));
         CountDownLatch startSignal = new CountDownLatch(1);
         CountDownLatch doneSignal = new CountDownLatch(1);
-        List<BookWorker> workers = new ArrayList<BookWorker>(5);
+        List<BookWorker> workers = new ArrayList<>(5);
         for (int x = 1; x < 6; x++) {
             workers.add(new BookWorker("http://localhost:" + port + getBaseAddress() + pathSegment + "/" + x, 
                                        Integer.toString(x), 

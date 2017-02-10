@@ -92,7 +92,7 @@ public class STSClientTest extends Assert {
         NodeList metadataSections = 
             doc.getElementsByTagNameNS("http://schemas.xmlsoap.org/ws/2004/09/mex", "MetadataSection");
         Element wsdlDefinition = null;
-        List<Element> schemas = new ArrayList<Element>();
+        List<Element> schemas = new ArrayList<>();
         for (int i = 0; i < metadataSections.getLength(); i++) {
             Node node = metadataSections.item(i);
             if (node instanceof Element) {

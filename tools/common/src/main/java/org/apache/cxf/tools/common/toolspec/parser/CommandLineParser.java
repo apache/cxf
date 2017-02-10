@@ -61,7 +61,7 @@ public class CommandLineParser {
 
     public static String[] getArgsFromString(String s) {
         StringTokenizer toker = new StringTokenizer(s);
-        List<Object> res = new ArrayList<Object>();
+        List<Object> res = new ArrayList<>();
 
         while (toker.hasMoreTokens()) {
             res.add(toker.nextToken());

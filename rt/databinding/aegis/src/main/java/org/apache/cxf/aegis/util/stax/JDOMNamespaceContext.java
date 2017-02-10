@@ -44,7 +44,7 @@ public class JDOMNamespaceContext implements NamespaceContext {
     }
 
     public Iterator<String> getPrefixes(String uri) {
-        List<String> prefixes = new ArrayList<String>();
+        List<String> prefixes = new ArrayList<>();
         rawGetPrefixes(element, uri, prefixes);
         return prefixes.iterator();
     }

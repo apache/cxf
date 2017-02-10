@@ -141,7 +141,7 @@ public class WadlOption extends Option {
     }
 
     public List<String> generateCommandLine(File outputDirFile, URI basedir, URI wadlURI, boolean debug) {
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         addIfNotNull(list, outputDirFile, "-d");
         for (String binding : getBindingFiles()) {
             File bindingFile = new File(binding);

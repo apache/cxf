@@ -74,7 +74,7 @@ public class MemoryOAuthDataProvider implements OAuthDataProvider {
     }
     
     private List<OAuthPermission> getPermissionsInfo(List<String> requestPermissions) {
-        List<OAuthPermission> permissions = new ArrayList<OAuthPermission>();
+        List<OAuthPermission> permissions = new ArrayList<>();
         for (String requestScope : requestPermissions) {
             OAuthPermission oAuthPermission = AVAILABLE_PERMISSIONS.get(requestScope);
             permissions.add(oAuthPermission);

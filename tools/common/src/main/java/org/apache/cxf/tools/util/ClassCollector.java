@@ -40,7 +40,7 @@ public class ClassCollector {
     private final Map<String, String> reservedClassNames = new HashMap<String, String>();
     
 
-    private final Set<String> typesPackages = new HashSet<String>();
+    private final Set<String> typesPackages = new HashSet<>();
     
     public ClassCollector() {
         

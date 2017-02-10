@@ -84,7 +84,7 @@ public class JPACriteriaQueryVisitor<T, E> extends AbstractJPATypedQueryVisitor<
     public CriteriaQuery<E> orderBy(List<SingularAttribute<T, ?>> attributes, boolean asc) {
         CriteriaBuilder cb = getCriteriaBuilder();
         
-        List<Order> orders = new ArrayList<Order>();
+        List<Order> orders = new ArrayList<>();
         for (SingularAttribute<T, ?> attribute : attributes) {
             Path<?> selection = getRoot().get(attribute);
             Order order = asc ? cb.asc(selection) : cb.desc(selection);

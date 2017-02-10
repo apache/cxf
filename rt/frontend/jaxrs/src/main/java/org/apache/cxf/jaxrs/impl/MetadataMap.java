@@ -71,7 +71,7 @@ public class MetadataMap<K, V> implements MultivaluedMap<K, V> {
             this.m = new LinkedHashMap<K, List<V>>();
             if (store != null) {
                 for (Map.Entry<K, List<V>> entry : store.entrySet()) {
-                    List<V> values = new ArrayList<V>(entry.getValue());
+                    List<V> values = new ArrayList<>(entry.getValue());
                     m.put(entry.getKey(), values);
                 }
             }
@@ -101,7 +101,7 @@ public class MetadataMap<K, V> implements MultivaluedMap<K, V> {
         } catch (UnsupportedOperationException ex) {
             // this may happen if an unmodifiable List was set via put or putAll
             if (!readOnly) {
-                List<V> newList = new ArrayList<V>(data);
+                List<V> newList = new ArrayList<>(data);
                 put(key, newList);
                 addValue(key, value, last);
             } else {
@@ -113,7 +113,7 @@ public class MetadataMap<K, V> implements MultivaluedMap<K, V> {
     private List<V> getList(K key) {
         List<V> data = this.get(key);
         if (data == null) {
-            data = new ArrayList<V>();    
+            data = new ArrayList<>();    
             m.put(key, data);
         }
         return readOnly ? Collections.unmodifiableList(data) : data;
@@ -125,7 +125,7 @@ public class MetadataMap<K, V> implements MultivaluedMap<K, V> {
     }
 
     public void putSingle(K key, V value) {
-        List<V> data = new ArrayList<V>();
+        List<V> data = new ArrayList<>();
         data.add(value);
         this.put(key, data);
     }

@@ -46,7 +46,7 @@ public class ServiceSchemaInfo {
         return schemaInfoList;
     }
     public void setSchemaInfoList(List<SchemaInfo> schemaInfoList) {
-        this.schemaInfoList = new ArrayList<SchemaInfo>(schemaInfoList);
+        this.schemaInfoList = new ArrayList<>(schemaInfoList);
     }
     public Map<String, Element> getSchemaElementList() {
         return schemaElementList;

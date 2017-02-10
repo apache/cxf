@@ -116,7 +116,7 @@ public abstract class AbstractClient implements Client {
         "org.apache.cxf.transport.complete_if_service_not_available";
     
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractClient.class);
-    private static final Set<String> KNOWN_METHODS = new HashSet<String>(
+    private static final Set<String> KNOWN_METHODS = new HashSet<>(
         Arrays.asList("GET", "POST", "HEAD", "OPTIONS", "PUT", "DELETE", "TRACE"));
     
     protected ClientConfiguration cfg = new ClientConfiguration();
@@ -823,7 +823,7 @@ public abstract class AbstractClient implements Client {
 
     protected String[] parseQuotedHeaderValue(String originalValue) {
         // this algorithm isn't perfect; see CXF-3518 for further discussion.
-        List<String> results = new ArrayList<String>();
+        List<String> results = new ArrayList<>();
         char[] chars = originalValue.toCharArray();
 
         int lastIndex = chars.length - 1;

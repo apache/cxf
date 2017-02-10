@@ -32,6 +32,6 @@ import org.apache.cxf.aegis.namespaces.intf.NameService;
 public class NameServiceImpl implements NameService {
 
     public List<Name> listAvailableNames() {
-        return new ArrayList<Name>();
+        return new ArrayList<>();
     }
 }

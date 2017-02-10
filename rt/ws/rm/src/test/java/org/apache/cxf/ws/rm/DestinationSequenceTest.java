@@ -465,7 +465,7 @@ public class DestinationSequenceTest extends Assert {
         
         long mn = 10;        
         SequenceAcknowledgement ack = control.createMock(SequenceAcknowledgement.class);
-        List<AcknowledgementRange> ranges = new ArrayList<AcknowledgementRange>();
+        List<AcknowledgementRange> ranges = new ArrayList<>();
         AcknowledgementRange r = control.createMock(AcknowledgementRange.class);
         EasyMock.expect(ack.getAcknowledgementRange()).andReturn(ranges);
         config.setDeliveryAssurance(DeliveryAssurance.AT_MOST_ONCE);
@@ -500,7 +500,7 @@ public class DestinationSequenceTest extends Assert {
         config.setDeliveryAssurance(DeliveryAssurance.AT_LEAST_ONCE);
         
         SequenceAcknowledgement ack = factory.createSequenceAcknowledgement();
-        List<AcknowledgementRange> ranges = new ArrayList<AcknowledgementRange>();
+        List<AcknowledgementRange> ranges = new ArrayList<>();
         
         final AcknowledgementRange r = 
             factory.createSequenceAcknowledgementAcknowledgementRange();

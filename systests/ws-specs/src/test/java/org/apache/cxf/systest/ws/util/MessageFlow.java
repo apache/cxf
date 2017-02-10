@@ -47,8 +47,8 @@ public class MessageFlow extends Assert {
     public MessageFlow(List<byte[]> out, List<byte[]> in, String addrns, String rmns) throws Exception {
         addressingNamespace = addrns;
         rmNamespace = rmns;
-        inboundMessages = new ArrayList<Document>();
-        outboundMessages = new ArrayList<Document>();
+        inboundMessages = new ArrayList<>();
+        outboundMessages = new ArrayList<>();
         reset(out, in);
     }
     

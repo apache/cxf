@@ -33,7 +33,7 @@ public final class IdlRoot extends IdlScopeBase {
     private IdlRoot() {
         super(null, "");
         primitiveTypes = new HashMap<String, IdlType>();
-        includeList = new ArrayList<String>();
+        includeList = new ArrayList<>();
 
         for (short i = IdlPrimitive.MINIMUM; i <= IdlPrimitive.MAXIMUM; ++i) {
             IdlPrimitive prim = IdlPrimitive.create(this, i);

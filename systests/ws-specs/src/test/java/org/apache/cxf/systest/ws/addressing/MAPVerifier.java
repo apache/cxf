@@ -41,7 +41,7 @@ import static org.apache.cxf.ws.addressing.JAXWSAConstants.ADDRESSING_PROPERTIES
  */
 public class MAPVerifier extends AbstractPhaseInterceptor<Message> {
     VerificationCache verificationCache;
-    List<String> expectedExposedAs = new ArrayList<String>();
+    List<String> expectedExposedAs = new ArrayList<>();
     private Map<String, Object> mapProperties;
 
     public MAPVerifier() {

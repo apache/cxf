@@ -562,7 +562,7 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
 
         Element responseCollection = getDocumentElement((DOMSource)obj[0]);
         Node child = responseCollection.getFirstChild();
-        List<SecurityToken> tokens = new ArrayList<SecurityToken>();
+        List<SecurityToken> tokens = new ArrayList<>();
         while (child != null) {
             if (child instanceof Element 
                 && "RequestSecurityTokenResponse".equals(((Element)child).getLocalName())) {
@@ -612,7 +612,7 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
         
         Element responseCollection = getDocumentElement((DOMSource)obj[0]);
         Node child = responseCollection.getFirstChild();
-        List<SecurityToken> tokens = new ArrayList<SecurityToken>();
+        List<SecurityToken> tokens = new ArrayList<>();
         while (child != null) {
             if (child instanceof Element 
                 && "RequestSecurityTokenResponse".equals(((Element)child).getLocalName())) {

@@ -99,7 +99,7 @@ public class ConfigurationImpl implements Configuration {
 
     @Override
     public Set<Object> getInstances() {
-        Set<Object> allInstances = new HashSet<Object>();
+        Set<Object> allInstances = new HashSet<>();
         allInstances.addAll(providers.keySet());
         allInstances.addAll(features.keySet());
         return Collections.unmodifiableSet(allInstances);

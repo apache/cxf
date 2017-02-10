@@ -50,7 +50,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
     private String userInfo;
     private int port = -1;
     private String host;
-    private List<PathSegment> paths = new ArrayList<PathSegment>();
+    private List<PathSegment> paths = new ArrayList<>();
     private boolean originalPathEmpty;
     private boolean leadingSlash;
     private String fragment;
@@ -288,7 +288,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
         }
         int idx = ind;
         Set<String> pathEncodeVars = alreadyResolvedTsPathEnc.isEmpty() && !encodePathSlash 
-            ? Collections.<String>emptySet() : new HashSet<String>();
+            ? Collections.<String>emptySet() : new HashSet<>();
         for (String var : uniqueVars) {
             
             boolean resolvedPathVarHasToBeEncoded = alreadyResolvedTsPathEnc.containsKey(var);
@@ -340,7 +340,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
     //CHECKSTYLE:ON
         URITemplate templ = new URITemplate(path);
         
-        Set<String> uniqueVars = new HashSet<String>(templ.getVariables());
+        Set<String> uniqueVars = new HashSet<>(templ.getVariables());
         if (varValueMap.size() + alreadyResolvedTs.size() + alreadyResolvedTsEnc.size()
             + alreadyResolvedTsPathEnc.size() < uniqueVars.size()) {
             throw new IllegalArgumentException("Unresolved variables; only " + varValueMap.size()
@@ -349,7 +349,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
         }
         
         Set<String> pathEncodeVars = alreadyResolvedTsPathEnc.isEmpty() && !encodePathSlash 
-            ? Collections.<String>emptySet() : new HashSet<String>();
+            ? Collections.<String>emptySet() : new HashSet<>();
         
         Map<String, Object> theMap = new LinkedHashMap<String, Object>(); 
         for (String var : uniqueVars) {
@@ -418,7 +418,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
         builder.userInfo = userInfo;
         builder.port = port;
         builder.host = host;
-        builder.paths = new ArrayList<PathSegment>(paths);
+        builder.paths = new ArrayList<>(paths);
         builder.fragment = fragment;
         builder.query = new MetadataMap<String, String>(query);
         builder.matrix = new MetadataMap<String, String>(matrix);
@@ -555,7 +555,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
         if (checkSegments) { 
             segments = JAXRSUtils.getPathSegments(path, false, false);
         } else {
-            segments = new ArrayList<PathSegment>();
+            segments = new ArrayList<>();
             path = path.replaceAll("/", "%2F");
             segments.add(new PathSegmentImpl(path, false));
         }
@@ -806,7 +806,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
      * @throws IllegalArgumentException when one of values is null
      */
     private List<String> toStringList(boolean encodeSlash, Object... values) throws IllegalArgumentException {
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         if (values != null) {
             for (int i = 0; i < values.length; i++) {
                 Object value = values[i];

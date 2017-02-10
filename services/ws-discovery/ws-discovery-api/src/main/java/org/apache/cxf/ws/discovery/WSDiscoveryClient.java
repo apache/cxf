@@ -259,7 +259,7 @@ public class WSDiscoveryClient implements Closeable {
                 Header h = new Header(seq.getName(),
                                       seq,
                                       new JAXBDataBinding(getJAXBContext()));
-                List<Header> headers = new ArrayList<Header>();
+                List<Header> headers = new ArrayList<>();
                 headers.add(h);
                 p.getRequestContext()
                     .put(Header.HEADER_LIST, headers);
@@ -333,7 +333,7 @@ public class WSDiscoveryClient implements Closeable {
             p.getTypes().add(type);
         }
         ProbeMatchesType pmt = probe(p, defaultProbeTimeout);
-        List<EndpointReference> er = new ArrayList<EndpointReference>();
+        List<EndpointReference> er = new ArrayList<>();
         for (ProbeMatchType pm : pmt.getProbeMatch()) {
             for (String add : pm.getXAddrs()) {
                 W3CEndpointReferenceBuilder builder = new W3CEndpointReferenceBuilder();

@@ -48,7 +48,7 @@ import org.apache.cxf.message.Message;
 public class SOAPMessageContextImpl extends WrappedMessageContext implements SOAPMessageContext {
     private static final SAAJInInterceptor SAAJ_IN = new SAAJInInterceptor();
     
-    private Set<String> roles = new HashSet<String>();
+    private Set<String> roles = new HashSet<>();
     
     public SOAPMessageContextImpl(Message m) {
         super(m, Scope.HANDLER);
@@ -91,7 +91,7 @@ public class SOAPMessageContextImpl extends WrappedMessageContext implements SOA
             if (header == null || !header.hasChildNodes()) {
                 return new Object[0];
             }
-            List<Object> ret = new ArrayList<Object>();
+            List<Object> ret = new ArrayList<>();
             Iterator<SOAPHeaderElement> it = CastUtils.cast(header.examineAllHeaderElements());
             while (it.hasNext()) {
                 SOAPHeaderElement she = it.next();

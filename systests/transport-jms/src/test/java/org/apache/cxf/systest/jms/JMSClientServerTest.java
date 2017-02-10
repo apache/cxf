@@ -78,7 +78,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(JMSClientServerTest.class);
  
     private static EmbeddedJMSBrokerLauncher broker;
-    private List<String> wsdlStrings = new ArrayList<String>();
+    private List<String> wsdlStrings = new ArrayList<>();
     
     @BeforeClass
     public static void startServers() throws Exception {

@@ -102,12 +102,12 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
         TokenValidateOperation validateOperation = new TokenValidateOperation();
         
         // Add Token Validator
-        List<TokenValidator> validatorList = new ArrayList<TokenValidator>();
+        List<TokenValidator> validatorList = new ArrayList<>();
         validatorList.add(new UsernameTokenValidator());
         validateOperation.setTokenValidators(validatorList);
 
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new SAMLTokenProvider());
         validateOperation.setTokenProviders(providerList);
         
@@ -183,14 +183,14 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
         TokenValidateOperation validateOperation = new TokenValidateOperation();
         
         // Add Token Validator
-        List<TokenValidator> validatorList = new ArrayList<TokenValidator>();
+        List<TokenValidator> validatorList = new ArrayList<>();
         UsernameTokenValidator validator = new UsernameTokenValidator();
         validator.setUsernameTokenRealmCodec(new CustomUsernameTokenRealmCodec());
         validatorList.add(validator);
         validateOperation.setTokenValidators(validatorList);
 
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         SAMLTokenProvider samlTokenProvider = new SAMLTokenProvider();
         providerList.add(samlTokenProvider);
         validateOperation.setTokenProviders(providerList);
@@ -327,18 +327,18 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
         Map<String, RealmProperties> realms = createSamlRealms();
         
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         SAMLTokenProvider samlTokenProvider = new SAMLTokenProvider();
         samlTokenProvider.setRealmMap(realms);
         List<AttributeStatementProvider> customProviderList = 
-            new ArrayList<AttributeStatementProvider>();
+            new ArrayList<>();
         customProviderList.add(new ClaimsAttributeStatementProvider());
         samlTokenProvider.setAttributeStatementProviders(customProviderList);
         providerList.add(samlTokenProvider);
         validateOperation.setTokenProviders(providerList);
         
         // Add Token Validator
-        List<TokenValidator> validatorList = new ArrayList<TokenValidator>();
+        List<TokenValidator> validatorList = new ArrayList<>();
         SAMLTokenValidator samlTokenValidator = new SAMLTokenValidator();
         samlTokenValidator.setSamlRealmCodec(new IssuerSAMLRealmCodec());
         validatorList.add(samlTokenValidator);
@@ -350,7 +350,7 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
         validateOperation.setServices(Collections.singletonList(service));
         
         // Add Relationship list
-        List<Relationship> relationshipList = new ArrayList<Relationship>();
+        List<Relationship> relationshipList = new ArrayList<>();
         Relationship rs = createRelationship();
         relationshipList.add(rs);
         
@@ -453,15 +453,15 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
         TokenValidateOperation validateOperation = new TokenValidateOperation();
         
         // Add Token Validator
-        List<TokenValidator> validatorList = new ArrayList<TokenValidator>();
+        List<TokenValidator> validatorList = new ArrayList<>();
         validatorList.add(new UsernameTokenValidator());
         validateOperation.setTokenValidators(validatorList);
 
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
        
         List<AttributeStatementProvider> customProviderList = 
-            new ArrayList<AttributeStatementProvider>();
+            new ArrayList<>();
         customProviderList.add(new CustomAttributeProvider());
         SAMLTokenProvider samlTokenProvider = new SAMLTokenProvider();
         samlTokenProvider.setAttributeStatementProviders(customProviderList);
@@ -550,18 +550,18 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
         Map<String, RealmProperties> realms = createSamlRealms();
         
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         SAMLTokenProvider samlTokenProvider = new SAMLTokenProvider();
         samlTokenProvider.setRealmMap(realms);
         List<AttributeStatementProvider> customProviderList = 
-            new ArrayList<AttributeStatementProvider>();
+            new ArrayList<>();
         customProviderList.add(new ClaimsAttributeStatementProvider());
         samlTokenProvider.setAttributeStatementProviders(customProviderList);
         providerList.add(samlTokenProvider);
         validateOperation.setTokenProviders(providerList);
         
         // Add Token Validator
-        List<TokenValidator> validatorList = new ArrayList<TokenValidator>();
+        List<TokenValidator> validatorList = new ArrayList<>();
         SAMLTokenValidator samlTokenValidator = new SAMLTokenValidator();
         samlTokenValidator.setSamlRealmCodec(new IssuerSAMLRealmCodec());
         validatorList.add(samlTokenValidator);
@@ -573,7 +573,7 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
         validateOperation.setServices(Collections.singletonList(service));
         
         // Add Relationship list
-        List<Relationship> relationshipList = new ArrayList<Relationship>();
+        List<Relationship> relationshipList = new ArrayList<>();
         Relationship rs = createRelationship();
         rs.setType(Relationship.FED_TYPE_IDENTITY);
         rs.setIdentityMapper(new CustomIdentityMapper());
@@ -839,7 +839,7 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
         SAMLTokenProvider samlTokenProvider = new SAMLTokenProvider();
         samlTokenProvider.setRealmMap(realms);
         List<AttributeStatementProvider> customProviderList = 
-            new ArrayList<AttributeStatementProvider>();
+            new ArrayList<>();
         customProviderList.add(new ClaimsAttributeStatementProvider());
         samlTokenProvider.setAttributeStatementProviders(customProviderList);
         

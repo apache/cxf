@@ -34,7 +34,7 @@ import org.apache.cxf.tracing.brave.jaxrs.BraveFeature;
 public class CatalogApplication extends Application {
     @Override
     public Set<Object> getSingletons() {
-        return new HashSet<Object>(
+        return new HashSet<>(
             Arrays.asList(
                 new Catalog(),
                 new BraveFeature(),

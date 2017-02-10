@@ -97,7 +97,7 @@ public class RMProperties {
     
     public void addAck(DestinationSequence seq) {
         if (null == acks) {
-            acks = new ArrayList<SequenceAcknowledgement>();
+            acks = new ArrayList<>();
         }
         SequenceAcknowledgement ack = seq.getAcknowledgment();
         acks.add(ack);

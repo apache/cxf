@@ -56,7 +56,7 @@ public class SAMLProviderCustomTest extends org.junit.Assert {
         TokenProviderParameters providerParameters = 
             createProviderParameters(WSConstants.WSS_SAML_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE);
         
-        List<AttributeStatementProvider> customProviderList = new ArrayList<AttributeStatementProvider>();
+        List<AttributeStatementProvider> customProviderList = new ArrayList<>();
         customProviderList.add(new CustomAttributeProvider());
         ((SAMLTokenProvider)samlTokenProvider).setAttributeStatementProviders(customProviderList);
         
@@ -84,7 +84,7 @@ public class SAMLProviderCustomTest extends org.junit.Assert {
             createProviderParameters(WSConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE);
         
         List<AuthenticationStatementProvider> customProviderList = 
-            new ArrayList<AuthenticationStatementProvider>();
+            new ArrayList<>();
         customProviderList.add(new CustomAuthenticationProvider());
         ((SAMLTokenProvider)samlTokenProvider).setAuthenticationStatementProviders(customProviderList);
         
@@ -112,7 +112,7 @@ public class SAMLProviderCustomTest extends org.junit.Assert {
             createProviderParameters(WSConstants.WSS_SAML_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE);
         
         List<AuthenticationStatementProvider> customProviderList = 
-            new ArrayList<AuthenticationStatementProvider>();
+            new ArrayList<>();
         customProviderList.add(new CustomAuthenticationProvider());
         ((SAMLTokenProvider)samlTokenProvider).setAuthenticationStatementProviders(customProviderList);
         
@@ -140,12 +140,12 @@ public class SAMLProviderCustomTest extends org.junit.Assert {
             createProviderParameters(WSConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE);
         
         List<AuthenticationStatementProvider> customProviderList = 
-            new ArrayList<AuthenticationStatementProvider>();
+            new ArrayList<>();
         customProviderList.add(new CustomAuthenticationProvider());
         ((SAMLTokenProvider)samlTokenProvider).setAuthenticationStatementProviders(customProviderList);
         
         List<AttributeStatementProvider> customAttributeProviderList = 
-            new ArrayList<AttributeStatementProvider>();
+            new ArrayList<>();
         customAttributeProviderList.add(new CustomAttributeProvider());
         ((SAMLTokenProvider)samlTokenProvider).setAttributeStatementProviders(customAttributeProviderList);
         
@@ -171,7 +171,7 @@ public class SAMLProviderCustomTest extends org.junit.Assert {
         TokenProviderParameters providerParameters = 
             createProviderParameters(WSConstants.WSS_SAML_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE);
         
-        List<AttributeStatementProvider> customProviderList = new ArrayList<AttributeStatementProvider>();
+        List<AttributeStatementProvider> customProviderList = new ArrayList<>();
         customProviderList.add(new CustomAttributeProvider());
         customProviderList.add(new CustomAttributeProvider());
         ((SAMLTokenProvider)samlTokenProvider).setAttributeStatementProviders(customProviderList);
@@ -200,7 +200,7 @@ public class SAMLProviderCustomTest extends org.junit.Assert {
             createProviderParameters(WSConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE);
         
         List<AuthDecisionStatementProvider> customProviderList = 
-            new ArrayList<AuthDecisionStatementProvider>();
+            new ArrayList<>();
         customProviderList.add(new CustomAuthDecisionProvider());
         ((SAMLTokenProvider)samlTokenProvider).setAuthDecisionStatementProviders(customProviderList);
         

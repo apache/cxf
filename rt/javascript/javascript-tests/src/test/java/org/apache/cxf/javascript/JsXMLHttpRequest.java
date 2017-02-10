@@ -77,7 +77,7 @@ public class JsXMLHttpRequest extends ScriptableObject {
     private static Charset utf8 = Charset.forName("utf-8");
     private static Set<String> validMethods;
     static {
-        validMethods = new HashSet<String>();
+        validMethods = new HashSet<>();
         validMethods.add("GET");
         validMethods.add("POST");
         validMethods.add("HEAD");

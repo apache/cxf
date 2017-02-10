@@ -87,7 +87,7 @@ public class BenchClient {
         verbose("Starting " + ID + " at " + (new Date()));
 
         // allow multiple URLs (each must start with http"
-        List<String> locationList = new ArrayList<String>();        
+        List<String> locationList = new ArrayList<>();        
         int pos = 0;
         while (pos < args.length) {
             String s = args[pos];
@@ -320,7 +320,7 @@ public class BenchClient {
                     }
                 }
             } else if (method == 'd') {
-            	ArrayList<Double> da = new ArrayList<Double>();            	 
+            	ArrayList<Double> da = new ArrayList<>();            	 
             	new Util<Double>().copyList(darr, off, da, td.arrSizeToSend);            	
                 List<Double> uda = null;
                 int dlen = -1;
@@ -349,7 +349,7 @@ public class BenchClient {
                     }
                 }
             } else if (method == 'i') {
-            	ArrayList<Integer> ia = new ArrayList<Integer>();
+            	ArrayList<Integer> ia = new ArrayList<>();
             	new Util<Integer>().copyList(iarr, off, ia, td.arrSizeToSend);
                 List<Integer> uia = null;
                 int ulen = -1;
@@ -380,7 +380,7 @@ public class BenchClient {
                     }
                 }
             } else if (method == 's') {
-            	ArrayList<String> sa = new ArrayList<String>();
+            	ArrayList<String> sa = new ArrayList<>();
             	new Util<String>().copyList(sarr, off, sa, td.arrSizeToSend);
                 List<String> usa = null;
                 int slen = -1;
@@ -413,7 +413,7 @@ public class BenchClient {
                     }
                 }
             } else if (method == 'm') {
-            	ArrayList<MeshInterfaceObject> ma = new ArrayList<MeshInterfaceObject>();
+            	ArrayList<MeshInterfaceObject> ma = new ArrayList<>();
             	new Util<MeshInterfaceObject>().copyList(marr, off, ma, td.arrSizeToSend);
                 List<MeshInterfaceObject> uma = null;
                 int slen = -1;
@@ -446,7 +446,7 @@ public class BenchClient {
                     }
                 }
             } else if (method == 'e') {
-            	ArrayList<SimpleEvent> ea = new ArrayList<SimpleEvent>();
+            	ArrayList<SimpleEvent> ea = new ArrayList<>();
             	new Util<SimpleEvent>().copyList(earr, off, ea, td.arrSizeToSend);
                 List<SimpleEvent> uea = null;
                 int slen = -1;

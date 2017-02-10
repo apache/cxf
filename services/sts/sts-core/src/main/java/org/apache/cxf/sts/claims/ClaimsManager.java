@@ -360,7 +360,7 @@ public class ClaimsManager {
             return Collections.emptyList();
         }
 
-        List<ProcessedClaim> collection = new ArrayList<ProcessedClaim>();
+        List<ProcessedClaim> collection = new ArrayList<>();
 
         for (org.opensaml.saml.saml2.core.AttributeStatement statement : attributeStatements) {
             if (LOG.isLoggable(Level.FINEST)) {

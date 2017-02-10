@@ -59,8 +59,8 @@ public class JwsJsonWriterInterceptor extends AbstractJwsJsonWriterProvider impl
         List<JwsSignatureProvider> sigProviders = getInitializedSigProviders();
         OutputStream actualOs = ctx.getOutputStream();
         if (useJwsOutputStream) {
-            List<String> protectedHeaders = new ArrayList<String>(sigProviders.size());
-            List<JwsSignature> signatures = new ArrayList<JwsSignature>(sigProviders.size());
+            List<String> protectedHeaders = new ArrayList<>(sigProviders.size());
+            List<JwsSignature> signatures = new ArrayList<>(sigProviders.size());
             for (JwsSignatureProvider signer : sigProviders) {
                 JwsHeaders protectedHeader = prepareProtectedHeader(ctx, signer);
                 String encoded = Base64UrlUtility.encode(writer.toJson(protectedHeader));

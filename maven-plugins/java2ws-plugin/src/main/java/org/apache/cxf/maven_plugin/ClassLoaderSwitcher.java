@@ -59,7 +59,7 @@ public class ClassLoaderSwitcher {
                                     boolean useCompileClasspath,
                                     String classpath,
                                     List<?> classpathElements) {
-        List<URL> urlList = new ArrayList<URL>();
+        List<URL> urlList = new ArrayList<>();
         StringBuilder buf = new StringBuilder();
 
         

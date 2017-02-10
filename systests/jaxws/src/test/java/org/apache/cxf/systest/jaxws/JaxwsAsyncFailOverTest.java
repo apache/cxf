@@ -79,7 +79,7 @@ public class JaxwsAsyncFailOverTest  extends AbstractBusClientServerTestBase {
          
     @Test
     public void testUseFailOverOnClient() throws Exception {
-        List<String> serviceList = new ArrayList<String>();
+        List<String> serviceList = new ArrayList<>();
         serviceList.add("http://localhost:" + PORT + "/SoapContext/GreeterPort");
 
         RandomStrategy strategy = new RandomStrategy();

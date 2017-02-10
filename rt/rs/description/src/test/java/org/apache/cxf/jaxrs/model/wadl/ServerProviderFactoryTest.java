@@ -76,7 +76,7 @@ public class ServerProviderFactoryTest extends Assert {
         assertEquals(1, pf.getPreMatchContainerRequestFilters().size());
         assertTrue(pf.getPreMatchContainerRequestFilters().get(0).getProvider() instanceof WadlGenerator);
         
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         WadlGenerator wg = new WadlGenerator();
         providers.add(wg);
         TestHandler th = new TestHandler();

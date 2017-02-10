@@ -101,7 +101,7 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
     }
 
     public Set<String> getArrayKeys() {
-        Set<String> set = new HashSet<String>();
+        Set<String> set = new HashSet<>();
         set.add(WadlToolConstants.CFG_BINDING);
         set.add(WadlToolConstants.CFG_SCHEMA_PACKAGENAME);
         set.add(WadlToolConstants.CFG_SCHEMA_TYPE_MAP);
@@ -232,7 +232,7 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
     private Set<String> parseMethodList(String paramName) {
         Object value = context.get(paramName);
         if (value != null) {
-            Set<String> methods = new HashSet<String>();
+            Set<String> methods = new HashSet<>();
             String[] values = value.toString().split(",");
             for (String s : values) {
                 String actual = s.trim();

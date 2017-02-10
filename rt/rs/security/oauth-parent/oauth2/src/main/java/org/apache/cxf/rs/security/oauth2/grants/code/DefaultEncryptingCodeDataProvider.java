@@ -37,7 +37,7 @@ import org.apache.cxf.rt.security.crypto.KeyProperties;
 public class DefaultEncryptingCodeDataProvider extends DefaultEncryptingOAuthDataProvider 
     implements AuthorizationCodeDataProvider {
     private long grantLifetime;
-    private Set<String> grants = Collections.synchronizedSet(new HashSet<String>());
+    private Set<String> grants = Collections.synchronizedSet(new HashSet<>());
     public DefaultEncryptingCodeDataProvider(String algo, int keySize) {
         super(algo, keySize);
     }
@@ -69,7 +69,7 @@ public class DefaultEncryptingCodeDataProvider extends DefaultEncryptingOAuthDat
 
     public List<ServerAuthorizationCodeGrant> getCodeGrants(Client c, UserSubject sub) {
         List<ServerAuthorizationCodeGrant> list = 
-            new ArrayList<ServerAuthorizationCodeGrant>(grants.size());
+            new ArrayList<>(grants.size());
         for (String key : grants) {
             ServerAuthorizationCodeGrant grant = getCodeGrant(key);
             if (c == null || grant.getClient().getClientId().equals(c.getClientId())) {

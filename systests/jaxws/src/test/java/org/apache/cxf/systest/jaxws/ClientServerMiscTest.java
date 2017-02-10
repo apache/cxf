@@ -495,14 +495,14 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
 
         Set<Foo> fooSet = port.getFooSet();
         assertEquals(2, fooSet.size());
-        assertEquals("size: 2", port.doFooList(new ArrayList<Foo>(fooSet)));
+        assertEquals("size: 2", port.doFooList(new ArrayList<>(fooSet)));
         
         assertEquals(24, port.echoIntDifferentWrapperName(24));
         
         String echoMsg = port.echo("Hello");
         assertEquals("Hello", echoMsg);
         
-        List<String> rev = new ArrayList<String>(Arrays.asList(DocLitWrappedCodeFirstServiceImpl.DATA));
+        List<String> rev = new ArrayList<>(Arrays.asList(DocLitWrappedCodeFirstServiceImpl.DATA));
         Collections.reverse(rev);
         
         String s;
@@ -532,7 +532,7 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
         assertEquals("string1string2string3string3string2string1Hello24", s);
         
         
-        s = port.listInput(new ArrayList<String>());
+        s = port.listInput(new ArrayList<>());
         assertEquals("", s);
 
         s = port.listInput(null);
@@ -683,7 +683,7 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
         String ret[] = port.convertToString(new int[] {1, 2, 3});
         assertEquals(3, ret.length);
 
-        List<String> rev = new ArrayList<String>(Arrays.asList(RpcLitCodeFirstServiceImpl.DATA));
+        List<String> rev = new ArrayList<>(Arrays.asList(RpcLitCodeFirstServiceImpl.DATA));
         Collections.reverse(rev);        
         
         String s;
@@ -713,7 +713,7 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
         assertEquals("string1string2string3string3string2string1Hello24", s);
         
         
-        s = port.listInput(new ArrayList<String>());
+        s = port.listInput(new ArrayList<>());
         assertEquals("", s);
 
         try {

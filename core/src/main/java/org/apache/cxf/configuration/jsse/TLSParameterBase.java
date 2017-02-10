@@ -36,7 +36,7 @@ public class TLSParameterBase {
     protected KeyManager[]    keyManagers;
     protected TrustManager[]  trustManagers;
     protected String          provider;
-    protected List<String>    ciphersuites = new ArrayList<String>();
+    protected List<String>    ciphersuites = new ArrayList<>();
     protected FiltersType     cipherSuiteFilters;
     protected CertificateConstraintsType certConstraints;
     protected SecureRandom    secureRandom;
@@ -100,7 +100,7 @@ public class TLSParameterBase {
      */
     public List<String> getCipherSuites() {
         if (ciphersuites == null) {
-            ciphersuites = new ArrayList<String>();
+            ciphersuites = new ArrayList<>();
         }
         return ciphersuites;
     }

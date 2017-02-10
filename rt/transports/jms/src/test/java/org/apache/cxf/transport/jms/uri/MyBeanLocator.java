@@ -47,7 +47,7 @@ public class MyBeanLocator implements ConfiguredBeanLocator {
     @SuppressWarnings("unchecked")
     @Override
     public <T> Collection<? extends T> getBeansOfType(Class<T> type) {
-        List<T> result = new ArrayList<T>();
+        List<T> result = new ArrayList<>();
         for (String name : registry.keySet()) {
             Object bean = registry.get(name);
             if (type.isAssignableFrom(bean.getClass())) {

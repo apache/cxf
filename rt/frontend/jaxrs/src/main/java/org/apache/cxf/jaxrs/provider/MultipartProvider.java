@@ -88,7 +88,7 @@ public class MultipartProvider extends AbstractConfigurableProvider
         WELL_KNOWN_MULTIPART_CLASSES.add(MultipartBody.class);
         WELL_KNOWN_MULTIPART_CLASSES.add(Attachment.class);
         
-        MULTIPART_SUBTYPES = new HashSet<String>();
+        MULTIPART_SUBTYPES = new HashSet<>();
         MULTIPART_SUBTYPES.add("form-data");
         MULTIPART_SUBTYPES.add("mixed");
         MULTIPART_SUBTYPES.add("related");
@@ -198,7 +198,7 @@ public class MultipartProvider extends AbstractConfigurableProvider
         if (Attachment.class.isAssignableFrom(actual)) {
             return infos;
         }
-        Collection<Object> objects = new ArrayList<Object>();
+        Collection<Object> objects = new ArrayList<>();
         for (Attachment a : infos) {
             objects.add(fromAttachment(a, actual, actual, anns));
         }
@@ -271,7 +271,7 @@ public class MultipartProvider extends AbstractConfigurableProvider
                                                    Annotation[] anns, MediaType mt)  throws IOException {
         if (Map.class.isAssignableFrom(obj.getClass())) {
             Map<Object, Object> objects = CastUtils.cast((Map<?, ?>)obj);
-            List<Attachment> handlers = new ArrayList<Attachment>(objects.size());
+            List<Attachment> handlers = new ArrayList<>(objects.size());
             int i = 0;
             for (Iterator<Map.Entry<Object, Object>> iter = objects.entrySet().iterator(); 
                 iter.hasNext();) {
@@ -304,7 +304,7 @@ public class MultipartProvider extends AbstractConfigurableProvider
     }
     
     private List<Attachment> getAttachments(List<?> objects, String rootMediaType) throws IOException {
-        List<Attachment> handlers = new ArrayList<Attachment>(objects.size());
+        List<Attachment> handlers = new ArrayList<>(objects.size());
         for (int i = 0; i < objects.size(); i++) {
             Object value = objects.get(i);
             Attachment handler = createDataHandler(value,

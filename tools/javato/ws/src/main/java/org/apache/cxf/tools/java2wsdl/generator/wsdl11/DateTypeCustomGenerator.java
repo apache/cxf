@@ -43,7 +43,7 @@ public final class DateTypeCustomGenerator extends AbstractGenerator<File> {
     private static final String CALENDAR_ADAPTER = "javax.xml.bind.DatatypeConverter";
 
     private String wsdlName;
-    private List<String> schemaFiles = new ArrayList<String>();
+    private List<String> schemaFiles = new ArrayList<>();
 
     public void addSchemaFiles(final Collection<String> s) {
         this.schemaFiles.addAll(s);
@@ -61,7 +61,7 @@ public final class DateTypeCustomGenerator extends AbstractGenerator<File> {
     }
 
     public List<String> getSchemaNamespaces() {
-        List<String> ns = new ArrayList<String>();
+        List<String> ns = new ArrayList<>();
         for (SchemaInfo schema : getServiceModel().getSchemas()) {
             ns.add(schema.getNamespaceURI());
         }

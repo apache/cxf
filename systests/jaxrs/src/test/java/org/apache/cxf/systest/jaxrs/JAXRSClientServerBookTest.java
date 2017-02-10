@@ -630,7 +630,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         wc.accept("application/xml").type("application/xml");
         Book b1 = new Book("CXF in Action", 123L);
         Book b2 = new Book("CXF Rocks", 124L);
-        List<Book> books = new ArrayList<Book>();
+        List<Book> books = new ArrayList<>();
         books.add(b1);
         books.add(b2);
         Book book = wc.postCollection(books, Book.class, Book.class);
@@ -648,7 +648,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         wc.accept("application/xml").type("application/xml");
         Book b1 = new Book("CXF in Action", 123L);
         Book b2 = new Book("CXF Rocks", 124L);
-        List<Book> books = new ArrayList<Book>();
+        List<Book> books = new ArrayList<>();
         books.add(b1);
         books.add(b2);
         GenericEntity<List<Book>> genericCollectionEntity = 
@@ -670,7 +670,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         wc.accept("application/xml").type("application/xml");
         Book b1 = new Book("CXF in Action", 123L);
         Book b2 = new Book("CXF Rocks", 124L);
-        List<Book> books = new ArrayList<Book>();
+        List<Book> books = new ArrayList<>();
         books.add(b1);
         books.add(b2);
         
@@ -703,10 +703,10 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         wc.accept("application/xml").type("application/xml");
         Book b1 = new Book("CXF in Action", 123L);
         Book b2 = new Book("CXF Rocks", 124L);
-        List<Book> books = new ArrayList<Book>();
+        List<Book> books = new ArrayList<>();
         books.add(b1);
         books.add(b2);
-        List<Book> books2 = new ArrayList<Book>(wc.postAndGetCollection(books, Book.class, Book.class));
+        List<Book> books2 = new ArrayList<>(wc.postAndGetCollection(books, Book.class, Book.class));
         assertNotNull(books2);
         assertNotSame(books, books2);
         assertEquals(2, books2.size());
@@ -738,7 +738,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         WebClient wc = WebClient.create(endpointAddress);
         wc.accept("application/xml").type("application/xml");
         Book b1 = new Book("Book", 666L);
-        List<Book> books = new ArrayList<Book>(wc.postObjectGetCollection(b1, Book.class));
+        List<Book> books = new ArrayList<>(wc.postObjectGetCollection(b1, Book.class));
         assertNotNull(books);
         assertEquals(1, books.size());
         Book b = books.get(0);
@@ -940,7 +940,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     @Test
     public void testProxyWithCollectionMatrixParams() throws Exception {
         BookStore proxy = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class);
-        List<String> params = new ArrayList<String>(); 
+        List<String> params = new ArrayList<>(); 
         params.add("12");
         params.add("3");
         Book book = proxy.getBookByMatrixListParams(params);
@@ -1095,7 +1095,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         BookStore store = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class);
         Book b1 = new Book("CXF in Action", 123L);
         Book b2 = new Book("CXF Rocks", 124L);
-        List<Book> books = new ArrayList<Book>();
+        List<Book> books = new ArrayList<>();
         books.add(b1);
         books.add(b2);
         List<Book> books2 = store.getBookCollection(books);
@@ -1139,11 +1139,11 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
                                            + "/bookstore/jaxbelementxmlrootcollections");
         Book b1 = new Book("CXF in Action", 123L);
         Book b2 = new Book("CXF Rocks", 124L);
-        List<Book> books = new ArrayList<Book>();
+        List<Book> books = new ArrayList<>();
         books.add(b1);
         books.add(b2);
         store.type("application/xml").accept("application/xml");
-        List<Book> books2 = new ArrayList<Book>(store.postAndGetCollection(books, Book.class, Book.class));
+        List<Book> books2 = new ArrayList<>(store.postAndGetCollection(books, Book.class, Book.class));
         assertNotNull(books2);
         assertNotSame(books, books2);
         assertEquals(2, books2.size());

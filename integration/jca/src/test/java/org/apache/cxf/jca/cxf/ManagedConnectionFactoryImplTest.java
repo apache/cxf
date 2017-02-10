@@ -152,7 +152,7 @@ public class ManagedConnectionFactoryImplTest extends Assert {
         mci = new ManagedConnectionFactoryImplTester();
         Object unboundMC = mci.createManagedConnection(null, null);
         assertNotNull("MC must not be null.", unboundMC);
-        Set<Object> mcSet = new HashSet<Object>();
+        Set<Object> mcSet = new HashSet<>();
         mcSet.add(unboundMC);
         assertSame("Must be same managed connection instance.",
                    mci.matchManagedConnections(mcSet, null, cri), unboundMC);
@@ -186,7 +186,7 @@ public class ManagedConnectionFactoryImplTest extends Assert {
         */
 //        EasyMock.verify(factory);
         
-        Set<ManagedConnection> mcSet = new HashSet<ManagedConnection>();
+        Set<ManagedConnection> mcSet = new HashSet<>();
         mcSet.add(mc1);
         //mcSet.add(mc2);
 

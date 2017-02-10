@@ -135,7 +135,7 @@ public class WSDLToIDLAction {
                 org.apache.cxf.common.i18n.Message msg = new org.apache.cxf.common.i18n.Message(msgStr, LOG);
                 throw new Exception(msg.toString());
             } else {
-                List<QName> portTypes = new ArrayList<QName>();
+                List<QName> portTypes = new ArrayList<>();
                 for (Binding binding : bindings) {
                     List<?> ext = binding.getExtensibilityElements();
                     if (!(ext.get(0) instanceof BindingType)) {

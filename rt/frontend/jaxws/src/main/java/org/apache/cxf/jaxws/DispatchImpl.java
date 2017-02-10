@@ -348,7 +348,7 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
                 = ((JaxWsClientEndpointImpl)client.getEndpoint()).getFeatures();
             List<Feature> allFeatures;
             if (client.getBus().getFeatures() != null) {
-                allFeatures = new ArrayList<Feature>(endpointFeatures.size() 
+                allFeatures = new ArrayList<>(endpointFeatures.size() 
                     + client.getBus().getFeatures().size());
                 allFeatures.addAll(endpointFeatures);
                 allFeatures.addAll(client.getBus().getFeatures());

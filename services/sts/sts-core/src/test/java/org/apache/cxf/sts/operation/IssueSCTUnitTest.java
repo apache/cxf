@@ -87,7 +87,7 @@ public class IssueSCTUnitTest extends org.junit.Assert {
         issueOperation.setTokenStore(tokenStore);
         
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new SCTProvider());
         issueOperation.setTokenProviders(providerList);
         
@@ -160,7 +160,7 @@ public class IssueSCTUnitTest extends org.junit.Assert {
         issueOperation.setEncryptIssuedToken(true);
         
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new SCTProvider());
         issueOperation.setTokenProviders(providerList);
         
@@ -239,7 +239,7 @@ public class IssueSCTUnitTest extends org.junit.Assert {
         issueOperation.setReturnReferences(false);
         
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new SCTProvider());
         issueOperation.setTokenProviders(providerList);
         

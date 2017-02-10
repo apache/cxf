@@ -98,7 +98,7 @@ public class MessageCallbackOnewayTest extends AbstractBusClientServerTestBase {
      */
     private void verifyCallbacks() {
         List<Callback> cbs = callback.getCallbacks();
-        Set<Long> acks = new HashSet<Long>();
+        Set<Long> acks = new HashSet<>();
         long nextNum = 1;
         for (Callback cb: cbs) {
             if (cb.isAccept()) {
@@ -304,7 +304,7 @@ public class MessageCallbackOnewayTest extends AbstractBusClientServerTestBase {
     @ServiceMode(Mode.PAYLOAD)
     public static class GreeterProvider implements Provider<Source> {
         
-        public static final List<String> CALL_ARGS = new ArrayList<String>();
+        public static final List<String> CALL_ARGS = new ArrayList<>();
 
         public Source invoke(Source obj) {
 
@@ -349,7 +349,7 @@ public class MessageCallbackOnewayTest extends AbstractBusClientServerTestBase {
     
     private static class RecordingMessageCallback implements MessageCallback {
         
-        private List<Callback> callbacks = new ArrayList<Callback>();
+        private List<Callback> callbacks = new ArrayList<>();
         
         @Override
         public void messageAccepted(String seqId, long msgNum) {

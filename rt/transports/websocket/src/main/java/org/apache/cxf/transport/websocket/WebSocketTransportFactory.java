@@ -53,7 +53,7 @@ public class WebSocketTransportFactory extends AbstractTransportFactory implemen
             "http://cxf.apache.org/transports/websocket/configuration"
         );
 
-    private static final Set<String> URI_PREFIXES = new HashSet<String>();
+    private static final Set<String> URI_PREFIXES = new HashSet<>();
     static {
         URI_PREFIXES.add("ws://");
         URI_PREFIXES.add("wss://");

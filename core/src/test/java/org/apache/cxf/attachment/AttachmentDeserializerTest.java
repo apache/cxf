@@ -111,7 +111,7 @@ public class AttachmentDeserializerTest extends Assert {
         assertTrue(attBody instanceof DelegatingInputStream);
         attBody.close();
         assertEquals(2, msg.getAttachments().size());
-        List<String> cidlist = new ArrayList<String>();
+        List<String> cidlist = new ArrayList<>();
         cidlist.add("xfire_logo.jpg");
         cidlist.add("xfire_logo2.jpg");
         

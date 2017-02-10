@@ -94,7 +94,7 @@ public class ServiceListGeneratorServlet extends HttpServlet {
         if (bus != null) {
             privateEndpoints = (List<String>)bus.getProperty("org.apache.cxf.private.endpoints");
         } else {
-            privateEndpoints = new ArrayList<String>();
+            privateEndpoints = new ArrayList<>();
         }
         
         AbstractDestination[] soapEndpoints = getSOAPEndpoints(destinations, privateEndpoints);
@@ -152,7 +152,7 @@ public class ServiceListGeneratorServlet extends HttpServlet {
 
     private AbstractDestination[] getSOAPEndpoints(AbstractDestination[] destinations,
                                                    List<String> privateEndpoints) {
-        List<AbstractDestination> soapEndpoints = new ArrayList<AbstractDestination>();
+        List<AbstractDestination> soapEndpoints = new ArrayList<>();
         for (AbstractDestination sd : destinations) {
             if (null != sd.getEndpointInfo().getName() && null != sd.getEndpointInfo().getInterface()
                 && !isPrivate(sd.getEndpointInfo(), privateEndpoints)) {
@@ -164,7 +164,7 @@ public class ServiceListGeneratorServlet extends HttpServlet {
     
     private AbstractDestination[] getRestEndpoints(AbstractDestination[] destinations,
                                                    List<String> privateEndpoints) {
-        List<AbstractDestination> restfulDests = new ArrayList<AbstractDestination>();
+        List<AbstractDestination> restfulDests = new ArrayList<>();
         for (AbstractDestination sd : destinations) {
             // use some more reasonable check - though this one seems to be the only option at the moment
             if (null == sd.getEndpointInfo().getInterface()

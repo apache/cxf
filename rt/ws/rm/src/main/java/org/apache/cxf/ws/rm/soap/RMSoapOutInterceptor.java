@@ -64,7 +64,7 @@ public class RMSoapOutInterceptor extends AbstractSoapInterceptor {
     
     private static final Set<QName> HEADERS;
     static {
-        Set<QName> set = new HashSet<QName>();
+        Set<QName> set = new HashSet<>();
         set.addAll(RM10Constants.HEADERS);
         set.addAll(RM11Constants.HEADERS);
         HEADERS = set;

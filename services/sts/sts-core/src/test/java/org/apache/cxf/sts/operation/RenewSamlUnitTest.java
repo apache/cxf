@@ -93,14 +93,14 @@ public class RenewSamlUnitTest extends org.junit.Assert {
         renewOperation.setTokenStore(tokenStore);
         
         // Add Token Renewer
-        List<TokenRenewer> renewerList = new ArrayList<TokenRenewer>();
+        List<TokenRenewer> renewerList = new ArrayList<>();
         TokenRenewer tokenRenewer = new SAMLTokenRenewer();
         tokenRenewer.setVerifyProofOfPossession(false);
         renewerList.add(tokenRenewer);
         renewOperation.setTokenRenewers(renewerList);
         
         // Add Token Validator
-        List<TokenValidator> validatorList = new ArrayList<TokenValidator>();
+        List<TokenValidator> validatorList = new ArrayList<>();
         validatorList.add(new SAMLTokenValidator());
         renewOperation.setTokenValidators(validatorList);
         
@@ -184,7 +184,7 @@ public class RenewSamlUnitTest extends org.junit.Assert {
         renewOperation.setTokenStore(tokenStore);
         
         // Add Token Renewer
-        List<TokenRenewer> renewerList = new ArrayList<TokenRenewer>();
+        List<TokenRenewer> renewerList = new ArrayList<>();
         TokenRenewer tokenRenewer = new SAMLTokenRenewer();
         tokenRenewer.setVerifyProofOfPossession(false);
         tokenRenewer.setAllowRenewalAfterExpiry(true);
@@ -192,7 +192,7 @@ public class RenewSamlUnitTest extends org.junit.Assert {
         renewOperation.setTokenRenewers(renewerList);
         
         // Add Token Validator
-        List<TokenValidator> validatorList = new ArrayList<TokenValidator>();
+        List<TokenValidator> validatorList = new ArrayList<>();
         validatorList.add(new SAMLTokenValidator());
         renewOperation.setTokenValidators(validatorList);
         
@@ -278,7 +278,7 @@ public class RenewSamlUnitTest extends org.junit.Assert {
         renewOperation.setTokenStore(tokenStore);
         
         // Add Token Renewer
-        List<TokenRenewer> renewerList = new ArrayList<TokenRenewer>();
+        List<TokenRenewer> renewerList = new ArrayList<>();
         TokenRenewer tokenRenewer = new SAMLTokenRenewer();
         tokenRenewer.setVerifyProofOfPossession(false);
         tokenRenewer.setAllowRenewalAfterExpiry(true);
@@ -286,7 +286,7 @@ public class RenewSamlUnitTest extends org.junit.Assert {
         renewOperation.setTokenRenewers(renewerList);
         
         // Add Token Validator
-        List<TokenValidator> validatorList = new ArrayList<TokenValidator>();
+        List<TokenValidator> validatorList = new ArrayList<>();
         validatorList.add(new SAMLTokenValidator());
         renewOperation.setTokenValidators(validatorList);
         
@@ -372,7 +372,7 @@ public class RenewSamlUnitTest extends org.junit.Assert {
         renewOperation.setTokenStore(tokenStore);
         
         // Add Token Renewer
-        List<TokenRenewer> renewerList = new ArrayList<TokenRenewer>();
+        List<TokenRenewer> renewerList = new ArrayList<>();
         TokenRenewer tokenRenewer = new SAMLTokenRenewer();
         tokenRenewer.setVerifyProofOfPossession(false);
         tokenRenewer.setAllowRenewalAfterExpiry(true);
@@ -380,7 +380,7 @@ public class RenewSamlUnitTest extends org.junit.Assert {
         renewOperation.setTokenRenewers(renewerList);
         
         // Add Token Validator
-        List<TokenValidator> validatorList = new ArrayList<TokenValidator>();
+        List<TokenValidator> validatorList = new ArrayList<>();
         validatorList.add(new SAMLTokenValidator());
         renewOperation.setTokenValidators(validatorList);
         

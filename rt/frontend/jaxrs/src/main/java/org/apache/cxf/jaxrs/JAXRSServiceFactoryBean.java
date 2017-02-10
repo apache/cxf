@@ -51,7 +51,7 @@ import org.apache.cxf.service.invoker.Invoker;
 public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
     
     protected List<ClassResourceInfo> classResourceInfos = 
-        new ArrayList<ClassResourceInfo>();
+        new ArrayList<>();
     
     private Invoker invoker;
     private Executor executor;

@@ -60,7 +60,7 @@ public class AtomPojoProviderTest extends Assert {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         
         Books books = new Books();
-        List<Book> bs = new ArrayList<Book>();
+        List<Book> bs = new ArrayList<>();
         bs.add(new Book("a"));
         bs.add(new Book("b"));
         books.setBooks(bs);
@@ -83,7 +83,7 @@ public class AtomPojoProviderTest extends Assert {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         
         Books books = new Books();
-        List<Book> bs = new ArrayList<Book>();
+        List<Book> bs = new ArrayList<>();
         bs.add(new Book("a"));
         bs.add(new Book("b"));
         books.setBooks(bs);
@@ -183,7 +183,7 @@ public class AtomPojoProviderTest extends Assert {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         MediaType mt = MediaType.valueOf("application/atom+xml;type=feed");
         Books books = new Books();
-        List<Book> bs = new ArrayList<Book>();
+        List<Book> bs = new ArrayList<>();
         bs.add(new Book("a"));
         bs.add(new Book("b"));
         books.setBooks(bs);
@@ -332,7 +332,7 @@ public class AtomPojoProviderTest extends Assert {
 
         public Books readFrom(Feed element) {
             Books books = new Books();
-            List<Book> list = new ArrayList<Book>();
+            List<Book> list = new ArrayList<>();
             CustomEntryReader entryReader = new CustomEntryReader();
             for (Entry e : element.getEntries()) {
                 list.add(entryReader.readFrom(e));

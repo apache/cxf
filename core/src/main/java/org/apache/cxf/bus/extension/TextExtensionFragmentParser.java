@@ -49,7 +49,7 @@ public class TextExtensionFragmentParser {
             return getExtensions(is);
         } catch (Exception e) {
             LOG.log(Level.WARNING, e.getMessage(), e);
-            return new ArrayList<Extension>();
+            return new ArrayList<>();
         } finally {
             if (is != null) {
                 try {
@@ -71,7 +71,7 @@ public class TextExtensionFragmentParser {
      * @throws IOException
      */
     public List<Extension> getExtensions(InputStream is) throws IOException {
-        List<Extension> extensions = new ArrayList<Extension>();
+        List<Extension> extensions = new ArrayList<>();
         BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
         String line = reader.readLine();
         while (line != null) {

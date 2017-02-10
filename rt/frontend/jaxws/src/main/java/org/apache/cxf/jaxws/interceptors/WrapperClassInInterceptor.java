@@ -140,7 +140,7 @@ public class WrapperClassInInterceptor extends AbstractPhaseInterceptor<Message>
                         } else if (mpi == null || mpi.getTypeClass() == null) {
                             //header, but not mapped to a param on the method
                             if (removes == null) {
-                                removes = new ArrayList<Integer>();
+                                removes = new ArrayList<>();
                             }
                             removes.add(part.getIndex());
                         }
@@ -171,8 +171,8 @@ public class WrapperClassInInterceptor extends AbstractPhaseInterceptor<Message>
                                               MessageInfo messageInfo,
                                               MessageInfo wrappedMessageInfo,
                                               Class<?> wrapperClass) {
-        List<String> partNames = new ArrayList<String>();
-        List<String> elTypeNames = new ArrayList<String>();
+        List<String> partNames = new ArrayList<>();
+        List<String> elTypeNames = new ArrayList<>();
         List<Class<?>> partClasses = new ArrayList<Class<?>>();
         QName wrapperName = null;
         for (MessagePartInfo p : wrappedMessageInfo.getMessageParts()) {

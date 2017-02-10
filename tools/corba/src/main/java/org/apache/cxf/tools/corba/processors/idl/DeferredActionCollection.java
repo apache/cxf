@@ -38,7 +38,7 @@ public final class DeferredActionCollection {
     public void add(Scope scope, DeferredAction action) {
         List<DeferredAction> list = deferredActions.get(scope.toString());
         if (list == null) {
-            list = new ArrayList<DeferredAction>();
+            list = new ArrayList<>();
             deferredActions.put(scope.toString(), list);
         }
         list.add(action);

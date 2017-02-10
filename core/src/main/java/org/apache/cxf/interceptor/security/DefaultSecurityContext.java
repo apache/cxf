@@ -122,7 +122,7 @@ public class DefaultSecurityContext implements LoginSecurityContext {
     }
 
     public Set<Principal> getUserRoles() {
-        Set<Principal> roles = new HashSet<Principal>();
+        Set<Principal> roles = new HashSet<>();
         if (subject != null) {
             for (Principal principal : subject.getPrincipals()) {
                 if (principal != p) { 

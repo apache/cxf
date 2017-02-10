@@ -75,7 +75,7 @@ public class PolicyUtilsTest extends Assert {
         control.verify();
 
         control.reset();
-        Collection<PolicyAssertion> as = new ArrayList<PolicyAssertion>();
+        Collection<PolicyAssertion> as = new ArrayList<>();
         AssertionInfoMap aim = new AssertionInfoMap(as);
         EasyMock.expect(message.get(AssertionInfoMap.class)).andReturn(aim);
         control.replay();
@@ -120,7 +120,7 @@ public class PolicyUtilsTest extends Assert {
 
         AssertionInfoMap aim = new AssertionInfoMap(CastUtils.cast(Collections.EMPTY_LIST,
                                                                    PolicyAssertion.class));
-        Collection<AssertionInfo> ais = new ArrayList<AssertionInfo>();
+        Collection<AssertionInfo> ais = new ArrayList<>();
         ais.add(eai);
         ais.add(cmai);
         ais.add(icmai);
@@ -173,7 +173,7 @@ public class PolicyUtilsTest extends Assert {
         AssertionInfo cmai = getServerPolicyAssertionInfo(cmp); 
         AssertionInfo icmai = getServerPolicyAssertionInfo(icmp);
 
-        Collection<AssertionInfo> ais = new ArrayList<AssertionInfo>();
+        Collection<AssertionInfo> ais = new ArrayList<>();
         ais.add(eai);
         ais.add(mai);
         ais.add(cmai);

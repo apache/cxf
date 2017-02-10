@@ -34,7 +34,7 @@ public class MultipartBodyTest extends Assert {
 
     @Test
     public void testGetAttachments() {
-        List<Attachment> atts = new ArrayList<Attachment>();
+        List<Attachment> atts = new ArrayList<>();
         atts.add(createAttachment("p1"));
         atts.add(createAttachment("p2"));
         MultipartBody b = new MultipartBody(atts);
@@ -45,7 +45,7 @@ public class MultipartBodyTest extends Assert {
     
     @Test
     public void testGetAttachmentsById() {
-        List<Attachment> atts = new ArrayList<Attachment>();
+        List<Attachment> atts = new ArrayList<>();
         atts.add(createAttachment("p1"));
         atts.add(createAttachment("p2"));
         MultipartBody b = new MultipartBody(atts);

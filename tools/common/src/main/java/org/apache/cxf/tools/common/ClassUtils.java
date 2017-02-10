@@ -68,9 +68,9 @@ public class ClassUtils {
 
         String outPutDir = (String)context.get(ToolConstants.CFG_OUTPUTDIR);
        
-        Set<String> dirSet = new HashSet<String>();
+        Set<String> dirSet = new HashSet<>();
         ClassCollector classCollector = context.get(ClassCollector.class);
-        List<String> fileList = new ArrayList<String>();
+        List<String> fileList = new ArrayList<>();
         Iterator<String> ite = classCollector.getGeneratedFileInfo().iterator();
         while (ite.hasNext()) {
             String fileName = ite.next();

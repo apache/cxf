@@ -590,7 +590,7 @@ public class JAXRSUtilsTest extends Assert {
     @Test
     public void testIntersectMimeTypes() throws Exception {
         //test basic
-        List<MediaType> methodMimeTypes = new ArrayList<MediaType>(
+        List<MediaType> methodMimeTypes = new ArrayList<>(
              JAXRSUtils.parseMediaTypes("application/mytype,application/xml,application/json"));
         
         MediaType acceptContentType = MediaType.valueOf("application/json");
@@ -775,11 +775,11 @@ public class JAXRSUtilsTest extends Assert {
                    compareSortedMediaTypes(Collections.singletonList(m1), 
                                                       Collections.singletonList(m1)) == 0);
         
-        List<MediaType> sortedList1 = new ArrayList<MediaType>();
+        List<MediaType> sortedList1 = new ArrayList<>();
         sortedList1.add(m1);
         sortedList1.add(m2);
                 
-        List<MediaType> sortedList2 = new ArrayList<MediaType>();
+        List<MediaType> sortedList2 = new ArrayList<>();
         sortedList2.add(m1);
         sortedList2.add(m2);
         

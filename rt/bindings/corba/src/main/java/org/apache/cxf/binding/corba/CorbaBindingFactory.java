@@ -54,7 +54,7 @@ public class CorbaBindingFactory extends AbstractWSDLBindingFactory
         );
 
     
-    protected List<String> transportIds = new ArrayList<String>(DEFAULT_NAMESPACES);
+    protected List<String> transportIds = new ArrayList<>(DEFAULT_NAMESPACES);
     protected OrbConfig orbConfig = new OrbConfig();
 
     public CorbaBindingFactory() {

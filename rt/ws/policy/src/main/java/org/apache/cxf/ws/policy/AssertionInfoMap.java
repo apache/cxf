@@ -60,7 +60,7 @@ public class AssertionInfoMap extends HashMap<QName, Collection<AssertionInfo>> 
         if (a instanceof PolicyContainingAssertion) {
             Policy p = ((PolicyContainingAssertion)a).getPolicy();
             if (p != null) {
-                List<Assertion> pcs = new ArrayList<Assertion>();
+                List<Assertion> pcs = new ArrayList<>();
                 getAssertions(p, pcs);
                 for (Assertion na : pcs) {
                     putAssertionInfo(na);
@@ -70,7 +70,7 @@ public class AssertionInfoMap extends HashMap<QName, Collection<AssertionInfo>> 
         AssertionInfo ai = new AssertionInfo(a);
         Collection<AssertionInfo> ail = get(a.getName());
         if (ail == null) {
-            ail = new ArrayList<AssertionInfo>();
+            ail = new ArrayList<>();
             put(a.getName(), ail);
         }
         for (AssertionInfo ai2 : ail) {
@@ -140,7 +140,7 @@ public class AssertionInfoMap extends HashMap<QName, Collection<AssertionInfo>> 
     
     public List<List<Assertion>> checkEffectivePolicy(Policy policy) {
         List<List<Assertion>> validated = new ArrayList<List<Assertion>>(4);       
-        List<QName> errors = new ArrayList<QName>();
+        List<QName> errors = new ArrayList<>();
         Iterator<List<Assertion>> alternatives = policy.getAlternatives();
         while (alternatives.hasNext()) {
             List<Assertion> pc = alternatives.next();
@@ -191,7 +191,7 @@ public class AssertionInfoMap extends HashMap<QName, Collection<AssertionInfo>> 
         }
     }
     private static Collection<Assertion> getAssertions(PolicyOperator p) {
-        Collection<Assertion> assertions = new ArrayList<Assertion>();
+        Collection<Assertion> assertions = new ArrayList<>();
         getAssertions(p, assertions);
         return assertions;
     }

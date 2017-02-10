@@ -705,7 +705,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         BookStoreJaxrsJaxws proxy = JAXRSClientFactory.create(baseAddress,
                                                                   BookStoreJaxrsJaxws.class);
         BookSubresource bs = proxy.getBookSubresource("679");
-        List<String> parts = new ArrayList<String>();
+        List<String> parts = new ArrayList<>();
         parts.add("CXF in Action - ");
         parts.add(Integer.toString(679));
         Book b = bs.getTheBook3("679", parts);
@@ -858,7 +858,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         bean.setAddress(baseAddress);
         bean.setResourceClass(BookStoreJaxrsJaxws.class);
         TestFeature testFeature = new TestFeature();
-        List<AbstractFeature> features = new ArrayList<AbstractFeature>();
+        List<AbstractFeature> features = new ArrayList<>();
         features.add(testFeature);
         bean.setFeatures(features);
         BookStoreJaxrsJaxws proxy = (BookStoreJaxrsJaxws)bean.create();
@@ -888,7 +888,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         bean.setResourceClass(BookStoreJaxrsJaxws.class);
         final boolean addBadOutInterceptor = true;
         TestFeature testFeature = new TestFeature(addBadOutInterceptor);
-        List<AbstractFeature> features = new ArrayList<AbstractFeature>();
+        List<AbstractFeature> features = new ArrayList<>();
         features.add(testFeature);
         bean.setFeatures(features);
         BookStoreJaxrsJaxws proxy = (BookStoreJaxrsJaxws)bean.create();
@@ -912,7 +912,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         bean.setAddress(baseAddress);
         bean.setResourceClass(BookStoreJaxrsJaxws.class);
         TestFeature testFeature = new TestFeature();
-        List<AbstractFeature> features = new ArrayList<AbstractFeature>();
+        List<AbstractFeature> features = new ArrayList<>();
         features.add(testFeature);
         bean.setFeatures(features);
         BookStoreJaxrsJaxws proxy = (BookStoreJaxrsJaxws)bean.create();

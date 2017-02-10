@@ -128,7 +128,7 @@ class WrappedAttachments implements Set<Attachment> {
 
     public boolean retainAll(Collection<?> c) {
         boolean b = false;
-        Set<String> ids = new HashSet<String>();
+        Set<String> ids = new HashSet<>();
         for (Iterator<?> it = c.iterator(); it.hasNext();) {
             Object o = it.next();
             if (o instanceof Attachment) {

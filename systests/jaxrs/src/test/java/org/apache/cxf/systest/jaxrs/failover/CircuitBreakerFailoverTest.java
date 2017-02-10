@@ -107,7 +107,7 @@ public class CircuitBreakerFailoverTest extends AbstractFailoverTest {
     
     private FailoverFeature customizeFeature(CircuitBreakerFailoverFeature feature, 
             boolean random, String ...address) {
-        List<String> alternateAddresses = new ArrayList<String>();
+        List<String> alternateAddresses = new ArrayList<>();
         for (String s : address) {
             alternateAddresses.add(s);
         }

@@ -68,7 +68,7 @@ public class CXFActivator implements BundleActivator {
                                                                      workQueues,
                                                                      ManagedWorkQueueList.FACTORY_PID);
                 
-        extensions = new ArrayList<Extension>();
+        extensions = new ArrayList<>();
         extensions.add(createOsgiBusListenerExtension(context));
         extensions.add(createManagedWorkQueueListExtension(workQueues));
         ExtensionRegistry.addExtensions(extensions);

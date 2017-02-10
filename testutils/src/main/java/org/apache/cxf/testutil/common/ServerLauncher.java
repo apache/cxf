@@ -369,7 +369,7 @@ public class ServerLauncher {
 
     private List<String> getCommand() throws URISyntaxException {
 
-        List<String> cmd = new ArrayList<String>();
+        List<String> cmd = new ArrayList<>();
         cmd.add(javaExe);
         
         if (null != properties) {

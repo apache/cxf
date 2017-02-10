@@ -103,7 +103,7 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
         
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new SAMLTokenProvider());
         issueOperation.setTokenProviders(providerList);
         
@@ -175,7 +175,7 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
         
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new SAMLTokenProvider());
         issueOperation.setTokenProviders(providerList);
         
@@ -248,7 +248,7 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
         
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new SAMLTokenProvider());
         issueOperation.setTokenProviders(providerList);
         
@@ -320,7 +320,7 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
         
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new SAMLTokenProvider());
         issueOperation.setTokenProviders(providerList);
         
@@ -423,7 +423,7 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         issueOperation.setEncryptIssuedToken(true);
         
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new SAMLTokenProvider());
         issueOperation.setTokenProviders(providerList);
         
@@ -500,7 +500,7 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
         
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new SAMLTokenProvider());
         issueOperation.setTokenProviders(providerList);
         
@@ -591,7 +591,7 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
         
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new SAMLTokenProvider());
         issueOperation.setTokenProviders(providerList);
         
@@ -689,7 +689,7 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
         
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new SAMLTokenProvider());
         issueOperation.setTokenProviders(providerList);
         
@@ -781,7 +781,7 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
         
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new SAMLTokenProvider());
         issueOperation.setTokenProviders(providerList);
         
@@ -899,7 +899,7 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         issueOperation.setReturnReferences(false);
         
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new SAMLTokenProvider());
         issueOperation.setTokenProviders(providerList);
         
@@ -966,7 +966,7 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
         
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new SAMLTokenProvider());
         issueOperation.setTokenProviders(providerList);
         
@@ -986,7 +986,7 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         stsProperties.setIssuer("STS");
         
         SignatureProperties sigProperties = new SignatureProperties();
-        List<String> acceptedC14nAlgorithms = new ArrayList<String>();
+        List<String> acceptedC14nAlgorithms = new ArrayList<>();
         acceptedC14nAlgorithms.add(WSConstants.C14N_EXCL_OMIT_COMMENTS);
         acceptedC14nAlgorithms.add(WSConstants.C14N_EXCL_WITH_COMMENTS);
         sigProperties.setAcceptedC14nAlgorithms(acceptedC14nAlgorithms);
@@ -1056,7 +1056,7 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
         
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new SAMLTokenProvider());
         issueOperation.setTokenProviders(providerList);
         
@@ -1076,7 +1076,7 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         stsProperties.setIssuer("STS");
         
         SignatureProperties sigProperties = new SignatureProperties();
-        List<String> acceptedSignatureAlgorithms = new ArrayList<String>();
+        List<String> acceptedSignatureAlgorithms = new ArrayList<>();
         String signatureAlgorithm = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256";
         acceptedSignatureAlgorithms.add(signatureAlgorithm);
         acceptedSignatureAlgorithms.add(WSConstants.RSA_SHA1);
@@ -1143,7 +1143,7 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
         
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new SAMLTokenProvider());
         issueOperation.setTokenProviders(providerList);
         
@@ -1249,7 +1249,7 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
         
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new SAMLTokenProvider());
         issueOperation.setTokenProviders(providerList);
         
@@ -1341,7 +1341,7 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
         
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new SAMLTokenProvider());
         issueOperation.setTokenProviders(providerList);
         

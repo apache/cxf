@@ -63,7 +63,7 @@ public class MessageInfo extends AbstractMessageContainer {
             return getMessageParts();
         }
         
-        List<MessagePartInfo> orderedParts = new ArrayList<MessagePartInfo>();
+        List<MessagePartInfo> orderedParts = new ArrayList<>();
         Map<QName, MessagePartInfo> partsMap = getMessagePartsMap();
         for (String part : order) {
             QName qname = getMessagePartQName(part);

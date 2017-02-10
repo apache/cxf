@@ -328,7 +328,7 @@ public class MAPCodecTest extends Assert {
         mimeHeaders = new HashMap<String, List<String>>();
         message.put(MIME_HEADERS, mimeHeaders);
         if (preExistingSOAPAction) {
-            List<String> soapAction = new ArrayList<String>();
+            List<String> soapAction = new ArrayList<>();
             soapAction.add("\"foobar\"");
             mimeHeaders.put(SoapBindingConstants.SOAP_ACTION, soapAction);
         }

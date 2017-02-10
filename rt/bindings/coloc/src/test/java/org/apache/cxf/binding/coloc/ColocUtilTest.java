@@ -176,13 +176,13 @@ public class ColocUtilTest extends Assert {
         
         boolean match = ColocUtil.isSameFaultInfo(null, null);
         assertEquals("Should return true", true, match);
-        List<FaultInfo> fil1 = new ArrayList<FaultInfo>();
+        List<FaultInfo> fil1 = new ArrayList<>();
         match = ColocUtil.isSameFaultInfo(fil1, null);
         assertEquals("Should not find a match", false, match);
         match = ColocUtil.isSameFaultInfo(null, fil1);
         assertEquals("Should not find a match", false, match);
         
-        List<FaultInfo> fil2 = new ArrayList<FaultInfo>();
+        List<FaultInfo> fil2 = new ArrayList<>();
         match = ColocUtil.isSameFaultInfo(fil1, fil2);
         
         QName fn1 = new QName("A", "B");

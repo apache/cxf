@@ -64,7 +64,7 @@ import org.apache.cxf.service.model.EndpointInfo;
 public class JaxWsServerFactoryBean extends ServerFactoryBean {
     protected boolean doInit;
     @SuppressWarnings("rawtypes")
-    protected List<Handler> handlers = new ArrayList<Handler>();
+    protected List<Handler> handlers = new ArrayList<>();
 
     private boolean blockPostConstruct;
     private boolean blockInjection;
@@ -244,7 +244,7 @@ public class JaxWsServerFactoryBean extends ServerFactoryBean {
     private void buildHandlerChain(Server server) {
         AnnotationHandlerChainBuilder builder = new AnnotationHandlerChainBuilder();
         @SuppressWarnings("rawtypes")
-        List<Handler> chain = new ArrayList<Handler>(handlers);
+        List<Handler> chain = new ArrayList<>(handlers);
         
         chain.addAll(builder.buildHandlerChainFromClass(getServiceBeanClass(),
                                                         server.getEndpoint().getEndpointInfo().getName(),

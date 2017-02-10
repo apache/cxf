@@ -70,13 +70,13 @@ public class CrossOriginSimpleTest extends AbstractBusClientServerTestBase {
 
     @Before
     public void before() {
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
         configClient = WebClient.create("http://localhost:" + PORT + "/config", providers);
     }
 
     private List<String> headerValues(Header[] headers) {
-        List<String> values = new ArrayList<String>();
+        List<String> values = new ArrayList<>();
         for (Header h : headers) {
             for (HeaderElement e : h.getElements()) {
                 values.add(e.getName());

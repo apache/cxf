@@ -32,7 +32,7 @@ public final class CollectionUtils {
         if (c1 == null || c1.size() == 0 || c2 == null || c2.size() == 0) {
             return c1;
         }
-        Collection<T> difference = new ArrayList<T>();
+        Collection<T> difference = new ArrayList<>();
         for (T item : c1) {
             if (!c2.contains(item)) {
                 difference.add(item);

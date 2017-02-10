@@ -40,7 +40,7 @@ public abstract class AbstractManagedConnectionImpl implements ManagedConnection
     protected ConnectionRequestInfo crinfo;
     protected Subject subject;
     protected Set<ConnectionEventListener> connectionEventListeners = 
-        new HashSet<ConnectionEventListener>();
+        new HashSet<>();
     private final AbstractManagedConnectionFactoryImpl managedConnectionFactory;
 
     public AbstractManagedConnectionImpl(AbstractManagedConnectionFactoryImpl managedFactory, 
@@ -88,7 +88,7 @@ public abstract class AbstractManagedConnectionImpl implements ManagedConnection
     // beging chucked from the pool
     public void destroy() throws ResourceException {
         LOG.log(Level.FINE, "DESTROY_CALLED", new Object[] {this});
-        connectionEventListeners = new HashSet<ConnectionEventListener>();
+        connectionEventListeners = new HashSet<>();
         
         LoggerHelper.deleteLoggingOnWriter();
         if (printWriter != null) {

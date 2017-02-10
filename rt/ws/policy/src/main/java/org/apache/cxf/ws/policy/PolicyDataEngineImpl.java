@@ -60,7 +60,7 @@ public class PolicyDataEngineImpl implements PolicyDataEngine {
                                          PolicyCalculator<T> policyCalculator) {
         Collection<Assertion> alternative = getPolicyEngine().getClientEndpointPolicy(ei, c, m)
             .getChosenAlternative();
-        List<T> filteredPolicies = new ArrayList<T>();
+        List<T> filteredPolicies = new ArrayList<>();
         for (Assertion a : alternative) {
             if (policyCalculator.getDataClassName().equals(a.getName())) {
                 T p = JaxbAssertion.cast(a, policyCalculator.getDataClass()).getData();
@@ -83,7 +83,7 @@ public class PolicyDataEngineImpl implements PolicyDataEngine {
                                          PolicyCalculator<T> policyCalculator) {
         Collection<Assertion> alternative = getPolicyEngine()
             .getServerEndpointPolicy(ei, d, m).getChosenAlternative();
-        List<T> filteredPolicies = new ArrayList<T>();
+        List<T> filteredPolicies = new ArrayList<>();
         for (Assertion a : alternative) {
             if (policyCalculator.getDataClassName().equals(a.getName())) {
                 T p = JaxbAssertion.cast(a, policyCalculator.getDataClass()).getData();
@@ -94,7 +94,7 @@ public class PolicyDataEngineImpl implements PolicyDataEngine {
     }
 
     private <T> List<T> getPoliciesFromMessage(QName name, Message message, Class<T> dataClass) {
-        List<T> policies = new ArrayList<T>();
+        List<T> policies = new ArrayList<>();
         AssertionInfoMap amap = message.get(AssertionInfoMap.class);
         if (null == amap || amap.isEmpty()) {
             return policies;

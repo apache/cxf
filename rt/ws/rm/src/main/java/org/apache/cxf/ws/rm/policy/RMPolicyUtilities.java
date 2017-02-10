@@ -43,7 +43,7 @@ public final class RMPolicyUtilities {
     
     private static final List<QName> ASSERTION_NAMES;
     static {
-        ASSERTION_NAMES = new ArrayList<QName>();
+        ASSERTION_NAMES = new ArrayList<>();
         ASSERTION_NAMES.addAll(RM10AssertionBuilder.KNOWN_ELEMENTS);
         for (QName qn : RM12AssertionBuilder.KNOWN_ELEMENTS) {
             ASSERTION_NAMES.add(qn);
@@ -87,7 +87,7 @@ public final class RMPolicyUtilities {
      * @return merged collection, never <code>null</code>
      */
     public static Collection<AssertionInfo> collectRMAssertions(AssertionInfoMap aim) {
-        Collection<AssertionInfo> mergedAsserts = new ArrayList<AssertionInfo>();
+        Collection<AssertionInfo> mergedAsserts = new ArrayList<>();
         if (aim != null) {
             for (QName qn : ASSERTION_NAMES) {
                 Collection<AssertionInfo> ais = aim.get(qn);

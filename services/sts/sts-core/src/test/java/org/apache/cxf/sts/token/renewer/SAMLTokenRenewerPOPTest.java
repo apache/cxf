@@ -129,7 +129,7 @@ public class SAMLTokenRenewerPOPTest extends org.junit.Assert {
             // expected
         }
         
-        List<WSSecurityEngineResult> signedResults = new ArrayList<WSSecurityEngineResult>();
+        List<WSSecurityEngineResult> signedResults = new ArrayList<>();
         WSSecurityEngineResult signedResult = new WSSecurityEngineResult(WSConstants.SIGN);
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
         cryptoType.setAlias("myclientkey");
@@ -206,7 +206,7 @@ public class SAMLTokenRenewerPOPTest extends org.junit.Assert {
             // expected
         }
         
-        List<WSSecurityEngineResult> signedResults = new ArrayList<WSSecurityEngineResult>();
+        List<WSSecurityEngineResult> signedResults = new ArrayList<>();
         WSSecurityEngineResult signedResult = new WSSecurityEngineResult(WSConstants.SIGN);
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
         cryptoType.setAlias("myservicekey");

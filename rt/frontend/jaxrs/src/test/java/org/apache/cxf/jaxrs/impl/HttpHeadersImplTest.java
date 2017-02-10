@@ -501,7 +501,7 @@ public class HttpHeadersImplTest extends Assert {
         hs.putSingle("Content-Type", "*/*");
         hs.putSingle("Date", "Tue, 21 Oct 2008 17:00:00 GMT");
         hs.putSingle("Content-Length", "10");
-        List<String> values = new ArrayList<String>();
+        List<String> values = new ArrayList<>();
         values.add("1");
         values.add("2");
         hs.addAll("a", values);
@@ -510,7 +510,7 @@ public class HttpHeadersImplTest extends Assert {
     
     private MetadataMap<String, String> createHeader(String name, String... values) {
         MetadataMap<String, String> hs = new MetadataMap<String, String>();
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         list.addAll(Arrays.asList(values));
         hs.put(name, list);
         return hs;

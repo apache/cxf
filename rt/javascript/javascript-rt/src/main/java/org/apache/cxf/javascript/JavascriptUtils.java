@@ -94,7 +94,7 @@ public class JavascriptUtils {
         defaultValueForSimpleType.put("unsignedLong", "0");
         defaultValueForSimpleType.put("float", "0.0");
         defaultValueForSimpleType.put("double", "0.0");
-        nonStringSimpleTypes = new HashSet<String>();
+        nonStringSimpleTypes = new HashSet<>();
         nonStringSimpleTypes.add("int");
         nonStringSimpleTypes.add("long");
         nonStringSimpleTypes.add("unsignedInt");
@@ -102,12 +102,12 @@ public class JavascriptUtils {
         nonStringSimpleTypes.add("float");
         nonStringSimpleTypes.add("double");
 
-        intTypes = new HashSet<String>();
+        intTypes = new HashSet<>();
         intTypes.add("int");
         intTypes.add("long");
         intTypes.add("unsignedInt");
         intTypes.add("unsignedLong");
-        floatTypes = new HashSet<String>();
+        floatTypes = new HashSet<>();
         floatTypes.add("float");
         floatTypes.add("double");
 
@@ -663,7 +663,7 @@ public class JavascriptUtils {
     
     public static List<XmlSchemaObject> getContentElements(XmlSchemaComplexType type,
                                                            SchemaCollection collection) {
-        List<XmlSchemaObject> results = new ArrayList<XmlSchemaObject>();
+        List<XmlSchemaObject> results = new ArrayList<>();
         QName baseTypeName = XmlSchemaUtils.getBaseType(type);
         if (baseTypeName != null) {
             XmlSchemaComplexType baseType = (XmlSchemaComplexType)collection.getTypeByQName(baseTypeName);

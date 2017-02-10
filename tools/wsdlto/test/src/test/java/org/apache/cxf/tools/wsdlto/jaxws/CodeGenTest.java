@@ -1693,7 +1693,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
         File clientjarFile = new File(output, "test-client.jar");
         assertTrue(clientjarFile.exists());
         
-        List<String> jarEntries = new ArrayList<String>();
+        List<String> jarEntries = new ArrayList<>();
         JarInputStream jarIns = new JarInputStream(new FileInputStream(clientjarFile));
         JarEntry entry = null;
         while ((entry = jarIns.getNextJarEntry()) != null) {

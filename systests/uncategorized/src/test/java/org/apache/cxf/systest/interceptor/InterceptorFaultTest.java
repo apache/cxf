@@ -363,7 +363,7 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
             comparator = new PhaseComparator();
         }
         if (null == inPhases) {
-            inPhases = new ArrayList<Phase>();
+            inPhases = new ArrayList<>();
             inPhases.addAll(greeterBus.getExtension(PhaseManager.class).getInPhases());
             Collections.sort(inPhases, comparator);
         }        

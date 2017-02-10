@@ -79,7 +79,7 @@ public class ValidateSCTUnitTest extends org.junit.Assert {
         validateOperation.setTokenStore(tokenStore);
         
         // Add Token Validator
-        List<TokenValidator> validatorList = new ArrayList<TokenValidator>();
+        List<TokenValidator> validatorList = new ArrayList<>();
         validatorList.add(new SCTValidator());
         validateOperation.setTokenValidators(validatorList);
         

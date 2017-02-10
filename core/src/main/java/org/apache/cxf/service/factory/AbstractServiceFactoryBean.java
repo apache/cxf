@@ -129,7 +129,7 @@ public abstract class AbstractServiceFactoryBean {
     
     private void fillDataBindingSchemas() {
         ResourceManager rr = getBus().getExtension(ResourceManager.class);
-        List<DOMSource> schemas = new ArrayList<DOMSource>();
+        List<DOMSource> schemas = new ArrayList<>();
         for (String l : schemaLocations) {
             URL url = rr.resolveResource(l, URL.class);
             if (url == null) {

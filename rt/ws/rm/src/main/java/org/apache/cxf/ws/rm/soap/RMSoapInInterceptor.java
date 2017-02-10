@@ -84,7 +84,7 @@ public class RMSoapInInterceptor extends AbstractSoapInterceptor {
     
     private static final Set<QName> HEADERS;
     static {
-        Set<QName> set = new HashSet<QName>();
+        Set<QName> set = new HashSet<>();
         set.addAll(RM10Constants.HEADERS);
         set.addAll(RM11Constants.HEADERS);
         HEADERS = set;
@@ -152,8 +152,8 @@ public class RMSoapInInterceptor extends AbstractSoapInterceptor {
 
     public void decodeHeaders(SoapMessage message, List<Header> headers, RMProperties rmps) {
         try {
-            Collection<SequenceAcknowledgement> acks = new ArrayList<SequenceAcknowledgement>();
-            Collection<AckRequestedType> requested = new ArrayList<AckRequestedType>();           
+            Collection<SequenceAcknowledgement> acks = new ArrayList<>();
+            Collection<AckRequestedType> requested = new ArrayList<>();           
             
             String rmUri = null;
             EncoderDecoder codec = null;

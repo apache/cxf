@@ -520,7 +520,7 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
      */
     Collection<Assertion> getAssertions(PolicyComponent pc, boolean includeOptional) {
     
-        Collection<Assertion> assertions = new ArrayList<Assertion>();
+        Collection<Assertion> assertions = new ArrayList<>();
     
         if (Constants.TYPE_ASSERTION == pc.getType()) {
             Assertion a = (Assertion)pc;
@@ -536,7 +536,7 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
         if (pc == null || pc.getChosenAlternative() == null) {
             return null;
         }
-        Collection<Assertion> assertions = new ArrayList<Assertion>();
+        Collection<Assertion> assertions = new ArrayList<>();
         for (Assertion assertion : pc.getChosenAlternative()) {
             if (Constants.TYPE_ASSERTION == assertion.getType()) {
                 if (includeOptional || !assertion.isOptional()) {
@@ -582,7 +582,7 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
      */
     Set<QName> getVocabulary(PolicyComponent pc, boolean includeOptional) {
         Collection<Assertion> assertions = getAssertions(pc, includeOptional);
-        Set<QName> vocabulary = new HashSet<QName>();
+        Set<QName> vocabulary = new HashSet<>();
         for (Assertion a : assertions) {
             vocabulary.add(a.getName());
         }

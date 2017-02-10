@@ -76,7 +76,7 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
 
         URL busFile = JWTAlgorithmTest.class.getResource("client.xml");
 
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
         JwtAuthenticationClientFilter clientFilter = new JwtAuthenticationClientFilter();
         clientFilter.setJwsRequired(false);
@@ -116,7 +116,7 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
 
         URL busFile = JWTAlgorithmTest.class.getResource("client.xml");
 
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
         JwtAuthenticationClientFilter clientFilter = new JwtAuthenticationClientFilter();
         clientFilter.setJwsRequired(false);
@@ -159,7 +159,7 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
 
         URL busFile = JWTAlgorithmTest.class.getResource("client.xml");
 
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
         JwtAuthenticationClientFilter clientFilter = new JwtAuthenticationClientFilter();
         clientFilter.setJwsRequired(false);
@@ -201,7 +201,7 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
         
         URL busFile = JWTAlgorithmTest.class.getResource("client.xml");
 
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
         JwtAuthenticationClientFilter clientFilter = new JwtAuthenticationClientFilter();
         clientFilter.setJwsRequired(false);
@@ -244,7 +244,7 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
         
         URL busFile = JWTAlgorithmTest.class.getResource("client.xml");
 
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
         JwtAuthenticationClientFilter clientFilter = new JwtAuthenticationClientFilter();
         clientFilter.setJwsRequired(false);
@@ -287,7 +287,7 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
 
         URL busFile = JWTAlgorithmTest.class.getResource("client.xml");
 
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
         providers.add(new JwtAuthenticationClientFilter());
 
@@ -324,7 +324,7 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
 
         URL busFile = JWTAlgorithmTest.class.getResource("client.xml");
 
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
         providers.add(new JwtAuthenticationClientFilter());
 
@@ -364,7 +364,7 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
 
         URL busFile = JWTAlgorithmTest.class.getResource("client.xml");
 
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
         providers.add(new JwtAuthenticationClientFilter());
 
@@ -400,7 +400,7 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
 
         URL busFile = JWTAlgorithmTest.class.getResource("client.xml");
 
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
         providers.add(new JwtAuthenticationClientFilter());
 
@@ -437,7 +437,7 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
 
         URL busFile = JWTAlgorithmTest.class.getResource("client.xml");
 
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
         providers.add(new JwtAuthenticationClientFilter());
 
@@ -478,7 +478,7 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
 
         URL busFile = JWTAlgorithmTest.class.getResource("client.xml");
 
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
         providers.add(new JwtAuthenticationClientFilter());
 
@@ -516,7 +516,7 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
 
         URL busFile = JWTAlgorithmTest.class.getResource("client.xml");
 
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
         providers.add(new JwtAuthenticationClientFilter());
 
@@ -552,7 +552,7 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
 
         URL busFile = JWTAlgorithmTest.class.getResource("client.xml");
 
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
         providers.add(new JwtAuthenticationClientFilter());
 
@@ -584,7 +584,7 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
 
         URL busFile = JWTAlgorithmTest.class.getResource("client.xml");
 
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
         JwtAuthenticationClientFilter clientFilter = new JwtAuthenticationClientFilter();
         clientFilter.setJwsRequired(true);
@@ -627,7 +627,7 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
 
         URL busFile = JWTAlgorithmTest.class.getResource("client.xml");
 
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
         providers.add(new JwtAuthenticationClientFilter());
 
@@ -669,7 +669,7 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
 
         URL busFile = JWTAlgorithmTest.class.getResource("client.xml");
 
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
         providers.add(new JwtAuthenticationClientFilter());
 
@@ -708,7 +708,7 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
 
         URL busFile = JWTAlgorithmTest.class.getResource("client.xml");
 
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
         providers.add(new JwtAuthenticationClientFilter());
 

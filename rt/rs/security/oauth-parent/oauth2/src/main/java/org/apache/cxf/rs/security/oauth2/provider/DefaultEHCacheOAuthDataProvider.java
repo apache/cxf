@@ -90,7 +90,7 @@ public class DefaultEHCacheOAuthDataProvider extends AbstractOAuthDataProvider {
     @Override
     public List<Client> getClients(UserSubject resourceOwner) {
         List<String> keys = CastUtils.cast(clientCache.getKeys());
-        List<Client> clients = new ArrayList<Client>(keys.size());
+        List<Client> clients = new ArrayList<>(keys.size());
         for (String key : keys) {
             Client c = getClient(key);
             if (isClientMatched(c, resourceOwner)) {
@@ -103,7 +103,7 @@ public class DefaultEHCacheOAuthDataProvider extends AbstractOAuthDataProvider {
     @Override
     public List<ServerAccessToken> getAccessTokens(Client c, UserSubject sub) {
         List<String> keys = CastUtils.cast(accessTokenCache.getKeys());
-        List<ServerAccessToken> tokens = new ArrayList<ServerAccessToken>(keys.size());
+        List<ServerAccessToken> tokens = new ArrayList<>(keys.size());
         for (String key : keys) {
             ServerAccessToken token = getAccessToken(key);
             if (isTokenMatched(token, c, sub)) {
@@ -116,7 +116,7 @@ public class DefaultEHCacheOAuthDataProvider extends AbstractOAuthDataProvider {
     @Override
     public List<RefreshToken> getRefreshTokens(Client c, UserSubject sub) {
         List<String> keys = CastUtils.cast(refreshTokenCache.getKeys());
-        List<RefreshToken> tokens = new ArrayList<RefreshToken>(keys.size());
+        List<RefreshToken> tokens = new ArrayList<>(keys.size());
         for (String key : keys) {
             RefreshToken token = getRefreshToken(key);
             if (isTokenMatched(token, c, sub)) {

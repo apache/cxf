@@ -559,7 +559,7 @@ public class MAPCodec extends AbstractSoapInterceptor {
                             }
                         } else if (null != headerElement.getAttribute(IS_REFERENCE_PARAM_ATTR_NAME)) {
                             if (null == referenceParameterHeaders) {
-                                referenceParameterHeaders = new HashSet<Element>();
+                                referenceParameterHeaders = new HashSet<>();
                             }
                             referenceParameterHeaders.add(headerElement); 
                         } else if (headerURI.contains(Names.WSA_NAMESPACE_PATTERN)) {

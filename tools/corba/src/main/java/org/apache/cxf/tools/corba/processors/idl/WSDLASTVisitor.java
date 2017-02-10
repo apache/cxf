@@ -249,7 +249,7 @@ public final class WSDLASTVisitor implements ASTVisitor {
     }
 
     public Binding[] getCorbaBindings() {
-        List<Binding> result = new ArrayList<Binding>();
+        List<Binding> result = new ArrayList<>();
         Map<QName, Binding> bindings = CastUtils.cast(definition.getBindings());
         for (Binding binding : bindings.values()) {
             List<ExtensibilityElement> extElements 

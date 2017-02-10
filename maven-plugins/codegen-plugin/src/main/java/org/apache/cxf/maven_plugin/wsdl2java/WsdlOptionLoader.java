@@ -43,7 +43,7 @@ public final class WsdlOptionLoader {
     
     public static List<GenericWsdlOption> loadWsdlOptionsFromDependencies(MavenProject project, 
                                                                           File outputDir) {
-        List<GenericWsdlOption> options = new ArrayList<GenericWsdlOption>();
+        List<GenericWsdlOption> options = new ArrayList<>();
         Set<Artifact> dependencies = CastUtils.cast(project.getDependencyArtifacts());
         for (Artifact artifact : dependencies) {
             WsdlOption option = generateWsdlOptionFromArtifact(artifact, outputDir);
@@ -91,7 +91,7 @@ public final class WsdlOptionLoader {
 
         List<File> wsdlFiles = WsdlUtilities.getWsdlFiles(wsdlBasedir, includes, excludes);
         List<GenericWsdlOption> wsdlOptions 
-            = new ArrayList<GenericWsdlOption>();
+            = new ArrayList<>();
         for (File wsdl : wsdlFiles) {
             WsdlOption wsdlOption = generateWsdlOptionFromFile(wsdl, defaultOutputDir);
             if (wsdlOption != null) {

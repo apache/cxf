@@ -54,7 +54,7 @@ public final class FaultBeanGenerator extends BeanGenerator {
             seiPackageName = getSEIPackage(method);
         }
 
-        Collection<JavaClass> faultBeanClasses = new HashSet<JavaClass>();
+        Collection<JavaClass> faultBeanClasses = new HashSet<>();
         String defaultPackage = seiPackageName + ".jaxws";
         FaultBean bean = new FaultBean();
         for (Class<?> clz : exceptionClasses) {

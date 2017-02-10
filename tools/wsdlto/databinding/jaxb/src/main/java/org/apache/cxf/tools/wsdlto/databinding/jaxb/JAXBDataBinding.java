@@ -291,7 +291,7 @@ public class JAXBDataBinding implements DataBindingProfile {
 
     private static final Logger LOG = LogUtils.getL7dLogger(JAXBDataBinding.class);
 
-    private static final Set<String> DEFAULT_TYPE_MAP = new HashSet<String>();
+    private static final Set<String> DEFAULT_TYPE_MAP = new HashSet<>();
     private static final Map<String, String> JLDEFAULT_TYPE_MAP = new HashMap<String, String>();
 
     private S2JJAXBModel rawJaxbModelGenCode;
@@ -371,7 +371,7 @@ public class JAXBDataBinding implements DataBindingProfile {
         SchemaCollection schemas = (SchemaCollection) context.get(ToolConstants.XML_SCHEMA_COLLECTION);
 
 
-        List<String> args = new ArrayList<String>();
+        List<String> args = new ArrayList<>();
 
         if (context.get(ToolConstants.CFG_NO_ADDRESS_BINDING) == null) {
             //hard code to enable jaxb extensions
@@ -609,7 +609,7 @@ public class JAXBDataBinding implements DataBindingProfile {
                             SchemaCompiler schemaCompiler,
                             SchemaCollection schemaCollection) {
 
-        Set<String> ids = new HashSet<String>();
+        Set<String> ids = new HashSet<>();
         List<ServiceInfo> serviceList = (List<ServiceInfo>)context.get(ToolConstants.SERVICE_LIST);
         for (ServiceInfo si : serviceList) {
             for (SchemaInfo sci : si.getSchemas()) {

@@ -43,7 +43,7 @@ public final class OptionLoader {
     
     public static List<WadlOption> loadWsdlOptionsFromDependencies(MavenProject project, 
                                                                    Option defaultOptions, File outputDir) {
-        List<WadlOption> options = new ArrayList<WadlOption>();
+        List<WadlOption> options = new ArrayList<>();
         Set<Artifact> dependencies = project.getDependencyArtifacts();
         for (Artifact artifact : dependencies) {
             WadlOption option = generateWsdlOptionFromArtifact(artifact, outputDir);
@@ -92,7 +92,7 @@ public final class OptionLoader {
         throws MojoExecutionException {
 
         if (wadlBasedir == null) {
-            return new ArrayList<WadlOption>();
+            return new ArrayList<>();
         }
 
         if (!wadlBasedir.exists()) {
@@ -100,7 +100,7 @@ public final class OptionLoader {
         }
 
         List<File> wadlFiles = getWadlFiles(wadlBasedir, includes, excludes);
-        List<WadlOption> wadlOptions = new ArrayList<WadlOption>();
+        List<WadlOption> wadlOptions = new ArrayList<>();
         for (File wadl : wadlFiles) {
             WadlOption wadlOption = generateWadlOptionFromFile(wadl, defaultOptions, defaultOutputDir);
             if (wadlOption != null) {
@@ -128,7 +128,7 @@ public final class OptionLoader {
     private static List<File> getWadlFiles(File dir, String includes[], String excludes[])
         throws MojoExecutionException {
 
-        List<String> exList = new ArrayList<String>();
+        List<String> exList = new ArrayList<>();
         if (excludes != null) {
             exList.addAll(Arrays.asList(excludes));
         }

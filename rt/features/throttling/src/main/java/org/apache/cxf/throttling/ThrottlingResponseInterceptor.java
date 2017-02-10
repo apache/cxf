@@ -58,7 +58,7 @@ public class ThrottlingResponseInterceptor extends AbstractPhaseInterceptor<Mess
             for (Map.Entry<String, String> e : rsp.getResponseHeaders().entrySet()) {
                 List<String> r = headers.get(e.getKey());
                 if (r == null) {
-                    r = new ArrayList<String>();
+                    r = new ArrayList<>();
                     headers.put(e.getKey(), r);
                 }
                 r.add(e.getValue());

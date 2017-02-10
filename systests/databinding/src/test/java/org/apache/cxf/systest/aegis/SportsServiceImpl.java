@@ -34,7 +34,7 @@ public class SportsServiceImpl implements SportsService {
 
     /** {@inheritDoc}*/
     public Collection<Team> getTeams() {
-        List<Team> teams = new ArrayList<Team>();
+        List<Team> teams = new ArrayList<>();
         teams.add(new Team("Patriots", "New England"));
         return teams;
     }

@@ -117,7 +117,7 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
         this.lowWaterMark = -1 == lowWaterMark ? Integer.MAX_VALUE : lowWaterMark;
         this.dequeueTimeout = dequeueTimeout;
         this.name = name;
-        this.changeListenerList = new ArrayList<PropertyChangeListener>();
+        this.changeListenerList = new ArrayList<>();
     }
     
     public void addChangeListener(PropertyChangeListener listener) {

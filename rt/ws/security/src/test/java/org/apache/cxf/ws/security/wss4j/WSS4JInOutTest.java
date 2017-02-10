@@ -97,7 +97,7 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
         inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
         
-        List<String> xpaths = new ArrayList<String>();
+        List<String> xpaths = new ArrayList<>();
         xpaths.add("//wsse:Security");
         xpaths.add("//wsse:Security/ds:Signature");
 
@@ -124,7 +124,7 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
         inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
         
-        List<String> xpaths = new ArrayList<String>();
+        List<String> xpaths = new ArrayList<>();
         xpaths.add("//wsse:Security");
         xpaths.add("//wsse:Security/wsse:BinarySecurityToken");
         xpaths.add("//wsse:Security/ds:Signature");
@@ -152,7 +152,7 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         inProperties.put(WSHandlerConstants.DEC_PROP_FILE, "insecurity.properties");
         inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback()); 
         
-        List<String> xpaths = new ArrayList<String>();
+        List<String> xpaths = new ArrayList<>();
         xpaths.add("//wsse:Security");
         xpaths.add("//s:Body/xenc:EncryptedData");
 
@@ -211,7 +211,7 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         inProperties.put(WSHandlerConstants.DEC_PROP_FILE, "insecurity.properties");
         inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback()); 
         
-        List<String> xpaths = new ArrayList<String>();
+        List<String> xpaths = new ArrayList<>();
         xpaths.add("//wsse:Security");
 
         SoapMessage inmsg = makeInvocation(outProperties, xpaths, inProperties);
@@ -252,7 +252,7 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         inProperties.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_DIGEST);
         inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback()); 
         
-        List<String> xpaths = new ArrayList<String>();
+        List<String> xpaths = new ArrayList<>();
         xpaths.add("//wsse:Security");
 
         //
@@ -410,7 +410,7 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
         inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "cxfca.properties");
         
-        List<String> xpaths = new ArrayList<String>();
+        List<String> xpaths = new ArrayList<>();
         xpaths.add("//wsse:Security");
         xpaths.add("//wsse:Security/ds:Signature");
 
@@ -453,7 +453,7 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         );
         inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
         
-        List<String> xpaths = new ArrayList<String>();
+        List<String> xpaths = new ArrayList<>();
         xpaths.add("//wsse:Security");
         xpaths.add("//wsse:Security/ds:Signature");
         xpaths.add("//wsse:Security/wsse:UsernameToken");

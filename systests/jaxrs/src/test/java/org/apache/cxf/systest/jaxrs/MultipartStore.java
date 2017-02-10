@@ -160,7 +160,7 @@ public class MultipartStore {
         if (atts.size() != 1) {
             throw new WebApplicationException();
         }
-        List<Attachment> newAtts = new ArrayList<Attachment>();
+        List<Attachment> newAtts = new ArrayList<>();
         Attachment at = atts.get(0);
         MultivaluedMap<String, String> headers = at.getHeaders();
         if (!"http://host/bar".equals(headers.getFirst("Content-Location"))) {
@@ -429,7 +429,7 @@ public class MultipartStore {
     @Consumes("multipart/mixed")
     @Produces("multipart/mixed;type=text/xml")
     public List<Book> addBooks(List<Book> books) {
-        List<Book> books2 = new ArrayList<Book>();
+        List<Book> books2 = new ArrayList<>();
         books2.addAll(books);
         return books2;
     }

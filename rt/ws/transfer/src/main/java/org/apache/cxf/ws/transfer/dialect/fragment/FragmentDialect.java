@@ -287,12 +287,12 @@ public class FragmentDialect implements Dialect {
             String mode,
             ValueType value) {
         if (resourceFragment instanceof Node) {
-            List<Node> nodeList = new ArrayList<Node>();
+            List<Node> nodeList = new ArrayList<>();
             nodeList.add((Node) resourceFragment);
             return modifyRepresentationMode(nodeList, mode, value);
         } else if (resourceFragment instanceof NodeList) {
             NodeList rfNodeList = (NodeList) resourceFragment;
-            List<Node> nodeList = new ArrayList<Node>();
+            List<Node> nodeList = new ArrayList<>();
             for (int i = 0; i < rfNodeList.getLength(); i++) {
                 nodeList.add(rfNodeList.item(i));
             }

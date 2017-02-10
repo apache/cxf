@@ -81,7 +81,7 @@ public class AnnotationHandlerChainBuilder extends HandlerChainBuilder {
             if (LOG.isLoggable(Level.FINE)) {
                 LOG.fine("no HandlerChain annotation on " + clz);
             }
-            chain = new ArrayList<Handler>();
+            chain = new ArrayList<>();
         } else {
             hcAnn.validate();
 
@@ -107,7 +107,7 @@ public class AnnotationHandlerChainBuilder extends HandlerChainBuilder {
                                                        "handler-chains".equals(el.getLocalName()),
                                                        xml, handlerFileURL));                    
                 }
-                chain = new ArrayList<Handler>();
+                chain = new ArrayList<>();
                 Node node = el.getFirstChild();
                 while (node != null) {
                     if (node instanceof Element) {

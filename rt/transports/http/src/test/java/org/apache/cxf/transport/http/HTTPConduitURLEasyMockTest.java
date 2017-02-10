@@ -269,11 +269,11 @@ public class HTTPConduitURLEasyMockTest extends Assert {
 
     private void setUpHeaders(Message message) {
         Map<String, List<String>> headers = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
-        List<String> contentTypes = new ArrayList<String>();
+        List<String> contentTypes = new ArrayList<>();
         contentTypes.add("text/xml;charset=utf8");
         headers.put("content-type", contentTypes);
         
-        List<String> acceptTypes = new ArrayList<String>();
+        List<String> acceptTypes = new ArrayList<>();
         acceptTypes.add("text/xml;charset=utf8");
         acceptTypes.add("text/plain");
         headers.put("Accept", acceptTypes);

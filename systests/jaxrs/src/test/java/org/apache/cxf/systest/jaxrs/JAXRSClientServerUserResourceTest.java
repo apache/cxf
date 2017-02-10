@@ -66,7 +66,7 @@ public class JAXRSClientServerUserResourceTest extends AbstractBusClientServerTe
             op2.setName("getBookChapter");
             op2.setParameters(Collections.singletonList(new Parameter(ParameterType.PATH, "id")));
             
-            List<UserOperation> ops = new ArrayList<UserOperation>();
+            List<UserOperation> ops = new ArrayList<>();
             ops.add(op);
             ops.add(op2);
             

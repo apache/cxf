@@ -61,7 +61,7 @@ public class LocalTransportFactory extends AbstractTransportFactory
         = LocalTransportFactory.class.getName() + ".includeProperties";
 
     private static final Logger LOG = LogUtils.getL7dLogger(LocalTransportFactory.class);
-    private static final Set<String> URI_PREFIXES = new HashSet<String>();
+    private static final Set<String> URI_PREFIXES = new HashSet<>();
     private static final String NULL_ADDRESS 
         = LocalTransportFactory.class.getName() + ".nulladdress";
 
@@ -74,14 +74,14 @@ public class LocalTransportFactory extends AbstractTransportFactory
 
     private Set<String> messageFilterProperties;
     private Set<String> messageIncludeProperties;
-    private Set<String> uriPrefixes = new HashSet<String>(URI_PREFIXES);
+    private Set<String> uriPrefixes = new HashSet<>(URI_PREFIXES);
     private volatile Executor executor;
 
     public LocalTransportFactory() {
         super(DEFAULT_NAMESPACES);
         
-        messageFilterProperties = new HashSet<String>();
-        messageIncludeProperties = new HashSet<String>();
+        messageFilterProperties = new HashSet<>();
+        messageIncludeProperties = new HashSet<>();
         messageFilterProperties.add(Message.REQUESTOR_ROLE); 
         
         messageIncludeProperties.add(Message.PROTOCOL_HEADERS);

@@ -52,7 +52,7 @@ public class JaxWsImplementorInfo {
     private Class<?> implementorClass;
     private Class<?> seiClass;
     private ParameterizedType seiType;
-    private List<WebService> wsAnnotations = new ArrayList<WebService>(2);
+    private List<WebService> wsAnnotations = new ArrayList<>(2);
     private WebServiceProvider wsProviderAnnotation;
 
     public JaxWsImplementorInfo(Class<?> ic) {

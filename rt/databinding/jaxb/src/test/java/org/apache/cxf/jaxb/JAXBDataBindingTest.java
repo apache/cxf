@@ -292,7 +292,7 @@ public class JAXBDataBindingTest extends Assert {
     @Test
     public void testResursiveType() throws Exception {
         Set<Class<?>> classes = new HashSet<Class<?>>();
-        Collection<Object> typeReferences = new ArrayList<Object>();
+        Collection<Object> typeReferences = new ArrayList<>();
         Map<String, Object> props = new HashMap<String, Object>();
         JAXBContextInitializer init = new JAXBContextInitializer(null, classes, typeReferences, props);
         init.addClass(Type2.class);

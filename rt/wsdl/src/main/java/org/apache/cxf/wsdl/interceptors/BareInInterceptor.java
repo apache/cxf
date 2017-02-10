@@ -50,7 +50,7 @@ import org.apache.cxf.staxutils.StaxUtils;
 public class BareInInterceptor extends AbstractInDatabindingInterceptor {
     private static final Logger LOG = LogUtils.getL7dLogger(BareInInterceptor.class);
 
-    private static Set<String> filter = new HashSet<String>();
+    private static Set<String> filter = new HashSet<>();
 
     static {
         filter.add("void");
@@ -85,7 +85,7 @@ public class BareInInterceptor extends AbstractInDatabindingInterceptor {
 
         Collection<OperationInfo> ops = null;
         if (bop == null) {
-            ops = new ArrayList<OperationInfo>();
+            ops = new ArrayList<>();
             ops.addAll(si.getInterface().getOperations());
             if (xmlReader.getEventType() == XMLStreamReader.END_ELEMENT && !client) {
                 //empty input

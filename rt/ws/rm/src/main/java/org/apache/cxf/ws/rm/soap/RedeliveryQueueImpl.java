@@ -117,7 +117,7 @@ public class RedeliveryQueueImpl implements RedeliveryQueue {
         return 0 == getUndelivered().size();
     }
     public void purgeAll(DestinationSequence seq) {
-        Collection<Long> purged = new ArrayList<Long>();
+        Collection<Long> purged = new ArrayList<>();
         synchronized (this) {
             LOG.fine("Start purging redeliver candidates.");
             List<RedeliverCandidate> sequenceCandidates = getSequenceCandidates(seq);
@@ -145,7 +145,7 @@ public class RedeliveryQueueImpl implements RedeliveryQueue {
     }
 
     public List<Long> getUndeliveredMessageNumbers(DestinationSequence seq) {
-        List<Long> undelivered = new ArrayList<Long>();
+        List<Long> undelivered = new ArrayList<>();
         List<RedeliverCandidate> sequenceCandidates = getSequenceCandidates(seq);
         if (null != sequenceCandidates) {
             for (int i = 0; i < sequenceCandidates.size(); i++) {
@@ -292,7 +292,7 @@ public class RedeliveryQueueImpl implements RedeliveryQueue {
         synchronized (this) {
             List<RedeliverCandidate> sequenceCandidates = getSequenceCandidates(key);
             if (null == sequenceCandidates) {
-                sequenceCandidates = new ArrayList<RedeliverCandidate>();
+                sequenceCandidates = new ArrayList<>();
                 candidates.put(key, sequenceCandidates);
             }
             candidate = getRedeliverCandidate(st, sequenceCandidates);

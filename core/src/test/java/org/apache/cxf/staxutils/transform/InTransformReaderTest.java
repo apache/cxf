@@ -272,7 +272,7 @@ public class InTransformReaderTest extends Assert {
         appendElements.put("requestValue",
                            "{http://cxf.apache.org/hello_world_soap_http/types}greetMe");
         
-        List<String> dropElements = new ArrayList<String>();
+        List<String> dropElements = new ArrayList<>();
         dropElements.add("value");
         
         Map<String, String> transformAttributes = new HashMap<String, String>();
@@ -415,7 +415,7 @@ public class InTransformReaderTest extends Assert {
         Map<String, String> appendElements = new HashMap<String, String>();
         appendElements.put("payload/",
                            "{http://www.w3.org/2003/05/soap-envelope}Body");
-        List<String> dropElements = new ArrayList<String>();
+        List<String> dropElements = new ArrayList<>();
         dropElements.add("param");
 
         TransformTestUtils.transformInStreamAndCompare("../resources/AddRequestIn3.xml", 

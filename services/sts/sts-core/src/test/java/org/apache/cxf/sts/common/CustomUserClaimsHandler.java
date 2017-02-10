@@ -35,7 +35,7 @@ import org.apache.cxf.sts.claims.ProcessedClaimCollection;
  */
 public class CustomUserClaimsHandler implements ClaimsHandler {
     
-    private static List<URI> knownURIs = new ArrayList<URI>();
+    private static List<URI> knownURIs = new ArrayList<>();
     
     static {
         knownURIs.add(ClaimTypes.FIRSTNAME);

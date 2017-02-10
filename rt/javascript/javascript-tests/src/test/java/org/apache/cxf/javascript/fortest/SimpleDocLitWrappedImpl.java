@@ -52,7 +52,7 @@ public class SimpleDocLitWrappedImpl implements SimpleDocLitWrapped {
     private InheritanceTestDerived lastInheritanceTestDerived;
     
     public String echoWithHeader(String what) {
-        List<Header> headers = new ArrayList<Header>();
+        List<Header> headers = new ArrayList<>();
         Header dummyHeader;
         try {
             dummyHeader = new Header(new QName("uri:org.apache.cxf", "dummy"), "decapitated",

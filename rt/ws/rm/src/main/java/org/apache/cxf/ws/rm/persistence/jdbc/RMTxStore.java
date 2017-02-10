@@ -511,7 +511,7 @@ public class RMTxStore implements RMStore {
         Connection con = verifyConnection();
         PreparedStatement stmt = null;
         SQLException conex = null;
-        Collection<DestinationSequence> seqs = new ArrayList<DestinationSequence>();
+        Collection<DestinationSequence> seqs = new ArrayList<>();
         ResultSet res = null;
         try {
             stmt = getStatement(con, SELECT_DEST_SEQUENCES_STMT_STR);
@@ -551,7 +551,7 @@ public class RMTxStore implements RMStore {
         Connection con = verifyConnection();
         PreparedStatement stmt = null;
         SQLException conex = null;
-        Collection<SourceSequence> seqs = new ArrayList<SourceSequence>();
+        Collection<SourceSequence> seqs = new ArrayList<>();
         ResultSet res = null;
         try {
             stmt = getStatement(con, SELECT_SRC_SEQUENCES_STMT_STR);
@@ -590,7 +590,7 @@ public class RMTxStore implements RMStore {
         Connection con = verifyConnection();
         PreparedStatement stmt = null;
         SQLException conex = null;
-        Collection<RMMessage> msgs = new ArrayList<RMMessage>();
+        Collection<RMMessage> msgs = new ArrayList<>();
         ResultSet res = null;
         try {
             stmt = getStatement(con, outbound ? SELECT_OUTBOUND_MESSAGES_STMT_STR : SELECT_INBOUND_MESSAGES_STMT_STR);
@@ -895,7 +895,7 @@ public class RMTxStore implements RMStore {
         try {
             DatabaseMetaData metadata = con.getMetaData();
             ResultSet rs = metadata.getColumns(null, null, tableName, "%");
-            Set<String> dbCols = new HashSet<String>();
+            Set<String> dbCols = new HashSet<>();
             List<String[]> newCols = new ArrayList<String[]>();
             while (rs.next()) {
                 dbCols.add(rs.getString(4));

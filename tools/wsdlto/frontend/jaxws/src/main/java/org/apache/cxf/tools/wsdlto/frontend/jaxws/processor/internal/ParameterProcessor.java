@@ -272,9 +272,9 @@ public class ParameterProcessor extends AbstractProcessor {
                         
         Map<QName, MessagePartInfo> inputPartsMap = inputMessage.getMessagePartsMap();
         List<MessagePartInfo> outputParts =
-            outputMessage == null ? new ArrayList<MessagePartInfo>() : outputMessage.getMessageParts();
+            outputMessage == null ? new ArrayList<>() : outputMessage.getMessageParts();
         // figure out output parts that are not present in input parts
-        List<MessagePartInfo> outParts = new ArrayList<MessagePartInfo>();
+        List<MessagePartInfo> outParts = new ArrayList<>();
         int numHeader = 0;
         if (isRequestResponse(method)) {
             for (MessagePartInfo outpart : outputParts) {
@@ -676,12 +676,12 @@ public class ParameterProcessor extends AbstractProcessor {
             outputParts = outputPartsMap.values();
         } else {
             outputPartsMap = new LinkedHashMap<QName, MessagePartInfo>();
-            outputParts = new ArrayList<MessagePartInfo>();
+            outputParts = new ArrayList<>();
         }
 
 
-        List<MessagePartInfo> inputUnlistedParts = new ArrayList<MessagePartInfo>();
-        List<MessagePartInfo> outputUnlistedParts = new ArrayList<MessagePartInfo>();
+        List<MessagePartInfo> inputUnlistedParts = new ArrayList<>();
+        List<MessagePartInfo> outputUnlistedParts = new ArrayList<>();
 
         for (MessagePartInfo part : inputParts) {
             if (!parameterList.contains(part.getName().getLocalPart())) {
@@ -766,7 +766,7 @@ public class ParameterProcessor extends AbstractProcessor {
         if (outputMessage != null) {
             outputParts = outputMessage.getMessageParts();
         } else {
-            outputParts = new ArrayList<MessagePartInfo>();
+            outputParts = new ArrayList<>();
         }
 
         while (params.hasNext()) {

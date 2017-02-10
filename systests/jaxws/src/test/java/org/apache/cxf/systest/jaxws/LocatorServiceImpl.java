@@ -107,7 +107,7 @@ public class LocatorServiceImpl implements LocatorService {
     
     public List<Endpoint> listEndpoints() {
         LOG.info("Executing operation listEndpoints");
-        return new ArrayList<Endpoint>();
+        return new ArrayList<>();
     }
 
     

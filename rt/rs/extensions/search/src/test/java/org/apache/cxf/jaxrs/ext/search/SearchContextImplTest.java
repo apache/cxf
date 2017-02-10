@@ -144,7 +144,7 @@ public class SearchContextImplTest extends Assert {
         SearchCondition<Book> sc = context.getCondition(Book.class);
         assertNotNull(sc);
         
-        List<Book> books = new ArrayList<Book>();
+        List<Book> books = new ArrayList<>();
         books.add(new Book("CXF is cool", 125L));
         books.add(new Book("CXF Rocks", 125L));
         
@@ -160,7 +160,7 @@ public class SearchContextImplTest extends Assert {
         SearchCondition<SearchBean> sc = context.getCondition(SearchBean.class);
         assertNotNull(sc);
         
-        List<SearchBean> beans = new ArrayList<SearchBean>();
+        List<SearchBean> beans = new ArrayList<>();
         SearchBean sb1 = new SearchBean();
         sb1.set("name", "CXF is cool");
         beans.add(sb1);

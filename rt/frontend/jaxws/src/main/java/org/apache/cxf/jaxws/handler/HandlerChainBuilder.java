@@ -68,7 +68,7 @@ public class HandlerChainBuilder {
         if (null == hc || hc.size() == 0) {
             return null;
         }
-        List<Handler> handlers = new ArrayList<Handler>();
+        List<Handler> handlers = new ArrayList<>();
         for (PortComponentHandlerType pt : hc) {
             handlers.addAll(buildHandlerChain(pt, getHandlerClassLoader()));
         }
@@ -94,8 +94,8 @@ public class HandlerChainBuilder {
     public List<Handler> sortHandlers(List<Handler> handlers) {
 
         final int size = handlers.size();
-        List<Handler> logicalHandlers = new ArrayList<Handler>(size);
-        List<Handler> protocolHandlers = new ArrayList<Handler>(Math.min(10, size));
+        List<Handler> logicalHandlers = new ArrayList<>(size);
+        List<Handler> protocolHandlers = new ArrayList<>(Math.min(10, size));
 
         for (Handler<?> handler : handlers) {
             if (handler instanceof LogicalHandler) {
@@ -116,7 +116,7 @@ public class HandlerChainBuilder {
     }
 
     protected List<Handler> buildHandlerChain(PortComponentHandlerType ht, ClassLoader classLoader) {
-        List<Handler> handlerChain = new ArrayList<Handler>();
+        List<Handler> handlerChain = new ArrayList<>();
         try {
             final boolean fineLog = LOG.isLoggable(Level.FINE);
             if (fineLog) {

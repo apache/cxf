@@ -28,7 +28,7 @@ import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
 
 public class AesWrapKeyEncryptionAlgorithm extends AbstractWrapKeyEncryptionAlgorithm {
-    private static final Set<String> SUPPORTED_ALGORITHMS = new HashSet<String>(
+    private static final Set<String> SUPPORTED_ALGORITHMS = new HashSet<>(
         Arrays.asList(KeyAlgorithm.A128KW.getJwaName(),
                       KeyAlgorithm.A192KW.getJwaName(),
                       KeyAlgorithm.A256KW.getJwaName()));

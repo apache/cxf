@@ -28,7 +28,7 @@ public class DescriptionInfo extends AbstractPropertiesHolder implements NamedIt
     QName name;
     String uri;
 
-    List<AbstractDescriptionElement> described = new ArrayList<AbstractDescriptionElement>();
+    List<AbstractDescriptionElement> described = new ArrayList<>();
 
     public DescriptionInfo() {
     }

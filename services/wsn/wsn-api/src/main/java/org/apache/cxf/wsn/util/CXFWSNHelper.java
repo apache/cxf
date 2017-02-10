@@ -86,7 +86,7 @@ public class CXFWSNHelper extends WSNHelper {
                     endpoint.setProperties(new HashMap<String, Object>());
                 }
                 endpoint.getProperties().put("javax.xml.ws.wsdl.description", wsdlLocation.toExternalForm());
-                List<Source> mt = new ArrayList<Source>();
+                List<Source> mt = new ArrayList<>();
                 StreamSource src = new StreamSource(wsdlLocation.openStream(), wsdlLocation.toExternalForm());
                 mt.add(src);
                 endpoint.setMetadata(mt);

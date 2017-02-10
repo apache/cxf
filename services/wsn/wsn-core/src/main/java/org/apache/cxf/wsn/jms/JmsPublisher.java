@@ -136,7 +136,7 @@ public abstract class JmsPublisher extends AbstractPublisher implements Consumer
         if (demand) {
             try {
                 producers = new HashMap<Destination, Object>();
-                advisories = new ArrayList<ConsumerEventSource>();
+                advisories = new ArrayList<>();
                 for (TopicExpressionType topic : this.topic) {
                     ConsumerEventSource advisory 
                         = new ConsumerEventSource(connection, topicConverter.toActiveMQTopic(topic));

@@ -172,7 +172,7 @@ public class ReadHeaderInterceptorTest extends TestBase {
         
         List<Header> eleHeaders = soapMessage.getHeaders();
         
-        List<Element> headerChilds = new ArrayList<Element>();
+        List<Element> headerChilds = new ArrayList<>();
         Iterator<Header> iter = eleHeaders.iterator();
         while (iter.hasNext()) {
             Header hdr = iter.next();
@@ -186,7 +186,7 @@ public class ReadHeaderInterceptorTest extends TestBase {
             Element ele = headerChilds.get(i);
             if (ele.getLocalName().equals("reservation")) {
                 Element reservation = ele;
-                List<Element> reservationChilds = new ArrayList<Element>();
+                List<Element> reservationChilds = new ArrayList<>();
                 Element elem = DOMUtils.getFirstElement(reservation);
                 while (elem != null) {
                     reservationChilds.add(elem);

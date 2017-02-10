@@ -53,7 +53,7 @@ public class AnnotationInterceptors {
     
     private <T> List<T> initializeAnnotationObjects(Annotation annotation,
                                              Class<T> type) {
-        List<T> list = new ArrayList<T>();
+        List<T> list = new ArrayList<>();
         for (String cn : getAnnotationObjectNames(annotation)) {
             list.add(initializeAnnotationObject(cn, type));
         }

@@ -104,7 +104,7 @@ public class JAXRSClientServerUserResourceDefaultTest extends AbstractBusClientS
             echoDefaultParam.setJavaType(SAXSource.class);
             op3.setParameters(Collections.singletonList(echoDefaultParam));
             
-            List<UserOperation> ops = new ArrayList<UserOperation>();
+            List<UserOperation> ops = new ArrayList<>();
             ops.add(op);
             ops.add(op2);
             ops.add(op3);

@@ -371,7 +371,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
     
     
     private void encryptTokensInSecurityHeader(AbstractToken encryptionToken, WSSecBase encrBase) {
-        List<WSEncryptionPart> secondEncrParts = new ArrayList<WSEncryptionPart>();
+        List<WSEncryptionPart> secondEncrParts = new ArrayList<>();
         
         // Check for signature protection
         if (abinding.isEncryptSignature()) {

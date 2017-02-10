@@ -92,7 +92,7 @@ public class CollectionTestsWithService extends AbstractAegisTest {
         assertEquals("Able", first);
 
         //CHECKSTYLE:OFF
-        HashSet<String> hashedSet = new HashSet<String>();
+        HashSet<String> hashedSet = new HashSet<>();
         hashedSet.addAll(strings);
         String countString = csi.takeUnsortedSet(hashedSet);
         assertEquals("2", countString);

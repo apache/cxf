@@ -154,7 +154,7 @@ public final class JSONUtils {
         }
         if (primitiveArrayKeys != null) { 
             conf.setPrimitiveArrayKeys(
-                new HashSet<String>(primitiveArrayKeys));
+                new HashSet<>(primitiveArrayKeys));
         }
         
         XMLInputFactory factory = depthProps != null 

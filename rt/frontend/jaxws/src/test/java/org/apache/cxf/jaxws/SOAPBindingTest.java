@@ -59,7 +59,7 @@ public class SOAPBindingTest extends AbstractJaxWsTest {
         assertTrue(binding.getRoles().contains(Soap12.getInstance().getUltimateReceiverRole()));
         
         String myrole = "http://myrole";
-        Set<String> roles = new HashSet<String>();
+        Set<String> roles = new HashSet<>();
         roles.add(myrole);
         
         binding.setRoles(roles);

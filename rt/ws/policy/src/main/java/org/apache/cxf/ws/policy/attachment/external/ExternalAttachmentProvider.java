@@ -158,7 +158,7 @@ public class ExternalAttachmentProvider extends AbstractPolicyProvider {
         }
         
         // read the document and build the attachments
-        attachments = new ArrayList<PolicyAttachment>();
+        attachments = new ArrayList<>();
         Document doc = null;
         try {
             InputStream is = location.getInputStream();
@@ -250,7 +250,7 @@ public class ExternalAttachmentProvider extends AbstractPolicyProvider {
     }  
     
     Collection<DomainExpression> readDomainExpressions(Element appliesToElem) {
-        Collection<DomainExpression> des = new ArrayList<DomainExpression>();
+        Collection<DomainExpression> des = new ArrayList<>();
         for (Node nd = appliesToElem.getFirstChild(); nd != null; nd = nd.getNextSibling()) {
             if (Node.ELEMENT_NODE == nd.getNodeType()) {
                 DomainExpressionBuilderRegistry debr 

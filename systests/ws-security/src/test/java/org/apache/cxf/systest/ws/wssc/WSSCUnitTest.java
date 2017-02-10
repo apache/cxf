@@ -315,7 +315,7 @@ public class WSSCUnitTest extends AbstractBusClientServerTestBase {
         binding.setProtectTokens(false);
         all.addPolicyComponent(binding);
         
-        List<Header> headers = new ArrayList<Header>();
+        List<Header> headers = new ArrayList<>();
         SignedParts signedParts = 
             new SignedParts(SPConstants.SPVersion.SP12, true, null, headers, false);
         all.addPolicyComponent(signedParts);

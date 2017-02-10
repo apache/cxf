@@ -71,7 +71,7 @@ public class AbstractAuthFilter {
     
     private static final Set<String> ALLOWED_OAUTH_PARAMETERS;
     static {
-        ALLOWED_OAUTH_PARAMETERS = new HashSet<String>();
+        ALLOWED_OAUTH_PARAMETERS = new HashSet<>();
         ALLOWED_OAUTH_PARAMETERS.addAll(Arrays.asList(REQUIRED_PARAMETERS));
         ALLOWED_OAUTH_PARAMETERS.add(OAuth.OAUTH_VERSION);
         ALLOWED_OAUTH_PARAMETERS.add(OAuthConstants.OAUTH_CONSUMER_SECRET);
@@ -177,7 +177,7 @@ public class AbstractAuthFilter {
         }
 
         List<OAuthPermission> permissions = accessToken.getScopes();
-        List<OAuthPermission> matchingPermissions = new ArrayList<OAuthPermission>();
+        List<OAuthPermission> matchingPermissions = new ArrayList<>();
         
         for (OAuthPermission perm : permissions) {
             boolean uriOK = checkRequestURI(req, perm.getUris());

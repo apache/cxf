@@ -42,19 +42,19 @@ public class Option {
     /**
      * 
      */
-    protected List<String> packagenames = new ArrayList<String>();
+    protected List<String> packagenames = new ArrayList<>();
 
     /**
      * Extra arguments to pass to the command-line code generator. For compatibility as well as to
      * specify any extra flags not addressed by other parameters
      */
-    protected List<String> extraargs = new ArrayList<String>();
+    protected List<String> extraargs = new ArrayList<>();
 
     /**
      * Extra arguments to pass to the XJC compiler command-line code generator.
      * For compatibility as well as to specify any extra flags not addressed by other parameters
      */
-    protected List<String> xjcargs = new ArrayList<String>();
+    protected List<String> xjcargs = new ArrayList<>();
     
     protected String[] asyncMethods;
     protected String[] bareMethods;
@@ -70,7 +70,7 @@ public class Option {
      * Also, optionally specifies the Java package name used by types described in the excluded 
      * namespace(s) using schema-namespace[=java-packagename]
      */
-    List<String> namespaceExcludes = new ArrayList<String>();
+    List<String> namespaceExcludes = new ArrayList<>();
 
     /**
      * Enables or disables the loading of the default excludes namespace mapping. Default is true.
@@ -99,7 +99,7 @@ public class Option {
     /**
      * Specifies JAXWS or JAXB binding files. Use spaces to separate multiple entries.
      */
-    Set<String> bindingFiles = new HashSet<String>();
+    Set<String> bindingFiles = new HashSet<>();
 
     /**
      * Specifies the value of the @WebServiceClient annotation's wsdlLocation property. 
@@ -162,7 +162,7 @@ public class Option {
     /**
      * The superinterfaces to use for generated SEIs
      */
-    List<String> seiSuper = new ArrayList<String>();
+    List<String> seiSuper = new ArrayList<>();
 
     /**
      * Uses @Generated annotation in all generated java classes if the flag is set to true.

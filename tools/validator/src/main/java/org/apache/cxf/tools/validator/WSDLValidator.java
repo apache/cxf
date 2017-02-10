@@ -44,7 +44,7 @@ public class WSDLValidator extends AbstractCXFToolContainer {
     }
 
     private Set<String> getArrayKeys() {
-        Set<String> set = new HashSet<String>();
+        Set<String> set = new HashSet<>();
         set.add(ToolConstants.CFG_SCHEMA_URL);
         return set;
     }

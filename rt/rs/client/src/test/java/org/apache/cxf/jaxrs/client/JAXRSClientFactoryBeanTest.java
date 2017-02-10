@@ -172,7 +172,7 @@ public class JAXRSClientFactoryBeanTest extends Assert {
         bean.setAddress("http://bar");
         bean.setResourceClass(BookStoreSubresourcesOnly.class);
         TestFeature testFeature = new TestFeature();
-        List<Feature> features = new ArrayList<Feature>();
+        List<Feature> features = new ArrayList<>();
         features.add(testFeature);
         bean.setFeatures(features);
         

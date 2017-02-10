@@ -1397,7 +1397,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType2.class);
         updateAddressPort(x509Port, PORT);
         
-        List<Header> headers = new ArrayList<Header>();
+        List<Header> headers = new ArrayList<>();
         Header dummyHeader = new Header(new QName("uri:org.apache.cxf", "dummy"), "dummy-header",
                                         new JAXBDataBinding(String.class));
         headers.add(dummyHeader);

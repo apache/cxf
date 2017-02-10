@@ -185,7 +185,7 @@ public final class JAXRSUtils {
     public static List<PathSegment> getPathSegments(String thePath, boolean decode, 
                                                     boolean ignoreLastSlash) {
         String[] segments = StringUtils.split(thePath, "/");
-        List<PathSegment> theList = new ArrayList<PathSegment>();
+        List<PathSegment> theList = new ArrayList<>();
         for (String path : segments) {
             if (!StringUtils.isEmpty(path)) {
                 theList.add(new PathSegmentImpl(path, decode));
@@ -236,7 +236,7 @@ public final class JAXRSUtils {
     }
     
     public static List<MediaType> getMediaTypes(String[] values) {
-        List<MediaType> supportedMimeTypes = new ArrayList<MediaType>(values.length);
+        List<MediaType> supportedMimeTypes = new ArrayList<>(values.length);
         for (int i = 0; i < values.length; i++) {
             supportedMimeTypes.addAll(parseMediaTypes(values[i]));    
         }
@@ -607,7 +607,7 @@ public final class JAXRSUtils {
                                           String responseMessage, int status, boolean addAllow) {
         ResponseBuilder rb = toResponseBuilder(status);
         if (addAllow) {
-            Set<String> allowedMethods = new HashSet<String>();
+            Set<String> allowedMethods = new HashSet<>();
             for (ClassResourceInfo cri : cris) {
                 allowedMethods.addAll(cri.getAllowedMethods());
             }
@@ -775,7 +775,7 @@ public final class JAXRSUtils {
         
         Type[] genericParameterTypes = ori.getInGenericParameterTypes();
         Annotation[][] anns = ori.getInParameterAnnotations();
-        List<Object> params = new ArrayList<Object>(parameterTypesLengh);
+        List<Object> params = new ArrayList<>(parameterTypesLengh);
 
         for (int i = 0; i < parameterTypesLengh; i++) {
             Class<?> param = null;
@@ -1438,7 +1438,7 @@ public final class JAXRSUtils {
     }
 
     public static List<MediaType> parseMediaTypes(String types) {
-        List<MediaType> acceptValues = new ArrayList<MediaType>();
+        List<MediaType> acceptValues = new ArrayList<>();
         
         if (types != null) {
             int x = 0;
@@ -1526,7 +1526,7 @@ public final class JAXRSUtils {
             }
         }
 
-        return new ArrayList<MediaType>(supportedMimeTypeList);
+        return new ArrayList<>(supportedMimeTypeList);
         
     }
     
@@ -1797,7 +1797,7 @@ public final class JAXRSUtils {
         if (params.size() <= 1) {
             values = Collections.emptyList();
         } else {
-            values = new ArrayList<String>(params.size() - 1);
+            values = new ArrayList<>(params.size() - 1);
             for (Parameter pm : ori.getParameters()) {
                 if (pm.getType() == ParameterType.PATH) {
                     List<String> paramValues = params.get(pm.getName());

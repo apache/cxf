@@ -228,7 +228,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
                 SupportingTokens suppTokens = (SupportingTokens)ai.getAssertion();
                 if (suppTokens != null && suppTokens.getTokens() != null 
                     && suppTokens.getTokens().size() > 0) {
-                    handleSupportingTokens(suppTokens, false, new ArrayList<SupportingToken>());
+                    handleSupportingTokens(suppTokens, false, new ArrayList<>());
                 }
                 ai.setAsserted(true);
             }

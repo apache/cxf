@@ -104,7 +104,7 @@ public class CXFServletTest extends AbstractServletTest {
         WebLink[] links = res.getLinks();
         assertEquals("Wrong number of service links", 6, links.length);
         
-        Set<String> links2 = new HashSet<String>();
+        Set<String> links2 = new HashSet<>();
         for (WebLink l : links) {
             links2.add(l.getURLString());
         }

@@ -189,7 +189,7 @@ public final class OAuthUtils {
     public static List<String> parseParamValue(String paramValue, String defaultValue) 
         throws IOException {
         
-        List<String> scopeList = new ArrayList<String>();
+        List<String> scopeList = new ArrayList<>();
 
         if (!StringUtils.isEmpty(paramValue)) {
             StringTokenizer tokenizer = new StringTokenizer(paramValue, " ");

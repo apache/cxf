@@ -53,7 +53,7 @@ public abstract class AbstractResourceInfo {
     private static final String FIELD_PROXY_MAP = "jaxrs-field-proxy-map";
     private static final String SETTER_PROXY_MAP = "jaxrs-setter-proxy-map";
     
-    private static final Set<String> STANDARD_CONTEXT_CLASSES = new HashSet<String>();
+    private static final Set<String> STANDARD_CONTEXT_CLASSES = new HashSet<>();
     static {
         // JAX-RS 1.0-1.1
         STANDARD_CONTEXT_CLASSES.add(Application.class.getName());
@@ -366,7 +366,7 @@ public abstract class AbstractResourceInfo {
         
         List<Field> fields = theFields.get(serviceClass);
         if (fields == null) {
-            fields = new ArrayList<Field>();
+            fields = new ArrayList<>();
             theFields.put(serviceClass, fields);
         }
         if (!fields.contains(f)) {

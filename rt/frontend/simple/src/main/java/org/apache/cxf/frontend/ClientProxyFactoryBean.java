@@ -65,7 +65,7 @@ public class ClientProxyFactoryBean extends AbstractBasicInterceptorProvider {
     private String password;
     private Map<String, Object> properties;
     private Bus bus;
-    private List<Feature> features = new ArrayList<Feature>();
+    private List<Feature> features = new ArrayList<>();
     private DataBinding dataBinding;
 
     public ClientProxyFactoryBean() {

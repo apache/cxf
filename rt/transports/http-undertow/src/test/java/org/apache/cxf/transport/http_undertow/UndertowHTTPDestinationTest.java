@@ -506,7 +506,7 @@ public class UndertowHTTPDestinationTest extends Assert {
             }
 
             public Set<String> getUriPrefixes() {
-                return new HashSet<String>(Collections.singletonList("http"));
+                return new HashSet<>(Collections.singletonList("http"));
             }
             
         };
@@ -671,7 +671,7 @@ public class UndertowHTTPDestinationTest extends Assert {
                 httpFields.add(new HttpString("content-type"), "charset=utf8");
                 httpFields.put(new HttpString(UndertowHTTPDestinationTest.AUTH_HEADER), 
                                UndertowHTTPDestinationTest.BASIC_AUTH);
-                List<String> headers = new ArrayList<String>();
+                List<String> headers = new ArrayList<>();
                 for (HttpString header : httpFields.getHeaderNames()) {
                     headers.add(header.toString());
                 }
@@ -743,7 +743,7 @@ public class UndertowHTTPDestinationTest extends Assert {
         Map<String, List<String>> responseHeaders =
             CastUtils.cast((Map<?, ?>)outMsg.get(Message.PROTOCOL_HEADERS));
         assertNotNull("expected response headers", responseHeaders);
-        List<String> challenges = new ArrayList<String>();
+        List<String> challenges = new ArrayList<>();
         challenges.add(BASIC_CHALLENGE);
         challenges.add(DIGEST_CHALLENGE);
         challenges.add(CUSTOM_CHALLENGE);

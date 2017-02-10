@@ -150,7 +150,7 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
             || (mode == AckRequestModeType.PENDING && seq.needAcknowledge(rmpsIn.getMessageNumber()))) {
             Collection<AckRequestedType> reqs = rmpsIn.getAcksRequested();
             if (reqs == null) {
-                reqs = new ArrayList<AckRequestedType>();
+                reqs = new ArrayList<>();
             }
             Identifier identifier = new Identifier();
             identifier.setValue(sequence.getIdentifier().getValue());

@@ -61,7 +61,7 @@ public class IssueUnitTest extends org.junit.Assert {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
         
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new DummyTokenProvider());
         issueOperation.setTokenProviders(providerList);
         
@@ -103,7 +103,7 @@ public class IssueUnitTest extends org.junit.Assert {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
         
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new DummyTokenProvider());
         issueOperation.setTokenProviders(providerList);
         
@@ -153,7 +153,7 @@ public class IssueUnitTest extends org.junit.Assert {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
         
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new DummyTokenProvider());
         issueOperation.setTokenProviders(providerList);
         
@@ -217,7 +217,7 @@ public class IssueUnitTest extends org.junit.Assert {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
         
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new DummyTokenProvider());
         issueOperation.setTokenProviders(providerList);
         
@@ -270,7 +270,7 @@ public class IssueUnitTest extends org.junit.Assert {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
         
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new DummyTokenProvider());
         issueOperation.setTokenProviders(providerList);
         
@@ -313,7 +313,7 @@ public class IssueUnitTest extends org.junit.Assert {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
         
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new DummyTokenProvider());
         issueOperation.setTokenProviders(providerList);
         
@@ -358,7 +358,7 @@ public class IssueUnitTest extends org.junit.Assert {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
         
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new DummyTokenProvider());
         issueOperation.setTokenProviders(providerList);
         
@@ -404,7 +404,7 @@ public class IssueUnitTest extends org.junit.Assert {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
         
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new DummyTokenProvider());
         issueOperation.setTokenProviders(providerList);
         

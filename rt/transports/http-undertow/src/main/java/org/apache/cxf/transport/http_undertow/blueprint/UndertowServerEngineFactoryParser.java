@@ -93,7 +93,7 @@ public class UndertowServerEngineFactoryParser extends AbstractBPBeanDefinitionP
        
     protected Metadata parseEngineHandlers(List<Element> engines, ComponentMetadata enclosingComponent, 
                                            ParserContext context) {
-        List<MapEntry> entries = new ArrayList<MapEntry>();
+        List<MapEntry> entries = new ArrayList<>();
         for (Element engine : engines) {
             String port = engine.getAttribute("port");
             ValueMetadata keyValue = createValue(context, port);

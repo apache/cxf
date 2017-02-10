@@ -128,11 +128,11 @@ public abstract class AbstractNotificationBroker extends AbstractEndpoint
     }
     
     public List<String> getPublisher() {
-        return new ArrayList<String>(publishers.keySet());
+        return new ArrayList<>(publishers.keySet());
     }
     
     public List<String> getSubscriptions() {
-        return new ArrayList<String>(subscriptions.keySet());
+        return new ArrayList<>(subscriptions.keySet());
     }
     
     public EndpointMBean getPublisher(String name) {

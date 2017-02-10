@@ -77,7 +77,7 @@ public class WSPolicyFeature extends AbstractFeature {
 
     public WSPolicyFeature(Policy... ps) {
         super();
-        policies = new ArrayList<Policy>();
+        policies = new ArrayList<>();
         Collections.addAll(policies, ps);
     }
 
@@ -154,7 +154,7 @@ public class WSPolicyFeature extends AbstractFeature {
         DescriptionInfo i = endpoint.getEndpointInfo().getDescription();
         Collection<Policy> loadedPolicies = null;
         if (policyElements != null || policyReferenceElements != null) {
-            loadedPolicies = new ArrayList<Policy>();
+            loadedPolicies = new ArrayList<>();
             PolicyBuilder builder = bus.getExtension(PolicyBuilder.class); 
             if (null != policyElements) {
                 for (Element e : policyElements) {
@@ -191,7 +191,7 @@ public class WSPolicyFeature extends AbstractFeature {
     
     public Collection<Policy> getPolicies() {
         if (policies == null) {
-            policies = new ArrayList<Policy>();
+            policies = new ArrayList<>();
         }
         return policies;
     }
@@ -202,7 +202,7 @@ public class WSPolicyFeature extends AbstractFeature {
 
     public Collection<Element> getPolicyElements() {
         if (policyElements == null) {
-            policyElements = new ArrayList<Element>();
+            policyElements = new ArrayList<>();
         }
         return policyElements;
     }
@@ -213,7 +213,7 @@ public class WSPolicyFeature extends AbstractFeature {
     
     public Collection<Element> getPolicyReferenceElements() {
         if (policyReferenceElements == null) {
-            policyReferenceElements = new ArrayList<Element>();
+            policyReferenceElements = new ArrayList<>();
         }
         return policyReferenceElements;
     }

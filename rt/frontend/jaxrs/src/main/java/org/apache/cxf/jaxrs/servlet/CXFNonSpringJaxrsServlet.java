@@ -204,7 +204,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
             return;
         }
         String[] locations = StringUtils.split(schemas, " ");
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         for (String loc : locations) {
             String theLoc = loc.trim();
             if (theLoc.length() != 0) {
@@ -341,7 +341,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
             return Collections.EMPTY_LIST;
         }
         String[] classNames = StringUtils.split(providersList, splitChar);
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         for (String cName : classNames) {
             Map<String, List<String>> props = new HashMap<String, List<String>>();
             String theName = getClassNameAndProperties(cName, props);

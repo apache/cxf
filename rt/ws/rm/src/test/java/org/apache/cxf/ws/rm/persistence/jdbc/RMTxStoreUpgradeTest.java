@@ -114,7 +114,7 @@ public class RMTxStoreUpgradeTest extends Assert {
         // verify the presence of the new fields
         DatabaseMetaData metadata = store.getConnection().getMetaData();
         ResultSet rs = metadata.getColumns(null, null, tableName, "%");
-        Set<String> colNames = new HashSet<String>();
+        Set<String> colNames = new HashSet<>();
         Collections.addAll(colNames, cols);
         while (rs.next()) {
             colNames.remove(rs.getString(4));

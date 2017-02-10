@@ -112,7 +112,7 @@ public class JettyHTTPServerEngineFactoryHolder {
             }
             //Engines
 
-            List<JettyHTTPServerEngine> engineList = new ArrayList<JettyHTTPServerEngine>();
+            List<JettyHTTPServerEngine> engineList = new ArrayList<>();
             for (JettyHTTPServerEngineConfigType engine : config.getEngine()) {
                 JettyHTTPServerEngine eng = new JettyHTTPServerEngine();
                 if (engine.getConnector() != null && connectorMap != null) {

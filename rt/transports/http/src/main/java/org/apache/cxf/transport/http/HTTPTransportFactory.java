@@ -72,7 +72,7 @@ public class HTTPTransportFactory
     /**
      * This constant holds the prefixes served by this factory.
      */
-    private static final Set<String> URI_PREFIXES = new HashSet<String>();
+    private static final Set<String> URI_PREFIXES = new HashSet<>();
     static {
         URI_PREFIXES.add("http://");
         URI_PREFIXES.add("https://");
@@ -125,7 +125,7 @@ public class HTTPTransportFactory
      * @param ans The transport ids.
      */
     public void setActivationNamespaces(Collection<String> ans) {
-        setTransportIds(new ArrayList<String>(ans));
+        setTransportIds(new ArrayList<>(ans));
     }
 
     public EndpointInfo createEndpointInfo(

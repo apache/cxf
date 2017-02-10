@@ -859,7 +859,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
         
         public List<?> getList() {
             if (l == null) {
-                l = new ArrayList<Object>();
+                l = new ArrayList<>();
             }
             return l;
         }
@@ -876,7 +876,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
                 Object first = theList.get(0);
                 
                 if (first instanceof Element) {
-                    List<Object> newList = new ArrayList<Object>(theList.size());
+                    List<Object> newList = new ArrayList<>(theList.size());
                     for (Object o : theList) {
                         newList.add(unm.unmarshal((Element)o, type));
                     }
@@ -890,14 +890,14 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
                 
                 if (first instanceof JAXBElement && !isJaxbElement && !JAXBElement.class.isAssignableFrom(type)) {
                     adapterChecked = true;
-                    List<Object> newList = new ArrayList<Object>(theList.size());
+                    List<Object> newList = new ArrayList<>(theList.size());
                     for (Object o : theList) {
                         newList.add(org.apache.cxf.jaxrs.utils.JAXBUtils.useAdapter(
                                         ((JAXBElement<?>)o).getValue(), adapter, false));
                     }
                     theList = newList;
                 } else if (!(first instanceof JAXBElement) && isJaxbElement) {
-                    List<Object> newList = new ArrayList<Object>(theList.size());
+                    List<Object> newList = new ArrayList<>(theList.size());
                     XmlRootElement root = type.getAnnotation(XmlRootElement.class);
                     QName qname = getQNameFromNamespaceAndName(root.namespace(), root.name(), type, false);
                     @SuppressWarnings("rawtypes")
@@ -917,14 +917,14 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
                 return values;
             } else {
                 if (!adapterChecked && adapter != null) {
-                    List<Object> newList = new ArrayList<Object>(theList.size());
+                    List<Object> newList = new ArrayList<>(theList.size());
                     for (Object o : theList) {
                         newList.add(org.apache.cxf.jaxrs.utils.JAXBUtils.useAdapter(o, adapter, false));
                     }
                     theList = newList;
                 }
                 if (collectionType == Set.class) {
-                    return new HashSet<Object>(theList);
+                    return new HashSet<>(theList);
                 } else {
                     return theList;
                 }

@@ -102,7 +102,7 @@ public class MtomPolicyTest extends AbstractBusClientServerTestBase {
         sf.setAddress(address);
         
         WSPolicyFeature policyFeature = new WSPolicyFeature();
-        List<Element> policyElements = new ArrayList<Element>();
+        List<Element> policyElements = new ArrayList<>();
         if (mtomRequired) {
             policyElements.add(StaxUtils.read(
                 getClass().getResourceAsStream("mtom-policy.xml"))

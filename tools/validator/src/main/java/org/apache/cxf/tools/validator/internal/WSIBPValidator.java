@@ -53,7 +53,7 @@ import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.wsdl.WSDLHelper;
 
 public class WSIBPValidator extends AbstractDefinitionValidator {
-    private List<String> operationMap = new ArrayList<String>();
+    private List<String> operationMap = new ArrayList<>();
     private WSDLHelper wsdlHelper = new WSDLHelper();
 
     public WSIBPValidator(Definition def) {
@@ -391,7 +391,7 @@ public class WSIBPValidator extends AbstractDefinitionValidator {
             && ext.getExtensibilityElements().get(0) instanceof MIMEMultipartRelated) {
             MIMEMultipartRelated mpr = (MIMEMultipartRelated)ext.getExtensibilityElements().get(0);
             List<MIMEPart> mps = CastUtils.cast(mpr.getMIMEParts());
-            parts = new HashSet<String>(mps.size());
+            parts = new HashSet<>(mps.size());
             for (Iterator<MIMEPart> it = mps.iterator(); it.hasNext();) {
                 MIMEPart mp = it.next();
                 if (mp.getExtensibilityElements() != null && mp.getExtensibilityElements().size() > 0

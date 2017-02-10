@@ -35,7 +35,7 @@ public class UrlEncodingParamConverter implements ParamConverter<String> {
     public UrlEncodingParamConverter(String encodeClientParametersListStr) {
         if (encodeClientParametersListStr != null) {
             String[] chars = encodeClientParametersListStr.trim().split(" ");
-            encodeClientParametersList = new HashSet<Character>();
+            encodeClientParametersList = new HashSet<>();
             for (String ch : chars) {
                 // this may need to be tuned though this should cover URI reserved chars
                 encodeClientParametersList.add(Character.valueOf(ch.charAt(0)));

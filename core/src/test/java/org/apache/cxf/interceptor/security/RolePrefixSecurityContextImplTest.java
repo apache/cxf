@@ -67,7 +67,7 @@ public class RolePrefixSecurityContextImplTest extends Assert {
         Principal p = new SimplePrincipal("Barry");
         s.getPrincipals().add(p);
         
-        Set<Principal> roles = new HashSet<Principal>();
+        Set<Principal> roles = new HashSet<>();
         roles.add(new SimplePrincipal("role_friend"));
         roles.add(new SimplePrincipal("role_admin"));
         s.getPrincipals().addAll(roles);

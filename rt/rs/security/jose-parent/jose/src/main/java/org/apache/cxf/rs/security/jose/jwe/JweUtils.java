@@ -472,7 +472,7 @@ public final class JweUtils {
         if (JoseConstants.HEADER_JSON_WEB_KEY.equals(props.get(JoseConstants.RSSEC_KEY_STORE_TYPE))) {
             List<JsonWebKey> jwks = JwkUtils.loadJsonWebKeys(m, props, KeyOperation.ENCRYPT);
             if (jwks != null) {
-                theEncProviders = new ArrayList<JweEncryptionProvider>(jwks.size());
+                theEncProviders = new ArrayList<>(jwks.size());
                 for (JsonWebKey jwk : jwks) {
                     theEncProviders.add(getDirectKeyJweEncryption(jwk));
                 }
@@ -494,7 +494,7 @@ public final class JweUtils {
         if (JoseConstants.HEADER_JSON_WEB_KEY.equals(props.get(JoseConstants.RSSEC_KEY_STORE_TYPE))) {
             List<JsonWebKey> jwks = JwkUtils.loadJsonWebKeys(m, props, KeyOperation.DECRYPT);
             if (jwks != null) {
-                theDecProviders = new ArrayList<JweDecryptionProvider>(jwks.size());
+                theDecProviders = new ArrayList<>(jwks.size());
                 for (JsonWebKey jwk : jwks) {
                     theDecProviders.add(getDirectKeyJweDecryption(jwk));
                 }

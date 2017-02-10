@@ -68,7 +68,7 @@ public class MIMEBindingValidator
         boolean gotRootPart = false;
         List<MIMEPart> parts = CastUtils.cast(mimeExt.getMIMEParts());
         for (MIMEPart mPart : parts) {
-            List<MIMEContent> mimeContents = new ArrayList<MIMEContent>();
+            List<MIMEContent> mimeContents = new ArrayList<>();
             List<ExtensibilityElement> extns = CastUtils.cast(mPart.getExtensibilityElements());
             for (ExtensibilityElement extElement : extns) {
                 if (SOAPBindingUtil.isSOAPBody(extElement)) {

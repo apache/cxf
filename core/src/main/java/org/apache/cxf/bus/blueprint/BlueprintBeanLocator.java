@@ -56,7 +56,7 @@ public class BlueprintBeanLocator implements ConfiguredBeanLocator {
         this.container = cont;
         this.context = context;
         if (orig instanceof ExtensionManagerImpl) {
-            List<String> names = new ArrayList<String>(container.getComponentIds());
+            List<String> names = new ArrayList<>(container.getComponentIds());
             ((ExtensionManagerImpl)orig).removeBeansOfNames(names);
         }
     }
@@ -109,12 +109,12 @@ public class BlueprintBeanLocator implements ConfiguredBeanLocator {
             }
         }
         names.addAll(orig.getBeanNamesOfType(type));
-        return new ArrayList<String>(names);
+        return new ArrayList<>(names);
     }
 
     /** {@inheritDoc}*/
     public <T> Collection<? extends T> getBeansOfType(Class<T> type) {
-        List<T> list = new ArrayList<T>();
+        List<T> list = new ArrayList<>();
         
         for (String s : container.getComponentIds()) {
             ComponentMetadata cmd = container.getComponentMetadata(s);
@@ -144,7 +144,7 @@ public class BlueprintBeanLocator implements ConfiguredBeanLocator {
 
     /** {@inheritDoc}*/
     public <T> boolean loadBeansOfType(Class<T> type, BeanLoaderListener<T> listener) {
-        List<String> names = new ArrayList<String>();
+        List<String> names = new ArrayList<>();
         boolean loaded = false;
         for (String s : container.getComponentIds()) {
             ComponentMetadata cmd = container.getComponentMetadata(s);

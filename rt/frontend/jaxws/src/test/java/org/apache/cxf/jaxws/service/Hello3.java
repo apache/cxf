@@ -35,7 +35,7 @@ public class Hello3 implements HelloInterface {
     }
     
     public List<String> getGreetings() {
-        List<String> strings = new ArrayList<String>();
+        List<String> strings = new ArrayList<>();
         strings.add("Hello");
         strings.add("Bonjour");
         return strings;

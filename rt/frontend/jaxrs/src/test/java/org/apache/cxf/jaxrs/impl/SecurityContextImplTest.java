@@ -36,7 +36,7 @@ public class SecurityContextImplTest extends Assert {
         Message m = new MessageImpl();
         Map<String, List<String>> requestHeaders 
             = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
-        List<String> values = new ArrayList<String>();
+        List<String> values = new ArrayList<>();
         values.add("Digest realm=\"custom\"");
         requestHeaders.put("Authorization", values);
         m.put(Message.PROTOCOL_HEADERS, requestHeaders);

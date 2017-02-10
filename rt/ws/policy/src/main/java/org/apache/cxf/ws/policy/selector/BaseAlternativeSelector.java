@@ -49,7 +49,7 @@ public abstract class BaseAlternativeSelector implements AlternativeSelector {
     }
 
     protected boolean isCompatible(List<Assertion> alternative, List<Assertion> r) {
-        List<QName> rNames = new ArrayList<QName>(r.size());
+        List<QName> rNames = new ArrayList<>(r.size());
         for (Assertion ra : r) {
             rNames.add(ra.getName());
         }

@@ -225,7 +225,7 @@ public class CodeFirstTest extends AbstractJaxWsTest {
             assertEquals(strings.length, 2);
             assertEquals(strings[0], "HelloHello");
             assertEquals(strings[1], "BonjourBonjour");
-            List<String> listInput = new ArrayList<String>();
+            List<String> listInput = new ArrayList<>();
             listInput.add("Hello");
             listInput.add("Bonjour");
             List<String> list = proxy.getStringList(listInput);
@@ -346,7 +346,7 @@ public class CodeFirstTest extends AbstractJaxWsTest {
             assertEquals(listOut.get(0), "string1");
             assertEquals(listOut.get(1), "string2");
             assertEquals(listOut.get(2), "string3");
-            List<String> listIn = new ArrayList<String>();
+            List<String> listIn = new ArrayList<>();
             listIn.add("list1");
             listIn.add("list2");
             listIn.add("list3");

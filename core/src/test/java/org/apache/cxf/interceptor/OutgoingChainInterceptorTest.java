@@ -63,7 +63,7 @@ public class OutgoingChainInterceptorTest extends Assert {
 
         control = EasyMock.createNiceControl();
 
-        phases = new ArrayList<Phase>();
+        phases = new ArrayList<>();
         phases.add(new Phase(Phase.SEND, 1000));
         empty = new ArrayList<Interceptor<? extends Message>>();
 

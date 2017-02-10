@@ -38,7 +38,7 @@ public class Tag {
 
     public List<String> getIgnoreAttr() {
         if (ignoreAttr == null) {
-            ignoreAttr = new ArrayList<String>();
+            ignoreAttr = new ArrayList<>();
         }
         return ignoreAttr;
     }
@@ -53,7 +53,7 @@ public class Tag {
 
     public List<Tag> getTags() {
         if (tags == null) {
-            tags = new ArrayList<Tag>();
+            tags = new ArrayList<>();
         }
         return tags;
     }

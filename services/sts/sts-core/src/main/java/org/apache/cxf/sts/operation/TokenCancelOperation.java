@@ -55,7 +55,7 @@ public class TokenCancelOperation extends AbstractOperation implements CancelOpe
 
     private static final Logger LOG = LogUtils.getL7dLogger(TokenCancelOperation.class);
 
-    private List<TokenCanceller> tokencancellers = new ArrayList<TokenCanceller>();
+    private List<TokenCanceller> tokencancellers = new ArrayList<>();
     
     public void setTokenCancellers(List<TokenCanceller> tokenCancellerList) {
         this.tokencancellers = tokenCancellerList;

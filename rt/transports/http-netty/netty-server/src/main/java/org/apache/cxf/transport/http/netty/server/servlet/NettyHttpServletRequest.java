@@ -408,7 +408,7 @@ public class NettyHttpServletRequest implements HttpServletRequest {
                                 HttpHeaders.Names.ACCEPT_LANGUAGE));
 
         if (locales == null || locales.isEmpty()) {
-            locales = new ArrayList<Locale>();
+            locales = new ArrayList<>();
             locales.add(Locale.getDefault());
         }
         return Utils.enumeration(locales);

@@ -42,7 +42,7 @@ public class AddressingPolicyInterceptorProvider extends AbstractPolicyIntercept
     private static final MAPCodec MAP_CODEC = new MAPCodec();
     
     static {
-        Collection<QName> types = new ArrayList<QName>();
+        Collection<QName> types = new ArrayList<>();
         types.add(MetadataConstants.ADDRESSING_ASSERTION_QNAME);
         types.add(MetadataConstants.ANON_RESPONSES_ASSERTION_QNAME);
         types.add(MetadataConstants.NON_ANON_RESPONSES_ASSERTION_QNAME);

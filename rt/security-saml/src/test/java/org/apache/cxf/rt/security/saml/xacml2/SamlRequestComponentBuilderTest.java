@@ -89,7 +89,7 @@ public class SamlRequestComponentBuilderTest extends org.junit.Assert {
                     "admin-user@apache.org",
                     Collections.singletonList(subjectGroupAttributeValue)
             );
-        List<AttributeType> attributes = new ArrayList<AttributeType>();
+        List<AttributeType> attributes = new ArrayList<>();
         attributes.add(subjectIdAttribute);
         attributes.add(subjectGroupAttribute);
         SubjectType subject = RequestComponentBuilder.createSubjectType(attributes, null);

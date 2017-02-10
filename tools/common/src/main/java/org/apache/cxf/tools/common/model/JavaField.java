@@ -27,7 +27,7 @@ import org.apache.cxf.common.util.URIParserUtil;
 
 public class JavaField extends JavaType implements JavaAnnotatable {
     private String modifier;
-    private List<JAnnotation> annotations = new ArrayList<JAnnotation>();
+    private List<JAnnotation> annotations = new ArrayList<>();
     private Annotation[] jaxbAnnotations;
 
     public JavaField() {

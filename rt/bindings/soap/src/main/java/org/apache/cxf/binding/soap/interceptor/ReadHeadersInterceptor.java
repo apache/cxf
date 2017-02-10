@@ -323,7 +323,7 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
         private final String header;
         private final String body;
         private final String envelope;
-        private final List<XMLEvent> events = new ArrayList<XMLEvent>(8);
+        private final List<XMLEvent> events = new ArrayList<>(8);
         private List<XMLEvent> envEvents;
         private List<XMLEvent> bodyEvents;
         private StreamToDOMContext context;
@@ -438,12 +438,12 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
                     final String lastEl = lastStartElementQName.getLocalPart();
                     if (body.equals(lastEl) && ns.equals(lastStartElementQName.getNamespaceURI())) {
                         if (bodyEvents == null) {
-                            bodyEvents = new ArrayList<XMLEvent>();
+                            bodyEvents = new ArrayList<>();
                         }
                         bodyEvents.add(event);
                     } else if (envelope.equals(lastEl) && ns.equals(lastStartElementQName.getNamespaceURI())) {
                         if (envEvents == null) {
-                            envEvents = new ArrayList<XMLEvent>();
+                            envEvents = new ArrayList<>();
                         }
                         envEvents.add(event);
                     }

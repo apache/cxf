@@ -44,7 +44,7 @@ public class JMSMessageHeadersType {
 
     public List<JMSPropertyType> getProperty() {
         if (property == null) {
-            property = new ArrayList<JMSPropertyType>();
+            property = new ArrayList<>();
         }
         return this.property;
     }

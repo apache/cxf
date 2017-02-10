@@ -279,7 +279,7 @@ public class JAXWSMethodInvokerTest extends Assert {
         Message inMessage = new MessageImpl();
         inMessage.setExchange(ex);
         inMessage.put(JAXWSMethodInvoker.COPY_SOAP_HEADERS_BY_FAULT, Boolean.valueOf(copyHeadersByFault));
-        List<Header> headers = new ArrayList<Header>();
+        List<Header> headers = new ArrayList<>();
         DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         Document headerDoc = builder.parse(new ByteArrayInputStream("<test:testValue xmlns:test=\"test\"/>"
             .getBytes()));

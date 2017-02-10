@@ -755,7 +755,7 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
 
     public List<Feature> getFeatures() {
         if (features == null) {
-            features = new ArrayList<Feature>();
+            features = new ArrayList<>();
         }
         return features;
     }

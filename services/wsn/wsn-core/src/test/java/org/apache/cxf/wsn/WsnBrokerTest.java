@@ -351,7 +351,7 @@ public abstract class WsnBrokerTest extends Assert {
     public static class TestConsumer implements Consumer.Callback {
 
         final List<NotificationMessageHolderType> notifications 
-            = new ArrayList<NotificationMessageHolderType>();
+            = new ArrayList<>();
 
         public void notify(NotificationMessageHolderType message) {
             synchronized (notifications) {

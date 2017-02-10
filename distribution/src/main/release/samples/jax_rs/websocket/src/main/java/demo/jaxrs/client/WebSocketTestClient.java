@@ -57,8 +57,8 @@ class WebSocketTestClient {
     private String url;
     
     WebSocketTestClient(String url) {
-        this.received = new ArrayList<Object>();
-        this.fragments = new ArrayList<Object>();
+        this.received = new ArrayList<>();
+        this.fragments = new ArrayList<>();
         this.latch = new CountDownLatch(1);
         this.client = new AsyncHttpClient();
         this.url = url;
@@ -92,7 +92,7 @@ class WebSocketTestClient {
 
     public List<Response> getReceivedResponses() {
         Object[] objs = received.toArray();
-        List<Response> responses = new ArrayList<Response>(objs.length);
+        List<Response> responses = new ArrayList<>(objs.length);
         for (Object o : objs) {
             responses.add(new Response(o));
         }

@@ -404,7 +404,7 @@ public class ScopedNameVisitor extends VisitorBase {
         boolean result = false;                
         List<Scope> baseScopes = wsdlVisitor.getInheritedScopeMap().get(scope);
         if (baseScopes != null) {
-            List<Scope> scopeList = new ArrayList<Scope>();
+            List<Scope> scopeList = new ArrayList<>();
             for (Scope scopeName : baseScopes) {
                 scopeList.add(scopeName);
             }
@@ -419,7 +419,7 @@ public class ScopedNameVisitor extends VisitorBase {
                                                     Definition defn, XmlSchema schemaRef,
                                                     AST node, WSDLASTVisitor wsdlVisitor,
                                                     VisitorTypeHolder holder) {
-        List<Scope> inheritedList = new ArrayList<Scope>();
+        List<Scope> inheritedList = new ArrayList<>();
         boolean result = false;
         
         if (scopeList != null) {            
@@ -443,7 +443,7 @@ public class ScopedNameVisitor extends VisitorBase {
             }
 
             if (!inheritedList.isEmpty()) {
-                List<Scope> baseList = new ArrayList<Scope>();
+                List<Scope> baseList = new ArrayList<>();
                 for (Scope scopeName : inheritedList) {
                     baseList.add(scopeName);
                 }

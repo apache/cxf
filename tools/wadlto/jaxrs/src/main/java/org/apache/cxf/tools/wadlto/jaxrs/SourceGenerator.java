@@ -155,7 +155,7 @@ public class SourceGenerator {
         PARAM_ANNOTATIONS.put("query", QueryParam.class);
         PARAM_ANNOTATIONS.put("matrix", MatrixParam.class);
         
-        RESOURCE_LEVEL_PARAMS = new HashSet<String>();
+        RESOURCE_LEVEL_PARAMS = new HashSet<>();
         RESOURCE_LEVEL_PARAMS.add("template");
         RESOURCE_LEVEL_PARAMS.add("matrix");
         
@@ -208,11 +208,11 @@ public class SourceGenerator {
     
     private Map<String, String> properties; 
     
-    private List<String> generatedServiceClasses = new ArrayList<String>(); 
-    private List<String> generatedTypeClasses = new ArrayList<String>();
+    private List<String> generatedServiceClasses = new ArrayList<>(); 
+    private List<String> generatedTypeClasses = new ArrayList<>();
     private List<InputSource> bindingFiles = Collections.emptyList();
     private List<InputSource> schemaPackageFiles = Collections.emptyList();
-    private List<String> compilerArgs = new ArrayList<String>();
+    private List<String> compilerArgs = new ArrayList<>();
     private Set<String> suspendedAsyncMethods = Collections.emptySet();
     private Set<String> responseMethods = Collections.emptySet();
     private Map<String, String> schemaPackageMap = Collections.emptyMap();
@@ -293,7 +293,7 @@ public class SourceGenerator {
     
     public void generateSource(String wadl, File srcDir, String codeType) {
         Application app = readWadl(wadl, wadlPath);
-        Set<String> typeClassNames = new HashSet<String>();
+        Set<String> typeClassNames = new HashSet<>();
         GrammarInfo gInfo = generateSchemaCodeAndInfo(app, typeClassNames, srcDir);
         if (!CODE_TYPE_GRAMMAR.equals(codeType)) {
             generateResourceClasses(app, gInfo, typeClassNames, srcDir);
@@ -1006,7 +1006,7 @@ public class SourceGenerator {
                                               List<Element> requestRepsWithElements,
                                               GrammarInfo gInfo) {
         int duplicatesCount = 0;
-        Set<String> elementRefs = new HashSet<String>();
+        Set<String> elementRefs = new HashSet<>();
         for (Element el : repElements) {
             String value = el.getAttribute("element");
             if (value.length() > 0 
@@ -1783,7 +1783,7 @@ public class SourceGenerator {
             return null;
         }
         
-        List<SchemaInfo> schemas = new ArrayList<SchemaInfo>();
+        List<SchemaInfo> schemas = new ArrayList<>();
         List<Element> schemasEls = DOMUtils.getChildrenWithName(grammarEls.get(0), 
                                                                 Constants.URI_2001_SCHEMA_XSD, "schema");
         for (int i = 0; i < schemasEls.size(); i++) {
@@ -2119,7 +2119,7 @@ public class SourceGenerator {
         private boolean interfaceIsGenerated;
         private Set<String> typeClassNames;
         private GrammarInfo gInfo;
-        private Set<String> resourceClassNames = new HashSet<String>();
+        private Set<String> resourceClassNames = new HashSet<>();
         private Application rootApp;
         private File srcDir;
         private List<Element> inheritedParams = new LinkedList<Element>();

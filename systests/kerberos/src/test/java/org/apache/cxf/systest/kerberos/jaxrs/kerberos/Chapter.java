@@ -89,7 +89,7 @@ public class Chapter {
     @Path("/matched-resources")
     @Produces("text/plain")
     public String getMatchedResources(@Context UriInfo ui) {
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         for (Object obj : ui.getMatchedResources()) {
             list.add(obj.toString());
         }

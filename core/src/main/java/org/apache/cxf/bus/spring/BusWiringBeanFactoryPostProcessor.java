@@ -143,7 +143,7 @@ public class BusWiringBeanFactoryPostProcessor implements BeanFactoryPostProcess
      * @param valueToInsert the value to insert as the first argument.
      */
     private void insertConstructorArg(ConstructorArgumentValues constructorArgs, Object valueToInsert) {
-        List<ValueHolder> genericArgs = new ArrayList<ValueHolder>(CastUtils
+        List<ValueHolder> genericArgs = new ArrayList<>(CastUtils
             .<ValueHolder> cast(constructorArgs.getGenericArgumentValues()));
         Map<Integer, ValueHolder> indexedArgs = new HashMap<Integer, ValueHolder>(CastUtils
             .<Integer, ValueHolder> cast(constructorArgs.getIndexedArgumentValues()));

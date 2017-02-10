@@ -95,7 +95,7 @@ public class Log4jLogger extends AbstractDelegatingLogger {
         log.removeAppender("HandlerWrapper-" + handler.hashCode());
     }
     public synchronized Handler[] getHandlers() {
-        List<Handler> ret = new ArrayList<Handler>();
+        List<Handler> ret = new ArrayList<>();
         Enumeration<?> en = log.getAllAppenders();
         while (en.hasMoreElements()) {
             Appender ap = (Appender)en.nextElement();

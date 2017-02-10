@@ -57,7 +57,7 @@ final class Utils {
     }
 
     private static Collection<Field> getFieldsInternal(Class<?> cls, XmlAccessType accessType) {
-        Set<Field> fields = new HashSet<Field>();
+        Set<Field> fields = new HashSet<>();
         Class<?> superClass = cls.getSuperclass();
         if (superClass != null && !superClass.equals(Object.class) && !superClass.equals(Throwable.class)) {
             // process super class until java.lang.Object or java.lang.Throwable is not reached
@@ -78,7 +78,7 @@ final class Utils {
     
     private static Collection<Method> getMethodsInternal(Class<?> cls, XmlAccessType accessType,
             boolean acceptSetters) {
-        Set<Method> methods = new HashSet<Method>();
+        Set<Method> methods = new HashSet<>();
         Class<?> superClass = cls.getSuperclass();
         if (superClass != null && !superClass.equals(Object.class) && !superClass.equals(Throwable.class)) {
             // process super class until java.lang.Object or java.lang.Throwable is not reached

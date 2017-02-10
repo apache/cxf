@@ -91,7 +91,7 @@ public class RequestImplTest extends Assert {
         metadata.putSingle(HttpHeaders.ACCEPT_LANGUAGE, "en");
         metadata.putSingle(HttpHeaders.ACCEPT_ENCODING, "utf-8");
         
-        List<Variant> list = new ArrayList<Variant>();
+        List<Variant> list = new ArrayList<>();
         list.add(new Variant(MediaType.APPLICATION_JSON_TYPE, new Locale("en"), "utf-8"));
         assertNull(new RequestImpl(m).selectVariant(list));
         
@@ -103,7 +103,7 @@ public class RequestImplTest extends Assert {
         metadata.putSingle(HttpHeaders.ACCEPT_LANGUAGE, "en");
         metadata.putSingle(HttpHeaders.ACCEPT_ENCODING, "utf-8");
         
-        List<Variant> list = new ArrayList<Variant>();
+        List<Variant> list = new ArrayList<>();
         list.add(new Variant(MediaType.APPLICATION_JSON_TYPE, new Locale("en"), "utf-8"));
         list.add(new Variant(MediaType.APPLICATION_XML_TYPE, new Locale("es"), "utf-8"));
         list.add(new Variant(MediaType.APPLICATION_XML_TYPE, new Locale("en"), "abc"));
@@ -117,7 +117,7 @@ public class RequestImplTest extends Assert {
         metadata.putSingle(HttpHeaders.ACCEPT_LANGUAGE, "en");
         metadata.putSingle(HttpHeaders.ACCEPT_ENCODING, "gzip");
         
-        List<Variant> list = new ArrayList<Variant>();
+        List<Variant> list = new ArrayList<>();
         list.add(new Variant(MediaType.APPLICATION_JSON_TYPE, new Locale("en"), "utf-8"));
         list.add(new Variant(MediaType.APPLICATION_XML_TYPE, new Locale("es"), "utf-8"));
         
@@ -133,7 +133,7 @@ public class RequestImplTest extends Assert {
         metadata.putSingle(HttpHeaders.ACCEPT_LANGUAGE, "en-us");
         metadata.putSingle(HttpHeaders.ACCEPT_ENCODING, "gzip;q=1.0, compress");
         
-        List<Variant> list = new ArrayList<Variant>();
+        List<Variant> list = new ArrayList<>();
         list.add(new Variant(MediaType.APPLICATION_JSON_TYPE, new Locale("en"), "gzip"));
         Variant var2 = new Variant(MediaType.APPLICATION_XML_TYPE, new Locale("en"), "gzip");
         list.add(var2);
@@ -147,7 +147,7 @@ public class RequestImplTest extends Assert {
     
     private void assertSameVariant(MediaType mt, Locale lang, String enc) {
         Variant var = new Variant(mt, lang, enc);
-        List<Variant> list = new ArrayList<Variant>();
+        List<Variant> list = new ArrayList<>();
         list.add(var);
         assertSame(var, new RequestImpl(m).selectVariant(list));    
     }

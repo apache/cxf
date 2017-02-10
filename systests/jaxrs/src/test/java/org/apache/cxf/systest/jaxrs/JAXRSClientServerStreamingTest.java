@@ -70,7 +70,7 @@ public class JAXRSClientServerStreamingTest extends AbstractBusClientServerTestB
             JAXBElementProvider<?> p2 = new CustomJaxbProvider();
             p2.setProduceMediaTypes(Collections.singletonList("text/xml"));
             
-            List<Object> providers = new ArrayList<Object>();
+            List<Object> providers = new ArrayList<>();
             providers.add(p1);
             providers.add(p2);
             sf.setProviders(providers);

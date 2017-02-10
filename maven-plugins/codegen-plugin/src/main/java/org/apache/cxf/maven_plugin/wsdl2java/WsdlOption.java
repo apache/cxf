@@ -145,7 +145,7 @@ public class WsdlOption extends Option implements org.apache.cxf.maven_plugin.Ge
     }
 
     public List<String> generateCommandLine(File outputDirFile, URI basedir, URI wsdlURI, boolean debug) {
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         addList(list, "-p", true, getPackagenames());
         addList(list, "-nexclude", true, getNamespaceExcludes());
         addIfNotNull(list, outputDirFile, "-d");

@@ -115,7 +115,7 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Que
      */
     public void reset() {
         state.set(new Stack<List<Query>>());
-        state.get().push(new ArrayList<Query>());        
+        state.get().push(new ArrayList<>());        
     }
     
     public void visit(SearchCondition<T> sc) {
@@ -130,7 +130,7 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Que
                                          statement.getValue()));
             }
         } else {
-            state.get().push(new ArrayList<Query>());
+            state.get().push(new ArrayList<>());
             for (SearchCondition<T> condition : sc.getSearchConditions()) {
                 condition.accept(this);
             }

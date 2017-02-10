@@ -141,7 +141,7 @@ public class SAMLClaimsTest extends Assert {
         attributeBean2.addAttributeValue("smith");
         
         SamlCallbackHandler samlCallbackHandler = new SamlCallbackHandler();
-        List<AttributeBean> attributes = new ArrayList<AttributeBean>();
+        List<AttributeBean> attributes = new ArrayList<>();
         attributes.add(attributeBean);
         attributes.add(attributeBean2);
         samlCallbackHandler.setAttributes(attributes);

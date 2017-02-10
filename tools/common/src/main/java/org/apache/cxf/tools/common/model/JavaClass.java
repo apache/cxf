@@ -26,7 +26,7 @@ import org.apache.cxf.common.util.StringUtils;
 
 public class JavaClass extends JavaInterface {
     
-    private final List<JavaField> jfield = new ArrayList<JavaField>();
+    private final List<JavaField> jfield = new ArrayList<>();
 
     public JavaClass() {
     }

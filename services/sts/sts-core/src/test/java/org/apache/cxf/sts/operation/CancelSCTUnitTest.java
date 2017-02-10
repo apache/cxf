@@ -78,7 +78,7 @@ public class CancelSCTUnitTest extends org.junit.Assert {
         cancelOperation.setTokenStore(tokenStore);
         
         // Add Token Canceller
-        List<TokenCanceller> cancellerList = new ArrayList<TokenCanceller>();
+        List<TokenCanceller> cancellerList = new ArrayList<>();
         TokenCanceller sctCanceller = new SCTCanceller();
         sctCanceller.setVerifyProofOfPossession(false);
         cancellerList.add(sctCanceller);

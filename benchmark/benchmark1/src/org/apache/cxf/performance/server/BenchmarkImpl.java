@@ -222,7 +222,7 @@ public class BenchmarkImpl implements Benchmark {
     )
     { 
        LOG.info("Executing operation sendStrings");       
-       List<String> ret = new ArrayList<String>(0);
+       List<String> ret = new ArrayList<>(0);
        for (int i = 0; i < size; i++) {
            String temp = "s" + i;
            ret.add(temp);

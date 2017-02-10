@@ -123,7 +123,7 @@ public class JAXRSJwsJsonTest extends AbstractBusClientServerTestBase {
     @Test
     public void testJwsJsonBookDoubleHmac() throws Exception {
         String address = "https://localhost:" + PORT + "/jwsjsonhmac2";
-        List<String> properties = new ArrayList<String>();
+        List<String> properties = new ArrayList<>();
         properties.add("org/apache/cxf/systest/jaxrs/security/secret.jwk.properties");
         properties.add("org/apache/cxf/systest/jaxrs/security/secret.jwk.hmac.properties");
         Map<String, Object> map = new HashMap<String, Object>();
@@ -139,7 +139,7 @@ public class JAXRSJwsJsonTest extends AbstractBusClientServerTestBase {
     @Test
     public void testJwsJsonBookDoubleHmacSinglePropsFile() throws Exception {
         String address = "https://localhost:" + PORT + "/jwsjsonhmac2";
-        List<String> properties = new ArrayList<String>();
+        List<String> properties = new ArrayList<>();
         properties.add("org/apache/cxf/systest/jaxrs/security/secret.jwk.hmac2.properties");
         Map<String, Object> map = new HashMap<String, Object>();
         map.put(JoseConstants.RSSEC_SIGNATURE_OUT_PROPS, properties);

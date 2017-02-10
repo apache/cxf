@@ -31,7 +31,7 @@ import org.omg.CORBA.ORB;
 
 public class CorbaUnionEventProducer extends AbstractStartEndEventProducer {
 
-    static final List<Attribute> IS_NIL_ATTRIBUTE_LIST = new ArrayList<Attribute>();
+    static final List<Attribute> IS_NIL_ATTRIBUTE_LIST = new ArrayList<>();
     static {
         XMLEventFactory factory = XMLEventFactory.newInstance();
         IS_NIL_ATTRIBUTE_LIST.add(factory.createAttribute(
@@ -54,7 +54,7 @@ public class CorbaUnionEventProducer extends AbstractStartEndEventProducer {
                         CorbaHandlerUtils.getTypeEventProducer(contents, serviceInfo, orb);
                     currentEventProducer = new SkipStartEndEventProducer(contentEventProducer, name);
                 } else {
-                    List<CorbaObjectHandler> list = new ArrayList<CorbaObjectHandler>();
+                    List<CorbaObjectHandler> list = new ArrayList<>();
                     list.add(contents);
                     iterator = list.iterator();
                 }

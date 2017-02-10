@@ -76,7 +76,7 @@ public class AttachmentDeserializer {
 
     private InputStream body;
     
-    private Set<DelegatingInputStream> loaded = new HashSet<DelegatingInputStream>();
+    private Set<DelegatingInputStream> loaded = new HashSet<>();
     private List<String> supportedTypes;
 
     public AttachmentDeserializer(Message message) {
@@ -187,7 +187,7 @@ public class AttachmentDeserializer {
             cache((DelegatingInputStream) body);
         }
 
-        List<Attachment> atts = new ArrayList<Attachment>(attachments.getLoadedAttachments());
+        List<Attachment> atts = new ArrayList<>(attachments.getLoadedAttachments());
         for (Attachment a : atts) {
             DataSource s = a.getDataHandler().getDataSource();
             if (s instanceof AttachmentDataSource) {
@@ -394,7 +394,7 @@ public class AttachmentDeserializer {
         }
         List<String> v = heads.get(name);
         if (v == null) {
-            v = new ArrayList<String>(1);
+            v = new ArrayList<>(1);
             heads.put(name, v);
         }
         v.add(value);

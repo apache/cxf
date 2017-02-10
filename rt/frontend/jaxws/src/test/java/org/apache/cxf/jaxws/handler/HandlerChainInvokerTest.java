@@ -71,7 +71,7 @@ public class HandlerChainInvokerTest extends Assert {
         AbstractHandlerBase.clear();
 
         @SuppressWarnings("rawtypes")
-        List<Handler> handlers = new ArrayList<Handler>();
+        List<Handler> handlers = new ArrayList<>();
         for (int i = 0; i < logicalHandlers.length; i++) {
             logicalHandlers[i] = new TestLogicalHandler();
             handlers.add(logicalHandlers[i]);
@@ -97,7 +97,7 @@ public class HandlerChainInvokerTest extends Assert {
     @SuppressWarnings("rawtypes")
     @Test
     public void testInvokeEmptyHandlerChain() {
-        invoker = new HandlerChainInvoker(new ArrayList<Handler>());
+        invoker = new HandlerChainInvoker(new ArrayList<>());
         assertTrue(invoker.invokeLogicalHandlers(false, lmc));
         assertTrue(invoker.invokeProtocolHandlers(false, pmc));
     }

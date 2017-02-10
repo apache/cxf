@@ -72,7 +72,7 @@ public class ProviderImplTest extends org.junit.Assert {
     public void testCreateW3CEprNoMetadataEmptyCustomMetadata() throws Exception {
         ProviderImpl impl = new ProviderImpl();
         W3CEndpointReference w3Epr = impl.createW3CEndpointReference(
-            "http://myaddress", null, null, new ArrayList<Element>(), null, null);
+            "http://myaddress", null, null, new ArrayList<>(), null, null);
         
         java.io.StringWriter sw = new java.io.StringWriter();
         StreamResult result = new StreamResult(sw);
@@ -118,7 +118,7 @@ public class ProviderImplTest extends org.junit.Assert {
         ProviderImpl impl = new ProviderImpl();
         DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         Element element = builder.newDocument().createElement("customMetadata");
-        List<Element> metadata = new ArrayList<Element>();
+        List<Element> metadata = new ArrayList<>();
         metadata.add(element);
         W3CEndpointReference w3Epr = impl.createW3CEndpointReference(
                          "http://myaddress", null, null, 

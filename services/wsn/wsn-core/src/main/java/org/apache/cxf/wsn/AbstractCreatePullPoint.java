@@ -72,7 +72,7 @@ public abstract class AbstractCreatePullPoint extends AbstractEndpoint
     }
     
     public List<String> getPullEndpoints() {
-        return new ArrayList<String>(pullPoints.keySet());
+        return new ArrayList<>(pullPoints.keySet());
     }
 
     public EndpointMBean getPullEndpoint(String name) {

@@ -31,7 +31,7 @@ public class SequenceMonitor {
     private static final Logger LOG = LogUtils.getL7dLogger(SequenceMonitor.class);
     private long monitorInterval = DEFAULT_MONITOR_INTERVAL;
     private long firstCheck;
-    private List<Long> receiveTimes = new ArrayList<Long>();
+    private List<Long> receiveTimes = new ArrayList<>();
 
     public void acknowledgeMessage() {
         long now = System.currentTimeMillis();

@@ -172,7 +172,7 @@ public class UriInfoImpl implements UriInfo {
 
     public List<String> getMatchedURIs(boolean decode) {
         if (stack != null) {
-            List<String> objects = new ArrayList<String>();
+            List<String> objects = new ArrayList<>();
             List<String> uris = new LinkedList<String>();
             StringBuilder sumPath = new StringBuilder("");
             for (MethodInvocationInfo invocation : stack) {
@@ -184,7 +184,7 @@ public class UriInfoImpl implements UriInfo {
                 };
                 if (paths[0] != null) {
                     int count = paths[0].getVariables().size();
-                    List<String> rootObjects = new ArrayList<String>(count);
+                    List<String> rootObjects = new ArrayList<>(count);
                     for (int i = 0; i < count && i < templateObjects.size(); i++) {
                         rootObjects.add(templateObjects.get(i));    
                     }

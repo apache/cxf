@@ -47,7 +47,7 @@ import org.apache.cxf.ws.addressing.ContextUtils;
 public class DefaultLogEventMapper implements LogEventMapper {
     private static final Set<String> BINARY_CONTENT_MEDIA_TYPES;
     static {
-        BINARY_CONTENT_MEDIA_TYPES = new HashSet<String>();
+        BINARY_CONTENT_MEDIA_TYPES = new HashSet<>();
         BINARY_CONTENT_MEDIA_TYPES.add("application/octet-stream");
         BINARY_CONTENT_MEDIA_TYPES.add("image/png");
         BINARY_CONTENT_MEDIA_TYPES.add("image/jpeg");

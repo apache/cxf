@@ -48,7 +48,7 @@ public class SecurityHeaderCacheInterceptor implements PhaseInterceptor<SoapMess
     
     private static final QName SEC_HEADER = 
         new QName(WSConstants.WSSE_NS, WSConstants.WSSE_LN, WSConstants.WSSE_PREFIX);
-    private Set<String> afterInterceptors = new HashSet<String>();
+    private Set<String> afterInterceptors = new HashSet<>();
     private SOAPHeaderElement cachedSecurityHeader;
     
     public SecurityHeaderCacheInterceptor() {

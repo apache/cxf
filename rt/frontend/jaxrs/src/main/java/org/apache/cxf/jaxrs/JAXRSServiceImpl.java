@@ -121,7 +121,7 @@ public class JAXRSServiceImpl extends AbstractAttributedInterceptorProvider impl
         // like @XmlRootElement for ex to select a namespace
         this.put("org.apache.cxf.databinding.namespace", "true");
         
-        List<ServiceInfo> infos = new ArrayList<ServiceInfo>();
+        List<ServiceInfo> infos = new ArrayList<>();
         for (ClassResourceInfo cri : classResourceInfos) {
             ServiceInfo si = new ServiceInfo();
             infos.add(si);

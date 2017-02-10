@@ -68,7 +68,7 @@ public class IDLToWSDLPlugin extends AbstractMojo {
             }
 
             if (doWork) {
-                List<Object> list = new ArrayList<Object>();
+                List<Object> list = new ArrayList<>();
                 list.add("-o");
                 list.add(outputDir);
                 list.addAll(idltowsdlOptions[x].getExtraargs());
