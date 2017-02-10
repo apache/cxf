@@ -36,11 +36,11 @@
             <soap:soapBinding mtomEnabled="true" version="1.2"/>
         </simple:binding>
         <simple:inInterceptors>
-            <bean class="org.apache.cxf.interceptor.LoggingInInterceptor"/>
+            <bean class="org.apache.cxf.ext.logging.LoggingInInterceptor"/>
             <ref bean="saajIn"/>
         </simple:inInterceptors>
         <simple:outInterceptors>
-            <bean class="org.apache.cxf.interceptor.LoggingOutInterceptor"/>
+            <bean class="org.apache.cxf.ext.logging.LoggingOutInterceptor"/>
             <ref bean="saajOut"/>
         </simple:outInterceptors>
         <simple:conduitSelector>

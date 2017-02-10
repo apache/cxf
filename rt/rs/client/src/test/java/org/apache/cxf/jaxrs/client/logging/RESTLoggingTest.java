@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.ext.logging;
+package org.apache.cxf.jaxrs.client.logging;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,18 +25,22 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.cxf.endpoint.Server;
+import org.apache.cxf.ext.logging.AbstractLoggingInterceptor;
+import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.ext.logging.event.EventType;
 import org.apache.cxf.ext.logging.event.LogEvent;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
+import org.apache.cxf.transport.local.LocalTransportFactory;
+
 import org.junit.Assert;
 import org.junit.Test;
 
 public class RESTLoggingTest {
 
-    private static final String SERVICE_URI = "http://localhost:5679/testrest";
-    private static final String SERVICE_URI_BINARY = "http://localhost:5680/testrest";
+    private static final String SERVICE_URI = "local://testrest";
+    private static final String SERVICE_URI_BINARY = "local://testrestbin";
 
     @Test
     public void testSlf4j() throws IOException {
@@ -83,9 +87,10 @@ public class RESTLoggingTest {
 
     private WebClient createClient(LoggingFeature loggingFeature) {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
-        bean.setAddress(SERVICE_URI + "/test1");
+        bean.setAddress(SERVICE_URI);
         bean.setFeatures(Collections.singletonList(loggingFeature));
-        return bean.createWebClient();
+        bean.setTransportId(LocalTransportFactory.TRANSPORT_ID);
+        return bean.createWebClient().path("test1");
     }
 
     private Server createService(LoggingFeature loggingFeature) {
@@ -93,14 +98,16 @@ public class RESTLoggingTest {
         factory.setAddress(SERVICE_URI);
         factory.setFeatures(Collections.singletonList(loggingFeature));
         factory.setServiceBean(new TestServiceRest());
+        factory.setTransportId(LocalTransportFactory.TRANSPORT_ID);
         return factory.create();
     }
     
     private WebClient createClientBinary(LoggingFeature loggingFeature) {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
-        bean.setAddress(SERVICE_URI_BINARY + "/test1");
+        bean.setAddress(SERVICE_URI_BINARY);
         bean.setFeatures(Collections.singletonList(loggingFeature));
-        return bean.createWebClient();
+        bean.setTransportId(LocalTransportFactory.TRANSPORT_ID);
+        return bean.createWebClient().path("test1");
     }
     
     private Server createServiceBinary(LoggingFeature loggingFeature) {
@@ -108,6 +115,7 @@ public class RESTLoggingTest {
         factory.setAddress(SERVICE_URI_BINARY);
         factory.setFeatures(Collections.singletonList(loggingFeature));
         factory.setServiceBean(new TestServiceRestBinary());
+        factory.setTransportId(LocalTransportFactory.TRANSPORT_ID);
         return factory.create();
     }
     
@@ -150,7 +158,6 @@ public class RESTLoggingTest {
         Assert.assertNotNull(requestIn.getExchangeId());
         Assert.assertEquals("GET", requestIn.getHttpMethod());
         Assert.assertNotNull(requestIn.getMessageId());
-        Assert.assertEquals("", requestIn.getPayload());
     }
     
     private void checkResponseOut(LogEvent responseOut) {
@@ -172,7 +179,6 @@ public class RESTLoggingTest {
         Assert.assertNull(responseIn.getAddress());
         Assert.assertEquals("application/octet-stream", responseIn.getContentType());
         Assert.assertEquals(EventType.RESP_IN, responseIn.getType());
-        Assert.assertEquals("ISO-8859-1", responseIn.getEncoding());
         Assert.assertNotNull(responseIn.getExchangeId());
         
         // Not yet available

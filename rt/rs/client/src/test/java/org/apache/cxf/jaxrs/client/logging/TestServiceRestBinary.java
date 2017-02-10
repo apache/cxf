@@ -16,17 +16,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.ext.logging;
+package org.apache.cxf.jaxrs.client.logging;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 
-public class TestServiceRest {
+public class TestServiceRestBinary {
     @GET
-    @Path("{msg}")
-    public String echo(@PathParam("msg") String msg) {
-        return msg;
+    @Path("test1") 
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    public byte[] getBinary() {
+        return new byte[] {1, 2, 3, 4, 5, 6, 8, 9};
     }
 
 }

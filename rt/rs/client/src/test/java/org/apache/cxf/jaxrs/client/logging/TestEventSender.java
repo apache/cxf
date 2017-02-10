@@ -16,11 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.ext.logging;
+package org.apache.cxf.jaxrs.client.logging;
 
-import javax.jws.WebService;
+import java.util.ArrayList;
+import java.util.List;
 
-@WebService
-public interface TestService {
-    String echo(String msg);
+import org.apache.cxf.ext.logging.event.LogEvent;
+import org.apache.cxf.ext.logging.event.LogEventSender;
+
+final class TestEventSender implements LogEventSender {
+    private final List<LogEvent> events = new ArrayList<>();
+
+    @Override
+    public void send(LogEvent event) {
+        events.add(event);
+    }
+    
+    public List<LogEvent> getEvents() {
+        return events;
+    }
 }

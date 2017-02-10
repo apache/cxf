@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.ext.logging;
+package org.apache.cxf.jaxws.logging;
 
 import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
@@ -24,27 +24,59 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.jws.WebService;
+import javax.xml.namespace.QName;
 import javax.xml.ws.Endpoint;
 
+import org.apache.cxf.binding.Binding;
+import org.apache.cxf.binding.soap.SoapBinding;
+import org.apache.cxf.ext.logging.LoggingFeature;
+import org.apache.cxf.ext.logging.event.DefaultLogEventMapper;
 import org.apache.cxf.ext.logging.event.EventType;
 import org.apache.cxf.ext.logging.event.LogEvent;
 import org.apache.cxf.feature.Feature;
+import org.apache.cxf.jaxws.AbstractJaxWsTest;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
+import org.apache.cxf.message.ExchangeImpl;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.service.model.BindingInfo;
+import org.apache.cxf.service.model.BindingOperationInfo;
+import org.apache.cxf.service.model.OperationInfo;
+import org.apache.cxf.service.model.ServiceInfo;
+
 import org.junit.Assert;
 import org.junit.Test;
 
-public class SOAPLoggingTest {
+public class SOAPLoggingTest extends AbstractJaxWsTest {
 
     private static final String SERVICE_URI = "http://localhost:5678/test";
 
-    @WebService(endpointInterface = "org.apache.cxf.ext.logging.TestService")
+    @WebService(endpointInterface = "org.apache.cxf.jaxws.logging.TestService")
     public final class TestServiceImplementation implements TestService {
         @Override
         public String echo(String msg) {
             return msg;
         }
     }
-
+    
+    
+    @Test
+    public void testSoap() {
+        DefaultLogEventMapper mapper = new DefaultLogEventMapper();
+        Message message = new MessageImpl();
+        ExchangeImpl exchange = new ExchangeImpl();
+        ServiceInfo service = new ServiceInfo();
+        BindingInfo info = new BindingInfo(service, "bindingId");
+        SoapBinding value = new SoapBinding(info);
+        exchange.put(Binding.class, value);
+        OperationInfo opInfo = new OperationInfo();
+        opInfo.setName(new QName("http://my", "Operation"));
+        BindingOperationInfo boi = new BindingOperationInfo(info, opInfo);
+        exchange.put(BindingOperationInfo.class, boi);
+        message.setExchange(exchange);
+        LogEvent event = mapper.map(message);
+        Assert.assertEquals("{http://my}Operation", event.getOperationName());
+    }
     @Test
     public void testSlf4j() throws MalformedURLException {
         TestService serviceImpl = new TestServiceImplementation();
@@ -83,7 +115,6 @@ public class SOAPLoggingTest {
         Assert.assertEquals(EventType.REQ_OUT, requestOut.getType());
         Assert.assertEquals(StandardCharsets.UTF_8.name(), requestOut.getEncoding());
         Assert.assertNotNull(requestOut.getExchangeId());
-        Assert.assertEquals("POST", requestOut.getHttpMethod());
         Assert.assertNotNull(requestOut.getMessageId());
         Assert.assertTrue(requestOut.getPayload().contains("<arg0>test</arg0>"));
         Assert.assertEquals("TestServicePort", requestOut.getPortName().getLocalPart());
@@ -93,11 +124,10 @@ public class SOAPLoggingTest {
     
     private void checkRequestIn(LogEvent requestIn) {
         Assert.assertEquals(SERVICE_URI, requestIn.getAddress());
-        Assert.assertEquals("text/xml; charset=UTF-8", requestIn.getContentType());
+        Assert.assertTrue(requestIn.getContentType(), requestIn.getContentType().contains("text/xml"));
         Assert.assertEquals(EventType.REQ_IN, requestIn.getType());
         Assert.assertEquals(StandardCharsets.UTF_8.name(), requestIn.getEncoding());
         Assert.assertNotNull(requestIn.getExchangeId());
-        Assert.assertEquals("POST", requestIn.getHttpMethod());
         Assert.assertNotNull(requestIn.getMessageId());
         Assert.assertTrue(requestIn.getPayload().contains("<arg0>test</arg0>"));
         Assert.assertEquals("TestServiceImplementationPort", requestIn.getPortName().getLocalPart());
@@ -124,7 +154,7 @@ public class SOAPLoggingTest {
     
     private void checkResponseIn(LogEvent responseIn) {
         Assert.assertNull(responseIn.getAddress());
-        Assert.assertEquals("text/xml;charset=utf-8", responseIn.getContentType().toLowerCase().replace(" ", ""));
+        Assert.assertTrue(responseIn.getContentType(), responseIn.getContentType().contains("text/xml"));
         Assert.assertEquals(EventType.RESP_IN, responseIn.getType());
         Assert.assertEquals(StandardCharsets.UTF_8.name(), responseIn.getEncoding());
         Assert.assertNotNull(responseIn.getExchangeId());

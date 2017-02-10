@@ -24,7 +24,7 @@
     -->
     <jaxws:client name="{http://apache.org/hello_world_soap_http}SoapPort" createdFromAPI="true">
         <jaxws:inInterceptors>
-            <bean class="org.apache.cxf.interceptor.LoggingInInterceptor"/>
+            <bean class="org.apache.cxf.ext.logging.LoggingInInterceptor"/>
         </jaxws:inInterceptors>
     </jaxws:client>
 </beans>

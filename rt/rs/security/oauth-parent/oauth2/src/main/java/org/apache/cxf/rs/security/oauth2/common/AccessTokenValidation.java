@@ -77,7 +77,7 @@ public class AccessTokenValidation {
         this.tokenIssuer = token.getIssuer();
         this.tokenSubject = token.getSubject();
         this.tokenScopes = token.getScopes();
-        this.setAudiences(token.getAudiences());
+        this.audiences = token.getAudiences();
         this.clientCodeVerifier = token.getClientCodeVerifier();
         this.extraProps.putAll(token.getExtraProperties());
     }

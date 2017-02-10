@@ -25,10 +25,8 @@ import org.w3c.dom.NodeList;
 
 import org.apache.cxf.aegis.AbstractAegisTest;
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
-import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.frontend.ServerFactoryBean;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -53,8 +51,7 @@ public class FlatArrayTest extends AbstractAegisTest {
         sf.setServiceBean(service);
         sf.setAddress("local://FlatArray");
         sf.setDataBinding(new AegisDatabinding());
-        Server s = sf.create();
-        s.getEndpoint().getInInterceptors().add(new LoggingInInterceptor());
+        sf.create();
 
         arrayWsdlDoc = getWSDLDocument("FlatArrayServiceInterface");
     }

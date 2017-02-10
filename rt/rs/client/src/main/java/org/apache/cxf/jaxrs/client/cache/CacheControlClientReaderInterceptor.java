@@ -51,7 +51,7 @@ public class CacheControlClientReaderInterceptor implements ReaderInterceptor {
     private boolean cacheResponseInputStream;
     
     public CacheControlClientReaderInterceptor(final Cache<Key, Entry> cache) {
-        setCache(cache);
+        this.cache = cache;
     }
 
     public CacheControlClientReaderInterceptor() {

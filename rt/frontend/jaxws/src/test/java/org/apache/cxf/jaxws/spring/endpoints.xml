@@ -65,12 +65,12 @@
     <bean id="saajOut" class="org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor"/>
     <jaxws:endpoint id="epWithInterceptors" implementor="org.apache.cxf.jaxws.service.Hello" address="http://localhost:8080/test1">
         <jaxws:inInterceptors>
-            <bean class="org.apache.cxf.interceptor.LoggingInInterceptor"/>
+            <bean class="org.apache.cxf.ext.logging.LoggingInInterceptor"/>
             <ref bean="saajIn"/>
         </jaxws:inInterceptors>
         <jaxws:outInterceptors>
             <ref bean="saajOut"/>
-            <bean class="org.apache.cxf.interceptor.LoggingOutInterceptor"/>
+            <bean class="org.apache.cxf.ext.logging.LoggingOutInterceptor"/>
         </jaxws:outInterceptors>
     </jaxws:endpoint>
     <jaxws:endpoint id="epWithDataBinding" implementor="org.apache.cxf.jaxws.service.Hello" address="http://localhost:8080/test2">

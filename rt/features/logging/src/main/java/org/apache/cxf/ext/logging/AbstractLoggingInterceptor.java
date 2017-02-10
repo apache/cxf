@@ -29,7 +29,7 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 
 public abstract class AbstractLoggingInterceptor extends AbstractPhaseInterceptor<Message> {
     public static final int DEFAULT_LIMIT = 48 * 1024;
-    protected static final String CONTENT_SUPPRESSED = "--- Content suppressed ---";
+    public static final String CONTENT_SUPPRESSED = "--- Content suppressed ---";
 
     protected int limit = DEFAULT_LIMIT;
     protected long threshold = -1;

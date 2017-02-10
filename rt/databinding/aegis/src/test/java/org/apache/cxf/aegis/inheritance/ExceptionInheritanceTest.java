@@ -32,7 +32,6 @@ import org.apache.cxf.aegis.inheritance.ws1.WS1ExtendedException;
 import org.apache.cxf.aegis.inheritance.ws1.impl.WS1Impl;
 import org.apache.cxf.aegis.services.SimpleBean;
 import org.apache.cxf.endpoint.Server;
-import org.apache.cxf.feature.LoggingFeature;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.service.invoker.BeanInvoker;
@@ -64,7 +63,6 @@ public class ExceptionInheritanceTest extends AbstractAegisTest {
         client = pf.create(WS1.class);
 
         Server server = createService(WS1.class, new WS1Impl(), "WS1", binding);
-        new LoggingFeature().initialize(server, null);
         server.getEndpoint().getService().setInvoker(new BeanInvoker(new WS1Impl()));
     }
 

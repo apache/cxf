@@ -65,7 +65,7 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
     
     public FailoverTargetSelector(String clientBootstrapAddress) {
         super();
-        this.setClientBootstrapAddress(clientBootstrapAddress);
+        this.clientBootstrapAddress = clientBootstrapAddress;
     }
     
     /**

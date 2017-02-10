@@ -39,11 +39,11 @@
     <bean id="saajOut" class="org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor"/>
     <jaxws:client xmlns:s="http://apache.org/hello_world_soap_http" id="client1" serviceClass="org.apache.hello_world_soap_http.Greeter" address="http://localhost:9000/foo" serviceName="s:SOAPService">
         <jaxws:inInterceptors>
-            <bean class="org.apache.cxf.interceptor.LoggingInInterceptor"/>
+            <bean class="org.apache.cxf.ext.logging.LoggingInInterceptor"/>
             <ref bean="saajIn"/>
         </jaxws:inInterceptors>
         <jaxws:outInterceptors>
-            <bean class="org.apache.cxf.interceptor.LoggingOutInterceptor"/>
+            <bean class="org.apache.cxf.ext.logging.LoggingOutInterceptor"/>
             <ref bean="saajOut"/>
         </jaxws:outInterceptors>
         <jaxws:conduitSelector>
@@ -61,7 +61,7 @@
     </jaxws:client>
     <jaxws:client xmlns:s="http://apache.org/hello_world_soap_http" name="{http://apache.org/hello_world_soap_http}GreeterPort" serviceClass="org.apache.hello_world_soap_http.Greeter" serviceName="s:SOAPService" endpointName="s:SoapPort" address="http://localhost:8080/simpleWithAddress" wsdlLocation="wsdl/hello_world.wsdl" createdFromAPI="true">
         <jaxws:inInterceptors>
-            <bean class="org.apache.cxf.interceptor.LoggingInInterceptor"/>
+            <bean class="org.apache.cxf.ext.logging.LoggingInInterceptor"/>
         </jaxws:inInterceptors>
     </jaxws:client>
     <!-- this configures the default bus "cxf" -->

@@ -29,8 +29,6 @@ import javax.xml.ws.Endpoint;
 import javax.xml.ws.Holder;
 
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.AbstractJaxWsTest;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.header_test.SOAPHeaderService;
@@ -75,14 +73,10 @@ public class HeaderClientServerTest extends AbstractJaxWsTest {
         Object implementor = new TestHeaderImpl();
         String address = "http://localhost:9104/SoapHeaderContext/SoapHeaderPort";
         endpoint = (EndpointImpl) Endpoint.publish(address, implementor);        
-        endpoint.getServer().getEndpoint().getInInterceptors().add(new LoggingInInterceptor());
-        endpoint.getServer().getEndpoint().getOutInterceptors().add(new LoggingOutInterceptor());
         
         implementor = new TestRPCHeaderImpl();
         address = "http://localhost:9104/SoapHeaderRPCContext/SoapHeaderRPCPort";
         rpcEndpoint = (EndpointImpl)Endpoint.publish(address, implementor);        
-        rpcEndpoint.getServer().getEndpoint().getInInterceptors().add(new LoggingInInterceptor());
-        rpcEndpoint.getServer().getEndpoint().getOutInterceptors().add(new LoggingOutInterceptor());
     }
     
     @After

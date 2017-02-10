@@ -41,7 +41,6 @@ import javax.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.IOUtils;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
@@ -177,7 +176,7 @@ public final class FormUtils {
             return;
         }
         String chain = PhaseInterceptorChain.getCurrentMessage().getInterceptorChain().toString();
-        if (chain.contains(LoggingInInterceptor.class.getSimpleName())) {
+        if (chain.contains("LoggingInInterceptor")) {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             try {
                 writeMapToOutputStream(params, bos, enc, false);

@@ -20,13 +20,9 @@ package org.apache.cxf.service.factory;
 
 import javax.xml.namespace.QName;
 
-import org.apache.cxf.endpoint.ClientImpl;
 import org.apache.cxf.frontend.ClientFactoryBean;
-import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.frontend.ServerFactoryBean;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.hello_world_doc_lit.Greeter;
 import org.apache.hello_world_doc_lit.GreeterImplDoc;
 import org.junit.Test;
@@ -50,13 +46,8 @@ public class RountripTest extends AbstractSimpleFrontendTest {
         clientBean.setTransportId("http://schemas.xmlsoap.org/soap/http");
         clientBean.setServiceClass(HelloService.class);
         clientBean.setBus(getBus());
-        clientBean.getInInterceptors().add(new LoggingInInterceptor());
         
         HelloService client = (HelloService) proxyFactory.create();
-        
-        ClientImpl c = (ClientImpl)ClientProxy.getClient(client);
-        c.getOutInterceptors().add(new LoggingOutInterceptor());
-        c.getInInterceptors().add(new LoggingInInterceptor());
         
         assertEquals("hello", client.sayHello());
         assertEquals("hello", client.echo("hello"));

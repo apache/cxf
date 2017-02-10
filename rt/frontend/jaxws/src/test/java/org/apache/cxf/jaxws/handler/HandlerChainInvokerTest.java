@@ -94,7 +94,6 @@ public class HandlerChainInvokerTest extends Assert {
         
     }
 
-    @SuppressWarnings("rawtypes")
     @Test
     public void testInvokeEmptyHandlerChain() {
         invoker = new HandlerChainInvoker(new ArrayList<>());

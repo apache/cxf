@@ -27,7 +27,6 @@ import java.util.Map;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.interceptor.StaxOutEndingInterceptor;
 import org.apache.cxf.interceptor.StaxOutInterceptor;
 import org.apache.cxf.message.Message;
@@ -63,7 +62,8 @@ public class TransformOutInterceptor extends AbstractPhaseInterceptor<Message> {
     public TransformOutInterceptor(String phase) {
         super(phase);
         addBefore(StaxOutInterceptor.class.getName());
-        addAfter(LoggingOutInterceptor.class.getName());
+        addAfter("org.apache.cxf.interceptor.LoggingOutInterceptor");
+        addAfter("org.apache.cxf.ext.logging.LoggingOutInterceptor");
     }
     
     @Override
