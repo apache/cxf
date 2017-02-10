@@ -170,7 +170,6 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
 
     private List<WSSecurityEngineResult> processToken(Element tokenElement, final SoapMessage message)
         throws WSSecurityException {
-        WSDocInfo wsDocInfo = new WSDocInfo(tokenElement.getOwnerDocument());
         
         RequestData data = new CXFRequestData();
         Object o = SecurityUtils.getSecurityPropertyValue(SecurityConstants.CALLBACK_HANDLER, message);
@@ -185,8 +184,11 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
         data.setSigVerCrypto(getCrypto(null, SecurityConstants.SIGNATURE_CRYPTO,
                                      SecurityConstants.SIGNATURE_PROPERTIES, message));
         
+        WSDocInfo wsDocInfo = new WSDocInfo(tokenElement.getOwnerDocument());
+        data.setWsDocInfo(wsDocInfo);
+        
         SAMLTokenProcessor p = new SAMLTokenProcessor();
-        return p.handleToken(tokenElement, data, wsDocInfo);
+        return p.handleToken(tokenElement, data);
     }
 
     protected AbstractToken assertTokens(SoapMessage message) {

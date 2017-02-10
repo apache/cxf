@@ -102,7 +102,6 @@ public class BinarySecurityTokenInterceptor extends AbstractTokenInterceptor {
     
     private List<WSSecurityEngineResult> processToken(Element tokenElement, final SoapMessage message)
         throws WSSecurityException {
-        WSDocInfo wsDocInfo = new WSDocInfo(tokenElement.getOwnerDocument());
         RequestData data = new CXFRequestData();
         Object o = SecurityUtils.getSecurityPropertyValue(SecurityConstants.CALLBACK_HANDLER, message);
         try {
@@ -113,10 +112,11 @@ public class BinarySecurityTokenInterceptor extends AbstractTokenInterceptor {
         data.setMsgContext(message);
         data.setWssConfig(WSSConfig.getNewInstance());
         
+        WSDocInfo wsDocInfo = new WSDocInfo(tokenElement.getOwnerDocument());
+        data.setWsDocInfo(wsDocInfo);
+        
         BinarySecurityTokenProcessor p = new BinarySecurityTokenProcessor();
-        List<WSSecurityEngineResult> results = 
-            p.handleToken(tokenElement, data, wsDocInfo);
-        return results;
+        return p.handleToken(tokenElement, data);
     }
     
     protected AbstractToken assertTokens(SoapMessage message) {

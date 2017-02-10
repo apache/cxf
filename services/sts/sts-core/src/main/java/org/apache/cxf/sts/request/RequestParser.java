@@ -518,11 +518,10 @@ public class RequestParser {
                 requestData.setDecCrypto(stsProperties.getSignatureCrypto());
                 requestData.setCallbackHandler(stsProperties.getCallbackHandler());
                 requestData.setWssConfig(WSSConfig.getNewInstance());
+                requestData.setWsDocInfo(new WSDocInfo(entropyElement.getOwnerDocument()));
                 try {
                     List<WSSecurityEngineResult> results = 
-                        processor.handleToken(
-                            entropyElement, requestData, new WSDocInfo(entropyElement.getOwnerDocument())
-                        );
+                        processor.handleToken(entropyElement, requestData);
                     Entropy entropy = new Entropy();
                     entropy.setDecryptedKey((byte[])results.get(0).get(WSSecurityEngineResult.TAG_SECRET));
                     return entropy;

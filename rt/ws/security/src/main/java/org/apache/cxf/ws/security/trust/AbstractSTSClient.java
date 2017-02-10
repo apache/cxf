@@ -1585,8 +1585,8 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
                 data.setWssConfig(WSSConfig.getNewInstance());
                 data.setDecCrypto(createCrypto(true));
                 data.setCallbackHandler(createHandler());
-                List<WSSecurityEngineResult> result =
-                    proc.handleToken(child, data, docInfo);
+                data.setWsDocInfo(docInfo);
+                List<WSSecurityEngineResult> result = proc.handleToken(child, data);
                 return 
                     (byte[])result.get(0).get(
                         WSSecurityEngineResult.TAG_SECRET

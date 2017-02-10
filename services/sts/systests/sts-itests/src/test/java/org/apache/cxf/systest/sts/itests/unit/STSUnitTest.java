@@ -122,11 +122,10 @@ public class STSUnitTest extends BasicSTSIntegrationTest {
         Crypto crypto = CryptoFactory.getInstance("clientKeystore.properties", 
                                                   this.getClass().getClassLoader());
         requestData.setSigVerCrypto(crypto);
+        requestData.setWsDocInfo(new WSDocInfo(token.getToken().getOwnerDocument()));
         
         Processor processor = new SAMLTokenProcessor();
-        return processor.handleToken(
-            token.getToken(), requestData, new WSDocInfo(token.getToken().getOwnerDocument())
-        );
+        return processor.handleToken(token.getToken(), requestData);
     }
     
 }

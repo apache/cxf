@@ -654,10 +654,9 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
         Crypto crypto = CryptoFactory.getInstance("serviceKeystore.properties");
         requestData.setDecCrypto(crypto);
         requestData.setSigVerCrypto(crypto);
+        requestData.setWsDocInfo(new WSDocInfo(token.getToken().getOwnerDocument()));
         
         Processor processor = new SAMLTokenProcessor();
-        return processor.handleToken(
-            token.getToken(), requestData, new WSDocInfo(token.getToken().getOwnerDocument())
-        );
+        return processor.handleToken(token.getToken(), requestData);
     }
 }

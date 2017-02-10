@@ -879,10 +879,10 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         data.setDecCrypto(CryptoFactory.getInstance(properties));
         data.setCallbackHandler(new PasswordCallbackHandler());
         data.setWssConfig(WSSConfig.getNewInstance());
+        data.setWsDocInfo(new WSDocInfo(assertion.getOwnerDocument()));
         
         assertionWrapper.parseSubject(
-            new WSSSAMLKeyInfoProcessor(data, new WSDocInfo(assertion.getOwnerDocument())), 
-                                        data.getSigVerCrypto(), data.getCallbackHandler()
+            new WSSSAMLKeyInfoProcessor(data), data.getSigVerCrypto(), data.getCallbackHandler()
         );
         
         SAMLKeyInfo samlKeyInfo = assertionWrapper.getSubjectKeyInfo();

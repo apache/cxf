@@ -201,7 +201,6 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
         boolean bspCompliant = isWsiBSPCompliant(message);
         boolean allowNoPassword = isAllowNoPassword(message.get(AssertionInfoMap.class));
         UsernameTokenProcessor p = new UsernameTokenProcessor();
-        WSDocInfo wsDocInfo = new WSDocInfo(tokenElement.getOwnerDocument());
         
         RequestData data = new CXFRequestData();
         Object o = SecurityUtils.getSecurityPropertyValue(SecurityConstants.CALLBACK_HANDLER, message);
@@ -225,9 +224,11 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
             data.setDisableBSPEnforcement(true);
         }
         data.setMsgContext(message);
+        
+        WSDocInfo wsDocInfo = new WSDocInfo(tokenElement.getOwnerDocument());
+        data.setWsDocInfo(wsDocInfo);
         try {
-            List<WSSecurityEngineResult> results = 
-                p.handleToken(tokenElement, data, wsDocInfo);
+            List<WSSecurityEngineResult> results = p.handleToken(tokenElement, data);
             return results.get(0);
         } catch (WSSecurityException ex) {
             throw WSS4JUtils.createSoapFault(message, message.getVersion(), ex);

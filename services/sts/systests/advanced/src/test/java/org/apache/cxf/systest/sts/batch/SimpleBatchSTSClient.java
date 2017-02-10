@@ -967,13 +967,15 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
         } else {
             try {
                 EncryptedKeyProcessor proc = new EncryptedKeyProcessor();
-                WSDocInfo docInfo = new WSDocInfo(child.getOwnerDocument());
                 RequestData data = new RequestData();
                 data.setWssConfig(WSSConfig.getNewInstance());
                 data.setDecCrypto(createCrypto(true));
                 data.setCallbackHandler(createHandler());
-                List<WSSecurityEngineResult> result =
-                    proc.handleToken(child, data, docInfo);
+                
+                WSDocInfo docInfo = new WSDocInfo(child.getOwnerDocument());
+                data.setWsDocInfo(docInfo);
+                
+                List<WSSecurityEngineResult> result = proc.handleToken(child, data);
                 return 
                     (byte[])result.get(0).get(
                         WSSecurityEngineResult.TAG_SECRET

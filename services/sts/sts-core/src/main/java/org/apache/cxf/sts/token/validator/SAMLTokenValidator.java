@@ -166,14 +166,14 @@ public class SAMLTokenValidator implements TokenValidator {
             requestData.setMsgContext(tokenParameters.getMessageContext());
             requestData.setSubjectCertConstraints(certConstraints.getCompiledSubjectContraints());
 
-            WSDocInfo docInfo = new WSDocInfo(validateTargetElement.getOwnerDocument());
+            requestData.setWsDocInfo(new WSDocInfo(validateTargetElement.getOwnerDocument()));
 
             // Verify the signature
             Signature sig = assertion.getSignature();
             KeyInfo keyInfo = sig.getKeyInfo();
             SAMLKeyInfo samlKeyInfo = 
                 SAMLUtil.getCredentialFromKeyInfo(
-                    keyInfo.getDOM(), new WSSSAMLKeyInfoProcessor(requestData, docInfo), sigCrypto
+                    keyInfo.getDOM(), new WSSSAMLKeyInfoProcessor(requestData), sigCrypto
                 );
             assertion.verifySignature(samlKeyInfo);
                 

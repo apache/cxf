@@ -197,16 +197,17 @@ public class Saml2BearerGrantHandler extends AbstractGrantHandler {
                 
                 Signature sig = assertion.getSignature();
                 WSDocInfo docInfo = new WSDocInfo(sig.getDOM().getOwnerDocument());
+                data.setWsDocInfo(docInfo);
                 KeyInfo keyInfo = sig.getKeyInfo();
                 
                 SAMLKeyInfo samlKeyInfo = 
                     SAMLUtil.getCredentialFromKeyInfo(
-                        keyInfo.getDOM(), new WSSSAMLKeyInfoProcessor(data, docInfo), 
+                        keyInfo.getDOM(), new WSSSAMLKeyInfoProcessor(data), 
                         data.getSigVerCrypto()
                     );
                 assertion.verifySignature(samlKeyInfo);
                 assertion.parseSubject(
-                    new WSSSAMLKeyInfoProcessor(data, null), data.getSigVerCrypto(), 
+                    new WSSSAMLKeyInfoProcessor(data), data.getSigVerCrypto(), 
                     data.getCallbackHandler()
                 );
             } else if (getTLSCertificates(message) == null) {

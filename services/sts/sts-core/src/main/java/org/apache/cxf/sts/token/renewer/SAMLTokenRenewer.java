@@ -333,12 +333,13 @@ public class SAMLTokenRenewer extends AbstractSAMLTokenProvider implements Token
             requestData.setSigVerCrypto(sigCrypto);
             WSSConfig wssConfig = WSSConfig.getNewInstance();
             requestData.setWssConfig(wssConfig);
-            requestData.setCallbackHandler(callbackHandler);
-            // Parse the HOK subject if it exists
             
             WSDocInfo docInfo = new WSDocInfo(((Element)tokenToRenew.getToken()).getOwnerDocument());
+            requestData.setWsDocInfo(docInfo);
+            // Parse the HOK subject if it exists
+            
             assertion.parseSubject(
-                new WSSSAMLKeyInfoProcessor(requestData, docInfo), sigCrypto, callbackHandler
+                new WSSSAMLKeyInfoProcessor(requestData), sigCrypto, callbackHandler
             );
             
             SAMLKeyInfo keyInfo = assertion.getSubjectKeyInfo();
