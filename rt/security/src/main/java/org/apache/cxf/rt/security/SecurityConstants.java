@@ -336,9 +336,33 @@ public class SecurityConstants {
      */
     public static final String STS_TOKEN_IMMINENT_EXPIRY_VALUE =
         "security.sts.token.imminent-expiry-value";
-    
+
+    /**
+     * This is a string that will be passed in the KeyInfo/KeyName field of the security
+     * header identifying the key to use for signature verification. This is a custom string
+     * so it needs to be supplied during configuration or at request time. The definition and
+     * interpretation of the content is a responsibility of higher layers.
+     */
+    public static final String SIGNATURE_KEYNAME = "security.signature.keyname";
+
+    /**
+     * This is a string that will be passed in the KeyInfo/KeyName field of the security
+     * header identifying the key to use for de/encryption. This is a custom string so it
+     * needs to be supplied during configuration or at request time. The definition and
+     * interpretation of the content is a responsibility of higher layers.
+     */
+    public static final String ENCRYPTION_KEYNAME = "security.encryption.keyname";
+
+    /**
+     * This is a map containing mappings from KeyName to alias. This needs to be used
+     * then KeyInfo/KeyName is used so the inbound handler can determine which key to use
+     * for signature verification or decryption.
+     */
+    public static final String KEYNAME_LOOKUP_MAP = "security.keyname.mapping";
+
+
     public static final Set<String> COMMON_PROPERTIES;
-    
+
     static {
         Set<String> s = new HashSet<>(Arrays.asList(new String[] {
             USERNAME, PASSWORD, SIGNATURE_USERNAME, ENCRYPT_USERNAME,
@@ -351,7 +375,7 @@ public class SecurityConstants {
             DISABLE_STS_CLIENT_WSMEX_CALL_USING_EPR_ADDRESS, STS_TOKEN_CRYPTO,
             STS_TOKEN_PROPERTIES, STS_TOKEN_USERNAME, STS_TOKEN_ACT_AS, STS_TOKEN_ON_BEHALF_OF,
             STS_CLIENT, STS_APPLIES_TO, CACHE_ISSUED_TOKEN_IN_ENDPOINT, PREFER_WSMEX_OVER_STS_CLIENT_CONFIG,
-            STS_TOKEN_IMMINENT_EXPIRY_VALUE
+            STS_TOKEN_IMMINENT_EXPIRY_VALUE, SIGNATURE_KEYNAME, ENCRYPTION_KEYNAME, KEYNAME_LOOKUP_MAP
         }));
         COMMON_PROPERTIES = Collections.unmodifiableSet(s);
     }

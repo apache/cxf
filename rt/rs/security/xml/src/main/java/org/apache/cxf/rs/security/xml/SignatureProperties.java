@@ -24,6 +24,7 @@ public class SignatureProperties {
     private String signatureC14nMethod;
     private String signatureC14nTransform;
     private String signatureKeyIdType;
+    private String signatureKeyName;
     
     public void setSignatureAlgo(String signatureAlgo) {
         this.signatureAlgo = signatureAlgo;
@@ -71,5 +72,12 @@ public class SignatureProperties {
     public void setSignatureKeyIdType(String signatureKeyIdType) {
         this.signatureKeyIdType = signatureKeyIdType;
     }
-    
+
+    public String getSignatureKeyName() {
+        return signatureKeyName;
+    }
+
+    public void setSignatureKeyName(String signatureKeyName) {
+        this.signatureKeyName = signatureKeyName;
+    }
 }

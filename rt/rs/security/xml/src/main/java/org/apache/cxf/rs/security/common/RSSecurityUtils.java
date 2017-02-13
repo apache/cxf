@@ -23,6 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.cert.X509Certificate;
+import java.util.Map;
 
 import javax.security.auth.callback.CallbackHandler;
 
@@ -164,6 +165,32 @@ public final class RSSecurityUtils {
         } catch (Exception ex) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
         }
+    }
+
+    public static String getAliasForKeyName(Message message, String keyName) throws WSSecurityException {
+        Object o = SecurityUtils.getSecurityPropertyValue(SecurityConstants.KEYNAME_LOOKUP_MAP, message);
+        if (o == null) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "stax.keyNotFoundForName",
+                    new Object[] {keyName});
+        }
+
+        Map<String, String> lookupMap = (Map<String, String>)o;
+        String keyAlias = null;
+        if (lookupMap.containsKey(keyName)) {
+            keyAlias = lookupMap.get(keyName);
+        }
+
+        if (keyAlias == null) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "stax.keyNotFoundForName",
+                    new Object[] {keyName});
+        }
+
+        return keyAlias;
+    }
+
+    public static Map<String, String> getKeyNameAliasLookupMap(Message message) {
+        return (Map<String, String>)SecurityUtils.
+                getSecurityPropertyValue(SecurityConstants.KEYNAME_LOOKUP_MAP, message);
     }
  
 }
