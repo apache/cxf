@@ -112,7 +112,7 @@ public class SseAtmosphereEventSinkImpl implements SseEventSink {
                 } catch (final TimeoutException ex) {
                     LOG.warning("SSE Atmosphere response was not delivered within default timeout");
                 }
-            } catch(final IOException ex) {
+            } catch (final IOException ex) {
                 LOG.warning("While writing the SSE event, an exception was raised: " + ex);
             }
         }
