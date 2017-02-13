@@ -34,10 +34,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import io.netty.handler.codec.http.Cookie;
-import io.netty.handler.codec.http.CookieDecoder;
 import io.netty.handler.codec.http.HttpRequest;
-import io.netty.handler.codec.http.HttpResponse;
+import io.netty.handler.codec.http.cookie.Cookie;
+import io.netty.handler.codec.http.cookie.ServerCookieDecoder;
 
 import static io.netty.handler.codec.http.HttpHeaders.Names.COOKIE;
 
@@ -104,30 +103,13 @@ public final class Utils {
     }
 
     public static Collection<Cookie> getCookies(String name,
-                                                      HttpRequest request) {
+                                                HttpRequest request) {
         String cookieString = request.headers().get(COOKIE);
         if (cookieString != null) {
             List<Cookie> foundCookie = new ArrayList<>();
-            Set<Cookie> cookies = CookieDecoder.decode(cookieString);
+            Set<Cookie> cookies = ServerCookieDecoder.STRICT.decode(cookieString);
             for (Cookie cookie : cookies) {
-                if (cookie.getName().equals(name)) {
-                    foundCookie.add(cookie);
-                }
-            }
-
-            return foundCookie;
-        }
-        return null;
-    }
-
-    public static Collection<Cookie> getCookies(String name,
-                                                HttpResponse response) {
-        String cookieString = response.headers().get(COOKIE);
-        if (cookieString != null) {
-            List<Cookie> foundCookie = new ArrayList<>();
-            Set<Cookie> cookies = CookieDecoder.decode(cookieString);
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals(name)) {
+                if (cookie.name().equals(name)) {
                     foundCookie.add(cookie);
                 }
             }

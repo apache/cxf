@@ -26,12 +26,12 @@ import org.apache.cxf.transport.http.netty.server.servlet.NettyHttpSession;
 import org.apache.cxf.transport.http.netty.server.session.HttpSessionStore;
 import org.apache.cxf.transport.http.netty.server.util.Utils;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.http.ClientCookieEncoder;
-import io.netty.handler.codec.http.Cookie;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpHeaders.Names;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponse;
+import io.netty.handler.codec.http.cookie.ClientCookieEncoder;
+import io.netty.handler.codec.http.cookie.Cookie;
 
 public class HttpSessionInterceptor implements NettyInterceptor {
     private boolean sessionRequestedByCookie;
@@ -49,7 +49,7 @@ public class HttpSessionInterceptor implements NettyInterceptor {
                 NettyHttpSession.SESSION_ID_KEY, request);
         if (cookies != null) {
             for (Cookie cookie : cookies) {
-                String jsessionId = cookie.getValue();
+                String jsessionId = cookie.value();
                 NettyHttpSession s = HttpSessionThreadLocal.getSessionStore()
                         .findSession(jsessionId);
                 if (s != null) {
@@ -69,7 +69,7 @@ public class HttpSessionInterceptor implements NettyInterceptor {
         if (s != null && !this.sessionRequestedByCookie) {
             // setup the Cookie for session
             HttpHeaders.addHeader(response, Names.SET_COOKIE,  
-                                  ClientCookieEncoder.encode(NettyHttpSession.SESSION_ID_KEY, s.getId()));
+                                  ClientCookieEncoder.STRICT.encode(NettyHttpSession.SESSION_ID_KEY, s.getId()));
         }
 
     }
