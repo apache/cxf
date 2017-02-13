@@ -19,8 +19,14 @@
 
 package org.apache.cxf.endpoint;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.extension.ExtensionManagerBus;
+import org.apache.cxf.feature.Feature;
+import org.apache.cxf.interceptor.LiveLoggingInInterceptor;
+import org.apache.cxf.interceptor.LiveLoggingOutInterceptor;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.ServiceImpl;
 import org.apache.cxf.service.model.EndpointInfo;
@@ -63,4 +69,33 @@ public class EndpointImplTest extends Assert {
     }
     
     //TODO add other tests
+
+    @Test
+    public void testLiveLoggingFeature() throws Exception {
+        ExtensionManagerBus bus = new ExtensionManagerBus();
+        bus.enableLiveLogging(true, true);
+
+        List<String> featureList = new ArrayList<>();
+        for (Feature feature : bus.getFeatures()) {
+            featureList.add(feature.getClass().getSimpleName());
+        }
+
+        assertEquals(true, featureList.contains("LiveLoggingFeature"));
+        Object inInterceptor = bus.getInInterceptors().get(0);
+        Object inFaultInterceptor = bus.getInFaultInterceptors().get(0);
+        Object outInterceptor = bus.getOutInterceptors().get(0);
+        Object outFaultInterceptor = bus.getOutFaultInterceptors().get(0);
+
+        assertTrue(inInterceptor instanceof LiveLoggingInInterceptor);
+        assertTrue(outInterceptor instanceof LiveLoggingOutInterceptor);
+        assertTrue(inFaultInterceptor instanceof LiveLoggingInInterceptor);
+        assertTrue(outFaultInterceptor instanceof LiveLoggingOutInterceptor);
+
+        bus.enableLiveLogging(false);
+        assertEquals(0, bus.getFeatures().size());
+        assertEquals(0, bus.getInInterceptors().size());
+        assertEquals(0, bus.getInFaultInterceptors().size());
+        assertEquals(0, bus.getOutInterceptors().size());
+        assertEquals(0, bus.getOutFaultInterceptors().size());
+    }
 }
