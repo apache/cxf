@@ -1064,7 +1064,7 @@ public final class InjectionUtils {
     }
     
     public static Method getGetterFromSetter(Method setter) throws Exception {
-        return setter.getClass().getMethod("get" + setter.getName().substring(3), new Class[]{});
+        return setter.getDeclaringClass().getMethod("get" + setter.getName().substring(3));
     }
     
     public static void injectContextProxiesAndApplication(AbstractResourceInfo cri, 
