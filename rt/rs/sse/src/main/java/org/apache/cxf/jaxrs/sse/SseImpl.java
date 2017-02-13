@@ -18,23 +18,21 @@
  */
 package org.apache.cxf.jaxrs.sse;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.ws.rs.sse.OutboundSseEvent.Builder;
+import javax.ws.rs.sse.SseBroadcaster;
+import javax.ws.rs.sse.Sse;
 
-import org.apache.cxf.Bus;
-import org.apache.cxf.endpoint.Server;
-import org.apache.cxf.feature.AbstractFeature;
-import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
-import org.apache.cxf.jaxrs.sse.atmosphere.SseAtmosphereEventSinkContextProvider;
-
-public class SseFeature extends AbstractFeature {
+class SseImpl implements Sse {
+    SseImpl() {
+    }
+    
     @Override
-    public void initialize(Server server, Bus bus) {
-        final List<Object> providers = new ArrayList<>();
+    public Builder newEventBuilder() {
+        return new OutboundSseEventImpl.BuilderImpl();
+    }
 
-        providers.add(new SseAtmosphereEventSinkContextProvider());
-
-        ((ServerProviderFactory) server.getEndpoint().get(
-            ServerProviderFactory.class.getName())).setUserProviders(providers);
+    @Override
+    public SseBroadcaster newBroadcaster() {
+        return new SseBroadcasterImpl();
     }
 }

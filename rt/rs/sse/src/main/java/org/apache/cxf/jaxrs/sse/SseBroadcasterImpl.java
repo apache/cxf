@@ -18,48 +18,74 @@
  */
 package org.apache.cxf.jaxrs.sse;
 
-import java.io.IOException;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
+import javax.ws.rs.Flow;
+import javax.ws.rs.Flow.Subscriber;
+import javax.ws.rs.Flow.Subscription;
 import javax.ws.rs.sse.OutboundSseEvent;
 import javax.ws.rs.sse.SseBroadcaster;
-import javax.ws.rs.sse.SseEventOutput;
 
 public class SseBroadcasterImpl implements SseBroadcaster {
-    private final Set<SseEventOutput> outputs = new CopyOnWriteArraySet<>();
-    private final Set<Listener> listeners = new CopyOnWriteArraySet<>();
+    private final Map<Flow.Subscriber<? super OutboundSseEvent>, Subscription> subscribers = 
+            new ConcurrentHashMap<>();
+    
+    private final Set<Consumer<Subscriber<? super OutboundSseEvent>>> closers = 
+            new CopyOnWriteArraySet<>();
+    
+    private final Set<BiConsumer<Subscriber<? super OutboundSseEvent>, Exception>> exceptioners = 
+            new CopyOnWriteArraySet<>();
             
     @Override
-    public boolean register(Listener listener) {
-        return listeners.add(listener);
-    }
+    public void subscribe(Flow.Subscriber<? super OutboundSseEvent> subscriber) {
+        final Subscription subscription =  new Subscription() {
+            public void request(long n) {
+            }
+            
+            @Override
+            public void cancel() {
+            }
+        };
 
-    @Override
-    public boolean register(SseEventOutput output) {
-        return outputs.add(output);
+        try {
+            subscriber.onSubscribe(subscription);
+            subscribers.put(subscriber, subscription);
+        } catch (final Exception ex) {
+            subscriber.onError(ex); 
+        }
     }
 
     @Override
     public void broadcast(OutboundSseEvent event) {
-        for (final SseEventOutput output: outputs) {
+        for (final Flow.Subscriber<? super OutboundSseEvent> subscriber: subscribers.keySet()) {
             try {
-                output.write(event);
-            } catch (final IOException ex) {
-                listeners.forEach(listener -> listener.onException(output, ex));
+                subscriber.onNext(event);
+            } catch (final Exception ex) {
+                exceptioners.forEach(exceptioner -> exceptioner.accept(subscriber, ex));
             }
         }
+    }
+    
+    @Override
+    public void onClose(Consumer<Subscriber<? super OutboundSseEvent>> subscriber) {
+        closers.add(subscriber);
+    }
+    
+    @Override
+    public void onException(BiConsumer<Subscriber<? super OutboundSseEvent>, Exception> exceptioner) {
+        exceptioners.add(exceptioner);
     }
 
     @Override
     public void close() {
-        for (final SseEventOutput output: outputs) {
-            try {
-                output.close();
-                listeners.forEach(listener -> listener.onClose(output));
-            } catch (final IOException ex) {
-                listeners.forEach(listener -> listener.onException(output, ex));
-            }
-        }
+        subscribers.keySet().forEach(subscriber -> {
+            subscriber.onComplete();
+            closers.forEach(closer -> closer.accept(subscriber));
+        });
     }
 }

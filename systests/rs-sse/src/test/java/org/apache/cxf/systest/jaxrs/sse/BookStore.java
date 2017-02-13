@@ -23,7 +23,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -36,10 +35,12 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.sse.OutboundSseEvent;
+import javax.ws.rs.sse.OutboundSseEvent.Builder;
+import javax.ws.rs.sse.Sse;
 import javax.ws.rs.sse.SseBroadcaster;
-import javax.ws.rs.sse.SseContext;
-import javax.ws.rs.sse.SseEventOutput;
+import javax.ws.rs.sse.SseEventSink;
 
+import org.apache.cxf.jaxrs.sse.SseFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,16 +48,12 @@ import org.slf4j.LoggerFactory;
 public class BookStore {
     private static final Logger LOG = LoggerFactory.getLogger(BookStore.class);
 
+    private final Sse sse = SseFactory.create();
     private final CountDownLatch latch = new CountDownLatch(2);
-    private final AtomicReference<SseBroadcaster> broadcaster = 
-        new AtomicReference<SseBroadcaster>();
+    private final SseBroadcaster broadcaster;
     
-    private static OutboundSseEvent createStatsEvent(final OutboundSseEvent.Builder builder, final int eventId) {
-        return builder
-            .id(Integer.toString(eventId))
-            .data(Book.class, new Book("New Book #" + eventId, eventId))
-            .mediaType(MediaType.APPLICATION_JSON_TYPE)
-            .build();
+    public BookStore() {
+        broadcaster = sse.newBroadcaster();
     }
     
     @GET
@@ -71,50 +68,37 @@ public class BookStore {
     @GET
     @Path("sse/{id}")
     @Produces(MediaType.SERVER_SENT_EVENTS)
-    public SseEventOutput forBook(@Context SseContext sseContext, @PathParam("id") final String id, 
+    public void forBook(@Context SseEventSink sink, @PathParam("id") final String id, 
             @HeaderParam(HttpHeaders.LAST_EVENT_ID_HEADER) @DefaultValue("0") final String lastEventId) {
-        final SseEventOutput output = sseContext.newOutput();
         
         new Thread() {
             public void run() {
                 try {
                     final Integer id = Integer.valueOf(lastEventId);
+                    final Builder builder = sse.newEventBuilder();
 
-                    output.write(createStatsEvent(sseContext.newEvent().name("book"), id + 1));
+                    sink.onNext(createStatsEvent(builder.name("book"), id + 1));
                     Thread.sleep(200);
-                    output.write(createStatsEvent(sseContext.newEvent().name("book"), id + 2));
+                    sink.onNext(createStatsEvent(builder.name("book"), id + 2));
                     Thread.sleep(200);
-                    output.write(createStatsEvent(sseContext.newEvent().name("book"), id + 3));
+                    sink.onNext(createStatsEvent(builder.name("book"), id + 3));
                     Thread.sleep(200);
-                    output.write(createStatsEvent(sseContext.newEvent().name("book"), id + 4));
+                    sink.onNext(createStatsEvent(builder.name("book"), id + 4));
                     Thread.sleep(200);
-                    output.close();
+                    sink.close();
                 } catch (final InterruptedException | IOException ex) {
                     LOG.error("Communication error", ex);
                 }
             }
         }.start();
-
-        return output;
     }
 
     @GET
     @Path("broadcast/sse")
     @Produces(MediaType.SERVER_SENT_EVENTS)
-    public SseEventOutput broadcast(@Context SseContext sseContext) {
-        final SseEventOutput output = sseContext.newOutput();
-        
-        if (broadcaster.get() == null) {
-            broadcaster.compareAndSet(null, sseContext.newBroadcaster());
-        }
-        
+    public void broadcast(@Context SseEventSink sink) {
         try {
-            broadcaster.get().register(output);
-            
-            broadcaster.get().broadcast(createStatsEvent(sseContext.newEvent().name("book"), 1000));
-            broadcaster.get().broadcast(createStatsEvent(sseContext.newEvent().name("book"), 2000));
-            
-            return output;
+            broadcaster.subscribe(sink);
         } finally {
             latch.countDown();
         }
@@ -125,15 +109,28 @@ public class BookStore {
     public void stop() {
         try {
             // Await a least 2 clients to be broadcasted over 
-            if (!latch.await(4, TimeUnit.SECONDS)) {
+            if (!latch.await(10, TimeUnit.SECONDS)) {
                 LOG.warn("Not enough clients have been connected, closing broadcaster anyway");
             }
+
+            final Builder builder = sse.newEventBuilder();
+            broadcaster.broadcast(createStatsEvent(builder.name("book"), 1000));
+            broadcaster.broadcast(createStatsEvent(builder.name("book"), 2000));
+            
         } catch (final InterruptedException ex) {
             LOG.error("Wait has been interrupted", ex);
         }
         
-        if (broadcaster.get() != null) {
-            broadcaster.get().close();
+        if (broadcaster != null) {
+            broadcaster.close();
         }
+    }
+    
+    private static OutboundSseEvent createStatsEvent(final OutboundSseEvent.Builder builder, final int eventId) {
+        return builder
+            .id(Integer.toString(eventId))
+            .data(Book.class, new Book("New Book #" + eventId, eventId))
+            .mediaType(MediaType.APPLICATION_JSON_TYPE)
+            .build();
     }
 }

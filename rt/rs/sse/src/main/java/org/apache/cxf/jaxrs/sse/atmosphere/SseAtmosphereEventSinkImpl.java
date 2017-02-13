@@ -28,23 +28,25 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Logger;
 
+import javax.ws.rs.Flow.Subscription;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.sse.OutboundSseEvent;
-import javax.ws.rs.sse.SseEventOutput;
+import javax.ws.rs.sse.SseEventSink;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.atmosphere.cpr.AtmosphereResource;
 import org.atmosphere.cpr.AtmosphereResponse;
 import org.atmosphere.cpr.Broadcaster;
 
-public class SseAtmosphereEventOutputImpl implements SseEventOutput {
-    private static final Logger LOG = LogUtils.getL7dLogger(SseAtmosphereEventOutputImpl.class);
+public class SseAtmosphereEventSinkImpl implements SseEventSink {
+    private static final Logger LOG = LogUtils.getL7dLogger(SseAtmosphereEventSinkImpl.class);
     
     private final AtmosphereResource resource;
     private final MessageBodyWriter<OutboundSseEvent> writer;
+    
     private volatile boolean closed;
     
-    public SseAtmosphereEventOutputImpl(final MessageBodyWriter<OutboundSseEvent> writer, 
+    public SseAtmosphereEventSinkImpl(final MessageBodyWriter<OutboundSseEvent> writer, 
             final AtmosphereResource resource) {
         this.writer = writer;
         this.resource = resource;
@@ -84,9 +86,9 @@ public class SseAtmosphereEventOutputImpl implements SseEventOutput {
             }
         }
     }
-
+    
     @Override
-    public void write(OutboundSseEvent event) throws IOException {
+    public void onNext(OutboundSseEvent event) {
         if (!closed && writer != null) {
             try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
                 writer.writeTo(event, event.getClass(), null, new Annotation [] {}, event.getMediaType(), null, os);
@@ -110,8 +112,29 @@ public class SseAtmosphereEventOutputImpl implements SseEventOutput {
                 } catch (final TimeoutException ex) {
                     LOG.warning("SSE Atmosphere response was not delivered within default timeout");
                 }
+            } catch(final IOException ex) {
+                LOG.warning("While writing the SSE event, an exception was raised: " + ex);
             }
         }
+    }
+    
+    @Override
+    public void onError(Throwable throwable) {
+        // TODO: Should we close the response?
+    }
+    
+    @Override
+    public void onComplete() {
+        try {
+            close();
+        } catch (final IOException ex) {
+            LOG.warning("While closing the SSE connection, an exception was raised: " + ex);
+        }
+    }
+    
+    @Override
+    public void onSubscribe(Subscription subscription) {
+        subscription.request(Long.MAX_VALUE);
     }
 
     @Override
